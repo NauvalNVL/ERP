@@ -6,7 +6,7 @@
     <!-- Sidebar Menu -->
     <nav class="flex-1 px-2 py-4 space-y-2">
         <!-- System Manager dengan Submenu -->
-        <div x-data="{ open: false }" class="relative group">
+        <div x-data="{ open: false, securityOpen: false }" class="relative group">
             <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-cogs w-5 h-5 mr-3"></i>
@@ -21,10 +21,26 @@
                     <i class="fas fa-tools w-4 h-4 mr-3"></i>
                     <span>System Setup</span>
                 </a>
-                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                    <i class="fas fa-shield-alt w-4 h-4 mr-3"></i>
-                    <span>System Security</span>
-                </a>
+                
+                <!-- System Security dengan Nested Submenu -->
+                <div class="relative">
+                    <button @click="securityOpen = !securityOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <div class="flex items-center">
+                            <i class="fas fa-shield-alt w-4 h-4 mr-3"></i>
+                            <span>System Security</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-xs transition-transform" :class="{ 'transform rotate-90': securityOpen }"></i>
+                    </button>
+                    
+                    <!-- System Security Nested Submenu -->
+                    <div x-show="securityOpen" class="pl-4 mt-1 space-y-1">
+                        <a href="{{ route('users.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-user-plus w-3 h-3 mr-3"></i>
+                            <span>Define User</span>
+                        </a>
+                    </div>
+                </div>
+                
                 <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                     <i class="fas fa-wrench w-4 h-4 mr-3"></i>
                     <span>System Maintenance</span>
