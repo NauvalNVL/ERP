@@ -1,10 +1,11 @@
-<div class="bg-gray-800 text-white w-64 py-4 flex flex-col">
+<div class="flex flex-col h-full bg-gray-800 text-white">
+    <!-- Header -->
     <div class="px-4 py-3 border-b border-gray-700">
         <h1 class="text-xl font-bold">ERP System</h1>
     </div>
     
-    <!-- Sidebar Menu -->
-    <nav class="flex-1 px-2 py-4 space-y-2">
+    <!-- Navigation Menu - dengan flex-grow untuk mendorong user profile ke bawah -->
+    <nav class="flex-grow px-2 py-4 space-y-2 overflow-y-auto hide-scrollbar">
         <!-- System Manager dengan Submenu -->
         <div x-data="{ open: false, securityOpen: false }" class="relative group">
             <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
@@ -151,8 +152,8 @@
         </div>
     </nav>
 
-    <!-- User Profile & Logout -->
-    <div class="border-t border-gray-700 p-4">
+    <!-- User Profile & Logout - akan selalu di bawah -->
+    <div class="border-t border-gray-700 p-4 mt-auto">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
                 <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">

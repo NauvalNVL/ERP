@@ -1,3 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/preflight";
+
+
+@layer utilities {
+    .transform {
+      --tw-translate-x: 0;
+      --tw-translate-y: 0;
+      transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y));
+    }
+}
