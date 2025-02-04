@@ -136,11 +136,38 @@
         </div>
 
         <!-- Material Management -->
-        <div class="relative group">
-            <a href="#" class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                <i class="fas fa-boxes w-5 h-5 mr-3"></i>
-                <span>Material Management</span>
-            </a>
+        <div x-data="{ materialOpen: false }" class="relative group">
+            <button @click="materialOpen = !materialOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                <div class="flex items-center">
+                    <i class="fas fa-boxes w-5 h-5 mr-3"></i>
+                    <span>Material Management</span>
+                </div>
+                <i class="fas fa-chevron-down transition-transform" :class="{ 'transform rotate-180': materialOpen }"></i>
+            </button>
+            
+            <!-- Material Management Submenu -->
+            <div x-show="materialOpen" class="pl-4 mt-2 space-y-1">
+                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-clipboard-list w-4 h-4 mr-3"></i>
+                    <span>System Requirement</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-shopping-basket w-4 h-4 mr-3"></i>
+                    <span>Purchase Order</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-box-open w-4 h-4 mr-3"></i>
+                    <span>Inventory Control</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-calculator w-4 h-4 mr-3"></i>
+                    <span>Costing</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-file-invoice-dollar w-4 h-4 mr-3"></i>
+                    <span>Account</span>
+                </a>
+            </div>
         </div>
 
         <!-- Production Management dengan Submenu Baru -->
