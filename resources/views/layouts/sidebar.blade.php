@@ -39,13 +39,52 @@
                             <i class="fas fa-user-plus w-3 h-3 mr-3"></i>
                             <span>Define User</span>
                         </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-key w-3 h-3 mr-3"></i>
+                            <span>Amend User Password</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-unlock w-3 h-3 mr-3"></i>
+                            <span>Release Locked Password</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-user-lock w-3 h-3 mr-3"></i>
+                            <span>Define User Access Permission</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-copy w-3 h-3 mr-3"></i>
+                            <span>Copy & Paste User Permission</span>
+                        </a>
                     </div>
                 </div>
                 
-                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                    <i class="fas fa-wrench w-4 h-4 mr-3"></i>
-                    <span>System Maintenance</span>
-                </a>
+                <!-- System Maintenance dengan Nested Submenu -->
+                <div class="relative" x-data="{ maintenanceOpen: false }">
+                    <button @click="maintenanceOpen = !maintenanceOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <div class="flex items-center">
+                            <i class="fas fa-wrench w-4 h-4 mr-3"></i>
+                            <span>System Maintenance</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-xs transition-transform" :class="{ 'transform rotate-90': maintenanceOpen }"></i>
+                    </button>
+
+                    <!-- System Maintenance Nested Submenu -->
+                    <div x-show="maintenanceOpen" class="pl-4 mt-1 space-y-1">
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                            <span>Define Business Form</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-money-bill-wave w-3 h-3 mr-3"></i>
+                            <span>Define Foreign Currency</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-print w-3 h-3 mr-3"></i>
+                            <span>View & Print Business Form</span>
+                        </a>
+                    </div>
+                </div>
+                
                 <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                     <i class="fas fa-user-cog w-4 h-4 mr-3"></i>
                     <span>System Administrator</span>
