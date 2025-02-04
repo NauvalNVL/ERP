@@ -97,11 +97,42 @@
         </div>
 
         <!-- Sales Management -->
-        <div class="relative group">
-            <a href="#" class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                <i class="fas fa-chart-line w-5 h-5 mr-3"></i>
-                <span>Sales Management</span>
-            </a>
+        <div x-data="{ salesOpen: false }" class="relative group">
+            <button @click="salesOpen = !salesOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                <div class="flex items-center">
+                    <i class="fas fa-chart-line w-5 h-5 mr-3"></i>
+                    <span>Sales Management</span>
+                </div>
+                <i class="fas fa-chevron-down transition-transform" :class="{ 'transform rotate-180': salesOpen }"></i>
+            </button>
+            
+            <!-- Sales Management Submenu -->
+            <div x-show="salesOpen" class="pl-4 mt-2 space-y-1">
+                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-clipboard-list w-4 h-4 mr-3"></i>
+                    <span>System Requirement</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-calculator w-4 h-4 mr-3"></i>
+                    <span>Standard Costing</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-flask w-4 h-4 mr-3"></i>
+                    <span>Standard Formula</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-shopping-cart w-4 h-4 mr-3"></i>
+                    <span>Sales Order</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-chart-bar w-4 h-4 mr-3"></i>
+                    <span>Sales Analysis</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <i class="fas fa-headset w-4 h-4 mr-3"></i>
+                    <span>Customer Service</span>
+                </a>
+            </div>
         </div>
 
         <!-- Material Management -->
