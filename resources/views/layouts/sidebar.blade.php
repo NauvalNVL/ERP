@@ -3,7 +3,7 @@
     <div class="px-4 py-3 border-b border-gray-700">
         <h1 class="text-xl font-bold">ERP System</h1>
     </div>
-    
+
     <!-- Navigation Menu - dengan flex-grow untuk mendorong user profile ke bawah -->
     <nav class="flex-grow px-2 py-4 space-y-2 overflow-y-auto hide-scrollbar">
         <!-- System Manager dengan Submenu -->
@@ -15,14 +15,52 @@
                 </div>
                 <i class="fas fa-chevron-down transition-transform" :class="{ 'transform rotate-180': open }"></i>
             </button>
-            
+
             <!-- System Manager Submenu -->
             <div x-show="open" class="pl-4 mt-2 space-y-1">
-                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                    <i class="fas fa-tools w-4 h-4 mr-3"></i>
-                    <span>System Setup</span>
-                </a>
-                
+                <!-- System Setup dengan Nested Submenu -->
+                <div class="relative" x-data="{ setupOpen: false }">
+                    <button @click="setupOpen = !setupOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <div class="flex items-center">
+                            <i class="fas fa-tools w-4 h-4 mr-3"></i>
+                            <span>System Setup</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-xs transition-transform" :class="{ 'transform rotate-90': setupOpen }"></i>
+                    </button>
+
+                    <!-- System Setup Nested Submenu -->
+                    <div x-show="setupOpen" class="pl-4 mt-1 space-y-1">
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-cog w-3 h-3 mr-3"></i>
+                            <span>Define Configuration</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-print w-3 h-3 mr-3"></i>
+                            <span>Define Printer</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-code w-3 h-3 mr-3"></i>
+                            <span>Define Customised Program</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-terminal w-3 h-3 mr-3"></i>
+                            <span>Define Program Printer</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-eye w-3 h-3 mr-3"></i>
+                            <span>View & Print Printer</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-file-code w-3 h-3 mr-3"></i>
+                            <span>View & Print Customised Program</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                            <span>View & Print Program Printer</span>
+                        </a>
+                    </div>
+                </div>
+
                 <!-- System Security dengan Nested Submenu -->
                 <div class="relative">
                     <button @click="securityOpen = !securityOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
@@ -32,7 +70,7 @@
                         </div>
                         <i class="fas fa-chevron-right text-xs transition-transform" :class="{ 'transform rotate-90': securityOpen }"></i>
                     </button>
-                    
+
                     <!-- System Security Nested Submenu -->
                     <div x-show="securityOpen" class="pl-4 mt-1 space-y-1">
                         <a href="{{ route('users.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
@@ -53,11 +91,27 @@
                         </a>
                         <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-copy w-3 h-3 mr-3"></i>
-                            <span>Copy & Paste User Permission</span>
+                            <span>Copy & Paste User Access Permission</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-trash-alt w-3 h-3 mr-3"></i>
+                            <span>Purge User Log-in/out Audit Log</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-users w-3 h-3 mr-3"></i>
+                            <span>View & Print User</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-list-alt w-3 h-3 mr-3"></i>
+                            <span>View & Print User Access Permission</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-history w-3 h-3 mr-3"></i>
+                            <span>View & Print User Log-in/out Audit Log</span>
                         </a>
                     </div>
                 </div>
-                
+
                 <!-- System Maintenance dengan Nested Submenu -->
                 <div class="relative" x-data="{ maintenanceOpen: false }">
                     <button @click="maintenanceOpen = !maintenanceOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
@@ -71,12 +125,24 @@
                     <!-- System Maintenance Nested Submenu -->
                     <div x-show="maintenanceOpen" class="pl-4 mt-1 space-y-1">
                         <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                            <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
-                            <span>Define Business Form</span>
+                            <i class="fas fa-coins w-3 h-3 mr-3"></i>
+                            <span>Define ISO Currency</span>
                         </a>
                         <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-money-bill-wave w-3 h-3 mr-3"></i>
                             <span>Define Foreign Currency</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                            <span>Define Business Form</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-list w-3 h-3 mr-3"></i>
+                            <span>View & Print ISO Currency</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                            <i class="fas fa-list-alt w-3 h-3 mr-3"></i>
+                            <span>View & Print Foreign Currency</span>
                         </a>
                         <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-print w-3 h-3 mr-3"></i>
@@ -84,7 +150,7 @@
                         </a>
                     </div>
                 </div>
-                
+
                 <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                     <i class="fas fa-user-cog w-4 h-4 mr-3"></i>
                     <span>System Administrator</span>
@@ -105,7 +171,7 @@
                 </div>
                 <i class="fas fa-chevron-down transition-transform" :class="{ 'transform rotate-180': salesOpen }"></i>
             </button>
-            
+
             <!-- Sales Management Submenu -->
             <div x-show="salesOpen" class="pl-4 mt-2 space-y-1">
                 <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
@@ -179,7 +245,7 @@
                 </div>
                 <i class="fas fa-chevron-down transition-transform" :class="{ 'transform rotate-180': open }"></i>
             </button>
-            
+
             <!-- Production Management Submenu -->
             <div x-show="open" class="pl-4 mt-2 space-y-1">
                 <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
@@ -206,7 +272,7 @@
                 </div>
                 <i class="fas fa-chevron-down transition-transform" :class="{ 'transform rotate-180': open }"></i>
             </button>
-            
+
             <!-- Warehouse Management Submenu -->
             <div x-show="open" class="pl-4 mt-2 space-y-1">
                 <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
@@ -269,4 +335,4 @@
 </div>
 
 <!-- Tambahkan Alpine.js untuk fungsi dropdown -->
-<script src="//unpkg.com/alpinejs" defer></script> 
+<script src="//unpkg.com/alpinejs" defer></script>
