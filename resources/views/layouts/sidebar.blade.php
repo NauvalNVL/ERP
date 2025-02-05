@@ -8,7 +8,7 @@
     <nav class="flex-grow px-2 py-4 space-y-2 overflow-y-auto hide-scrollbar">
         <!-- System Manager -->
         <div x-data="{ open: false, securityOpen: false }" class="relative group">
-            <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-cogs w-5 h-5 mr-3"></i>
                     <span>System Manager</span>
@@ -164,7 +164,7 @@
 
         <!-- Sales Management -->
         <div x-data="{ salesOpen: false }" class="relative group">
-            <button @click="salesOpen = !salesOpen" class="flex items-center justify-between w-full px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <button @click="salesOpen = !salesOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-chart-line w-5 h-5 mr-3"></i>
                     <span>Sales Management</span>
@@ -186,6 +186,7 @@
 
                     <!-- System Requirement Nested Submenu -->
                     <div x-show="requirementOpen" class="pl-4 mt-1 space-y-1">
+
                         <!-- Sales Configuration -->
                         <div class="relative" x-data="{ salesConfigOpen: false }">
                             <button @click="salesConfigOpen = !salesConfigOpen" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
@@ -196,11 +197,142 @@
                                 <i class="fas fa-chevron-right text-xs transition-transform" :class="{ 'transform rotate-90': salesConfigOpen }"></i>
                             </button>
 
-                            <!-- Sales Configuration Nested Submenu -->
                             <div x-show="salesConfigOpen" class="pl-4 mt-1 space-y-1">
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-sliders-h w-3 h-3 mr-3"></i>
                                     <span>Define Sales Configuration</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Standard Requirement -->
+                        <div class="relative" x-data="{ stdReqOpen: false }">
+                            <button @click="stdReqOpen = !stdReqOpen" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <div class="flex items-center">
+                                    <i class="fas fa-clipboard-check w-3 h-3 mr-3"></i>
+                                    <span>Standard Requirement</span>
+                                </div>
+                                <i class="fas fa-chevron-right text-xs transition-transform" :class="{ 'transform rotate-90': stdReqOpen }"></i>
+                            </button>
+
+                            <div x-show="stdReqOpen" class="pl-4 mt-1 space-y-1">
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-users-cog w-3 h-3 mr-3"></i>
+                                    <span>Define Sales Team</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-user-tie w-3 h-3 mr-3"></i>
+                                    <span>Define Salesperson</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-user-friends w-3 h-3 mr-3"></i>
+                                    <span>Define Salesperson Team</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-industry w-3 h-3 mr-3"></i>
+                                    <span>Define Industry</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-globe w-3 h-3 mr-3"></i>
+                                    <span>Define Geo</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-boxes w-3 h-3 mr-3"></i>
+                                    <span>Define Product Group</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-box w-3 h-3 mr-3"></i>
+                                    <span>Define Product</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-drafting-compass w-3 h-3 mr-3"></i>
+                                    <span>Define Product Design</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-scroll w-3 h-3 mr-3"></i>
+                                    <span>Define Paper Quality</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-ban w-3 h-3 mr-3"></i>
+                                    <span>Obsolete/Unobsolete Paper Quality</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-layer-group w-3 h-3 mr-3"></i>
+                                    <span>Define Paper Flute</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-ruler-combined w-3 h-3 mr-3"></i>
+                                    <span>Define Paper Size</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-cut w-3 h-3 mr-3"></i>
+                                    <span>Define Scoring Tool</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-palette w-3 h-3 mr-3"></i>
+                                    <span>Define Color Group</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-fill-drip w-3 h-3 mr-3"></i>
+                                    <span>Define Color</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-paint-roller w-3 h-3 mr-3"></i>
+                                    <span>Define Finishing</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-link w-3 h-3 mr-3"></i>
+                                    <span>Define Stitch Wire</span>
+                                </a>
+
+                                <!-- View & Print Section -->
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Geo</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Product Group</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Product</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Product Design</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Paper Quality</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Paper Flute</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Paper Size</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Scoring Tool</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Color Group</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Color</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Finishing</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Stitch Wire</span>
                                 </a>
                             </div>
                         </div>
@@ -260,37 +392,73 @@
                             </div>
                         </div>
 
-                        <!-- Master Card -->
+                                                <!-- Master Card Nested List -->
                         <div class="relative" x-data="{ masterCardOpen: false }">
                             <button @click="masterCardOpen = !masterCardOpen" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                 <div class="flex items-center">
-                                    <i class="fas fa-credit-card w-3 h-3 mr-3"></i>
+                                    <i class="fas fa-id-card w-3 h-3 mr-3"></i>
                                     <span>Master Card</span>
                                 </div>
                                 <i class="fas fa-chevron-right text-xs transition-transform" :class="{ 'transform rotate-90': masterCardOpen }"></i>
                             </button>
 
-                            <!-- Master Card Nested Submenu -->
+                            <!-- Master Card Submenu -->
                             <div x-show="masterCardOpen" class="pl-4 mt-1 space-y-1">
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                                    <i class="fas fa-plus-circle w-3 h-3 mr-3"></i>
-                                    <span>Define Master Card</span>
-                                </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-edit w-3 h-3 mr-3"></i>
-                                    <span>Update Master Card</span>
+                                    <span>Update MC</span>
                                 </a>
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                                    <i class="fas fa-clock w-3 h-3 mr-3"></i>
-                                    <span>Obsolete/Reactive Master Card</span>
+                                    <i class="fas fa-check w-3 h-3 mr-3"></i>
+                                    <span>Approve MC</span>
                                 </a>
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                                    <i class="fas fa-list w-3 h-3 mr-3"></i>
-                                    <span>View & Print Master Card</span>
+                                    <i class="fas fa-unlock w-3 h-3 mr-3"></i>
+                                    <span>Release Approved MC</span>
                                 </a>
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-ban w-3 h-3 mr-3"></i>
-                                    <span>View & Print Non-Active Master Card</span>
+                                    <span>Obsolate & Reactive MC</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print MC</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                                    <span>View & Print MC Maintenance Log</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                                    <span>View & Print MC Approval Log</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                                    <span>View & Print Non-Active MC</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                                    <span>Initialized MC Maintenance Log</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                                    <span>View & Print MC Print/DC Block Listing</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                                    <span>View & Print MC DC Block Matching</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                                    <span>View & Print MC by Color</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                                    <span>View & Print MC by P/Size P/Quality</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
+                                    <span>View & Print MC by Machine</span>
                                 </a>
                             </div>
                         </div>
@@ -356,7 +524,7 @@
 
         <!-- Material Management -->
         <div x-data="{ materialOpen: false }" class="relative group">
-            <button @click="materialOpen = !materialOpen" class="flex items-center justify-between w-full px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <button @click="materialOpen = !materialOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-boxes w-5 h-5 mr-3"></i>
                     <span>Material Management</span>
@@ -391,7 +559,7 @@
 
         <!-- Production Management -->
         <div x-data="{ productionOpen: false }" class="relative group">
-            <button @click="productionOpen = !productionOpen" class="flex items-center justify-between w-full px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <button @click="productionOpen = !productionOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-industry w-5 h-5 mr-3"></i>
                     <span>Production Management</span>
@@ -418,7 +586,7 @@
 
         <!-- Warehouse Management -->
         <div x-data="{ warehouseOpen: false }" class="relative group">
-            <button @click="warehouseOpen = !warehouseOpen" class="flex items-center justify-between w-full px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <button @click="warehouseOpen = !warehouseOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-warehouse w-5 h-5 mr-3"></i>
                     <span>Warehouse Management</span>
@@ -461,7 +629,7 @@
 
         <!-- Data Mining -->
         <div class="relative group">
-            <a href="#" class="flex items-center px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <a href="#" class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <i class="fas fa-database w-5 h-5 mr-3"></i>
                 <span>Data Mining</span>
             </a>
