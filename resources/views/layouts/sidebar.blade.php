@@ -186,8 +186,7 @@
 
                     <!-- System Requirement Nested Submenu -->
                     <div x-show="requirementOpen" class="pl-4 mt-1 space-y-1">
-
-                        <!-- Sales Configuration -->
+                        <!-- Sales Configuration dan Customer Account tetap di dalam System Requirement -->
                         <div class="relative" x-data="{ salesConfigOpen: false }">
                             <button @click="salesConfigOpen = !salesConfigOpen" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                 <div class="flex items-center">
