@@ -8,7 +8,7 @@
     <nav class="flex-grow px-2 py-4 space-y-2 overflow-y-auto hide-scrollbar">
         <!-- System Manager -->
         <div x-data="{ open: false, securityOpen: false }" class="relative group">
-            <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-cogs w-5 h-5 mr-3"></i>
                     <span>System Manager</span>
@@ -164,7 +164,7 @@
 
         <!-- Sales Management -->
         <div x-data="{ salesOpen: false }" class="relative group">
-            <button @click="salesOpen = !salesOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <button @click="salesOpen = !salesOpen" class="flex items-center justify-between w-full px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-chart-line w-5 h-5 mr-3"></i>
                     <span>Sales Management</span>
@@ -186,7 +186,7 @@
 
                     <!-- System Requirement Nested Submenu -->
                     <div x-show="requirementOpen" class="pl-4 mt-1 space-y-1">
-                        <!-- Sales Configuration dan Customer Account tetap di dalam System Requirement -->
+                        <!-- Sales Configuration -->
                         <div class="relative" x-data="{ salesConfigOpen: false }">
                             <button @click="salesConfigOpen = !salesConfigOpen" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                 <div class="flex items-center">
@@ -205,7 +205,7 @@
                             </div>
                         </div>
 
-                        <!-- Customer Account dengan Nested Submenu -->
+                        <!-- Customer Account -->
                         <div class="relative" x-data="{ customerAccOpen: false }">
                             <button @click="customerAccOpen = !customerAccOpen" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                 <div class="flex items-center">
@@ -256,6 +256,41 @@
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-list w-3 h-3 mr-3"></i>
                                     <span>View & Print Non-Active Customer</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Master Card -->
+                        <div class="relative" x-data="{ masterCardOpen: false }">
+                            <button @click="masterCardOpen = !masterCardOpen" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <div class="flex items-center">
+                                    <i class="fas fa-credit-card w-3 h-3 mr-3"></i>
+                                    <span>Master Card</span>
+                                </div>
+                                <i class="fas fa-chevron-right text-xs transition-transform" :class="{ 'transform rotate-90': masterCardOpen }"></i>
+                            </button>
+
+                            <!-- Master Card Nested Submenu -->
+                            <div x-show="masterCardOpen" class="pl-4 mt-1 space-y-1">
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-plus-circle w-3 h-3 mr-3"></i>
+                                    <span>Define Master Card</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-edit w-3 h-3 mr-3"></i>
+                                    <span>Update Master Card</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-clock w-3 h-3 mr-3"></i>
+                                    <span>Obsolete/Reactive Master Card</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-list w-3 h-3 mr-3"></i>
+                                    <span>View & Print Master Card</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-ban w-3 h-3 mr-3"></i>
+                                    <span>View & Print Non-Active Master Card</span>
                                 </a>
                             </div>
                         </div>
@@ -321,7 +356,7 @@
 
         <!-- Material Management -->
         <div x-data="{ materialOpen: false }" class="relative group">
-            <button @click="materialOpen = !materialOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <button @click="materialOpen = !materialOpen" class="flex items-center justify-between w-full px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-boxes w-5 h-5 mr-3"></i>
                     <span>Material Management</span>
@@ -356,7 +391,7 @@
 
         <!-- Production Management -->
         <div x-data="{ productionOpen: false }" class="relative group">
-            <button @click="productionOpen = !productionOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <button @click="productionOpen = !productionOpen" class="flex items-center justify-between w-full px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-industry w-5 h-5 mr-3"></i>
                     <span>Production Management</span>
@@ -383,7 +418,7 @@
 
         <!-- Warehouse Management -->
         <div x-data="{ warehouseOpen: false }" class="relative group">
-            <button @click="warehouseOpen = !warehouseOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <button @click="warehouseOpen = !warehouseOpen" class="flex items-center justify-between w-full px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-warehouse w-5 h-5 mr-3"></i>
                     <span>Warehouse Management</span>
@@ -426,7 +461,7 @@
 
         <!-- Data Mining -->
         <div class="relative group">
-            <a href="#" class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+            <a href="#" class="flex items-center px-4 py-2 text-base text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <i class="fas fa-database w-5 h-5 mr-3"></i>
                 <span>Data Mining</span>
             </a>
