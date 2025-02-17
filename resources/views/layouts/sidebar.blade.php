@@ -30,7 +30,7 @@
 
                     <!-- System Setup Nested Submenu -->
                     <div x-show="setupOpen" class="pl-4 mt-1 space-y-1">
-                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <a href="{{ route('system-configuration.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-cog w-3 h-3 mr-3"></i>
                             <span>Define Configuration</span>
                         </a>

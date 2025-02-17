@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SystemConfigurationController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -37,3 +38,6 @@ Route::middleware(['auth'])->group(function () {
 // Amend Password Routes
 Route::get('/users/amend-password', [UserController::class, 'showAmendForm'])->name('users.amend-password');
 Route::post('/users/amend-password', [UserController::class, 'updatePassword'])->name('users.update-password');
+
+Route::get('/system-configuration', [SystemConfigurationController::class, 'index'])->name('system-configuration.index');
+Route::put('/system-configuration', [SystemConfigurationController::class, 'update'])->name('system-configuration.update');
