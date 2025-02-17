@@ -77,7 +77,7 @@
                             <i class="fas fa-user-plus w-3 h-3 mr-3"></i>
                             <span>Define User</span>
                         </a>
-                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <a href="{{ route('users.amend-password') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-key w-3 h-3 mr-3"></i>
                             <span>Amend User Password</span>
                         </a>

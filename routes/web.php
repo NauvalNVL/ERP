@@ -33,3 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
 });
+
+// Amend Password Routes
+Route::get('/users/amend-password', [UserController::class, 'showAmendForm'])->name('users.amend-password');
+Route::post('/users/amend-password', [UserController::class, 'updatePassword'])->name('users.update-password');

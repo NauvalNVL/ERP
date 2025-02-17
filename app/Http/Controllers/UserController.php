@@ -150,6 +150,38 @@ class UserController extends Controller
             return back()->with('error', 'Terjadi kesalahan saat menghapus user');
         }
     }
+
+    public function showAmendForm(Request $request)
+    {
+        $user = null;
+        
+        if($request->has('search_user_id')) {
+            $user = User::where('user_id', $request->search_user_id)->first();
+            
+            if(!$user) {
+                return redirect()->route('users.amend-password')
+                    ->with('error', 'User ID tidak ditemukan');
+            }
+        }
+        
+        return view('users.amend', compact('user'));
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,user_id',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = User::where('user_id', $request->user_id)->first();
+        $user->update([
+            'password' => bcrypt($request->new_password)
+        ]);
+
+        return redirect()->route('users.amend-password')
+            ->with('success', 'Password berhasil diperbarui untuk user: '.$user->user_id);
+    }
 }
 
 
