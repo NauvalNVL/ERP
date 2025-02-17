@@ -13,82 +13,82 @@
             @csrf
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Name -->
+                <!-- User ID -->
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                    <input type="text" name="name" id="name" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        value="{{ old('name') }}" required>
-                    @error('name')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Email -->
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" name="email" id="email" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        value="{{ old('email') }}" required>
-                    @error('email')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Password -->
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" name="password" id="password" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        required minlength="8"
-                        oninvalid="this.setCustomValidity('Password harus minimal 8 karakter')"
-                        oninput="this.setCustomValidity('')">
-                    <p class="mt-1 text-sm text-gray-500">Password minimal 8 karakter</p>
-                    @error('password')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Confirm Password -->
-                <div>
-                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                    <input type="password" name="password_confirmation" id="password_confirmation" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        required minlength="8">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Role -->
-                <div>
-                    <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
-                    <select name="role" id="role" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    <label for="user_id" class="block text-sm font-medium text-gray-700">User ID</label>
+                    <input type="text" name="user_id" id="user_id" 
+                        class="form-input"
                         required>
-                        <option value="">Select Role</option>
-                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="manager" {{ old('role') == 'manager' ? 'selected' : '' }}>Manager</option>
-                        <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
+                </div>
+                
+                <!-- Username -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" name="username" id="username" 
+                        class="form-input"
+                        required>
+                </div>
+
+                <!-- Official Name -->
+                <div>
+                    <label for="official_name" class="block text-sm font-medium text-gray-700">Official Name</label>
+                    <input type="text" name="official_name" id="official_name" 
+                        class="form-input"
+                        required>
+                </div>
+
+                <!-- Official Title -->
+                <div>
+                    <label for="official_title" class="block text-sm font-medium text-gray-700">Official Title</label>
+                    <input type="text" name="official_title" id="official_title" 
+                        class="form-input">
+                </div>
+
+                <!-- Mobile Number -->
+                <div>
+                    <label for="mobile_number" class="block text-sm font-medium text-gray-700">Mobile Number</label>
+                    <input type="text" name="mobile_number" id="mobile_number" 
+                        class="form-input">
+                </div>
+
+                <!-- Official Tel -->
+                <div>
+                    <label for="official_tel" class="block text-sm font-medium text-gray-700">Official Telephone</label>
+                    <input type="text" name="official_tel" id="official_tel" 
+                        class="form-input">
+                </div>
+
+                <!-- Password Expiry Date -->
+                <div>
+                    <label for="password_expiry_date" class="block text-sm font-medium text-gray-700">Password Expiry</label>
+                    <div class="flex items-center">
+                        <input type="number" name="password_expiry_date" id="password_expiry_date" 
+                            class="form-input w-32"
+                            min="0"
+                            value="0">
+                        <span class="ml-2 text-sm text-gray-500">days (zero for none)</span>
+                    </div>
+                </div>
+
+                <!-- Amend Expired Password -->
+                <div>
+                    <label for="amend_expired_password" class="block text-sm font-medium text-gray-700">Amend Expired Password</label>
+                    <select name="amend_expired_password" id="amend_expired_password" 
+                        class="form-input">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
                     </select>
-                    @error('role')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
                 </div>
 
                 <!-- Status -->
                 <div>
                     <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                     <select name="status" id="status" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        class="form-input"
                         required>
-                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        <option value="A">A - Active</option>
+                        <option value="O">O - Obsolate</option>
                     </select>
-                    @error('status')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
                 </div>
             </div>
 

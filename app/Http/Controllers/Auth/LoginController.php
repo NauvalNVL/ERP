@@ -10,62 +10,31 @@ use App\Models\User;
 
 class LoginController extends Controller
 {
-    public function index()
+    public function showLoginForm()
     {
-        if (Auth::check()) {
-            return redirect()->route('dashboard');
-        }
         return view('auth.login');
     }
 
-    public function authenticate(Request $request)
+    public function login(Request $request)
     {
-        try {
-            $credentials = $request->validate([
-                'email' => ['required', 'email'],
-                'password' => ['required'],
-            ]);
+        $credentials = $request->validate([
+            'user_id' => 'required|string',
+            'password' => 'required|string',
+        ]);
 
-            // Log untuk debugging
-            Log::info('Login attempt', ['email' => $request->email]);
-
-            // Cek apakah user ada dan aktif
-            $user = User::where('email', $request->email)->first();
-            
-            if (!$user) {
-                Log::info('User not found', ['email' => $request->email]);
-                return back()
-                    ->withInput($request->only('email'))
-                    ->withErrors(['email' => 'Email tidak ditemukan.']);
-            }
-
-            if ($user->status === 'inactive') {
-                Log::info('Inactive user attempted login', ['email' => $request->email]);
-                return back()
-                    ->withInput($request->only('email'))
-                    ->withErrors(['email' => 'Akun Anda tidak aktif.']);
-            }
-
-            // Coba login
-            if (Auth::attempt($credentials, $request->boolean('remember'))) {
-                Log::info('Login successful', ['user_id' => Auth::id()]);
-                
-                $request->session()->regenerate();
-                
-                return redirect()->intended('dashboard');
-            }
-
-            Log::info('Login failed - wrong password', ['email' => $request->email]);
-            return back()
-                ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Email atau password yang dimasukkan tidak sesuai.']);
-
-        } catch (\Exception $e) {
-            Log::error('Login error: ' . $e->getMessage());
-            return back()
-                ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Terjadi kesalahan saat login.']);
+        if (auth()->attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/dashboard');
         }
+
+        return back()->withErrors([
+            'user_id' => 'User ID atau password salah.',
+        ]);
+    }
+
+    public function username()
+    {
+        return 'user_id';
     }
 
     public function logout(Request $request)
