@@ -32,7 +32,7 @@
                     <div x-show="setupOpen" class="pl-4 mt-1 space-y-1">
                         <a href="{{ route('system-configuration.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-cog w-3 h-3 mr-3"></i>
-                            <span>Define Configuration</span>
+                            <span>Define ERP</span>
                         </a>
                         <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-print w-3 h-3 mr-3"></i>
@@ -668,8 +668,8 @@
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" 
-                        class="text-gray-300 hover:text-white flex items-center 
+                <button type="submit"
+                    class="text-gray-300 hover:text-white flex items-center 
                                transition-colors duration-200 ease-in-out">
                     <i class="fas fa-sign-out-alt mr-2"></i>
                     Logout
