@@ -6,7 +6,7 @@
 <div class="container mx-auto px-4 sm:px-6">
     <div class="bg-white shadow-md rounded-lg p-4 sm:p-6">
         <h1 class="text-2xl font-semibold text-gray-900 mb-6">
-            <i class="fas fa-cog mr-2 text-blue-500"></i>System Configuration
+            <i class="fas fa-cog mr-2 text-blue-500"></i>Define Configuration
         </h1>
 
         @if(session('success'))
