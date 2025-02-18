@@ -41,3 +41,9 @@ Route::post('/users/amend-password', [UserController::class, 'updatePassword'])-
 
 Route::get('/system-configuration', [SystemConfigurationController::class, 'index'])->name('system-configuration.index');
 Route::put('/system-configuration', [SystemConfigurationController::class, 'update'])->name('system-configuration.update');
+
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
+
+Route::group(['middleware' => ['auth']], function() {
+    // Semua route yang membutuhkan autentikasi
+});

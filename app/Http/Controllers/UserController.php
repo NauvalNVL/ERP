@@ -14,13 +14,8 @@ class UserController extends Controller
 {
     public function index()
     {
-        try {
-            $users = User::all();
-            return view('users.index', compact('users'));
-        } catch (\Exception $e) {
-            Log::error('Error in UserController@index: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan saat mengambil data users');
-        }
+        $users = User::paginate(10);
+        return view('users.index', compact('users'));
     }
 
     public function create()
