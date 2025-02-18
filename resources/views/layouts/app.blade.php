@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,19 +16,24 @@
         }
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="//unpkg.com/alpinejs" defer></script>
     <style>
         @media (min-width: 1024px) {
             .hide-scrollbar::-webkit-scrollbar {
                 display: none;
             }
+
             .hide-scrollbar {
                 -ms-overflow-style: none;
                 scrollbar-width: none;
             }
         }
+
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
+
 <body class="bg-gray-100">
     <div x-data="{ sidebarOpen: false }" class="min-h-screen">
         <!-- Mobile menu button -->
@@ -38,14 +44,14 @@
         </div>
 
         <!-- Mobile sidebar backdrop -->
-        <div x-show="sidebarOpen" 
-             class="fixed inset-0 z-10 bg-black bg-opacity-50 lg:hidden"
-             @click="sidebarOpen = false"></div>
+        <div x-show="sidebarOpen"
+            class="fixed inset-0 z-10 bg-black bg-opacity-50 lg:hidden"
+            @click="sidebarOpen = false"></div>
 
         <div class="flex min-h-screen">
             <!-- Sidebar -->
             <div :class="{'translate-x-0': sidebarOpen || window.innerWidth >= 1024, '-translate-x-full': !sidebarOpen && window.innerWidth < 1024}"
-                 class="fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out bg-gray-800 overflow-y-auto lg:sticky lg:top-0 lg:translate-x-0 h-screen hide-scrollbar">
+                class="fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out bg-gray-800 overflow-y-auto lg:sticky lg:top-0 lg:translate-x-0 h-screen hide-scrollbar">
                 @include('layouts.sidebar')
             </div>
 
@@ -69,4 +75,5 @@
         </div>
     </div>
 </body>
-</html> 
+
+</html>
