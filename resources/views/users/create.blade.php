@@ -1,106 +1,165 @@
 @extends('layouts.app')
 
-@section('title', 'Add New User - ERP System')
+@section('title', 'Buat User Baru - ERP System')
 
 @section('content')
-<div class="container mx-auto px-4 sm:px-6">
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-900">Add New User</h1>
-    </div>
+<div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white shadow-xl rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-blue-200 pb-3">
+            <i class="fas fa-user-plus text-blue-600 mr-2"></i>Form Pendaftaran User Baru
+        </h2>
 
-    <div class="bg-white shadow-md rounded-lg p-4 sm:p-6">
-        <form action="{{ route('users.store') }}" method="POST" class="space-y-4">
+        <form action="{{ route('users.store') }}" method="POST" class="space-y-6">
             @csrf
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- User ID -->
-                <div>
-                    <label for="user_id" class="block text-sm font-medium text-gray-700">User ID</label>
-                    <input type="text" name="user_id" id="user_id" 
-                        class="form-input"
-                        required>
-                </div>
+            <!-- Section Informasi Utama -->
+            <div class="space-y-6">
+                <h3 class="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+                    <i class="fas fa-id-card mr-2"></i>Informasi Utama
+                </h3>
                 
-                <!-- Username -->
-                <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                    <input type="text" name="username" id="username" 
-                        class="form-input"
-                        required>
-                </div>
-
-                <!-- Official Name -->
-                <div>
-                    <label for="official_name" class="block text-sm font-medium text-gray-700">Official Name</label>
-                    <input type="text" name="official_name" id="official_name" 
-                        class="form-input"
-                        required>
-                </div>
-
-                <!-- Official Title -->
-                <div>
-                    <label for="official_title" class="block text-sm font-medium text-gray-700">Official Title</label>
-                    <input type="text" name="official_title" id="official_title" 
-                        class="form-input">
-                </div>
-
-                <!-- Mobile Number -->
-                <div>
-                    <label for="mobile_number" class="block text-sm font-medium text-gray-700">Mobile Number</label>
-                    <input type="text" name="mobile_number" id="mobile_number" 
-                        class="form-input">
-                </div>
-
-                <!-- Official Tel -->
-                <div>
-                    <label for="official_tel" class="block text-sm font-medium text-gray-700">Official Telephone</label>
-                    <input type="text" name="official_tel" id="official_tel" 
-                        class="form-input">
-                </div>
-
-                <!-- Password Expiry Date -->
-                <div>
-                    <label for="password_expiry_date" class="block text-sm font-medium text-gray-700">Password Expiry</label>
-                    <div class="flex items-center">
-                        <input type="number" name="password_expiry_date" id="password_expiry_date" 
-                            class="form-input w-32"
-                            min="0"
-                            value="0">
-                        <span class="ml-2 text-sm text-gray-500">days (zero for none)</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- User ID -->
+                    <div>
+                        <label for="user_id" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user-tag text-blue-500 mr-1"></i>User ID
+                        </label>
+                        <input type="text" name="user_id" id="user_id" 
+                            class="form-input @error('user_id') border-red-500 @enderror w-full rounded-lg p-3 border-2 border-gray-200 focus:border-blue-500 transition-all"
+                            placeholder="Contoh: EMP001"
+                            value="{{ old('user_id') }}">
+                        @error('user_id')
+                            <p class="text-red-500 text-sm mt-1 animate-pulse">{{ $message }}</p>
+                        @enderror
                     </div>
-                </div>
 
-                <!-- Amend Expired Password -->
-                <div>
-                    <label for="amend_expired_password" class="block text-sm font-medium text-gray-700">Amend Expired Password</label>
-                    <select name="amend_expired_password" id="amend_expired_password" 
-                        class="form-input">
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                    </select>
-                </div>
-
-                <!-- Status -->
-                <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                    <select name="status" id="status" 
-                        class="form-input"
-                        required>
-                        <option value="A">A - Active</option>
-                        <option value="O">O - Obsolate</option>
-                    </select>
+                    <!-- Username -->
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user-circle text-blue-500 mr-1"></i>Username
+                        </label>
+                        <input type="text" name="username" id="username" 
+                            class="form-input @error('username') border-red-500 @enderror w-full rounded-lg p-3 border-2 border-gray-200 focus:border-blue-500 transition-all"
+                            placeholder="Contoh: johndoe"
+                            value="{{ old('username') }}">
+                        @error('username')
+                            <p class="text-red-500 text-sm mt-1 animate-pulse">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
             </div>
 
-            <!-- Buttons -->
-            <div class="flex flex-col sm:flex-row justify-end gap-3 mt-6">
-                <a href="{{ route('users.index') }}" 
-                    class="w-full sm:w-auto text-center inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Cancel
-                </a>
+            <!-- Section Data Pribadi -->
+            <div class="space-y-6">
+                <h3 class="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+                    <i class="fas fa-address-book mr-2"></i>Data Pribadi
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Official Name -->
+                    <div>
+                        <label for="official_name" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-signature text-blue-500 mr-1"></i>Nama Resmi
+                        </label>
+                        <input type="text" name="official_name" id="official_name" 
+                            class="form-input @error('official_name') border-red-500 @enderror w-full rounded-lg p-3 border-2 border-gray-200 focus:border-blue-500 transition-all"
+                            placeholder="Contoh: John Doe"
+                            value="{{ old('official_name') }}">
+                        @error('official_name')
+                            <p class="text-red-500 text-sm mt-1 animate-pulse">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Official Title -->
+                    <div>
+                        <label for="official_title" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-briefcase text-blue-500 mr-1"></i>Jabatan
+                        </label>
+                        <input type="text" name="official_title" id="official_title" 
+                            class="form-input w-full rounded-lg p-3 border-2 border-gray-200 focus:border-blue-500 transition-all"
+                            placeholder="Contoh: Manager Produksi"
+                            value="{{ old('official_title') }}">
+                    </div>
+
+                    <!-- Mobile Number -->
+                    <div>
+                        <label for="mobile_number" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-mobile-alt text-blue-500 mr-1"></i>Nomor HP
+                        </label>
+                        <input type="text" name="mobile_number" id="mobile_number" 
+                            class="form-input w-full rounded-lg p-3 border-2 border-gray-200 focus:border-blue-500 transition-all"
+                            placeholder="Contoh: 08123456789"
+                            value="{{ old('mobile_number') }}">
+                    </div>
+
+                    <!-- Official Tel -->
+                    <div>
+                        <label for="official_tel" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-phone-alt text-blue-500 mr-1"></i>Telepon Kantor
+                        </label>
+                        <input type="text" name="official_tel" id="official_tel" 
+                            class="form-input w-full rounded-lg p-3 border-2 border-gray-200 focus:border-blue-500 transition-all"
+                            placeholder="Contoh: 0211234567"
+                            value="{{ old('official_tel') }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Pengaturan Akun -->
+            <div class="space-y-6">
+                <h3 class="text-lg font-semibold text-blue-700 mb-4 flex items-center">
+                    <i class="fas fa-cogs mr-2"></i>Pengaturan Akun
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Status -->
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user-lock text-blue-500 mr-1"></i>Status Akun
+                        </label>
+                        <select name="status" id="status" 
+                            class="form-select @error('status') border-red-500 @enderror w-full rounded-lg p-3 border-2 border-gray-200 focus:border-blue-500 transition-all">
+                            <option value="A" class="text-green-600">🟢 Active</option>
+                            <option value="O" class="text-red-600">🔴 Obsolate</option>
+                        </select>
+                        @error('status')
+                            <p class="text-red-500 text-sm mt-1 animate-pulse">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Password Expiry Date -->
+                    <div>
+                        <label for="password_expiry_date" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-calendar-times text-blue-500 mr-1"></i>Masa Berlaku Password
+                        </label>
+                        <div class="flex items-center space-x-3">
+                            <input type="number" name="password_expiry_date" id="password_expiry_date" 
+                                class="form-input w-32 rounded-lg p-3 border-2 border-gray-200 focus:border-blue-500 transition-all"
+                                min="0"
+                                value="{{ old('password_expiry_date', 0) }}">
+                            <span class="text-sm text-gray-500">hari (0 = tidak kadaluarsa)</span>
+                        </div>
+                    </div>
+
+                    <!-- Amend Expired Password -->
+                    <div>
+                        <label for="amend_expired_password" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-key text-blue-500 mr-1"></i>Perbarui Password Kadaluarsa
+                        </label>
+                        <select name="amend_expired_password" id="amend_expired_password" 
+                            class="form-select w-full rounded-lg p-3 border-2 border-gray-200 focus:border-blue-500 transition-all">
+                            <option value="Yes">Ya</option>
+                            <option value="No">Tidak</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mt-8">
                 <button type="submit" 
-                    class="w-full sm:w-auto inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                    Create User
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
+                    <i class="fas fa-save mr-2"></i>Simpan User Baru
                 </button>
             </div>
         </form>

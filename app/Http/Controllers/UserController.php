@@ -14,13 +14,8 @@ class UserController extends Controller
 {
     public function index()
     {
-        try {
-            $users = User::all();
-            return view('users.index', compact('users'));
-        } catch (\Exception $e) {
-            Log::error('Error in UserController@index: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan saat mengambil data users');
-        }
+        $users = User::paginate(10);
+        return view('users.index', compact('users'));
     }
 
     public function create()
@@ -35,41 +30,30 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            // Cek apakah email sudah ada
-            if (User::where('email', $request->email)->exists()) {
-                return back()
-                    ->withInput()
-                    ->withErrors(['email' => 'Email sudah digunakan.']);
-            }
+        $validated = $request->validate([
+            'user_id' => 'required|unique:users',
+            'username' => 'required|unique:users',
+            'official_name' => 'required',
+            'password_expiry_date' => 'integer|min:0',
+            'status' => 'required|in:A,O',
+            'amend_expired_password' => 'required|in:Yes,No'
+        ]);
 
-            $validated = $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'password' => ['required', 'string', 'min:8', 'confirmed'],
-                'role' => ['required', Rule::in(['admin', 'manager', 'user'])],
-                'status' => ['required', Rule::in(['active', 'inactive'])]
-            ]);
+        $user = User::create([
+            'user_id' => $validated['user_id'],
+            'username' => $validated['username'],
+            'official_name' => $validated['official_name'],
+            'official_title' => $request->official_title,
+            'mobile_number' => $request->mobile_number,
+            'official_tel' => $request->official_tel,
+            'password' => bcrypt('temporary_password'), // Password default
+            'status' => $validated['status'],
+            'password_expiry_date' => $validated['password_expiry_date'],
+            'amend_expired_password' => $validated['amend_expired_password']
+        ]);
 
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'role' => $validated['role'],
-                'status' => $validated['status']
-            ]);
-
-            Log::info('User created successfully', ['user_id' => $user->id]);
-            return redirect()->route('users.index')
-                ->with('success', 'User berhasil ditambahkan');
-
-        } catch (\Exception $e) {
-            Log::error('Error in UserController@store: ' . $e->getMessage());
-            
-            return back()
-                ->withInput()
-                ->withErrors(['error' => 'Terjadi kesalahan saat menyimpan user baru.']);
-        }
+        return redirect()->route('users.index')
+            ->with('success', 'User '.$user->user_id.' berhasil dibuat');
     }
 
     public function edit(User $user)

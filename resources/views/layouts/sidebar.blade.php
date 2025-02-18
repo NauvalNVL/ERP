@@ -656,3 +656,26 @@
 
 <!-- Tambahkan Alpine.js untuk fungsi dropdown -->
 <script src="//unpkg.com/alpinejs" defer></script>
+
+@auth
+<div class="mt-auto pt-2">
+    <!-- User ID Display -->
+    <div class="px-4 py-2 text-xs text-gray-400 border-t border-gray-700">
+        <div class="flex items-center justify-between">
+            <div>
+                <i class="fas fa-id-badge mr-1"></i>
+                <span class="font-mono">{{ Auth::user()->user_id }}</span>
+            </div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" 
+                        class="text-gray-300 hover:text-white flex items-center 
+                               transition-colors duration-200 ease-in-out">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    Logout
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+@endauth

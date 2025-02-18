@@ -21,8 +21,13 @@ class User extends Authenticatable
         'user_id',
         'username',
         'official_name',
+        'official_title',
+        'mobile_number',
+        'official_tel',
         'password',
-        'status'
+        'status',
+        'password_expiry_date',
+        'amend_expired_password'
     ];
 
     /**
