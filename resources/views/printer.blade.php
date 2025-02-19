@@ -133,6 +133,11 @@
                     <div class="flex justify-between">
                         <span class="font-medium">Printer Driver:</span>
                         <input type="text" id="dialogPrinterDriver" class="text-gray-600 border border-gray-300 rounded-md px-2" />
+                        <button class="ml-2 p-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 transition duration-300" onclick="showDriverModal()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
                     </div>
                     <div class="flex justify-between">
                         <span class="font-medium">Logical Name:</span>
@@ -140,19 +145,89 @@
                     </div>
                 </div>
                 <p class="mt-4 text-gray-600 font-semibold">Guide:</p>
-                <p class="text-gray-600">Printer Type 1 - Network Printer</p>
-                <p class="text-gray-600">Printer Driver, Internal</p>
-                <p class="text-gray-600">This is Server based Printer which prints report from Server to Network Printer. This is good for ASCII and ANSI character sets. Logical Name is needed based on Server Printer setup.</p>
-                <p class="text-gray-600">Printer Driver, Universal</p>
-                <p class="text-gray-600">This is Windows PC based Printers which prints report from PC to IP Network Printers. This is good for International character sets like Thai, Vietnam, etc. Logical Name is needed based on PC Printer setup.</p>
-                <p class="text-gray-600">Printer Driver, Universal: This is available for CPS 2020 and Windows 10 onwards and Business Forms must be in Universal programming code.</p>
-                <p class="text-gray-600">Printer Driver, XPS: This is available for CPS 2020 and Windows 7 onwards and Business Forms must be in Universal programming code.</p>
-                <p class="text-gray-600">Printer Type 2 - Report Viewer: This prints the report into Screen Viewer. Printer Driver is DUMP and Logical Name is blank.</p>
-                <p class="text-gray-600">Printer Type 3 - Excel Writer: This prints the report into Excel. Printer Driver is DUMP and Logical Name is blank.</p>
-                <p class="text-gray-600">Printer Type 4 - UNIX/LINUX CRON Printer: This is good for Distributed Computing architecture where report is processed in Server and sent over to Network Printer.</p>
+                <p class="text-red-600">Printer Type 1 - Network Printer</p>
+                <p class="text-blue-600">Printer Driver, Internal</p>
+                <p class="text-black">This is Server based Printer which prints report from Server to Network Printer. This is good for ASCII and ANSI character sets. Logical Name is needed based on Server Printer setup.</p>
+                <p class="text-blue-600">Printer Driver, Universal</p>
+                <p class="text-black">This is Windows PC based Printers which prints report from PC to IP Network Printers. This is good for International character sets like Thai, Vietnam, etc. Logical Name is needed based on PC Printer setup.</p>
+                <p class="text-blue-600">Printer Driver, MSPDF</p>
+                <p class="text-black">This is available for CPS 2020 and Windows 10 onwards and Business Forms must be in Universal programming code.</p>
+                <p class="text-blue-600">Printer Driver, XPS</p>
+                <p class="text-black">This is available for CPS 2020 and Windows 7 onwards and Business Forms must be in Universal programming code.</p>
+                <p class="text-red-600">Printer Type 2 - Report Viewer</p>
+                <p class="text-black">This prints the report into Screen Viewer. Printer Driver is DUMP and Logical Name is blank.</p>
+                <p class="text-red-600">Printer Type 3 - Excel Writer</p>
+                <p class="text-black">This prints the report into Excel. Printer Driver is DUMP and Logical Name is blank.</p>
+                <p class="text-red-600">Printer Type 4 - UNIX/LINUX CRON Printer</p>
+                <p class="text-black">This is good for Distributed Computing architecture where report is processed in Server and sent over to Network Printer.</p>
                 <div class="mt-4 flex justify-center space-x-2">
                     <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300" onclick="updatePrinterTable()">Update</button>
                     <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300" onclick="closeInfoDialog()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Printer Driver Modal -->
+    <div id="driverModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-3xl shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Printer Driver Table</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">Code</th>
+                                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">Name</th>
+                                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">Path</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('Dump')">
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">Dump</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">Dump</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/dump</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('Epson')">
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">Epson</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">Epson Printer</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/epson</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('HP Laser')">
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">HP Laser</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">HP Laser PCL - A4</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/hplaser</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('HP Laser2')">
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">HP Laser2</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">HP Laser PCL - A4 - Top Zero Margin</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/hplaser2</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('IBM ProPrinter')">
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">IBM ProPrinter</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">IBM ProPrinter</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/ibmproprinter</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('Star Printer')">
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">Star Printer</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">Star Printer</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/starprinter</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('Universal HP Laser')">
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">Universal HP Laser</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">Universal HP Laser Printer - A4</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/universalhplaser</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('Universal HP Laser2')">
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">Universal HP Laser2</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">Universal HP Laser Printer - A3</td>
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/universalhplaser2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 flex justify-center space-x-2">
+                    <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300" onclick="closeDriverModal()">Close</button>
                 </div>
             </div>
         </div>
@@ -208,6 +283,19 @@
 
     function closeInfoDialog() {
         document.getElementById('infoDialog').classList.add('hidden');
+    }
+
+    function showDriverModal() {
+        document.getElementById('driverModal').classList.remove('hidden');
+    }
+
+    function closeDriverModal() {
+        document.getElementById('driverModal').classList.add('hidden');
+    }
+
+    function selectDriver(driverName) {
+        document.getElementById('dialogPrinterDriver').value = driverName; // Set driver name in the input
+        closeDriverModal(); // Close the driver modal
     }
 </script>
 @endsection
