@@ -12,7 +12,6 @@ class SystemConfigurationController extends Controller
     {
         $config = DB::table('system_configurations')->first();
         
-        // Jika tabel kosong, buat data default
         if (!$config) {
             DB::table('system_configurations')->insert([
                 'business_name' => 'Default Business',
@@ -28,11 +27,19 @@ class SystemConfigurationController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-            
             $config = DB::table('system_configurations')->first();
         }
 
-        return view('system-configuration', compact('config'));
+        $configModules = [
+            ['title' => 'Tax Data', 'icon' => 'percent', 'color' => 'bg-purple-100 text-purple-800'],
+            ['title' => 'Base Currency', 'icon' => 'dollar-sign', 'color' => 'bg-green-100 text-green-800'],
+            ['title' => 'Password Policy', 'icon' => 'lock', 'color' => 'bg-red-100 text-red-800'],
+            ['title' => 'Security Policy', 'icon' => 'shield-alt', 'color' => 'bg-blue-100 text-blue-800'],
+            ['title' => 'Email', 'icon' => 'envelope', 'color' => 'bg-cyan-100 text-cyan-800'],
+            ['title' => '3rd Party Software', 'icon' => 'cubes', 'color' => 'bg-orange-100 text-orange-800']
+        ];
+        
+        return view('system-configuration', compact('config', 'configModules'));
     }
 
     public function update(Request $request)
@@ -52,5 +59,18 @@ class SystemConfigurationController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Configuration updated successfully!');
+    }
+
+    public function showTaxData()
+    {
+        return view('system-configuration.tax-data');
+    }
+
+    public function updateTaxData(Request $request)
+    {
+        // Logika untuk update tax data
+        // ...
+
+        return redirect()->back()->with('success', 'Tax data updated successfully!');
     }
 } 

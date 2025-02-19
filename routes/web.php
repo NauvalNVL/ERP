@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SystemConfigurationController;
+use App\Http\Controllers\PrinterController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -43,3 +44,4 @@ Route::prefix('system-configuration')->group(function () {
     Route::get('/', [SystemConfigurationController::class, 'index'])->name('system-configuration.index');
     Route::put('/', [SystemConfigurationController::class, 'update'])->name('system-configuration.update');
 });
+Route::get('/define-printer', [PrinterController::class, 'index'])->name('define-printer');
