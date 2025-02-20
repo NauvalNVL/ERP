@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SystemConfigurationController;
 use App\Http\Controllers\PrinterController;
+use App\Http\Controllers\CustomisedProgramController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -34,6 +35,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::get('/customised-program', [CustomisedProgramController::class, 'index'])->name('customised-program.index');
+    Route::post('/customised-program', [CustomisedProgramController::class, 'store'])->name('customised-program.store');
 });
 
 // Amend Password Routes

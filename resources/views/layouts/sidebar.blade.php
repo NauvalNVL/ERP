@@ -38,7 +38,7 @@
                             <i class="fas fa-print w-3 h-3 mr-3"></i>
                             <span>Define Printer</span>
                         </a>
-                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <a href="{{ route('customised-program.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-code w-3 h-3 mr-3"></i>
                             <span>Define Customised Program</span>
                         </a>
