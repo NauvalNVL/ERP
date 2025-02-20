@@ -170,64 +170,66 @@
 
     <!-- Printer Driver Modal -->
     <div id="driverModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-3xl shadow-lg rounded-md bg-white">
-            <div class="mt-3 text-center">
-                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Printer Driver Table</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-                        <thead class="bg-gray-100">
+        <div class="relative top-20 mx-auto p-8 border w-11/12 max-w-4xl shadow-2xl rounded-xl bg-white">
+            <div class="mt-3">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Printer Driver Selection</h3>
+                <div class="overflow-x-auto rounded-xl shadow-md border border-gray-100">
+                    <table class="min-w-full bg-white">
+                        <thead class="bg-gradient-to-r from-blue-500 to-blue-600">
                             <tr>
-                                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">Code</th>
-                                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">Name</th>
-                                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-700">Path</th>
+                                <th class="py-3 px-6 text-left text-sm font-semibold text-white">Code</th>
+                                <th class="py-3 px-6 text-left text-sm font-semibold text-white">Name</th>
+                                <th class="py-3 px-6 text-left text-sm font-semibold text-white">Path</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('Dump')">
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">Dump</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">Dump</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/dump</td>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="hover:bg-blue-50 transition-colors duration-200 cursor-pointer" onclick="selectDriver('Dump')">
+                                <td class="py-4 px-6 text-sm font-medium text-gray-700">Dump</td>
+                                <td class="py-4 px-6 text-sm text-gray-600">Dump</td>
+                                <td class="py-4 px-6 text-sm text-gray-500 font-mono">/p/mix/lib/drivers/pt/dump</td>
                             </tr>
-                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('Epson')">
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">Epson</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">Epson Printer</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/epson</td>
+                            <tr class="hover:bg-blue-50 transition-colors duration-200 cursor-pointer" onclick="selectDriver('Epson')">
+                                <td class="py-4 px-6 text-sm font-medium text-gray-700">Epson</td>
+                                <td class="py-4 px-6 text-sm text-gray-600">Epson Printer</td>
+                                <td class="py-4 px-6 text-sm text-gray-500 font-mono">/p/mix/lib/drivers/pt/epson</td>
                             </tr>
-                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('HP Laser')">
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">HP Laser</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">HP Laser PCL - A4</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/hplaser</td>
+                            <tr class="hover:bg-blue-50 transition-colors duration-200 cursor-pointer" onclick="selectDriver('HP Laser')">
+                                <td class="py-4 px-6 text-sm font-medium text-gray-700">HP Laser</td>
+                                <td class="py-4 px-6 text-sm text-gray-600">HP Laser PCL - A4</td>
+                                <td class="py-4 px-6 text-sm text-gray-500 font-mono">/p/mix/lib/drivers/pt/hplaser</td>
                             </tr>
-                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('HP Laser2')">
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">HP Laser2</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">HP Laser PCL - A4 - Top Zero Margin</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/hplaser2</td>
+                            <tr class="hover:bg-blue-50 transition-colors duration-200 cursor-pointer" onclick="selectDriver('HP Laser2')">
+                                <td class="py-4 px-6 text-sm font-medium text-gray-700">HP Laser2</td>
+                                <td class="py-4 px-6 text-sm text-gray-600">HP Laser PCL - A4 - Top Zero Margin</td>
+                                <td class="py-4 px-6 text-sm text-gray-500 font-mono">/p/mix/lib/drivers/pt/hplaser2</td>
                             </tr>
-                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('IBM ProPrinter')">
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">IBM ProPrinter</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">IBM ProPrinter</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/ibmproprinter</td>
+                            <tr class="hover:bg-blue-50 transition-colors duration-200 cursor-pointer" onclick="selectDriver('IBM ProPrinter')">
+                                <td class="py-4 px-6 text-sm font-medium text-gray-700">IBM ProPrinter</td>
+                                <td class="py-4 px-6 text-sm text-gray-600">IBM ProPrinter</td>
+                                <td class="py-4 px-6 text-sm text-gray-500 font-mono">/p/mix/lib/drivers/pt/ibmproprinter</td>
                             </tr>
-                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('Star Printer')">
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">Star Printer</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">Star Printer</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/starprinter</td>
+                            <tr class="hover:bg-blue-50 transition-colors duration-200 cursor-pointer" onclick="selectDriver('Star Printer')">
+                                <td class="py-4 px-6 text-sm font-medium text-gray-700">Star Printer</td>
+                                <td class="py-4 px-6 text-sm text-gray-600">Star Printer</td>
+                                <td class="py-4 px-6 text-sm text-gray-500 font-mono">/p/mix/lib/drivers/pt/starprinter</td>
                             </tr>
-                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('Universal HP Laser')">
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">Universal HP Laser</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">Universal HP Laser Printer - A4</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/universalhplaser</td>
+                            <tr class="hover:bg-blue-50 transition-colors duration-200 cursor-pointer" onclick="selectDriver('Universal HP Laser')">
+                                <td class="py-4 px-6 text-sm font-medium text-gray-700">Universal HP Laser</td>
+                                <td class="py-4 px-6 text-sm text-gray-600">Universal HP Laser Printer - A4</td>
+                                <td class="py-4 px-6 text-sm text-gray-500 font-mono">/p/mix/lib/drivers/pt/universalhplaser</td>
                             </tr>
-                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="selectDriver('Universal HP Laser2')">
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">Universal HP Laser2</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">Universal HP Laser Printer - A3</td>
-                                <td class="py-2 px-4 border-b text-sm text-gray-600">/p/mix/lib/drivers/pt/universalhplaser2</td>
+                            <tr class="hover:bg-blue-50 transition-colors duration-200 cursor-pointer" onclick="selectDriver('Universal HP Laser2')">
+                                <td class="py-4 px-6 text-sm font-medium text-gray-700">Universal HP Laser2</td>
+                                <td class="py-4 px-6 text-sm text-gray-600">Universal HP Laser Printer - A3</td>
+                                <td class="py-4 px-6 text-sm text-gray-500 font-mono">/p/mix/lib/drivers/pt/universalhplaser2</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-4 flex justify-center space-x-2">
-                    <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300" onclick="closeDriverModal()">Close</button>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button class="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-gray-600 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50" onclick="closeDriverModal()">
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>
