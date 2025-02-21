@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SystemConfigurationController;
 use App\Http\Controllers\PrinterController;
 use App\Http\Controllers\CustomisedProgramController;
+use App\Http\Controllers\ProgramPrinterController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -48,3 +49,4 @@ Route::prefix('system-configuration')->group(function () {
     Route::put('/', [SystemConfigurationController::class, 'update'])->name('system-configuration.update');
 });
 Route::get('/define-printer', [PrinterController::class, 'index'])->name('define-printer');
+Route::get('/program-printer', [ProgramPrinterController::class, 'index'])->name('program-printer.index');
