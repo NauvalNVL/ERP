@@ -6,6 +6,7 @@ use App\Http\Controllers\SystemConfigurationController;
 use App\Http\Controllers\PrinterController;
 use App\Http\Controllers\CustomisedProgramController;
 use App\Http\Controllers\ProgramPrinterController;
+use App\Http\Controllers\SalesConfigurationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,6 +32,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
+
+    Route::get('/sales-configuration', [SalesConfigurationController::class, 'index'])->name('sales-configuration.index');
+    Route::post('/sales-configuration', [SalesConfigurationController::class, 'store'])->name('sales-configuration.store');
+    Route::put('/sales-configuration', [SalesConfigurationController::class, 'update'])->name('sales-configuration.update');
 });
 
 Route::middleware(['auth'])->group(function () {
