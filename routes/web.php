@@ -36,6 +36,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/sales-configuration', [SalesConfigurationController::class, 'index'])->name('sales-configuration.index');
     Route::post('/sales-configuration', [SalesConfigurationController::class, 'store'])->name('sales-configuration.store');
     Route::put('/sales-configuration', [SalesConfigurationController::class, 'update'])->name('sales-configuration.update');
+
+    Route::get('/system-configuration', [SystemConfigurationController::class, 'index'])->name('system-configuration.index');
+    Route::put('/system-configuration', [SystemConfigurationController::class, 'update'])->name('system-configuration.update');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -46,8 +49,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Amend Password Routes
-Route::get('/users/amend-password', [UserController::class, 'showAmendForm'])->name('users.amend-password');
-Route::post('/users/amend-password', [UserController::class, 'updatePassword'])->name('users.update-password');
+Route::get('/system-security/amend-password', [UserController::class, 'showAmendForm'])->name('users.amend-password');
+Route::post('/system-security/amend-password', [UserController::class, 'updatePassword'])->name('users.update-password');
 
 Route::prefix('system-configuration')->group(function () {
     Route::get('/', [SystemConfigurationController::class, 'index'])->name('system-configuration.index');

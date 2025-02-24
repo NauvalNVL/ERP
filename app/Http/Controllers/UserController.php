@@ -15,13 +15,13 @@ class UserController extends Controller
     public function index()
     {
         $users = User::paginate(10);
-        return view('users.index', compact('users'));
+        return view('system-security/index', compact('users'));
     }
 
     public function create()
     {
         try {
-            return view('users.create');
+            return view('system-security/create');
         } catch (\Exception $e) {
             Log::error('Error in UserController@create: ' . $e->getMessage());
             return back()->with('error', 'Terjadi kesalahan saat membuka form create');
@@ -52,14 +52,14 @@ class UserController extends Controller
             'amend_expired_password' => $validated['amend_expired_password']
         ]);
 
-        return redirect()->route('users.index')
+        return redirect()->route('system-security/index')
             ->with('success', 'User '.$user->user_id.' berhasil dibuat');
     }
 
     public function edit(User $user)
     {
         try {
-            return view('users.edit', compact('user'));
+            return view('system-security/edit', compact('user'));
         } catch (\Exception $e) {
             Log::error('Error in UserController@edit: ' . $e->getMessage());
             return back()->with('error', 'Terjadi kesalahan saat membuka form edit');
@@ -70,10 +70,12 @@ class UserController extends Controller
     {
         try {
             $rules = [
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-                'role' => ['required', Rule::in(['admin', 'manager', 'user'])],
-                'status' => ['required', Rule::in(['active', 'inactive'])]
+                'user_id' => ['required', Rule::unique('users')->ignore($user->id)],
+                'username' => ['required', Rule::unique('users')->ignore($user->id)],
+                'official_name' => 'required',
+                'status' => 'required|in:A,O',
+                'password_expiry_date' => 'integer|min:0',
+                'amend_expired_password' => 'required|in:Yes,No'
             ];
 
             if ($request->filled('password')) {
@@ -82,34 +84,27 @@ class UserController extends Controller
 
             $validated = $request->validate($rules);
 
-            // Update basic info
-            $user->name = $validated['name'];
-            $user->email = $validated['email'];
-            $user->role = $validated['role'];
-            $user->status = $validated['status'];
+            $updateData = [
+                'user_id' => $validated['user_id'],
+                'username' => $validated['username'],
+                'official_name' => $validated['official_name'],
+                'official_title' => $request->official_title,
+                'mobile_number' => $request->mobile_number,
+                'official_tel' => $request->official_tel,
+                'status' => $validated['status'],
+                'password_expiry_date' => $validated['password_expiry_date'],
+                'amend_expired_password' => $validated['amend_expired_password']
+            ];
 
-            // Update password if provided
             if ($request->filled('password')) {
-                $user->password = Hash::make($validated['password']);
+                $updateData['password'] = Hash::make($validated['password']);
             }
 
-            $user->save();
+            $user->update($updateData);
 
-            Log::info('User updated successfully', ['user_id' => $user->id]);
-            return redirect()->route('users.index')
+            return redirect()->route('system-security/index')
                 ->with('success', 'User berhasil diperbarui');
 
-        } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->errorInfo[1] == 1062) { // MySQL error code for duplicate entry
-                return back()
-                    ->withInput()
-                    ->withErrors(['email' => 'Email sudah digunakan.']);
-            }
-            
-            Log::error('Database error in UserController@update: ' . $e->getMessage());
-            return back()
-                ->withInput()
-                ->withErrors(['error' => 'Terjadi kesalahan database saat memperbarui user.']);
         } catch (\Exception $e) {
             Log::error('Error in UserController@update: ' . $e->getMessage());
             return back()
@@ -121,13 +116,12 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         try {
-            // Prevent self-deletion
             if ($user->id === Auth::id()) {
                 return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
             }
 
             $user->delete();
-            return redirect()->route('users.index')
+            return redirect()->route('system-security/index')
                 ->with('success', 'User berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error in UserController@destroy: ' . $e->getMessage());
@@ -143,12 +137,12 @@ class UserController extends Controller
             $user = User::where('user_id', $request->search_user_id)->first();
             
             if(!$user) {
-                return redirect()->route('users.amend-password')
+                return redirect()->route('system-security/amend-password')
                     ->with('error', 'User ID tidak ditemukan');
             }
         }
         
-        return view('users.amend', compact('user'));
+        return view('system-security/amend', compact('user'));
     }
 
     public function updatePassword(Request $request)
@@ -163,9 +157,7 @@ class UserController extends Controller
             'password' => bcrypt($request->new_password)
         ]);
 
-        return redirect()->route('users.amend-password')
+        return redirect()->route('system-security/amend-password')
             ->with('success', 'Password berhasil diperbarui untuk user: '.$user->user_id);
     }
 }
-
-

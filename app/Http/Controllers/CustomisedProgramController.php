@@ -8,7 +8,7 @@ class CustomisedProgramController extends Controller
 {
     public function index()
     {
-        return view('customisedprogram');
+        return view('system-setup/customisedprogram');
     }
 
     public function store(Request $request)

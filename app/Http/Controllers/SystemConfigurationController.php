@@ -39,7 +39,7 @@ class SystemConfigurationController extends Controller
             ['title' => '3rd Party Software', 'icon' => 'cubes', 'color' => 'bg-orange-100 text-orange-800']
         ];
         
-        return view('system-configuration', compact('config', 'configModules'));
+        return view('system-setup.system-configuration', compact('config', 'configModules'));
     }
 
     public function update(Request $request)
@@ -63,7 +63,7 @@ class SystemConfigurationController extends Controller
 
     public function showTaxData()
     {
-        return view('system-configuration.tax-data');
+        return view('system-setup/system-configuration.tax-data');
     }
 
     public function updateTaxData(Request $request)

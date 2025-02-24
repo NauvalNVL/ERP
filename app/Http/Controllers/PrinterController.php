@@ -6,6 +6,6 @@ class PrinterController extends Controller
 {
     public function index()
     {
-        return view('printer');
+        return view('system-setup/printer');
     }
 }

@@ -8,6 +8,6 @@ class ProgramPrinterController extends Controller
 {
     public function index()
     {
-        return view('programprinter');
+        return view('system-setup/programprinter');
     }
 }
