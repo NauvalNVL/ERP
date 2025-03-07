@@ -31,29 +31,37 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|unique:users',
-            'username' => 'required|unique:users',
-            'official_name' => 'required',
-            'password_expiry_date' => 'integer|min:0',
+            'user_id' => 'required|unique:users|max:20',
+            'username' => 'required|unique:users|max:30',
+            'official_name' => 'required|max:100',
+            'password_expiry_date' => 'required|integer|min:0',
             'status' => 'required|in:A,O',
             'amend_expired_password' => 'required|in:Yes,No'
         ]);
 
-        $user = User::create([
-            'user_id' => $validated['user_id'],
-            'username' => $validated['username'],
-            'official_name' => $validated['official_name'],
-            'official_title' => $request->official_title,
-            'mobile_number' => $request->mobile_number,
-            'official_tel' => $request->official_tel,
-            'password' => bcrypt('temporary_password'), // Password default
-            'status' => $validated['status'],
-            'password_expiry_date' => $validated['password_expiry_date'],
-            'amend_expired_password' => $validated['amend_expired_password']
-        ]);
+        try {
+            $user = User::create([
+                'user_id' => $validated['user_id'],
+                'username' => $validated['username'],
+                'official_name' => $validated['official_name'],
+                'official_title' => $request->official_title,
+                'mobile_number' => $request->mobile_number,
+                'official_tel' => $request->official_tel,
+                'password' => bcrypt('temporary_password'),
+                'status' => $validated['status'],
+                'password_expiry_date' => $validated['password_expiry_date'],
+                'amend_expired_password' => $validated['amend_expired_password']
+            ]);
 
-        return redirect()->route('system-security/index')
-            ->with('success', 'User '.$user->user_id.' berhasil dibuat');
+            return redirect()->route('users.index')
+                ->with('success', 'User '.$user->user_id.' berhasil dibuat');
+
+        } catch (\Exception $e) {
+            Log::error('Error creating user: '.$e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal membuat user: '.$e->getMessage());
+        }
     }
 
     public function edit(User $user)
@@ -68,29 +76,32 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        $rules = [
+            'user_id' => ['required','max:20',Rule::unique('users')->ignore($user->id)],
+            'username' => ['required','max:30',Rule::unique('users')->ignore($user->id)],
+            'official_name' => 'required|max:100',
+            'official_title' => 'nullable|max:50',
+            'mobile_number' => 'nullable|digits_between:10,15',
+            'official_tel' => 'nullable|digits_between:8,15',
+            'status' => 'required|in:A,O',
+            'password_expiry_date' => 'required|integer|min:0',
+            'amend_expired_password' => 'required|in:Yes,No'
+        ];
+
+        if ($request->filled('password')) {
+            $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];
+        }
+
+        $validated = $request->validate($rules);
+
         try {
-            $rules = [
-                'user_id' => ['required', Rule::unique('users')->ignore($user->id)],
-                'username' => ['required', Rule::unique('users')->ignore($user->id)],
-                'official_name' => 'required',
-                'status' => 'required|in:A,O',
-                'password_expiry_date' => 'integer|min:0',
-                'amend_expired_password' => 'required|in:Yes,No'
-            ];
-
-            if ($request->filled('password')) {
-                $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];
-            }
-
-            $validated = $request->validate($rules);
-
             $updateData = [
                 'user_id' => $validated['user_id'],
                 'username' => $validated['username'],
                 'official_name' => $validated['official_name'],
-                'official_title' => $request->official_title,
-                'mobile_number' => $request->mobile_number,
-                'official_tel' => $request->official_tel,
+                'official_title' => $validated['official_title'],
+                'mobile_number' => $validated['mobile_number'],
+                'official_tel' => $validated['official_tel'],
                 'status' => $validated['status'],
                 'password_expiry_date' => $validated['password_expiry_date'],
                 'amend_expired_password' => $validated['amend_expired_password']
@@ -102,30 +113,29 @@ class UserController extends Controller
 
             $user->update($updateData);
 
-            return redirect()->route('system-security/index')
+            return redirect()->route('users.index')
                 ->with('success', 'User berhasil diperbarui');
 
         } catch (\Exception $e) {
-            Log::error('Error in UserController@update: ' . $e->getMessage());
-            return back()
-                ->withInput()
-                ->withErrors(['error' => 'Terjadi kesalahan saat memperbarui user.']);
+            Log::error('Error updating user: '.$e->getMessage());
+            return back()->withInput()
+                ->with('error', 'Gagal memperbarui user. Silakan coba lagi.');
         }
     }
 
     public function destroy(User $user)
     {
         try {
-            if ($user->id === Auth::id()) {
-                return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+            if ($user->user_id === Auth::user()->user_id) {
+                return back()->with('error', 'Tidak dapat menghapus akun sendiri');
             }
 
             $user->delete();
-            return redirect()->route('system-security/index')
+            return redirect()->route('users.index')
                 ->with('success', 'User berhasil dihapus');
         } catch (\Exception $e) {
-            Log::error('Error in UserController@destroy: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan saat menghapus user');
+            Log::error('Error deleting user: '.$e->getMessage());
+            return back()->with('error', 'Gagal menghapus user. Silakan coba lagi.');
         }
     }
 

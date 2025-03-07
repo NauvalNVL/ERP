@@ -18,17 +18,22 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'user_id' => 'required|string',
-            'password' => 'required|string',
+            'user_id' => 'required|string|max:20',
+            'password' => 'required|string|min:8'
         ]);
 
-        if (auth()->attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/dashboard');
+        try {
+            if (Auth::attempt($credentials, $request->remember)) {
+                $request->session()->regenerate();
+                return redirect()->intended('/dashboard');
+            }
+        } catch (\Exception $e) {
+            Log::error('Login error: '.$e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan sistem');
         }
 
         return back()->withErrors([
-            'user_id' => 'User ID atau password salah.',
+            'user_id' => 'Kredensial tidak valid',
         ]);
     }
 

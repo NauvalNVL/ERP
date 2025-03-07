@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SystemConfigurationController extends Controller
 {
@@ -44,21 +45,24 @@ class SystemConfigurationController extends Controller
 
     public function update(Request $request)
     {
-        DB::table('system_configurations')->update([
-            'business_name' => $request->business_name,
-            'registration_number' => $request->registration_number,
-            'cps_version' => $request->cps_version,
-            'display_registration' => $request->has('display_registration'),
-            'logo_appear_time' => $request->logo_appear_time,
-            'date_validity_start' => $request->date_validity_start,
-            'date_validity_end' => $request->date_validity_end,
-            'turbo_loop_engine' => $request->turbo_loop_engine,
-            'financial_system_code' => $request->financial_system_code,
-            'period_end_closing' => $request->period_end_closing,
-            'updated_at' => now(),
+        $validated = $request->validate([
+            'business_name' => 'required|max:100',
+            'registration_number' => 'required|max:50',
+            'cps_version' => 'required|max:20',
+            'logo_appear_time' => 'required|integer|min:1|max:60',
+            'date_validity_start' => 'required|date',
+            'date_validity_end' => 'required|date|after:date_validity_start',
+            'financial_system_code' => 'required|max:10',
+            'period_end_closing' => 'required|max:50'
         ]);
 
-        return redirect()->back()->with('success', 'Configuration updated successfully!');
+        try {
+            DB::table('system_configurations')->update($validated);
+            return redirect()->back()->with('success', 'Konfigurasi berhasil diperbarui');
+        } catch (\Exception $e) {
+            Log::error('Error updating system config: '.$e->getMessage());
+            return back()->with('error', 'Gagal menyimpan konfigurasi');
+        }
     }
 
     public function showTaxData()

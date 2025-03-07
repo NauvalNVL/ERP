@@ -5,6 +5,23 @@
 @section('content')
 <div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
     <div class="bg-white shadow-xl rounded-lg p-8">
+        @if ($errors->any())
+        <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg">
+            <i class="fas fa-exclamation-circle mr-2"></i> Terdapat kesalahan dalam input data:
+            <ul class="mt-2 list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg">
+            <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
+        </div>
+        @endif
+
         <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-blue-200 pb-3">
             <i class="fas fa-user-plus text-blue-600 mr-2"></i>Form Pendaftaran User Baru
         </h2>
