@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SalesConfigurationController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SalesTeamController;
+use App\Http\Controllers\SalespersonController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -42,3 +44,19 @@ Route::middleware(['auth'])->group(function () {
 // Amend Password Routes
 Route::get('/system-security/amend-password', [UserController::class, 'showAmendForm'])->name('users.amend-password');
 Route::post('/system-security/amend-password', [UserController::class, 'updatePassword'])->name('users.update-password');
+
+Route::get('/sales-team', [SalesTeamController::class, 'index'])->name('sales-team.index');
+Route::post('/sales-team', [SalesTeamController::class, 'store'])->name('sales-team.store');
+Route::get('/sales-team/search', [SalesTeamController::class, 'search'])->name('sales-team.search');
+Route::get('/sales-team/{id}/edit', [SalesTeamController::class, 'edit'])->name('sales-team.edit');
+Route::put('/sales-team/{id}', [SalesTeamController::class, 'update'])->name('sales-team.update');
+Route::delete('/sales-team/{id}', [SalesTeamController::class, 'destroy'])->name('sales-team.destroy');
+
+// Salesperson Routes
+Route::get('/salesperson', [SalespersonController::class, 'index'])->name('salesperson.index');
+Route::get('/salesperson/create', [SalespersonController::class, 'create'])->name('salesperson.create');
+Route::post('/salesperson', [SalespersonController::class, 'store'])->name('salesperson.store');
+Route::get('/salesperson/{id}/edit', [SalespersonController::class, 'edit'])->name('salesperson.edit');
+Route::put('/salesperson/{id}', [SalespersonController::class, 'update'])->name('salesperson.update');
+Route::delete('/salesperson/{id}', [SalespersonController::class, 'destroy'])->name('salesperson.destroy');
+Route::get('/salesperson/search', [SalespersonController::class, 'search'])->name('salesperson.search');
