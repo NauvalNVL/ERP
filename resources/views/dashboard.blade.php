@@ -8,7 +8,7 @@
 <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
     <div class="flex items-center justify-between">
         <div>
-            <h3 class="text-xl font-semibold text-gray-800">Selamat Datang, {{ Auth::user()->name }}</h3>
+            <h3 class="text-xl font-semibold text-gray-800">Welcome, {{ Auth::user()->name }}</h3>
             <p class="text-gray-600 mt-1">{{ now()->format('l, d F Y') }}</p>
         </div>
         <div class="bg-blue-100 p-2 rounded-full">
@@ -24,10 +24,10 @@
     <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500 hover:shadow-md transition duration-300">
         <div class="flex justify-between items-center">
             <div>
-                <p class="text-sm text-gray-500 font-medium">Total Penjualan</p>
-                <h4 class="text-2xl font-bold text-gray-800">Rp 8.5 Jt</h4>
+                <p class="text-sm text-gray-500 font-medium">Total Sales</p>
+                <h4 class="text-2xl font-bold text-gray-800">$8.5K</h4>
                 <p class="text-xs text-green-500 mt-1">
-                    <span class="font-bold">↑ 12%</span> dari bulan lalu
+                    <span class="font-bold">↑ 12%</span> from last month
                 </p>
             </div>
             <div class="bg-blue-100 p-3 rounded-full">
@@ -42,10 +42,10 @@
     <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-green-500 hover:shadow-md transition duration-300">
         <div class="flex justify-between items-center">
             <div>
-                <p class="text-sm text-gray-500 font-medium">Produk Terjual</p>
+                <p class="text-sm text-gray-500 font-medium">Products Sold</p>
                 <h4 class="text-2xl font-bold text-gray-800">254</h4>
                 <p class="text-xs text-green-500 mt-1">
-                    <span class="font-bold">↑ 8%</span> dari bulan lalu
+                    <span class="font-bold">↑ 8%</span> from last month
                 </p>
             </div>
             <div class="bg-green-100 p-3 rounded-full">
@@ -60,10 +60,10 @@
     <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-purple-500 hover:shadow-md transition duration-300">
         <div class="flex justify-between items-center">
             <div>
-                <p class="text-sm text-gray-500 font-medium">Pelanggan Baru</p>
+                <p class="text-sm text-gray-500 font-medium">New Customers</p>
                 <h4 class="text-2xl font-bold text-gray-800">45</h4>
                 <p class="text-xs text-green-500 mt-1">
-                    <span class="font-bold">↑ 15%</span> dari bulan lalu
+                    <span class="font-bold">↑ 15%</span> from last month
                 </p>
             </div>
             <div class="bg-purple-100 p-3 rounded-full">
@@ -78,10 +78,10 @@
     <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-yellow-500 hover:shadow-md transition duration-300">
         <div class="flex justify-between items-center">
             <div>
-                <p class="text-sm text-gray-500 font-medium">Pesanan Pending</p>
+                <p class="text-sm text-gray-500 font-medium">Pending Orders</p>
                 <h4 class="text-2xl font-bold text-gray-800">12</h4>
                 <p class="text-xs text-red-500 mt-1">
-                    <span class="font-bold">↑ 3</span> dari kemarin
+                    <span class="font-bold">↑ 3</span> from yesterday
                 </p>
             </div>
             <div class="bg-yellow-100 p-3 rounded-full">
@@ -96,7 +96,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
     <!-- Chart -->
     <div class="bg-white rounded-lg shadow-sm p-6 lg:col-span-2">
-        <h4 class="text-lg font-semibold text-gray-800 mb-4">Grafik Penjualan</h4>
+        <h4 class="text-lg font-semibold text-gray-800 mb-4">Sales Chart</h4>
         <div class="h-64">
             <canvas id="salesChart"></canvas>
         </div>
@@ -104,7 +104,7 @@
 
     <!-- Recent Activities -->
     <div class="bg-white rounded-lg shadow-sm p-6">
-        <h4 class="text-lg font-semibold text-gray-800 mb-4">Aktivitas Terbaru</h4>
+        <h4 class="text-lg font-semibold text-gray-800 mb-4">Recent Activities</h4>
         <div class="space-y-4">
             <div class="flex items-start">
                 <div class="bg-blue-100 p-2 rounded-full mr-3">
@@ -113,8 +113,8 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-sm font-medium">Pesanan Baru #1234</p>
-                    <p class="text-xs text-gray-500">2 jam yang lalu</p>
+                    <p class="text-sm font-medium">New Order #1234</p>
+                    <p class="text-xs text-gray-500">2 hours ago</p>
                 </div>
             </div>
             <div class="flex items-start">
@@ -124,8 +124,8 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-sm font-medium">Pembayaran Diterima</p>
-                    <p class="text-xs text-gray-500">4 jam yang lalu</p>
+                    <p class="text-sm font-medium">Payment Received</p>
+                    <p class="text-xs text-gray-500">4 hours ago</p>
                 </div>
             </div>
             <div class="flex items-start">
@@ -135,13 +135,13 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-sm font-medium">Stok Menipis</p>
-                    <p class="text-xs text-gray-500">6 jam yang lalu</p>
+                    <p class="text-sm font-medium">Low Stock Alert</p>
+                    <p class="text-xs text-gray-500">6 hours ago</p>
                 </div>
             </div>
         </div>
         <button class="w-full mt-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded hover:bg-gray-200 transition duration-300">
-            Lihat Semua Aktivitas
+            View All Activities
         </button>
     </div>
 </div>
@@ -150,15 +150,15 @@
     <!-- Recent Orders -->
     <div class="bg-white rounded-lg shadow-sm p-6">
         <div class="flex justify-between items-center mb-4">
-            <h4 class="text-lg font-semibold text-gray-800">Pesanan Terbaru</h4>
-            <a href="#" class="text-sm text-blue-500 hover:underline">Lihat Semua</a>
+            <h4 class="text-lg font-semibold text-gray-800">Recent Orders</h4>
+            <a href="#" class="text-sm text-blue-500 hover:underline">View All</a>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead>
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggan</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                     </tr>
@@ -168,25 +168,25 @@
                         <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">#1234</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">Ahmad Fauzi</td>
                         <td class="px-4 py-3 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Selesai</span>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">Rp 1.250.000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">$1,250.00</td>
                     </tr>
                     <tr>
                         <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">#1233</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">Siti Nurhaliza</td>
                         <td class="px-4 py-3 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Proses</span>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Processing</span>
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">Rp 850.000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">$850.00</td>
                     </tr>
                     <tr>
                         <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">#1232</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">Budi Santoso</td>
                         <td class="px-4 py-3 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Dibatalkan</span>
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Cancelled</span>
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">Rp 2.100.000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">$2,100.00</td>
                     </tr>
                 </tbody>
             </table>
@@ -194,8 +194,8 @@
     </div>
 
     <!-- Quick Actions -->
-<div class="bg-white rounded-lg shadow-sm p-6">
-        <h4 class="text-lg font-semibold text-gray-800 mb-4">Aksi Cepat</h4>
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h4 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h4>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
             <a href="#" class="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-300">
                 <div class="bg-blue-100 p-3 rounded-full mb-2">
@@ -203,7 +203,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                 </div>
-                <span class="text-sm font-medium text-gray-700">Tambah Produk</span>
+                <span class="text-sm font-medium text-gray-700">Add Product</span>
             </a>
             <a href="#" class="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition duration-300">
                 <div class="bg-green-100 p-3 rounded-full mb-2">
@@ -211,7 +211,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                 </div>
-                <span class="text-sm font-medium text-gray-700">Buat Pesanan</span>
+                <span class="text-sm font-medium text-gray-700">Create Order</span>
             </a>
             <a href="#" class="flex flex-col items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition duration-300">
                 <div class="bg-purple-100 p-3 rounded-full mb-2">
@@ -219,7 +219,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </div>
-                <span class="text-sm font-medium text-gray-700">Tambah Pelanggan</span>
+                <span class="text-sm font-medium text-gray-700">Add Customer</span>
             </a>
             <a href="#" class="flex flex-col items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition duration-300">
                 <div class="bg-yellow-100 p-3 rounded-full mb-2">
@@ -227,7 +227,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                 </div>
-                <span class="text-sm font-medium text-gray-700">Laporan</span>
+                <span class="text-sm font-medium text-gray-700">Reports</span>
             </a>
             <a href="#" class="flex flex-col items-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition duration-300">
                 <div class="bg-red-100 p-3 rounded-full mb-2">
@@ -235,7 +235,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <span class="text-sm font-medium text-gray-700">Keuangan</span>
+                <span class="text-sm font-medium text-gray-700">Finance</span>
             </a>
             <a href="#" class="flex flex-col items-center p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition duration-300">
                 <div class="bg-indigo-100 p-3 rounded-full mb-2">
@@ -244,17 +244,17 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </div>
-                <span class="text-sm font-medium text-gray-700">Pengaturan</span>
+                <span class="text-sm font-medium text-gray-700">Settings</span>
             </a>
         </div>
     </div>
 </div>
 
-<!-- Tambahkan grafik kategori produk -->
+<!-- Product Categories Chart -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <!-- Product Categories Chart -->
     <div class="bg-white rounded-lg shadow-sm p-6">
-        <h4 class="text-lg font-semibold text-gray-800 mb-4">Kategori Produk</h4>
+        <h4 class="text-lg font-semibold text-gray-800 mb-4">Product Categories</h4>
         <div class="h-64">
             <canvas id="productChart"></canvas>
         </div>
@@ -262,11 +262,11 @@
     
     <!-- Performance Metrics -->
     <div class="bg-white rounded-lg shadow-sm p-6">
-        <h4 class="text-lg font-semibold text-gray-800 mb-4">Performa Bulanan</h4>
+        <h4 class="text-lg font-semibold text-gray-800 mb-4">Monthly Performance</h4>
         <div class="space-y-4">
             <div>
                 <div class="flex justify-between mb-1">
-                    <span class="text-sm font-medium text-gray-700">Target Penjualan</span>
+                    <span class="text-sm font-medium text-gray-700">Sales Target</span>
                     <span class="text-sm font-medium text-gray-700">85%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -275,7 +275,7 @@
             </div>
             <div>
                 <div class="flex justify-between mb-1">
-                    <span class="text-sm font-medium text-gray-700">Kepuasan Pelanggan</span>
+                    <span class="text-sm font-medium text-gray-700">Customer Satisfaction</span>
                     <span class="text-sm font-medium text-gray-700">92%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -284,7 +284,7 @@
             </div>
             <div>
                 <div class="flex justify-between mb-1">
-                    <span class="text-sm font-medium text-gray-700">Pengiriman Tepat Waktu</span>
+                    <span class="text-sm font-medium text-gray-700">On-time Delivery</span>
                     <span class="text-sm font-medium text-gray-700">78%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -293,7 +293,7 @@
             </div>
             <div>
                 <div class="flex justify-between mb-1">
-                    <span class="text-sm font-medium text-gray-700">Konversi Pengunjung</span>
+                    <span class="text-sm font-medium text-gray-700">Visitor Conversion</span>
                     <span class="text-sm font-medium text-gray-700">65%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -309,12 +309,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Data untuk grafik penjualan
+        // Sales chart data
         const salesData = {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             datasets: [
                 {
-                    label: 'Penjualan 2023',
+                    label: 'Sales 2023',
                     data: [5.2, 6.3, 8.5, 7.8, 8.2, 7.5, 9.1, 10.5, 11.2, 9.8, 8.7, 12.3],
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     borderColor: 'rgba(59, 130, 246, 0.8)',
@@ -323,7 +323,7 @@
                     fill: true
                 },
                 {
-                    label: 'Penjualan 2022',
+                    label: 'Sales 2022',
                     data: [4.8, 5.7, 7.2, 6.5, 7.1, 6.8, 8.2, 9.3, 9.8, 8.5, 7.9, 10.5],
                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
                     borderColor: 'rgba(16, 185, 129, 0.8)',
@@ -334,7 +334,7 @@
             ]
         };
 
-        // Konfigurasi grafik
+        // Chart configuration
         const config = {
             type: 'line',
             data: salesData,
@@ -358,7 +358,7 @@
                         displayColors: false,
                         callbacks: {
                             label: function(context) {
-                                return context.dataset.label + ': Rp ' + context.parsed.y + ' Jt';
+                                return context.dataset.label + ': $' + context.parsed.y + 'K';
                             }
                         }
                     }
@@ -373,7 +373,7 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return 'Rp ' + value + ' Jt';
+                                return '$' + value + 'K';
                             }
                         }
                     }
@@ -381,17 +381,17 @@
             }
         };
 
-        // Inisialisasi grafik
+        // Initialize chart
         const salesChart = new Chart(
             document.getElementById('salesChart'),
             config
         );
 
-        // Grafik kedua - Perbandingan Kategori Produk
+        // Product categories chart
         const productData = {
-            labels: ['Elektronik', 'Fashion', 'Makanan', 'Furniture', 'Kesehatan'],
+            labels: ['Electronics', 'Fashion', 'Food', 'Furniture', 'Health'],
             datasets: [{
-                label: 'Penjualan per Kategori',
+                label: 'Sales by Category',
                 data: [35, 25, 20, 15, 5],
                 backgroundColor: [
                     'rgba(59, 130, 246, 0.8)',
@@ -404,7 +404,7 @@
             }]
         };
 
-        // Konfigurasi grafik donat
+        // Doughnut chart configuration
         const doughnutConfig = {
             type: 'doughnut',
             data: productData,
@@ -437,7 +437,7 @@
             }
         };
 
-        // Inisialisasi grafik donat
+        // Initialize doughnut chart
         const productChart = new Chart(
             document.getElementById('productChart'),
             doughnutConfig
