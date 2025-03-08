@@ -592,18 +592,24 @@
         </div>
     </nav>
 
-    <!-- User Profile & Logout - akan selalu di bawah -->
+    <!-- User Profile & Logout -->
     <div class="border-t border-gray-700 p-4 mt-auto">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
                 <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
                     <span class="text-sm font-medium">{{ substr(Auth::user()->name, 0, 1) }}</span>
                 </div>
-                <span class="ml-3 text-sm">{{ Auth::user()->name }}</span>
+                <div class="ml-3">
+                    <span class="text-sm font-medium">{{ Auth::user()->name }}</span>
+                    <p class="text-xs text-gray-400">
+                        <i class="fas fa-id-badge mr-1"></i>
+                        <span class="font-mono">{{ Auth::user()->user_id }}</span>
+                    </p>
+                </div>
             </div>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="text-red-400 hover:text-red-300">
+                <button type="submit" class="text-gray-300 hover:text-red-400 transition-colors">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </form>
@@ -611,28 +617,5 @@
     </div>
 </div>
 
-<!-- Tambahkan Alpine.js untuk fungsi dropdown -->
+<!-- Alpine.js for dropdown functionality -->
 <script src="//unpkg.com/alpinejs" defer></script>
-
-@auth
-<div class="mt-auto pt-2">
-    <!-- User ID Display -->
-    <div class="px-4 py-2 text-xs text-gray-400 border-t border-gray-700">
-        <div class="flex items-center justify-between">
-            <div>
-                <i class="fas fa-id-badge mr-1"></i>
-                <span class="font-mono">{{ Auth::user()->user_id }}</span>
-            </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit"
-                    class="text-gray-300 hover:text-white flex items-center 
-                               transition-colors duration-200 ease-in-out">
-                    <i class="fas fa-sign-out-alt mr-2"></i>
-                    Logout
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-@endauth
