@@ -6,6 +6,14 @@
 
     <!-- Navigation Menu -->
     <nav class="flex-grow px-2 py-4 space-y-2 overflow-y-auto hide-scrollbar">
+        <!-- Dashboard -->
+        <div class="relative group">
+            <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+                <span>Dashboard</span>
+            </a>
+        </div>
+        
         <!-- System Manager -->
         <div x-data="{ open: false, securityOpen: false }" class="relative group">
             <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
