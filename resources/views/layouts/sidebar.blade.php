@@ -18,49 +18,6 @@
 
             <!-- System Manager Submenu -->
             <div x-show="open" class="pl-4 mt-2 space-y-1">
-                <!-- System Setup dengan Nested Submenu -->
-                <div class="relative" x-data="{ setupOpen: false }">
-                    <button @click="setupOpen = !setupOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                        <div class="flex items-center">
-                            <i class="fas fa-tools w-4 h-4 mr-3"></i>
-                            <span>System Setup</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-xs transition-transform" :class="{ 'transform rotate-90': setupOpen }"></i>
-                    </button>
-
-                    <!-- System Setup Nested Submenu -->
-                    <div x-show="setupOpen" class="pl-4 mt-1 space-y-1">
-                        <a href="{{ route('system-configuration.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                            <i class="fas fa-cog w-3 h-3 mr-3"></i>
-                            <span>Define ERP</span>
-                        </a>
-                        <a href="{{ route('define-printer') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                            <i class="fas fa-print w-3 h-3 mr-3"></i>
-                            <span>Define Printer</span>
-                        </a>
-                        <a href="{{ route('customised-program.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                            <i class="fas fa-code w-3 h-3 mr-3"></i>
-                            <span>Define Customised Program</span>
-                        </a>
-                        <a href="{{ route('program-printer.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                            <i class="fas fa-terminal w-3 h-3 mr-3"></i>
-                            <span>Define Program Printer</span>
-                        </a>
-                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                            <i class="fas fa-eye w-3 h-3 mr-3"></i>
-                            <span>View & Print Printer</span>
-                        </a>
-                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                            <i class="fas fa-file-code w-3 h-3 mr-3"></i>
-                            <span>View & Print Customised Program</span>
-                        </a>
-                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                            <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
-                            <span>View & Print Program Printer</span>
-                        </a>
-                    </div>
-                </div>
-
                 <!-- System Security dengan Nested Submenu -->
                 <div class="relative">
                     <button @click="securityOpen = !securityOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">

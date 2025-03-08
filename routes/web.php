@@ -2,10 +2,6 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\SystemConfigurationController;
-use App\Http\Controllers\PrinterController;
-use App\Http\Controllers\CustomisedProgramController;
-use App\Http\Controllers\ProgramPrinterController;
 use App\Http\Controllers\SalesConfigurationController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,25 +32,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/sales-configuration', [SalesConfigurationController::class, 'index'])->name('sales-configuration.index');
     Route::post('/sales-configuration', [SalesConfigurationController::class, 'store'])->name('sales-configuration.store');
     Route::put('/sales-configuration', [SalesConfigurationController::class, 'update'])->name('sales-configuration.update');
-
-    Route::get('/system-configuration', [SystemConfigurationController::class, 'index'])->name('system-configuration.index');
-    Route::put('/system-configuration', [SystemConfigurationController::class, 'update'])->name('system-configuration.update');
 });
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-    Route::get('/customised-program', [CustomisedProgramController::class, 'index'])->name('customised-program.index');
-    Route::post('/customised-program', [CustomisedProgramController::class, 'store'])->name('customised-program.store');
 });
 
 // Amend Password Routes
 Route::get('/system-security/amend-password', [UserController::class, 'showAmendForm'])->name('users.amend-password');
 Route::post('/system-security/amend-password', [UserController::class, 'updatePassword'])->name('users.update-password');
-
-Route::prefix('system-configuration')->group(function () {
-    Route::get('/', [SystemConfigurationController::class, 'index'])->name('system-configuration.index');
-    Route::put('/', [SystemConfigurationController::class, 'update'])->name('system-configuration.update');
-});
-Route::get('/define-printer', [PrinterController::class, 'index'])->name('define-printer');
-Route::get('/program-printer', [ProgramPrinterController::class, 'index'])->name('program-printer.index');
