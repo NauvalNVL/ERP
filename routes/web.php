@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SalesConfigurationController;
@@ -10,6 +11,15 @@ use App\Http\Controllers\IndustryController;
 
 Route::get('/', function () {
     return redirect('/login');
+});
+
+Route::get('/test-db', function () {
+    try {
+        DB::connection()->getPdo();
+        return response()->json(['status' => 'Connected']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
 });
 
 Route::middleware('guest')->group(function () {
