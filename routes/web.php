@@ -6,6 +6,7 @@ use App\Http\Controllers\SalesConfigurationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SalesTeamController;
 use App\Http\Controllers\SalespersonController;
+use App\Http\Controllers\IndustryController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -60,3 +61,10 @@ Route::get('/salesperson/{id}/edit', [SalespersonController::class, 'edit'])->na
 Route::put('/salesperson/{id}', [SalespersonController::class, 'update'])->name('salesperson.update');
 Route::delete('/salesperson/{id}', [SalespersonController::class, 'destroy'])->name('salesperson.destroy');
 Route::get('/salesperson/search', [SalespersonController::class, 'search'])->name('salesperson.search');
+
+// Industry Routes
+Route::get('/industry', [IndustryController::class, 'index'])->name('industry.index');
+Route::post('/industry', [IndustryController::class, 'store'])->name('industry.store');
+Route::get('/industry/{id}/edit', [IndustryController::class, 'edit'])->name('industry.edit');
+Route::put('/industry/{id}', [IndustryController::class, 'update'])->name('industry.update');
+Route::delete('/industry/{id}', [IndustryController::class, 'destroy'])->name('industry.destroy');

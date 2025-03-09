@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Pengguna - ERP System')
+@section('title', 'Define User')
+
+@section('header', 'Define User')
 
 @section('content')
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

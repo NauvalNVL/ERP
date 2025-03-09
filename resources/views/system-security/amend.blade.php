@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Ubah Password - ERP System')
+@section('title', 'Amend Password')
+
+@section('header', 'Amend Password')
 
 @section('content')
 <div class="max-w-2xl mx-auto py-6 px-4 sm:px-6 lg:px-8">

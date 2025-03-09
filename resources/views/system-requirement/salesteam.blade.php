@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('title', 'Define Sales Team')
+
+@section('header', 'Define Sales Team')
+
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <div class="bg-white rounded-lg shadow-md p-6">
