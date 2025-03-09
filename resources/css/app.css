@@ -1,10 +1,12 @@
 @import "tailwindcss/preflight";
-
+@import "tailwindcss";
+@source "../views";
 
 @layer utilities {
     .transform {
-      --tw-translate-x: 0;
-      --tw-translate-y: 0;
-      transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y));
+        --tw-translate-x: 0;
+        --tw-translate-y: 0;
+        transform: translateX(var(--tw-translate-x))
+            translateY(var(--tw-translate-y));
     }
 }
