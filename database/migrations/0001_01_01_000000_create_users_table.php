@@ -23,6 +23,7 @@ return new class extends Migration
             $table->char('status', 1);
             $table->date('password_expiry_date');
             $table->string('amend_expired_password');
+            $table->rememberToken();  // <-- TAMBAHKAN INI
             $table->timestamps();
         });
 

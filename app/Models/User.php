@@ -27,7 +27,8 @@ class User extends Authenticatable
         'password',
         'status',
         'password_expiry_date',
-        'amend_expired_password'
+        'amend_expired_password',
+        'remember_token'
     ];
 
     /**
