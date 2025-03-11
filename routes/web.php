@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SalesTeamController;
 use App\Http\Controllers\SalespersonController;
 use App\Http\Controllers\IndustryController;
+use App\Http\Controllers\SalespersonTeamController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -45,6 +46,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/sales-configuration', [SalesConfigurationController::class, 'index'])->name('sales-configuration.index');
     Route::post('/sales-configuration', [SalesConfigurationController::class, 'store'])->name('sales-configuration.store');
     Route::put('/sales-configuration', [SalesConfigurationController::class, 'update'])->name('sales-configuration.update');
+
+    // Salesperson Team Routes
+    Route::get('/salesperson-team', [SalespersonTeamController::class, 'index'])->name('salesperson-team.index');
+    Route::post('/salesperson-team', [SalespersonTeamController::class, 'store'])->name('salesperson-team.store');
+    Route::get('/salesperson-team/{id}/edit', [SalespersonTeamController::class, 'edit'])->name('salesperson-team.edit');
+    Route::put('/salesperson-team/{id}', [SalespersonTeamController::class, 'update'])->name('salesperson-team.update');
+    Route::delete('/salesperson-team/{id}', [SalespersonTeamController::class, 'destroy'])->name('salesperson-team.destroy');
 });
 
 Route::middleware(['auth'])->group(function () {
