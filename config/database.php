@@ -101,11 +101,11 @@ return [
             'driver' => 'sqlsrv',
             'schema' => 'dbo',
             'url'       =>  env('DATABASE_URL'),
-            'host'      =>  '192.168.1.9',    // IP ADDRESS OF YOUR MACHINE 
+            'host'      =>  '127.0.0.1',    // IP ADDRESS OF YOUR MACHINE 
             'port'      =>  '1433',           // PORT
             'database'  =>  'ERP',     // DATABASE
             'username'  =>  'sa',        // user name on MSSQL SERVER
-            'password'  =>  'riomulya', // password on MSSQL SERVER
+            'password'  =>  '12345678', // password on MSSQL SERVER
             'prefix'    =>  '',
             'charset'   => 'utf8',
             'collation' => 'utf8mb4_unicode_ci',

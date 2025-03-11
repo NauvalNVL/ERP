@@ -26,7 +26,7 @@
             @endif
 
             <form class="mt-8 space-y-6" action="{{ route('login') }}" method="POST">
-                @csrf
+                <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                 <div class="rounded-md shadow-sm -space-y-px">
                     <div>
                         <label for="user_id" class="sr-only">User ID</label>
