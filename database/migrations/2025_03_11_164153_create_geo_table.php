@@ -10,6 +10,7 @@ class CreateGeoTable extends Migration
     {
         Schema::create('geo', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();
             $table->string('country');
             $table->string('state');
             $table->string('town');
