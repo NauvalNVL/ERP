@@ -188,7 +188,7 @@
                                     <i class="fas fa-user-tie w-3 h-3 mr-3"></i>
                                     <span>Define Salesperson</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('salesperson-team.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-user-friends w-3 h-3 mr-3"></i>
                                     <span>Define Salesperson Team</span>
                                 </a>
