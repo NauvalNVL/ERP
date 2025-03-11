@@ -9,6 +9,7 @@ use App\Http\Controllers\SalesTeamController;
 use App\Http\Controllers\SalespersonController;
 use App\Http\Controllers\IndustryController;
 use App\Http\Controllers\SalespersonTeamController;
+use App\Http\Controllers\GeoController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -86,3 +87,5 @@ Route::post('/industry', [IndustryController::class, 'store'])->name('industry.s
 Route::get('/industry/{id}/edit', [IndustryController::class, 'edit'])->name('industry.edit');
 Route::put('/industry/{id}', [IndustryController::class, 'update'])->name('industry.update');
 Route::delete('/industry/{id}', [IndustryController::class, 'destroy'])->name('industry.destroy');
+
+Route::resource('geo', GeoController::class);
