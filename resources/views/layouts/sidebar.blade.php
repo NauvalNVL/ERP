@@ -244,10 +244,6 @@
                                     <i class="fas fa-paint-roller w-3 h-3 mr-3"></i>
                                     <span>Define Finishing</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                                    <i class="fas fa-link w-3 h-3 mr-3"></i>
-                                    <span>Define Stitch Wire</span>
-                                </a>
 
                                 <!-- View & Print Section -->
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
@@ -293,10 +289,6 @@
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Finishing</span>
-                                </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
-                                    <span>View & Print Stitch Wire</span>
                                 </a>
                             </div>
                         </div>
