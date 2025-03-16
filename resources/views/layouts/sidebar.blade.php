@@ -200,11 +200,11 @@
                                     <i class="fas fa-globe w-3 h-3 mr-3"></i>
                                     <span>Define Geo</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('product-group.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-boxes w-3 h-3 mr-3"></i>
                                     <span>Define Product Group</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('product.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-box w-3 h-3 mr-3"></i>
                                     <span>Define Product</span>
                                 </a>
@@ -605,22 +605,35 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center">
                 <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
-                    <span class="text-sm font-medium">{{ substr(Auth::user()->name, 0, 1) }}</span>
+                    <span class="text-sm font-medium">{{ Auth::check() ? substr(Auth::user()->name, 0, 1) : 'G' }}</span>
                 </div>
                 <div class="ml-3">
-                    <span class="text-sm font-medium">{{ Auth::user()->name }}</span>
+                    <span class="text-sm font-medium">{{ Auth::check() ? Auth::user()->name : 'Guest' }}</span>
+                    @if(Auth::check())
                     <p class="text-xs text-gray-400">
                         <i class="fas fa-id-badge mr-1"></i>
                         <span class="font-mono">{{ Auth::user()->user_id }}</span>
                     </p>
+                    @else
+                    <p class="text-xs text-gray-400">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        <span class="font-mono">Not logged in</span>
+                    </p>
+                    @endif
                 </div>
             </div>
+            @if(Auth::check())
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="text-gray-300 hover:text-red-400 transition-colors">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </form>
+            @else
+            <a href="{{ route('login') }}" class="text-gray-300 hover:text-green-400 transition-colors">
+                <i class="fas fa-sign-in-alt"></i>
+            </a>
+            @endif
         </div>
     </div>
 </div>

@@ -10,6 +10,8 @@ use App\Http\Controllers\SalespersonController;
 use App\Http\Controllers\IndustryController;
 use App\Http\Controllers\SalespersonTeamController;
 use App\Http\Controllers\GeoController;
+use App\Http\Controllers\ProductGroupController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -54,6 +56,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/salesperson-team/{id}/edit', [SalespersonTeamController::class, 'edit'])->name('salesperson-team.edit');
     Route::put('/salesperson-team/{id}', [SalespersonTeamController::class, 'update'])->name('salesperson-team.update');
     Route::delete('/salesperson-team/{id}', [SalespersonTeamController::class, 'destroy'])->name('salesperson-team.destroy');
+
+    Route::resource('product-group', ProductGroupController::class);
+    Route::resource('product', ProductController::class);
 });
 
 Route::middleware(['auth'])->group(function () {
