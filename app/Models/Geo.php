@@ -14,6 +14,7 @@ class Geo extends Model
 
     // Specify the fillable fields
     protected $fillable = [
+        'code',
         'country',
         'state',
         'town',

@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             SalesTeamSeeder::class,
             SalespersonSeeder::class,
             ProductGroupSeeder::class,
+            GeoSeeder::class,
         ]);
     }
 } 
