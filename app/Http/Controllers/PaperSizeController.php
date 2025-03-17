@@ -2,22 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PapperSize;
+use App\Models\PaperSize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 
-class PapperSizeController extends Controller
+class PaperSizeController extends Controller
 {
     public function index()
     {
         try {
-            $papperSizes = PapperSize::orderBy('size', 'asc')->get();
-            return view('system-requirement.pappersize', compact('papperSizes'));
+            $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+            return view('system-requirement.papersize', compact('paperSizes'));
         } catch (\Exception $e) {
-            Log::error('Error in PapperSizeController@index: ' . $e->getMessage());
-            return view('system-requirement.pappersize', ['papperSizes' => collect([])])
+            Log::error('Error in PaperSizeController@index: ' . $e->getMessage());
+            return view('system-requirement.papersize', ['paperSizes' => collect([])])
                 ->with('error', 'Terjadi kesalahan saat memuat data');
         }
     }
@@ -40,11 +40,11 @@ class PapperSizeController extends Controller
             ]);
 
             // Hitung inches secara manual untuk memastikan data konsisten
-            $inches = PapperSize::convertToInches($validated['size']);
+            $inches = PaperSize::convertToInches($validated['size']);
             
             $createdBy = Auth::check() ? Auth::user()->user_id : 'system';
             
-            PapperSize::create([
+            PaperSize::create([
                 'size' => $validated['size'],
                 'inches' => $inches,
                 'unit' => 'Millimeter',
@@ -55,7 +55,7 @@ class PapperSizeController extends Controller
             return redirect()->route('paper-size.index')
                 ->with('success', 'Ukuran kertas berhasil ditambahkan');
         } catch (\Exception $e) {
-            Log::error('Error in PapperSizeController@store: ' . $e->getMessage());
+            Log::error('Error in PaperSizeController@store: ' . $e->getMessage());
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Gagal menyimpan ukuran kertas: ' . $e->getMessage());
@@ -65,12 +65,12 @@ class PapperSizeController extends Controller
     public function edit($id)
     {
         try {
-            $papperSize = PapperSize::findOrFail($id);
-            $papperSizes = PapperSize::orderBy('size', 'asc')->get();
+            $paperSize = PaperSize::findOrFail($id);
+            $paperSizes = PaperSize::orderBy('size', 'asc')->get();
             
-            return view('system-requirement.pappersize', compact('papperSize', 'papperSizes'));
+            return view('system-requirement.papersize', compact('paperSize', 'paperSizes'));
         } catch (\Exception $e) {
-            Log::error('Error in PapperSizeController@edit: ' . $e->getMessage());
+            Log::error('Error in PaperSizeController@edit: ' . $e->getMessage());
             return redirect()->route('paper-size.index')
                 ->with('error', 'Data ukuran kertas tidak ditemukan');
         }
@@ -79,7 +79,7 @@ class PapperSizeController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $papperSize = PapperSize::findOrFail($id);
+            $paperSize = PaperSize::findOrFail($id);
             
             $validated = $request->validate([
                 'size' => [
@@ -96,11 +96,11 @@ class PapperSizeController extends Controller
             ]);
 
             // Hitung inches secara manual untuk memastikan data konsisten
-            $inches = PapperSize::convertToInches($validated['size']);
+            $inches = PaperSize::convertToInches($validated['size']);
             
             $updatedBy = Auth::check() ? Auth::user()->user_id : 'system';
             
-            $papperSize->update([
+            $paperSize->update([
                 'size' => $validated['size'],
                 'inches' => $inches,
                 'updated_by' => $updatedBy
@@ -109,7 +109,7 @@ class PapperSizeController extends Controller
             return redirect()->route('paper-size.index')
                 ->with('success', 'Ukuran kertas berhasil diperbarui');
         } catch (\Exception $e) {
-            Log::error('Error in PapperSizeController@update: ' . $e->getMessage());
+            Log::error('Error in PaperSizeController@update: ' . $e->getMessage());
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Gagal memperbarui ukuran kertas: ' . $e->getMessage());
@@ -119,13 +119,13 @@ class PapperSizeController extends Controller
     public function destroy($id)
     {
         try {
-            $papperSize = PapperSize::findOrFail($id);
-            $papperSize->delete();
+            $paperSize = PaperSize::findOrFail($id);
+            $paperSize->delete();
             
             return redirect()->route('paper-size.index')
                 ->with('success', 'Ukuran kertas berhasil dihapus');
         } catch (\Exception $e) {
-            Log::error('Error in PapperSizeController@destroy: ' . $e->getMessage());
+            Log::error('Error in PaperSizeController@destroy: ' . $e->getMessage());
             return redirect()->route('paper-size.index')
                 ->with('error', 'Gagal menghapus ukuran kertas: ' . $e->getMessage());
         }

@@ -36,10 +36,10 @@
                 </div>
             @endif
 
-            <form action="{{ isset($papperSize) ? route('paper-size.update', $papperSize->id) : route('paper-size.store') }}" 
+            <form action="{{ isset($paperSize) ? route('paper-size.update', $paperSize->id) : route('paper-size.store') }}" 
                   method="POST" class="mb-6">
                 @csrf
-                @if(isset($papperSize))
+                @if(isset($paperSize))
                     @method('PUT')
                 @endif
 
@@ -120,7 +120,7 @@
                                             </tr>
                                         </thead>
                                         <tbody class="bg-white divide-y divide-gray-200">
-                                            @foreach($papperSizes as $index => $size)
+                                            @foreach($paperSizes as $index => $size)
                                                 <tr class="hover:bg-gray-50">
                                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
                                                         {{ $index + 1 }}
@@ -217,10 +217,10 @@
 
                 <div class="flex space-x-2 mt-6">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                        {{ isset($papperSize) ? 'Update' : 'Save' }}
+                        {{ isset($paperSize) ? 'Update' : 'Save' }}
                     </button>
                     
-                    @if(isset($papperSize))
+                    @if(isset($paperSize))
                         <a href="{{ route('paper-size.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
                             Cancel
                         </a>
@@ -236,8 +236,8 @@
         return {
             showSizeTable: false,
             showEditModal: false,
-            mmValue: {{ isset($papperSize) ? $papperSize->size : old('size', 0) }},
-            inchValue: {{ isset($papperSize) ? $papperSize->inches : old('inches', 0) }},
+            mmValue: {{ isset($paperSize) ? $paperSize->size : old('size', 0) }},
+            inchValue: {{ isset($paperSize) ? $paperSize->inches : old('inches', 0) }},
             tempMmValue: 0,
             tempInchValue: 0,
             

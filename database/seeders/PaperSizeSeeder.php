@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\PapperSize;
+use App\Models\PaperSize;
 use Illuminate\Database\Seeder;
 
-class PapperSizeSeeder extends Seeder
+class PaperSizeSeeder extends Seeder
 {
     public function run()
     {
@@ -60,7 +60,7 @@ class PapperSizeSeeder extends Seeder
         ];
 
         foreach ($paperSizes as $paperSize) {
-            PapperSize::create($paperSize);
+            PaperSize::create($paperSize);
         }
     }
 } 

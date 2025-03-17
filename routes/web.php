@@ -12,7 +12,7 @@ use App\Http\Controllers\SalespersonTeamController;
 use App\Http\Controllers\GeoController;
 use App\Http\Controllers\ProductGroupController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\PapperSizeController;
+use App\Http\Controllers\PaperSizeController;
 use App\Http\Controllers\PaperFluteController;
 
 Route::get('/', function () {
@@ -63,7 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('product', ProductController::class);
 
     // Tambahkan route berikut di dalam middleware auth
-    Route::resource('paper-size', PapperSizeController::class);
+    Route::resource('paper-size', PaperSizeController::class);
 });
 
 Route::middleware(['auth'])->group(function () {
