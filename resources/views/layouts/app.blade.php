@@ -32,6 +32,21 @@
         [x-cloak] {
             display: none !important;
         }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #flutesTable, #flutesTable * {
+                visibility: visible;
+            }
+            #flutesTable {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 

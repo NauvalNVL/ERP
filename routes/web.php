@@ -13,6 +13,7 @@ use App\Http\Controllers\GeoController;
 use App\Http\Controllers\ProductGroupController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PapperSizeController;
+use App\Http\Controllers\PaperFluteController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -98,3 +99,5 @@ Route::put('/industry/{id}', [IndustryController::class, 'update'])->name('indus
 Route::delete('/industry/{id}', [IndustryController::class, 'destroy'])->name('industry.destroy');
 
 Route::resource('geo', GeoController::class);
+
+Route::resource('paper-flute', PaperFluteController::class)->middleware('auth');

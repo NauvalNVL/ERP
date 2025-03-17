@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             ProductGroupSeeder::class,
             GeoSeeder::class,
             PapperSizeSeeder::class,
+            PaperFluteSeeder::class,
         ]);
     }
 } 

@@ -220,7 +220,7 @@
                                     <i class="fas fa-ban w-3 h-3 mr-3"></i>
                                     <span>Obsolete/Unobsolete Paper Quality</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('paper-flute.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-layer-group w-3 h-3 mr-3"></i>
                                     <span>Define Paper Flute</span>
                                 </a>
