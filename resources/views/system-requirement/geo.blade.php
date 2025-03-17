@@ -11,7 +11,6 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
             </svg>
-            Cari Data
         </button>
     </div>
     
@@ -455,11 +454,52 @@
             `;
         }
         
+        // Update tabel dengan data yang sudah diperbarui
+        updateGeoTable();
+        
         // Dalam aplikasi nyata, kita akan mengirim data ke server di sini
         // Misalnya dengan AJAX POST ke endpoint API yang sesuai
         
         // Untuk demo ini, kita bisa menambahkan alert sebagai indikasi
         alert('Data berhasil disimpan!');
+    }
+    
+    // Fungsi untuk memperbarui tampilan tabel berdasarkan data terbaru
+    function updateGeoTable() {
+        const tableBody = document.getElementById('geoTableBody');
+        
+        // Kosongkan tabel terlebih dahulu
+        tableBody.innerHTML = '';
+        
+        // Jika tidak ada data, tampilkan pesan
+        if (geoData.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="7" class="py-6 px-6 text-center text-gray-500">Tidak ada data yang tersedia</td></tr>';
+            return;
+        }
+        
+        // Isi tabel dengan data terbaru
+        geoData.forEach((geo, index) => {
+            const row = document.createElement('tr');
+            row.className = 'border-b border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors duration-150';
+            row.setAttribute('data-code', geo.code);
+            row.setAttribute('data-area', geo.area);
+            row.onclick = function() { selectGeoRow(this); };
+            
+            row.innerHTML = `
+                <td class="py-3 px-6">${index + 1}</td>
+                <td class="py-3 px-6 font-medium">${geo.code}</td>
+                <td class="py-3 px-6">${geo.country}</td>
+                <td class="py-3 px-6">${geo.state || ''}</td>
+                <td class="py-3 px-6">${geo.town || ''}</td>
+                <td class="py-3 px-6">${geo.town_section || ''}</td>
+                <td class="py-3 px-6">${geo.area || ''}</td>
+            `;
+            
+            tableBody.appendChild(row);
+        });
+        
+        // Tambahkan kembali event handler untuk baris tabel
+        modifyTableRowHandlers();
     }
     
     function toggleModal(modalId) {
