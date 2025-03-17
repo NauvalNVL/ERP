@@ -14,6 +14,7 @@ use App\Http\Controllers\ProductGroupController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaperSizeController;
 use App\Http\Controllers\PaperFluteController;
+use App\Http\Controllers\ScoringToolController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -64,6 +65,14 @@ Route::middleware('auth')->group(function () {
 
     // Tambahkan route berikut di dalam middleware auth
     Route::resource('paper-size', PaperSizeController::class);
+
+    // Scoring Tool Routes
+    Route::get('/scoring-tool', [ScoringToolController::class, 'index'])->name('scoring-tool.index');
+    Route::post('/scoring-tool', [ScoringToolController::class, 'store'])->name('scoring-tool.store');
+    Route::get('/scoring-tool/{id}/edit', [ScoringToolController::class, 'edit'])->name('scoring-tool.edit');
+    Route::put('/scoring-tool/{id}', [ScoringToolController::class, 'update'])->name('scoring-tool.update');
+    Route::delete('/scoring-tool/{id}', [ScoringToolController::class, 'destroy'])->name('scoring-tool.destroy');
+    Route::get('/scoring-tool/{id}', [ScoringToolController::class, 'show'])->name('scoring-tool.show');
 });
 
 Route::middleware(['auth'])->group(function () {

@@ -208,9 +208,9 @@
                                     <i class="fas fa-box w-3 h-3 mr-3"></i>
                                     <span>Define Product</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                                    <i class="fas fa-drafting-compass w-3 h-3 mr-3"></i>
-                                    <span>Define Product Design</span>
+                                <a href="{{ route('scoring-tool.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-cut w-3 h-3 mr-3"></i>
+                                    <span>Define Scoring Tool</span>
                                 </a>
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-scroll w-3 h-3 mr-3"></i>
@@ -227,10 +227,6 @@
                                 <a href="{{ route('paper-size.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-ruler-combined w-3 h-3 mr-3"></i>
                                     <span>Define Paper Size</span>
-                                </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
-                                    <i class="fas fa-cut w-3 h-3 mr-3"></i>
-                                    <span>Define Scoring Tool</span>
                                 </a>
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-palette w-3 h-3 mr-3"></i>

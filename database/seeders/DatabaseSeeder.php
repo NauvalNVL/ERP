@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             GeoSeeder::class,
             PaperSizeSeeder::class,
             PaperFluteSeeder::class,
+            ScoringToolSeeder::class,
+            UserSeeder::class,
         ]);
     }
 } 
