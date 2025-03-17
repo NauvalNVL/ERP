@@ -2,81 +2,77 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <!-- Toolbar dengan tampilan ultra-modern -->
-    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 p-5 rounded-2xl shadow-2xl mb-8 border-b-4 border-indigo-800 transition-all duration-300 hover:shadow-blue-200/50 transform hover:-translate-y-1">
-        <div class="flex items-center justify-between space-x-4">
-            <div class="flex items-center space-x-3">
-                <button id="newButton" type="button" class="p-3 bg-white/90 border-0 rounded-xl hover:bg-blue-50 transition-all duration-300 shadow hover:shadow-lg transform hover:-translate-y-1 hover:scale-105" title="Baru">
-                    <i class="fas fa-file text-blue-600 text-xl"></i>
+    <!-- Toolbar minimalis modern -->
+    <div class="bg-white p-4 rounded-lg shadow-sm mb-6 border border-gray-100">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <button id="newButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Baru">
+                    <i class="fas fa-file text-gray-600"></i>
                 </button>
-                <button id="editButton" type="button" class="p-3 bg-white/90 border-0 rounded-xl hover:bg-blue-50 transition-all duration-300 shadow hover:shadow-lg transform hover:-translate-y-1 hover:scale-105" title="Edit">
-                    <i class="fas fa-edit text-blue-600 text-xl"></i>
+                <button id="editButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Edit">
+                    <i class="fas fa-edit text-gray-600"></i>
                 </button>
-                <button id="deleteButton" type="button" class="p-3 bg-white/90 border-0 rounded-xl hover:bg-red-50 transition-all duration-300 shadow hover:shadow-lg transform hover:-translate-y-1 hover:scale-105" title="Hapus">
-                    <i class="fas fa-trash-alt text-red-600 text-xl"></i>
+                <button id="deleteButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Hapus">
+                    <i class="fas fa-trash-alt text-gray-600"></i>
                 </button>
-                <div class="h-10 mx-4 border-r-2 border-white/50"></div>
-                <button id="printButton" type="button" class="p-3 bg-white/90 border-0 rounded-xl hover:bg-blue-50 transition-all duration-300 shadow hover:shadow-lg transform hover:-translate-y-1 hover:scale-105" title="Cetak">
-                    <i class="fas fa-print text-blue-600 text-xl"></i>
+                <div class="h-6 mx-2 border-r border-gray-200"></div>
+                <button id="printButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Cetak">
+                    <i class="fas fa-print text-gray-600"></i>
                 </button>
-                <button id="searchButton" type="button" class="p-3 bg-white/90 border-0 rounded-xl hover:bg-blue-50 transition-all duration-300 shadow hover:shadow-lg transform hover:-translate-y-1 hover:scale-105" title="Cari">
-                    <i class="fas fa-search text-blue-600 text-xl"></i>
+                <button id="searchButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Cari">
+                    <i class="fas fa-search text-gray-600"></i>
                 </button>
             </div>
-            <button id="refreshButton" type="button" class="p-3 bg-white/90 border-0 rounded-xl hover:bg-green-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105" title="Refresh">
-                <i class="fas fa-sync-alt text-green-600 text-xl animate-spin-slow"></i>
+            <button id="refreshButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Refresh">
+                <i class="fas fa-sync-alt text-gray-600"></i>
             </button>
         </div>
     </div>
 
-    <!-- Header yang lebih menarik dan dinamis -->
-    <div class="flex items-center mb-10">
-        <div class="relative">
-            <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-800">
-                Define Paper Flute
-            </h1>
-            <span class="absolute -bottom-3 left-0 h-2 w-48 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-md"></span>
-            <span class="absolute -bottom-3 left-0 h-2 w-24 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full animate-pulse"></span>
-        </div>
+    <!-- Header sederhana -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-gray-800">Define Paper Flute</h1>
+        <div class="h-1 w-20 bg-blue-500 mt-2 rounded-full"></div>
     </div>
 
-    <!-- Card utama dengan desain ultra-modern -->
-    <div class="bg-white/95 p-8 rounded-2xl shadow-2xl border-0 transition-all duration-300 hover:shadow-blue-100 backdrop-blur-sm">
-        <!-- Form pencarian dengan tampilan yang lebih modern dan efek glassmorphism -->
-        <div class="mb-8 flex items-center bg-gradient-to-r from-blue-50/90 to-indigo-50/90 p-6 rounded-2xl border-l-4 border-blue-500 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-md">
-            <label for="paperFluteSearch" class="mr-4 w-32 font-bold text-gray-700">Paper Flute:</label>
-            <input type="text" id="paperFluteSearch" class="border border-gray-300 p-3 rounded-xl w-96 focus:ring-3 focus:ring-blue-400/40 focus:border-blue-500 transition-all duration-300 shadow-inner" placeholder="Pilih paper flute..." readonly>
-            <button id="openModalButton" type="button" class="ml-3 p-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white border-0 rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
-                <i class="fas fa-ellipsis-h"></i>
-            </button>
+    <!-- Card utama minimalis -->
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+        <!-- Form pencarian minimalis -->
+        <div class="mb-6 flex items-center">
+            <label for="paperFluteSearch" class="mr-4 w-32 font-medium text-gray-700">Paper Flute:</label>
+            <div class="relative flex-1">
+                <input type="text" id="paperFluteSearch" class="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400 transition-all duration-200" placeholder="Pilih paper flute..." readonly>
+                <button id="openModalButton" type="button" class="absolute right-1 top-1 p-1.5 bg-gray-100 text-gray-700 border-0 rounded-md hover:bg-gray-200 transition-all duration-200">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+            </div>
         </div>
 
-        <!-- Tabel dengan desain yang lebih modern dan animasi -->
-        <div id="flutesTable" class="mt-10 hidden animate__animated animate__fadeIn">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-extrabold text-gray-800 flex items-center">
-                    <i class="fas fa-table text-indigo-600 mr-3"></i>
+        <!-- Tabel minimalis -->
+        <div id="flutesTable" class="mt-6 hidden animate__animated animate__fadeIn">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">
                     Daftar Paper Flute
                 </h2>
-                <div class="bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 text-white text-sm font-semibold px-5 py-2 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300">
+                <div class="bg-blue-500 text-white text-xs font-medium px-3 py-1 rounded-md">
                     Data Terpilih
                 </div>
             </div>
-            <div class="overflow-hidden rounded-2xl border border-gray-200 shadow-2xl transition-all duration-300 hover:shadow-indigo-100/50">
+            <div class="overflow-hidden rounded-md border border-gray-200">
                 <table class="min-w-full bg-white">
                     <thead>
-                        <tr class="bg-gradient-to-r from-gray-100 to-blue-50 text-gray-700">
-                            <th class="py-4 px-6 border-b border-gray-200 text-left font-extrabold">Kode</th>
-                            <th class="py-4 px-6 border-b border-gray-200 text-left font-extrabold">Nama</th>
-                            <th class="py-4 px-6 border-b border-gray-200 text-left font-extrabold">Deskripsi</th>
+                        <tr class="bg-gray-50 text-gray-600">
+                            <th class="py-3 px-4 border-b border-gray-200 text-left font-medium text-xs uppercase">Kode</th>
+                            <th class="py-3 px-4 border-b border-gray-200 text-left font-medium text-xs uppercase">Nama</th>
+                            <th class="py-3 px-4 border-b border-gray-200 text-left font-medium text-xs uppercase">Deskripsi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($paperFlutes as $flute)
-                        <tr class="hover:bg-blue-50 border-b border-gray-100 transition-all duration-300 cursor-pointer">
-                            <td class="py-4 px-6 font-medium text-blue-700">{{ $flute->code }}</td>
-                            <td class="py-4 px-6">{{ $flute->name }}</td>
-                            <td class="py-4 px-6 text-gray-600">{{ $flute->description }}</td>
+                        <tr class="hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 cursor-pointer">
+                            <td class="py-3 px-4 font-medium text-blue-600">{{ $flute->code }}</td>
+                            <td class="py-3 px-4">{{ $flute->name }}</td>
+                            <td class="py-3 px-4 text-gray-600">{{ $flute->description }}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -86,65 +82,63 @@
     </div>
 </div>
 
-<!-- Modal Box untuk Paper Flute dengan desain yang lebih responsif -->
-<div id="paperFluteModal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center hidden z-50 transition-all duration-300 animate__animated animate__fadeIn p-4">
-    <div class="bg-white/95 rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 w-full max-w-3xl transform transition-all duration-300 animate__animated animate__zoomIn border-t-4 border-blue-600">
-        <div class="flex justify-between items-center mb-4 sm:mb-6 border-b border-gray-200 pb-4">
-            <h3 class="text-lg sm:text-xl font-bold text-gray-800 flex items-center">
-                <i class="fas fa-layer-group text-blue-600 mr-2 sm:mr-3"></i>
+<!-- Modal Box untuk Paper Flute minimalis -->
+<div id="paperFluteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50 transition-all duration-200 animate__animated animate__fadeIn p-4">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl transform transition-all duration-200 animate__animated animate__zoomIn">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-800">
                 Pilih Paper Flute
             </h3>
-            <button id="closeModalButton" class="text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-full p-2 sm:p-3 transition-colors">
+            <button id="closeModalButton" class="text-gray-500 hover:text-gray-700 p-1">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         
-        <div class="mb-4 sm:mb-6 relative">
-            <input type="text" id="searchModalInput" placeholder="Cari paper flute..." class="w-full p-3 sm:p-4 pl-10 sm:pl-12 border border-gray-300 rounded-xl focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm">
-            <i class="fas fa-search absolute left-3 sm:left-4 top-3 sm:top-4 text-gray-400"></i>
+        <div class="mb-4 relative">
+            <input type="text" id="searchModalInput" placeholder="Cari paper flute..." class="w-full p-2 pl-8 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400">
+            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
         </div>
         
-        <div class="max-h-60 sm:max-h-80 overflow-y-auto rounded-xl border border-gray-200 shadow-xl hover:shadow-blue-100/50 transition-all duration-300">
+        <div class="max-h-80 overflow-y-auto rounded-md border border-gray-200">
             <table class="min-w-full bg-white">
-                <thead class="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 z-10 shadow-sm">
+                <thead class="sticky top-0 bg-gray-50 z-10">
                     <tr>
-                        <th class="py-3 sm:py-4 px-3 sm:px-6 border-b text-left font-bold text-gray-700 text-xs sm:text-sm">Kode</th>
-                        <th class="py-3 sm:py-4 px-3 sm:px-6 border-b text-left font-bold text-gray-700 text-xs sm:text-sm">Nama</th>
-                        <th class="py-3 sm:py-4 px-3 sm:px-6 border-b text-left font-bold text-gray-700 text-xs sm:text-sm hidden sm:table-cell">Deskripsi</th>
+                        <th class="py-2 px-4 border-b text-left font-medium text-xs uppercase text-gray-600">Kode</th>
+                        <th class="py-2 px-4 border-b text-left font-medium text-xs uppercase text-gray-600">Nama</th>
+                        <th class="py-2 px-4 border-b text-left font-medium text-xs uppercase text-gray-600 hidden sm:table-cell">Deskripsi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($paperFlutes as $flute)
-                    <tr class="hover:bg-blue-50 cursor-pointer flute-row border-b border-gray-100 transition-all duration-200" data-code="{{ $flute->code }}" data-name="{{ $flute->name }}">
-                        <td class="py-2 sm:py-4 px-3 sm:px-6 font-medium text-blue-700 text-xs sm:text-sm">{{ $flute->code }}</td>
-                        <td class="py-2 sm:py-4 px-3 sm:px-6 text-xs sm:text-sm">{{ $flute->name }}</td>
-                        <td class="py-2 sm:py-4 px-3 sm:px-6 text-gray-600 text-xs sm:text-sm hidden sm:table-cell">{{ $flute->description }}</td>
+                    <tr class="hover:bg-gray-50 cursor-pointer flute-row border-b border-gray-100" data-code="{{ $flute->code }}" data-name="{{ $flute->name }}">
+                        <td class="py-2 px-4 font-medium text-blue-600">{{ $flute->code }}</td>
+                        <td class="py-2 px-4">{{ $flute->name }}</td>
+                        <td class="py-2 px-4 text-gray-600 hidden sm:table-cell">{{ $flute->description }}</td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
         
-        <div class="flex flex-col sm:flex-row justify-end mt-4 sm:mt-6 space-y-3 sm:space-y-0 sm:space-x-4">
-            <button id="cancelModalButton" class="w-full sm:w-auto px-4 sm:px-6 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition-all duration-300 font-medium shadow-sm hover:shadow transform hover:-translate-y-1 order-2 sm:order-1">
-                <i class="fas fa-times-circle mr-2"></i>Batal
+        <div class="flex justify-end mt-4 space-x-3">
+            <button id="cancelModalButton" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-all duration-200">
+                Batal
             </button>
-            <button id="addNewFluteButton" class="w-full sm:w-auto px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-1 order-1 sm:order-2">
-                <i class="fas fa-plus-circle mr-2"></i>Tambah Baru
+            <button id="addNewFluteButton" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200">
+                Tambah Baru
             </button>
         </div>
     </div>
 </div>
 
-<!-- Modal untuk Tambah/Edit Paper Flute dengan desain yang lebih responsif -->
-<div id="editFluteModal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center hidden z-50 transition-all duration-300 animate__animated animate__fadeIn p-4">
-    <div class="bg-white/95 rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 w-full max-w-xl transform transition-all duration-300 animate__animated animate__zoomIn border-t-4 border-blue-600">
-        <div class="flex justify-between items-center mb-4 sm:mb-6 border-b border-gray-200 pb-4">
-            <h3 class="text-lg sm:text-xl font-bold text-gray-800 flex items-center">
-                <i class="fas fa-edit text-blue-600 mr-2 sm:mr-3"></i>
+<!-- Modal untuk Tambah/Edit Paper Flute minimalis -->
+<div id="editFluteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50 transition-all duration-200 animate__animated animate__fadeIn p-4">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-200 animate__animated animate__zoomIn">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-800">
                 <span id="modalTitle">Tambah Paper Flute Baru</span>
             </h3>
-            <button id="closeEditModalButton" class="text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-full p-2 sm:p-3 transition-colors">
+            <button id="closeEditModalButton" class="text-gray-500 hover:text-gray-700 p-1">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -154,96 +148,93 @@
             <input type="hidden" id="editFluteId" name="id">
             <input type="hidden" id="methodField" name="_method" value="POST">
             
-            <div class="mb-4 sm:mb-6">
-                <label for="fluteCode" class="block text-sm font-medium text-gray-700 mb-2">Kode Flute</label>
+            <div class="mb-4">
+                <label for="fluteCode" class="block text-sm font-medium text-gray-700 mb-1">Kode Flute</label>
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 sm:pl-4 pointer-events-none">
-                        <i class="fas fa-barcode text-gray-400 text-sm sm:text-base"></i>
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <i class="fas fa-barcode text-gray-400"></i>
                     </div>
-                    <input type="text" id="fluteCode" name="code" class="w-full pl-10 sm:pl-12 px-3 sm:px-4 py-3 sm:py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-sm sm:text-base" required>
+                    <input type="text" id="fluteCode" name="code" class="w-full pl-9 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" required>
                 </div>
             </div>
             
-            <div class="mb-4 sm:mb-6">
-                <label for="fluteName" class="block text-sm font-medium text-gray-700 mb-2">Nama Flute</label>
+            <div class="mb-4">
+                <label for="fluteName" class="block text-sm font-medium text-gray-700 mb-1">Nama Flute</label>
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 sm:pl-4 pointer-events-none">
-                        <i class="fas fa-signature text-gray-400 text-sm sm:text-base"></i>
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <i class="fas fa-signature text-gray-400"></i>
                     </div>
-                    <input type="text" id="fluteName" name="name" class="w-full pl-10 sm:pl-12 px-3 sm:px-4 py-3 sm:py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-sm sm:text-base" required>
+                    <input type="text" id="fluteName" name="name" class="w-full pl-9 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" required>
                 </div>
             </div>
             
-            <div class="mb-6 sm:mb-8">
-                <label for="fluteDescription" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+            <div class="mb-5">
+                <label for="fluteDescription" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
                 <div class="relative">
-                    <div class="absolute top-3 sm:top-3.5 left-3 sm:left-4 pointer-events-none">
-                        <i class="fas fa-align-left text-gray-400 text-sm sm:text-base"></i>
+                    <div class="absolute top-3 left-3 pointer-events-none">
+                        <i class="fas fa-align-left text-gray-400"></i>
                     </div>
-                    <textarea id="fluteDescription" name="description" rows="4" class="w-full pl-10 sm:pl-12 px-3 sm:px-4 py-3 sm:py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-sm sm:text-base"></textarea>
+                    <textarea id="fluteDescription" name="description" rows="3" class="w-full pl-9 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400"></textarea>
                 </div>
             </div>
             
-            <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
-                <button type="button" id="cancelEditButton" class="w-full sm:w-auto px-4 sm:px-6 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition-all duration-300 font-medium shadow-sm hover:shadow transform hover:-translate-y-1 order-2 sm:order-1">
-                    <i class="fas fa-times-circle mr-2"></i>Batal
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancelEditButton" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-all duration-200">
+                    Batal
                 </button>
-                <button type="submit" class="w-full sm:w-auto px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-1 order-1 sm:order-2">
-                    <i class="fas fa-save mr-2"></i>Simpan
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200">
+                    Simpan
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal Konfirmasi Hapus dengan desain yang lebih responsif -->
-<div id="deleteConfirmModal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center hidden z-50 transition-all duration-300 animate__animated animate__fadeIn p-4">
-    <div class="bg-white/95 rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 w-full max-w-lg transform transition-all duration-300 animate__animated animate__zoomIn border-t-4 border-red-600">
-        <div class="mb-4 sm:mb-6 pb-4">
-            <div class="bg-red-50 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6 border-l-4 border-red-500 shadow-md">
-                <h3 class="text-lg sm:text-xl font-bold text-red-600 flex items-center">
-                    <i class="fas fa-exclamation-triangle mr-2 sm:mr-3"></i>
-                    Konfirmasi Hapus
-                </h3>
-                <p class="mt-3 text-gray-600 text-sm sm:text-base">Anda yakin ingin menghapus paper flute ini? Tindakan ini tidak dapat dibatalkan.</p>
-            </div>
-            <p id="deleteFluteName" class="font-semibold mt-4 p-3 sm:p-4 bg-gray-50 rounded-xl text-gray-800 border border-gray-200 shadow-sm text-sm sm:text-base"></p>
+<!-- Modal Konfirmasi Hapus minimalis -->
+<div id="deleteConfirmModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50 transition-all duration-200 animate__animated animate__fadeIn p-4">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-200 animate__animated animate__zoomIn">
+        <div class="mb-4 pb-3 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-800 mb-2">
+                Konfirmasi Hapus
+            </h3>
+            <p class="text-gray-600 text-sm">Anda yakin ingin menghapus paper flute ini? Tindakan ini tidak dapat dibatalkan.</p>
         </div>
+        
+        <p id="deleteFluteName" class="font-medium mb-4 p-3 bg-gray-50 rounded-md text-gray-700 border border-gray-200"></p>
         
         <form id="deleteForm" method="POST">
             @csrf
             @method('DELETE')
             
-            <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
-                <button type="button" id="cancelDeleteButton" class="w-full sm:w-auto px-4 sm:px-6 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition-all duration-300 font-medium shadow-sm hover:shadow transform hover:-translate-y-1 order-2 sm:order-1">
-                    <i class="fas fa-times-circle mr-2"></i>Batal
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancelDeleteButton" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-all duration-200">
+                    Batal
                 </button>
-                <button type="submit" class="w-full sm:w-auto px-4 sm:px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-1 order-1 sm:order-2">
-                    <i class="fas fa-trash-alt mr-2"></i>Hapus Permanen
+                <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all duration-200">
+                    Hapus
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal Detail Paper Flute dengan desain yang lebih responsif -->
-<div id="fluteDetailModal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center hidden z-50 transition-all duration-300 animate__animated animate__fadeIn p-4">
-    <div class="bg-white/95 rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 w-full max-w-3xl transform transition-all duration-300 animate__animated animate__zoomIn border-t-4 border-blue-600">
-        <div class="flex justify-between items-center mb-4 sm:mb-6 border-b border-gray-200 pb-4">
-            <h3 class="text-lg sm:text-xl font-bold text-gray-800 flex items-center">
-                <i class="fas fa-info-circle text-blue-600 mr-2 sm:mr-3"></i>
+<!-- Modal Detail Paper Flute minimalis -->
+<div id="fluteDetailModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50 transition-all duration-200 animate__animated animate__fadeIn p-4">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl transform transition-all duration-200 animate__animated animate__zoomIn">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-800">
                 Detail Paper Flute
             </h3>
-            <button id="closeDetailModalButton" class="text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-full p-2 sm:p-3 transition-colors">
+            <button id="closeDetailModalButton" class="text-gray-500 hover:text-gray-700 p-1">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         
         <form id="fluteDetailForm" class="overflow-y-auto max-h-[70vh]">
-            <div class="grid grid-cols-1 gap-4 mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 sm:p-6 rounded-xl border border-blue-100 shadow-md">
+            <div class="grid grid-cols-1 gap-4 mb-5 bg-gray-50 p-4 rounded-md">
                 <div class="flex flex-col sm:flex-row sm:items-center">
-                    <label for="detailPaperFlute" class="w-full sm:w-32 font-medium text-gray-700 mb-2 sm:mb-0">Paper Flute:</label>
-                    <select id="detailPaperFlute" class="border border-gray-300 p-3 rounded-xl w-full focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-sm sm:text-base">
+                    <label for="detailPaperFlute" class="w-full sm:w-32 font-medium text-gray-700 mb-1 sm:mb-0">Paper Flute:</label>
+                    <select id="detailPaperFlute" class="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400">
                         <option value="All">All</option>
                         @foreach($paperFlutes as $flute)
                             <option value="{{ $flute->code }}">{{ $flute->code }}</option>
@@ -251,107 +242,86 @@
                     </select>
                 </div>
                 <div class="flex flex-col sm:flex-row sm:items-center">
-                    <label for="detailDescription" class="w-full sm:w-32 font-medium text-gray-700 mb-2 sm:mb-0">Description:</label>
-                    <input type="text" id="detailDescription" class="border border-gray-300 p-3 rounded-xl w-full focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-sm sm:text-base" value="All">
+                    <label for="detailDescription" class="w-full sm:w-32 font-medium text-gray-700 mb-1 sm:mb-0">Description:</label>
+                    <input type="text" id="detailDescription" class="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="All">
                 </div>
             </div>
             
-            <div class="border-t border-gray-200 pt-4 sm:pt-6 mb-6 sm:mb-8">
-                <div class="mb-4 sm:mb-5 bg-gradient-to-r from-blue-50 to-indigo-50 p-3 sm:p-4 rounded-xl border-l-4 border-blue-500 shadow-md">
-                    <label class="font-semibold text-gray-800 flex items-center text-sm sm:text-base">
-                        <i class="fas fa-layer-group text-blue-600 mr-2"></i>
-                        Take Up Ratio
-                    </label>
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 mb-6 sm:mb-8">
-                    <div class="flex items-center bg-white p-3 sm:p-5 rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                        <label for="layer1" class="w-16 sm:w-24 text-xs sm:text-sm font-medium">Layer 1:</label>
-                        <input type="text" id="layer1" class="border border-gray-300 p-2 sm:p-3 rounded-xl w-full text-right focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-xs sm:text-sm" value="1.00">
-                        <span class="ml-2 sm:ml-3 text-blue-700 font-semibold bg-blue-50 py-1 px-2 sm:px-3 rounded-lg text-xs sm:text-sm">KL</span>
+            <div class="mb-5">
+                <h4 class="font-medium text-gray-800 mb-2">Take Up Ratio</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                    <div class="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200">
+                        <label for="layer1" class="w-16 text-sm font-medium text-gray-700">Layer 1:</label>
+                        <input type="text" id="layer1" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="1.00">
+                        <span class="ml-2 text-gray-700 bg-gray-100 py-1 px-2 rounded text-xs">KL</span>
                     </div>
-                    <div class="flex items-center bg-white p-3 sm:p-5 rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                        <label for="layer2" class="w-16 sm:w-24 text-xs sm:text-sm font-medium">Layer 2:</label>
-                        <input type="text" id="layer2" class="border border-gray-300 p-2 sm:p-3 rounded-xl w-full text-right focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-xs sm:text-sm" value="1.40">
-                        <span class="ml-2 sm:ml-3 text-blue-700 font-semibold bg-blue-50 py-1 px-2 sm:px-3 rounded-lg text-xs sm:text-sm">B</span>
+                    <div class="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200">
+                        <label for="layer2" class="w-16 text-sm font-medium text-gray-700">Layer 2:</label>
+                        <input type="text" id="layer2" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="1.40">
+                        <span class="ml-2 text-gray-700 bg-gray-100 py-1 px-2 rounded text-xs">B</span>
                     </div>
-                    <div class="flex items-center bg-white p-3 sm:p-5 rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                        <label for="layer3" class="w-16 sm:w-24 text-xs sm:text-sm font-medium">Layer 3:</label>
-                        <input type="text" id="layer3" class="border border-gray-300 p-2 sm:p-3 rounded-xl w-full text-right focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-xs sm:text-sm" value="1.00">
-                        <span class="ml-2 sm:ml-3 text-blue-700 font-semibold bg-blue-50 py-1 px-2 sm:px-3 rounded-lg text-xs sm:text-sm">L</span>
+                    <div class="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200">
+                        <label for="layer3" class="w-16 text-sm font-medium text-gray-700">Layer 3:</label>
+                        <input type="text" id="layer3" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="1.00">
+                        <span class="ml-2 text-gray-700 bg-gray-100 py-1 px-2 rounded text-xs">L</span>
                     </div>
-                    <div class="flex items-center bg-white p-3 sm:p-5 rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                        <label for="layer4" class="w-16 sm:w-24 text-xs sm:text-sm font-medium">Layer 4:</label>
-                        <input type="text" id="layer4" class="border border-gray-300 p-2 sm:p-3 rounded-xl w-full text-right focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-xs sm:text-sm" value="1.60">
-                        <span class="ml-2 sm:ml-3 text-blue-700 font-semibold bg-blue-50 py-1 px-2 sm:px-3 rounded-lg text-xs sm:text-sm">A/C/E</span>
+                    <div class="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200">
+                        <label for="layer4" class="w-16 text-sm font-medium text-gray-700">Layer 4:</label>
+                        <input type="text" id="layer4" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="1.60">
+                        <span class="ml-2 text-gray-700 bg-gray-100 py-1 px-2 rounded text-xs">A/C/E</span>
                     </div>
-                    <div class="flex items-center bg-white p-3 sm:p-5 rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                        <label for="layer5" class="w-16 sm:w-24 text-xs sm:text-sm font-medium">Layer 5:</label>
-                        <input type="text" id="layer5" class="border border-gray-300 p-2 sm:p-3 rounded-xl w-full text-right focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-xs sm:text-sm" value="1.00">
-                        <span class="ml-2 sm:ml-3 text-blue-700 font-semibold bg-blue-50 py-1 px-2 sm:px-3 rounded-lg text-xs sm:text-sm">2L</span>
+                    <div class="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200">
+                        <label for="layer5" class="w-16 text-sm font-medium text-gray-700">Layer 5:</label>
+                        <input type="text" id="layer5" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="1.00">
+                        <span class="ml-2 text-gray-700 bg-gray-100 py-1 px-2 rounded text-xs">2L</span>
                     </div>
                 </div>
             </div>
             
-            <div class="border-t border-gray-200 pt-4 sm:pt-6 mb-6 sm:mb-8">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center bg-white p-4 sm:p-5 rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                        <label for="fluteHeight" class="w-full sm:w-32 text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-0">Flute Height:</label>
+            <div class="mb-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center bg-gray-50 p-3 rounded-md border border-gray-200">
+                        <label for="fluteHeight" class="w-full sm:w-28 text-sm font-medium text-gray-700 mb-1 sm:mb-0">Flute Height:</label>
                         <div class="flex items-center w-full">
-                            <input type="text" id="fluteHeight" class="border border-gray-300 p-2 sm:p-3 rounded-xl w-full text-right focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-xs sm:text-sm" value="0.00">
-                            <span class="ml-2 sm:ml-3 text-gray-600 bg-gray-50 py-1 px-2 sm:px-3 rounded-lg text-xs sm:text-sm whitespace-nowrap">Millimeter</span>
+                            <input type="text" id="fluteHeight" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="0.00">
+                            <span class="ml-2 text-gray-600 bg-gray-100 py-1 px-2 rounded text-xs whitespace-nowrap">mm</span>
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row sm:items-center bg-white p-4 sm:p-5 rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                        <label for="starchConsumption" class="w-full sm:w-32 text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-0">Starch Consumption:</label>
+                    <div class="flex flex-col sm:flex-row sm:items-center bg-gray-50 p-3 rounded-md border border-gray-200">
+                        <label for="starchConsumption" class="w-full sm:w-28 text-sm font-medium text-gray-700 mb-1 sm:mb-0">Starch Cons:</label>
                         <div class="flex items-center w-full">
-                            <input type="text" id="starchConsumption" class="border border-gray-300 p-2 sm:p-3 rounded-xl w-full text-right focus:ring-3 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 shadow-sm text-xs sm:text-sm" value="0.00">
-                            <span class="ml-2 sm:ml-3 text-gray-600 bg-gray-50 py-1 px-2 sm:px-3 rounded-lg text-xs sm:text-sm whitespace-nowrap">Factor</span>
+                            <input type="text" id="starchConsumption" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="0.00">
+                            <span class="ml-2 text-gray-600 bg-gray-100 py-1 px-2 rounded text-xs whitespace-nowrap">Factor</span>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="border-t border-gray-200 pt-4 sm:pt-6 mb-6 sm:mb-8">
-                <div class="bg-gradient-to-r from-yellow-50 to-amber-50 p-4 sm:p-5 rounded-xl border-l-4 border-yellow-400 shadow-md">
-                    <label class="font-semibold text-gray-800 flex items-center text-sm sm:text-base">
-                        <i class="fas fa-sticky-note text-yellow-600 mr-2"></i>
-                        Catatan:
-                    </label>
-                    <p class="text-xs sm:text-sm text-gray-600 mt-2 sm:mt-3">Starch Consumption (G/M²) = Area(M²) × Factor</p>
+            <div class="mb-5">
+                <div class="bg-yellow-50 p-3 rounded-md border border-yellow-100">
+                    <p class="text-xs text-gray-600">
+                        <span class="font-medium text-gray-700">Catatan:</span>
+                        Starch Consumption (G/M²) = Area(M²) × Factor
+                    </p>
                 </div>
             </div>
             
-            <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 mt-6 sm:mt-8">
-                <button type="button" id="cancelDetailButton" class="w-full sm:w-auto px-4 sm:px-6 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition-all duration-300 font-medium shadow-sm hover:shadow transform hover:-translate-y-1 order-2 sm:order-1">
-                    <i class="fas fa-times-circle mr-2"></i>Tutup
+            <div class="flex justify-end space-x-3">
+                <button type="button" id="cancelDetailButton" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-all duration-200">
+                    Tutup
                 </button>
-                <button type="button" id="saveDetailButton" class="w-full sm:w-auto px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-1 order-1 sm:order-2">
-                    <i class="fas fa-save mr-2"></i>Simpan
+                <button type="button" id="saveDetailButton" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200">
+                    Simpan
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Tambahkan CSS untuk animasi dan efek-efek modern -->
+<!-- Tambahkan CSS untuk animasi -->
 <style>
-    .animate-spin-slow {
-        animation: spin 3s linear infinite;
-    }
-    
-    @keyframes spin {
-        from {
-            transform: rotate(0deg);
-        }
-        to {
-            transform: rotate(360deg);
-        }
-    }
-    
-    /* Animasi untuk elemen-elemen UI */
     .animate__animated {
-        animation-duration: 0.5s;
+        animation-duration: 0.3s;
     }
     
     .animate__fadeIn {
@@ -378,72 +348,6 @@
         }
         50% {
             opacity: 1;
-        }
-    }
-    
-    /* Efek glassmorphism untuk modal dan card */
-    .modal-glass {
-        backdrop-filter: blur(12px);
-        background: rgba(255, 255, 255, 0.7);
-    }
-    
-    /* Perubahan warna gradien saat hover */
-    .gradient-hover {
-        background-size: 200% 200%;
-        transition: background-position 0.5s;
-    }
-    
-    .gradient-hover:hover {
-        background-position: right center;
-    }
-    
-    /* Efek glassmorphism yang lebih kuat untuk modal */
-    .bg-white\/95 {
-        backdrop-filter: blur(12px);
-    }
-    
-    /* Animasi hover yang lebih halus untuk tombol */
-    button {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* Efek bayangan yang lebih baik untuk kartu */
-    .shadow-modal {
-        box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04);
-    }
-    
-    /* Tambahan CSS untuk responsivitas */
-    @media (max-width: 640px) {
-        .modal-content {
-            width: 95%;
-        }
-        
-        .modal-header h3 {
-            font-size: 1.1rem;
-        }
-        
-        .table-responsive {
-            display: block;
-            width: 100%;
-            overflow-x: auto;
-        }
-    }
-    
-    /* Memastikan modal tidak terlalu tinggi pada layar kecil */
-    .max-h-modal {
-        max-height: 90vh;
-    }
-    
-    /* Styling untuk form lebih responsif */
-    .form-group-responsive {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    @media (min-width: 640px) {
-        .form-group-responsive {
-            flex-direction: row;
-            align-items: center;
         }
     }
 </style>
@@ -671,7 +575,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Simpan detail flute
     saveDetailButton.addEventListener('click', function() {
         // Implementasi penyimpanan data detail flute
-        // Bisa menggunakan AJAX untuk menyimpan ke server
         alert('Data detail flute telah disimpan');
         closeDetailModal();
     });
