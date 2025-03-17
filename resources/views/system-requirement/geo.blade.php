@@ -18,139 +18,157 @@
 
     <!-- Modal -->
     <div id="geoModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-        <div class="modal-overlay absolute inset-0 bg-gray-800 opacity-75"></div>
-        <div class="modal-content bg-white rounded-lg shadow-xl z-10 w-4/5 max-h-screen flex flex-col">
-            <div class="modal-header p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-lg">
-                <h5 class="modal-title text-lg font-bold text-gray-800">Geo Area Table</h5>
-                <button type="button" class="text-gray-500 hover:text-gray-700 focus:outline-none" onclick="toggleModal('geoModal')">
+        <div class="modal-overlay absolute inset-0 bg-black bg-opacity-70 backdrop-blur-sm transition-opacity duration-300 ease-in-out"></div>
+        <div class="modal-content bg-white bg-opacity-95 rounded-2xl shadow-2xl z-10 w-4/5 max-h-[90vh] flex flex-col transform transition-all duration-300 ease-in-out scale-95 opacity-0 overflow-hidden">
+            <div class="modal-header p-5 border-b flex justify-between items-center bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-t-2xl">
+                <h5 class="modal-title text-xl font-bold flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-2 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                    Geo Area Table
+                </h5>
+                <button type="button" class="text-white hover:text-red-200 focus:outline-none transition-colors duration-200 p-1 rounded-full hover:bg-white hover:bg-opacity-20" onclick="toggleModal('geoModal')">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-            <div class="modal-body p-4 overflow-auto">
-                <div class="mb-4 relative">
-                    <input type="text" id="searchInput" class="w-full p-2 pl-10 border border-gray-300 rounded-md" placeholder="Cari berdasarkan kode, negara, provinsi, kota...">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+            <div class="modal-body p-6 overflow-auto bg-gradient-to-b from-gray-50 to-white">
+                <div class="mb-5 relative">
+                    <input type="text" id="searchInput" class="w-full p-4 pl-12 border border-gray-300 rounded-xl shadow-sm focus:ring-3 focus:ring-blue-400 focus:border-blue-500 transition-all" placeholder="Cari berdasarkan kode, negara, provinsi, kota...">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                         </svg>
                     </div>
                 </div>
-                <div class="overflow-x-auto shadow-md rounded-lg">
-                    <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                <div class="overflow-x-auto shadow-xl rounded-xl">
+                    <table class="min-w-full bg-white rounded-xl overflow-hidden">
                         <thead>
-                            <tr class="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
-                                <th class="py-3 px-6 text-left">No</th>
-                                <th class="py-3 px-6 text-left">Kode</th>
-                                <th class="py-3 px-6 text-left">Negara</th>
-                                <th class="py-3 px-6 text-left">Provinsi</th>
-                                <th class="py-3 px-6 text-left">Kota</th>
-                                <th class="py-3 px-6 text-left">Bagian Kota</th>
-                                <th class="py-3 px-6 text-left">Area</th>
+                            <tr class="bg-gradient-to-r from-blue-50 to-indigo-100 text-indigo-900 uppercase text-sm leading-normal font-semibold">
+                                <th class="py-4 px-6 text-left">No</th>
+                                <th class="py-4 px-6 text-left">Kode</th>
+                                <th class="py-4 px-6 text-left">Negara</th>
+                                <th class="py-4 px-6 text-left">Provinsi</th>
+                                <th class="py-4 px-6 text-left">Kota</th>
+                                <th class="py-4 px-6 text-left">Bagian Kota</th>
+                                <th class="py-4 px-6 text-left">Area</th>
                             </tr>
                         </thead>
-                        <tbody class="text-gray-600 text-sm" id="geoTableBody">
+                        <tbody class="text-gray-700 text-sm" id="geoTableBody">
                             @forelse($geoData as $index => $geo)
-                            <tr class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer transition-colors duration-150" data-code="{{ $geo->code }}" data-area="{{ $geo->area }}" onclick="selectGeoRow(this)">
-                                <td class="py-3 px-6">{{ $index + 1 }}</td>
-                                <td class="py-3 px-6 font-medium">{{ $geo->code }}</td>
-                                <td class="py-3 px-6">{{ $geo->country }}</td>
-                                <td class="py-3 px-6">{{ $geo->state }}</td>
-                                <td class="py-3 px-6">{{ $geo->town }}</td>
-                                <td class="py-3 px-6">{{ $geo->town_section }}</td>
-                                <td class="py-3 px-6">{{ $geo->area }}</td>
+                            <tr class="border-b border-gray-200 hover:bg-blue-50 cursor-pointer transition-colors duration-150" data-code="{{ $geo->code }}" data-area="{{ $geo->area }}" onclick="selectGeoRow(this)">
+                                <td class="py-3.5 px-6">{{ $index + 1 }}</td>
+                                <td class="py-3.5 px-6 font-medium text-blue-800">{{ $geo->code }}</td>
+                                <td class="py-3.5 px-6">{{ $geo->country }}</td>
+                                <td class="py-3.5 px-6">{{ $geo->state }}</td>
+                                <td class="py-3.5 px-6">{{ $geo->town }}</td>
+                                <td class="py-3.5 px-6">{{ $geo->town_section }}</td>
+                                <td class="py-3.5 px-6">{{ $geo->area }}</td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" class="py-6 px-6 text-center text-gray-500">Tidak ada data yang tersedia</td>
+                                <td colspan="7" class="py-8 px-6 text-center text-gray-500">
+                                    <div class="flex flex-col items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <span>Tidak ada data yang tersedia</span>
+                                    </div>
+                                </td>
                             </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div class="modal-footer p-4 border-t flex justify-between bg-gray-50 rounded-b-lg">
-                <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200 flex items-center" onclick="selectGeo()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+            <div class="modal-footer p-5 border-t flex justify-between bg-white rounded-b-2xl">
+                <button type="button" class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-blue-200 transition duration-300 flex items-center transform hover:-translate-y-1" onclick="selectGeo()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
-                    Select
+                    Pilih
                 </button>
-                <button type="button" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition duration-200 flex items-center" onclick="toggleModal('geoModal')">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <button type="button" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-xl shadow hover:bg-gray-300 transition duration-300 flex items-center transform hover:-translate-y-1" onclick="toggleModal('geoModal')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
-                    Exit
+                    Keluar
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Modal untuk mengubah data geo -->
-    <div id="editGeoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-md shadow-lg w-full max-w-md">
-            <div class="flex justify-between items-center border-b p-4">
-                <h3 class="text-lg font-medium">Edit Data Geo</h3>
-                <button type="button" class="text-gray-400 hover:text-gray-500" onclick="toggleModal('editGeoModal')">
+    <div id="editGeoModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="modal-overlay absolute inset-0 bg-black bg-opacity-70 backdrop-blur-sm transition-opacity duration-300 ease-in-out"></div>
+        <div class="modal-content bg-white bg-opacity-95 rounded-2xl shadow-2xl w-full max-w-lg transform transition-all duration-300 ease-in-out scale-95 opacity-0 overflow-hidden">
+            <div class="flex justify-between items-center border-b p-5 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-t-2xl">
+                <h3 class="text-xl font-bold flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-2 text-purple-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    Edit Data Geo
+                </h3>
+                <button type="button" class="text-white hover:text-red-200 focus:outline-none transition-colors duration-200 p-1 rounded-full hover:bg-white hover:bg-opacity-20" onclick="toggleModal('editGeoModal')">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
-            <div class="p-4">
-                <form id="editGeoForm" class="space-y-4">
+            <div class="p-6 bg-gradient-to-b from-gray-50 to-white">
+                <form id="editGeoForm" class="space-y-5">
                     <div class="grid grid-cols-3 gap-4 items-center">
-                        <label for="editGeoCode" class="font-medium text-gray-700">Geo Code:</label>
+                        <label for="editGeoCode" class="font-medium text-gray-700 text-right">Geo Code:</label>
                         <div class="col-span-2">
-                            <input type="text" id="editGeoCode" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="editGeoCode" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-3 focus:ring-purple-400 focus:border-purple-500 transition-all shadow-sm">
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-3 gap-4 items-center">
-                        <label for="editCountry" class="font-medium text-gray-700">Country:</label>
+                        <label for="editCountry" class="font-medium text-gray-700 text-right">Country:</label>
                         <div class="col-span-2">
-                            <input type="text" id="editCountry" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="editCountry" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-3 focus:ring-purple-400 focus:border-purple-500 transition-all shadow-sm">
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-3 gap-4 items-center">
-                        <label for="editState" class="font-medium text-gray-700">State:</label>
+                        <label for="editState" class="font-medium text-gray-700 text-right">State:</label>
                         <div class="col-span-2">
-                            <input type="text" id="editState" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="editState" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-3 focus:ring-purple-400 focus:border-purple-500 transition-all shadow-sm">
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-3 gap-4 items-center">
-                        <label for="editTown" class="font-medium text-gray-700">Town:</label>
+                        <label for="editTown" class="font-medium text-gray-700 text-right">Town:</label>
                         <div class="col-span-2">
-                            <input type="text" id="editTown" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="editTown" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-3 focus:ring-purple-400 focus:border-purple-500 transition-all shadow-sm">
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-3 gap-4 items-center">
-                        <label for="editTownSection" class="font-medium text-gray-700">Town Section:</label>
+                        <label for="editTownSection" class="font-medium text-gray-700 text-right">Town Section:</label>
                         <div class="col-span-2">
-                            <input type="text" id="editTownSection" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="editTownSection" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-3 focus:ring-purple-400 focus:border-purple-500 transition-all shadow-sm">
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-3 gap-4 items-center">
-                        <label for="editGeoArea" class="font-medium text-gray-700">Geo Area:</label>
+                        <label for="editGeoArea" class="font-medium text-gray-700 text-right">Geo Area:</label>
                         <div class="col-span-2">
-                            <input type="text" id="editGeoArea" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="editGeoArea" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-3 focus:ring-purple-400 focus:border-purple-500 transition-all shadow-sm">
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="flex justify-end border-t p-4 space-x-3">
-                <button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-200" onclick="toggleModal('editGeoModal')">
+            <div class="flex justify-end border-t p-5 space-x-3 bg-white rounded-b-2xl">
+                <button type="button" class="px-5 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition duration-300 transform hover:-translate-y-1 shadow" onclick="toggleModal('editGeoModal')">
                     Batal
                 </button>
-                <button type="button" id="btnReview" class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-200">
+                <button type="button" id="btnReview" class="px-5 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl hover:shadow-amber-200 hover:shadow-lg transition duration-300 transform hover:-translate-y-1">
                     Review
                 </button>
-                <button type="button" id="btnRecord" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200" onclick="saveGeoData()">
+                <button type="button" id="btnRecord" class="px-5 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl hover:shadow-indigo-200 hover:shadow-lg transition duration-300 transform hover:-translate-y-1" onclick="saveGeoData()">
                     Record
                 </button>
             </div>
@@ -158,49 +176,55 @@
     </div>
 
     <!-- Modal untuk review data -->
-    <div id="reviewGeoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-md shadow-lg w-full max-w-md">
-            <div class="flex justify-between items-center border-b p-4">
-                <h3 class="text-lg font-medium">Review Data Geo</h3>
-                <button type="button" class="text-gray-400 hover:text-gray-500" onclick="toggleModal('reviewGeoModal')">
+    <div id="reviewGeoModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="modal-overlay absolute inset-0 bg-black bg-opacity-70 backdrop-blur-sm transition-opacity duration-300 ease-in-out"></div>
+        <div class="modal-content bg-white bg-opacity-95 rounded-2xl shadow-2xl w-full max-w-lg transform transition-all duration-300 ease-in-out scale-95 opacity-0 overflow-hidden">
+            <div class="flex justify-between items-center border-b p-5 bg-gradient-to-r from-green-600 to-teal-700 text-white rounded-t-2xl">
+                <h3 class="text-xl font-bold flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-2 text-green-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Review Data Geo
+                </h3>
+                <button type="button" class="text-white hover:text-red-200 focus:outline-none transition-colors duration-200 p-1 rounded-full hover:bg-white hover:bg-opacity-20" onclick="toggleModal('reviewGeoModal')">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
-            <div class="p-4">
-                <div class="space-y-3 text-sm">
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="font-medium">Geo Code:</div>
-                        <div class="col-span-2" id="reviewGeoCode"></div>
+            <div class="p-6 bg-gradient-to-b from-gray-50 to-white">
+                <div class="bg-white rounded-xl p-5 shadow-md space-y-5 text-sm border border-gray-100">
+                    <div class="grid grid-cols-3 gap-3 items-center border-b pb-3">
+                        <div class="font-semibold text-gray-600">Geo Code:</div>
+                        <div class="col-span-2 font-bold text-green-700 text-base" id="reviewGeoCode"></div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="font-medium">Country:</div>
-                        <div class="col-span-2" id="reviewCountry"></div>
+                    <div class="grid grid-cols-3 gap-3 items-center border-b pb-3">
+                        <div class="font-semibold text-gray-600">Country:</div>
+                        <div class="col-span-2 font-bold text-gray-800" id="reviewCountry"></div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="font-medium">State:</div>
-                        <div class="col-span-2" id="reviewState"></div>
+                    <div class="grid grid-cols-3 gap-3 items-center border-b pb-3">
+                        <div class="font-semibold text-gray-600">State:</div>
+                        <div class="col-span-2 font-bold text-gray-800" id="reviewState"></div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="font-medium">Town:</div>
-                        <div class="col-span-2" id="reviewTown"></div>
+                    <div class="grid grid-cols-3 gap-3 items-center border-b pb-3">
+                        <div class="font-semibold text-gray-600">Town:</div>
+                        <div class="col-span-2 font-bold text-gray-800" id="reviewTown"></div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="font-medium">Town Section:</div>
-                        <div class="col-span-2" id="reviewTownSection"></div>
+                    <div class="grid grid-cols-3 gap-3 items-center border-b pb-3">
+                        <div class="font-semibold text-gray-600">Town Section:</div>
+                        <div class="col-span-2 font-bold text-gray-800" id="reviewTownSection"></div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="font-medium">Geo Area:</div>
-                        <div class="col-span-2" id="reviewGeoArea"></div>
+                    <div class="grid grid-cols-3 gap-3 items-center">
+                        <div class="font-semibold text-gray-600">Geo Area:</div>
+                        <div class="col-span-2 font-bold text-green-700 text-base" id="reviewGeoArea"></div>
                     </div>
                 </div>
             </div>
-            <div class="flex justify-end border-t p-4 space-x-3">
-                <button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-200" onclick="toggleModal('reviewGeoModal')">
+            <div class="flex justify-end border-t p-5 space-x-3 bg-white rounded-b-2xl">
+                <button type="button" class="px-5 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition duration-300 transform hover:-translate-y-1 shadow" onclick="toggleModal('reviewGeoModal')">
                     Kembali
                 </button>
-                <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200" onclick="confirmAndSave()">
+                <button type="button" class="px-6 py-3 bg-gradient-to-r from-green-600 to-teal-700 text-white rounded-xl hover:shadow-green-200 hover:shadow-lg transition duration-300 transform hover:-translate-y-1" onclick="confirmAndSave()">
                     Konfirmasi
                 </button>
             </div>
@@ -487,7 +511,7 @@
             
             row.innerHTML = `
                 <td class="py-3 px-6">${index + 1}</td>
-                <td class="py-3 px-6 font-medium">${geo.code}</td>
+                <td class="py-3 px-6 font-medium text-blue-800">${geo.code}</td>
                 <td class="py-3 px-6">${geo.country}</td>
                 <td class="py-3 px-6">${geo.state || ''}</td>
                 <td class="py-3 px-6">${geo.town || ''}</td>
@@ -504,9 +528,30 @@
     
     function toggleModal(modalId) {
         const modal = document.getElementById(modalId);
-        modal.classList.toggle('hidden');
-        if (!modal.classList.contains('hidden')) {
-            document.getElementById('searchInput').focus();
+        const modalContent = modal.querySelector('.modal-content');
+        const modalOverlay = modal.querySelector('.modal-overlay');
+        
+        if (modal.classList.contains('hidden')) {
+            // Tampilkan modal dengan animasi
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalOverlay.classList.add('opacity-100');
+                modalContent.classList.add('opacity-100', 'scale-100');
+                modalContent.classList.remove('opacity-0', 'scale-95');
+            }, 10);
+            
+            if (modalId === 'geoModal' && document.getElementById('searchInput')) {
+                document.getElementById('searchInput').focus();
+            }
+        } else {
+            // Sembunyikan modal dengan animasi
+            modalOverlay.classList.remove('opacity-100');
+            modalContent.classList.remove('opacity-100', 'scale-100');
+            modalContent.classList.add('opacity-0', 'scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
         }
     }
     
