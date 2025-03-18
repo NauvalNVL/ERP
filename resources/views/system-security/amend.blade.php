@@ -51,6 +51,16 @@
 
                 <input type="hidden" name="user_id" value="{{ $user->user_id }}">
 
+                <!-- Tambahkan validasi error -->
+                @if($errors->any())
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-4">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        @foreach ($errors->all() as $error)
+                            <p>{{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
+
                 <div>
                     <label for="new_password" class="block text-sm font-medium text-gray-700 mb-2">
                         <i class="fas fa-lock text-blue-500 mr-1"></i>Password Baru
@@ -58,7 +68,11 @@
                     <input type="password" name="new_password" id="new_password" 
                         class="form-input w-full rounded-lg p-3 border-2 border-gray-200 focus:border-blue-500 transition-all"
                         placeholder="Masukkan password minimal 8 karakter"
-                        required>
+                        required
+                        minlength="8">
+                    @error('new_password')
+                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div>
@@ -68,7 +82,8 @@
                     <input type="password" name="new_password_confirmation" id="new_password_confirmation" 
                         class="form-input w-full rounded-lg p-3 border-2 border-gray-200 focus:border-blue-500 transition-all"
                         placeholder="Ketik ulang password"
-                        required>
+                        required
+                        minlength="8">
                 </div>
 
                 <button type="submit" 

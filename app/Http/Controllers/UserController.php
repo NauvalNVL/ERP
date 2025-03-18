@@ -34,6 +34,9 @@ class UserController extends Controller
             'user_id' => 'required|unique:users|max:20',
             'username' => 'required|unique:users|max:30',
             'official_name' => 'required|max:100',
+            'official_title' => 'required|max:50',
+            'mobile_number' => 'required|digits_between:10,15',
+            'official_tel' => 'required|digits_between:8,15',
             'password_expiry_date' => 'required|integer|min:0',
             'status' => 'required|in:A,O',
             'amend_expired_password' => 'required|in:Yes,No'
@@ -44,13 +47,15 @@ class UserController extends Controller
                 'user_id' => $validated['user_id'],
                 'username' => $validated['username'],
                 'official_name' => $validated['official_name'],
-                'official_title' => $request->official_title,
-                'mobile_number' => $request->mobile_number,
-                'official_tel' => $request->official_tel,
+                'official_title' => $validated['official_title'],
+                'mobile_number' => $validated['mobile_number'],
+                'official_tel' => $validated['official_tel'],
                 'password' => bcrypt('temporary_password'),
                 'status' => $validated['status'],
-                'password_expiry_date' => $validated['password_expiry_date'],
-                'amend_expired_password' => $validated['amend_expired_password']
+                'password_expiry_date' => (int)$validated['password_expiry_date'],
+                'amend_expired_password' => $validated['amend_expired_password'],
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
 
             return redirect()->route('users.index')
@@ -104,7 +109,8 @@ class UserController extends Controller
                 'official_tel' => $validated['official_tel'],
                 'status' => $validated['status'],
                 'password_expiry_date' => $validated['password_expiry_date'],
-                'amend_expired_password' => $validated['amend_expired_password']
+                'amend_expired_password' => $validated['amend_expired_password'],
+                'updated_at' => now()
             ];
 
             if ($request->filled('password')) {
@@ -147,7 +153,8 @@ class UserController extends Controller
             $user = User::where('user_id', $request->search_user_id)->first();
             
             if(!$user) {
-                return redirect()->route('system-security/amend-password')
+                return redirect()->route('users.amend-password')
+                    ->withInput()
                     ->with('error', 'User ID tidak ditemukan');
             }
         }
@@ -162,12 +169,27 @@ class UserController extends Controller
             'new_password' => 'required|min:8|confirmed',
         ]);
 
-        $user = User::where('user_id', $request->user_id)->first();
-        $user->update([
-            'password' => bcrypt($request->new_password)
-        ]);
+        try {
+            $user = User::where('user_id', $request->user_id)->firstOrFail();
+            
+            // Perbaikan perhitungan hari
+            $expiryDate = now()->addDays(90)->startOfDay();
+            $currentDate = now()->startOfDay();
+            $daysDifference = $expiryDate->diffInDays($currentDate);
 
-        return redirect()->route('system-security/amend-password')
-            ->with('success', 'Password berhasil diperbarui untuk user: '.$user->user_id);
+            $user->update([
+                'password' => bcrypt($request->new_password),
+                'password_expiry_date' => $daysDifference
+            ]);
+
+            return redirect()->route('users.amend-password', ['search_user_id' => $user->user_id])
+                ->with('success', 'Password berhasil diperbarui untuk user: '.$user->user_id);
+
+        } catch (\Exception $e) {
+            Log::error('Password update error: '.$e->getMessage());
+            return redirect()->route('users.amend-password')
+                ->withInput()
+                ->with('error', 'Gagal memperbarui password: '.$e->getMessage());
+        }
     }
 }

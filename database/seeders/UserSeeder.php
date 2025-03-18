@@ -2,30 +2,45 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
     public function run()
     {
-        DB::table('users')->insert([
+        // Data super admin
+        User::create([
             'user_id' => 'ADMIN001',
-            'username' => 'admin',
-            'official_name' => 'Administrator',
+            'username' => 'superadmin',
+            'official_name' => 'Super Administrator',
             'official_title' => 'System Admin',
-            'mobile_number' => '08123456789',
-            'official_tel' => '0217654321',
+            'mobile_number' => '081234567890',
+            'official_tel' => '021123456',
             'password' => bcrypt('admin123'),
             'status' => 'A',
-            'password_expiry_date' => 0,
+            'password_expiry_date' => 90, // dalam hari
+            'amend_expired_password' => 'Yes',
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        // Data sample user
+        User::create([
+            'user_id' => 'USER001',
+            'username' => 'john.doe',
+            'official_name' => 'John Doe',
+            'official_title' => 'Sales Manager',
+            'mobile_number' => '087812345678',
+            'official_tel' => '0217654321',
+            'password' => bcrypt('password123'),
+            'status' => 'A',
+            'password_expiry_date' => 30,
             'amend_expired_password' => 'No',
             'created_at' => now(),
-            'updated_at' => now(),
-            'password_expiry_date' => now()->addYear(), // Ganti 0 dengan tanggal valid
-            'amend_expired_password' => 'Yes', // Ganti 'No' jika enum di database mengharuskan 'Yes'
-            'remember_token' => Str::random(10),
+            'updated_at' => now()
         ]);
     }
 }
+
