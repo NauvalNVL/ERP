@@ -11,10 +11,7 @@
     <span class="block sm:inline">{{ $error }}</span>
     <p class="mt-2">
         Silakan jalankan perintah berikut di terminal untuk mengatur database:
-        <pre class="bg-gray-800 text-white p-2 rounded mt-1 overflow-x-auto">
-php artisan migrate:fresh
-php artisan db:seed --class=SalesTeamSeeder
-php artisan db:seed --class=SalespersonSeeder</pre>
+        <pre class="bg-gray-800 text-white p-2 rounded mt-1 overflow-x-auto"></pre>
     </p>
 </div>
 @endif
