@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaperSizeController;
 use App\Http\Controllers\PaperFluteController;
 use App\Http\Controllers\ScoringToolController;
+use App\Http\Controllers\FinishingController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -73,6 +74,14 @@ Route::middleware('auth')->group(function () {
     Route::put('/scoring-tool/{id}', [ScoringToolController::class, 'update'])->name('scoring-tool.update');
     Route::delete('/scoring-tool/{id}', [ScoringToolController::class, 'destroy'])->name('scoring-tool.destroy');
     Route::get('/scoring-tool/{id}', [ScoringToolController::class, 'show'])->name('scoring-tool.show');
+
+    // Finishing Routes
+    Route::get('/system-requirement/finishing', [FinishingController::class, 'index'])->name('finishing.index');
+    Route::get('/system-requirement/finishing/create', [FinishingController::class, 'create'])->name('finishing.create');
+    Route::post('/system-requirement/finishing', [FinishingController::class, 'store'])->name('finishing.store');
+    Route::get('/system-requirement/finishing/{finishing}/edit', [FinishingController::class, 'edit'])->name('finishing.edit');
+    Route::put('/system-requirement/finishing/{finishing}', [FinishingController::class, 'update'])->name('finishing.update');
+    Route::delete('/system-requirement/finishing/{finishing}', [FinishingController::class, 'destroy'])->name('finishing.destroy');
 });
 
 Route::middleware(['auth'])->group(function () {
