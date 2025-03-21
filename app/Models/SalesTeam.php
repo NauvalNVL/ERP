@@ -9,6 +9,9 @@ class SalesTeam extends Model
 {
     use HasFactory;
 
+    // Definisikan nama tabel yang benar sesuai dengan seeder
+    protected $table = 'sales_team';
+
     protected $fillable = [
         'code',
         'name',
