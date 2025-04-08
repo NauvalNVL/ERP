@@ -1,80 +1,698 @@
 @extends('layouts.app')
 
+@section('title', 'Define Color')
+
+@section('styles')
+<style>
+    /* Variabel CSS untuk Tema Minimalis Modern */
+    :root {
+        --primary: #4361ee;
+        --primary-light: #4895ef;
+        --secondary: #3f37c9;
+        --accent: #f72585;
+        --success: #4cc9f0;
+        --warning: #f8961e;
+        --danger: #e63946;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --gray: #6c757d;
+        --light-gray: #e9ecef;
+        --white: #ffffff;
+        --black: #000000;
+        --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        --radius: 8px;
+        --transition: all 0.25s ease;
+    }
+
+    /* Layout & Base */
+    body {
+        font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
+        background-color: #f5f7fb;
+        color: var(--dark);
+    }
+
+    .container-fluid {
+        padding: 20px;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+
+    /* Header Minimalis */
+    .header-minimal {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--dark);
+        margin: 0;
+    }
+
+    /* Toolbar Minimalis */
+    .toolbar {
+        display: flex;
+        background-color: var(--white);
+        border-radius: var(--radius);
+        padding: 10px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow);
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .toolbar-divider {
+        width: 1px;
+        height: 24px;
+        background-color: var(--light-gray);
+        margin: 0 5px;
+    }
+
+    .btn-toolbar {
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray);
+        transition: var(--transition);
+    }
+
+    .btn-toolbar:hover {
+        background-color: var(--light);
+        color: var(--primary);
+    }
+
+    .btn-toolbar.active {
+        background-color: var(--primary-light);
+        color: var(--white);
+    }
+
+    /* Card Utama Minimalis */
+    .card-minimal {
+        background-color: var(--white);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 15px 20px;
+        background-color: var(--white);
+        border-bottom: 1px solid var(--light-gray);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .card-header-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .card-footer {
+        padding: 15px 20px;
+        background-color: var(--light);
+        border-top: 1px solid var(--light-gray);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    /* Tabel Minimalis */
+    .table-minimal {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .table-minimal th {
+        background-color: var(--light);
+        font-weight: 600;
+        color: var(--dark);
+        text-align: left;
+        padding: 12px 15px;
+        font-size: 13px;
+        border-bottom: 1px solid var(--light-gray);
+    }
+
+    .table-minimal td {
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--light-gray);
+        color: var(--gray);
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .table-minimal tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table-minimal tr:hover td {
+        background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .table-minimal .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--gray);
+    }
+
+    /* Color Swatch pada tabel */
+    .color-swatch {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-right: 8px;
+        vertical-align: middle;
+        border: 1px solid var(--light-gray);
+    }
+
+    /* Action buttons pada tabel */
+    .table-actions {
+        display: flex;
+        gap: 5px;
+    }
+
+    .btn-table-action {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 12px;
+    }
+
+    .btn-info {
+        background-color: rgba(72, 149, 239, 0.1);
+        color: var(--primary);
+    }
+
+    .btn-info:hover {
+        background-color: var(--primary);
+        color: var(--white);
+    }
+
+    .btn-edit {
+        background-color: rgba(76, 201, 240, 0.1);
+        color: var(--success);
+    }
+
+    .btn-edit:hover {
+        background-color: var(--success);
+        color: var(--white);
+    }
+
+    .btn-delete {
+        background-color: rgba(230, 57, 70, 0.1);
+        color: var(--danger);
+    }
+
+    .btn-delete:hover {
+        background-color: var(--danger);
+        color: var(--white);
+    }
+
+    /* Form Elements minimalis */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--dark);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--radius);
+        transition: var(--transition);
+        background-color: var(--white);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    }
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: -10px;
+    }
+
+    .form-col {
+        flex: 1;
+        padding: 10px;
+        min-width: 250px;
+    }
+
+    /* Buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: var(--radius);
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        color: var(--white);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--secondary);
+        box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+    }
+
+    .btn-secondary {
+        background-color: var(--light);
+        color: var(--gray);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--light-gray);
+    }
+
+    .btn-success {
+        background-color: var(--success);
+        color: var(--white);
+    }
+
+    .btn-success:hover {
+        background-color: #3ba3c6;
+        box-shadow: 0 4px 10px rgba(76, 201, 240, 0.3);
+    }
+
+    .btn-danger {
+        background-color: var(--danger);
+        color: var(--white);
+    }
+
+    .btn-danger:hover {
+        background-color: #c1121f;
+        box-shadow: 0 4px 10px rgba(230, 57, 70, 0.3);
+    }
+
+    /* Modal Minimalis */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal {
+        background-color: var(--white);
+        border-radius: var(--radius);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .modal-sm {
+        max-width: 400px;
+    }
+
+    .modal-lg {
+        max-width: 800px;
+    }
+
+    .modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--light-gray);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--dark);
+        margin: 0;
+    }
+
+    .modal-close {
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--gray);
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: var(--transition);
+    }
+
+    .modal-close:hover {
+        background-color: var(--light);
+        color: var(--danger);
+    }
+
+    .modal-body {
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .modal-search {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .modal-search-input {
+        width: 100%;
+        padding: 10px 15px 10px 40px;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--radius);
+        transition: var(--transition);
+    }
+
+    .modal-search-input:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    }
+
+    .modal-search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+    }
+
+    .modal-search-clear {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        display: none;
+    }
+
+    .modal-search-clear.visible {
+        display: block;
+    }
+
+    .modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid var(--light-gray);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        background-color: var(--light);
+    }
+
+    /* Confirmation Modal */
+    .modal-confirm {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .modal-confirm-icon {
+        font-size: 48px;
+        color: var(--danger);
+        margin-bottom: 20px;
+    }
+
+    .modal-confirm-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .modal-confirm-text {
+        color: var(--gray);
+        margin-bottom: 20px;
+    }
+
+    /* Detail View dalam Modal */
+    .detail-view {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .detail-item {
+        display: flex;
+        border-bottom: 1px solid var(--light-gray);
+        padding-bottom: 10px;
+    }
+
+    .detail-label {
+        width: 40%;
+        font-weight: 500;
+        color: var(--dark);
+    }
+
+    .detail-value {
+        width: 60%;
+        color: var(--gray);
+    }
+
+    .color-preview-lg {
+        width: 100%;
+        height: 100px;
+        border-radius: var(--radius);
+        margin-bottom: 15px;
+        border: 1px solid var(--light-gray);
+    }
+
+    /* Animasi */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .slide-up {
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .pulse {
+        animation: pulse 1.5s infinite;
+    }
+
+    /* Responsif */
+    @media (max-width: 768px) {
+        .toolbar {
+            justify-content: space-between;
+        }
+        
+        .form-col {
+            min-width: 100%;
+        }
+        
+        .modal {
+            width: 90%;
+        }
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <!-- Toolbar minimalis modern -->
-    <div class="bg-white p-4 rounded-lg shadow-sm mb-6 border border-gray-100">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <button id="newButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Baru">
-                    <i class="fas fa-file text-gray-600"></i>
-                </button>
-                <button id="editButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Edit">
-                    <i class="fas fa-edit text-gray-600"></i>
-                </button>
-                <button id="deleteButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Hapus">
-                    <i class="fas fa-trash-alt text-gray-600"></i>
-                </button>
-                <div class="h-6 mx-2 border-r border-gray-200"></div>
-                <button id="printButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Cetak">
-                    <i class="fas fa-print text-gray-600"></i>
-                </button>
-                <button id="searchButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Cari">
-                    <i class="fas fa-search text-gray-600"></i>
-                </button>
-            </div>
-            <button id="refreshButton" type="button" class="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-all duration-200" title="Refresh">
-                <i class="fas fa-sync-alt text-gray-600"></i>
+<div class="container-fluid">
+    <!-- Header Minimalis -->
+    <div class="header-minimal">
+        <h1 class="page-title">Define Color</h1>
+    </div>
+    
+    <!-- Toolbar Minimalis -->
+    <div class="toolbar">
+        <button class="btn-toolbar" id="btnNew" title="Tambah Baru">
+            <i class="fas fa-plus"></i>
+        </button>
+        <button class="btn-toolbar" id="btnEdit" title="Edit">
+            <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-toolbar" id="btnDelete" title="Hapus">
+            <i class="fas fa-trash"></i>
+        </button>
+        
+        <span class="toolbar-divider"></span>
+        
+        <button class="btn-toolbar" id="btnRefresh" title="Refresh">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+        <button class="btn-toolbar" id="btnSearch" title="Pencarian">
+            <i class="fas fa-search"></i>
+        </button>
+        
+        <span class="toolbar-divider"></span>
+        
+        <button class="btn-toolbar" id="btnPrint" title="Cetak">
+            <i class="fas fa-print"></i>
+        </button>
+        <button class="btn-toolbar" id="btnExit" title="Keluar">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+    </div>
+    
+    <!-- Card Utama Minimalis -->
+    <div class="card-minimal">
+        <div class="card-header">
+            <h2 class="card-header-title">
+                <i class="fas fa-palette"></i> Informasi Warna
+            </h2>
+            <button class="btn-toolbar" id="btnToggleView" title="Toggle Detail/List View">
+                <i class="fas fa-th-list"></i>
             </button>
         </div>
-    </div>
-
-    <!-- Header sederhana -->
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800">Define Paper Flute</h1>
-        <div class="h-1 w-20 bg-blue-500 mt-2 rounded-full"></div>
-    </div>
-
-    <!-- Card utama minimalis -->
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-        <!-- Form pencarian minimalis -->
-        <div class="mb-6 flex items-center">
-            <label for="paperFluteSearch" class="mr-4 w-32 font-medium text-gray-700">Paper Flute:</label>
-            <div class="relative flex-1">
-                <input type="text" id="paperFluteSearch" class="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400 transition-all duration-200" placeholder="Pilih paper flute..." readonly>
-                <button id="openModalButton" type="button" class="absolute right-1 top-1 p-1.5 bg-gray-100 text-gray-700 border-0 rounded-md hover:bg-gray-200 transition-all duration-200">
-                    <i class="fas fa-ellipsis-h"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Tabel minimalis -->
-        <div id="flutesTable" class="mt-6 hidden animate__animated animate__fadeIn">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold text-gray-800">
-                    Daftar Paper Flute
-                </h2>
-                <div class="bg-blue-500 text-white text-xs font-medium px-3 py-1 rounded-md">
-                    Data Terpilih
+        
+        <div class="card-body">
+            <!-- Detail View -->
+            <div id="detailView">
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label">ID Warna</label>
+                            <input type="text" class="form-control" id="inputColorId" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nama Warna</label>
+                            <input type="text" class="form-control" id="inputColorName" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Asal</label>
+                            <input type="text" class="form-control" id="inputOrigin" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label">ID Grup Warna</label>
+                            <input type="text" class="form-control" id="inputColorGroupId" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tipe CG</label>
+                            <input type="text" class="form-control" id="inputCgType" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <input type="text" class="form-control" id="inputStatus" readonly>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="overflow-hidden rounded-md border border-gray-200">
-                <table class="min-w-full bg-white">
+            
+            <!-- List View / Table -->
+            <div id="listView" style="display:none;">
+                <table class="table-minimal">
                     <thead>
-                        <tr class="bg-gray-50 text-gray-600">
-                            <th class="py-3 px-4 border-b border-gray-200 text-left font-medium text-xs uppercase">Kode</th>
-                            <th class="py-3 px-4 border-b border-gray-200 text-left font-medium text-xs uppercase">Nama</th>
-                            <th class="py-3 px-4 border-b border-gray-200 text-left font-medium text-xs uppercase">Deskripsi</th>
+                        <tr>
+                            <th width="15%">ID Warna</th>
+                            <th width="25%">Nama Warna</th>
+                            <th width="15%">Asal</th>
+                            <th width="15%">ID Grup</th>
+                            <th width="15%">Tipe CG</th>
+                            <th width="15%">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($paperFlutes as $flute)
-                        <tr class="hover:bg-gray-50 border-b border-gray-100 transition-all duration-200 cursor-pointer">
-                            <td class="py-3 px-4 font-medium text-blue-600">{{ $flute->code }}</td>
-                            <td class="py-3 px-4">{{ $flute->name }}</td>
-                            <td class="py-3 px-4 text-gray-600">{{ $flute->description }}</td>
-                        </tr>
-                        @endforeach
+                    <tbody id="colorTableBody">
+                        @if(isset($colors) && count($colors) > 0)
+                            @foreach($colors as $color)
+                                <tr data-id="{{ $color->color_id }}">
+                                    <td>{{ $color->color_id }}</td>
+                                    <td>
+                                        <span class="color-swatch" style="background-color: #{{ substr($color->color_id, 0, 6) }};"></span>
+                                        {{ $color->color_name }}
+                                    </td>
+                                    <td>{{ $color->origin }}</td>
+                                    <td>{{ $color->color_group_id }}</td>
+                                    <td>{{ $color->cg_type ?? 'N/A' }}</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="btn-table-action btn-info" onclick="showDetailModal('{{ $color->color_id }}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-table-action btn-edit" onclick="showEditModal('{{ $color->color_id }}')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-table-action btn-delete" onclick="showDeleteModal('{{ $color->color_id }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    <i class="fas fa-palette fa-3x mb-3"></i>
+                                    <p>Tidak ada data warna ditemukan. Klik tombol tambah baru untuk menambahkan warna.</p>
+                                </td>
+                            </tr>
+                        @endif
                     </tbody>
                 </table>
             </div>
@@ -82,502 +700,390 @@
     </div>
 </div>
 
-<!-- Modal Box untuk Paper Flute minimalis -->
-<div id="paperFluteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50 transition-all duration-200 animate__animated animate__fadeIn p-4">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl transform transition-all duration-200 animate__animated animate__zoomIn">
-        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-800">
-                Pilih Paper Flute
-            </h3>
-            <button id="closeModalButton" class="text-gray-500 hover:text-gray-700 p-1">
-                <i class="fas fa-times"></i>
-            </button>
+<!-- Modal Pencarian -->
+<div class="modal-overlay" id="searchModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Cari Warna</h3>
+            <button class="modal-close" id="closeSearchModal">&times;</button>
         </div>
-        
-        <div class="mb-4 relative">
-            <input type="text" id="searchModalInput" placeholder="Cari paper flute..." class="w-full p-2 pl-8 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400">
-            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
-        </div>
-        
-        <div class="max-h-80 overflow-y-auto rounded-md border border-gray-200">
-            <table class="min-w-full bg-white">
-                <thead class="sticky top-0 bg-gray-50 z-10">
+        <div class="modal-body">
+            <div class="modal-search">
+                <i class="fas fa-search modal-search-icon"></i>
+                <input type="text" class="modal-search-input" id="searchInput" placeholder="Cari berdasarkan ID atau nama warna...">
+                <button class="modal-search-clear" id="clearSearch">&times;</button>
+            </div>
+            
+            <table class="table-minimal">
+                <thead>
                     <tr>
-                        <th class="py-2 px-4 border-b text-left font-medium text-xs uppercase text-gray-600">Kode</th>
-                        <th class="py-2 px-4 border-b text-left font-medium text-xs uppercase text-gray-600">Nama</th>
-                        <th class="py-2 px-4 border-b text-left font-medium text-xs uppercase text-gray-600 hidden sm:table-cell">Deskripsi</th>
+                        <th width="20%">ID Warna</th>
+                        <th width="40%">Nama Warna</th>
+                        <th width="20%">Asal</th>
+                        <th width="20%">ID Grup</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach($paperFlutes as $flute)
-                    <tr class="hover:bg-gray-50 cursor-pointer flute-row border-b border-gray-100" data-code="{{ $flute->code }}" data-name="{{ $flute->name }}">
-                        <td class="py-2 px-4 font-medium text-blue-600">{{ $flute->code }}</td>
-                        <td class="py-2 px-4">{{ $flute->name }}</td>
-                        <td class="py-2 px-4 text-gray-600 hidden sm:table-cell">{{ $flute->description }}</td>
-                    </tr>
-                    @endforeach
+                <tbody id="searchResultsBody">
+                    <!-- Hasil pencarian akan ditampilkan di sini -->
                 </tbody>
             </table>
         </div>
-        
-        <div class="flex justify-end mt-4 space-x-3">
-            <button id="cancelModalButton" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-all duration-200">
-                Batal
-            </button>
-            <button id="addNewFluteButton" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200">
-                Tambah Baru
-            </button>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelSearch">Batal</button>
         </div>
     </div>
 </div>
 
-<!-- Modal untuk Tambah/Edit Paper Flute minimalis -->
-<div id="editFluteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50 transition-all duration-200 animate__animated animate__fadeIn p-4">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-200 animate__animated animate__zoomIn">
-        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-800">
-                <span id="modalTitle">Tambah Paper Flute Baru</span>
-            </h3>
-            <button id="closeEditModalButton" class="text-gray-500 hover:text-gray-700 p-1">
-                <i class="fas fa-times"></i>
-            </button>
+<!-- Modal Detail Warna -->
+<div class="modal-overlay" id="detailModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Detail Warna</h3>
+            <button class="modal-close" id="closeDetailModal">&times;</button>
         </div>
-        
-        <form id="fluteForm" method="POST" action="{{ route('paper-flute.store') }}" class="overflow-y-auto max-h-[70vh]">
-            @csrf
-            <input type="hidden" id="editFluteId" name="id">
-            <input type="hidden" id="methodField" name="_method" value="POST">
+        <div class="modal-body">
+            <div class="color-preview-lg" id="colorPreview"></div>
             
-            <div class="mb-4">
-                <label for="fluteCode" class="block text-sm font-medium text-gray-700 mb-1">Kode Flute</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <i class="fas fa-barcode text-gray-400"></i>
-                    </div>
-                    <input type="text" id="fluteCode" name="code" class="w-full pl-9 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" required>
+            <div class="detail-view">
+                <div class="detail-item">
+                    <div class="detail-label">ID Warna</div>
+                    <div class="detail-value" id="detailColorId"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Nama Warna</div>
+                    <div class="detail-value" id="detailColorName"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Asal</div>
+                    <div class="detail-value" id="detailOrigin"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">ID Grup Warna</div>
+                    <div class="detail-value" id="detailColorGroupId"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Tipe CG</div>
+                    <div class="detail-value" id="detailCgType"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value" id="detailStatus"></div>
                 </div>
             </div>
-            
-            <div class="mb-4">
-                <label for="fluteName" class="block text-sm font-medium text-gray-700 mb-1">Nama Flute</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <i class="fas fa-signature text-gray-400"></i>
-                    </div>
-                    <input type="text" id="fluteName" name="name" class="w-full pl-9 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" required>
-                </div>
-            </div>
-            
-            <div class="mb-5">
-                <label for="fluteDescription" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
-                <div class="relative">
-                    <div class="absolute top-3 left-3 pointer-events-none">
-                        <i class="fas fa-align-left text-gray-400"></i>
-                    </div>
-                    <textarea id="fluteDescription" name="description" rows="3" class="w-full pl-9 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400"></textarea>
-                </div>
-            </div>
-            
-            <div class="flex justify-end space-x-3">
-                <button type="button" id="cancelEditButton" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-all duration-200">
-                    Batal
-                </button>
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200">
-                    Simpan
-                </button>
-            </div>
-        </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="editFromDetail">Edit</button>
+            <button class="btn btn-secondary" id="closeDetailBtn">Tutup</button>
+        </div>
     </div>
 </div>
 
-<!-- Modal Konfirmasi Hapus minimalis -->
-<div id="deleteConfirmModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50 transition-all duration-200 animate__animated animate__fadeIn p-4">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-200 animate__animated animate__zoomIn">
-        <div class="mb-4 pb-3 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-800 mb-2">
-                Konfirmasi Hapus
-            </h3>
-            <p class="text-gray-600 text-sm">Anda yakin ingin menghapus paper flute ini? Tindakan ini tidak dapat dibatalkan.</p>
+<!-- Modal Tambah/Edit Warna -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="editModalTitle">Tambah Warna Baru</h3>
+            <button class="modal-close" id="closeEditModal">&times;</button>
         </div>
-        
-        <p id="deleteFluteName" class="font-medium mb-4 p-3 bg-gray-50 rounded-md text-gray-700 border border-gray-200"></p>
-        
-        <form id="deleteForm" method="POST">
-            @csrf
-            @method('DELETE')
-            
-            <div class="flex justify-end space-x-3">
-                <button type="button" id="cancelDeleteButton" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-all duration-200">
-                    Batal
-                </button>
-                <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all duration-200">
-                    Hapus
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Modal Detail Paper Flute minimalis -->
-<div id="fluteDetailModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50 transition-all duration-200 animate__animated animate__fadeIn p-4">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl transform transition-all duration-200 animate__animated animate__zoomIn">
-        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-800">
-                Detail Paper Flute
-            </h3>
-            <button id="closeDetailModalButton" class="text-gray-500 hover:text-gray-700 p-1">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        
-        <form id="fluteDetailForm" class="overflow-y-auto max-h-[70vh]">
-            <div class="grid grid-cols-1 gap-4 mb-5 bg-gray-50 p-4 rounded-md">
-                <div class="flex flex-col sm:flex-row sm:items-center">
-                    <label for="detailPaperFlute" class="w-full sm:w-32 font-medium text-gray-700 mb-1 sm:mb-0">Paper Flute:</label>
-                    <select id="detailPaperFlute" class="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400">
-                        <option value="All">All</option>
-                        @foreach($paperFlutes as $flute)
-                            <option value="{{ $flute->code }}">{{ $flute->code }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="flex flex-col sm:flex-row sm:items-center">
-                    <label for="detailDescription" class="w-full sm:w-32 font-medium text-gray-700 mb-1 sm:mb-0">Description:</label>
-                    <input type="text" id="detailDescription" class="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="All">
-                </div>
-            </div>
-            
-            <div class="mb-5">
-                <h4 class="font-medium text-gray-800 mb-2">Take Up Ratio</h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-                    <div class="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200">
-                        <label for="layer1" class="w-16 text-sm font-medium text-gray-700">Layer 1:</label>
-                        <input type="text" id="layer1" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="1.00">
-                        <span class="ml-2 text-gray-700 bg-gray-100 py-1 px-2 rounded text-xs">KL</span>
-                    </div>
-                    <div class="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200">
-                        <label for="layer2" class="w-16 text-sm font-medium text-gray-700">Layer 2:</label>
-                        <input type="text" id="layer2" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="1.40">
-                        <span class="ml-2 text-gray-700 bg-gray-100 py-1 px-2 rounded text-xs">B</span>
-                    </div>
-                    <div class="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200">
-                        <label for="layer3" class="w-16 text-sm font-medium text-gray-700">Layer 3:</label>
-                        <input type="text" id="layer3" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="1.00">
-                        <span class="ml-2 text-gray-700 bg-gray-100 py-1 px-2 rounded text-xs">L</span>
-                    </div>
-                    <div class="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200">
-                        <label for="layer4" class="w-16 text-sm font-medium text-gray-700">Layer 4:</label>
-                        <input type="text" id="layer4" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="1.60">
-                        <span class="ml-2 text-gray-700 bg-gray-100 py-1 px-2 rounded text-xs">A/C/E</span>
-                    </div>
-                    <div class="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200">
-                        <label for="layer5" class="w-16 text-sm font-medium text-gray-700">Layer 5:</label>
-                        <input type="text" id="layer5" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="1.00">
-                        <span class="ml-2 text-gray-700 bg-gray-100 py-1 px-2 rounded text-xs">2L</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mb-5">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center bg-gray-50 p-3 rounded-md border border-gray-200">
-                        <label for="fluteHeight" class="w-full sm:w-28 text-sm font-medium text-gray-700 mb-1 sm:mb-0">Flute Height:</label>
-                        <div class="flex items-center w-full">
-                            <input type="text" id="fluteHeight" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="0.00">
-                            <span class="ml-2 text-gray-600 bg-gray-100 py-1 px-2 rounded text-xs whitespace-nowrap">mm</span>
+        <div class="modal-body">
+            <form id="colorForm">
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label">ID Warna <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editColorId" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nama Warna <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editColorName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Asal</label>
+                            <input type="text" class="form-control" id="editOrigin">
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row sm:items-center bg-gray-50 p-3 rounded-md border border-gray-200">
-                        <label for="starchConsumption" class="w-full sm:w-28 text-sm font-medium text-gray-700 mb-1 sm:mb-0">Starch Cons:</label>
-                        <div class="flex items-center w-full">
-                            <input type="text" id="starchConsumption" class="border border-gray-300 p-2 rounded-md w-full text-right focus:ring-2 focus:ring-blue-400/30 focus:border-blue-400" value="0.00">
-                            <span class="ml-2 text-gray-600 bg-gray-100 py-1 px-2 rounded text-xs whitespace-nowrap">Factor</span>
+                    
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label">ID Grup Warna</label>
+                            <input type="text" class="form-control" id="editColorGroupId">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tipe CG</label>
+                            <input type="text" class="form-control" id="editCgType">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-control" id="editStatus">
+                                <option value="active">Aktif</option>
+                                <option value="inactive">Tidak Aktif</option>
+                            </select>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="mb-5">
-                <div class="bg-yellow-50 p-3 rounded-md border border-yellow-100">
-                    <p class="text-xs text-gray-600">
-                        <span class="font-medium text-gray-700">Catatan:</span>
-                        Starch Consumption (G/M²) = Area(M²) × Factor
-                    </p>
-                </div>
-            </div>
-            
-            <div class="flex justify-end space-x-3">
-                <button type="button" id="cancelDetailButton" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-all duration-200">
-                    Tutup
-                </button>
-                <button type="button" id="saveDetailButton" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200">
-                    Simpan
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="saveColor">Simpan</button>
+            <button class="btn btn-secondary" id="cancelEdit">Batal</button>
+        </div>
     </div>
 </div>
 
-<!-- Tambahkan CSS untuk animasi -->
-<style>
-    .animate__animated {
-        animation-duration: 0.3s;
-    }
-    
-    .animate__fadeIn {
-        animation-name: fadeIn;
-    }
-    
-    .animate__zoomIn {
-        animation-name: zoomIn;
-    }
-    
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-    
-    @keyframes zoomIn {
-        from {
-            opacity: 0;
-            transform: scale3d(0.3, 0.3, 0.3);
-        }
-        50% {
-            opacity: 1;
-        }
-    }
-</style>
+<!-- Modal Konfirmasi Hapus -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h3 class="modal-title">Konfirmasi Hapus</h3>
+            <button class="modal-close" id="closeDeleteModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-confirm">
+                <div class="modal-confirm-icon">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <div class="modal-confirm-title">Hapus Warna?</div>
+                <div class="modal-confirm-text">
+                    Anda yakin ingin menghapus warna "<span id="deleteColorName"></span>"? 
+                    Tindakan ini tidak dapat dibatalkan.
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" id="confirmDelete">Hapus</button>
+            <button class="btn btn-secondary" id="cancelDelete">Batal</button>
+        </div>
+    </div>
+</div>
+@endsection
 
+@section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Variabel untuk menyimpan data flute yang dipilih
-    let selectedFlute = null;
+    // Variabel untuk menyimpan data warna yang dipilih
+    let selectedColor = null;
+    let colors = @json(isset($colors) ? $colors : []);
     
-    // Tombol dan elemen untuk modal utama
-    const openModalButton = document.getElementById('openModalButton');
-    const paperFluteModal = document.getElementById('paperFluteModal');
-    const closeModalButton = document.getElementById('closeModalButton');
-    const cancelModalButton = document.getElementById('cancelModalButton');
-    const paperFluteSearch = document.getElementById('paperFluteSearch');
-    const searchModalInput = document.getElementById('searchModalInput');
-    const fluteRows = document.querySelectorAll('.flute-row');
-    
-    // Tombol toolbar
-    const newButton = document.getElementById('newButton');
-    const editButton = document.getElementById('editButton');
-    const deleteButton = document.getElementById('deleteButton');
-    const printButton = document.getElementById('printButton');
-    const searchButton = document.getElementById('searchButton');
-    const refreshButton = document.getElementById('refreshButton');
-    
-    // Elemen untuk modal edit
-    const addNewFluteButton = document.getElementById('addNewFluteButton');
-    const editFluteModal = document.getElementById('editFluteModal');
-    const closeEditModalButton = document.getElementById('closeEditModalButton');
-    const cancelEditButton = document.getElementById('cancelEditButton');
-    const fluteForm = document.getElementById('fluteForm');
-    const modalTitle = document.getElementById('modalTitle');
-    const editFluteId = document.getElementById('editFluteId');
-    const methodField = document.getElementById('methodField');
-    const fluteCode = document.getElementById('fluteCode');
-    const fluteName = document.getElementById('fluteName');
-    const fluteDescription = document.getElementById('fluteDescription');
-    
-    // Elemen untuk modal hapus
-    const deleteConfirmModal = document.getElementById('deleteConfirmModal');
-    const cancelDeleteButton = document.getElementById('cancelDeleteButton');
-    const deleteForm = document.getElementById('deleteForm');
-    const deleteFluteName = document.getElementById('deleteFluteName');
-    
-    // Tabel flutes
-    const flutesTable = document.getElementById('flutesTable');
-    
-    // Tambahan untuk modal detail flute
-    const fluteDetailModal = document.getElementById('fluteDetailModal');
-    const closeDetailModalButton = document.getElementById('closeDetailModalButton');
-    const cancelDetailButton = document.getElementById('cancelDetailButton');
-    const saveDetailButton = document.getElementById('saveDetailButton');
-    const detailPaperFlute = document.getElementById('detailPaperFlute');
-    const detailDescription = document.getElementById('detailDescription');
-    
-    // Buka modal utama
-    openModalButton.addEventListener('click', function() {
-        paperFluteModal.classList.remove('hidden');
-        searchModalInput.focus();
-    });
-    
-    // Tutup modal utama
-    function closeMainModal() {
-        paperFluteModal.classList.add('hidden');
-        searchModalInput.value = '';
-        resetModalSearch();
-    }
-    
-    closeModalButton.addEventListener('click', closeMainModal);
-    cancelModalButton.addEventListener('click', closeMainModal);
-    
-    // Pencarian dalam modal
-    searchModalInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        fluteRows.forEach(row => {
-            const code = row.querySelector('td:first-child').textContent.toLowerCase();
-            const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-            const description = row.querySelector('td:last-child').textContent.toLowerCase();
-            
-            if (code.includes(searchTerm) || name.includes(searchTerm) || description.includes(searchTerm)) {
-                row.classList.remove('hidden');
+    $(document).ready(function() {
+        // Toggle antara tampilan detail dan list
+        $('#btnToggleView').click(function() {
+            $('#detailView').toggle();
+            $('#listView').toggle();
+            $(this).find('i').toggleClass('fa-th-list fa-id-card');
+        });
+        
+        // ====== TOMBOL TOOLBAR ======
+        
+        // Tombol tambah baru
+        $('#btnNew').click(function() {
+            showEditModal();
+        });
+        
+        // Tombol edit
+        $('#btnEdit').click(function() {
+            if (selectedColor) {
+                showEditModal(selectedColor.color_id);
             } else {
-                row.classList.add('hidden');
+                alert('Silakan pilih warna terlebih dahulu');
             }
         });
+        
+        // Tombol hapus
+        $('#btnDelete').click(function() {
+            if (selectedColor) {
+                showDeleteModal(selectedColor.color_id);
+            } else {
+                alert('Silakan pilih warna terlebih dahulu');
+            }
+        });
+        
+        // Tombol refresh
+        $('#btnRefresh').click(function() {
+            location.reload();
+        });
+        
+        // Tombol search
+        $('#btnSearch').click(function() {
+            showSearchModal();
+        });
+        
+        // Tombol print
+        $('#btnPrint').click(function() {
+            printColorData();
+        });
+        
+        // Tombol exit
+        $('#btnExit').click(function() {
+            window.location.href = '{{ route("dashboard") }}';
+        });
+        
+        // ====== MODAL UTAMA ======
+        
+        // Tutup modal pencarian
+        $('#closeSearchModal, #cancelSearch').click(function() {
+            $('#searchModal').hide();
+        });
+        
+        // Pencarian dalam modal
+        $('#searchInput').on('input', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            
+            if (searchTerm.length > 0) {
+                $('#clearSearch').addClass('visible');
+                
+                // Filter data berdasarkan kata kunci
+                const filteredColors = colors.filter(color => 
+                    color.color_id.toLowerCase().includes(searchTerm) || 
+                    color.color_name.toLowerCase().includes(searchTerm)
+                );
+                
+                renderSearchResults(filteredColors);
+            } else {
+                $('#clearSearch').removeClass('visible');
+                $('#searchResultsBody').html('');
+            }
+        });
+        
+        // Reset pencarian
+        $('#clearSearch').click(function() {
+            $('#searchInput').val('');
+            $('#searchResultsBody').html('');
+            $(this).removeClass('visible');
+        });
+        
+        // ====== MODAL DETAIL ======
+        
+        // Tutup modal detail
+        $('#closeDetailModal, #closeDetailBtn').click(function() {
+            $('#detailModal').hide();
+        });
+        
+        // Edit dari modal detail
+        $('#editFromDetail').click(function() {
+            $('#detailModal').hide();
+            showEditModal(selectedColor.color_id);
+        });
+        
+        // ====== MODAL EDIT ======
+        
+        // Tutup modal edit
+        $('#closeEditModal, #cancelEdit').click(function() {
+            $('#editModal').hide();
+        });
+        
+        // Simpan perubahan
+        $('#saveColor').click(function() {
+            saveColorData();
+        });
+        
+        // ====== MODAL HAPUS ======
+        
+        // Tutup modal hapus
+        $('#closeDeleteModal, #cancelDelete').click(function() {
+            $('#deleteModal').hide();
+        });
+        
+        // Konfirmasi hapus
+        $('#confirmDelete').click(function() {
+            deleteColorData();
+        });
+        
+        // Jika ada data dari pencarian sebelumnya, tampilkan
+        @if(isset($colors) && count($colors) > 0 && request('search'))
+            const foundColor = @json($colors->first());
+            setSelectedColor(foundColor);
+        @endif
     });
     
-    // Reset pencarian modal
-    function resetModalSearch() {
-        fluteRows.forEach(row => {
-            row.classList.remove('hidden');
+    // ========== FUNCTIONS ==========
+    
+    // Menampilkan modal pencarian
+    function showSearchModal() {
+        $('#searchInput').val('');
+        $('#searchResultsBody').html('');
+        $('#clearSearch').removeClass('visible');
+        $('#searchModal').show();
+    }
+    
+    // Render hasil pencarian
+    function renderSearchResults(results) {
+        let html = '';
+        
+        if (results.length > 0) {
+            results.forEach(color => {
+                html += `
+                <tr data-id="${color.color_id}" class="search-result-row">
+                    <td>${color.color_id}</td>
+                    <td>
+                        <span class="color-swatch" style="background-color: #${color.color_id.substring(0, 6)};"></span>
+                        ${color.color_name}
+                    </td>
+                    <td>${color.origin || '-'}</td>
+                    <td>${color.color_group_id || '-'}</td>
+                </tr>`;
+            });
+        } else {
+            html = `<tr><td colspan="4" class="empty-state">Tidak ada hasil ditemukan</td></tr>`;
+        }
+        
+        $('#searchResultsBody').html(html);
+        
+        // Tambahkan event listener untuk baris hasil pencarian
+        $('.search-result-row').click(function() {
+            const colorId = $(this).data('id');
+            const color = colors.find(c => c.color_id === colorId);
+            
+            if (color) {
+                setSelectedColor(color);
+                $('#searchModal').hide();
+            }
         });
     }
     
-    // Pilih flute dari modal
-    fluteRows.forEach(row => {
-        row.addEventListener('click', function() {
-            const code = this.getAttribute('data-code');
-            const name = this.getAttribute('data-name');
+    // Set warna yang dipilih
+    function setSelectedColor(color) {
+        selectedColor = color;
+        
+        // Isi form detail
+        $('#inputColorId').val(color.color_id);
+        $('#inputColorName').val(color.color_name);
+        $('#inputOrigin').val(color.origin || '');
+        $('#inputColorGroupId').val(color.color_group_id || '');
+        $('#inputCgType').val(color.cg_type || '');
+        $('#inputStatus').val(color.status || 'active');
+        
+        // Highlight baris yang dipilih pada tabel
+        $('#colorTableBody tr').removeClass('active');
+        $(`#colorTableBody tr[data-id="${color.color_id}"]`).addClass('active');
+    }
+    
+    // Tampilkan modal detail
+    function showDetailModal(colorId) {
+        const color = colors.find(c => c.color_id === colorId);
+        
+        if (color) {
+            selectedColor = color;
             
-            paperFluteSearch.value = `${code} - ${name}`;
-            selectedFlute = {
-                id: this.getAttribute('data-id'),
-                code: code,
-                name: name
-            };
+            $('#colorPreview').css('background-color', `#${color.color_id.substring(0, 6)}`);
+            $('#detailColorId').text(color.color_id);
+            $('#detailColorName').text(color.color_name);
+            $('#detailOrigin').text(color.origin || '-');
+            $('#detailColorGroupId').text(color.color_group_id || '-');
+            $('#detailCgType').text(color.cg_type || '-');
+            $('#detailStatus').text(color.status || 'active');
             
-            closeMainModal();
-            flutesTable.classList.remove('hidden');
+            $('#detailModal').show();
+        }
+    }
+    
+    // Tampilkan modal edit
+    function showEditModal(colorId = null) {
+        if (colorId) {
+            // Mode edit
+            const color = colors.find(c => c.color_id === colorId);
             
-            // Tampilkan modal detail setelah memilih flute
-            showFluteDetail(code, name);
-        });
-    });
-    
-    // Tambah flute baru
-    function openNewFluteModal() {
-        modalTitle.textContent = 'Tambah Paper Flute Baru';
-        fluteForm.action = "{{ route('paper-flute.store') }}";
-        methodField.value = 'POST';
-        editFluteId.value = '';
-        fluteCode.value = '';
-        fluteName.value = '';
-        fluteDescription.value = '';
-        fluteCode.readOnly = false;
-        
-        editFluteModal.classList.remove('hidden');
-        fluteCode.focus();
-    }
-    
-    newButton.addEventListener('click', openNewFluteModal);
-    addNewFluteButton.addEventListener('click', function() {
-        closeMainModal();
-        openNewFluteModal();
-    });
-    
-    // Edit flute
-    editButton.addEventListener('click', function() {
-        if (!selectedFlute) {
-            alert('Pilih paper flute terlebih dahulu.');
-            return;
-        }
-        
-        modalTitle.textContent = 'Edit Paper Flute';
-        fluteForm.action = `/paper-flute/${selectedFlute.id}`;
-        methodField.value = 'PUT';
-        editFluteId.value = selectedFlute.id;
-        fluteCode.value = selectedFlute.code;
-        fluteName.value = selectedFlute.name;
-        // Deskripsi perlu diambil dari data baris yang dipilih
-        const selectedRow = document.querySelector(`.flute-row[data-code="${selectedFlute.code}"]`);
-        fluteDescription.value = selectedRow.querySelector('td:last-child').textContent;
-        fluteCode.readOnly = true;
-        
-        editFluteModal.classList.remove('hidden');
-        fluteName.focus();
-    });
-    
-    // Tutup modal edit
-    function closeEditModal() {
-        editFluteModal.classList.add('hidden');
-    }
-    
-    closeEditModalButton.addEventListener('click', closeEditModal);
-    cancelEditButton.addEventListener('click', closeEditModal);
-    
-    // Hapus flute
-    deleteButton.addEventListener('click', function() {
-        if (!selectedFlute) {
-            alert('Pilih paper flute terlebih dahulu.');
-            return;
-        }
-        
-        deleteForm.action = `/paper-flute/${selectedFlute.id}`;
-        deleteFluteName.textContent = `${selectedFlute.code} - ${selectedFlute.name}`;
-        
-        deleteConfirmModal.classList.remove('hidden');
-    });
-    
-    // Tutup modal hapus
-    function closeDeleteModal() {
-        deleteConfirmModal.classList.add('hidden');
-    }
-    
-    cancelDeleteButton.addEventListener('click', closeDeleteModal);
-    
-    // Tombol Refresh
-    refreshButton.addEventListener('click', function() {
-        location.reload();
-    });
-    
-    // Tombol Search
-    searchButton.addEventListener('click', function() {
-        openModalButton.click();
-    });
-    
-    // Tombol Print
-    printButton.addEventListener('click', function() {
-        if (flutesTable.classList.contains('hidden')) {
-            alert('Tampilkan data paper flute terlebih dahulu.');
-            return;
-        }
-        window.print();
-    });
-
-    // Pilih flute dari modal dan tampilkan detail
-    function showFluteDetail(code, name) {
-        // Set nilai pada form detail
-        detailPaperFlute.value = code;
-        detailDescription.value = name;
-        
-        // Tampilkan modal detail
-        fluteDetailModal.classList.remove('hidden');
-    }
-
-    // Tutup modal detail
-    function closeDetailModal() {
-        fluteDetailModal.classList.add('hidden');
-    }
-
-    closeDetailModalButton.addEventListener('click', closeDetailModal);
-    cancelDetailButton.addEventListener('click', closeDetailModal);
-
-    // Simpan detail flute
-    saveDetailButton.addEventListener('click', function() {
-        // Implementasi penyimpanan data detail flute
-        alert('Data detail flute telah disimpan');
-        closeDetailModal();
-    });
-});
-</script>
-@endsection 
+            if (color) {
+                $('#editModalTitle').text('Edit Warna');
+                $('#editColorId').val(color.color_id);
+                $('#editColorId').prop('readonly', true);
+                $('#editColorName').val(color.color_name);
+                $('#editOrigin').val(color.origin

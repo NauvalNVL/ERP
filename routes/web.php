@@ -15,8 +15,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaperSizeController;
 use App\Http\Controllers\PaperFluteController;
 use App\Http\Controllers\ScoringToolController;
-use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\FinishingController;
+use App\Http\Controllers\ColorController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -75,6 +75,17 @@ Route::middleware('auth')->group(function () {
     Route::put('/scoring-tool/{id}', [ScoringToolController::class, 'update'])->name('scoring-tool.update');
     Route::delete('/scoring-tool/{id}', [ScoringToolController::class, 'destroy'])->name('scoring-tool.destroy');
     Route::get('/scoring-tool/{id}', [ScoringToolController::class, 'show'])->name('scoring-tool.show');
+
+    // Color Routes - Dipindahkan ke dalam middleware auth
+    Route::get('/color', [ColorController::class, 'index'])->name('color.index');
+    Route::post('/color', [ColorController::class, 'store'])->name('color.store');
+    Route::get('/color/create', [ColorController::class, 'create'])->name('color.create');
+    Route::get('/color/{color}/edit', [ColorController::class, 'edit'])->name('color.edit');
+    Route::put('/color/{color}', [ColorController::class, 'update'])->name('color.update');
+    Route::delete('/color/{color}', [ColorController::class, 'destroy'])->name('color.destroy');
+    
+    // Finishing Routes
+    Route::resource('finishing', FinishingController::class);
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -113,8 +124,6 @@ Route::resource('geo', GeoController::class);
 
 Route::resource('paper-flute', PaperFluteController::class)->middleware('auth');
 
-// Color Group Routes
-Route::resource('color-group', ColorGroupController::class)->middleware('auth');
+// Color Routes
+Route::resource('color', ColorController::class);
 
-// Finishing Routes
-Route::resource('finishing', FinishingController::class)->middleware('auth');
