@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Color;
+use App\Models\ColorGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -30,11 +32,17 @@ class ColorController extends Controller
                     ->get();
             }
             
-            return view('system-requirement.color', ['colors' => $colors]);
+            $colorGroups = ColorGroup::all();
+            
+            return view('system-requirement.color', [
+                'colors' => $colors,
+                'colorGroups' => $colorGroups
+            ]);
         } catch (\Exception $e) {
             Log::error('Error in ColorController@index: ' . $e->getMessage());
             return view('system-requirement.color', [
                 'colors' => [],
+                'colorGroups' => [],
                 'error' => 'Terjadi kesalahan dalam menampilkan data warna: ' . $e->getMessage()
             ]);
         }
@@ -47,7 +55,8 @@ class ColorController extends Controller
      */
     public function create()
     {
-        return view('system-requirement.color-create');
+        $colorGroups = ColorGroup::all();
+        return view('system-requirement.color', compact('colorGroups'));
     }
 
     /**
@@ -59,25 +68,16 @@ class ColorController extends Controller
     public function store(Request $request)
     {
         try {
-            $validated = $request->validate([
-                'color_id' => 'required|string|max:5|unique:colors,color_id',
-                'color_name' => 'required|string|max:100',
-                'origin' => 'required|string|max:2',
-                'color_group_id' => 'required|string|max:5',
-                'cg_type' => 'nullable|string|max:50',
+            $validatedData = $request->validate([
+                'color_id' => 'required|unique:colors|max:10',
+                'color_name' => 'required|max:50',
+                'color_group_id' => 'required|exists:color_groups,id',
+                'origin' => 'nullable|max:100'
             ]);
 
-            DB::table('colors')->insert([
-                'color_id' => $validated['color_id'],
-                'color_name' => $validated['color_name'],
-                'origin' => $validated['origin'],
-                'color_group_id' => $validated['color_group_id'],
-                'cg_type' => $validated['cg_type'] ?? null,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+            Color::create($validatedData);
 
-            return redirect()->route('color.index')->with('success', 'Warna berhasil ditambahkan');
+            return redirect()->route('colors.index')->with('success', 'Color created successfully');
         } catch (\Exception $e) {
             Log::error('Error in ColorController@store: ' . $e->getMessage());
             return back()->withInput()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());

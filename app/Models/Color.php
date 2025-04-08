@@ -10,8 +10,8 @@ class Color extends Model
     use HasFactory;
 
     protected $table = 'colors';
-    protected $primaryKey = 'color_id';
-    public $incrementing = false;
+    protected $primaryKey = 'id';
+    public $incrementing = true;
     protected $keyType = 'string';
     
     protected $fillable = [
@@ -21,4 +21,10 @@ class Color extends Model
         'color_group_id',
         'cg_type',
     ];
+
+    // Relasi dengan Color Group
+    public function colorGroup()
+    {
+        return $this->belongsTo(ColorGroup::class, 'color_group_id', 'id');
+    }
 }

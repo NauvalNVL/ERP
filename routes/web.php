@@ -17,6 +17,7 @@ use App\Http\Controllers\PaperFluteController;
 use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\ColorController;
+use App\Http\Controllers\ColorGroupController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -126,4 +127,6 @@ Route::resource('paper-flute', PaperFluteController::class)->middleware('auth');
 
 // Color Routes
 Route::resource('color', ColorController::class);
+
+Route::resource('color-group', ColorGroupController::class);
 

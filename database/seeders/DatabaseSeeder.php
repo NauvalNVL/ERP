@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             PaperFluteSeeder::class,
             ScoringToolSeeder::class,
             UserSeeder::class,
-            ColorGroupSeeder::class,
+            ColorSeeder::class,
         ]);
     }
 }
