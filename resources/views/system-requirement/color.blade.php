@@ -4,109 +4,105 @@
 
 <!-- Add direct script for opening modal -->
 <script>
-// Demo data for testing (will be removed when real data is working)
-const demoColors = [
-    { color_id: '00001', color_name: 'Black', origin: '01', color_group_id: '01', cg_type: 'X-Flexo' },
-    { color_id: '00002', color_name: 'White', origin: '02', color_group_id: '02', cg_type: '' },
-    { color_id: '00003', color_name: 'Red', origin: '03', color_group_id: '03', cg_type: '' },
-    { color_id: '00004', color_name: 'Dark Red', origin: '03', color_group_id: '03', cg_type: '' },
-    { color_id: '00005', color_name: 'Light Red', origin: '03', color_group_id: '03', cg_type: '' },
-    { color_id: '00006', color_name: 'Blue', origin: '04', color_group_id: '04', cg_type: '' },
-    { color_id: '00007', color_name: 'Dark Blue', origin: '04', color_group_id: '04', cg_type: '' },
-    { color_id: '00008', color_name: 'Light Blue', origin: '04', color_group_id: '04', cg_type: '' },
-    { color_id: '00009', color_name: 'Green', origin: '05', color_group_id: '05', cg_type: '' },
-    { color_id: '00010', color_name: 'Dark Green', origin: '05', color_group_id: '05', cg_type: '' }
-];
-
-function openColorModal() {
-    console.log('Opening color modal directly');
-    var modal = document.getElementById('colorTableWindow');
-    if (modal) {
-        modal.style.display = 'block';
-        modal.classList.remove('hidden');
-        
-        // Check if we have data in the table
-        var tableBody = document.querySelector('#colorDataTable tbody');
-        var rows = tableBody.querySelectorAll('tr');
-        
-        // If we have no real data, we can populate with demo data for testing
-        if (rows.length === 1 && rows[0].querySelector('td[colspan="6"]')) {
-            console.log('No data found - using demo data for testing');
-            populateWithDemoData();
-        } else {
-            console.log('Found ' + rows.length + ' rows of real data');
+// Fungsi mengurutkan tabel
+function sortTableDirectly(columnIndex) {
+    console.log("Sorting by column: " + columnIndex);
+    
+    var table = document.getElementById('colorDataTable');
+    if (!table) {
+        console.error("Table not found");
+        return;
+    }
+    
+    var tbody = table.querySelector('tbody');
+    if (!tbody) {
+        console.error("Table body not found");
+        return;
+    }
+    
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Jangan urutkan jika tidak ada data atau hanya ada pesan "tidak ada data"
+    if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'))) {
+        console.log("No data to sort");
+        return;
+    }
+    
+    // Urutkan baris berdasarkan isi kolom
+    rows.sort(function(a, b) {
+        // Periksa apakah kolom tersedia
+        if (!a.cells[columnIndex] || !b.cells[columnIndex]) {
+            return 0;
         }
         
-        // Default sort order - by Color#
-        sortByColor();
+        var textA = a.cells[columnIndex].textContent.trim();
+        var textB = b.cells[columnIndex].textContent.trim();
         
-        // Make sure the "By Color#" button is highlighted as the default sort
-        highlightSortButton('byColor');
+        // Pengurutan berbasis numerik untuk kolom ID
+        if (columnIndex === 0 || columnIndex === 3) {
+            return textA.localeCompare(textB, undefined, { numeric: true });
+        }
         
-        // Highlight rows based on color group
-        highlightBlueRows();
-    } else {
-        console.error('Modal element not found');
-    }
-}
-
-function populateWithDemoData() {
-    var tableBody = document.querySelector('#colorDataTable tbody');
-    if (!tableBody) return;
-    
-    // Clear the "no data" message
-    tableBody.innerHTML = '';
-    
-    // Add the demo rows
-    demoColors.forEach(function(color) {
-        var row = document.createElement('tr');
-        row.className = 'cursor-pointer';
-        row.setAttribute('data-color-id', color.color_id);
-        row.setAttribute('data-color-name', color.color_name);
-        row.setAttribute('data-origin', color.origin);
-        row.setAttribute('data-cg-id', color.color_group_id);
-        row.setAttribute('data-cg-type', color.cg_type);
-        
-        row.onclick = function(e) {
-            selectRow(this);
-            e.stopPropagation();
-        };
-        
-        row.ondblclick = function() {
-            selectColor(color.color_id);
-        };
-        
-        row.innerHTML = `
-            <td class="px-2 py-0.5 border-b border-r border-gray-300">${color.color_id}</td>
-            <td class="px-2 py-0.5 border-b border-r border-gray-300">${color.color_name}</td>
-            <td class="px-2 py-0.5 border-b border-r border-gray-300">${color.origin}</td>
-            <td class="px-2 py-0.5 border-b border-r border-gray-300">${color.color_group_id}</td>
-            <td class="px-2 py-0.5 border-b border-r border-gray-300">${getCGName(color.color_group_id)}</td>
-            <td class="px-2 py-0.5 border-b border-gray-300">${color.cg_type}</td>
-        `;
-        
-        tableBody.appendChild(row);
+        // Pengurutan teks biasa untuk kolom lainnya
+        return textA.localeCompare(textB);
     });
-}
-
-function getCGName(cgId) {
-    // Map of color group IDs to names based on ColorGroupSeeder
-    const cgNames = {
-        '01': 'BLACK',
-        '02': 'WHITE',
-        '03': 'RED',
-        '04': 'BLUE',
-        '05': 'GREEN',
-        '06': 'CYAN',
-        '07': 'MAGENTA',
-        '08': 'PINK'
-    };
     
-    return cgNames[cgId] || '';
+    // Hapus semua baris dari tabel
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    
+    // Tambahkan baris yang sudah diurutkan ke tabel
+    rows.forEach(function(row) {
+        tbody.appendChild(row);
+    });
+    
+    // Highlight baris pertama setelah pengurutan
+    if (rows.length > 0) {
+        rows.forEach(function(row) {
+            row.classList.remove('selected');
+        });
+        rows[0].classList.add('selected');
+    }
+    
+    // Highlight baris warna berdasarkan color group
+    highlightBlueRows();
+    
+    console.log("Sorting complete");
 }
 
-function closeColorTable() {
-    console.log('Closing color table modal');
+// Fungi memilih baris saat ini dan menutup modal
+function selectCurrentRow() {
+    var selectedRow = document.querySelector('#colorDataTable tbody tr.selected');
+    if (!selectedRow) {
+        console.log("No row selected");
+        return;
+    }
+    
+    var colorId = selectedRow.cells[0].textContent.trim();
+    var colorName = selectedRow.cells[1].textContent.trim();
+    console.log("Selected color ID: " + colorId);
+    
+    // Pilih warna dan tutup modal
+    selectColor(colorId, colorName);
+}
+
+// Fungsi memilih warna
+function selectColor(colorId, colorName) {
+    console.log('Selecting color: ' + colorId + ' - ' + colorName);
+    
+    // Isi input form dengan ID warna yang dipilih
+    var colorInput = document.querySelector('input[type="text"]');
+    if (colorInput) {
+        colorInput.value = colorId;
+    }
+    
+    // Tutup modal
+    closeColorModal();
+}
+
+// Fungsi menutup modal
+function closeColorModal() {
     var modal = document.getElementById('colorTableWindow');
     if (modal) {
         modal.style.display = 'none';
@@ -114,26 +110,38 @@ function closeColorTable() {
     }
 }
 
-function selectColor(colorId) {
-    console.log('Selecting color: ' + colorId);
-    var input = document.querySelector('input[type="text"]');
-    if (input) {
-        input.value = colorId;
-    }
-    closeColorTable();
-}
-
+// Fungsi memilih baris
 function selectRow(row) {
-    // Remove selected class from all rows
-    var rows = document.querySelectorAll('#colorDataTable tbody tr');
-    rows.forEach(function(r) {
+    // Hapus kelas 'selected' dari semua baris
+    var allRows = document.querySelectorAll('#colorDataTable tbody tr');
+    allRows.forEach(function(r) {
         r.classList.remove('selected');
     });
     
-    // Add selected class to this row
+    // Tambahkan kelas 'selected' ke baris yang dipilih
     row.classList.add('selected');
 }
 
+// Fungsi untuk menampilkan modal
+function openColorModal() {
+    console.log('Opening color modal');
+    var modal = document.getElementById('colorTableWindow');
+    if (!modal) {
+        console.error('Modal element not found');
+        return;
+    }
+    
+    // Tampilkan modal
+    modal.style.display = 'block';
+    modal.classList.remove('hidden');
+    
+    // Urutkan berdasarkan Color# secara default
+    sortTableDirectly(0);
+    
+    console.log('Modal opened successfully');
+}
+
+// Fungsi untuk memberikan warna biru pada baris tertentu
 function highlightBlueRows() {
     // Color rows based on the pattern shown in the image
     var rows = document.querySelectorAll('#colorDataTable tbody tr');
@@ -153,6 +161,27 @@ function highlightBlueRows() {
             row.classList.add('blue-row');
         }
     });
+}
+
+// Mapping nama Color Group berdasarkan ID
+function getCGName(cgId) {
+    // Map of color group IDs to names based on ColorGroupSeeder
+    const cgNames = {
+        '01': 'BLACK',
+        '02': 'WHITE',
+        '03': 'RED',
+        '04': 'BLUE',
+        '05': 'GREEN',
+        '06': 'CYAN',
+        '07': 'MAGENTA',
+        '08': 'PINK'
+    };
+    
+    return cgNames[cgId] || '';
+}
+
+function closeModalX() {
+    closeColorModal();
 }
 </script>
 
@@ -221,7 +250,7 @@ function highlightBlueRows() {
         <!-- Modal Header - Title Bar -->
         <div class="bg-blue-800 px-1 py-0.5 text-white flex justify-between items-center">
             <h3 class="text-xs font-normal">Color Table</h3>
-            <button type="button" onclick="closeColorTable()" class="text-white hover:text-gray-200 focus:outline-none">
+            <button type="button" onclick="closeModalX()" class="text-white hover:text-gray-200 focus:outline-none">
                 <span class="text-lg">×</span>
             </button>
         </div>
@@ -250,7 +279,7 @@ function highlightBlueRows() {
                                 data-cg-id="{{ $color->color_group_id }}"
                                 data-cg-type="{{ $color->cg_type ?? '' }}"
                                 onclick="selectRow(this); event.stopPropagation();"
-                                ondblclick="selectColor('{{ $color->color_id }}')">
+                                ondblclick="selectColor('{{ $color->color_id }}', '{{ $color->color_name }}')">
                                 <td class="px-2 py-0.5 border-b border-r border-gray-300">{{ $color->color_id }}</td>
                                 <td class="px-2 py-0.5 border-b border-r border-gray-300">{{ $color->color_name }}</td>
                                 <td class="px-2 py-0.5 border-b border-r border-gray-300">{{ $color->origin }}</td>
@@ -282,11 +311,11 @@ function highlightBlueRows() {
 
             <!-- Bottom Buttons with equal spacing -->
             <div class="flex justify-between mt-2">
-                <button type="button" id="btnSortByColor" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-20">By Color#</button>
-                <button type="button" id="btnSortByCG" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-24">By CG# + Color#</button>
-                <button type="button" id="btnSortByCGType" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-28">By CG Type + Color#</button>
-                <button type="button" id="btnSelect" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-16">Select</button>
-                <button type="button" id="btnExit" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-16">Exit</button>
+                <button type="button" onclick="sortTableDirectly(0)" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-20">By Color#</button>
+                <button type="button" onclick="sortTableDirectly(3)" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-24">By CG# + Color#</button>
+                <button type="button" onclick="sortTableDirectly(5)" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-28">By CG Type + Color#</button>
+                <button type="button" onclick="selectCurrentRow()" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-16">Select</button>
+                <button type="button" onclick="closeColorModal()" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-16">Exit</button>
             </div>
         </div>
     </div>
@@ -294,116 +323,91 @@ function highlightBlueRows() {
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded');
+// Fungsi untuk mengurutkan tabel
+function sortTableDirectly(columnIndex) {
+    console.log("Sorting by column: " + columnIndex);
     
-    // Modal handling
-    var colorTableWindow = document.getElementById('colorTableWindow');
-    var showColorTableBtn = document.getElementById('showColorTableBtn');
-    var btnExit = document.getElementById('btnExit');
-    
-    // Sort buttons
-    var btnSortByColor = document.getElementById('btnSortByColor');
-    var btnSortByCG = document.getElementById('btnSortByCG');
-    var btnSortByCGType = document.getElementById('btnSortByCGType');
-    var btnSelect = document.getElementById('btnSelect');
-    
-    // Open modal
-    if (showColorTableBtn) {
-        showColorTableBtn.onclick = function() {
-            console.log('Show button clicked');
-            if (colorTableWindow) {
-                colorTableWindow.style.display = 'block';
-                colorTableWindow.classList.remove('hidden');
-            }
-        };
+    var table = document.getElementById('colorDataTable');
+    if (!table) {
+        console.error("Table not found");
+        return;
     }
     
-    // Close modal
-    if (btnExit) {
-        btnExit.onclick = function() {
-            console.log('Exit button clicked');
-            closeModal();
-        };
+    var tbody = table.querySelector('tbody');
+    if (!tbody) {
+        console.error("Table body not found");
+        return;
     }
     
-    // Handle clicking outside to close
-    if (colorTableWindow) {
-        colorTableWindow.onclick = function(e) {
-            if (e.target === colorTableWindow) {
-                closeModal();
-            }
-        };
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Jangan urutkan jika tidak ada data atau hanya ada pesan "tidak ada data"
+    if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'))) {
+        console.log("No data to sort");
+        return;
     }
     
-    // Sorting functions
-    if (btnSortByColor) {
-        btnSortByColor.onclick = function() {
-            console.log('Sort by Color# clicked');
-            sortTableByColumn(0); // First column (Color#)
-        };
-    }
-    
-    if (btnSortByCG) {
-        btnSortByCG.onclick = function() {
-            console.log('Sort by CG# clicked');
-            sortTableByColumn(3); // Fourth column (CG#)
-        };
-    }
-    
-    if (btnSortByCGType) {
-        btnSortByCGType.onclick = function() {
-            console.log('Sort by CG Type clicked');
-            sortTableByColumn(5); // Sixth column (CG Type)
-        };
-    }
-    
-    // Select button
-    if (btnSelect) {
-        btnSelect.onclick = function() {
-            console.log('Select button clicked');
-            var selected = document.querySelector('#colorDataTable tbody tr.selected');
-            if (selected) {
-                var colorId = selected.cells[0].textContent.trim();
-                selectColor(colorId);
-            }
-        };
-    }
-    
-    // Set up row click events
-    setupRowEvents();
-});
-
-function setupRowEvents() {
-    var rows = document.querySelectorAll('#colorDataTable tbody tr');
-    
-    rows.forEach(function(row) {
-        // Skip the no-data row
-        if (row.cells.length === 1) return;
+    // Urutkan baris berdasarkan isi kolom
+    rows.sort(function(a, b) {
+        // Periksa apakah kolom tersedia
+        if (!a.cells[columnIndex] || !b.cells[columnIndex]) {
+            return 0;
+        }
         
-        // Click to select
-        row.onclick = function(e) {
-            e.stopPropagation();
-            
-            // Remove selection from all rows
-            var allRows = document.querySelectorAll('#colorDataTable tbody tr');
-            allRows.forEach(function(r) {
-                r.classList.remove('selected');
-            });
-            
-            // Add selected class to this row
-            this.classList.add('selected');
-        };
+        var textA = a.cells[columnIndex].textContent.trim();
+        var textB = b.cells[columnIndex].textContent.trim();
         
-        // Double-click to select and close
-        row.ondblclick = function() {
-            var colorId = this.cells[0].textContent.trim();
-            selectColor(colorId);
-        };
+        // Pengurutan berbasis numerik untuk kolom ID
+        if (columnIndex === 0 || columnIndex === 3) {
+            return textA.localeCompare(textB, undefined, { numeric: true });
+        }
+        
+        // Pengurutan teks biasa untuk kolom lainnya
+        return textA.localeCompare(textB);
     });
+    
+    // Hapus semua baris dari tabel
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    
+    // Tambahkan baris yang sudah diurutkan ke tabel
+    rows.forEach(function(row) {
+        tbody.appendChild(row);
+    });
+    
+    // Highlight baris pertama setelah pengurutan
+    if (rows.length > 0) {
+        rows.forEach(function(row) {
+            row.classList.remove('selected');
+        });
+        rows[0].classList.add('selected');
+    }
+    
+    // Highlight baris warna berdasarkan color group
+    highlightBlueRows();
+    
+    console.log("Sorting complete");
 }
 
-function closeModal() {
+// Fungsi untuk memilih baris saat ini dan menutup modal
+function selectCurrentRow() {
+    var selectedRow = document.querySelector('#colorDataTable tbody tr.selected');
+    if (!selectedRow) {
+        console.log("No row selected");
+        return;
+    }
+    
+    var colorId = selectedRow.cells[0].textContent.trim();
+    var colorName = selectedRow.cells[1].textContent.trim();
+    console.log("Selected color ID: " + colorId);
+    
+    // Pilih warna dan tutup modal
+    selectColor(colorId, colorName);
+}
+
+// Fungsi untuk menutup modal
+function closeColorModal() {
     var modal = document.getElementById('colorTableWindow');
     if (modal) {
         modal.style.display = 'none';
@@ -411,65 +415,73 @@ function closeModal() {
     }
 }
 
-function selectColor(colorId) {
-    console.log('Selecting color: ' + colorId);
-    var input = document.querySelector('input[type="text"]');
-    if (input) {
-        input.value = colorId;
-    }
-    closeModal();
+// Fungsi untuk memilih baris
+function selectRow(row) {
+    // Hapus kelas 'selected' dari semua baris
+    var allRows = document.querySelectorAll('#colorDataTable tbody tr');
+    allRows.forEach(function(r) {
+        r.classList.remove('selected');
+    });
+    
+    // Tambahkan kelas 'selected' ke baris yang dipilih
+    row.classList.add('selected');
 }
 
-function sortTableByColumn(columnIndex) {
-    console.log('Sorting by column: ' + columnIndex);
-    var table = document.getElementById('colorDataTable');
-    var tbody = table.querySelector('tbody');
-    var rows = Array.from(tbody.querySelectorAll('tr'));
+// Inisialisasi event handler saat dokumen dimuat
+document.addEventListener('DOMContentLoaded', function() {
+    // Dapatkan tombol dan modal
+    var showBtn = document.getElementById('showColorTableBtn');
+    var colorModal = document.getElementById('colorTableWindow');
     
-    // Skip if there's only a "no data" message
-    if (rows.length === 1 && rows[0].cells.length === 1) {
-        return;
-    }
-    
-    // Sort the rows based on the specified column
-    rows.sort(function(rowA, rowB) {
-        // Handle potential missing cells
-        if (!rowA.cells[columnIndex] || !rowB.cells[columnIndex]) {
-            return 0;
-        }
-        
-        var textA = rowA.cells[columnIndex].textContent.trim();
-        var textB = rowB.cells[columnIndex].textContent.trim();
-        
-        // If sorting by Color# (column 0) or CG# (column 3), do numeric sort
-        if (columnIndex === 0 || columnIndex === 3) {
-            // Remove leading zeros for numeric comparison
-            textA = textA.replace(/^0+/, '');
-            textB = textB.replace(/^0+/, '');
-            
-            // If both are numbers, compare numerically
-            if (!isNaN(textA) && !isNaN(textB)) {
-                return parseInt(textA) - parseInt(textB);
+    // Tambahkan event listener ke tombol untuk menampilkan modal
+    if (showBtn) {
+        showBtn.onclick = function() {
+            if (colorModal) {
+                colorModal.style.display = 'block';
+                colorModal.classList.remove('hidden');
+                
+                // Urutkan berdasarkan kolom pertama secara default
+                sortTableDirectly(0);
             }
-        }
-        
-        // Default to string comparison
-        return textA.localeCompare(textB);
-    });
-    
-    // Clear the table and append the sorted rows
-    rows.forEach(function(row) {
-        tbody.appendChild(row);
-    });
-    
-    // Select the first row after sorting
-    if (rows.length > 0) {
-        rows.forEach(function(row) {
-            row.classList.remove('selected');
-        });
-        rows[0].classList.add('selected');
+        };
     }
-}
+    
+    // Atur event untuk baris tabel
+    var tableRows = document.querySelectorAll('#colorDataTable tbody tr');
+    tableRows.forEach(function(row) {
+        // Lewati baris "tidak ada data"
+        if (row.querySelector('td[colspan]')) return;
+        
+        // Event klik untuk memilih baris
+        row.onclick = function(e) {
+            e.stopPropagation();
+            selectRow(this);
+        };
+        
+        // Event klik ganda untuk memilih warna
+        row.ondblclick = function() {
+            var colorId = this.cells[0].textContent.trim();
+            
+            // Isi input form
+            var colorInput = document.querySelector('input[type="text"]');
+            if (colorInput) {
+                colorInput.value = colorId;
+            }
+            
+            // Tutup modal
+            closeColorModal();
+        };
+    });
+    
+    // Tutup modal saat mengklik area di luar tabel
+    if (colorModal) {
+        colorModal.onclick = function(e) {
+            if (e.target === colorModal) {
+                closeColorModal();
+            }
+        };
+    }
+});
 </script>
 @endpush
 
@@ -542,6 +554,13 @@ function sortTableByColumn(columnIndex) {
     
     button:active {
         transform: translateY(1px);
+    }
+    
+    /* Sort button active style */
+    .sort-btn.active-sort {
+        background-color: #4299e1;
+        color: white;
+        font-weight: bold;
     }
     
     /* Classic Windows scrollbar style */
