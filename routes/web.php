@@ -18,6 +18,7 @@ use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ColorGroupController;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -129,4 +130,14 @@ Route::resource('paper-flute', PaperFluteController::class)->middleware('auth');
 Route::resource('color', ColorController::class);
 
 Route::resource('color-group', ColorGroupController::class);
+
+// Add a route to run the color seeder
+Route::get('/run-color-seeder', function () {
+    try {
+        Artisan::call('db:seed', ['--class' => 'ColorSeeder']);
+        return redirect()->back()->with('success', 'Color seeder berhasil dijalankan');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+    }
+})->name('run.color.seeder');
 

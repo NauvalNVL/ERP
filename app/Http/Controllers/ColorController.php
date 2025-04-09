@@ -27,12 +27,27 @@ class ColorController extends Controller
                     ->orderBy('color_id', 'asc')
                     ->get();
             } else {
+                // Get all colors matching the seed data structure
                 $colors = DB::table('colors')
+                    ->select([
+                        'color_id',
+                        'color_name',
+                        'origin',
+                        'color_group_id',
+                        'cg_type'
+                    ])
                     ->orderBy('color_id', 'asc')
                     ->get();
             }
             
             $colorGroups = ColorGroup::all();
+            
+            // For debugging
+            if ($colors->isEmpty()) {
+                Log::info('No colors found in the database');
+            } else {
+                Log::info('Found ' . $colors->count() . ' colors in the database');
+            }
             
             return view('system-requirement.color', [
                 'colors' => $colors,
