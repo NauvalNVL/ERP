@@ -201,9 +201,9 @@ function closeModalX() {
             </button>
             <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                 <i class="fas fa-search"></i>
-            </button>
+                </button>
             <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                <i class="fas fa-save"></i>
+                    <i class="fas fa-save"></i>
             </button>
         </div>
 
@@ -239,10 +239,10 @@ function closeModalX() {
         @elseif(count($colors) > 0)
         <div class="mt-4 bg-green-100 p-3 rounded">
             <p class="text-sm font-medium text-green-800">Data tersedia: {{ count($colors) }} warna ditemukan.</p>
-        </div>
+                    </div>
         @endif
-    </div>
-</div>
+                    </div>
+            </div>
 
 <!-- Color Table Window -->
 <div id="colorTableWindow" class="hidden fixed inset-0 z-50">
@@ -254,7 +254,7 @@ function closeModalX() {
                 <span class="text-lg">×</span>
             </button>
         </div>
-        
+
         <!-- Table Content -->
         <div class="p-1">
             <div class="border border-gray-300 overflow-hidden">
@@ -267,11 +267,11 @@ function closeModalX() {
                             <th class="px-2 py-0.5 bg-gray-100 border-b border-r border-gray-300 text-left text-xs font-semibold">CG#</th>
                             <th class="px-2 py-0.5 bg-gray-100 border-b border-r border-gray-300 text-left text-xs font-semibold">CG Name</th>
                             <th class="px-2 py-0.5 bg-gray-100 border-b border-gray-300 text-left text-xs font-semibold">CG Type</th>
-                        </tr>
-                    </thead>
+                    </tr>
+                </thead>
                     <tbody class="text-xs">
                         @if(isset($colors) && count($colors) > 0)
-                            @foreach($colors as $color)
+                    @foreach($colors as $color)
                             <tr class="cursor-pointer" 
                                 data-color-id="{{ $color->color_id }}"
                                 data-color-name="{{ $color->color_name }}"
@@ -296,18 +296,18 @@ function closeModalX() {
                                     @else
                                         {{ $color->color_group_id }}
                                     @endif
-                                </td>
+                        </td>
                                 <td class="px-2 py-0.5 border-b border-gray-300">{{ $color->cg_type ?? '' }}</td>
-                            </tr>
-                            @endforeach
+                    </tr>
+                    @endforeach
                         @else
                             <tr>
                                 <td colspan="6" class="px-2 py-4 text-center border-b border-gray-300">Tidak ada data warna yang tersedia.</td>
                             </tr>
                         @endif
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
+        </div>
 
             <!-- Bottom Buttons with equal spacing -->
             <div class="flex justify-between mt-2">
@@ -404,10 +404,10 @@ function selectCurrentRow() {
     
     // Pilih warna dan tutup modal
     selectColor(colorId, colorName);
-}
+    }
 
-// Fungsi untuk menutup modal
-function closeColorModal() {
+    // Fungsi untuk menutup modal
+    function closeColorModal() {
     var modal = document.getElementById('colorTableWindow');
     if (modal) {
         modal.style.display = 'none';

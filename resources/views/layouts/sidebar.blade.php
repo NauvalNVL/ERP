@@ -208,6 +208,10 @@
                                     <i class="fas fa-box w-3 h-3 mr-3"></i>
                                     <span>Define Product</span>
                                 </a>
+                                <a href="{{ route('product-design.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-drafting-compass w-3 h-3 mr-3"></i>
+                                    <span>Define Product Design</span>
+                                </a>
                                 <a href="{{ route('scoring-tool.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-cut w-3 h-3 mr-3"></i>
                                     <span>Define Scoring Tool</span>

@@ -19,6 +19,7 @@ use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ColorGroupController;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\ProductDesignController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -66,6 +67,14 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('product-group', ProductGroupController::class);
     Route::resource('product', ProductController::class);
+
+    // Product Design Routes
+    Route::get('/product-design', [ProductDesignController::class, 'index'])->name('product-design.index');
+    Route::get('/product-design/create', [ProductDesignController::class, 'create'])->name('product-design.create');
+    Route::post('/product-design', [ProductDesignController::class, 'store'])->name('product-design.store');
+    Route::get('/product-design/{id}/edit', [ProductDesignController::class, 'edit'])->name('product-design.edit');
+    Route::put('/product-design/{id}', [ProductDesignController::class, 'update'])->name('product-design.update');
+    Route::delete('/product-design/{id}', [ProductDesignController::class, 'destroy'])->name('product-design.destroy');
 
     // Tambahkan route berikut di dalam middleware auth
     Route::resource('paper-size', PaperSizeController::class);
