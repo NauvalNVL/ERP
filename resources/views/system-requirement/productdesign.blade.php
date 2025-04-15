@@ -2,10 +2,13 @@
 
 @section('title', 'Define Product Design')
 
+@section('header', 'Define Product Design')
+
 @section('content')
 <div class="container mx-auto p-6">
     <div class="bg-white shadow-lg rounded-lg">
         <div class="p-4">
+            
             <!-- Navigation buttons -->
             <div class="flex items-center space-x-1 mb-4">
                 <button type="button" class="p-1 hover:bg-gray-200 border border-gray-300">
