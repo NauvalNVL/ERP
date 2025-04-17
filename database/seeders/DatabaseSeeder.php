@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ScoringToolSeeder::class,
             UserSeeder::class,
             ColorSeeder::class,
+            ColorGroupSeeder::class,
         ]);
     }
 }
