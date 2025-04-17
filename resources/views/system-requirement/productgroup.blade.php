@@ -720,7 +720,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="loadingOverlay" class="loading-overlay hidden">
             <div class="loading-spinner"></div>
         </div>
-        
+
         <div class="bg-white rounded-lg shadow-lg p-6">
             <!-- Header with navigation buttons -->
             <div class="flex items-center space-x-2 mb-6">
@@ -735,11 +735,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
                 <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-search"></i>
-                </button>
+                    </button>
                 <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-save"></i>
                 </button>
-            </div>
+    </div>
 
             <!-- Search Section -->
             <div class="flex justify-between items-center mb-6">
@@ -754,9 +754,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="text-gray-600">Record:</span>
                     <button type="button" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 border border-gray-300">
                         Select
-                    </button>
-                </div>
-            </div>
+            </button>
+    </div>
+</div>
 
             <!-- Debug Information -->
             @if(empty($productGroups) || count($productGroups) === 0)
@@ -769,13 +769,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     </a>
                     <button onclick="loadSeedData()" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded">
                         Load Product Group Seeder Data (JS)
-                    </button>
+                        </button>
                 </div>
             </div>
             @elseif(count($productGroups) > 0)
             <div class="mt-4 bg-green-100 p-3 rounded">
                 <p class="text-sm font-medium text-green-800">Data tersedia: {{ count($productGroups) }} product group ditemukan.</p>
-            </div>
+        </div>
             @endif
         </div>
     </div>
@@ -817,7 +817,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td class="px-2 py-0.5 border-b border-r border-gray-300">{{ $group->product_group_id }}</td>
                                 <td class="px-2 py-0.5 border-b border-r border-gray-300">{{ $group->product_group_name }}</td>
                                 <td class="px-2 py-0.5 border-b border-gray-300">{{ $group->is_active ? 'Active' : 'Inactive' }}</td>
-                            </tr>
+                        </tr>
                         @endforeach
                         @else
                             <tr>

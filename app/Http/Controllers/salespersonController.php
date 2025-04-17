@@ -12,7 +12,10 @@ class SalesPersonController extends Controller
 {
     public function index()
     {
-        return view('system-requirement.salesperson');
+        $salespersons = Salesperson::orderBy('code')->get();
+        \Log::info('Salespersons count in index: ' . $salespersons->count());
+        
+        return view('system-requirement.salesperson', compact('salespersons'));
     }
 
     public function list()
