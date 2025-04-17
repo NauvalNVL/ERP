@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('salesperson', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 10)->unique();
-            $table->string('name', 100);
-            $table->foreignId('sales_team_id')->constrained('sales_team');
-            $table->string('position', 50);
+            $table->string('code', 10)->unique()->comment('Salesperson code');
+            $table->string('name', 100)->comment('Salesperson name');
+            $table->foreignId('sales_team_id')->nullable()->constrained('sales_team');
+            $table->string('position', 50)->nullable();
+            $table->string('user_id', 20)->nullable()->comment('User ID for this salesperson');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

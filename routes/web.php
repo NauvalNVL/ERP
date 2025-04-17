@@ -150,3 +150,32 @@ Route::get('/run-color-seeder', function () {
     }
 })->name('run.color.seeder');
 
+// Add a route to run the salesperson seeder
+Route::get('/run-salesperson-seeder', function () {
+    try {
+        Artisan::call('db:seed', ['--class' => 'SalespersonSeeder']);
+        return redirect()->back()->with('success', 'Salesperson seeder berhasil dijalankan');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+    }
+})->name('run.salesperson.seeder');
+
+// Add a POST route for AJAX requests to run the salesperson seeder
+Route::post('/run-salesperson-seeder', function () {
+    try {
+        $output = Artisan::call('db:seed', ['--class' => 'SalespersonSeeder']);
+        $count = DB::table('salesperson')->count();
+        return response()->json([
+            'success' => true,
+            'message' => 'Salesperson seeder berhasil dijalankan',
+            'count' => $count,
+            'output' => $output
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+

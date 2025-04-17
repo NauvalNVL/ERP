@@ -9,6 +9,9 @@ class Salesperson extends Model
 {
     use HasFactory;
 
+    // Set the table name explicitly to match the migration
+    protected $table = 'salesperson';
+
     protected $fillable = [
         'code',
         'name',

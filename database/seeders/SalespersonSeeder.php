@@ -12,12 +12,17 @@ class SalespersonSeeder extends Seeder
      */
     public function run(): void
     {
+        // Clear the table before seeding
+        DB::table('salesperson')->truncate();
+
         $salespersons = [
             [
                 'code' => 'S101',
                 'name' => 'ABENG',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'root',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -26,6 +31,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'AGUNG',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -34,6 +41,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'EKO',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -42,6 +51,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'ELIAS',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -50,6 +61,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'FEBBY',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -58,6 +71,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'HASAN',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -66,6 +81,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'HENGKI',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -74,14 +91,18 @@ class SalespersonSeeder extends Seeder
                 'name' => 'IN HOUSE',
                 'sales_team_id' => 2, // MANAGEMENT LOCAL
                 'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'code' => 'S109',
                 'name' => 'IN HOUSE FREELANCE JONO',
-                'sales_team_id' => 2, // MANAGEMENT LOCAL
+                'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -90,6 +111,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'INDAH SIE',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -98,6 +121,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'KHOES TJ',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -106,6 +131,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'KURNIAWAN',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -114,6 +141,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'MARTIN',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -122,6 +151,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'MEGA',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -130,6 +161,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'MELINA',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -138,6 +171,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'MULTI NATIONAL COMPANY',
                 'sales_team_id' => 3, // MANAGEMENT MNC
                 'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -146,6 +181,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'ROBERT',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -154,6 +191,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'ROBERT PURBA',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -162,6 +201,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'SUSAN',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -170,6 +211,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'TEDDY',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -178,6 +221,8 @@ class SalespersonSeeder extends Seeder
                 'name' => 'TORRY',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -186,6 +231,188 @@ class SalespersonSeeder extends Seeder
                 'name' => 'TUN WIE',
                 'sales_team_id' => 1, // MBI
                 'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S123',
+                'name' => 'YONAS',
+                'sales_team_id' => 1, // MBI
+                'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S124',
+                'name' => 'FEIGE SIE',
+                'sales_team_id' => 2, // MANAGEMENT LOCAL
+                'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S125',
+                'name' => 'INHOUSE FREELANCE SUFATO',
+                'sales_team_id' => 1, // MBI
+                'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S126',
+                'name' => 'INHOUSE FREELANCE ROBBY',
+                'sales_team_id' => 1, // MBI
+                'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S127',
+                'name' => 'KIRBY',
+                'sales_team_id' => 1, // MBI
+                'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S128',
+                'name' => '-',
+                'sales_team_id' => 2, // MANAGEMENT LOCAL
+                'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S129',
+                'name' => 'MULTI NATIONAL COMPANY OIA',
+                'sales_team_id' => 3, // MANAGEMENT MNC
+                'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S130',
+                'name' => 'MULTI NATIONAL COMPANY PACCCESS',
+                'sales_team_id' => 3, // MANAGEMENT MNC
+                'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S131',
+                'name' => 'MULTI NATIONAL COMPANY PILAR',
+                'sales_team_id' => 3, // MANAGEMENT MNC
+                'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S132',
+                'name' => 'MULTI NATIONAL COMPANY AVERY',
+                'sales_team_id' => 3, // MANAGEMENT MNC
+                'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S133',
+                'name' => 'INHOUSE ROLL',
+                'sales_team_id' => 2, // MANAGEMENT LOCAL
+                'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S134',
+                'name' => '-',
+                'sales_team_id' => 2, // MANAGEMENT LOCAL
+                'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S135',
+                'name' => '-',
+                'sales_team_id' => 2, // MANAGEMENT LOCAL
+                'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S136',
+                'name' => 'INHOUSE FREELANCE BOBBY',
+                'sales_team_id' => 1, // MBI
+                'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S137',
+                'name' => 'INHOUSE FREELANCE YULI',
+                'sales_team_id' => 1, // MBI
+                'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S138',
+                'name' => 'INHOUSE MARWAN',
+                'sales_team_id' => 1, // MBI
+                'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S139',
+                'name' => 'LATH LATN',
+                'sales_team_id' => 2, // MANAGEMENT LOCAL
+                'position' => 'E - Executive',
+                'user_id' => 'MKT',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'S140',
+                'name' => 'FEBRIAN',
+                'sales_team_id' => 1, // MBI
+                'position' => 'E - Executive',
+                'user_id' => 'SLS',
+                'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
