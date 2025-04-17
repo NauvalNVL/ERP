@@ -19,6 +19,7 @@ class Kernel extends HttpKernel
     protected $middlewareGroups = [
         'web' => [
             // Web middleware group
+            \App\Http\Middleware\HandleInertiaRequests::class,
         ],
 
         'api' => [

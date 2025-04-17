@@ -20,10 +20,19 @@ use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ColorGroupController;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ProductDesignController;
+use App\Http\Controllers\DashboardController;
+
+use Inertia\Inertia;
+
+Route::get('/test-vue', function () {
+    return Inertia::render('Dashboard');
+});
 
 Route::get('/', function () {
     return redirect('/login');
 });
+
+
 
 Route::get('/test-db', function () {
     try {
@@ -40,6 +49,10 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    // prefix /vue
+    Route::prefix('vue')->group(function () {
+         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    });
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/dashboard', function () {
         return view('dashboard');

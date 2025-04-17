@@ -1,6 +1,6 @@
-@import "tailwindcss/preflight";
 @import "tailwindcss";
 @source "../views";
+/* @source "../views"; */
 
 @layer utilities {
     .transform {

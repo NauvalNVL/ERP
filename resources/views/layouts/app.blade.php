@@ -5,17 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'ERP System')</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- @vite('resources/css/app.css') -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    // konfigurasi tema kustom di sini jika diperlukan
-                }
-            }
-        }
-    </script>
+    @vite('resources/css/app.css')
+    @vite('resources/js/app.js')
+    @if(Request::is('vue/*'))
+    @inertiaHead
+    @endif
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @media (min-width: 1024px) {
@@ -85,7 +80,11 @@
 
                 <!-- Page Content -->
                 <div class="p-4 md:p-6 flex-grow">
-                    @yield('content')
+                    @if(Request::is('vue/*'))
+                    @inertia
+                    @else
+                    @yield('content')       
+                    @endif
                 </div>
             </div>
         </div>

@@ -8,7 +8,7 @@ use App\Models\SalesTeam;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class SalespersonController extends Controller
+class SalesPersonController extends Controller
 {
     public function index()
     {
