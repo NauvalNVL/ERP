@@ -11,12 +11,12 @@ class ProductDesignController extends Controller
     public function index()
     {
         $designs = ProductDesign::all();
-        return view('product-design.index', compact('designs'));
+        return view('system-requirement.productdesign', compact('designs'));
     }
 
     public function create()
     {
-        return view('product-design.create');
+        return view('system-requirement.productdesign');
     }
 
     public function store(Request $request)
@@ -38,7 +38,8 @@ class ProductDesignController extends Controller
     public function edit($id)
     {
         $design = ProductDesign::findOrFail($id);
-        return view('system-requirement.productdesign', compact('design'));
+        $productDesigns = ProductDesign::all();
+        return view('system-requirement.productdesign', compact('design', 'productDesigns'));
     }
 
     public function update(Request $request, $id)

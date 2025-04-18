@@ -7,6 +7,7 @@ use App\Models\ColorGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class ColorController extends Controller
 {
@@ -178,6 +179,42 @@ class ColorController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in ColorController@destroy: ' . $e->getMessage());
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Display a listing of the colors for Vue component.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            // Get all colors matching the seed data structure
+            $colors = DB::table('colors')
+                ->select([
+                    'color_id',
+                    'color_name',
+                    'origin',
+                    'color_group_id',
+                    'cg_type'
+                ])
+                ->orderBy('color_id', 'asc')
+                ->get();
+            
+            $colorGroups = ColorGroup::all();
+            
+            return Inertia::render('system-requirement/color', [
+                'colors' => $colors,
+                'colorGroups' => $colorGroups
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorController@vueIndex: ' . $e->getMessage());
+            return Inertia::render('system-requirement/color', [
+                'colors' => [],
+                'colorGroups' => [],
+                'error' => 'Terjadi kesalahan dalam menampilkan data warna: ' . $e->getMessage()
+            ]);
         }
     }
 }

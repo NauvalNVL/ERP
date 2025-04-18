@@ -2,105 +2,225 @@
 
 @section('title', 'Define Salesperson')
 
-@section('header', 'Define Salesperson')
-
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-    <div class="container mx-auto max-w-7xl">
-        <!-- Loading Overlay -->
-        <div id="loadingOverlay" class="loading-overlay hidden">
-            <div class="loading-spinner"></div>
-        </div>
-        
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <!-- Header with navigation buttons -->
-            <div class="flex items-center space-x-2 mb-6">
-                <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-power-off"></i>
-                </button>
-                <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-                <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-search"></i>
-                </button>
-                <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-save"></i>
-                </button>
-            </div>
+<script src="{{ asset('js/salesperson.js') }}"></script>
 
-            <!-- Search Section -->
-            <div class="flex justify-between items-center mb-6">
-                <div class="flex items-center space-x-2">
-                    <label class="text-gray-600">Salesperson Code:</label>
-                    <input type="text" class="border border-gray-300 rounded px-3 py-2 w-48">
-                    <button type="button" id="showSalespersonTableBtn" class="bg-gray-200 hover:bg-gray-300 px-2 py-2 border border-gray-400" onclick="openSalespersonModal()">
-                        <i class="fas fa-table text-gray-600"></i>
+<!-- Header Section -->
+<div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
+    <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-user-tie mr-3"></i> Define Salesperson
+    </h2>
+    <p class="text-cyan-100">Definisikan data salesperson untuk manajemen pengguna dan tim penjualan</p>
+</div>
+
+<div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column - Main Content -->
+        <div class="lg:col-span-2">
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+                <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
+                    <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                        <i class="fas fa-edit text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800">Salesperson Management</h3>
+                </div>
+    
+                <!-- Header with navigation buttons -->
+                <div class="flex items-center space-x-2 mb-6">
+                    <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-save"></i>
                     </button>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <span class="text-gray-600">Record:</span>
-                    <button type="button" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 border border-gray-300">
-                        Select
-                    </button>
-                </div>
-            </div>
 
-            <!-- Debug Information -->
-            <div class="debug-info">
+                <!-- Search Section -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code:</label>
+                        <div class="relative flex">
+                            <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                                <i class="fas fa-user-tie"></i>
+                            </span>
+                            <input type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                            <button type="button" id="showSalespersonTableBtn" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px" onclick="openSalespersonModal()">
+                                <i class="fas fa-table"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
+                        <button type="button" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                            <i class="fas fa-list-ul mr-2"></i> Select Record
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Debug Information -->
                 @if(empty($salespersons) || (isset($salespersons) && count($salespersons) == 0))
-                    <div class="alert alert-danger mt-4">
-                        <h4>Warning: No Salesperson found</h4>
-                        <p>Please ensure database tables are set up correctly and run the salesperson seeder.</p>
-                        <a href="{{ route('run.salesperson.seeder') }}" class="btn btn-warning">Run Salesperson Seeder</a>
-                        <button class="btn btn-info" id="loadDataJsBtn">Load via JavaScript</button>
+                <div class="mt-4 bg-yellow-100 p-3 rounded alert-danger">
+                    <p class="text-sm font-medium text-yellow-800">Warning: No Salesperson found</p>
+                    <p class="text-xs text-yellow-700 mt-1">Please ensure database tables are set up correctly and run the salesperson seeder.</p>
+                    <div class="mt-2 flex items-center space-x-3">
+                        <a href="{{ route('run.salesperson.seeder') }}" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded transform active:translate-y-px">
+                            Run Salesperson Seeder (DB)
+                        </a>
+                        <button id="loadDataJsBtn" onclick="loadSeedData()" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transform active:translate-y-px">
+                            Load Salesperson Data (JS)
+                        </button>
                     </div>
-                @else
-                    <div class="alert alert-success mt-4">
-                        <h4>Found {{ count($salespersons) }} salespersons available</h4>
-                    </div>
+                </div>
+                @elseif(isset($salespersons) && count($salespersons) > 0)
+                <div class="mt-4 bg-green-100 p-3 rounded alert-success">
+                    <p class="text-sm font-medium text-green-800">Found {{ count($salespersons) }} salespersons available</p>
+                </div>
                 @endif
             </div>
+        </div>
 
-            <div class="flex justify-end mt-4">
-                <button type="button" id="runSeederBtn" class="bg-orange-500 hover:bg-orange-600 text-white text-xs px-4 py-1 rounded mr-2">Run Salesperson Seeder</button>
+        <!-- Right Column - Quick Info -->
+        <div class="lg:col-span-1">
+            <!-- Salesperson Info Card -->
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
+                <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                    <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                        <i class="fas fa-info-circle text-white"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">Info Salesperson</h3>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="p-4 bg-teal-50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Petunjuk</h4>
+                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                            <li>Kode salesperson harus unik</li>
+                            <li>Setiap salesperson memiliki satu tim penjualan</li>
+                            <li>Position menunjukkan level jabatan</li>
+                            <li>User ID digunakan untuk login sistem</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Sales Teams</h4>
+                        <div class="grid grid-cols-1 gap-2 text-sm">
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 flex items-center justify-center bg-purple-600 text-white rounded-full font-bold mr-2">1</span>
+                                <span>MBI</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">2</span>
+                                <span>MANAGEMENT LOCAL</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 flex items-center justify-center bg-green-600 text-white rounded-full font-bold mr-2">3</span>
+                                <span>MANAGEMENT MNC</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                    <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                        <i class="fas fa-link text-white"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">Tautan Cepat</h3>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3">
+                    <a href="#" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <div class="p-2 bg-purple-500 rounded-full mr-3">
+                            <i class="fas fa-users text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-purple-900">Sales Teams</p>
+                            <p class="text-xs text-purple-700">Kelola tim penjualan</p>
+                        </div>
+                    </a>
+
+                    <a href="#" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <div class="p-2 bg-blue-500 rounded-full mr-3">
+                            <i class="fas fa-chart-line text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-blue-900">Performance</p>
+                            <p class="text-xs text-blue-700">Lihat kinerja salesperson</p>
+                        </div>
+                    </a>
+
+                    <a href="#" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <div class="p-2 bg-green-500 rounded-full mr-3">
+                            <i class="fas fa-print text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-green-900">Cetak Daftar</p>
+                            <p class="text-xs text-green-700">Cetak daftar salesperson</p>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Salesperson Table Window -->
-<div id="salespersonTableWindow" class="hidden fixed inset-0 z-50">
-    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-gray-500 shadow-lg" style="width: 700px;">
+<div id="salespersonTableWindow" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 max-w-5xl mx-auto transform transition-transform duration-300" style="max-height: 80vh;">
         <!-- Modal Header - Title Bar -->
-        <div class="bg-blue-800 px-1 py-0.5 text-white flex justify-between items-center">
-            <h3 class="text-xs font-normal">Salesperson Table</h3>
-            <button type="button" onclick="closeModalX()" class="text-white hover:text-gray-200 focus:outline-none">
-                <span class="text-lg">×</span>
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h3 class="text-xl font-semibold">Salesperson Table</h3>
+            </div>
+            <button type="button" onclick="closeModalX()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                <i class="fas fa-times text-xl"></i>
             </button>
         </div>
 
         <!-- Table Content -->
-        <div class="p-1">
-            <div class="border border-gray-300 overflow-hidden">
-                <table class="w-full" id="salespersonDataTable">
-                    <thead>
+        <div class="p-5 overflow-auto" style="max-height: calc(80vh - 130px);">
+            <div class="mb-4">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" id="searchSalespersonInput" placeholder="Search salespersons..."
+                        class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200" id="salespersonDataTable">
+                    <thead class="bg-gray-50 sticky top-0">
                         <tr>
-                            <th class="px-2 py-0.5 bg-gray-100 border-b border-r border-gray-300 text-left text-xs font-semibold">Code</th>
-                            <th class="px-2 py-0.5 bg-gray-100 border-b border-r border-gray-300 text-left text-xs font-semibold">Name</th>
-                            <th class="px-2 py-0.5 bg-gray-100 border-b border-r border-gray-300 text-left text-xs font-semibold">Sales Team</th>
-                            <th class="px-2 py-0.5 bg-gray-100 border-b border-gray-300 text-left text-xs font-semibold">Position</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales Team</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                         </tr>
                     </thead>
-                    <tbody class="text-xs">
+                    <tbody class="bg-white divide-y divide-gray-200 text-xs">
                         <!-- Data dari database akan ditampilkan di sini jika tersedia -->
                         <!-- Jika tidak ada data dari database, JavaScript akan mengisi dengan data dari SalespersonSeeder -->
                         @if(isset($salespersons) && count($salespersons) > 0)
                         @foreach($salespersons as $person)
-                            <tr class="cursor-pointer" 
+                            <tr class="hover:bg-blue-50 cursor-pointer" 
                                 data-person-code="{{ $person->code }}"
                                 data-person-name="{{ $person->name }}"
                                 data-person-team="{{ $person->sales_team_id }}"
@@ -109,9 +229,9 @@
                                 data-person-is-active="{{ $person->is_active }}"
                                 onclick="selectRow(this); event.stopPropagation();"
                                 ondblclick="openEditSalespersonModal(this)">
-                                <td class="px-2 py-0.5 border-b border-r border-gray-300">{{ $person->code }}</td>
-                                <td class="px-2 py-0.5 border-b border-r border-gray-300">{{ $person->name }}</td>
-                                <td class="px-2 py-0.5 border-b border-r border-gray-300">
+                                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $person->code }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $person->name }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">
                                     @if($person->sales_team_id == 1)
                                         MBI
                                     @elseif($person->sales_team_id == 2)
@@ -120,704 +240,148 @@
                                         MANAGEMENT MNC
                                     @endif
                                 </td>
-                                <td class="px-2 py-0.5 border-b border-gray-300">{{ $person->position }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $person->position }}</td>
                             </tr>
                         @endforeach
                         @else
                             <tr>
-                                <td colspan="4" class="px-2 py-4 text-center border-b border-gray-300">Tidak ada data salesperson yang tersedia.</td>
+                                <td colspan="4" class="px-4 py-4 text-center text-gray-500">Tidak ada data salesperson yang tersedia.</td>
                             </tr>
                         @endif
                     </tbody>
                 </table>
             </div>
 
-            <!-- Bottom Buttons with equal spacing -->
-            <div class="flex justify-between mt-2">
-                <button type="button" onclick="sortTableDirectly(0)" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-24">By Code</button>
-                <button type="button" onclick="sortTableDirectly(1)" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-24">By Name</button>
-                <button type="button" onclick="sortTableDirectly(2)" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-24">By Team</button>
-                <button type="button" onclick="editSelectedRow()" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-24">Select</button>
-                <button type="button" onclick="closeSalespersonModal()" class="py-0.5 px-2 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs w-24">Exit</button>
+            <!-- Bottom Buttons -->
+            <div class="mt-4 grid grid-cols-5 gap-2">
+                <button type="button" onclick="sortTableDirectly(0)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                    <i class="fas fa-sort mr-1"></i>By Code
+                </button>
+                <button type="button" onclick="sortTableDirectly(1)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                    <i class="fas fa-sort mr-1"></i>By Name
+                </button>
+                <button type="button" onclick="sortTableDirectly(2)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                    <i class="fas fa-sort mr-1"></i>By Team
+                </button>
+                <button type="button" onclick="editSelectedRow()" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
+                    <i class="fas fa-edit mr-1"></i>Select
+                </button>
+                <button type="button" onclick="closeSalespersonModal()" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
+                    <i class="fas fa-times mr-1"></i>Exit
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Edit Salesperson Modal -->
-<div id="editSalespersonModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-30">
-    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-gray-500 shadow-lg" style="width: 400px;">
+<div id="editSalespersonModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
         <!-- Modal Header - Title Bar -->
-        <div class="bg-blue-800 px-1 py-0.5 text-white flex justify-between items-center">
-            <h3 class="text-xs font-normal">Define Salesperson</h3>
-            <button type="button" onclick="closeEditSalespersonModal()" class="text-white hover:text-gray-200 focus:outline-none">
-                <span class="text-lg">×</span>
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h3 class="text-xl font-semibold">Define Salesperson</h3>
+            </div>
+            <button type="button" onclick="closeEditSalespersonModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                <i class="fas fa-times text-xl"></i>
             </button>
         </div>
 
         <!-- Form Content -->
-        <div class="p-4">
-            <form id="editSalespersonForm" onsubmit="saveSalespersonChanges(); return false;">
-                <div class="space-y-3">
-                    <div class="flex items-center">
-                        <label class="w-24 text-xs text-gray-600">Code:</label>
-                        <input id="edit_person_code" type="text" class="border border-gray-300 rounded px-2 py-1 text-xs w-24" required>
+        <div class="p-6">
+            <form id="editSalespersonForm" onsubmit="saveSalespersonChanges(); return false;" class="space-y-4">
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label for="edit_person_code" class="block text-sm font-medium text-gray-700 mb-1">Code:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fas fa-hashtag"></i>
+                            </span>
+                            <input id="edit_person_code" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                        </div>
                     </div>
-                    <div class="flex items-center">
-                        <label class="w-24 text-xs text-gray-600">Name:</label>
-                        <input id="edit_person_name" type="text" class="border border-gray-300 rounded px-2 py-1 text-xs w-full" required>
+                    
+                    <div>
+                        <label for="edit_person_name" class="block text-sm font-medium text-gray-700 mb-1">Name:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input id="edit_person_name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                        </div>
                     </div>
-                    <div class="flex items-center">
-                        <label class="w-24 text-xs text-gray-600">Sales Team:</label>
-                        <select id="edit_person_team" class="border border-gray-300 rounded px-2 py-1 text-xs w-48" required>
-                            <option value="1">MBI</option>
-                            <option value="2">MANAGEMENT LOCAL</option>
-                            <option value="3">MANAGEMENT MNC</option>
-                        </select>
+                    
+                    <div>
+                        <label for="edit_person_team" class="block text-sm font-medium text-gray-700 mb-1">Sales Team:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fas fa-users"></i>
+                            </span>
+                            <select id="edit_person_team" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <option value="1">MBI</option>
+                                <option value="2">MANAGEMENT LOCAL</option>
+                                <option value="3">MANAGEMENT MNC</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="flex items-center">
-                        <label class="w-24 text-xs text-gray-600">Position:</label>
-                        <select id="edit_person_position" class="border border-gray-300 rounded px-2 py-1 text-xs w-48" required>
-                            <option value="E - Executive">E - Executive</option>
-                            <option value="M - Manager">M - Manager</option>
-                            <option value="S - Supervisor">S - Supervisor</option>
-                        </select>
+                    
+                    <div>
+                        <label for="edit_person_position" class="block text-sm font-medium text-gray-700 mb-1">Position:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fas fa-briefcase"></i>
+                            </span>
+                            <select id="edit_person_position" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <option value="E - Executive">E - Executive</option>
+                                <option value="M - Manager">M - Manager</option>
+                                <option value="S - Supervisor">S - Supervisor</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="flex items-center">
-                        <label class="w-24 text-xs text-gray-600">User ID:</label>
-                        <input id="edit_person_user_id" type="text" class="border border-gray-300 rounded px-2 py-1 text-xs w-48">
+                    
+                    <div>
+                        <label for="edit_person_user_id" class="block text-sm font-medium text-gray-700 mb-1">User ID:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fas fa-id-badge"></i>
+                            </span>
+                            <input id="edit_person_user_id" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        </div>
                     </div>
-                    <div class="flex items-center">
-                        <label class="w-24 text-xs text-gray-600">Status:</label>
-                        <select id="edit_person_is_active" class="border border-gray-300 rounded px-2 py-1 text-xs w-48" required>
-                            <option value="1">Active</option>
-                            <option value="0">Inactive</option>
-                        </select>
+                    
+                    <div>
+                        <label for="edit_person_is_active" class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fas fa-toggle-on"></i>
+                            </span>
+                            <select id="edit_person_is_active" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div class="flex justify-end mt-4">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-4 py-1 rounded mr-2">Save</button>
-                    <button type="button" onclick="closeEditSalespersonModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs px-4 py-1 rounded">Cancel</button>
+                
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeEditSalespersonModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
+                        <i class="fas fa-save mr-2"></i>Save
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Sales Person Table Modal -->
-<div class="modal fade" id="salespersonTableModal" tabindex="-1" role="dialog" aria-labelledby="salespersonTableModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="salespersonTableModalLabel">Sales Person Table</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <table id="salespersonTable" class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Code</th>
-                            <th>Name</th>
-                            <th>Sales Team</th>
-                            <th>Position</th>
-                            <th>User ID</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- This will be populated dynamically -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="editSelectedRowBtn">Edit Selected</button>
-            </div>
-        </div>
-    </div>
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden">
+    <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
 </div>
 
-<!-- Edit Sales Person Modal -->
-<div class="modal fade" id="editSalespersonModalBootstrap" tabindex="-1" role="dialog" aria-labelledby="editSalespersonModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editSalespersonModalLabel">Edit Sales Person</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="editSalespersonFormBootstrap">
-                    <input type="hidden" id="edit_id">
-                    <div class="form-group">
-                        <label for="edit_code">Sales Person Code</label>
-                        <input type="text" class="form-control" id="edit_code">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_name">Sales Person Name</label>
-                        <input type="text" class="form-control" id="edit_name">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_sales_team_id">Sales Team</label>
-                        <select class="form-control" id="edit_sales_team_id">
-                            <!-- This will be populated dynamically -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_position">Position</label>
-                        <input type="text" class="form-control" id="edit_position">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_user_id">User ID</label>
-                        <input type="text" class="form-control" id="edit_user_id">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_is_active">Status</label>
-                        <select class="form-control" id="edit_is_active">
-                            <option value="1">Active</option>
-                            <option value="0">Inactive</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveSalesperson">Save</button>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
-
-@section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM content loaded');
-        
-        // Test if the edit modal exists
-        const editModal = document.getElementById('editSalespersonModal');
-        if (editModal) {
-            console.log('Edit modal found in DOM');
-        } else {
-            console.error('Edit modal not found in DOM');
-        }
-        
-        // Add event listener for the Run Seeder button
-        var runSeederBtn = document.getElementById('runSeederBtn');
-        if (runSeederBtn) {
-            runSeederBtn.addEventListener('click', function() {
-                runSalespersonSeeder();
-            });
-        }
-        
-        // Function to run the salesperson seeder
-        function runSalespersonSeeder() {
-            showLoadingOverlay();
-            
-            // Use POST with CSRF token and handle JSON response
-            $.ajax({
-                url: '/run-salesperson-seeder',
-                type: 'POST',
-                dataType: 'json',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function(response) {
-                    console.log('Salesperson seeder response:', response);
-                    hideLoadingOverlay();
-                    
-                    if (response.success) {
-                        // Reload the page to show the newly seeded data
-                        location.reload();
-                    } else {
-                        // Display error message
-                        alert('Error: ' + (response.message || 'Failed to run salesperson seeder'));
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error running salesperson seeder:', error);
-                    hideLoadingOverlay();
-                    alert('Error: Failed to run salesperson seeder. Please check the console for details.');
-                }
-            });
-        }
-        
-        // Function to show loading overlay
-        function showLoadingOverlay() {
-            var overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                overlay.classList.remove('hidden');
-            } else {
-                overlay = document.createElement('div');
-                overlay.className = 'loading-overlay';
-                overlay.id = 'loadingOverlay';
-                
-                var spinner = document.createElement('div');
-                spinner.className = 'loading-spinner';
-                
-                overlay.appendChild(spinner);
-                document.body.appendChild(overlay);
-            }
-        }
-        
-        // Function to hide loading overlay
-        function hideLoadingOverlay() {
-            var overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                overlay.classList.add('hidden');
-            }
-        }
-        
-        // Dapatkan tombol dan modal
-        var showBtn = document.getElementById('showSalespersonTableBtn');
-        var salespersonModal = document.getElementById('salespersonTableWindow');
-        
-        // Tambahkan event listener ke tombol untuk menampilkan modal
-        if (showBtn) {
-            showBtn.onclick = function() {
-                if (salespersonModal) {
-                    salespersonModal.style.display = 'block';
-                    salespersonModal.classList.remove('hidden');
-                    
-                    // Populasi tabel dengan data dari SalespersonSeeder jika perlu
-                    populateSalespersonTable();
-                    
-                    // Urutkan berdasarkan kolom pertama secara default
-                    sortTableDirectly(0);
-                }
-            };
-        }
-        
-        // Setup row events initially
-        setupTableRowEvents();
-        
-        // Override the sortTableDirectly function to setup events after sort
-        const originalSortFunction = window.sortTableDirectly;
-        if (typeof originalSortFunction === 'function') {
-            window.sortTableDirectly = function(columnIndex) {
-                originalSortFunction(columnIndex);
-                setupTableRowEvents(); // Re-attach events after sorting
-            };
-        }
-        
-        // Tutup modal saat mengklik area di luar tabel
-        if (salespersonModal) {
-            salespersonModal.onclick = function(e) {
-                if (e.target === salespersonModal) {
-                    closeSalespersonModal();
-                }
-            };
-        }
-        
-        // Event untuk menutup modal saat mengklik di luar
-        window.onclick = function(event) {
-            const editModal = document.getElementById('editSalespersonModal');
-            if (event.target === editModal) {
-                closeEditSalespersonModal();
-            }
-        };
-
-        function populateSalespersonTable() {
-            $.ajax({
-                url: '/get-salesperson-list',
-                type: 'GET',
-                success: function(response) {
-                    if (response.salespersons.length === 0) {
-                        // If no data from server, use seed data
-                        const seedData = [
-                            // Sample seed data for testing
-                            { id: 1, code: 'S101', name: 'ABENG', sales_team_id: 1, position: 'E - Executive', user_id: 'root', is_active: true },
-                            { id: 2, code: 'S102', name: 'AGUNG', sales_team_id: 1, position: 'E - Executive', user_id: 'SLS', is_active: true },
-                            { id: 3, code: 'S103', name: 'EKO', sales_team_id: 1, position: 'E - Executive', user_id: 'SLS', is_active: true },
-                            { id: 4, code: 'S104', name: 'ELIAS', sales_team_id: 1, position: 'E - Executive', user_id: 'SLS', is_active: true },
-                            { id: 5, code: 'S105', name: 'FEBBY', sales_team_id: 1, position: 'E - Executive', user_id: 'SLS', is_active: true }
-                        ];
-                        
-                        $('#salespersonTable tbody').empty();
-                        
-                        seedData.forEach(function(salesperson) {
-                            const statusBadge = salesperson.is_active ? 
-                                '<span class="badge badge-success">Active</span>' : 
-                                '<span class="badge badge-danger">Inactive</span>';
-                                
-                            $('#salespersonTable tbody').append(`
-                                <tr data-id="${salesperson.id}">
-                                    <td>${salesperson.id}</td>
-                                    <td>${salesperson.code}</td>
-                                    <td>${salesperson.name}</td>
-                                    <td>${salesperson.sales_team_id}</td>
-                                    <td>${salesperson.position}</td>
-                                    <td>${salesperson.user_id}</td>
-                                    <td>${statusBadge}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info edit-btn" data-id="${salesperson.id}">Edit</button>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    } else {
-                        // If data from server, use that data
-                        $('#salespersonTable tbody').empty();
-                        
-                        response.salespersons.forEach(function(salesperson) {
-                            const statusBadge = salesperson.is_active ? 
-                                '<span class="badge badge-success">Active</span>' : 
-                                '<span class="badge badge-danger">Inactive</span>';
-                                
-                            $('#salespersonTable tbody').append(`
-                                <tr data-id="${salesperson.id}">
-                                    <td>${salesperson.id}</td>
-                                    <td>${salesperson.code}</td>
-                                    <td>${salesperson.name}</td>
-                                    <td>${salesperson.sales_team_id}</td>
-                                    <td>${salesperson.position}</td>
-                                    <td>${salesperson.user_id}</td>
-                                    <td>${statusBadge}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info edit-btn" data-id="${salesperson.id}">Edit</button>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-                    // Add event listeners to the edit buttons
-                    $('.edit-btn').on('click', function() {
-                        const id = $(this).data('id');
-                        editSalesperson(id);
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching salesperson data:', error);
-                    // If error, use seed data as fallback
-                    const seedData = [
-                        { id: 1, code: 'S101', name: 'ABENG', sales_team_id: 1, position: 'E - Executive', user_id: 'root', is_active: true },
-                        { id: 2, code: 'S102', name: 'AGUNG', sales_team_id: 1, position: 'E - Executive', user_id: 'SLS', is_active: true },
-                        { id: 3, code: 'S103', name: 'EKO', sales_team_id: 1, position: 'E - Executive', user_id: 'SLS', is_active: true },
-                        { id: 4, code: 'S104', name: 'ELIAS', sales_team_id: 1, position: 'E - Executive', user_id: 'SLS', is_active: true },
-                        { id: 5, code: 'S105', name: 'FEBBY', sales_team_id: 1, position: 'E - Executive', user_id: 'SLS', is_active: true }
-                    ];
-                    
-                    $('#salespersonTable tbody').empty();
-                    
-                    seedData.forEach(function(salesperson) {
-                        const statusBadge = salesperson.is_active ? 
-                            '<span class="badge badge-success">Active</span>' : 
-                            '<span class="badge badge-danger">Inactive</span>';
-                            
-                        $('#salespersonTable tbody').append(`
-                            <tr data-id="${salesperson.id}">
-                                <td>${salesperson.id}</td>
-                                <td>${salesperson.code}</td>
-                                <td>${salesperson.name}</td>
-                                <td>${salesperson.sales_team_id}</td>
-                                <td>${salesperson.position}</td>
-                                <td>${salesperson.user_id}</td>
-                                <td>${statusBadge}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-info edit-btn" data-id="${salesperson.id}">Edit</button>
-                                </td>
-                            </tr>
-                        `);
-                    });
-
-                    // Add event listeners to the edit buttons
-                    $('.edit-btn').on('click', function() {
-                        const id = $(this).data('id');
-                        editSalesperson(id);
-                    });
-                }
-            });
-        }
-
-        // Function to edit a salesperson
-        function editSalesperson(id) {
-            // Find the selected row in the table
-            const selectedRow = $(`#salespersonTable tr[data-id="${id}"]`);
-            
-            if (selectedRow.length) {
-                const cells = selectedRow.find('td');
-                
-                // Populate the form with the data from the selected row
-                $('#edit_id').val(id);
-                $('#edit_code').val(cells.eq(1).text());
-                $('#edit_name').val(cells.eq(2).text());
-                $('#edit_sales_team_id').val(cells.eq(3).text());
-                $('#edit_position').val(cells.eq(4).text());
-                $('#edit_user_id').val(cells.eq(5).text());
-                $('#edit_is_active').val(cells.eq(6).text().trim() === 'Active' ? 1 : 0);
-                
-                // Show the edit modal
-                $('#editSalespersonModal').modal('show');
-            }
-        }
-
-        // Save the edited salesperson
-        $('#saveSalesperson').on('click', function() {
-            const id = $('#edit_id').val();
-            const code = $('#edit_code').val();
-            const name = $('#edit_name').val();
-            const sales_team_id = $('#edit_sales_team_id').val();
-            const position = $('#edit_position').val();
-            const user_id = $('#edit_user_id').val();
-            const is_active = $('#edit_is_active').val();
-            
-            $.ajax({
-                url: `/update-salesperson/${id}`,
-                type: 'POST',
-                data: {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    code: code,
-                    name: name,
-                    sales_team_id: sales_team_id,
-                    position: position,
-                    user_id: user_id,
-                    is_active: is_active
-                },
-                success: function(response) {
-                    $('#editSalespersonModal').modal('hide');
-                    
-                    // Update the table row
-                    const selectedRow = $(`#salespersonTable tr[data-id="${id}"]`);
-                    const cells = selectedRow.find('td');
-                    
-                    cells.eq(1).text(code);
-                    cells.eq(2).text(name);
-                    cells.eq(3).text(sales_team_id);
-                    cells.eq(4).text(position);
-                    cells.eq(5).text(user_id);
-                    
-                    const statusBadge = is_active == 1 ? 
-                        '<span class="badge badge-success">Active</span>' : 
-                        '<span class="badge badge-danger">Inactive</span>';
-                    cells.eq(6).html(statusBadge);
-                    
-                    alert('Salesperson updated successfully!');
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error updating salesperson:', error);
-                    alert('Error updating salesperson. Please try again.');
-                }
-            });
-        });
-
-        function closeEditSalespersonModal() {
-            const editModal = document.getElementById('editSalespersonModal');
-            if (editModal) {
-                editModal.classList.add('hidden');
-            }
-        }
-
-        function saveSalespersonChanges() {
-            // Get the values from the form
-            const personCode = document.getElementById('edit_person_code').value;
-            const personName = document.getElementById('edit_person_name').value;
-            const personTeam = document.getElementById('edit_person_team').value;
-            const personPosition = document.getElementById('edit_person_position').value;
-            const personUserId = document.getElementById('edit_person_user_id').value;
-            const personIsActive = document.getElementById('edit_person_is_active').value;
-
-            // Here you would normally submit this data to your server
-            console.log('Saving salesperson changes:', { 
-                code: personCode, 
-                name: personName, 
-                team: personTeam, 
-                position: personPosition,
-                user_id: personUserId,
-                is_active: personIsActive
-            });
-
-            // Mock update to table (in a real app, you'd update after server confirmation)
-            const selectedRow = document.querySelector('#salespersonTable tr.selected');
-            if (selectedRow) {
-                const cells = selectedRow.getElementsByTagName('td');
-                cells[1].textContent = personCode;
-                cells[2].textContent = personName;
-                cells[3].textContent = personTeam;
-                cells[4].textContent = personPosition;
-                cells[5].textContent = personUserId;
-                cells[6].textContent = personIsActive == 1 ? 'Active' : 'Inactive';
-                
-                // Update data attributes
-                selectedRow.setAttribute('data-person-code', personCode);
-                selectedRow.setAttribute('data-person-name', personName);
-                selectedRow.setAttribute('data-person-team', personTeam);
-                selectedRow.setAttribute('data-person-position', personPosition);
-                selectedRow.setAttribute('data-person-user-id', personUserId);
-                selectedRow.setAttribute('data-person-is-active', personIsActive);
-            }
-
-            // Close the modal
-            closeEditSalespersonModal();
-        }
-
-        // For the Bootstrap modal
-        $(document).ready(function() {
-            // Save changes when clicking the Save button in the Bootstrap modal
-            $('#saveSalesperson').on('click', function() {
-                const id = $('#edit_id').val();
-                const code = $('#edit_code').val();
-                const name = $('#edit_name').val();
-                const salesTeamId = $('#edit_sales_team_id').val();
-                const position = $('#edit_position').val();
-                const userId = $('#edit_user_id').val();
-                const isActive = $('#edit_is_active').val();
-                
-                // Here you would normally save the data via AJAX
-                console.log('Saving salesperson with Bootstrap modal:', {
-                    id, code, name, salesTeamId, position, userId, isActive
-                });
-                
-                // Update the table row (mock update)
-                updateTableRow(id, code, name, salesTeamId, position, userId, isActive);
-                
-                // Close the modal
-                $('#editSalespersonModalBootstrap').modal('hide');
-            });
-            
-            // Function to update the table row
-            function updateTableRow(id, code, name, salesTeamId, position, userId, isActive) {
-                const row = $(`#salespersonTable tr[data-id="${id}"]`);
-                if (row.length) {
-                    const cells = row.find('td');
-                    cells.eq(1).text(code);
-                    cells.eq(2).text(name);
-                    cells.eq(3).text(salesTeamId);
-                    cells.eq(4).text(position);
-                    cells.eq(5).text(userId);
-                    cells.eq(6).text(isActive == 1 ? 'Active' : 'Inactive');
-                    
-                    // Update data attributes
-                    row.attr('data-person-code', code);
-                    row.attr('data-person-name', name);
-                    row.attr('data-person-team', salesTeamId);
-                    row.attr('data-person-position', position);
-                    row.attr('data-person-user-id', userId);
-                    row.attr('data-person-is-active', isActive);
-                }
-            }
-        });
-    });
-</script>
-@endsection
-
-@push('styles')
-<style>
-    /* Modal window styles */
-    #salespersonTableWindow, #editSalespersonModal {
-        background-color: rgba(0, 0, 0, 0.2);
-        z-index: 9999;
-    }
-    
-    #salespersonTableWindow:not(.hidden), #editSalespersonModal:not(.hidden) {
-        display: block;
-    }
-    
-    #salespersonTableWindow.hidden, #editSalespersonModal.hidden {
-        display: none;
-    }
-    
-    /* Loading overlay */
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-    }
-    
-    .loading-spinner {
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #3498db;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 2s linear infinite;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    /* Table styles */
-    #salespersonDataTable {
-        border-collapse: collapse;
-        width: 100%;
-    }
-    
-    #salespersonDataTable tbody {
-        display: block;
-        max-height: 250px;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-    
-    #salespersonDataTable thead {
-        display: table;
-        width: calc(100% - 17px); /* Adjust for scrollbar width */
-        table-layout: fixed;
-    }
-    
-    #salespersonDataTable tbody tr {
-        display: table;
-        width: 100%;
-        table-layout: fixed;
-    }
-    
-    /* Selected row */
-    #salespersonDataTable tbody tr.selected {
-        background-color: #0078d7;
-        color: white;
-    }
-    
-    #salespersonDataTable tbody tr:hover {
-        background-color: #0078d7;
-        color: white;
-    }
-    
-    /* Classic Windows button styles */
-    button {
-        cursor: pointer;
-    }
-    
-    button:active {
-        transform: translateY(1px);
-    }
-    
-    /* Sort button active style */
-    .sort-btn.active-sort {
-        background-color: #4299e1;
-        color: white;
-        font-weight: bold;
-    }
-    
-    /* Classic Windows scrollbar style */
-    #salespersonDataTable tbody::-webkit-scrollbar {
-        width: 16px;
-    }
-    
-    #salespersonDataTable tbody::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-    
-    #salespersonDataTable tbody::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border: 1px solid #a1a1a1;
-    }
-    
-    #salespersonDataTable tbody::-webkit-scrollbar-thumb:hover {
-        background: #a1a1a1;
-    }
-</style>
-@endpush

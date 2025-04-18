@@ -3,110 +3,229 @@
 @section('title', 'Define Paper Size')
 
 @section('content')
-<style>
-    [x-cloak] { display: none !important; }
-</style>
+<script src="{{ asset('js/papersize.js') }}"></script>
 
-<div class="container mx-auto px-4 py-5" x-data="paperSizeEditor()" x-cloak>
-    <div class="bg-white rounded-lg shadow-md">
-        <div class="border-b border-gray-200 px-6 py-4">
-            <h1 class="text-lg font-medium text-gray-900">Define Paper Size</h1>
+<!-- Header Section -->
+<div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
+    <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-file-alt mr-3"></i> Define Paper Size
+    </h2>
+    <p class="text-cyan-100">Definisikan ukuran kertas standar untuk berbagai dokumen dan aplikasi</p>
         </div>
 
-        <div class="p-6">
-            @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                    {{ session('success') }}
+<div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column - Main Content -->
+        <div class="lg:col-span-2">
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+                <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
+                    <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                        <i class="fas fa-edit text-white"></i>
                 </div>
-            @endif
-
-            @if(session('error'))
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    {{ session('error') }}
+                    <h3 class="text-xl font-semibold text-gray-800">Paper Size Management</h3>
                 </div>
-            @endif
-
-            @if($errors->any())
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    <ul>
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                
+                <!-- Header with navigation buttons -->
+                <div class="flex items-center space-x-2 mb-6">
+                    <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-save"></i>
+                    </button>
                 </div>
-            @endif
 
-            <form action="{{ isset($paperSize) ? route('paper-size.update', $paperSize->id) : route('paper-size.store') }}" 
-                  method="POST" class="mb-6">
-                @csrf
-                @if(isset($paperSize))
-                    @method('PUT')
-                @endif
-
-                <div class="flex items-center mb-4">
-                    <label for="size" class="block text-sm font-medium text-gray-700 w-24">Paper Size:</label>
-                    <div class="flex items-center">
-                        <div class="flex border border-gray-300 rounded-md">
+                <!-- Paper Size Form -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Paper Size:</label>
+                        <div class="relative flex">
+                            <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                                <i class="fas fa-ruler-combined"></i>
+                            </span>
                             <input type="number" step="0.01" id="size" name="size" 
-                                x-model="mmValue"
                                 min="0.01"
-                                class="w-20 px-2 py-1 border-0 focus:ring-indigo-500 focus:border-indigo-500 text-right">
-                            <button type="button" @click="openSizeTable()" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 border-l border-gray-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
+                                class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-right">
+                            <button type="button" id="showPaperSizeTableBtn" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px" onclick="openPaperSizeModal()">
+                                <i class="fas fa-table"></i>
                             </button>
                         </div>
-                        <span class="ml-2 text-gray-700">Millimeter</span>
+                        <span class="text-xs text-gray-700 mt-1 block">Millimeter</span>
+                    </div>
+                    
+                    <div class="col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
+                        <button type="button" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                            <i class="fas fa-list-ul mr-2"></i> Select Record
+                        </button>
                     </div>
                 </div>
 
-                <input type="hidden" id="inches" name="inches" x-model="inchValue">
+                <!-- Inches Display -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Equivalent Size:</label>
+                    <div class="flex items-center bg-gray-100 p-3 rounded-lg">
+                        <span class="mr-2 text-gray-700"><i class="fas fa-ruler mr-2"></i></span>
+                        <span class="text-lg font-medium" id="inchDisplay"></span>
+                    </div>
+                </div>
 
-                <!-- Table Modal -->
-                <div x-show="showSizeTable" 
-                     x-cloak
-                     class="fixed inset-0 z-50 overflow-y-auto"
-                     x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0"
-                     x-transition:enter-end="opacity-100"
-                     x-transition:leave="transition ease-in duration-150"
-                     x-transition:leave-start="opacity-100"
-                     x-transition:leave-end="opacity-0">
-                    
-                    <!-- Backdrop -->
-                    <div class="fixed inset-0 bg-black bg-opacity-50" @click="showSizeTable = false"></div>
-                    
-                    <!-- Modal Container -->
-                    <div class="flex items-center justify-center min-h-screen px-4 py-8 text-center sm:p-0">
-                        <div class="relative bg-white rounded-lg max-w-lg w-full mx-auto shadow-xl"
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                            
+                <!-- Debug Information -->
+                <div class="mt-6">
+                    @if(empty($paperSizes) || count($paperSizes) === 0)
+                    <div class="mt-4 bg-yellow-100 p-3 rounded">
+                        <p class="text-sm font-medium text-yellow-800">Tidak ada data ukuran kertas yang tersedia.</p>
+                        <p class="text-xs text-yellow-700 mt-1">Pastikan database telah diatur dengan benar dan data seeder telah dijalankan.</p>
+                        <div class="mt-2 flex items-center space-x-3">
+                            <button onclick="loadSeedData()" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transform active:translate-y-px">
+                                Load Paper Size Data (JS)
+                            </button>
+                        </div>
+                    </div>
+                    @elseif(count($paperSizes) > 0)
+                    <div class="mt-4 bg-green-100 p-3 rounded">
+                        <p class="text-sm font-medium text-green-800">Data tersedia: {{ count($paperSizes) }} ukuran kertas ditemukan.</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Quick Info -->
+        <div class="lg:col-span-1">
+            <!-- Paper Size Info Card -->
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
+                <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                    <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                        <i class="fas fa-info-circle text-white"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">Info Ukuran Kertas</h3>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="p-4 bg-teal-50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Petunjuk</h4>
+                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                            <li>Ukuran kertas dapat dimasukkan dalam mm atau inch</li>
+                            <li>Konversi antara mm dan inch otomatis</li>
+                            <li>Gunakan table untuk memilih ukuran standar</li>
+                            <li>Perubahan apa pun harus disimpan</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Standar Ukuran</h4>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">A4</span>
+                                <span>210 x 297 mm</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">A3</span>
+                                <span>297 x 420 mm</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">A5</span>
+                                <span>148 x 210 mm</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">LTR</span>
+                                <span>216 x 279 mm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                    <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                        <i class="fas fa-link text-white"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">Tautan Cepat</h3>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3">
+                    <a href="#" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <div class="p-2 bg-purple-500 rounded-full mr-3">
+                            <i class="fas fa-print text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-purple-900">Print Settings</p>
+                            <p class="text-xs text-purple-700">Konfigurasi printer</p>
+                        </div>
+                    </a>
+
+                    <a href="#" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <div class="p-2 bg-blue-500 rounded-full mr-3">
+                            <i class="fas fa-th-list text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-blue-900">Paper Types</p>
+                            <p class="text-xs text-blue-700">Lihat tipe kertas</p>
+                        </div>
+                    </a>
+
+                    <a href="#" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <div class="p-2 bg-green-500 rounded-full mr-3">
+                            <i class="fas fa-file-export text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-green-900">Export Daftar</p>
+                            <p class="text-xs text-green-700">Export data ukuran kertas</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Paper Size Table Modal -->
+<div id="paperSizeTableWindow" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="relative bg-white rounded-lg max-w-3xl w-full mx-auto shadow-xl">
                             <!-- Header -->
-                            <div class="flex items-center justify-between p-4 border-b border-gray-200">
-                                <h3 class="text-lg font-medium text-gray-900" id="modal-title">
-                                    Pilih Ukuran Kertas
-                                </h3>
-                                <button type="button" @click="showSizeTable = false" class="text-gray-400 hover:text-gray-500">
-                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                    <i class="fas fa-ruler-combined"></i>
+                </div>
+                <h3 class="text-xl font-semibold">Paper Size Table</h3>
+            </div>
+            <button type="button" onclick="closeModalX()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                <i class="fas fa-times text-xl"></i>
                                 </button>
                             </div>
                             
                             <!-- Content -->
                             <div class="py-4 px-6">
+            <div class="mb-4">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" id="searchPaperSizeInput" placeholder="Search sizes..."
+                        class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                </div>
+            </div>
+            
                                 <div class="overflow-y-auto max-h-80">
-                                    <table class="min-w-full divide-y divide-gray-200">
+                <table class="min-w-full divide-y divide-gray-200" id="paperSizeDataTable">
                                         <thead class="bg-gray-50 sticky top-0">
                                             <tr>
                                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    No
+                                Size ID
                                                 </th>
                                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Millimeters
@@ -114,16 +233,26 @@
                                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Inches
                                                 </th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Description
+                                                </th>
                                                 <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Pilih
+                                Action
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white divide-y divide-gray-200" id="paperSizeTableBody">
+                        @if(isset($paperSizes) && count($paperSizes) > 0)
                                             @foreach($paperSizes as $index => $size)
-                                                <tr class="hover:bg-gray-50">
-                                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
-                                                        {{ $index + 1 }}
+                                <tr class="hover:bg-blue-50 cursor-pointer" 
+                                    data-size-id="{{ $size->id }}"
+                                    data-size-mm="{{ $size->size }}"
+                                    data-size-inch="{{ $size->inches }}"
+                                    data-description="{{ $size->description ?? '' }}"
+                                    onclick="selectRow(this); event.stopPropagation();"
+                                    ondblclick="openEditPaperSizeModal(this)">
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                                        PS{{ sprintf('%03d', $size->id) }}
                                                     </td>
                                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
                                                         {{ number_format($size->size, 2) }}
@@ -131,15 +260,19 @@
                                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
                                                         {{ number_format($size->inches, 2) }}
                                                     </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">
+                                        {{ $size->description ?? '' }}
+                                                    </td>
                                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
                                                         <button type="button" 
-                                                                @click="selectAndEditSize({{ $size->size }}, {{ $size->inches }})" 
+                                                onclick="openEditPaperSizeModal(this.closest('tr'))" 
                                                                 class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                                            Pilih
+                                            Select
                                                         </button>
                                                     </td>
                                                 </tr>
                                             @endforeach
+                        @endif
                                         </tbody>
                                     </table>
                                 </div>
@@ -147,152 +280,95 @@
                             
                             <!-- Footer -->
                             <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
-                                <button type="button" @click="showSizeTable = false" 
-                                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                                    Tutup
+            <button type="button" onclick="sortTableDirectly(1)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px mr-2">
+                <i class="fas fa-sort mr-1"></i>By Size
+            </button>
+            <button type="button" onclick="sortTableDirectly(3)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px mr-2">
+                <i class="fas fa-sort mr-1"></i>By Description
+            </button>
+            <button type="button" onclick="closePaperSizeModal()" 
+                    class="mt-3 inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs transform active:translate-y-px">
+                <i class="fas fa-times mr-1"></i>Close
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- End Table Modal -->
 
-                <!-- Edit Modal - Dua input (Millimeter & Inches) -->
-                <div x-show="showEditModal" 
-                     x-cloak
-                     class="fixed inset-0 z-50 overflow-y-auto">
-                    
-                    <!-- Backdrop -->
-                    <div class="fixed inset-0 bg-black bg-opacity-50" @click="cancelEdit()"></div>
-                    
-                    <!-- Modal Container - Kotak dialog -->
-                    <div class="flex items-center justify-center min-h-screen">
-                        <div class="relative bg-gray-100 rounded-lg shadow-md border border-gray-300 w-80"
-                             @click.away="cancelEdit()">
-                            
-                            <!-- Header dengan judul dan tombol close (X) -->
-                            <div class="bg-gray-200 border-b border-gray-300 py-1 px-2 flex items-center justify-between">
-                                <h3 class="text-xs font-medium text-gray-700">Define Paper Size</h3>
-                                <button type="button" @click="cancelEdit()" class="text-gray-500 hover:text-gray-700">
-                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+<!-- Edit Modal -->
+<div id="editPaperSizeModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+    <!-- Modal Container -->
+    <div class="relative bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                    <i class="fas fa-ruler-combined"></i>
+                </div>
+                <h3 class="text-xl font-semibold">Define Paper Size</h3>
+            </div>
+            <button type="button" onclick="closeEditPaperSizeModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                <i class="fas fa-times text-xl"></i>
                                 </button>
                             </div>
                             
-                            <!-- Form Fields - 2 baris input (mm dan inches) -->
-                            <div class="p-3 space-y-2">
+        <!-- Form Fields -->
+        <div class="p-6 space-y-4">
                                 <!-- Input Millimeter -->
-                                <div class="flex items-center">
-                                    <label class="block text-xs font-medium text-gray-700 w-20">Paper Size:</label>
-                                    <input type="number" step="0.01" x-model="tempMmValue" @input="updateInchesFromMm()" 
-                                           class="px-2 py-1 border border-gray-300 rounded w-20 text-right bg-white text-xs">
-                                    <span class="ml-2 text-xs text-gray-700">Millimeter</span>
+            <div>
+                <label for="edit_size_mm" class="block text-sm font-medium text-gray-700 mb-1">Size (mm):</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fas fa-ruler"></i>
+                    </span>
+                    <input type="number" step="0.01" id="edit_size_mm" 
+                        class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                </div>
                                 </div>
                                 
                                 <!-- Input Inches -->
-                                <div class="flex items-center">
-                                    <label class="block text-xs font-medium text-gray-700 w-20">Paper Size:</label>
-                                    <input type="number" step="0.01" x-model="tempInchValue" @input="updateMmFromInches()"
-                                           class="px-2 py-1 border border-gray-300 rounded w-20 text-right bg-white text-xs">
-                                    <span class="ml-2 text-xs text-gray-700">Inches</span>
+            <div>
+                <label for="edit_size_inch" class="block text-sm font-medium text-gray-700 mb-1">Size (inches):</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fas fa-ruler-horizontal"></i>
+                    </span>
+                    <input type="number" step="0.01" id="edit_size_inch"
+                        class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 </div>
                             </div>
                             
-                            <!-- Footer dengan tombol OK dan Batal -->
-                            <div class="flex justify-end px-3 py-2 space-x-2 border-t border-gray-300">
-                                <button type="button" @click="confirmEdit()" 
-                                        class="px-3 py-1 bg-gray-200 border border-gray-400 text-xs text-gray-700 font-medium rounded shadow-sm hover:bg-gray-300">
-                                    OK
-                                </button>
-                                <button type="button" @click="cancelEdit()" 
-                                        class="px-3 py-1 bg-gray-200 border border-gray-400 text-xs text-gray-700 font-medium rounded shadow-sm hover:bg-gray-300">
-                                    Batal
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Description -->
+            <div>
+                <label for="edit_description" class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fas fa-font"></i>
+                    </span>
+                    <input type="text" id="edit_description" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="e.g., A4, Letter, Custom">
                 </div>
-                <!-- End Edit Modal -->
+            </div>
 
-                <div class="flex space-x-2 mt-6">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                        {{ isset($paperSize) ? 'Update' : 'Save' }}
+            <!-- ID Hidden Field -->
+            <input type="hidden" id="edit_size_id">
+        </div>
+        
+        <!-- Footer -->
+        <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-lg">
+            <button type="button" onclick="savePaperSizeChanges()" 
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform active:translate-y-px sm:ml-3 sm:w-auto">
+                <i class="fas fa-save mr-2"></i>Save
+            </button>
+            <button type="button" onclick="closeEditPaperSizeModal()" 
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-200 text-gray-800 text-sm font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform active:translate-y-px sm:mt-0 sm:ml-3 sm:w-auto">
+                <i class="fas fa-times mr-2"></i>Cancel
                     </button>
-                    
-                    @if(isset($paperSize))
-                        <a href="{{ route('paper-size.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
-                            Cancel
-                        </a>
-                    @endif
-                </div>
-            </form>
         </div>
     </div>
 </div>
 
-<script>
-    function paperSizeEditor() {
-        return {
-            showSizeTable: false,
-            showEditModal: false,
-            mmValue: {{ isset($paperSize) ? $paperSize->size : old('size', 0) }},
-            inchValue: {{ isset($paperSize) ? $paperSize->inches : old('inches', 0) }},
-            tempMmValue: 0,
-            tempInchValue: 0,
-            
-            // Membuka tabel ukuran
-            openSizeTable() {
-                this.showSizeTable = true;
-            },
-            
-            // Memilih ukuran dari tabel dan langsung menampilkan modal edit
-            selectAndEditSize(mm, inch) {
-                this.tempMmValue = parseFloat(mm).toFixed(2);
-                this.tempInchValue = parseFloat(inch).toFixed(2);
-                this.showSizeTable = false;
-                
-                // Menggunakan timeout untuk memastikan modal table ditutup dulu
-                // sebelum modal edit ditampilkan
-                setTimeout(() => {
-                    this.showEditModal = true;
-                }, 100);
-            },
-            
-            // Update nilai inches saat milimeter diubah
-            updateInchesFromMm() {
-                if (this.tempMmValue && !isNaN(this.tempMmValue) && this.tempMmValue > 0) {
-                    this.tempInchValue = (parseFloat(this.tempMmValue) / 25.4).toFixed(2);
-                } else {
-                    this.tempInchValue = "0.00";
-                }
-            },
-            
-            // Update nilai milimeter saat inches diubah
-            updateMmFromInches() {
-                if (this.tempInchValue && !isNaN(this.tempInchValue) && this.tempInchValue > 0) {
-                    this.tempMmValue = (parseFloat(this.tempInchValue) * 25.4).toFixed(2);
-                } else {
-                    this.tempMmValue = "0.00";
-                }
-            },
-            
-            // Konfirmasi edit dan terapkan nilai baru
-            confirmEdit() {
-                if (this.tempMmValue && this.tempInchValue) {
-                    this.mmValue = parseFloat(this.tempMmValue);
-                    this.inchValue = parseFloat(this.tempInchValue);
-                    this.showEditModal = false;
-                } else {
-                    alert('Silakan masukkan nilai yang valid');
-                }
-            },
-            
-            // Batalkan edit
-            cancelEdit() {
-                this.showEditModal = false;
-            }
-        }
-    }
-</script>
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden">
+    <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+</div>
+
 @endsection

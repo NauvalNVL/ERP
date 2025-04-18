@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
 
-class SalesPersonTeamController extends Controller
+class SalespersonTeamController extends Controller
 {
     public function index()
     {
@@ -46,9 +47,13 @@ class SalesPersonTeamController extends Controller
             // Mengambil data sales team untuk dropdown
             $salesTeams = DB::table('sales_team')->get();
             
+            // Log the query result
+            Log::info('Salesperson teams count in index: ' . $salespersons->count());
+            
             // Mengirim data ke view
             return view('system-requirement.salespersonteam', compact('salespersons', 'salesTeams'));
         } catch (\Exception $e) {
+            Log::error('Error loading salesperson teams: ' . $e->getMessage());
             return view('system-requirement.salespersonteam', [
                 'salespersons' => [],
                 'salesTeams' => [],

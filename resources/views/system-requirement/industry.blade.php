@@ -2,28 +2,82 @@
 
 @section('title', 'Define Industry')
 
-@section('header', 'Define Industry')
-
 @section('content')
-<div class="bg-white rounded-lg shadow-md p-6">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-semibold">Define Industry</h2>
-        <div class="flex space-x-2">
-            <button id="addIndustryBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                <i class="fas fa-plus mr-2"></i>Add New
+<script src="{{ asset('js/industry.js') }}"></script>
+
+<!-- Header Section -->
+<div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
+    <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-industry mr-3"></i> Define Industry
+    </h2>
+    <p class="text-cyan-100">Definisikan industri untuk kategorisasi pelanggan dan produk</p>
+</div>
+
+<div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column - Main Content -->
+        <div class="lg:col-span-2">
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+                <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
+                    <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                        <i class="fas fa-cogs text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800">Industry Management</h3>
+                </div>
+    
+                <!-- Header with navigation buttons -->
+                <div class="flex items-center space-x-2 mb-6">
+                    <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                        <i class="fas fa-save"></i>
+                    </button>
+                </div>
+
+                <!-- Search Section -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Industry Code:</label>
+                        <div class="relative flex">
+                            <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                                <i class="fas fa-industry"></i>
+                            </span>
+                            <input type="text" id="searchInput" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Enter industry code">
+                            <button type="button" id="showIndustryTableBtn" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                <i class="fas fa-table"></i>
             </button>
         </div>
     </div>
 
+                    <div class="col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
+                        <button type="button" id="addIndustryBtn" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                            <i class="fas fa-plus-circle mr-2"></i> Add New
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status Messages -->
     @if(session('success'))
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-        {{ session('success') }}
+                <div class="mt-4 bg-green-100 p-3 rounded">
+                    <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
     </div>
     @endif
 
     @if($errors->any())
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-        <ul>
+                <div class="mt-4 bg-red-100 p-3 rounded">
+                    <ul class="list-disc pl-5 text-sm text-red-700">
             @foreach($errors->all() as $error)
             <li>{{ $error }}</li>
             @endforeach
@@ -31,106 +85,22 @@
     </div>
     @endif
 
-    <!-- Search & Filter -->
-    <div class="mb-6 flex items-center">
-        <div class="relative flex-1">
-            <input type="text" id="searchInput" placeholder="Industry Code" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button type="button" id="searchBtn" class="absolute right-2 top-2 text-gray-500">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
-        <div class="ml-4">
-            <button type="button" id="selectBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                Select
-            </button>
-        </div>
-    </div>
-
-    <!-- Industry Dialog -->
-    <div id="industryDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg shadow-lg w-1/2 max-w-2xl">
-            <div class="p-4 border-b border-gray-200 bg-gray-100 flex justify-between items-center">
-                <h3 class="text-lg font-semibold">Industry Table</h3>
-                <button type="button" id="closeDialog" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div class="p-6">
-                <div class="mb-6 max-h-80 overflow-y-auto">
-                    <table class="w-full border-collapse">
-                        <thead class="bg-gray-100">
+                <!-- Data Table -->
+                <div class="mt-6 overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
                             <tr>
-                                <th class="border border-gray-300 px-4 py-2 text-left">CODE</th>
-                                <th class="border border-gray-300 px-4 py-2 text-left">NAME</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="industryTableBody">
-                            @foreach($industries as $industry)
-                            <tr class="cursor-pointer hover:bg-blue-100" data-id="{{ $industry->id }}">
-                                <td class="border border-gray-300 px-4 py-2">{{ $industry->code }}</td>
-                                <td class="border border-gray-300 px-4 py-2">{{ $industry->name }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="flex justify-end space-x-2">
-                    <button type="button" id="selectIndustryBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Select</button>
-                    <button type="button" id="cancelSelectBtn" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Exit</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Industry Form Modal -->
-    <div id="industryFormModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg shadow-lg w-1/2 max-w-md">
-            <div class="p-4 border-b border-gray-200 bg-gray-100 flex justify-between items-center">
-                <h3 id="modalTitle" class="text-lg font-semibold">Add Industry</h3>
-                <button type="button" id="closeFormModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <form id="industryForm" method="POST" action="{{ route('industry.store') }}">
-                @csrf
-                <div id="methodField"></div>
-                <div class="p-6">
-                    <div class="mb-4">
-                        <label for="code" class="block text-sm font-medium text-gray-700 mb-1">Industry Code</label>
-                        <input type="text" id="code" name="code" maxlength="4" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-6">
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Industry Name</label>
-                        <input type="text" id="name" name="name" maxlength="100" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="flex justify-end space-x-2">
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save</button>
-                        <button type="button" id="cancelForm" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Data Table -->
-    <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-300">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="py-2 px-4 border-b text-left">Code</th>
-                    <th class="py-2 px-4 border-b text-left">Name</th>
-                    <th class="py-2 px-4 border-b text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
+                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
                 @forelse($industries as $industry)
-                <tr class="hover:bg-gray-50">
-                    <td class="py-2 px-4 border-b">{{ $industry->code }}</td>
-                    <td class="py-2 px-4 border-b">{{ $industry->name }}</td>
-                    <td class="py-2 px-4 border-b text-center">
+                            <tr class="hover:bg-blue-50">
+                                <td class="px-4 py-3 whitespace-nowrap font-medium text-blue-800">{{ $industry->code }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $industry->name }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-center">
                         <button type="button" class="text-blue-500 hover:text-blue-700 edit-btn mr-2" data-id="{{ $industry->id }}">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -145,166 +115,232 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="3" class="py-4 text-center text-gray-500">No industries found</td>
+                                <td colspan="3" class="px-4 py-4 text-center text-gray-500">No industries found</td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 </div>
-@endsection
+        </div>
 
-@section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Industry Dialog
-        const searchBtn = document.getElementById('searchBtn');
-        const selectBtn = document.getElementById('selectBtn');
-        const industryDialog = document.getElementById('industryDialog');
-        const closeDialog = document.getElementById('closeDialog');
-        const cancelSelectBtn = document.getElementById('cancelSelectBtn');
-        const selectIndustryBtn = document.getElementById('selectIndustryBtn');
-        const searchInput = document.getElementById('searchInput');
-        const industryTableBody = document.getElementById('industryTableBody');
+        <!-- Right Column - Quick Info -->
+        <div class="lg:col-span-1">
+            <!-- Industry Info Card -->
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
+                <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                    <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                        <i class="fas fa-info-circle text-white"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">Info Industry</h3>
+                </div>
 
-        // Industry Form Modal
-        const addIndustryBtn = document.getElementById('addIndustryBtn');
-        const industryFormModal = document.getElementById('industryFormModal');
-        const closeFormModal = document.getElementById('closeFormModal');
-        const cancelForm = document.getElementById('cancelForm');
-        const industryForm = document.getElementById('industryForm');
-        const modalTitle = document.getElementById('modalTitle');
-        const methodField = document.getElementById('methodField');
-        const codeInput = document.getElementById('code');
-        const nameInput = document.getElementById('name');
+                <div class="space-y-4">
+                    <div class="p-4 bg-teal-50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Petunjuk</h4>
+                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                            <li>Kode industri harus unik dan maksimal 4 karakter</li>
+                            <li>Gunakan tombol <span class="font-medium">Add New</span> untuk menambahkan industri baru</li>
+                            <li>Nama industri sebaiknya deskriptif dan spesifik</li>
+                            <li>Industri digunakan untuk kategorisasi pelanggan</li>
+                        </ul>
+                    </div>
 
-        // Edit buttons
-        const editButtons = document.querySelectorAll('.edit-btn');
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Top Industries</h4>
+                        <div class="grid grid-cols-1 gap-2 text-sm">
+                            @php
+                                $topIndustries = $industries->take(5);
+                            @endphp
+                            
+                            @forelse($topIndustries as $industry)
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">
+                                        {{ substr($industry->code, 0, 1) }}
+                                    </span>
+                                    <span>{{ $industry->code }}</span>
+                                </div>
+                                <span class="text-gray-600">{{ $industry->name }}</span>
+                            </div>
+                            @empty
+                            <p class="text-gray-500 italic">No industries available</p>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        if (searchBtn && selectBtn) {
-            // Show industry dialog
-            [searchBtn, selectBtn].forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (industryDialog) industryDialog.classList.remove('hidden');
-                });
-            });
-        }
+            <!-- Quick Links -->
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                    <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                        <i class="fas fa-link text-white"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800">Tautan Cepat</h3>
+                </div>
 
-        if (closeDialog && cancelSelectBtn) {
-            // Close industry dialog
-            [closeDialog, cancelSelectBtn].forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (industryDialog) industryDialog.classList.add('hidden');
-                });
-            });
-        }
+                <div class="grid grid-cols-1 gap-3">
+                    <a href="#" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <div class="p-2 bg-purple-500 rounded-full mr-3">
+                            <i class="fas fa-building text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-purple-900">Customers</p>
+                            <p class="text-xs text-purple-700">Kelola data pelanggan</p>
+                        </div>
+                    </a>
 
-        if (addIndustryBtn) {
-            // Show add industry modal
-            addIndustryBtn.addEventListener('click', () => {
-                if (modalTitle) modalTitle.textContent = 'Add Industry';
-                if (methodField) methodField.innerHTML = '';
-                if (industryForm) industryForm.action = "{{ route('industry.store') }}";
-                if (codeInput) codeInput.value = '';
-                if (nameInput) nameInput.value = '';
-                if (industryFormModal) industryFormModal.classList.remove('hidden');
-            });
-        }
+                    <a href="#" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <div class="p-2 bg-blue-500 rounded-full mr-3">
+                            <i class="fas fa-chart-pie text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-blue-900">Reports</p>
+                            <p class="text-xs text-blue-700">Lihat laporan industri</p>
+                        </div>
+                    </a>
 
-        if (closeFormModal && cancelForm) {
-            // Close industry form modal
-            [closeFormModal, cancelForm].forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (industryFormModal) industryFormModal.classList.add('hidden');
-                });
-            });
-        }
+                    <a href="#" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <div class="p-2 bg-green-500 rounded-full mr-3">
+                            <i class="fas fa-print text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-green-900">Cetak Daftar</p>
+                            <p class="text-xs text-green-700">Cetak daftar industri</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        if (editButtons && editButtons.length > 0) {
-            // Edit industry
-            editButtons.forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.dataset.id;
-                    if (modalTitle) modalTitle.textContent = 'Edit Industry';
-                    if (methodField) methodField.innerHTML = `@method('PUT')`;
-                    if (industryForm) industryForm.action = `/industry/${id}`;
+<!-- Industry Table Window -->
+<div id="industryDialog" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 max-w-5xl mx-auto transform transition-transform duration-300" style="max-height: 80vh;">
+        <!-- Modal Header - Title Bar -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                    <i class="fas fa-industry"></i>
+                </div>
+                <h3 class="text-xl font-semibold">Industry Table</h3>
+            </div>
+            <button type="button" id="closeDialog" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
 
-                    try {
-                        const response = await fetch(`/industry/${id}/edit`);
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        const industry = await response.json();
-                        
-                        if (codeInput) codeInput.value = industry.code;
-                        if (nameInput) nameInput.value = industry.name;
-                        
-                        if (industryFormModal) industryFormModal.classList.remove('hidden');
-                    } catch (error) {
-                        console.error('Error fetching industry data:', error);
-                        alert('Error loading industry data. Please try again.');
-                    }
-                });
-            });
-        }
+        <!-- Table Content -->
+        <div class="p-5 overflow-auto" style="max-height: calc(80vh - 130px);">
+            <div class="mb-4">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" id="tableSearchInput" placeholder="Search industries..."
+                        class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="industryTableBody" class="bg-white divide-y divide-gray-200 text-xs">
+                        @foreach($industries as $industry)
+                        <tr class="hover:bg-blue-50 cursor-pointer">
+                            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $industry->code }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $industry->name }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
-        if (searchInput && industryTableBody) {
-            // Filter industry table
-            searchInput.addEventListener('keyup', () => {
-                const searchTerm = searchInput.value.toUpperCase();
-                const rows = industryTableBody.querySelectorAll('tr');
+            <!-- Bottom Buttons -->
+            <div class="mt-4 flex justify-end space-x-3">
+                <button type="button" id="selectIndustryBtn" class="py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transform active:translate-y-px">
+                    <i class="fas fa-check mr-1"></i>Select
+                </button>
+                <button type="button" id="cancelSelectBtn" class="py-2 px-4 bg-gray-300 hover:bg-gray-400 text-gray-800 text-sm rounded-lg transform active:translate-y-px">
+                    <i class="fas fa-times mr-1"></i>Exit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
-                rows.forEach(row => {
-                    const codeCell = row.cells[0];
-                    const nameCell = row.cells[1];
+<!-- Industry Form Modal -->
+<div id="industryFormModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
+        <!-- Modal Header - Title Bar -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                    <i class="fas fa-industry"></i>
+                </div>
+                <h3 id="modalTitle" class="text-xl font-semibold">Define Industry</h3>
+            </div>
+            <button type="button" id="closeFormModal" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Form Content -->
+        <div class="p-6">
+            <form id="industryForm" method="POST" action="{{ route('industry.store') }}" data-store-url="{{ route('industry.store') }}" data-base-url="{{ url('/industry') }}" class="space-y-4">
+                @csrf
+                <div id="methodField"></div>
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label for="code" class="block text-sm font-medium text-gray-700 mb-1">Industry Code:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fas fa-hashtag"></i>
+                            </span>
+                            <input id="code" name="code" type="text" maxlength="4" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                        </div>
+                    </div>
                     
-                    if (codeCell && nameCell) {
-                        const codeText = codeCell.textContent || codeCell.innerText;
-                        const nameText = nameCell.textContent || nameCell.innerText;
-                        
-                        if (codeText.toUpperCase().indexOf(searchTerm) > -1 || 
-                            nameText.toUpperCase().indexOf(searchTerm) > -1) {
-                            row.style.display = "";
-                        } else {
-                            row.style.display = "none";
-                        }
-                    }
-                });
-            });
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Industry Name:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fas fa-font"></i>
+                            </span>
+                            <input id="name" name="name" type="text" maxlength="100" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Note:</label>
+                        <div class="border border-gray-300 rounded-md p-3 bg-gray-50 h-16 overflow-auto text-sm">
+                            <p>Kode industry maksimal 4 karakter. Nama industry maksimal 100 karakter.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+                    <button type="button" id="cancelForm" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
+                        <i class="fas fa-save mr-2"></i>Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-            // Select industry row
-            const tableRows = industryTableBody.querySelectorAll('tr');
-            tableRows.forEach(row => {
-                row.addEventListener('click', () => {
-                    tableRows.forEach(r => r.classList.remove('bg-blue-200'));
-                    row.classList.add('bg-blue-200');
-                });
-
-                row.addEventListener('dblclick', () => {
-                    const codeCell = row.cells[0];
-                    if (searchInput && codeCell) {
-                        searchInput.value = codeCell.textContent.trim();
-                        if (industryDialog) industryDialog.classList.add('hidden');
-                    }
-                });
-            });
-        }
-
-        if (selectIndustryBtn) {
-            // Select button in dialog
-            selectIndustryBtn.addEventListener('click', () => {
-                if (industryTableBody) {
-                    const selectedRow = industryTableBody.querySelector('tr.bg-blue-200');
-                    if (selectedRow) {
-                        const codeCell = selectedRow.cells[0];
-                        if (searchInput && codeCell) {
-                            searchInput.value = codeCell.textContent.trim();
-                            if (industryDialog) industryDialog.classList.add('hidden');
-                        }
-                    }
-                }
-            });
-        }
-    });
-</script>
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden">
+    <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+</div>
 @endsection

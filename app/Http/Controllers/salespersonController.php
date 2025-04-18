@@ -6,14 +6,15 @@ use Illuminate\Http\Request;
 use App\Models\Salesperson;
 use App\Models\SalesTeam;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
-class SalesPersonController extends Controller
+class SalespersonController extends Controller
 {
     public function index()
     {
         $salespersons = Salesperson::orderBy('code')->get();
-        \Log::info('Salespersons count in index: ' . $salespersons->count());
+        Log::info('Salespersons count in index: ' . $salespersons->count());
         
         return view('system-requirement.salesperson', compact('salespersons'));
     }

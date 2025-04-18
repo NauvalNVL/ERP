@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
     // prefix /vue
     Route::prefix('vue')->group(function () {
          Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+         Route::get('/system-requirement/color', [ColorController::class, 'vueIndex'])->name('vue.color.index');
     });
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/dashboard', function () {
