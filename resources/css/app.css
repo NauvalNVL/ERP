@@ -1,12 +1,9 @@
-@import "tailwindcss";
-@source "../views";
+/* @import "tailwindcss"; */
+/* @source "../views"; */
 /* @source "../views"; */
 
-@layer utilities {
-    .transform {
-        --tw-translate-x: 0;
-        --tw-translate-y: 0;
-        transform: translateX(var(--tw-translate-x))
-            translateY(var(--tw-translate-y));
-    }
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+

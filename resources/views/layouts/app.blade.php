@@ -7,42 +7,45 @@
     <title>@yield('title', 'ERP System')</title>
     @vite('resources/css/app.css')
     @vite('resources/js/app.js')
+  
+    <style>
+@media (min-width: 1024px) {
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #flutesTable,
+    #flutesTable * {
+        visibility: visible;
+    }
+    #flutesTable {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}
+</style>
     @if(Request::is('vue/*'))
     @inertiaHead
     @endif
-    
+    <!-- <link rel="stylesheet" href="/resources/css/"> -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @media (min-width: 1024px) {
-            .hide-scrollbar::-webkit-scrollbar {
-                display: none;
-            }
-
-            .hide-scrollbar {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-        }
-
-        [x-cloak] {
-            display: none !important;
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #flutesTable, #flutesTable * {
-                visibility: visible;
-            }
-            #flutesTable {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-        }
-    </style>
+    
 </head>
 
 <body class="bg-gray-100">

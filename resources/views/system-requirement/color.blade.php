@@ -1,6 +1,4 @@
-@extends('layouts.app')
 
-@section('title', 'Define Color')
 
 <!-- Add direct script for opening modal -->
 <script>
@@ -439,7 +437,7 @@ function closeColorModal() {
     var modal = document.getElementById('colorTableWindow');
     if (modal) {
         modal.style.display = 'none';
-        modal.classList.add('hidden');
+        // modal.classList.add('hidden');
     }
 }
 
@@ -473,7 +471,7 @@ function openEditColorModal(row) {
     document.getElementById('edit_cg_type').value = "X-Flexo"; // Always set to X-Flexo
     
     const editModal = document.getElementById('editColorModal');
-    editModal.classList.remove('hidden');
+    // editModal.classList.remove('hidden');
     editModal.style.display = 'block';
     
     console.log('Edit modal opened');
@@ -813,6 +811,10 @@ function updateSeedColorData(colorId, colorName, origin, colorGroup, cgType, kgP
     }
 }
 </script>
+
+@extends('layouts.app')
+
+@section('title', 'Define Color')
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
