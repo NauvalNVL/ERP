@@ -130,4 +130,16 @@ class PaperSizeController extends Controller
                 ->with('error', 'Gagal menghapus ukuran kertas: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \\Illuminate\\View\\View
+     */
+    public function viewAndPrint()
+    {
+        // Ambil semua data paper size, urutkan berdasarkan size
+        $paperSizes = PaperSize::orderBy('size')->get(); 
+        return view('system-requirement.viewandprintpapersize', compact('paperSizes')); 
+    }
 }

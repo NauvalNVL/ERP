@@ -7,6 +7,7 @@
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.10",
+        "@vitejs/plugin-vue": "^5.2.3",
         "autoprefixer": "^10.4.21",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
@@ -18,7 +19,6 @@
     "dependencies": {
         "@inertiajs/vue3": "^2.0.8",
         "@tailwindcss/postcss": "^4.0.12",
-        "@vitejs/plugin-vue": "^5.2.3",
         "chart.js": "^4.4.9",
         "vue": "^3.5.13"
     }

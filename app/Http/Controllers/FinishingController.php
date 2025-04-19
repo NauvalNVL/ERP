@@ -56,4 +56,16 @@ class FinishingController extends Controller
         return redirect()->route('finishing.index')
             ->with('success', 'Finishing berhasil dihapus');
     }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \\Illuminate\\View\\View
+     */
+    public function viewAndPrint()
+    {
+        // Ambil semua data finishing, urutkan berdasarkan code
+        $finishings = Finishing::orderBy('code')->get(); 
+        return view('system-requirement.viewandprintfinishing', compact('finishings')); 
+    }
 }

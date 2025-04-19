@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ProductDesign;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ProductDesignController extends Controller
 {
@@ -67,5 +68,17 @@ class ProductDesignController extends Controller
 
         return redirect()->route('product-design.index')
             ->with('success', 'Product design deleted successfully.');
+    }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \\Illuminate\\View\\View
+     */
+    public function viewAndPrint()
+    {
+        // Ambil semua data desain produk, urutkan berdasarkan nama
+        $productDesigns = ProductDesign::orderBy('design_name')->get(); 
+        return view('system-requirement.viewandprintproductdesign', compact('productDesigns')); 
     }
 }

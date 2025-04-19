@@ -27,4 +27,16 @@ class GeoController extends Controller
         Geo::create($request->all());
         return redirect()->route('geo.index')->with('success', 'Geo data added successfully.');
     }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function viewAndPrint()
+    {
+        // Urutkan berdasarkan country, lalu state
+        $geos = Geo::orderBy('country')->orderBy('state')->get(); 
+        return view('system-requirement.viewandprintgeo', compact('geos')); 
+    }
 }

@@ -55,4 +55,16 @@ class PaperFluteController extends Controller
 
         return redirect()->route('paper-flute.index')->with('success', 'Paper flute berhasil dihapus.');
     }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \\Illuminate\\View\\View
+     */
+    public function viewAndPrint()
+    {
+        // Ambil semua data paper flute, urutkan berdasarkan code
+        $paperFlutes = PaperFlute::orderBy('code')->get(); 
+        return view('system-requirement.viewandprintpaperflute', compact('paperFlutes')); 
+    }
 } 

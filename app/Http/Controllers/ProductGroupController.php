@@ -70,4 +70,15 @@ class ProductGroupController extends Controller
 
         return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil dihapus');
     }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \\Illuminate\\View\\View
+     */
+    public function viewAndPrint()
+    {
+        $productGroups = ProductGroup::orderBy('product_group_name')->get();
+        return view('system-requirement.viewandprintproductgroup', compact('productGroups'));
+    }
 } 

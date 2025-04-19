@@ -15,8 +15,12 @@
         </div>
         
         <!-- System Manager -->
-        <div x-data="{ open: false, securityOpen: false }" class="relative group">
-            <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+        <div x-data="{ 
+                open: $store.sidebar.isOpen('system-manager'), 
+                securityOpen: $store.sidebar.isOpen('system-security') 
+             }" 
+             class="relative group">
+            <button @click="open = !open; $store.sidebar.toggle('system-manager')" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-cogs w-5 h-5 mr-3"></i>
                     <span>System Manager</span>
@@ -25,10 +29,10 @@
             </button>
 
             <!-- System Manager Submenu -->
-            <div x-show="open" class="pl-4 mt-2 space-y-1">
+            <div x-show="open" x-collapse class="pl-4 mt-2 space-y-1">
                 <!-- System Security dengan Nested Submenu -->
                 <div class="relative">
-                    <button @click="securityOpen = !securityOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                    <button @click="securityOpen = !securityOpen; $store.sidebar.toggle('system-security')" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                         <div class="flex items-center">
                             <i class="fas fa-shield-alt w-4 h-4 mr-3"></i>
                             <span>System Security</span>
@@ -37,7 +41,7 @@
                     </button>
 
                     <!-- System Security Nested Submenu -->
-                    <div x-show="securityOpen" class="pl-4 mt-1 space-y-1">
+                    <div x-show="securityOpen" x-collapse class="pl-4 mt-1 space-y-1">
                         <a href="{{ route('users.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-user-plus w-3 h-3 mr-3"></i>
                             <span>Define User</span>
@@ -78,8 +82,8 @@
                 </div>
 
                 <!-- System Maintenance dengan Nested Submenu -->
-                <div class="relative" x-data="{ maintenanceOpen: false }">
-                    <button @click="maintenanceOpen = !maintenanceOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                <div class="relative" x-data="{ maintenanceOpen: $store.sidebar.isOpen('system-maintenance') }">
+                    <button @click="maintenanceOpen = !maintenanceOpen; $store.sidebar.toggle('system-maintenance')" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                         <div class="flex items-center">
                             <i class="fas fa-wrench w-4 h-4 mr-3"></i>
                             <span>System Maintenance</span>
@@ -88,7 +92,7 @@
                     </button>
 
                     <!-- System Maintenance Nested Submenu -->
-                    <div x-show="maintenanceOpen" class="pl-4 mt-1 space-y-1">
+                    <div x-show="maintenanceOpen" x-collapse class="pl-4 mt-1 space-y-1">
                         <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-coins w-3 h-3 mr-3"></i>
                             <span>Define ISO Currency</span>
@@ -128,8 +132,8 @@
         </div>
 
         <!-- Sales Management -->
-        <div x-data="{ salesOpen: false }" class="relative group">
-            <button @click="salesOpen = !salesOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+        <div x-data="{ salesOpen: $store.sidebar.isOpen('sales-management') }" class="relative group">
+            <button @click="salesOpen = !salesOpen; $store.sidebar.toggle('sales-management')" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-chart-line w-5 h-5 mr-3"></i>
                     <span>Sales Management</span>
@@ -138,10 +142,10 @@
             </button>
 
             <!-- Sales Management Submenu -->
-            <div x-show="salesOpen" class="pl-4 mt-2 space-y-1">
+            <div x-show="salesOpen" x-collapse class="pl-4 mt-2 space-y-1">
                 <!-- System Requirement dengan Nested Submenu -->
-                <div class="relative" x-data="{ requirementOpen: false }">
-                    <button @click="requirementOpen = !requirementOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                <div class="relative" x-data="{ requirementOpen: $store.sidebar.isOpen('system-requirement') }">
+                    <button @click="requirementOpen = !requirementOpen; $store.sidebar.toggle('system-requirement')" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                         <div class="flex items-center">
                             <i class="fas fa-clipboard-list w-4 h-4 mr-3"></i>
                             <span>System Requirement</span>
@@ -150,10 +154,10 @@
                     </button>
 
                     <!-- System Requirement Nested Submenu -->
-                    <div x-show="requirementOpen" class="pl-4 mt-1 space-y-1">
+                    <div x-show="requirementOpen" x-collapse class="pl-4 mt-1 space-y-1">
                         <!-- Sales Configuration dan Customer Account tetap di dalam System Requirement -->
-                        <div class="relative" x-data="{ salesConfigOpen: false }">
-                            <button @click="salesConfigOpen = !salesConfigOpen" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <div class="relative" x-data="{ salesConfigOpen: $store.sidebar.isOpen('sales-config') }">
+                            <button @click="salesConfigOpen = !salesConfigOpen; $store.sidebar.toggle('sales-config')" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                 <div class="flex items-center">
                                     <i class="fas fa-cog w-3 h-3 mr-3"></i>
                                     <span>Sales Configuration</span>
@@ -161,7 +165,7 @@
                                 <i class="fas fa-chevron-right text-xs transition-transform" :class="{ 'transform rotate-90': salesConfigOpen }"></i>
                             </button>
 
-                            <div x-show="salesConfigOpen" class="pl-4 mt-1 space-y-1">
+                            <div x-show="salesConfigOpen" x-collapse class="pl-4 mt-1 space-y-1">
                                 <a href="{{ route('sales-configuration.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-sliders-h w-3 h-3 mr-3"></i>
                                     <span>Define Sales Configuration</span>
@@ -170,8 +174,8 @@
                         </div>
 
                         <!-- Standard Requirement -->
-                        <div class="relative" x-data="{ stdReqOpen: false }">
-                            <button @click="stdReqOpen = !stdReqOpen" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <div class="relative" x-data="{ stdReqOpen: $store.sidebar.isOpen('standard-requirement') }">
+                            <button @click="stdReqOpen = !stdReqOpen; $store.sidebar.toggle('standard-requirement')" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                 <div class="flex items-center">
                                     <i class="fas fa-clipboard-check w-3 h-3 mr-3"></i>
                                     <span>Standard Requirement</span>
@@ -179,7 +183,7 @@
                                 <i class="fas fa-chevron-right text-xs transition-transform" :class="{ 'transform rotate-90': stdReqOpen }"></i>
                             </button>
 
-                            <div x-show="stdReqOpen" class="pl-4 mt-1 space-y-1">
+                            <div x-show="stdReqOpen" x-collapse class="pl-4 mt-1 space-y-1">
                                 <a href="{{ route('sales-team.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-users-cog w-3 h-3 mr-3"></i>
                                     <span>Define Sales Team</span>
@@ -246,19 +250,19 @@
                                 </a>
 
                                 <!-- View & Print Section -->
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('geo.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Geo</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('product-group.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Product Group</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('product.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Product</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('product-design.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Product Design</span>
                                 </a>
@@ -266,27 +270,27 @@
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Paper Quality</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('paper-flute.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Paper Flute</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('paper-size.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Paper Size</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('scoring-tool.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Scoring Tool</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('color-group.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Color Group</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('color.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Color</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('finishing.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Finishing</span>
                                 </a>
@@ -294,8 +298,8 @@
                         </div>
 
                         <!-- Customer Account -->
-                        <div class="relative" x-data="{ customerAccOpen: false }">
-                            <button @click="customerAccOpen = !customerAccOpen" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <div class="relative" x-data="{ customerAccOpen: $store.sidebar.isOpen('customer-account') }">
+                            <button @click="customerAccOpen = !customerAccOpen; $store.sidebar.toggle('customer-account')" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                 <div class="flex items-center">
                                     <i class="fas fa-user-circle w-3 h-3 mr-3"></i>
                                     <span>Customer Account</span>
@@ -304,7 +308,7 @@
                             </button>
 
                             <!-- Customer Account Nested Submenu -->
-                            <div x-show="customerAccOpen" class="pl-4 mt-1 space-y-1">
+                            <div x-show="customerAccOpen" x-collapse class="pl-4 mt-1 space-y-1">
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-users w-3 h-3 mr-3"></i>
                                     <span>Define Customer Group</span>
@@ -349,8 +353,8 @@
                         </div>
 
                         <!-- Master Card Nested List -->
-                        <div class="relative" x-data="{ masterCardOpen: false }">
-                            <button @click="masterCardOpen = !masterCardOpen" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <div class="relative" x-data="{ masterCardOpen: $store.sidebar.isOpen('master-card') }">
+                            <button @click="masterCardOpen = !masterCardOpen; $store.sidebar.toggle('master-card')" class="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                 <div class="flex items-center">
                                     <i class="fas fa-id-card w-3 h-3 mr-3"></i>
                                     <span>Master Card</span>
@@ -359,7 +363,7 @@
                             </button>
 
                             <!-- Master Card Submenu -->
-                            <div x-show="masterCardOpen" class="pl-4 mt-1 space-y-1">
+                            <div x-show="masterCardOpen" x-collapse class="pl-4 mt-1 space-y-1">
                                 <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-edit w-3 h-3 mr-3"></i>
                                     <span>Update MC</span>
@@ -422,8 +426,8 @@
                 </div>
 
                 <!-- Standard Costing -->
-                <div class="relative" x-data="{ costingOpen: false }">
-                    <button @click="costingOpen = !costingOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                <div class="relative" x-data="{ costingOpen: $store.sidebar.isOpen('standard-costing') }">
+                    <button @click="costingOpen = !costingOpen; $store.sidebar.toggle('standard-costing')" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                         <div class="flex items-center">
                             <i class="fas fa-calculator w-4 h-4 mr-3"></i>
                             <span>Standard Costing</span>
@@ -433,8 +437,8 @@
                 </div>
 
                 <!-- Standard Formula -->
-                <div class="relative" x-data="{ formulaOpen: false }">
-                    <button @click="formulaOpen = !formulaOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                <div class="relative" x-data="{ formulaOpen: $store.sidebar.isOpen('standard-formula') }">
+                    <button @click="formulaOpen = !formulaOpen; $store.sidebar.toggle('standard-formula')" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                         <div class="flex items-center">
                             <i class="fas fa-flask w-4 h-4 mr-3"></i>
                             <span>Standard Formula</span>
@@ -444,8 +448,8 @@
                 </div>
 
                 <!-- Sales Order -->
-                <div class="relative" x-data="{ orderOpen: false }">
-                    <button @click="orderOpen = !orderOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                <div class="relative" x-data="{ orderOpen: $store.sidebar.isOpen('sales-order') }">
+                    <button @click="orderOpen = !orderOpen; $store.sidebar.toggle('sales-order')" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                         <div class="flex items-center">
                             <i class="fas fa-shopping-cart w-4 h-4 mr-3"></i>
                             <span>Sales Order</span>
@@ -455,8 +459,8 @@
                 </div>
 
                 <!-- Sales Analysis -->
-                <div class="relative" x-data="{ analysisOpen: false }">
-                    <button @click="analysisOpen = !analysisOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                <div class="relative" x-data="{ analysisOpen: $store.sidebar.isOpen('sales-analysis') }">
+                    <button @click="analysisOpen = !analysisOpen; $store.sidebar.toggle('sales-analysis')" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                         <div class="flex items-center">
                             <i class="fas fa-chart-bar w-4 h-4 mr-3"></i>
                             <span>Sales Analysis</span>
@@ -466,8 +470,8 @@
                 </div>
 
                 <!-- Customer Service -->
-                <div class="relative" x-data="{ serviceOpen: false }">
-                    <button @click="serviceOpen = !serviceOpen" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                <div class="relative" x-data="{ serviceOpen: $store.sidebar.isOpen('customer-service') }">
+                    <button @click="serviceOpen = !serviceOpen; $store.sidebar.toggle('customer-service')" class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                         <div class="flex items-center">
                             <i class="fas fa-headset w-4 h-4 mr-3"></i>
                             <span>Customer Service</span>
@@ -479,8 +483,8 @@
         </div>
 
         <!-- Material Management -->
-        <div x-data="{ materialOpen: false }" class="relative group">
-            <button @click="materialOpen = !materialOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+        <div x-data="{ materialOpen: $store.sidebar.isOpen('material-management') }" class="relative group">
+            <button @click="materialOpen = !materialOpen; $store.sidebar.toggle('material-management')" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-boxes w-5 h-5 mr-3"></i>
                     <span>Material Management</span>
@@ -489,7 +493,7 @@
             </button>
 
             <!-- Material Management Submenu -->
-            <div x-show="materialOpen" class="pl-4 mt-2 space-y-1">
+            <div x-show="materialOpen" x-collapse class="pl-4 mt-2 space-y-1">
                 <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                     <i class="fas fa-clipboard-list w-4 h-4 mr-3"></i>
                     <span>System Requirement</span>
@@ -514,8 +518,8 @@
         </div>
 
         <!-- Production Management -->
-        <div x-data="{ productionOpen: false }" class="relative group">
-            <button @click="productionOpen = !productionOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+        <div x-data="{ productionOpen: $store.sidebar.isOpen('production-management') }" class="relative group">
+            <button @click="productionOpen = !productionOpen; $store.sidebar.toggle('production-management')" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-industry w-5 h-5 mr-3"></i>
                     <span>Production Management</span>
@@ -524,7 +528,7 @@
             </button>
 
             <!-- Production Management Submenu -->
-            <div x-show="productionOpen" class="pl-4 mt-2 space-y-1">
+            <div x-show="productionOpen" x-collapse class="pl-4 mt-2 space-y-1">
                 <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                     <i class="fas fa-sliders-h w-4 h-4 mr-3"></i>
                     <span>Production Configuration</span>
@@ -541,8 +545,8 @@
         </div>
 
         <!-- Warehouse Management -->
-        <div x-data="{ warehouseOpen: false }" class="relative group">
-            <button @click="warehouseOpen = !warehouseOpen" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+        <div x-data="{ warehouseOpen: $store.sidebar.isOpen('warehouse-management') }" class="relative group">
+            <button @click="warehouseOpen = !warehouseOpen; $store.sidebar.toggle('warehouse-management')" class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                 <div class="flex items-center">
                     <i class="fas fa-warehouse w-5 h-5 mr-3"></i>
                     <span>Warehouse Management</span>
@@ -551,7 +555,7 @@
             </button>
 
             <!-- Warehouse Management Submenu -->
-            <div x-show="warehouseOpen" class="pl-4 mt-2 space-y-1">
+            <div x-show="warehouseOpen" x-collapse class="pl-4 mt-2 space-y-1">
                 <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                     <i class="fas fa-box-open w-4 h-4 mr-3"></i>
                     <span>Finished Goods</span>
@@ -632,3 +636,32 @@
 
 <!-- Alpine.js for dropdown functionality -->
 <script src="//unpkg.com/alpinejs" defer></script>
+
+<!-- Add Alpine.js store for sidebar state -->
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('sidebar', {
+            state: Alpine.reactive(JSON.parse(localStorage.getItem('sidebarState') || '{}')),
+
+            isOpen(id) {
+                return this.state[id] === true;
+            },
+
+            toggle(id) {
+                this.state[id] = !this.isOpen(id);
+                localStorage.setItem('sidebarState', JSON.stringify(this.state));
+            }
+        });
+    });
+</script>
+
+<!-- Add CSS for hide-scrollbar utility -->
+<style>
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
+    }
+    .hide-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+</style>

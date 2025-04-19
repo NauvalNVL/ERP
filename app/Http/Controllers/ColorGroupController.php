@@ -6,6 +6,8 @@ use App\Models\ColorGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
 
 class ColorGroupController extends Controller
 {
@@ -120,5 +122,16 @@ class ColorGroupController extends Controller
             Log::error('Error in ColorGroupController@vueIndex: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load color groups data'], 500);
         }
+    }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \\Illuminate\\View\\View
+     */
+    public function viewAndPrint()
+    {
+        $colorGroups = ColorGroup::orderBy('cg_name')->get();
+        return view('system-requirement.viewandprintcolorgroup', compact('colorGroups'));
     }
 } 

@@ -21,7 +21,6 @@ use App\Http\Controllers\ColorGroupController;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ProductDesignController;
 use App\Http\Controllers\DashboardController;
-
 use Inertia\Inertia;
 
 Route::get('/test-vue', function () {
@@ -80,7 +79,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/salesperson-team/{id}', [SalespersonTeamController::class, 'destroy'])->name('salesperson-team.destroy');
 
     Route::resource('product-group', ProductGroupController::class);
+    // Route baru untuk View & Print Product Group
+    Route::get('/system-requirement/product-group/view-print', [ProductGroupController::class, 'viewAndPrint'])
+         ->name('product-group.view-print');
+    
     Route::resource('product', ProductController::class);
+    // Route baru untuk View & Print Product
+    Route::get('/system-requirement/product/view-print', [ProductController::class, 'viewAndPrint'])
+         ->name('product.view-print');
 
     // Product Design Routes
     Route::get('/product-design', [ProductDesignController::class, 'index'])->name('product-design.index');
@@ -89,9 +95,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/product-design/{id}/edit', [ProductDesignController::class, 'edit'])->name('product-design.edit');
     Route::put('/product-design/{id}', [ProductDesignController::class, 'update'])->name('product-design.update');
     Route::delete('/product-design/{id}', [ProductDesignController::class, 'destroy'])->name('product-design.destroy');
+    // Route baru untuk View & Print Product Design
+    Route::get('/system-requirement/product-design/view-print', [ProductDesignController::class, 'viewAndPrint'])
+         ->name('product-design.view-print');
 
     // Tambahkan route berikut di dalam middleware auth
     Route::resource('paper-size', PaperSizeController::class);
+    // Route baru untuk View & Print Paper Size
+    Route::get('/system-requirement/paper-size/view-print', [PaperSizeController::class, 'viewAndPrint'])
+         ->name('paper-size.view-print');
 
     // Scoring Tool Routes
     Route::get('/scoring-tool', [ScoringToolController::class, 'index'])->name('scoring-tool.index');
@@ -100,6 +112,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/scoring-tool/{id}', [ScoringToolController::class, 'update'])->name('scoring-tool.update');
     Route::delete('/scoring-tool/{id}', [ScoringToolController::class, 'destroy'])->name('scoring-tool.destroy');
     Route::get('/scoring-tool/{id}', [ScoringToolController::class, 'show'])->name('scoring-tool.show');
+    // Route baru untuk View & Print Scoring Tool
+    Route::get('/system-requirement/scoring-tool/view-print', [ScoringToolController::class, 'viewAndPrint'])
+         ->name('scoring-tool.view-print');
 
     // Color Routes - Dipindahkan ke dalam middleware auth
     Route::get('/color', [ColorController::class, 'index'])->name('color.index');
@@ -108,9 +123,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/color/{color}/edit', [ColorController::class, 'edit'])->name('color.edit');
     Route::put('/color/{color}', [ColorController::class, 'update'])->name('color.update');
     Route::delete('/color/{color}', [ColorController::class, 'destroy'])->name('color.destroy');
+    // Route baru untuk View & Print Color
+    Route::get('/system-requirement/color/view-print', [ColorController::class, 'viewAndPrint'])
+         ->name('color.view-print');
     
     // Finishing Routes
     Route::resource('finishing', FinishingController::class);
+    // Route baru untuk View & Print Finishing
+    Route::get('/system-requirement/finishing/view-print', [FinishingController::class, 'viewAndPrint'])
+         ->name('finishing.view-print');
+
+    // Route baru untuk View & Print Color Group
+    Route::get('/system-requirement/color-group/view-print', [ColorGroupController::class, 'viewAndPrint'])
+         ->name('color-group.view-print');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -146,8 +171,16 @@ Route::put('/industry/{id}', [IndustryController::class, 'update'])->name('indus
 Route::delete('/industry/{id}', [IndustryController::class, 'destroy'])->name('industry.destroy');
 
 Route::resource('geo', GeoController::class);
+// Route baru untuk View & Print Geo
+Route::get('/system-requirement/geo/view-print', [GeoController::class, 'viewAndPrint'])
+     ->middleware('auth') // Pastikan route ini di dalam auth middleware
+     ->name('geo.view-print');
 
 Route::resource('paper-flute', PaperFluteController::class)->middleware('auth');
+// Route baru untuk View & Print Paper Flute
+Route::get('/system-requirement/paper-flute/view-print', [PaperFluteController::class, 'viewAndPrint'])
+     ->middleware('auth') // Pastikan route ini di dalam auth middleware
+     ->name('paper-flute.view-print');
 
 // Color Routes
 Route::resource('color', ColorController::class);

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class ColorController extends Controller
 {
@@ -216,5 +217,18 @@ class ColorController extends Controller
                 'error' => 'Terjadi kesalahan dalam menampilkan data warna: ' . $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function viewAndPrint()
+    {
+        // Ambil semua data warna, urutkan berdasarkan nama
+        // Eager load ColorGroup
+        $colors = Color::with('colorGroup')->orderBy('color_name')->get(); 
+        return view('system-requirement.viewandprintcolor', compact('colors')); 
     }
 }

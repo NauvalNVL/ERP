@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ScoringTool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ScoringToolController extends Controller
 {
@@ -110,5 +112,17 @@ class ScoringToolController extends Controller
     {
         $scoringTool = ScoringTool::findOrFail($id);
         return response()->json($scoringTool);
+    }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function viewAndPrint()
+    {
+        // Ambil semua data scoring tool, urutkan berdasarkan code
+        $scoringTools = ScoringTool::orderBy('code')->get(); 
+        return view('system-requirement.viewandprintscoringtool', compact('scoringTools')); 
     }
 }

@@ -98,4 +98,17 @@ class ProductController extends Controller
             '7-Other Packaging Products'
         ];
     }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \\Illuminate\\View\\View
+     */
+    public function viewAndPrint()
+    {
+        // Ambil semua data produk, urutkan berdasarkan deskripsi
+        // Eager load ProductGroup jika ingin menampilkan nama grup di view
+        $products = Product::with('productGroup')->orderBy('description')->get();
+        return view('system-requirement.viewandprintproduct', compact('products')); 
+    }
 }
