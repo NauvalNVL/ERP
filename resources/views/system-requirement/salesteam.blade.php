@@ -24,28 +24,28 @@
                         <i class="fas fa-edit text-white"></i>
                     </div>
                     <h3 class="text-xl font-semibold text-gray-800">Sales Team Management</h3>
-                </div>
-                
-                <!-- Header with navigation buttons -->
-                <div class="flex items-center space-x-2 mb-6">
+        </div>
+        
+            <!-- Header with navigation buttons -->
+            <div class="flex items-center space-x-2 mb-6">
                     <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                        <i class="fas fa-power-off"></i>
-                    </button>
+                    <i class="fas fa-power-off"></i>
+                </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
+                    <i class="fas fa-arrow-left"></i>
+                </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                        <i class="fas fa-search"></i>
-                    </button>
+                    <i class="fas fa-search"></i>
+                </button>
                     <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                        <i class="fas fa-save"></i>
-                    </button>
-                </div>
+                    <i class="fas fa-save"></i>
+                </button>
+            </div>
 
-                <!-- Search Section -->
+            <!-- Search Section -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                     <div class="col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Sales Team Code:</label>
@@ -56,37 +56,37 @@
                             <input type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                             <button type="button" id="showSalesTeamTableBtn" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px" onclick="openSalesTeamModal()">
                                 <i class="fas fa-table"></i>
-                            </button>
-                        </div>
+                    </button>
+                </div>
                     </div>
                     
                     <div class="col-span-1">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
                         <button type="button" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
                             <i class="fas fa-list-ul mr-2"></i> Select Record
-                        </button>
-                    </div>
+                    </button>
                 </div>
-
-                <!-- Debug Information -->
-                @if(empty($salesTeams) || count($salesTeams) === 0)
-                <div class="mt-4 bg-yellow-100 p-3 rounded">
-                    <p class="text-sm font-medium text-yellow-800">Tidak ada data sales team yang tersedia.</p>
-                    <p class="text-xs text-yellow-700 mt-1">Pastikan database telah diatur dengan benar dan data seeder telah dijalankan.</p>
-                    <div class="mt-2 flex items-center space-x-3">
+            </div>
+            
+            <!-- Debug Information -->
+            @if(empty($salesTeams) || count($salesTeams) === 0)
+            <div class="mt-4 bg-yellow-100 p-3 rounded">
+                <p class="text-sm font-medium text-yellow-800">Tidak ada data sales team yang tersedia.</p>
+                <p class="text-xs text-yellow-700 mt-1">Pastikan database telah diatur dengan benar dan data seeder telah dijalankan.</p>
+                <div class="mt-2 flex items-center space-x-3">
                         <a href="{{ route('run.salesteam.seeder') }}" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded transform active:translate-y-px">
-                            Run Sales Team Seeder (DB)
-                        </a>
+                        Run Sales Team Seeder (DB)
+                    </a>
                         <button id="loadDataJsBtn" onclick="loadSeedData()" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transform active:translate-y-px">
                             Load Sales Team Data (JS)
-                        </button>
-                    </div>
+                </button>
                 </div>
-                @elseif(count($salesTeams) > 0)
-                <div class="mt-4 bg-green-100 p-3 rounded">
-                    <p class="text-sm font-medium text-green-800">Data tersedia: {{ count($salesTeams) }} sales team ditemukan.</p>
-                </div>
-                @endif
+            </div>
+            @elseif(count($salesTeams) > 0)
+            <div class="mt-4 bg-green-100 p-3 rounded">
+                <p class="text-sm font-medium text-green-800">Data tersedia: {{ count($salesTeams) }} sales team ditemukan.</p>
+            </div>
+            @endif
             </div>
         </div>
 
@@ -192,7 +192,7 @@
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
-
+        
         <!-- Table Content -->
         <div class="p-5 overflow-auto" style="max-height: calc(80vh - 130px);">
             <div class="mb-4">
@@ -211,29 +211,29 @@
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        </tr>
-                    </thead>
+                    </tr>
+                </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @if(isset($salesTeams) && count($salesTeams) > 0)
-                            @foreach($salesTeams as $team)
+                    @foreach($salesTeams as $team)
                                 <tr class="hover:bg-blue-50 cursor-pointer" 
-                                    data-team-code="{{ $team->code }}"
-                                    data-team-name="{{ $team->name }}"
-                                    onclick="selectRow(this); event.stopPropagation();"
-                                    ondblclick="openEditSalesTeamModal(this)">
+                                data-team-code="{{ $team->code }}"
+                                data-team-name="{{ $team->name }}"
+                                onclick="selectRow(this); event.stopPropagation();"
+                                ondblclick="openEditSalesTeamModal(this)">
                                     <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $team->code }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $team->name }}</td>
-                                </tr>
-                            @endforeach
+                    </tr>
+                    @endforeach
                         @else
                             <tr>
                                 <td colspan="2" class="px-4 py-4 text-center text-gray-500">Tidak ada data sales team yang tersedia.</td>
                             </tr>
                         @endif
-                    </tbody>
-                </table>
-            </div>
-
+                </tbody>
+            </table>
+        </div>
+        
             <!-- Bottom Buttons -->
             <div class="mt-4 grid grid-cols-4 gap-2">
                 <button type="button" onclick="sortTableDirectly(0)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">

@@ -36,14 +36,14 @@
                     </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                         <i class="fas fa-arrow-left"></i>
-                    </button>
+        </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                         <i class="fas fa-search"></i>
-                    </button>
+        </button>
                     <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                         <i class="fas fa-save"></i>
-                    </button>
-                </div>
+        </button>
+    </div>
 
                 <!-- Search Section -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
@@ -66,7 +66,7 @@
                             <i class="fas fa-plus-circle mr-2"></i> Add New
                         </button>
                     </div>
-                </div>
+            </div>
 
                 <!-- Debug Information -->
                 @if(empty($salespersons) || (isset($salespersons) && count($salespersons) == 0))
@@ -79,73 +79,73 @@
                         </a>
                         <button id="loadDataJsBtn" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transform active:translate-y-px">
                             Load Team Data (JS)
-                        </button>
-                    </div>
-                </div>
+                </button>
+            </div>
+        </div>
                 @elseif(isset($salespersons) && count($salespersons) > 0)
                 <div class="mt-4 bg-green-100 p-3 rounded alert-success">
                     <p class="text-sm font-medium text-green-800">Data tersedia: {{ count($salespersons) }} tim salesperson ditemukan.</p>
-                </div>
+    </div>
                 @endif
                 
                 <!-- Salesperson Team Table -->
                 <div class="mt-6 overflow-x-auto rounded-lg border border-gray-200">
                     <table class="min-w-full divide-y divide-gray-200" id="salespersonTable">
                         <thead class="bg-gray-50 sticky top-0">
-                            <tr>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
-                                    <input type="checkbox" id="selectAll" class="rounded text-blue-500 focus:ring-blue-500">
-                                </th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Salesperson<br>Code
-                                </th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Salesperson<br>Name
-                                </th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    S/Team<br>Code
-                                </th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Sales Team<br>Name
-                                </th>
-                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Sales Team<br>Position
-                                </th>
-                            </tr>
-                        </thead>
+                <tr>
+                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
+                        <input type="checkbox" id="selectAll" class="rounded text-blue-500 focus:ring-blue-500">
+                    </th>
+                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Salesperson<br>Code
+                    </th>
+                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Salesperson<br>Name
+                    </th>
+                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        S/Team<br>Code
+                    </th>
+                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Sales Team<br>Name
+                    </th>
+                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Sales Team<br>Position
+                    </th>
+                </tr>
+            </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @if(isset($salespersons) && count($salespersons) > 0)
-                                @foreach ($salespersons as $salesperson)
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-3 py-2 whitespace-nowrap">
-                                        <input type="checkbox" name="selected[]" value="{{ $salesperson->id }}" class="selectItem rounded text-blue-500 focus:ring-blue-500">
-                                    </td>
-                                    <td class="px-3 py-2 whitespace-nowrap font-medium">
-                                        {{ $salesperson->salesperson_code }}
-                                    </td>
-                                    <td class="px-3 py-2 whitespace-nowrap">
-                                        {{ $salesperson->salesperson_name }}
-                                    </td>
-                                    <td class="px-3 py-2 whitespace-nowrap font-medium">
-                                        {{ $salesperson->team_code }}
-                                    </td>
-                                    <td class="px-3 py-2 whitespace-nowrap">
-                                        {{ $salesperson->team_name }}
-                                    </td>
-                                    <td class="px-3 py-2 whitespace-nowrap">
-                                        {{ $salesperson->position }}
-                                    </td>
-                                </tr>
-                                @endforeach
+                @foreach ($salespersons as $salesperson)
+                <tr class="hover:bg-gray-50">
+                    <td class="px-3 py-2 whitespace-nowrap">
+                        <input type="checkbox" name="selected[]" value="{{ $salesperson->id }}" class="selectItem rounded text-blue-500 focus:ring-blue-500">
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap font-medium">
+                        {{ $salesperson->salesperson_code }}
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                        {{ $salesperson->salesperson_name }}
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap font-medium">
+                        {{ $salesperson->team_code }}
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                        {{ $salesperson->team_name }}
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                        {{ $salesperson->position }}
+                    </td>
+                </tr>
+                @endforeach
                             @else
                                 <tr>
                                     <td colspan="6" class="px-4 py-4 text-center text-gray-500">Tidak ada data salesperson team yang tersedia.</td>
                                 </tr>
                             @endif
-                        </tbody>
-                    </table>
-                </div>
-                
+            </tbody>
+        </table>
+    </div>
+
                 <!-- Action Buttons -->
                 <div class="mt-4 grid grid-cols-3 gap-2">
                     <button type="button" id="editButton" onclick="showEditModal()" disabled class="py-2 px-3 bg-yellow-500 hover:bg-yellow-600 text-white text-xs rounded-lg transform active:translate-y-px opacity-50 cursor-not-allowed">
@@ -290,11 +290,11 @@
                             <i class="fas fa-users"></i>
                         </span>
                         <select name="sales_team_id" id="sales_team_id" required class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Pilih Sales Team</option>
-                            @foreach ($salesTeams as $team)
-                            <option value="{{ $team->id }}">{{ $team->code }} - {{ $team->name }}</option>
-                            @endforeach
-                        </select>
+                        <option value="">Pilih Sales Team</option>
+                        @foreach ($salesTeams as $team)
+                        <option value="{{ $team->id }}">{{ $team->code }} - {{ $team->name }}</option>
+                        @endforeach
+                    </select>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -304,11 +304,11 @@
                             <i class="fas fa-briefcase"></i>
                         </span>
                         <select name="position" id="position" required class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Pilih Position</option>
-                            <option value="E - Executive">E - Executive</option>
-                            <option value="M - Manager">M - Manager</option>
-                            <option value="T - Team Leader">T - Team Leader</option>
-                        </select>
+                        <option value="">Pilih Position</option>
+                        <option value="E - Executive">E - Executive</option>
+                        <option value="M - Manager">M - Manager</option>
+                        <option value="T - Team Leader">T - Team Leader</option>
+                    </select>
                     </div>
                 </div>
             </div>
@@ -367,11 +367,11 @@
                             <i class="fas fa-users"></i>
                         </span>
                         <select name="sales_team_id" id="edit_sales_team_id" required class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Pilih Sales Team</option>
-                            @foreach ($salesTeams as $team)
-                            <option value="{{ $team->id }}">{{ $team->code }} - {{ $team->name }}</option>
-                            @endforeach
-                        </select>
+                        <option value="">Pilih Sales Team</option>
+                        @foreach ($salesTeams as $team)
+                        <option value="{{ $team->id }}">{{ $team->code }} - {{ $team->name }}</option>
+                        @endforeach
+                    </select>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -381,11 +381,11 @@
                             <i class="fas fa-briefcase"></i>
                         </span>
                         <select name="position" id="edit_position" required class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <option value="">Pilih Position</option>
-                            <option value="E - Executive">E - Executive</option>
-                            <option value="M - Manager">M - Manager</option>
-                            <option value="T - Team Leader">T - Team Leader</option>
-                        </select>
+                        <option value="">Pilih Position</option>
+                        <option value="E - Executive">E - Executive</option>
+                        <option value="M - Manager">M - Manager</option>
+                        <option value="T - Team Leader">T - Team Leader</option>
+                    </select>
                     </div>
                 </div>
             </div>
@@ -410,7 +410,7 @@
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
                 <h3 class="text-xl font-semibold">Confirm Delete</h3>
-            </div>
+        </div>
             <button type="button" onclick="hideDeleteModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
                 <i class="fas fa-times text-xl"></i>
             </button>
@@ -422,13 +422,13 @@
                 <button type="button" onclick="hideDeleteModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
                     <i class="fas fa-times mr-2"></i>Cancel
                 </button>
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
+            <form id="deleteForm" method="POST">
+                @csrf
+                @method('DELETE')
                     <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm transform active:translate-y-px">
                         <i class="fas fa-trash-alt mr-2"></i>Delete
                     </button>
-                </form>
+            </form>
             </div>
         </div>
     </div>

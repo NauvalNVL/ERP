@@ -349,7 +349,7 @@
                                 <i class="fas fa-layer-group"></i>
                             </span>
                             <input id="edit_color_group" type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-sm" required>
-                            <button class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                            <button type="button" onclick="openColorGroupModal()" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
@@ -393,6 +393,62 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Color Group Table Modal -->
+<div id="colorGroupTableModal" class="hidden fixed inset-0 z-[70] bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 max-w-2xl mx-auto transform transition-transform duration-300">
+        <!-- Modal Header - Title Bar -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h3 class="text-xl font-semibold">Color Group Table</h3>
+            </div>
+            <button type="button" onclick="closeColorGroupModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Table Content -->
+        <div class="p-5 overflow-auto" style="max-height: calc(80vh - 130px);">
+            <div class="mb-4">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" id="searchColorGroupInput" placeholder="Search color groups..."
+                        class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200" id="colorGroupDataTable">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CG#</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CG Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CG Type</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 text-xs">
+                        <!-- Data from ColorGroupSeeder will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bottom Buttons -->
+            <div class="mt-4 flex justify-center space-x-4">
+                <button type="button" onclick="selectColorGroup()" class="py-2 px-6 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transform active:translate-y-px">
+                    <i class="fas fa-check mr-2"></i>Select
+                </button>
+                <button type="button" onclick="closeColorGroupModal()" class="py-2 px-6 bg-gray-300 hover:bg-gray-400 text-gray-800 text-sm rounded-lg transform active:translate-y-px">
+                    <i class="fas fa-times mr-2"></i>Exit
+                </button>
+            </div>
         </div>
     </div>
 </div>

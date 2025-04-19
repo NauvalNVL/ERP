@@ -14,6 +14,25 @@ const seedColors = [
     { color_id: 'C010', color_name: 'White Matte', origin: '2', color_group_id: '02', cg_type: 'X-Flexo' }
 ];
 
+// Define seed data for color groups (based on ColorGroupSeeder)
+const seedColorGroups = [
+    { cg: '01', cg_name: 'BLACK', cg_type: 'X-Flex' },
+    { cg: '02', cg_name: 'WHITE', cg_type: 'X-Flex' },
+    { cg: '03', cg_name: 'RED', cg_type: 'X-Flex' },
+    { cg: '04', cg_name: 'BLUE', cg_type: 'X-Flex' },
+    { cg: '05', cg_name: 'GREEN', cg_type: 'X-Flex' },
+    { cg: '06', cg_name: 'YELLOW', cg_type: 'X-Flex' },
+    { cg: '07', cg_name: 'MAGENTA', cg_type: 'X-Flex' },
+    { cg: '08', cg_name: 'CYAN', cg_type: 'X-Flex' },
+    { cg: '09', cg_name: 'ORANGE', cg_type: 'C-Coating' },
+    { cg: '10', cg_name: 'BROWN', cg_type: 'S-Offset' },
+    { cg: '11', cg_name: 'GRAY', cg_type: 'S-Offset' },
+    { cg: '12', cg_name: 'PURPLE', cg_type: 'C-Coating' },
+    { cg: '13', cg_name: 'VIOLET', cg_type: 'S-Offset' },
+    { cg: '14', cg_name: 'CREAM', cg_type: 'S-Offset' },
+    { cg: '15', cg_name: 'PANTONE', cg_type: 'S-Offset' }
+];
+
 function populateColorTable() {
     console.log('Populating color table');
     
@@ -279,19 +298,8 @@ function highlightBlueRows() {
 
 // Mapping of Color Group names based on ID
 function getCGName(cgId) {
-    // Map of color group IDs to names based on ColorGroupSeeder
-    const cgNames = {
-        '01': 'BLACK',
-        '02': 'WHITE',
-        '03': 'RED',
-        '04': 'BLUE',
-        '05': 'GREEN',
-        '06': 'CYAN',
-        '07': 'MAGENTA',
-        '08': 'PINK'
-    };
-    
-    return cgNames[cgId] || '';
+    const colorGroup = seedColorGroups.find(cg => cg.cg === cgId);
+    return colorGroup ? colorGroup.cg_name : 'Unknown';
 }
 
 // Function to set up events on table rows
@@ -547,4 +555,175 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-}); 
+    
+    // Setup Color Group search when the input exists
+    const colorGroupSearchInput = document.getElementById('searchColorGroupInput');
+    if (colorGroupSearchInput) {
+        colorGroupSearchInput.addEventListener('input', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#colorGroupDataTable tbody tr');
+            
+            rows.forEach(row => {
+                const cg = row.cells[0].textContent.toLowerCase();
+                const name = row.cells[1].textContent.toLowerCase();
+                const type = row.cells[2].textContent.toLowerCase();
+                
+                if (cg.includes(searchText) || name.includes(searchText) || type.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+    
+    // Close Color Group modal when clicking outside
+    const colorGroupModal = document.getElementById('colorGroupTableModal');
+    if (colorGroupModal) {
+        colorGroupModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeColorGroupModal();
+            }
+        });
+    }
+});
+
+// Function to handle the Color Group modal
+
+// Variable to store the currently selected color group row
+let selectedColorGroupRow = null;
+
+// Function to open the Color Group modal
+function openColorGroupModal() {
+    console.log('Opening color group modal');
+    const modal = document.getElementById('colorGroupTableModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        populateColorGroupTable();
+    }
+}
+
+// Function to close the Color Group modal
+function closeColorGroupModal() {
+    console.log('Closing color group modal');
+    const modal = document.getElementById('colorGroupTableModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Function to populate the Color Group table
+function populateColorGroupTable() {
+    console.log('Populating color group table');
+    
+    // Get the table body
+    const tbody = document.querySelector('#colorGroupDataTable tbody');
+    if (!tbody) {
+        console.error('Color group table body not found');
+        return;
+    }
+    
+    // Clear existing rows
+    tbody.innerHTML = '';
+    
+    // Add rows from seed data
+    seedColorGroups.forEach(group => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-blue-50 cursor-pointer';
+        row.setAttribute('data-cg', group.cg);
+        row.setAttribute('data-cg-name', group.cg_name);
+        row.setAttribute('data-cg-type', group.cg_type);
+        
+        // Set click event to select row
+        row.onclick = function(e) {
+            selectColorGroupRow(this);
+            e.stopPropagation();
+        };
+        
+        // Set double-click event to select and close modal
+        row.ondblclick = function() {
+            selectColorGroupRow(this);
+            selectColorGroup();
+        };
+        
+        // Create cells
+        const cgCell = document.createElement('td');
+        cgCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
+        cgCell.textContent = group.cg;
+        
+        const nameCell = document.createElement('td');
+        nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+        nameCell.textContent = group.cg_name;
+        
+        const typeCell = document.createElement('td');
+        typeCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+        typeCell.textContent = group.cg_type;
+        
+        // Add cells to row
+        row.appendChild(cgCell);
+        row.appendChild(nameCell);
+        row.appendChild(typeCell);
+        
+        // Add row to table
+        tbody.appendChild(row);
+    });
+    
+    // Add search functionality
+    setupColorGroupSearch();
+}
+
+// Function to select a color group row
+function selectColorGroupRow(row) {
+    // Remove highlight from previously selected row
+    if (selectedColorGroupRow) {
+        selectedColorGroupRow.classList.remove('bg-blue-600', 'text-white');
+    }
+    
+    // Highlight the new selected row
+    row.classList.add('bg-blue-600', 'text-white');
+    selectedColorGroupRow = row;
+}
+
+// Function to use the selected color group
+function selectColorGroup() {
+    if (!selectedColorGroupRow) {
+        alert('Please select a color group first');
+        return;
+    }
+    
+    // Get data from selected row
+    const cg = selectedColorGroupRow.getAttribute('data-cg');
+    const cgName = selectedColorGroupRow.getAttribute('data-cg-name');
+    const cgType = selectedColorGroupRow.getAttribute('data-cg-type');
+    
+    // Update the edit form
+    document.getElementById('edit_color_group').value = cg;
+    document.getElementById('edit_cg_type').value = cgType;
+    
+    // Close the modal
+    closeColorGroupModal();
+}
+
+// Function to setup search functionality for color group table
+function setupColorGroupSearch() {
+    const searchInput = document.getElementById('searchColorGroupInput');
+    if (!searchInput) return;
+    
+    searchInput.addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#colorGroupDataTable tbody tr');
+        
+        rows.forEach(row => {
+            const cg = row.getAttribute('data-cg').toLowerCase();
+            const name = row.getAttribute('data-cg-name').toLowerCase();
+            const type = row.getAttribute('data-cg-type').toLowerCase();
+            
+            // Show/hide rows based on search text
+            if (cg.includes(searchText) || name.includes(searchText) || type.includes(searchText)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+} 

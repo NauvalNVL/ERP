@@ -24,28 +24,28 @@
                         <i class="fas fa-edit text-white"></i>
                     </div>
                     <h3 class="text-xl font-semibold text-gray-800">Salesperson Management</h3>
-                </div>
-    
-                <!-- Header with navigation buttons -->
-                <div class="flex items-center space-x-2 mb-6">
+        </div>
+        
+            <!-- Header with navigation buttons -->
+            <div class="flex items-center space-x-2 mb-6">
                     <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                        <i class="fas fa-power-off"></i>
-                    </button>
+                    <i class="fas fa-power-off"></i>
+                </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
+                    <i class="fas fa-arrow-left"></i>
+                </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                        <i class="fas fa-search"></i>
-                    </button>
+                    <i class="fas fa-search"></i>
+                </button>
                     <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                        <i class="fas fa-save"></i>
-                    </button>
-                </div>
+                    <i class="fas fa-save"></i>
+                </button>
+            </div>
 
-                <!-- Search Section -->
+            <!-- Search Section -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                     <div class="col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code:</label>
@@ -56,19 +56,19 @@
                             <input type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                             <button type="button" id="showSalespersonTableBtn" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px" onclick="openSalespersonModal()">
                                 <i class="fas fa-table"></i>
-                            </button>
-                        </div>
+                    </button>
+                </div>
                     </div>
                     
                     <div class="col-span-1">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
                         <button type="button" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
                             <i class="fas fa-list-ul mr-2"></i> Select Record
-                        </button>
-                    </div>
+                    </button>
                 </div>
+            </div>
 
-                <!-- Debug Information -->
+            <!-- Debug Information -->
                 @if(empty($salespersons) || (isset($salespersons) && count($salespersons) == 0))
                 <div class="mt-4 bg-yellow-100 p-3 rounded alert-danger">
                     <p class="text-sm font-medium text-yellow-800">Warning: No Salesperson found</p>
@@ -85,7 +85,7 @@
                 @elseif(isset($salespersons) && count($salespersons) > 0)
                 <div class="mt-4 bg-green-100 p-3 rounded alert-success">
                     <p class="text-sm font-medium text-green-800">Found {{ count($salespersons) }} salespersons available</p>
-                </div>
+                    </div>
                 @endif
             </div>
         </div>
@@ -321,11 +321,11 @@
                                 <i class="fas fa-users"></i>
                             </span>
                             <select id="edit_person_team" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                                <option value="1">MBI</option>
-                                <option value="2">MANAGEMENT LOCAL</option>
-                                <option value="3">MANAGEMENT MNC</option>
-                            </select>
-                        </div>
+                            <option value="1">MBI</option>
+                            <option value="2">MANAGEMENT LOCAL</option>
+                            <option value="3">MANAGEMENT MNC</option>
+                        </select>
+                    </div>
                     </div>
                     
                     <div>
@@ -335,11 +335,11 @@
                                 <i class="fas fa-briefcase"></i>
                             </span>
                             <select id="edit_person_position" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                                <option value="E - Executive">E - Executive</option>
-                                <option value="M - Manager">M - Manager</option>
-                                <option value="S - Supervisor">S - Supervisor</option>
-                            </select>
-                        </div>
+                            <option value="E - Executive">E - Executive</option>
+                            <option value="M - Manager">M - Manager</option>
+                            <option value="S - Supervisor">S - Supervisor</option>
+                        </select>
+                    </div>
                     </div>
                     
                     <div>
@@ -359,9 +359,9 @@
                                 <i class="fas fa-toggle-on"></i>
                             </span>
                             <select id="edit_person_is_active" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
                         </div>
                     </div>
                 </div>
