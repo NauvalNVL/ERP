@@ -21,6 +21,7 @@ use App\Http\Controllers\ColorGroupController;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ProductDesignController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PaperQualityController;
 use Inertia\Inertia;
 
 Route::get('/test-vue', function () {
@@ -136,6 +137,18 @@ Route::middleware('auth')->group(function () {
     // Route baru untuk View & Print Color Group
     Route::get('/system-requirement/color-group/view-print', [ColorGroupController::class, 'viewAndPrint'])
          ->name('color-group.view-print');
+         
+    // Paper Quality Routes
+    Route::get('/paper-quality', [PaperQualityController::class, 'index'])->name('paper-quality.index');
+    Route::get('/paper-quality/create', [PaperQualityController::class, 'create'])->name('paper-quality.create');
+    Route::post('/paper-quality', [PaperQualityController::class, 'store'])->name('paper-quality.store');
+    Route::get('/paper-quality/{id}/edit', [PaperQualityController::class, 'edit'])->name('paper-quality.edit');
+    Route::put('/paper-quality/{id}', [PaperQualityController::class, 'update'])->name('paper-quality.update');
+    Route::delete('/paper-quality/{id}', [PaperQualityController::class, 'destroy'])->name('paper-quality.destroy');
+    Route::patch('/paper-quality/{id}/toggle-status', [PaperQualityController::class, 'toggleStatus'])->name('paper-quality.toggle-status');
+    // Route baru untuk View & Print Paper Quality
+    Route::get('/system-requirement/paper-quality/view-print', [PaperQualityController::class, 'viewAndPrint'])
+         ->name('paper-quality.view-print');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -215,6 +228,25 @@ Route::post('/run-salesperson-seeder', function () {
         return response()->json([
             'success' => true,
             'message' => 'Salesperson seeder berhasil dijalankan',
+            'count' => $count,
+            'output' => $output
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
+// Add a POST route for AJAX requests to run the paper quality seeder
+Route::post('/run-paper-quality-seeder', function () {
+    try {
+        $output = Artisan::call('db:seed', ['--class' => 'PaperQualitySeeder']);
+        $count = DB::table('paper_qualities')->count();
+        return response()->json([
+            'success' => true,
+            'message' => 'Paper Quality seeder berhasil dijalankan',
             'count' => $count,
             'output' => $output
         ]);

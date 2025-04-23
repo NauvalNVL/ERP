@@ -220,7 +220,11 @@
                                     <i class="fas fa-cut w-3 h-3 mr-3"></i>
                                     <span>Define Scoring Tool</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('finishing.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Finishing</span>
+                                </a>
+                                <a href="{{ route('paper-quality.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-scroll w-3 h-3 mr-3"></i>
                                     <span>Define Paper Quality</span>
                                 </a>
@@ -266,7 +270,7 @@
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Product Design</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('paper-quality.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Paper Quality</span>
                                 </a>
