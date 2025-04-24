@@ -11,7 +11,7 @@ class ProductGroupController extends Controller
     public function index()
     {
         $productGroups = ProductGroup::all();
-        return view('system-requirement.productgroup', compact('productGroups'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.productgroup', compact('productGroups'));
     }
 
     public function store(Request $request)
@@ -40,7 +40,7 @@ class ProductGroupController extends Controller
     {
         $productGroup = ProductGroup::where('product_group_id', $id)->firstOrFail();
         $productGroups = ProductGroup::all();
-        return view('system-requirement.productgroup', compact('productGroup', 'productGroups'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.productgroup', compact('productGroup', 'productGroups'));
     }
 
     public function update(Request $request, $id)
@@ -79,6 +79,6 @@ class ProductGroupController extends Controller
     public function viewAndPrint()
     {
         $productGroups = ProductGroup::orderBy('product_group_name')->get();
-        return view('system-requirement.viewandprintproductgroup', compact('productGroups'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintproductgroup', compact('productGroups'));
     }
 } 

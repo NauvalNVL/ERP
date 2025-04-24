@@ -14,10 +14,10 @@ class PaperSizeController extends Controller
     {
         try {
             $paperSizes = PaperSize::orderBy('size', 'asc')->get();
-            return view('system-requirement.papersize', compact('paperSizes'));
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.papersize', compact('paperSizes'));
         } catch (\Exception $e) {
             Log::error('Error in PaperSizeController@index: ' . $e->getMessage());
-            return view('system-requirement.papersize', ['paperSizes' => collect([])])
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.papersize', ['paperSizes' => collect([])])
                 ->with('error', 'Terjadi kesalahan saat memuat data');
         }
     }
@@ -68,7 +68,7 @@ class PaperSizeController extends Controller
             $paperSize = PaperSize::findOrFail($id);
             $paperSizes = PaperSize::orderBy('size', 'asc')->get();
             
-            return view('system-requirement.papersize', compact('paperSize', 'paperSizes'));
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.papersize', compact('paperSize', 'paperSizes'));
         } catch (\Exception $e) {
             Log::error('Error in PaperSizeController@edit: ' . $e->getMessage());
             return redirect()->route('paper-size.index')
@@ -140,6 +140,6 @@ class PaperSizeController extends Controller
     {
         // Ambil semua data paper size, urutkan berdasarkan size
         $paperSizes = PaperSize::orderBy('size')->get(); 
-        return view('system-requirement.viewandprintpapersize', compact('paperSizes')); 
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpapersize', compact('paperSizes')); 
     }
 }

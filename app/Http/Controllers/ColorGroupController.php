@@ -24,10 +24,10 @@ class ColorGroupController extends Controller
                 $colorGroups = ColorGroup::paginate(10);
             }
 
-            return view('system-requirement.color-group', compact('colorGroups'));
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.color-group', compact('colorGroups'));
         } catch (\Exception $e) {
             Log::error('Error in ColorGroupController@index: ' . $e->getMessage());
-            return view('system-requirement.color-group')->with('error', 'Failed to load color groups data');
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.color-group')->with('error', 'Failed to load color groups data');
         }
     }
 
@@ -132,6 +132,6 @@ class ColorGroupController extends Controller
     public function viewAndPrint()
     {
         $colorGroups = ColorGroup::orderBy('cg_name')->get();
-        return view('system-requirement.viewandprintcolorgroup', compact('colorGroups'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintcolorgroup', compact('colorGroups'));
     }
 } 

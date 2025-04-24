@@ -51,13 +51,13 @@ class ColorController extends Controller
                 Log::info('Found ' . $colors->count() . ' colors in the database');
             }
             
-            return view('system-requirement.color', [
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.color', [
                 'colors' => $colors,
                 'colorGroups' => $colorGroups
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ColorController@index: ' . $e->getMessage());
-            return view('system-requirement.color', [
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.color', [
                 'colors' => [],
                 'colorGroups' => [],
                 'error' => 'Terjadi kesalahan dalam menampilkan data warna: ' . $e->getMessage()
@@ -73,7 +73,7 @@ class ColorController extends Controller
     public function create()
     {
         $colorGroups = ColorGroup::all();
-        return view('system-requirement.color', compact('colorGroups'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.color', compact('colorGroups'));
     }
 
     /**
@@ -116,7 +116,7 @@ class ColorController extends Controller
                 return redirect()->route('color.index')->with('error', 'Warna tidak ditemukan');
             }
             
-            return view('system-requirement.color-edit', ['color' => $color]);
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.color-edit', ['color' => $color]);
         } catch (\Exception $e) {
             Log::error('Error in ColorController@edit: ' . $e->getMessage());
             return redirect()->route('color.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -205,13 +205,13 @@ class ColorController extends Controller
             
             $colorGroups = ColorGroup::all();
             
-            return Inertia::render('system-requirement/color', [
+            return Inertia::render('sales-management/system-requirement/system-requirement/standard-requirement/color', [
                 'colors' => $colors,
                 'colorGroups' => $colorGroups
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ColorController@vueIndex: ' . $e->getMessage());
-            return Inertia::render('system-requirement/color', [
+            return Inertia::render('sales-management/system-requirement/system-requirement/standard-requirement/color', [
                 'colors' => [],
                 'colorGroups' => [],
                 'error' => 'Terjadi kesalahan dalam menampilkan data warna: ' . $e->getMessage()
@@ -229,6 +229,6 @@ class ColorController extends Controller
         // Ambil semua data warna, urutkan berdasarkan nama
         // Eager load ColorGroup
         $colors = Color::with('colorGroup')->orderBy('color_name')->get(); 
-        return view('system-requirement.viewandprintcolor', compact('colors')); 
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintcolor', compact('colors')); 
     }
 }

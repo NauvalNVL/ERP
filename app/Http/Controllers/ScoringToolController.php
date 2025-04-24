@@ -27,7 +27,7 @@ class ScoringToolController extends Controller
         
         $scoringTools = $query->orderBy('code')->paginate(10);
         
-        return view('system-requirement.scoringtool', compact('scoringTools'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.scoringtool', compact('scoringTools'));
     }
 
     /**
@@ -63,7 +63,7 @@ class ScoringToolController extends Controller
         $scoringTool = ScoringTool::findOrFail($id);
         $scoringTools = ScoringTool::orderBy('code')->paginate(10);
         
-        return view('system-requirement.scoringtool', compact('scoringTool', 'scoringTools'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.scoringtool', compact('scoringTool', 'scoringTools'));
     }
 
     /**
@@ -123,6 +123,6 @@ class ScoringToolController extends Controller
     {
         // Ambil semua data scoring tool, urutkan berdasarkan code
         $scoringTools = ScoringTool::orderBy('code')->get(); 
-        return view('system-requirement.viewandprintscoringtool', compact('scoringTools')); 
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintscoringtool', compact('scoringTools')); 
     }
 }

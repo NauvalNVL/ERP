@@ -10,7 +10,7 @@ class IndustryController extends Controller
     public function index()
     {
         $industries = Industry::orderBy('code')->get();
-        return view('system-requirement.industry', compact('industries'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.industry', compact('industries'));
     }
 
     public function store(Request $request)
@@ -67,6 +67,6 @@ class IndustryController extends Controller
     public function viewAndPrint()
     {
         $industries = Industry::orderBy('code')->get();
-        return view('system-requirement.viewandprintindustry', compact('industries'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintindustry', compact('industries'));
     }
 }

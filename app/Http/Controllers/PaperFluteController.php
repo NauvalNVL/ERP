@@ -10,7 +10,7 @@ class PaperFluteController extends Controller
     public function index()
     {
         $paperFlutes = PaperFlute::all();
-        return view('system-requirement.paperflute', compact('paperFlutes'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.paperflute', compact('paperFlutes'));
     }
 
     public function store(Request $request)
@@ -30,7 +30,7 @@ class PaperFluteController extends Controller
     {
         $paperFlute = PaperFlute::findOrFail($id);
         $paperFlutes = PaperFlute::all();
-        return view('system-requirement.paperflute', compact('paperFlute', 'paperFlutes'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.paperflute', compact('paperFlute', 'paperFlutes'));
     }
 
     public function update(Request $request, $id)
@@ -65,6 +65,6 @@ class PaperFluteController extends Controller
     {
         // Ambil semua data paper flute, urutkan berdasarkan code
         $paperFlutes = PaperFlute::orderBy('code')->get(); 
-        return view('system-requirement.viewandprintpaperflute', compact('paperFlutes')); 
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpaperflute', compact('paperFlutes')); 
     }
 } 

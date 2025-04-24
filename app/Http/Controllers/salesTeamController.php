@@ -11,7 +11,7 @@ class SalesTeamController extends Controller
     public function index()
     {
         $salesTeams = SalesTeam::all();
-        return view('system-requirement.salesteam', compact('salesTeams'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.salesteam', compact('salesTeams'));
     }
 
     public function store(Request $request)
@@ -51,7 +51,7 @@ class SalesTeamController extends Controller
     {
         $salesTeam = SalesTeam::findOrFail($id);
         $salesTeams = SalesTeam::all();
-        return view('system-requirement.salesteam-edit', compact('salesTeam', 'salesTeams'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.salesteam-edit', compact('salesTeam', 'salesTeams'));
     }
     
     public function update(Request $request, $id)
@@ -96,6 +96,6 @@ class SalesTeamController extends Controller
     {
         // Ambil semua data sales team, urutkan berdasarkan code
         $salesTeams = SalesTeam::orderBy('code')->get(); 
-        return view('system-requirement.viewandprintsalesteam', compact('salesTeams')); 
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintsalesteam', compact('salesTeams')); 
     }
 }

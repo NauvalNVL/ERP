@@ -10,12 +10,12 @@ class FinishingController extends Controller
     public function index()
     {
         $finishings = Finishing::all();
-        return view('system-requirement.finishing', compact('finishings'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.finishing', compact('finishings'));
     }
 
     public function create()
     {
-        return view('system-requirement.finishing-create');
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.finishing-create');
     }
 
     public function store(Request $request)
@@ -33,7 +33,7 @@ class FinishingController extends Controller
 
     public function edit(Finishing $finishing)
     {
-        return view('system-requirement.finishing-edit', compact('finishing'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.finishing-edit', compact('finishing'));
     }
 
     public function update(Request $request, Finishing $finishing)
@@ -66,6 +66,6 @@ class FinishingController extends Controller
     {
         // Ambil semua data finishing, urutkan berdasarkan code
         $finishings = Finishing::orderBy('code')->get(); 
-        return view('system-requirement.viewandprintfinishing', compact('finishings')); 
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintfinishing', compact('finishings')); 
     }
 }

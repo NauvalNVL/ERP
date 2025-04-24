@@ -14,7 +14,7 @@ class SalespersonTeamController extends Controller
     {
         // Cek apakah tabel-tabel yang diperlukan ada di database
         if (!Schema::hasTable('salesperson')) {
-            return view('system-requirement.salespersonteam', [
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.salespersonteam', [
                 'salespersons' => [],
                 'salesTeams' => [],
                 'error' => 'Tabel salesperson tidak ditemukan. Silakan jalankan migrasi terlebih dahulu.'
@@ -22,7 +22,7 @@ class SalespersonTeamController extends Controller
         }
 
         if (!Schema::hasTable('sales_team')) {
-            return view('system-requirement.salespersonteam', [
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.salespersonteam', [
                 'salespersons' => [],
                 'salesTeams' => [],
                 'error' => 'Tabel sales_team tidak ditemukan. Silakan jalankan migrasi terlebih dahulu.'
@@ -51,10 +51,10 @@ class SalespersonTeamController extends Controller
             Log::info('Salesperson teams count in index: ' . $salespersons->count());
             
             // Mengirim data ke view
-            return view('system-requirement.salespersonteam', compact('salespersons', 'salesTeams'));
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.salespersonteam', compact('salespersons', 'salesTeams'));
         } catch (\Exception $e) {
             Log::error('Error loading salesperson teams: ' . $e->getMessage());
-            return view('system-requirement.salespersonteam', [
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.salespersonteam', [
                 'salespersons' => [],
                 'salesTeams' => [],
                 'error' => 'Error: ' . $e->getMessage()
@@ -114,7 +114,7 @@ class SalespersonTeamController extends Controller
             // Mengambil data sales team untuk dropdown
             $salesTeams = DB::table('sales_team')->get();
             
-            return view('system-requirement.salespersonteam-edit', compact('salesperson', 'salesTeams'));
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.salespersonteam-edit', compact('salesperson', 'salesTeams'));
         } catch (\Exception $e) {
             return redirect()->route('salesperson-team.index')->with('error', 'Error: ' . $e->getMessage());
         }

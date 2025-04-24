@@ -12,12 +12,12 @@ class ProductDesignController extends Controller
     public function index()
     {
         $designs = ProductDesign::all();
-        return view('system-requirement.productdesign', compact('designs'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.productdesign', compact('designs'));
     }
 
     public function create()
     {
-        return view('system-requirement.productdesign');
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.productdesign');
     }
 
     public function store(Request $request)
@@ -40,7 +40,7 @@ class ProductDesignController extends Controller
     {
         $design = ProductDesign::findOrFail($id);
         $productDesigns = ProductDesign::all();
-        return view('system-requirement.productdesign', compact('design', 'productDesigns'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.productdesign', compact('design', 'productDesigns'));
     }
 
     public function update(Request $request, $id)
@@ -79,6 +79,6 @@ class ProductDesignController extends Controller
     {
         // Ambil semua data desain produk, urutkan berdasarkan nama
         $productDesigns = ProductDesign::orderBy('design_name')->get(); 
-        return view('system-requirement.viewandprintproductdesign', compact('productDesigns')); 
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintproductdesign', compact('productDesigns')); 
     }
 }

@@ -14,17 +14,17 @@ class PaperQualityController extends Controller
     {
         try {
             $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->get();
-            return view('system-requirement.paperquality', compact('paperQualities'));
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.paperquality', compact('paperQualities'));
         } catch (\Exception $e) {
             Log::error('Error in PaperQualityController@index: ' . $e->getMessage());
-            return view('system-requirement.paperquality', ['paperQualities' => collect([])])
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.paperquality', ['paperQualities' => collect([])])
                 ->with('error', 'Terjadi kesalahan saat memuat data');
         }
     }
 
     public function create()
     {
-        return view('system-requirement.paperquality');
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.paperquality');
     }
 
     public function store(Request $request)
@@ -98,7 +98,7 @@ class PaperQualityController extends Controller
             $paperQuality = PaperQuality::findOrFail($id);
             $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->get();
             
-            return view('system-requirement.paperquality', compact('paperQuality', 'paperQualities'));
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.paperquality', compact('paperQuality', 'paperQualities'));
         } catch (\Exception $e) {
             Log::error('Error in PaperQualityController@edit: ' . $e->getMessage());
             return redirect()->route('paper-quality.index')
@@ -215,6 +215,6 @@ class PaperQualityController extends Controller
     {
         // Ambil semua data paper quality, urutkan berdasarkan kode
         $paperQualities = PaperQuality::orderBy('paper_quality')->get(); 
-        return view('system-requirement.viewandprintpaperquality', compact('paperQualities')); 
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpaperquality', compact('paperQualities'));
     }
 }

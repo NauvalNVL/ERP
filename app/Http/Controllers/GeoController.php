@@ -10,7 +10,7 @@ class GeoController extends Controller
     public function index()
     {
         $geoData = Geo::all();
-        return view('system-requirement.geo', compact('geoData'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.geo', compact('geoData'));
     }
 
     public function store(Request $request)
@@ -37,6 +37,6 @@ class GeoController extends Controller
     {
         // Urutkan berdasarkan country, lalu state
         $geos = Geo::orderBy('country')->orderBy('state')->get(); 
-        return view('system-requirement.viewandprintgeo', compact('geos')); 
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintgeo', compact('geos')); 
     }
 }

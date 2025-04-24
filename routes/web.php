@@ -81,12 +81,12 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('product-group', ProductGroupController::class);
     // Route baru untuk View & Print Product Group
-    Route::get('/system-requirement/product-group/view-print', [ProductGroupController::class, 'viewAndPrint'])
+    Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/product-group/view-print', [ProductGroupController::class, 'viewAndPrint'])
          ->name('product-group.view-print');
     
     Route::resource('product', ProductController::class);
     // Route baru untuk View & Print Product
-    Route::get('/system-requirement/product/view-print', [ProductController::class, 'viewAndPrint'])
+    Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/product/view-print', [ProductController::class, 'viewAndPrint'])
          ->name('product.view-print');
 
     // Product Design Routes
@@ -97,13 +97,13 @@ Route::middleware('auth')->group(function () {
     Route::put('/product-design/{id}', [ProductDesignController::class, 'update'])->name('product-design.update');
     Route::delete('/product-design/{id}', [ProductDesignController::class, 'destroy'])->name('product-design.destroy');
     // Route baru untuk View & Print Product Design
-    Route::get('/system-requirement/product-design/view-print', [ProductDesignController::class, 'viewAndPrint'])
+    Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/product-design/view-print', [ProductDesignController::class, 'viewAndPrint'])
          ->name('product-design.view-print');
 
     // Tambahkan route berikut di dalam middleware auth
     Route::resource('paper-size', PaperSizeController::class);
     // Route baru untuk View & Print Paper Size
-    Route::get('/system-requirement/paper-size/view-print', [PaperSizeController::class, 'viewAndPrint'])
+    Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/paper-size/view-print', [PaperSizeController::class, 'viewAndPrint'])
          ->name('paper-size.view-print');
 
     // Scoring Tool Routes
@@ -114,7 +114,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/scoring-tool/{id}', [ScoringToolController::class, 'destroy'])->name('scoring-tool.destroy');
     Route::get('/scoring-tool/{id}', [ScoringToolController::class, 'show'])->name('scoring-tool.show');
     // Route baru untuk View & Print Scoring Tool
-    Route::get('/system-requirement/scoring-tool/view-print', [ScoringToolController::class, 'viewAndPrint'])
+    Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/scoring-tool/view-print', [ScoringToolController::class, 'viewAndPrint'])
          ->name('scoring-tool.view-print');
 
     // Color Routes - Dipindahkan ke dalam middleware auth
@@ -125,17 +125,17 @@ Route::middleware('auth')->group(function () {
     Route::put('/color/{color}', [ColorController::class, 'update'])->name('color.update');
     Route::delete('/color/{color}', [ColorController::class, 'destroy'])->name('color.destroy');
     // Route baru untuk View & Print Color
-    Route::get('/system-requirement/color/view-print', [ColorController::class, 'viewAndPrint'])
+    Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/color/view-print', [ColorController::class, 'viewAndPrint'])
          ->name('color.view-print');
     
     // Finishing Routes
     Route::resource('finishing', FinishingController::class);
     // Route baru untuk View & Print Finishing
-    Route::get('/system-requirement/finishing/view-print', [FinishingController::class, 'viewAndPrint'])
+    Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/finishing/view-print', [FinishingController::class, 'viewAndPrint'])
          ->name('finishing.view-print');
 
     // Route baru untuk View & Print Color Group
-    Route::get('/system-requirement/color-group/view-print', [ColorGroupController::class, 'viewAndPrint'])
+    Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/color-group/view-print', [ColorGroupController::class, 'viewAndPrint'])
          ->name('color-group.view-print');
          
     // Paper Quality Routes
@@ -147,7 +147,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/paper-quality/{id}', [PaperQualityController::class, 'destroy'])->name('paper-quality.destroy');
     Route::patch('/paper-quality/{id}/toggle-status', [PaperQualityController::class, 'toggleStatus'])->name('paper-quality.toggle-status');
     // Route baru untuk View & Print Paper Quality
-    Route::get('/system-requirement/paper-quality/view-print', [PaperQualityController::class, 'viewAndPrint'])
+    Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/paper-quality/view-print', [PaperQualityController::class, 'viewAndPrint'])
          ->name('paper-quality.view-print');
 });
 
@@ -167,7 +167,7 @@ Route::get('/sales-team/{id}/edit', [SalesTeamController::class, 'edit'])->name(
 Route::put('/sales-team/{id}', [SalesTeamController::class, 'update'])->name('sales-team.update');
 Route::delete('/sales-team/{id}', [SalesTeamController::class, 'destroy'])->name('sales-team.destroy');
 // Route baru untuk View & Print Sales Team
-Route::get('/system-requirement/sales-team/view-print', [SalesTeamController::class, 'viewAndPrint'])
+Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/sales-team/view-print', [SalesTeamController::class, 'viewAndPrint'])
      ->middleware('auth') // Pastikan di dalam auth middleware
      ->name('sales-team.view-print');
 
@@ -180,7 +180,7 @@ Route::put('/salesperson/{id}', [SalespersonController::class, 'update'])->name(
 Route::delete('/salesperson/{id}', [SalespersonController::class, 'destroy'])->name('salesperson.destroy');
 Route::get('/salesperson/search', [SalespersonController::class, 'search'])->name('salesperson.search');
 // Route baru untuk View & Print Salesperson
-Route::get('/system-requirement/salesperson/view-print', [SalespersonController::class, 'viewAndPrint'])
+Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/salesperson/view-print', [SalespersonController::class, 'viewAndPrint'])
      ->middleware('auth') // Pastikan di dalam auth middleware
      ->name('salesperson.view-print');
 
@@ -192,19 +192,19 @@ Route::put('/industry/{id}', [IndustryController::class, 'update'])->name('indus
 Route::delete('/industry/{id}', [IndustryController::class, 'destroy'])->name('industry.destroy');
 
 // Route baru untuk View & Print Industry
-Route::get('/system-requirement/industry/view-print', [IndustryController::class, 'viewAndPrint'])
+Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/industry/view-print', [IndustryController::class, 'viewAndPrint'])
      ->middleware('auth') // Pastikan di dalam auth middleware
      ->name('industry.view-print');
 
 Route::resource('geo', GeoController::class);
 // Route baru untuk View & Print Geo
-Route::get('/system-requirement/geo/view-print', [GeoController::class, 'viewAndPrint'])
+Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/geo/view-print', [GeoController::class, 'viewAndPrint'])
      ->middleware('auth') // Pastikan route ini di dalam auth middleware
      ->name('geo.view-print');
 
 Route::resource('paper-flute', PaperFluteController::class)->middleware('auth');
 // Route baru untuk View & Print Paper Flute
-Route::get('/system-requirement/paper-flute/view-print', [PaperFluteController::class, 'viewAndPrint'])
+Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/paper-flute/view-print', [PaperFluteController::class, 'viewAndPrint'])
      ->middleware('auth') // Pastikan route ini di dalam auth middleware
      ->name('paper-flute.view-print');
 

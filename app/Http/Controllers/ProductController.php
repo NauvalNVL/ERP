@@ -15,7 +15,7 @@ class ProductController extends Controller
         $productGroups = ProductGroup::all();
         $categories = $this->getCategories();
         
-        return view('system-requirement.product', compact('products', 'productGroups', 'categories'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.product', compact('products', 'productGroups', 'categories'));
     }
 
     public function store(Request $request)
@@ -51,7 +51,7 @@ class ProductController extends Controller
         $productGroups = ProductGroup::all();
         $categories = $this->getCategories();
 
-        return view('system-requirement.product', compact('product', 'products', 'productGroups', 'categories'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.product', compact('product', 'products', 'productGroups', 'categories'));
     }
 
     public function update(Request $request, $id)
@@ -109,6 +109,6 @@ class ProductController extends Controller
         // Ambil semua data produk, urutkan berdasarkan deskripsi
         // Eager load ProductGroup jika ingin menampilkan nama grup di view
         $products = Product::with('productGroup')->orderBy('description')->get();
-        return view('system-requirement.viewandprintproduct', compact('products')); 
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintproduct', compact('products')); 
     }
 }

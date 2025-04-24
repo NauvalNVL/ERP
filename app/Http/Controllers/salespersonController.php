@@ -17,13 +17,13 @@ class SalespersonController extends Controller
         $salespersons = Salesperson::orderBy('code')->get();
         Log::info('Salespersons count in index: ' . $salespersons->count());
         
-        return view('system-requirement.salesperson', compact('salespersons'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.salesperson', compact('salespersons'));
     }
 
     public function list()
     {
         $salespersons = Salesperson::orderBy('code')->paginate(15);
-        return view('system-requirement.salesperson.list', compact('salespersons'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.salesperson.list', compact('salespersons'));
     }
 
     public function store(Request $request)
@@ -74,7 +74,7 @@ class SalespersonController extends Controller
     public function edit($id)
     {
         $salesperson = Salesperson::with('salesTeam')->findOrFail($id);
-        return view('system-requirement.salesperson', compact('salesperson'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.salesperson', compact('salesperson'));
     }
 
     public function update(Request $request, $id)
@@ -169,6 +169,6 @@ class SalespersonController extends Controller
         // Ambil semua data salesperson, urutkan berdasarkan code
         // Eager load relasi SalesTeam
         $salespersons = Salesperson::with('salesTeam')->orderBy('code')->get(); 
-        return view('system-requirement.viewandprintsalesperson', compact('salespersons')); 
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintsalesperson', compact('salespersons')); 
     }
 }
