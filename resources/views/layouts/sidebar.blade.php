@@ -254,6 +254,18 @@
                                 </a>
 
                                 <!-- View & Print Section -->
+                                <a href="{{ route('sales-team.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Sales Team</span>
+                                </a>
+                                <a href="{{ route('salesperson.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Salesperson</span>
+                                </a>
+                                <a href="{{ route('industry.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Industry</span>
+                                </a>
                                 <a href="{{ route('geo.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Geo</span>

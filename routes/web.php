@@ -166,6 +166,10 @@ Route::get('/sales-team/search', [SalesTeamController::class, 'search'])->name('
 Route::get('/sales-team/{id}/edit', [SalesTeamController::class, 'edit'])->name('sales-team.edit');
 Route::put('/sales-team/{id}', [SalesTeamController::class, 'update'])->name('sales-team.update');
 Route::delete('/sales-team/{id}', [SalesTeamController::class, 'destroy'])->name('sales-team.destroy');
+// Route baru untuk View & Print Sales Team
+Route::get('/system-requirement/sales-team/view-print', [SalesTeamController::class, 'viewAndPrint'])
+     ->middleware('auth') // Pastikan di dalam auth middleware
+     ->name('sales-team.view-print');
 
 // Salesperson Routes
 Route::get('/salesperson', [SalespersonController::class, 'index'])->name('salesperson.index');
@@ -175,6 +179,10 @@ Route::get('/salesperson/{id}/edit', [SalespersonController::class, 'edit'])->na
 Route::put('/salesperson/{id}', [SalespersonController::class, 'update'])->name('salesperson.update');
 Route::delete('/salesperson/{id}', [SalespersonController::class, 'destroy'])->name('salesperson.destroy');
 Route::get('/salesperson/search', [SalespersonController::class, 'search'])->name('salesperson.search');
+// Route baru untuk View & Print Salesperson
+Route::get('/system-requirement/salesperson/view-print', [SalespersonController::class, 'viewAndPrint'])
+     ->middleware('auth') // Pastikan di dalam auth middleware
+     ->name('salesperson.view-print');
 
 // Industry Routes
 Route::get('/industry', [IndustryController::class, 'index'])->name('industry.index');
@@ -182,6 +190,11 @@ Route::post('/industry', [IndustryController::class, 'store'])->name('industry.s
 Route::get('/industry/{id}/edit', [IndustryController::class, 'edit'])->name('industry.edit');
 Route::put('/industry/{id}', [IndustryController::class, 'update'])->name('industry.update');
 Route::delete('/industry/{id}', [IndustryController::class, 'destroy'])->name('industry.destroy');
+
+// Route baru untuk View & Print Industry
+Route::get('/system-requirement/industry/view-print', [IndustryController::class, 'viewAndPrint'])
+     ->middleware('auth') // Pastikan di dalam auth middleware
+     ->name('industry.view-print');
 
 Route::resource('geo', GeoController::class);
 // Route baru untuk View & Print Geo

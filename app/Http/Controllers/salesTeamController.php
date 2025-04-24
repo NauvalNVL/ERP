@@ -86,4 +86,16 @@ class SalesTeamController extends Controller
         return redirect()->route('sales-team.index')
             ->with('success', 'Sales team deleted successfully');
     }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \\Illuminate\\View\\View
+     */
+    public function viewAndPrint()
+    {
+        // Ambil semua data sales team, urutkan berdasarkan code
+        $salesTeams = SalesTeam::orderBy('code')->get(); 
+        return view('system-requirement.viewandprintsalesteam', compact('salesTeams')); 
+    }
 }

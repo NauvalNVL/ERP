@@ -58,4 +58,15 @@ class IndustryController extends Controller
         
         return redirect()->route('industry.index')->with('success', 'Industry deleted successfully');
     }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function viewAndPrint()
+    {
+        $industries = Industry::orderBy('code')->get();
+        return view('system-requirement.viewandprintindustry', compact('industries'));
+    }
 }

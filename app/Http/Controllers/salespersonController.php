@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Salesperson;
 use App\Models\SalesTeam;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -156,5 +157,18 @@ class SalespersonController extends Controller
         }
 
         return response()->json($salesperson);
+    }
+
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \\Illuminate\\View\\View
+     */
+    public function viewAndPrint()
+    {
+        // Ambil semua data salesperson, urutkan berdasarkan code
+        // Eager load relasi SalesTeam
+        $salespersons = Salesperson::with('salesTeam')->orderBy('code')->get(); 
+        return view('system-requirement.viewandprintsalesperson', compact('salespersons')); 
     }
 }
