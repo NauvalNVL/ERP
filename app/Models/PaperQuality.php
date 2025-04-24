@@ -12,11 +12,19 @@ class PaperQuality extends Model
     protected $table = 'paper_qualities';
     
     protected $fillable = [
-        'code',
-        'name',
-        'description',
-        'gsm',
-        'paper_type',
+        'paper_quality',
+        'paper_name',
+        'weight_kg_m',
+        'commercial_code',
+        'wet_end_code',
+        'decc_code',
+        'status',
+        'flute',
+        'db',
+        'b',
+        'il',
+        'a_c_e',
+        '2l',
         'is_active',
         'created_by',
         'updated_by'
@@ -24,7 +32,7 @@ class PaperQuality extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
-        'gsm' => 'integer',
+        'weight_kg_m' => 'decimal:4',
     ];
 
     public function scopeActive($query)

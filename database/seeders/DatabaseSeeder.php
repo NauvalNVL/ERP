@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             GeoSeeder::class,
             PaperSizeSeeder::class,
             PaperFluteSeeder::class,
+            PaperQualitySeeder::class,
             ScoringToolSeeder::class,
             UserSeeder::class,
             ColorSeeder::class,

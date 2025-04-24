@@ -57,7 +57,7 @@
                                     <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                         <i class="fas fa-hashtag"></i>
                                     </span>
-                                    <input type="text" id="code" name="code" 
+                                    <input type="text" id="paper_quality" name="paper_quality" 
                                         class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                                     <button type="button" id="showPaperQualityTableBtn" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px" onclick="openPaperQualityModal()">
                                         <i class="fas fa-table"></i>
@@ -75,58 +75,62 @@
 
                         <!-- Paper Quality Name -->
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Paper Quality Name:</label>
+                            <label for="paper_name" class="block text-sm font-medium text-gray-700 mb-1">Paper Quality Name:</label>
                             <div class="relative flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-font"></i>
                                 </span>
-                                <input type="text" id="name" name="name" placeholder="Enter paper quality name" 
+                                <input type="text" id="paper_name" name="paper_name" placeholder="Enter paper quality name" 
                                     class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                             </div>
                         </div>
 
-                        <!-- Description -->
+                        <!-- Weight KG/M -->
                         <div>
-                            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-align-left"></i>
-                                </span>
-                                <input type="text" id="description" name="description" placeholder="Enter description" 
-                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-
-                        <!-- GSM (Gramature) -->
-                        <div>
-                            <label for="gsm" class="block text-sm font-medium text-gray-700 mb-1">GSM (g/m²):</label>
+                            <label for="weight_kg_m" class="block text-sm font-medium text-gray-700 mb-1">Weight (KG/M):</label>
                             <div class="relative flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-weight"></i>
                                 </span>
-                                <input type="number" id="gsm" name="gsm" placeholder="Enter paper weight in g/m²" 
-                                    min="0" step="1"
+                                <input type="number" id="weight_kg_m" name="weight_kg_m" placeholder="Enter paper weight" 
+                                    min="0" step="0.0001" max="9.9999"
                                     class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                             </div>
                         </div>
 
-                        <!-- Paper Type -->
+                        <!-- Commercial Code -->
                         <div>
-                            <label for="paper_type" class="block text-sm font-medium text-gray-700 mb-1">Paper Type:</label>
+                            <label for="commercial_code" class="block text-sm font-medium text-gray-700 mb-1">Commercial Code:</label>
                             <div class="relative flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-file"></i>
+                                    <i class="fas fa-barcode"></i>
                                 </span>
-                                <select id="paper_type" name="paper_type" 
+                                <input type="text" id="commercial_code" name="commercial_code" placeholder="Enter commercial code" 
                                     class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="">Select paper type</option>
-                                    <option value="liner">Liner</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="chipboard">Chipboard</option>
-                                    <option value="kraft">Kraft</option>
-                                    <option value="art">Art Paper</option>
-                                    <option value="other">Other</option>
-                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Wet End Code -->
+                        <div>
+                            <label for="wet_end_code" class="block text-sm font-medium text-gray-700 mb-1">Wet-End Code:</label>
+                            <div class="relative flex">
+                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                                    <i class="fas fa-code"></i>
+                                </span>
+                                <input type="text" id="wet_end_code" name="wet_end_code" placeholder="Enter wet-end code" 
+                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+
+                        <!-- DECC Code -->
+                        <div>
+                            <label for="decc_code" class="block text-sm font-medium text-gray-700 mb-1">DECC Code:</label>
+                            <div class="relative flex">
+                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                                    <i class="fas fa-tag"></i>
+                                </span>
+                                <input type="text" id="decc_code" name="decc_code" placeholder="Enter DECC code" 
+                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                             </div>
                         </div>
 
@@ -135,13 +139,14 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
                             <div class="grid grid-cols-2 gap-4">
                                 <label class="relative flex items-center p-3 rounded-lg border border-gray-200 hover:border-blue-500 cursor-pointer transition-colors">
-                                    <input type="radio" name="is_active" value="1" class="h-4 w-4 text-blue-600 focus:ring-blue-500" checked>
-                                    <span class="ml-3 text-gray-900">Active</span>
+                                    <input type="radio" name="status" value="Act" class="h-4 w-4 text-blue-600 focus:ring-blue-500" checked>
+                                    <span class="ml-3 text-gray-900">Active (Act)</span>
                                 </label>
                                 <label class="relative flex items-center p-3 rounded-lg border border-gray-200 hover:border-blue-500 cursor-pointer transition-colors">
-                                    <input type="radio" name="is_active" value="0" class="h-4 w-4 text-blue-600 focus:ring-blue-500">
-                                    <span class="ml-3 text-gray-900">Inactive</span>
+                                    <input type="radio" name="status" value="Obs" class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                    <span class="ml-3 text-gray-900">Obsolete (Obs)</span>
                                 </label>
+                                <input type="hidden" name="is_active" id="is_active" value="1">
                             </div>
                         </div>
                     </div>
@@ -155,7 +160,7 @@
                         <p class="text-xs text-yellow-700 mt-1">Pastikan database telah diatur dengan benar dan data seeder telah dijalankan.</p>
                         <div class="mt-2 flex items-center space-x-3">
                             <button onclick="loadSeedData()" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transform active:translate-y-px">
-                                Load Paper Quality Data (JS)
+                                Load Paper Quality Data
                             </button>
                         </div>
                     </div>
@@ -292,19 +297,22 @@
                     <thead class="bg-gray-50 sticky top-0">
                         <tr>
                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Code
+                                Paper Quality
                             </th>
                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Name
+                                Paper Name
                             </th>
                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Description
+                                Weight KG/M
                             </th>
                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                GSM
+                                Commercial
                             </th>
                             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Paper Type
+                                Wet-End
+                            </th>
+                            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                DECC
                             </th>
                             <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Status
@@ -319,22 +327,25 @@
                             @foreach($paperQualities as $quality)
                                 <tr class="hover:bg-blue-50 cursor-pointer" 
                                     data-quality-id="{{ $quality->id }}"
-                                    data-quality-code="{{ $quality->code }}"
-                                    data-quality-name="{{ $quality->name }}"
-                                    data-description="{{ $quality->description }}"
-                                    data-gsm="{{ $quality->gsm }}"
-                                    data-paper-type="{{ $quality->paper_type }}"
+                                    data-paper-quality="{{ $quality->paper_quality }}"
+                                    data-paper-name="{{ $quality->paper_name }}"
+                                    data-weight-kg-m="{{ $quality->weight_kg_m }}"
+                                    data-commercial-code="{{ $quality->commercial_code }}"
+                                    data-wet-end-code="{{ $quality->wet_end_code }}"
+                                    data-decc-code="{{ $quality->decc_code }}"
+                                    data-status="{{ $quality->status }}"
                                     data-is-active="{{ $quality->is_active ? 'true' : 'false' }}"
                                     onclick="selectRow(this)"
                                     ondblclick="selectAndClosePaperQualityModal(this)">
-                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ $quality->code }}</td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{{ $quality->name }}</td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{{ $quality->description }}</td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{{ $quality->gsm }}</td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{{ $quality->paper_type }}</td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ $quality->paper_quality }}</td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{{ $quality->paper_name }}</td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{{ $quality->weight_kg_m }}</td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{{ $quality->commercial_code }}</td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{{ $quality->wet_end_code }}</td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">{{ $quality->decc_code }}</td>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $quality->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                            {{ $quality->is_active ? 'Active' : 'Inactive' }}
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $quality->status == 'Act' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                            {{ $quality->status }}
                                         </span>
                                     </td>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
@@ -346,7 +357,7 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="7" class="px-3 py-6 text-center text-sm text-gray-500">
+                                <td colspan="8" class="px-3 py-6 text-center text-sm text-gray-500">
                                     Tidak ada data kualitas kertas yang tersedia.
                                 </td>
                             </tr>
@@ -369,56 +380,7 @@
 
 @section('scripts')
 <script>
-    // These functions would be defined in paperquality.js
-    function openPaperQualityModal() {
-        document.getElementById('paperQualityTableWindow').classList.remove('hidden');
-    }
-    
-    function closeModal() {
-        document.getElementById('paperQualityTableWindow').classList.add('hidden');
-    }
-    
-    function closeModalX() {
-        closeModal();
-    }
-    
-    function selectRow(row) {
-        const rows = document.querySelectorAll('#paperQualityTableBody tr');
-        rows.forEach(r => r.classList.remove('bg-blue-100'));
-        row.classList.add('bg-blue-100');
-    }
-    
-    function selectAndClosePaperQualityModal(row) {
-        // Fill form with row data
-        document.getElementById('code').value = row.getAttribute('data-quality-code');
-        document.getElementById('name').value = row.getAttribute('data-quality-name');
-        document.getElementById('description').value = row.getAttribute('data-description');
-        document.getElementById('gsm').value = row.getAttribute('data-gsm');
-        document.getElementById('paper_type').value = row.getAttribute('data-paper-type');
-        
-        const isActive = row.getAttribute('data-is-active') === 'true';
-        document.querySelector('input[name="is_active"][value="1"]').checked = isActive;
-        document.querySelector('input[name="is_active"][value="0"]').checked = !isActive;
-        
-        closeModal();
-    }
-    
-    function createNewPaperQuality() {
-        // Clear form fields for a new entry
-        document.getElementById('paperQualityForm').reset();
-        closeModal();
-    }
-    
-    function editPaperQuality(id) {
-        // Redirect to edit page or load edit form
-        window.location.href = `/paper-quality/${id}/edit`;
-    }
-    
-    function loadSeedData() {
-        // AJAX call to load seed data
-        console.log('Loading seed data...');
-        // Implement AJAX call to seed data endpoint
-    }
+    // Add any additional scripts that are not in the JS file
 </script>
 @endsection
 

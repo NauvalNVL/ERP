@@ -8,7 +8,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add event listeners to navigation buttons if they exist
     addButtonListeners();
+    
+    // Add event listeners to status radio buttons
+    setupStatusRadioListeners();
 });
+
+function setupStatusRadioListeners() {
+    const statusRadios = document.querySelectorAll('input[name="status"]');
+    const isActiveField = document.getElementById('is_active');
+    
+    if (statusRadios.length > 0 && isActiveField) {
+        statusRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Update is_active field based on status selection
+                isActiveField.value = (this.value === 'Act') ? '1' : '0';
+            });
+        });
+    }
+}
 
 function initSearch() {
     const searchInput = document.getElementById('searchPaperQualityInput');
@@ -39,6 +56,12 @@ function addButtonListeners() {
             closeModal();
         });
     });
+    
+    // Load seed data button
+    const loadSeedBtn = document.querySelector('button[onclick="loadSeedData()"]');
+    if (loadSeedBtn) {
+        loadSeedBtn.addEventListener('click', loadSeedData);
+    }
 }
 
 function openPaperQualityModal() {
@@ -68,15 +91,27 @@ function selectRow(row) {
 
 function selectAndClosePaperQualityModal(row) {
     // Fill form with row data
-    document.getElementById('code').value = row.getAttribute('data-quality-code');
-    document.getElementById('name').value = row.getAttribute('data-quality-name');
-    document.getElementById('description').value = row.getAttribute('data-description');
-    document.getElementById('gsm').value = row.getAttribute('data-gsm');
-    document.getElementById('paper_type').value = row.getAttribute('data-paper-type');
+    document.getElementById('paper_quality').value = row.getAttribute('data-paper-quality');
+    document.getElementById('paper_name').value = row.getAttribute('data-paper-name');
+    document.getElementById('weight_kg_m').value = row.getAttribute('data-weight-kg-m');
+    document.getElementById('commercial_code').value = row.getAttribute('data-commercial-code') || '';
+    document.getElementById('wet_end_code').value = row.getAttribute('data-wet-end-code') || '';
+    document.getElementById('decc_code').value = row.getAttribute('data-decc-code') || '';
     
-    const isActive = row.getAttribute('data-is-active') === 'true';
-    document.querySelector('input[name="is_active"][value="1"]').checked = isActive;
-    document.querySelector('input[name="is_active"][value="0"]').checked = !isActive;
+    const status = row.getAttribute('data-status');
+    const statusRadios = document.querySelectorAll('input[name="status"]');
+    
+    if (statusRadios.length > 0) {
+        statusRadios.forEach(radio => {
+            radio.checked = (radio.value === status);
+        });
+    }
+    
+    // Update is_active hidden field based on status
+    const isActiveField = document.getElementById('is_active');
+    if (isActiveField) {
+        isActiveField.value = (status === 'Act') ? '1' : '0';
+    }
     
     closeModal();
 }
@@ -86,6 +121,12 @@ function createNewPaperQuality() {
     const form = document.getElementById('paperQualityForm');
     if (form) {
         form.reset();
+        
+        // Set default values
+        const isActiveField = document.getElementById('is_active');
+        if (isActiveField) {
+            isActiveField.value = '1';
+        }
     }
     closeModal();
 }
