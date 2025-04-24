@@ -206,15 +206,15 @@ class PaperQualityController extends Controller
         }
     }
 
+    /**
+     * Display a listing of the resource for printing.
+     *
+     * @return \\Illuminate\\View\\View
+     */
     public function viewAndPrint()
     {
-        try {
-            $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->get();
-            return view('system-requirement.viewandprintpaperquality', compact('paperQualities'));
-        } catch (\Exception $e) {
-            Log::error('Error in PaperQualityController@viewAndPrint: ' . $e->getMessage());
-            return view('system-requirement.viewandprintpaperquality', ['paperQualities' => collect([])])
-                ->with('error', 'Terjadi kesalahan saat memuat data');
-        }
+        // Ambil semua data paper quality, urutkan berdasarkan kode
+        $paperQualities = PaperQuality::orderBy('paper_quality')->get(); 
+        return view('system-requirement.viewandprintpaperquality', compact('paperQualities')); 
     }
 }
