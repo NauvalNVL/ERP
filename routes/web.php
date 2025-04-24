@@ -23,6 +23,7 @@ use App\Http\Controllers\ProductDesignController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PaperQualityController;
 use Inertia\Inertia;
+use App\Http\Controllers\ForeignCurrencyController;
 
 Route::get('/test-vue', function () {
     return Inertia::render('Dashboard');
@@ -149,6 +150,21 @@ Route::middleware('auth')->group(function () {
     // Route baru untuk View & Print Paper Quality
     Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/paper-quality/view-print', [PaperQualityController::class, 'viewAndPrint'])
          ->name('paper-quality.view-print');
+
+    // Route baru untuk halaman manage status (obsolate/unobsolate)
+    Route::get('/paper-quality/manage-status', [PaperQualityController::class, 'manageStatus'])
+         ->name('paper-quality.manage-status');
+
+    Route::prefix('system-manager')->group(function () {
+        Route::prefix('system-maintenance')->group(function () {
+            // Foreign Currency Routes
+            Route::resource('foreign-currency', ForeignCurrencyController::class)->parameters([
+                'foreign-currency' => 'foreignCurrency' // Match parameter name with controller type-hint
+            ]);
+            Route::get('foreign-currency/view-print', [ForeignCurrencyController::class, 'viewAndPrint'])
+                 ->name('foreign-currency.view-print');
+        });
+    });
 });
 
 Route::middleware(['auth'])->group(function () {

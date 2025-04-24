@@ -217,4 +217,18 @@ class PaperQualityController extends Controller
         $paperQualities = PaperQuality::orderBy('paper_quality')->get(); 
             return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpaperquality', compact('paperQualities'));
     }
+
+    /**
+     * Display a listing of the resource to manage status.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function manageStatus()
+    {
+        // Menggunakan pagination, mengambil 15 item per halaman, diurutkan berdasarkan paper_quality
+        $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->paginate(15);
+        
+        // Memperbaiki path view, menghapus titik ekstra setelah 'obsolate'
+        return view('system-requirement.obsolateunobsolatepaperquality', compact('paperQualities'));
+    }
 }

@@ -97,7 +97,7 @@
                             <i class="fas fa-coins w-3 h-3 mr-3"></i>
                             <span>Define ISO Currency</span>
                         </a>
-                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <a href="{{ route('foreign-currency.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-money-bill-wave w-3 h-3 mr-3"></i>
                             <span>Define Foreign Currency</span>
                         </a>
@@ -228,7 +228,7 @@
                                     <i class="fas fa-scroll w-3 h-3 mr-3"></i>
                                     <span>Define Paper Quality</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('paper-quality.manage-status') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-ban w-3 h-3 mr-3"></i>
                                     <span>Obsolete/Unobsolete Paper Quality</span>
                                 </a>
