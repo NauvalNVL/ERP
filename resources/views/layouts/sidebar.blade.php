@@ -101,7 +101,7 @@
                             <i class="fas fa-money-bill-wave w-3 h-3 mr-3"></i>
                             <span>Define Foreign Currency</span>
                         </a>
-                        <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                        <a href="{{ route('business-form.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                             <i class="fas fa-file-alt w-3 h-3 mr-3"></i>
                             <span>Define Business Form</span>
                         </a>
