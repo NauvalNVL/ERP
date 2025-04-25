@@ -121,7 +121,7 @@
                     <p class="text-xs text-yellow-700 mt-1">Pastikan database telah diatur dengan benar dan data seeder telah dijalankan.</p>
                     <div class="mt-2 flex items-center space-x-3">
                         <button onclick="loadSeedData()" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transform active:translate-y-px">
-                            Load Product Design Data (JS)
+                            Load Product Design Data
                         </button>
                     </div>
                 </div>
@@ -408,4 +408,38 @@
     color: white;
 }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+function loadSeedData() {
+    // Show loading overlay
+    document.getElementById('loadingOverlay').classList.remove('hidden');
+    
+    // Make AJAX request to load seed data
+    fetch('/run-product-design-seeder', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Error loading data: ' + error.message);
+    })
+    .finally(() => {
+        // Hide loading overlay
+        document.getElementById('loadingOverlay').classList.add('hidden');
+    });
+}
+</script>
 @endpush

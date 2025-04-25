@@ -287,3 +287,7 @@ Route::post('/run-paper-quality-seeder', function () {
     }
 });
 
+// Add a route to run the product design seeder
+Route::post('/run-product-design-seeder', [ProductDesignController::class, 'loadSeedData'])
+    ->name('run.product-design.seeder');
+
