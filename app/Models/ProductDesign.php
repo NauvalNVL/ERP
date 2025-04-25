@@ -10,14 +10,10 @@ class ProductDesign extends Model
     use HasFactory;
 
     protected $fillable = [
-        'design_code',
-        'design_name',
+        'pd_code',
+        'pd_name',
         'product_code',
-        'description',
-        'status'
-    ];
-
-    protected $casts = [
-        'status' => 'boolean',
+        'dimension',
+        'idc'
     ];
 } 
