@@ -24,6 +24,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PaperQualityController;
 use Inertia\Inertia;
 use App\Http\Controllers\ForeignCurrencyController;
+use App\Http\Controllers\BusinessFormController;
 
 Route::get('/test-vue', function () {
     return Inertia::render('Dashboard');
@@ -129,7 +130,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/color/view-print', [ColorController::class, 'viewAndPrint'])
          ->name('color.view-print');
     
-    // Finishing Routes
     Route::resource('finishing', FinishingController::class);
     // Route baru untuk View & Print Finishing
     Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/finishing/view-print', [FinishingController::class, 'viewAndPrint'])
@@ -163,6 +163,12 @@ Route::middleware('auth')->group(function () {
             ]);
             Route::get('foreign-currency/view-print', [ForeignCurrencyController::class, 'viewAndPrint'])
                  ->name('foreign-currency.view-print');
+
+            // Business Form Routes
+            Route::resource('business-form', BusinessFormController::class)->parameters([
+                'business-form' => 'businessForm' // Map parameter name
+            ]);
+            Route::get('business-form-search', [BusinessFormController::class, 'search'])->name('business-form.search'); // Route untuk pencarian
         });
     });
 });
