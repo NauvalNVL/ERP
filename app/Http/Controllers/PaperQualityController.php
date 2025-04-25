@@ -229,6 +229,6 @@ class PaperQualityController extends Controller
         $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->paginate(15);
         
         // Memperbaiki path view, menghapus titik ekstra setelah 'obsolate'
-        return view('system-requirement.obsolateunobsolatepaperquality', compact('paperQualities'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.obsolateunobsolatepaperquality', compact('paperQualities'));
     }
 }
