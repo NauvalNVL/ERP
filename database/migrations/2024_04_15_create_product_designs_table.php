@@ -10,11 +10,11 @@ return new class extends Migration
     {
         Schema::create('product_designs', function (Blueprint $table) {
             $table->id();
-            $table->string('design_code')->unique();
-            $table->string('design_name');
+            $table->string('pd_code')->unique();
+            $table->string('pd_name');
             $table->string('product_code');
-            $table->text('description')->nullable();
-            $table->boolean('status')->default(true);
+            $table->string('dimension');
+            $table->string('idc');
             $table->timestamps();
         });
     }

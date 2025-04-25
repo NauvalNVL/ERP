@@ -8,7 +8,7 @@ class SalesConfigurationController extends Controller
 {
     public function index()
     {
-        return view('system-requirement/salesconfiguration');
+        return view('sales-management.system-requirement.salesconfiguration');
     }
 
     public function store(Request $request)

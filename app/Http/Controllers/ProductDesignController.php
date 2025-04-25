@@ -6,13 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\ProductDesign;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Artisan;
 
 class ProductDesignController extends Controller
 {
     public function index()
     {
-        $designs = ProductDesign::all();
-        return view('sales-management.system-requirement.system-requirement.standard-requirement.productdesign', compact('designs'));
+        $productDesigns = ProductDesign::all();
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.productdesign', compact('productDesigns'));
     }
 
     public function create()
@@ -23,11 +24,11 @@ class ProductDesignController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'design_code' => 'required|unique:product_designs,design_code',
-            'design_name' => 'required',
+            'pd_code' => 'required|unique:product_designs,pd_code',
+            'pd_name' => 'required',
             'product_code' => 'required',
-            'description' => 'nullable',
-            'status' => 'required|boolean'
+            'dimension' => 'required',
+            'idc' => 'required'
         ]);
 
         ProductDesign::create($validated);
@@ -48,11 +49,11 @@ class ProductDesignController extends Controller
         $design = ProductDesign::findOrFail($id);
         
         $validated = $request->validate([
-            'design_code' => 'required|unique:product_designs,design_code,' . $id,
-            'design_name' => 'required',
+            'pd_code' => 'required|unique:product_designs,pd_code,' . $id,
+            'pd_name' => 'required',
             'product_code' => 'required',
-            'description' => 'nullable',
-            'status' => 'required|boolean'
+            'dimension' => 'required',
+            'idc' => 'required'
         ]);
 
         $design->update($validated);
@@ -73,12 +74,35 @@ class ProductDesignController extends Controller
     /**
      * Display a listing of the resource for printing.
      *
-     * @return \\Illuminate\\View\\View
+     * @return \Illuminate\View\View
      */
     public function viewAndPrint()
     {
-        // Ambil semua data desain produk, urutkan berdasarkan nama
-        $productDesigns = ProductDesign::orderBy('design_name')->get(); 
+        $productDesigns = ProductDesign::orderBy('pd_name')->get(); 
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintproductdesign', compact('productDesigns')); 
+    }
+
+    /**
+     * Load seed data for product designs
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function loadSeedData()
+    {
+        try {
+            Artisan::call('db:seed', ['--class' => 'ProductDesignSeeder']);
+            $count = ProductDesign::count();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Product design data loaded successfully',
+                'count' => $count
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading product design data: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
