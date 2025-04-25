@@ -165,10 +165,14 @@ Route::middleware('auth')->group(function () {
                  ->name('foreign-currency.view-print');
 
             // Business Form Routes
+            // Definisikan route spesifik SEBELUM resource
+            Route::get('business-form/view-print', [BusinessFormController::class, 'viewAndPrint'])->name('business-form.view-print'); // Route untuk View & Print
+            Route::get('business-form-search', [BusinessFormController::class, 'search'])->name('business-form.search'); // Route untuk pencarian modal
+
+            // Baru definisikan resource setelahnya
             Route::resource('business-form', BusinessFormController::class)->parameters([
                 'business-form' => 'businessForm' // Map parameter name
             ]);
-            Route::get('business-form-search', [BusinessFormController::class, 'search'])->name('business-form.search'); // Route untuk pencarian
         });
     });
 });

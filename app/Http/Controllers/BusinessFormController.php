@@ -155,6 +155,32 @@ class BusinessFormController extends Controller
         }
 
         // Jika bukan AJAX, mungkin redirect atau tampilkan view berbeda (opsional)
-        return view('system-manager.system-maintenance.definebusinessform', compact('businessForms')); // Atau return JSON saja
+        // Seharusnya tidak terpanggil jika request berasal dari modal
+        return view('system-manager.system-maintenance.definebusinessform');
+    }
+
+    /**
+     * Display the view and print page for Business Forms.
+     */
+    public function viewAndPrint(Request $request)
+    {
+        $query = BusinessForm::query();
+
+        $search_group = $request->input('search_group');
+        $search_code = $request->input('search_code');
+
+        if ($search_group) {
+            $query->where('bf_group', 'like', '%' . $search_group . '%');
+        }
+
+        if ($search_code) {
+            $query->where('bf_code', 'like', '%' . $search_code . '%');
+        }
+
+        // Mungkin filter berdasarkan check/approve name/title juga di sini jika diperlukan di masa depan
+
+        $businessForms = $query->orderBy('bf_group')->orderBy('bf_code')->get(); // Ambil semua hasil yang cocok untuk dicetak
+
+        return view('system-manager.system-maintenance.viewandprintbusinessform', compact('businessForms', 'search_group', 'search_code'));
     }
 }
