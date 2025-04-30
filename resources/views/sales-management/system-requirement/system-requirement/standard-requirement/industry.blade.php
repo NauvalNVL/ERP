@@ -55,10 +55,10 @@
                             </span>
                             <input type="text" id="searchInput" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Enter industry code">
                             <button type="button" id="showIndustryTableBtn" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
-                                <i class="fas fa-table"></i>
-            </button>
-        </div>
-    </div>
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
 
                     <div class="col-span-1">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
@@ -69,59 +69,22 @@
                 </div>
 
                 <!-- Status Messages -->
-    @if(session('success'))
+                @if(session('success'))
                 <div class="mt-4 bg-green-100 p-3 rounded">
                     <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
-    </div>
-    @endif
+                </div>
+                @endif
 
-    @if($errors->any())
+                @if($errors->any())
                 <div class="mt-4 bg-red-100 p-3 rounded">
                     <ul class="list-disc pl-5 text-sm text-red-700">
-            @foreach($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
-
-                <!-- Data Table -->
-                <div class="mt-6 overflow-x-auto rounded-lg border border-gray-200">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                @forelse($industries as $industry)
-                            <tr class="hover:bg-blue-50">
-                                <td class="px-4 py-3 whitespace-nowrap font-medium text-blue-800">{{ $industry->code }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $industry->name }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-center">
-                        <button type="button" class="text-blue-500 hover:text-blue-700 edit-btn mr-2" data-id="{{ $industry->id }}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <form class="inline-block" method="POST" action="{{ route('industry.destroy', $industry->id) }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700" onclick="return confirm('Are you sure you want to delete this industry?');">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                                <td colspan="3" class="px-4 py-4 text-center text-gray-500">No industries found</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
+                        @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+            </div>
         </div>
 
         <!-- Right Column - Quick Info -->
@@ -145,71 +108,6 @@
                             <li>Industri digunakan untuk kategorisasi pelanggan</li>
                         </ul>
                     </div>
-
-                    <div class="p-4 bg-blue-50 rounded-lg">
-                        <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Top Industries</h4>
-                        <div class="grid grid-cols-1 gap-2 text-sm">
-                            @php
-                                $topIndustries = $industries->take(5);
-                            @endphp
-                            
-                            @forelse($topIndustries as $industry)
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">
-                                        {{ substr($industry->code, 0, 1) }}
-                                    </span>
-                                    <span>{{ $industry->code }}</span>
-                                </div>
-                                <span class="text-gray-600">{{ $industry->name }}</span>
-                            </div>
-                            @empty
-                            <p class="text-gray-500 italic">No industries available</p>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Links -->
-            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
-                <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                    <div class="p-2 bg-purple-500 rounded-lg mr-3">
-                        <i class="fas fa-link text-white"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-800">Tautan Cepat</h3>
-                </div>
-
-                <div class="grid grid-cols-1 gap-3">
-                    <a href="#" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                        <div class="p-2 bg-purple-500 rounded-full mr-3">
-                            <i class="fas fa-building text-white text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="font-medium text-purple-900">Customers</p>
-                            <p class="text-xs text-purple-700">Kelola data pelanggan</p>
-                        </div>
-                    </a>
-
-                    <a href="#" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                        <div class="p-2 bg-blue-500 rounded-full mr-3">
-                            <i class="fas fa-chart-pie text-white text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="font-medium text-blue-900">Reports</p>
-                            <p class="text-xs text-blue-700">Lihat laporan industri</p>
-                        </div>
-                    </a>
-
-                    <a href="#" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                        <div class="p-2 bg-green-500 rounded-full mr-3">
-                            <i class="fas fa-print text-white text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="font-medium text-green-900">Cetak Daftar</p>
-                            <p class="text-xs text-green-700">Cetak daftar industri</p>
-                        </div>
-                    </a>
                 </div>
             </div>
         </div>
