@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             FinishingSeeder::class,
             BusinessFormSeeder::class,
             ProductDesignSeeder::class,
-
+            IndustrySeeder::class,
         ]);
     }
 }
