@@ -15,12 +15,15 @@ class Salesperson extends Model
     protected $fillable = [
         'code',
         'name',
-        'status',
-        'email',
-        'phone',
-        'mobile',
-        'notes',
         'sales_team_id',
+        'position',
+        'user_id',
+        'is_active'
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'sales_team_id' => 'integer'
     ];
 
     /**

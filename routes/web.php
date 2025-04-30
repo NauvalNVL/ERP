@@ -198,18 +198,15 @@ Route::get('/sales-management/system-requirement/system-requirement/standard-req
      ->middleware('auth') // Pastikan di dalam auth middleware
      ->name('sales-team.view-print');
 
-// Salesperson Routes
+// Salesperson routes
 Route::get('/salesperson', [SalespersonController::class, 'index'])->name('salesperson.index');
-Route::get('/salesperson/create', [SalespersonController::class, 'create'])->name('salesperson.create');
-Route::post('/salesperson', [SalespersonController::class, 'store'])->name('salesperson.store');
-Route::get('/salesperson/{id}/edit', [SalespersonController::class, 'edit'])->name('salesperson.edit');
-Route::put('/salesperson/{id}', [SalespersonController::class, 'update'])->name('salesperson.update');
-Route::delete('/salesperson/{id}', [SalespersonController::class, 'destroy'])->name('salesperson.destroy');
+Route::post('/salesperson/update/{code}', [SalespersonController::class, 'update'])->name('salesperson.update');
+Route::post('/salesperson/seed', [SalespersonController::class, 'seed'])->name('salesperson.seed');
 Route::get('/salesperson/search', [SalespersonController::class, 'search'])->name('salesperson.search');
-// Route baru untuk View & Print Salesperson
+Route::get('/salesperson/details/{code}', [SalespersonController::class, 'getDetails'])->name('salesperson.details');
 Route::get('/sales-management/system-requirement/system-requirement/standard-requirement/salesperson/view-print', [SalespersonController::class, 'viewAndPrint'])
-     ->middleware('auth') // Pastikan di dalam auth middleware
-     ->name('salesperson.view-print');
+    ->middleware('auth')
+    ->name('salesperson.view-print');
 
 // Industry Routes
 Route::get('/industry', [IndustryController::class, 'index'])->name('industry.index');

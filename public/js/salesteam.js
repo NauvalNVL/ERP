@@ -1,31 +1,45 @@
 // SalesTeam.js - Functions for sales team management
 
-// Define seed data for sales teams
-const seedSalesTeams = [
-    { code: '01', name: 'MBI' },
-    { code: '02', name: 'MANAGEMENT LOCAL' },
-    { code: '03', name: 'MANAGEMENT MNC' }
-];
-
-// Function to populate sales team table with seed data
+// Function to populate sales team table with data from database
 function populateSalesTeamTable() {
     console.log('Populating sales team table');
     
-    // Check if table already has data
+    // Remove "no data" message if present
     const tbody = document.querySelector('#salesTeamDataTable tbody');
-    const rows = tbody.querySelectorAll('tr');
-    const isEmpty = rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'));
+    if (!tbody) {
+        console.error('Table body element not found');
+        return;
+    }
     
-    if (isEmpty) {
-        console.log('Table is empty, populating with seed data');
-        
-        // Remove "no data" message if present
+    // Show loading message
+    tbody.innerHTML = '<tr><td colspan="2" class="px-4 py-4 text-center text-gray-500">Loading data...</td></tr>';
+    
+    // Fetch data from the database
+    fetch('/sales-team', {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Clear loading message
         tbody.innerHTML = '';
         
-        // Fill table with data from seedSalesTeams
-        seedSalesTeams.forEach(team => {
+        if (!Array.isArray(data) || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" class="px-4 py-4 text-center text-gray-500">Tidak ada data sales team yang tersedia.</td></tr>';
+            return;
+        }
+
+        // Fill table with data from database
+        data.forEach(team => {
             const row = document.createElement('tr');
-            row.className = 'cursor-pointer';
+            row.className = 'hover:bg-blue-50 cursor-pointer';
             row.setAttribute('data-team-code', team.code);
             row.setAttribute('data-team-name', team.name);
             row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
@@ -33,11 +47,11 @@ function populateSalesTeamTable() {
             
             // Create columns for each cell
             const codeCell = document.createElement('td');
-            codeCell.className = 'px-2 py-0.5 border-b border-r border-gray-300';
+            codeCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
             codeCell.textContent = team.code;
             
             const nameCell = document.createElement('td');
-            nameCell.className = 'px-2 py-0.5 border-b border-gray-300';
+            nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
             nameCell.textContent = team.name;
             
             // Add all cells to row
@@ -48,16 +62,35 @@ function populateSalesTeamTable() {
             tbody.appendChild(row);
         });
         
-        console.log('Table populated with seed data');
+        console.log('Table populated with database data:', data);
         
         // Setup event handlers for the table rows
         setupTableRowEvents();
         
         // Sort table by Code by default
         sortTableDirectly(0);
-    } else {
-        console.log('Table already has data, no need to populate');
-    }
+        
+        // Update the data status message
+        const dbStatusElement = document.querySelector('.bg-yellow-100, .bg-green-100');
+        if (dbStatusElement) {
+            dbStatusElement.className = 'mt-4 bg-green-100 p-3 rounded';
+            dbStatusElement.innerHTML = `
+                <p class="text-sm font-medium text-green-800">Data tersedia: ${data.length} sales team ditemukan.</p>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching database data:', error);
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="2" class="px-4 py-4 text-center text-red-500">
+                Error loading data from database. ${error.message}
+                <br>
+                <button onclick="populateSalesTeamTable()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    <i class="fas fa-sync-alt mr-2"></i>Coba Lagi
+                </button>
+            </td></tr>`;
+        }
+    });
 }
 
 // Function to sort table
@@ -94,12 +127,7 @@ function sortTableDirectly(columnIndex) {
         var textA = a.cells[columnIndex].textContent.trim();
         var textB = b.cells[columnIndex].textContent.trim();
         
-        // Numeric-based sort for ID columns
-        if (columnIndex === 0) {
-            return textA.localeCompare(textB, undefined, { numeric: true });
-        }
-        
-        // Regular text sort for other columns
+        // Regular text sort for all columns
         return textA.localeCompare(textB);
     });
     
@@ -124,7 +152,7 @@ function sortTableDirectly(columnIndex) {
     console.log("Sorting complete");
 }
 
-// Function to edit selected row (Edit button)
+// Function to edit selected row
 function editSelectedRow() {
     var selectedRow = document.querySelector('#salesTeamDataTable tbody tr.bg-blue-600');
     if (!selectedRow) {
@@ -141,8 +169,10 @@ function editSelectedRow() {
 
 // Function to select a row
 function selectRow(row) {
+    if (!row) return;
+    
     // Remove highlight from all rows
-    var allRows = document.querySelectorAll('#salesTeamDataTable tbody tr');
+    const allRows = document.querySelectorAll('#salesTeamDataTable tbody tr');
     allRows.forEach(function(r) {
         r.classList.remove('selected');
         r.classList.remove('bg-blue-600', 'text-white');
@@ -150,10 +180,22 @@ function selectRow(row) {
     
     // Add highlighting to selected row
     row.classList.add('bg-blue-600', 'text-white');
+
+    // Update the main code input field with the selected row's code
+    const code = row.getAttribute('data-team-code');
+    const codeInput = document.getElementById('code');
+    if (codeInput) {
+        codeInput.value = code;
+    }
 }
 
 // Function to open edit modal
 function openEditSalesTeamModal(row) {
+    if (!row) {
+        console.error('No row provided to edit modal');
+        return;
+    }
+    
     console.log('Opening edit sales team modal for row:', row);
     
     const code = row.getAttribute('data-team-code');
@@ -161,11 +203,18 @@ function openEditSalesTeamModal(row) {
     
     console.log('Sales team data:', { code, name });
     
-    document.getElementById('edit_team_code').value = code;
-    document.getElementById('edit_team_name').value = name;
-    
+    const codeInput = document.getElementById('edit_team_code');
+    const nameInput = document.getElementById('edit_team_name');
     const editModal = document.getElementById('editSalesTeamModal');
-    editModal.style.display = 'block';
+    
+    if (!codeInput || !nameInput || !editModal) {
+        console.error('Required modal elements not found');
+        return;
+    }
+    
+    codeInput.value = code;
+    nameInput.value = name;
+    
     editModal.classList.remove('hidden');
     
     console.log('Edit modal opened');
@@ -176,7 +225,6 @@ function closeEditSalesTeamModal() {
     console.log('Closing edit sales team modal');
     const editModal = document.getElementById('editSalesTeamModal');
     editModal.classList.add('hidden');
-    editModal.style.display = 'none';
 }
 
 // Function to display modal
@@ -189,10 +237,9 @@ function openSalesTeamModal() {
     }
     
     // Show modal
-    modal.style.display = 'block';
     modal.classList.remove('hidden');
     
-    // Populate table with data from SalesTeamSeeder if needed
+    // Populate table with data if needed
     populateSalesTeamTable();
     
     // Sort by Code by default
@@ -205,7 +252,6 @@ function openSalesTeamModal() {
 function closeSalesTeamModal() {
     var modal = document.getElementById('salesTeamTableWindow');
     if (modal) {
-        modal.style.display = 'none';
         modal.classList.add('hidden');
     }
 }
@@ -242,194 +288,127 @@ function setupTableRowEvents() {
 function saveSalesTeamChanges() {
     console.log('Saving sales team changes');
     
-    const code = document.getElementById('edit_team_code').value;
-    const name = document.getElementById('edit_team_name').value;
+    const codeInput = document.getElementById('edit_team_code');
+    const nameInput = document.getElementById('edit_team_name');
+    
+    if (!codeInput || !nameInput) {
+        console.error('Form inputs not found');
+        return;
+    }
+    
+    const code = codeInput.value;
+    const name = nameInput.value;
     
     console.log('Form data to save:', { code, name });
     
+    // Validate input
+    if (!name) {
+        alert('Nama sales team tidak boleh kosong');
+        return;
+    }
+    
     // Display loading indicator on button and overlay
     const saveButton = document.querySelector('#editSalesTeamForm button[type="submit"]');
-    const originalText = saveButton.innerText;
-    saveButton.innerText = 'Menyimpan...';
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    
+    if (!saveButton || !loadingOverlay) {
+        console.error('Required elements not found');
+        return;
+    }
+    
+    const originalText = saveButton.innerHTML;
+    saveButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyimpan...';
     saveButton.disabled = true;
     
     // Show loading overlay
-    document.getElementById('loadingOverlay').classList.remove('hidden');
+    loadingOverlay.classList.remove('hidden');
     
-    // Update row in table immediately to provide visual feedback
-    const row = document.querySelector(`#salesTeamDataTable tbody tr[data-team-code="${code}"]`);
-    if (row) {
-        console.log('Found row to update:', row);
-        
-        try {
-            // Direct DOM manipulation for cell updates
-            const cells = row.cells;
-            console.log('Row has cells:', cells.length);
-            
-            if (cells.length >= 2) {
-                console.log('Original cell values:');
-                console.log('- Cell 0 (Code):', cells[0].textContent);
-                console.log('- Cell 1 (Name):', cells[1].textContent);
-                
-                // Update cell text directly
-                cells[0].textContent = code;
-                cells[1].textContent = name;
-                
-                console.log('After update:');
-                console.log('- Cell 0 (Code):', cells[0].textContent);
-                console.log('- Cell 1 (Name):', cells[1].textContent);
-                
-                // Update data attributes
-                row.setAttribute('data-team-code', code);
-                row.setAttribute('data-team-name', name);
-                
-                // Highlight row with Tailwind classes to ensure visibility
-                row.classList.add('bg-blue-600', 'text-white');
-                
-                // Also update seedSalesTeams array to keep data in sync
-                updateSeedSalesTeamData(code, name);
-            } else {
-                console.error('Row does not have enough cells:', cells.length);
-            }
-        } catch (error) {
-            console.error('Error updating row cells:', error);
-        }
-        
-        console.log('Row updated successfully in the table');
-    } else {
-        console.log('Row not found, creating new row');
-        
-        // Create a new row if it doesn't exist
-        const tbody = document.querySelector('#salesTeamDataTable tbody');
-        
-        // Create a new row
-        const newRow = document.createElement('tr');
-        newRow.className = 'cursor-pointer';
-        newRow.setAttribute('data-team-code', code);
-        newRow.setAttribute('data-team-name', name);
-        newRow.onclick = function(e) { selectRow(this); e.stopPropagation(); };
-        newRow.ondblclick = function() { openEditSalesTeamModal(this); };
-        
-        // Create cells
-        const codeCell = document.createElement('td');
-        codeCell.className = 'px-2 py-0.5 border-b border-r border-gray-300';
-        codeCell.textContent = code;
-        
-        const nameCell = document.createElement('td');
-        nameCell.className = 'px-2 py-0.5 border-b border-gray-300';
-        nameCell.textContent = name;
-        
-        // Add cells to row
-        newRow.appendChild(codeCell);
-        newRow.appendChild(nameCell);
-        
-        // Add row to table
-        tbody.appendChild(newRow);
-        
-        // Select the new row
-        selectRow(newRow);
-        
-        // Add to seedSalesTeams
-        updateSeedSalesTeamData(code, name);
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        console.error('CSRF token not found');
+        return;
     }
     
-    // Show success message and close modal
-    alert('Data sales team berhasil diperbarui');
-    closeEditSalesTeamModal();
-    
-    // Reset button state and hide loading overlay after a short delay
-    setTimeout(() => {
-        saveButton.innerText = originalText;
-        saveButton.disabled = false;
-        document.getElementById('loadingOverlay').classList.add('hidden');
-    }, 500);
-}
-
-// Function to update data in seedSalesTeams array
-function updateSeedSalesTeamData(code, name) {
-    // Find team with matching code in seedSalesTeams array
-    const teamIndex = seedSalesTeams.findIndex(team => team.code === code);
-    
-    if (teamIndex !== -1) {
-        console.log(`Updating seedSalesTeams[${teamIndex}] with new data`);
-        
-        // Update data in array
-        seedSalesTeams[teamIndex].name = name;
-        
-        console.log('Updated seedSalesTeams:', seedSalesTeams[teamIndex]);
-    } else {
-        console.log(`Sales team with code ${code} not found in seedSalesTeams array`);
-        
-        // If not found, add as new item
-        seedSalesTeams.push({
+    // Send update to server
+    fetch('/sales-team/' + code, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': csrfToken.content,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
             code: code,
             name: name
-        });
-        
-        console.log('Added new sales team to seedSalesTeams array');
-    }
-}
-
-// Function to make seed data available without database
-function loadSeedData() {
-    // Check if data is already loaded
-    const tbody = document.querySelector('#salesTeamDataTable tbody');
-    if (!tbody) return;
-    
-    // Show loading overlay
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.classList.remove('hidden');
-    }
-    
-    // Empty the table
-    tbody.innerHTML = '';
-    
-    // Simulate loading
-    setTimeout(() => {
-        // Fill table with data from seedSalesTeams
-        populateSalesTeamTable();
-        
-        // Show notification
-        alert('Data sales team berhasil dimuat dari SalesTeamSeeder');
-        
-        // Hide loading overlay
-        if (loadingOverlay) {
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            console.log('Sales team updated successfully:', data);
+            
+            // Update row in table
+            const row = document.querySelector(`#salesTeamDataTable tbody tr[data-team-code="${code}"]`);
+            if (row) {
+                const cells = row.cells;
+                if (cells.length >= 2) {
+                    cells[0].textContent = code;
+                    cells[1].textContent = name;
+                    
+                    row.setAttribute('data-team-code', code);
+                    row.setAttribute('data-team-name', name);
+                }
+            }
+            
+            // Update the main code input field
+            const mainCodeInput = document.getElementById('code');
+            if (mainCodeInput) {
+                mainCodeInput.value = code;
+            }
+            
+            // Close the edit modal
+            closeEditSalesTeamModal();
+            
+            // Refresh the table data
+            populateSalesTeamTable();
+            
+            alert('Data sales team berhasil diperbarui');
+        } else {
+            throw new Error(data.message || 'Error updating sales team');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating sales team:', error);
+        alert(error.message || 'Error updating sales team. Please try again.');
+    })
+    .finally(() => {
+        // Reset button state and hide loading overlay
+        if (saveButton && loadingOverlay) {
+            saveButton.innerHTML = originalText;
+            saveButton.disabled = false;
             loadingOverlay.classList.add('hidden');
         }
-        
-        // Update notification on main page
-        const dbStatusElement = document.querySelector('.bg-yellow-100');
-        if (dbStatusElement) {
-            dbStatusElement.classList.remove('bg-yellow-100');
-            dbStatusElement.classList.add('bg-green-100');
-            dbStatusElement.innerHTML = `
-                <p class="text-sm font-medium text-green-800">Data tersedia: ${seedSalesTeams.length} sales team ditemukan (dari JavaScript).</p>
-            `;
-        }
-        
-        // Open modal to display data
-        openSalesTeamModal();
-    }, 1000);
+    });
 }
 
 // Initialize event handlers when document loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM content loaded');
+    console.log('DOM content loaded for sales team');
     
     // Setup row events initially
     setupTableRowEvents();
     
-    // Initialize sales team table if open button exists
+    // Initialize sales team table if show button exists
     const showBtn = document.getElementById('showSalesTeamTableBtn');
     if (showBtn) {
-        console.log('Show button found, setting up event listener');
-    }
-    
-    // Setup load data button if it exists
-    const loadDataBtn = document.getElementById('loadDataJsBtn');
-    if (loadDataBtn) {
-        loadDataBtn.addEventListener('click', loadSeedData);
+        showBtn.addEventListener('click', openSalesTeamModal);
     }
     
     // Close modal when clicking outside table
@@ -445,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event to close modal when clicking outside
     window.onclick = function(event) {
         const editModal = document.getElementById('editSalesTeamModal');
-        if (event.target === editModal) {
+        if (editModal && event.target === editModal) {
             closeEditSalesTeamModal();
         }
     };

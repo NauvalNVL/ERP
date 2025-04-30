@@ -1,194 +1,167 @@
 // Salesperson Management JavaScript
 // This file provides functionality for the salesperson management page
 
-// Define seed data for salespersons (used if no data in database)
-const salespersonSeedData = [
-    { code: 'S101', name: 'ABENG', sales_team_id: 1, position: 'E - Executive', user_id: 'root', is_active: 1 },
-    { code: 'S102', name: 'AGUNG', sales_team_id: 1, position: 'M - Manager', user_id: 'SLS', is_active: 1 },
-    { code: 'S103', name: 'EKO', sales_team_id: 2, position: 'S - Supervisor', user_id: 'SLS', is_active: 1 },
-    { code: 'S104', name: 'ELIAS', sales_team_id: 2, position: 'E - Executive', user_id: 'SLS', is_active: 1 },
-    { code: 'S105', name: 'FEBBY', sales_team_id: 3, position: 'M - Manager', user_id: 'SLS', is_active: 1 },
-    { code: 'S106', name: 'HENGKY', sales_team_id: 3, position: 'S - Supervisor', user_id: 'SLS', is_active: 1 }
-];
-
-// Mapping for sales team IDs to names
-const salesTeamNames = {
-    1: 'MBI',
-    2: 'MANAGEMENT LOCAL',
-    3: 'MANAGEMENT MNC'
-};
-
-// Initialize and setup when document is ready
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Salesperson JS loaded');
-    
-    // Setup load data button if it exists
-    const loadDataBtn = document.getElementById('loadDataJsBtn');
-    if (loadDataBtn) {
-        loadDataBtn.addEventListener('click', function() {
-            loadSeedData();
-        });
-    }
-    
-    // Setup initial table row events
     setupTableRowEvents();
+    populateSalespersonTable();
 });
 
-// Function to load seed data into the table
-function loadSeedData() {
+function populateSalespersonTable() {
+    console.log('Populating salesperson table');
+    
+    // Remove "no data" message if present
+    const tbody = document.querySelector('#salespersonDataTable tbody');
+    tbody.innerHTML = '';
+    
+    // Show loading message
+    tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Loading data...</td></tr>';
+    
+    // Show loading overlay
     showLoadingOverlay();
     
-    // Simulate loading time
-    setTimeout(function() {
-        populateSalespersonTable();
-        hideLoadingOverlay();
-    }, 800);
-}
-
-// Function to populate salesperson table with seed data if needed
-function populateSalespersonTable() {
-    const table = document.getElementById('salespersonDataTable');
-    if (!table) {
-        console.error('Salesperson table not found in DOM');
-        return;
-    }
-    
-    const tbody = table.querySelector('tbody');
-    
-    // Only populate if table is empty or has just one row with "no data" message
-    if (tbody.children.length <= 1 || (tbody.children.length === 1 && tbody.children[0].cells.length === 1)) {
-        console.log('Populating salesperson table with seed data');
+    // Fetch data from the database
+    fetch('/salesperson', {
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
         tbody.innerHTML = '';
         
-        salespersonSeedData.forEach(function(person) {
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-blue-50 cursor-pointer';
-            row.setAttribute('data-person-code', person.code);
-            row.setAttribute('data-person-name', person.name);
-            row.setAttribute('data-person-team', person.sales_team_id);
-            row.setAttribute('data-person-position', person.position);
-            row.setAttribute('data-person-user-id', person.user_id);
-            row.setAttribute('data-person-is-active', person.is_active);
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Tidak ada data salesperson yang tersedia.</td></tr>';
+            return;
+        }
+        
+        data.forEach(person => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-blue-50 cursor-pointer';
+            tr.setAttribute('data-person-code', person.code);
+            tr.setAttribute('data-person-name', person.name);
+            tr.setAttribute('data-person-team', person.sales_team_id);
+            tr.setAttribute('data-person-position', person.position);
+            tr.setAttribute('data-person-user-id', person.user_id);
+            tr.setAttribute('data-person-is-active', person.is_active ? '1' : '0');
             
-            row.onclick = function(e) {
+            tr.onclick = function(event) {
                 selectRow(this);
-                e.stopPropagation();
+                event.stopPropagation();
             };
             
-            row.ondblclick = function() {
+            tr.ondblclick = function() {
                 openEditSalespersonModal(this);
             };
             
-            row.innerHTML = `
+            tr.innerHTML = `
                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${person.code}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">${person.name}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">${salesTeamNames[person.sales_team_id]}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">${getTeamName(person.sales_team_id)}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">${person.position}</td>
             `;
             
-            tbody.appendChild(row);
+            tbody.appendChild(tr);
+        });
+    })
+    .catch(error => {
+        console.error('Error fetching salesperson data:', error);
+        tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-red-500">Error loading data. Please try again.</td></tr>';
+    })
+    .finally(() => {
+        hideLoadingOverlay();
+    });
+}
+
+function sortTableDirectly(columnIndex) {
+    const table = document.getElementById('salespersonDataTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Remove existing sort indicators
+    table.querySelectorAll('th i.fas').forEach(icon => {
+        icon.remove();
+    });
+    
+    // Get current sort direction
+    const currentDir = tbody.getAttribute('data-sort-dir') === 'asc' ? 'desc' : 'asc';
+    tbody.setAttribute('data-sort-dir', currentDir);
+    
+    // Add sort indicator to header
+    const th = table.querySelectorAll('th')[columnIndex];
+    const icon = document.createElement('i');
+    icon.className = `fas fa-sort-${currentDir === 'asc' ? 'up' : 'down'} ml-1`;
+    th.appendChild(icon);
+    
+    // Sort rows
+    rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex].textContent.trim();
+        const bValue = b.cells[columnIndex].textContent.trim();
+        
+        if (currentDir === 'asc') {
+            return aValue.localeCompare(bValue);
+        } else {
+            return bValue.localeCompare(aValue);
+        }
+    });
+    
+    // Clear and re-append rows
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function selectRow(row) {
+    // Remove selection from other rows
+    document.querySelectorAll('#salespersonDataTable tbody tr').forEach(tr => {
+        tr.classList.remove('bg-blue-100');
+    });
+    
+    // Add selection to clicked row
+    row.classList.add('bg-blue-100');
+    
+    // Update code input field
+    document.getElementById('code').value = row.getAttribute('data-person-code');
+}
+
+function getTeamName(teamId) {
+    const teams = {
+        1: 'MBI',
+        2: 'MANAGEMENT LOCAL',
+        3: 'MANAGEMENT MNC'
+    };
+    return teams[teamId] || '';
+}
+
+function setupTableRowEvents() {
+    const searchInput = document.getElementById('searchSalespersonInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            filterSalespersonTable(this.value);
         });
     }
 }
 
-// Function to sort the table by column
-function sortTableDirectly(columnIndex) {
-    const table = document.getElementById('salespersonDataTable');
-    if (!table) return;
-    
-    const tbody = table.querySelector('tbody');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    
-    let sortDirection = 1;
-    
-    // Check if we're already sorted on this column and reverse direction if so
-    if (table.getAttribute('data-sort-col') == columnIndex) {
-        sortDirection = table.getAttribute('data-sort-dir') == '1' ? -1 : 1;
-    }
-    
-    // Store sort state
-    table.setAttribute('data-sort-col', columnIndex);
-    table.setAttribute('data-sort-dir', sortDirection);
-    
-    // Sort the rows
-    rows.sort((a, b) => {
-        const cellA = a.cells[columnIndex].textContent.trim().toUpperCase();
-        const cellB = b.cells[columnIndex].textContent.trim().toUpperCase();
-        
-        if (cellA < cellB) return -1 * sortDirection;
-        if (cellA > cellB) return 1 * sortDirection;
-        return 0;
-    });
-    
-    // Remove all rows and re-add in sorted order
-    rows.forEach(row => tbody.removeChild(row));
-    rows.forEach(row => tbody.appendChild(row));
-    
-    // Re-setup row events after sorting
-    setupTableRowEvents();
-}
-
-// Function to setup row events
-function setupTableRowEvents() {
-    const rows = document.querySelectorAll('#salespersonDataTable tbody tr');
-    rows.forEach(row => {
-        row.onclick = function(e) {
-            selectRow(this);
-            e.stopPropagation();
-        };
-        
-        row.ondblclick = function() {
-            openEditSalespersonModal(this);
-        };
-    });
-}
-
-// Function to select a row
-function selectRow(row) {
-    // Clear previous selection
-    const allRows = document.querySelectorAll('#salespersonDataTable tbody tr');
-    allRows.forEach(r => r.classList.remove('bg-blue-200'));
-    
-    // Add selected class to this row
-    row.classList.add('bg-blue-200');
-}
-
-// Function to edit the selected row
-function editSelectedRow() {
-    const selectedRow = document.querySelector('#salespersonDataTable tbody tr.bg-blue-200');
-    if (selectedRow) {
-        openEditSalespersonModal(selectedRow);
-    } else {
-        alert('Please select a salesperson to edit');
-    }
-}
-
-// Open salesperson table modal
 function openSalespersonModal() {
     const modal = document.getElementById('salespersonTableWindow');
     if (modal) {
         modal.classList.remove('hidden');
-        populateSalespersonTable();
-        sortTableDirectly(0); // Default sort by first column
         
-        // Filter functionality for search input
+        // Populate table if empty
+        const tbody = document.querySelector('#salespersonDataTable tbody');
+        if (!tbody.children.length || tbody.children[0].cells[0].textContent.includes('Loading')) {
+            populateSalespersonTable();
+        }
+        
+        // Clear search input
         const searchInput = document.getElementById('searchSalespersonInput');
         if (searchInput) {
-            searchInput.value = ''; // Clear previous search
-            searchInput.focus();
-            
-            // Add event listener if not already added
-            if (!searchInput.hasAttribute('data-listener-added')) {
-                searchInput.setAttribute('data-listener-added', 'true');
-                searchInput.addEventListener('input', function() {
-                    filterSalespersonTable(this.value);
-                });
-            }
+            searchInput.value = '';
+            filterSalespersonTable('');
         }
     }
 }
 
-// Close salesperson table modal
 function closeSalespersonModal() {
     const modal = document.getElementById('salespersonTableWindow');
     if (modal) {
@@ -196,36 +169,16 @@ function closeSalespersonModal() {
     }
 }
 
-// Function for the X button in the modal
-function closeModalX() {
-    closeSalespersonModal();
-}
-
-// Filter salesperson table based on search input
 function filterSalespersonTable(searchTerm) {
     const rows = document.querySelectorAll('#salespersonDataTable tbody tr');
-    searchTerm = searchTerm.toLowerCase();
+    const searchLower = searchTerm.toLowerCase();
     
     rows.forEach(row => {
-        const code = row.getAttribute('data-person-code').toLowerCase();
-        const name = row.getAttribute('data-person-name').toLowerCase();
-        const teamId = row.getAttribute('data-person-team');
-        const team = salesTeamNames[teamId].toLowerCase();
-        const position = row.getAttribute('data-person-position').toLowerCase();
-        
-        // Show row if any field contains the search term
-        if (code.includes(searchTerm) || 
-            name.includes(searchTerm) || 
-            team.includes(searchTerm) || 
-            position.includes(searchTerm)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchLower) ? '' : 'none';
     });
 }
 
-// Open edit salesperson modal
 function openEditSalespersonModal(row) {
     const modal = document.getElementById('editSalespersonModal');
     if (!modal) return;
@@ -238,7 +191,7 @@ function openEditSalespersonModal(row) {
     const userId = row.getAttribute('data-person-user-id');
     const isActive = row.getAttribute('data-person-is-active');
     
-    // Populate form
+    // Set form values
     document.getElementById('edit_person_code').value = code;
     document.getElementById('edit_person_name').value = name;
     document.getElementById('edit_person_team').value = team;
@@ -248,12 +201,8 @@ function openEditSalespersonModal(row) {
     
     // Show modal
     modal.classList.remove('hidden');
-    
-    // Focus first field
-    document.getElementById('edit_person_code').focus();
 }
 
-// Close edit salesperson modal
 function closeEditSalespersonModal() {
     const modal = document.getElementById('editSalespersonModal');
     if (modal) {
@@ -261,7 +210,6 @@ function closeEditSalespersonModal() {
     }
 }
 
-// Save salesperson changes
 function saveSalespersonChanges() {
     // Get form values
     const code = document.getElementById('edit_person_code').value;
@@ -269,49 +217,75 @@ function saveSalespersonChanges() {
     const team = document.getElementById('edit_person_team').value;
     const position = document.getElementById('edit_person_position').value;
     const userId = document.getElementById('edit_person_user_id').value;
-    const isActive = document.getElementById('edit_person_is_active').value;
-    
-    // Validation
-    if (!code || !name) {
-        alert('Code and Name are required fields');
-        return;
-    }
+    const isActive = document.getElementById('edit_person_is_active').value === '1';
     
     // Show loading overlay
     showLoadingOverlay();
     
-    // Simulate server request
-    setTimeout(function() {
-        // In a real app, you'd send this data to the server via AJAX
-        console.log('Saving salesperson:', { code, name, team, position, userId, isActive });
-        
-        // Update row in the table (if it exists)
-        const selectedRow = document.querySelector('#salespersonDataTable tbody tr.bg-blue-200');
-        if (selectedRow) {
-            selectedRow.setAttribute('data-person-code', code);
-            selectedRow.setAttribute('data-person-name', name);
-            selectedRow.setAttribute('data-person-team', team);
-            selectedRow.setAttribute('data-person-position', position);
-            selectedRow.setAttribute('data-person-user-id', userId);
-            selectedRow.setAttribute('data-person-is-active', isActive);
+    // Send update request
+    fetch(`/salesperson/update/${code}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            name: name,
+            sales_team_id: team,
+            position: position,
+            user_id: userId,
+            is_active: isActive
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close modal
+            closeEditSalespersonModal();
             
-            // Update visible cell text
-            selectedRow.cells[0].textContent = code;
-            selectedRow.cells[1].textContent = name;
-            selectedRow.cells[2].textContent = salesTeamNames[team];
-            selectedRow.cells[3].textContent = position;
+            // Refresh table
+            populateSalespersonTable();
+            
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
+            successDiv.innerHTML = `
+                <strong class="font-bold">Success!</strong>
+                <span class="block sm:inline">${data.message}</span>
+            `;
+            document.body.appendChild(successDiv);
+            
+            // Remove success message after 3 seconds
+            setTimeout(() => {
+                successDiv.remove();
+            }, 3000);
+        } else {
+            throw new Error(data.message);
         }
+    })
+    .catch(error => {
+        console.error('Error updating salesperson:', error);
         
-        // Hide loading overlay and close modal
+        // Show error message
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+        errorDiv.innerHTML = `
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">${error.message}</span>
+        `;
+        document.body.appendChild(errorDiv);
+        
+        // Remove error message after 3 seconds
+        setTimeout(() => {
+            errorDiv.remove();
+        }, 3000);
+    })
+    .finally(() => {
         hideLoadingOverlay();
-        closeEditSalespersonModal();
-    }, 800);
-    
-    // Prevent form submission
-    return false;
+    });
 }
 
-// Show loading overlay
 function showLoadingOverlay() {
     const overlay = document.getElementById('loadingOverlay');
     if (overlay) {
@@ -319,10 +293,63 @@ function showLoadingOverlay() {
     }
 }
 
-// Hide loading overlay
 function hideLoadingOverlay() {
     const overlay = document.getElementById('loadingOverlay');
     if (overlay) {
         overlay.classList.add('hidden');
     }
+}
+
+function loadSeedData() {
+    showLoadingOverlay();
+    
+    fetch('/salesperson/seed', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            populateSalespersonTable();
+            
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
+            successDiv.innerHTML = `
+                <strong class="font-bold">Success!</strong>
+                <span class="block sm:inline">${data.message}</span>
+            `;
+            document.body.appendChild(successDiv);
+            
+            // Remove success message after 3 seconds
+            setTimeout(() => {
+                successDiv.remove();
+            }, 3000);
+        } else {
+            throw new Error(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading seed data:', error);
+        
+        // Show error message
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+        errorDiv.innerHTML = `
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">${error.message}</span>
+        `;
+        document.body.appendChild(errorDiv);
+        
+        // Remove error message after 3 seconds
+        setTimeout(() => {
+            errorDiv.remove();
+        }, 3000);
+    })
+    .finally(() => {
+        hideLoadingOverlay();
+    });
 }
