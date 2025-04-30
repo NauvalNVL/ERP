@@ -195,44 +195,45 @@
 </div>
 
 <!-- Sales Team Table Window -->
-<div id="salesTeamTableWindow" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 max-w-2xl mx-auto transform transition-transform duration-300">
-        <!-- Modal Header - Title Bar -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-            <div class="flex items-center">
-                <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
-                    <i class="fas fa-users"></i>
+<div id="salesTeamTableWindow" class="hidden">
+    <div class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 max-w-2xl mx-auto transform transition-transform duration-300">
+            <!-- Modal Header - Title Bar -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                <div class="flex items-center">
+                    <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold">Sales Team Table</h3>
                 </div>
-                <h3 class="text-xl font-semibold">Sales Team Table</h3>
-            </div>
-            <button type="button" onclick="closeSalesTeamModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-        </div>
-        
-        <!-- Table Content -->
-        <div class="p-5 overflow-auto" style="max-height: calc(80vh - 130px);">
-            <div class="mb-4">
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                        <i class="fas fa-search"></i>
-                    </span>
-                    <input type="text" id="searchSalesTeamInput" placeholder="Search teams..."
-                        class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
-                </div>
+                <button type="button" onclick="closeSalesTeamModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
             
-            <div class="overflow-x-auto rounded-lg border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200" id="salesTeamDataTable">
-                    <thead class="bg-gray-50 sticky top-0">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    </tr>
-                </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @if(isset($salesTeams) && count($salesTeams) > 0)
-                    @foreach($salesTeams as $team)
+            <!-- Table Content -->
+            <div class="p-5 overflow-auto" style="max-height: calc(80vh - 130px);">
+                <div class="mb-4">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" id="searchSalesTeamInput" placeholder="Search teams..."
+                            class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200" id="salesTeamDataTable">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        </tr>
+                    </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @if(isset($salesTeams) && count($salesTeams) > 0)
+                        @foreach($salesTeams as $team)
                                 <tr class="hover:bg-blue-50 cursor-pointer" 
                                 data-team-code="{{ $team->code }}"
                                 data-team-name="{{ $team->name }}"
@@ -240,91 +241,96 @@
                                 ondblclick="openEditSalesTeamModal(this)">
                                     <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $team->code }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $team->name }}</td>
-                    </tr>
-                    @endforeach
-                        @else
-                            <tr>
-                                <td colspan="2" class="px-4 py-4 text-center text-gray-500">Tidak ada data sales team yang tersedia.</td>
-                            </tr>
-                        @endif
-                </tbody>
-            </table>
-        </div>
-        
-            <!-- Bottom Buttons -->
-            <div class="mt-4 grid grid-cols-4 gap-2">
-                <button type="button" onclick="sortTableDirectly(0)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-                    <i class="fas fa-sort mr-1"></i>By Code
-                </button>
-                <button type="button" onclick="sortTableDirectly(1)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-                    <i class="fas fa-sort mr-1"></i>By Name
-                </button>
-                <button type="button" onclick="editSelectedRow()" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
-                    <i class="fas fa-edit mr-1"></i>Select
-                </button>
-                <button type="button" onclick="closeSalesTeamModal()" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
-                    <i class="fas fa-times mr-1"></i>Exit
-                </button>
+                        </tr>
+                        @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="2" class="px-4 py-4 text-center text-gray-500">Tidak ada data sales team yang tersedia.</td>
+                                </tr>
+                            @endif
+                    </tbody>
+                </table>
+            </div>
+            
+                <!-- Bottom Buttons -->
+                <div class="mt-4 grid grid-cols-4 gap-2">
+                    <button type="button" onclick="sortTableDirectly(0)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                        <i class="fas fa-sort mr-1"></i>By Code
+                    </button>
+                    <button type="button" onclick="sortTableDirectly(1)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                        <i class="fas fa-sort mr-1"></i>By Name
+                    </button>
+                    <button type="button" onclick="editSelectedRow()" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
+                        <i class="fas fa-edit mr-1"></i>Select
+                    </button>
+                    <button type="button" onclick="closeSalesTeamModal()" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
+                        <i class="fas fa-times mr-1"></i>Exit
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Edit Sales Team Modal -->
-<div id="editSalesTeamModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
-        <!-- Modal Header - Title Bar -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-            <div class="flex items-center">
-                <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
-                    <i class="fas fa-users"></i>
+<div id="editSalesTeamModal" class="hidden">
+    <div class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
+            <!-- Modal Header - Title Bar -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                <div class="flex items-center">
+                    <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold">Define Sales Team</h3>
                 </div>
-                <h3 class="text-xl font-semibold">Define Sales Team</h3>
+                <button type="button" onclick="closeEditSalesTeamModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <button type="button" onclick="closeEditSalesTeamModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-        </div>
 
-        <!-- Form Content -->
-        <div class="p-6">
-            <form id="editSalesTeamForm" onsubmit="saveSalesTeamChanges(); return false;" class="space-y-4">
-                <div>
-                    <label for="edit_team_code" class="block text-sm font-medium text-gray-700 mb-1">Team Code:</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                            <i class="fas fa-hashtag"></i>
-                        </span>
-                        <input id="edit_team_code" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+            <!-- Form Content -->
+            <div class="p-6">
+                <form id="editSalesTeamForm" onsubmit="saveSalesTeamChanges(); return false;" class="space-y-4">
+                    <div>
+                        <label for="edit_team_code" class="block text-sm font-medium text-gray-700 mb-1">Team Code:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fas fa-hashtag"></i>
+                            </span>
+                            <input id="edit_team_code" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                        </div>
                     </div>
-                </div>
-                
-                <div>
-                    <label for="edit_team_name" class="block text-sm font-medium text-gray-700 mb-1">Team Name:</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                            <i class="fas fa-users"></i>
-                        </span>
-                        <input id="edit_team_name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                    
+                    <div>
+                        <label for="edit_team_name" class="block text-sm font-medium text-gray-700 mb-1">Team Name:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fas fa-users"></i>
+                            </span>
+                            <input id="edit_team_name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
-                    <button type="button" onclick="closeEditSalesTeamModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
-                        <i class="fas fa-times mr-2"></i>Cancel
-                    </button>
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
-                        <i class="fas fa-save mr-2"></i>Save
-                    </button>
-                </div>
-            </form>
+                    
+                    <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+                        <button type="button" onclick="closeEditSalesTeamModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-save mr-2"></i>Save
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Loading Overlay -->
-<div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden">
-    <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+<div id="loadingOverlay" class="hidden">
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
 </div>
 
 @endsection

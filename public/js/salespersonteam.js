@@ -17,34 +17,19 @@ function populateSearchTable() {
 
 // Function to open search modal
 function openSearchModal() {
-    console.log('Opening search modal');
     const modal = document.getElementById('searchModal');
-    if (!modal) {
-        console.error('Search modal element not found');
-        return;
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
-    
-    // Show modal
-    modal.style.display = 'block';
-    modal.classList.remove('hidden');
-    
-    // Setup search input event listener
-    const searchInput = document.getElementById('searchSalespersonInput');
-    if (searchInput) {
-        searchInput.addEventListener('keyup', function(e) {
-            filterSearchTable(this.value);
-        });
-    }
-    
-    console.log('Search modal opened successfully');
 }
 
 // Function to close search modal
 function closeSearchModal() {
     const modal = document.getElementById('searchModal');
     if (modal) {
-        modal.style.display = 'none';
         modal.classList.add('hidden');
+        modal.classList.remove('flex');
     }
 }
 
@@ -195,33 +180,53 @@ function selectSearchResult(row = null) {
 
 // Function to show/hide add modal
 function showAddModal() {
-    document.getElementById('addModal').classList.remove('hidden');
+    const modal = document.getElementById('addModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
 }
 
 function hideAddModal() {
-    document.getElementById('addModal').classList.add('hidden');
-    document.getElementById('salesperson_code').value = '';
-    document.getElementById('salesperson_name').value = '';
-    document.getElementById('sales_team_id').selectedIndex = 0;
-    document.getElementById('position').selectedIndex = 0;
+    const modal = document.getElementById('addModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
 }
 
 // Function to show/hide edit modal
 function showEditModal() {
-    document.getElementById('editModal').classList.remove('hidden');
+    const modal = document.getElementById('editModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
 }
 
 function hideEditModal() {
-    document.getElementById('editModal').classList.add('hidden');
+    const modal = document.getElementById('editModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
 }
 
 // Function to show/hide delete modal
 function showDeleteModal() {
-    document.getElementById('deleteModal').classList.remove('hidden');
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
 }
 
 function hideDeleteModal() {
-    document.getElementById('deleteModal').classList.add('hidden');
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
 }
 
 // Function to load seed data for demo purposes

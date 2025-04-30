@@ -208,7 +208,7 @@ class SalespersonController extends Controller
     /**
      * Display a listing of the resource for printing.
      *
-     * @return \\Illuminate\\View\\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function viewAndPrint()
     {

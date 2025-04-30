@@ -20,7 +20,7 @@ class ScoringToolSeeder extends Seeder
             'description' => 'N/A',
             'is_active' => true,
         ],
-                                [
+                                                        [
                 'code' => '2',
                 'name' => 'MALE MALE',
                 'scores' => 0,
@@ -28,7 +28,7 @@ class ScoringToolSeeder extends Seeder
                 'specification' => '',
                 'description' => 'MALE MALE',
                 'is_active' => true,
-            ],,,
+            ],,,,,
                                 [
                 'code' => '3',
                 'name' => 'MALE FEMALE 10MM',

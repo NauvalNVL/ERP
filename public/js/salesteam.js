@@ -238,6 +238,7 @@ function openSalesTeamModal() {
     
     // Show modal
     modal.classList.remove('hidden');
+    modal.classList.add('flex');
     
     // Populate table with data if needed
     populateSalesTeamTable();
@@ -253,6 +254,7 @@ function closeSalesTeamModal() {
     var modal = document.getElementById('salesTeamTableWindow');
     if (modal) {
         modal.classList.add('hidden');
+        modal.classList.remove('flex');
     }
 }
 

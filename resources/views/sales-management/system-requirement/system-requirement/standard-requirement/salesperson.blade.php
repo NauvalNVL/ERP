@@ -153,7 +153,7 @@
 </div>
 
 <!-- Salesperson Table Window -->
-<div id="salespersonTableWindow" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+<div id="salespersonTableWindow" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 items-center justify-center">
     <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 max-w-2xl mx-auto transform transition-transform duration-300">
         <!-- Modal Header - Title Bar -->
         <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
@@ -237,7 +237,7 @@
 </div>
 
 <!-- Edit Salesperson Modal -->
-<div id="editSalespersonModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+<div id="editSalespersonModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 items-center justify-center">
     <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
         <!-- Modal Header - Title Bar -->
         <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
@@ -340,7 +340,7 @@
 </div>
 
 <!-- Loading Overlay -->
-<div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden">
+<div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 hidden">
     <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
 </div>
 
