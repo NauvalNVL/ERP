@@ -13,39 +13,34 @@ class SalespersonTeamController extends Controller
     public function index()
     {
         // Cek apakah tabel-tabel yang diperlukan ada di database
-        if (!Schema::hasTable('salesperson')) {
+        if (!Schema::hasTable('salesperson_teams')) {
             return view('sales-management.system-requirement.system-requirement.standard-requirement.salespersonteam', [
                 'salespersons' => [],
                 'salesTeams' => [],
-                'error' => 'Tabel salesperson tidak ditemukan. Silakan jalankan migrasi terlebih dahulu.'
-            ]);
-        }
-
-        if (!Schema::hasTable('sales_team')) {
-            return view('sales-management.system-requirement.system-requirement.standard-requirement.salespersonteam', [
-                'salespersons' => [],
-                'salesTeams' => [],
-                'error' => 'Tabel sales_team tidak ditemukan. Silakan jalankan migrasi terlebih dahulu.'
+                'error' => 'Tabel salesperson_teams tidak ditemukan. Silakan jalankan migrasi terlebih dahulu.'
             ]);
         }
 
         try {
-            // Mengambil data salesperson team beserta informasi terkait
-            $salespersons = DB::table('salesperson')
-                ->join('sales_team', 'salesperson.sales_team_id', '=', 'sales_team.id')
+            // Mengambil data salesperson team dari tabel
+            $salespersons = DB::table('salesperson_teams')
                 ->select(
-                    'salesperson.id',
-                    'salesperson.code as salesperson_code',
-                    'salesperson.name as salesperson_name',
-                    'sales_team.code as team_code',
-                    'sales_team.name as team_name',
-                    'salesperson.position'
+                    'id',
+                    's_person_code',
+                    'salesperson_name',
+                    'st_code',
+                    'sales_team_name',
+                    'sales_team_position'
                 )
-                ->orderBy('salesperson.code')
+                ->orderBy('s_person_code')
                 ->get();
-    
-            // Mengambil data sales team untuk dropdown
-            $salesTeams = DB::table('sales_team')->get();
+            
+            // Mengambil data sales team untuk dropdown dan convert ke collection
+            $salesTeams = collect([
+                (object)['id' => 1, 'code' => '01', 'name' => 'MBI'],
+                (object)['id' => 2, 'code' => '02', 'name' => 'MANAGEMENT LOCAL'],
+                (object)['id' => 3, 'code' => '03', 'name' => 'MANAGEMENT MNC']
+            ]);
             
             // Log the query result
             Log::info('Salesperson teams count in index: ' . $salespersons->count());
@@ -56,7 +51,7 @@ class SalespersonTeamController extends Controller
             Log::error('Error loading salesperson teams: ' . $e->getMessage());
             return view('sales-management.system-requirement.system-requirement.standard-requirement.salespersonteam', [
                 'salespersons' => [],
-                'salesTeams' => [],
+                'salesTeams' => collect([]),
                 'error' => 'Error: ' . $e->getMessage()
             ]);
         }
@@ -66,9 +61,9 @@ class SalespersonTeamController extends Controller
     {
         // Validasi input
         $validator = Validator::make($request->all(), [
-            'salesperson_code' => 'required|string|max:10|unique:salesperson,code',
+            'salesperson_code' => 'required|string|max:10|unique:salesperson_teams,s_person_code',
             'salesperson_name' => 'required|string|max:100',
-            'sales_team_id' => 'required|exists:sales_team,id',
+            'sales_team_id' => 'required',
             'position' => 'required|string|max:50',
         ]);
 
@@ -77,12 +72,24 @@ class SalespersonTeamController extends Controller
         }
 
         try {
+            // Get sales team info based on ID
+            $salesTeam = collect([
+                (object)['id' => 1, 'code' => '01', 'name' => 'MBI'],
+                (object)['id' => 2, 'code' => '02', 'name' => 'MANAGEMENT LOCAL'],
+                (object)['id' => 3, 'code' => '03', 'name' => 'MANAGEMENT MNC']
+            ])->firstWhere('id', $request->sales_team_id);
+
+            if (!$salesTeam) {
+                return redirect()->back()->with('error', 'Sales team tidak ditemukan')->withInput();
+            }
+
             // Menyimpan data salesperson baru
-            DB::table('salesperson')->insert([
-                'code' => strtoupper($request->salesperson_code),
-                'name' => strtoupper($request->salesperson_name),
-                'sales_team_id' => $request->sales_team_id,
-                'position' => $request->position,
+            DB::table('salesperson_teams')->insert([
+                's_person_code' => strtoupper($request->salesperson_code),
+                'salesperson_name' => strtoupper($request->salesperson_name),
+                'st_code' => $salesTeam->code,
+                'sales_team_name' => $salesTeam->name,
+                'sales_team_position' => $request->position,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -122,31 +129,74 @@ class SalespersonTeamController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validasi input
-        $validator = Validator::make($request->all(), [
-            'salesperson_name' => 'required|string|max:100',
-            'sales_team_id' => 'required|exists:sales_team,id',
-            'position' => 'required|string|max:50',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
         try {
-            // Memperbarui data salesperson
-            DB::table('salesperson')
+            // Validate request
+            $validator = Validator::make($request->all(), [
+                's_person_code' => 'required|string|max:255',
+                'salesperson_name' => 'required|string|max:255',
+                'st_code' => 'required|string|max:255',
+                'sales_team_name' => 'required|string|max:255',
+                'sales_team_position' => 'required|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Update salesperson team
+            $updated = DB::table('salesperson_teams')
                 ->where('id', $id)
                 ->update([
-                    'name' => strtoupper($request->salesperson_name),
-                    'sales_team_id' => $request->sales_team_id,
-                    'position' => $request->position,
-                    'updated_at' => now(),
+                    's_person_code' => $request->s_person_code,
+                    'salesperson_name' => $request->salesperson_name,
+                    'st_code' => $request->st_code,
+                    'sales_team_name' => $request->sales_team_name,
+                    'sales_team_position' => $request->sales_team_position,
+                    'updated_at' => now()
                 ]);
-    
-            return redirect()->route('salesperson-team.index')->with('success', 'Salesperson team berhasil diperbarui');
+
+            if (!$updated) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update salesperson team'
+                ], 500);
+            }
+
+            // Get updated data
+            $updatedData = DB::table('salesperson_teams')
+                ->where('id', $id)
+                ->first();
+
+            if (!$updatedData) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Updated data not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Salesperson team updated successfully',
+                'data' => [
+                    'id' => $updatedData->id,
+                    's_person_code' => $updatedData->s_person_code,
+                    'salesperson_name' => $updatedData->salesperson_name,
+                    'st_code' => $updatedData->st_code,
+                    'sales_team_name' => $updatedData->sales_team_name,
+                    'sales_team_position' => $updatedData->sales_team_position
+                ]
+            ]);
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error: ' . $e->getMessage())->withInput();
+            Log::error('Error updating salesperson team: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating the salesperson team: ' . $e->getMessage()
+            ], 500);
         }
     }
 

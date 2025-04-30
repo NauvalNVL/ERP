@@ -3,6 +3,7 @@
 @section('title', 'Define Salesperson Team')
 
 @section('content')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <script src="{{ asset('js/salespersonteam.js') }}"></script>
 
 <!-- Header Section -->
@@ -36,14 +37,14 @@
                     </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                         <i class="fas fa-arrow-left"></i>
-        </button>
+                    </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                         <i class="fas fa-search"></i>
-        </button>
+                    </button>
                     <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                         <i class="fas fa-save"></i>
-        </button>
-    </div>
+                    </button>
+                </div>
 
                 <!-- Search Section -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
@@ -54,7 +55,7 @@
                                 <i class="fas fa-users"></i>
                             </span>
                             <input type="text" id="searchInput" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                            <button type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px" onclick="searchData()">
+                            <button type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px" onclick="openSearchModal()">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
@@ -66,98 +67,24 @@
                             <i class="fas fa-plus-circle mr-2"></i> Add New
                         </button>
                     </div>
-            </div>
+                </div>
 
                 <!-- Debug Information -->
-                @if(empty($salespersons) || (isset($salespersons) && count($salespersons) == 0))
+                @if(empty($salespersons) || count($salespersons) === 0)
                 <div class="mt-4 bg-yellow-100 p-3 rounded alert-danger">
                     <p class="text-sm font-medium text-yellow-800">Tidak ada data tim salesperson yang tersedia.</p>
                     <p class="text-xs text-yellow-700 mt-1">Pastikan database telah diatur dengan benar dan data seeder telah dijalankan.</p>
                     <div class="mt-2 flex items-center space-x-3">
-                        <a href="{{ route('salesperson-team.index') }}" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded transform active:translate-y-px">
-                            Run Team Seeder (DB)
+                        <a href="{{ route('run.salespersonteam.seeder') }}" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded transform active:translate-y-px">
+                            Run Salesperson Team Seeder
                         </a>
-                        <button id="loadDataJsBtn" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded transform active:translate-y-px">
-                            Load Team Data (JS)
-                </button>
-            </div>
-        </div>
-                @elseif(isset($salespersons) && count($salespersons) > 0)
+                    </div>
+                </div>
+                @elseif(count($salespersons) > 0)
                 <div class="mt-4 bg-green-100 p-3 rounded alert-success">
                     <p class="text-sm font-medium text-green-800">Data tersedia: {{ count($salespersons) }} tim salesperson ditemukan.</p>
-    </div>
-                @endif
-                
-                <!-- Salesperson Team Table -->
-                <div class="mt-6 overflow-x-auto rounded-lg border border-gray-200">
-                    <table class="min-w-full divide-y divide-gray-200" id="salespersonTable">
-                        <thead class="bg-gray-50 sticky top-0">
-                <tr>
-                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
-                        <input type="checkbox" id="selectAll" class="rounded text-blue-500 focus:ring-blue-500">
-                    </th>
-                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Salesperson<br>Code
-                    </th>
-                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Salesperson<br>Name
-                    </th>
-                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        S/Team<br>Code
-                    </th>
-                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Sales Team<br>Name
-                    </th>
-                    <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Sales Team<br>Position
-                    </th>
-                </tr>
-            </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @if(isset($salespersons) && count($salespersons) > 0)
-                @foreach ($salespersons as $salesperson)
-                <tr class="hover:bg-gray-50">
-                    <td class="px-3 py-2 whitespace-nowrap">
-                        <input type="checkbox" name="selected[]" value="{{ $salesperson->id }}" class="selectItem rounded text-blue-500 focus:ring-blue-500">
-                    </td>
-                    <td class="px-3 py-2 whitespace-nowrap font-medium">
-                        {{ $salesperson->salesperson_code }}
-                    </td>
-                    <td class="px-3 py-2 whitespace-nowrap">
-                        {{ $salesperson->salesperson_name }}
-                    </td>
-                    <td class="px-3 py-2 whitespace-nowrap font-medium">
-                        {{ $salesperson->team_code }}
-                    </td>
-                    <td class="px-3 py-2 whitespace-nowrap">
-                        {{ $salesperson->team_name }}
-                    </td>
-                    <td class="px-3 py-2 whitespace-nowrap">
-                        {{ $salesperson->position }}
-                    </td>
-                </tr>
-                @endforeach
-                            @else
-                                <tr>
-                                    <td colspan="6" class="px-4 py-4 text-center text-gray-500">Tidak ada data salesperson team yang tersedia.</td>
-                                </tr>
-                            @endif
-            </tbody>
-        </table>
-    </div>
-
-                <!-- Action Buttons -->
-                <div class="mt-4 grid grid-cols-3 gap-2">
-                    <button type="button" id="editButton" onclick="showEditModal()" disabled class="py-2 px-3 bg-yellow-500 hover:bg-yellow-600 text-white text-xs rounded-lg transform active:translate-y-px opacity-50 cursor-not-allowed">
-                        <i class="fas fa-edit mr-1"></i> Edit Selected
-                    </button>
-                    <button type="button" id="deleteButton" onclick="showDeleteModal()" disabled class="py-2 px-3 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg transform active:translate-y-px opacity-50 cursor-not-allowed">
-                        <i class="fas fa-trash-alt mr-1"></i> Delete Selected
-                    </button>
-                    <button type="button" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
-                        <i class="fas fa-print mr-1"></i> Print List
-                    </button>
                 </div>
+                @endif
             </div>
         </div>
 
@@ -187,16 +114,26 @@
                         <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Team Positions</h4>
                         <div class="grid grid-cols-1 gap-2 text-sm">
                             <div class="flex items-center">
-                                <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">M</span>
-                                <span>Manager</span>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="w-6 h-6 flex items-center justify-center bg-green-600 text-white rounded-full font-bold mr-2">T</span>
-                                <span>Team Leader</span>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="w-6 h-6 flex items-center justify-center bg-purple-600 text-white rounded-full font-bold mr-2">E</span>
+                                <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">E</span>
                                 <span>Executive</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Preset Teams</h4>
+                        <div class="grid grid-cols-1 gap-2 text-sm">
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 flex items-center justify-center bg-green-600 text-white rounded-full font-bold mr-2">01</span>
+                                <span>MBI</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">02</span>
+                                <span>MANAGEMENT LOCAL</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 flex items-center justify-center bg-purple-600 text-white rounded-full font-bold mr-2">03</span>
+                                <span>MANAGEMENT MNC</span>
                             </div>
                         </div>
                     </div>
@@ -290,11 +227,14 @@
                             <i class="fas fa-users"></i>
                         </span>
                         <select name="sales_team_id" id="sales_team_id" required class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        <option value="">Pilih Sales Team</option>
-                        @foreach ($salesTeams as $team)
-                        <option value="{{ $team->id }}">{{ $team->code }} - {{ $team->name }}</option>
-                        @endforeach
-                    </select>
+                            <option value="">Pilih Sales Team</option>
+                            @foreach ($salesTeams as $team)
+                                <option value="{{ is_object($team) ? $team->id : $team['id'] }}">
+                                    {{ is_object($team) ? $team->code : $team['code'] }} - 
+                                    {{ is_object($team) ? $team->name : $team['name'] }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -304,11 +244,9 @@
                             <i class="fas fa-briefcase"></i>
                         </span>
                         <select name="position" id="position" required class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        <option value="">Pilih Position</option>
-                        <option value="E - Executive">E - Executive</option>
-                        <option value="M - Manager">M - Manager</option>
-                        <option value="T - Team Leader">T - Team Leader</option>
-                    </select>
+                            <option value="">Pilih Position</option>
+                            <option value="E-Executive">E-Executive</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -324,9 +262,10 @@
     </div>
 </div>
 
-<!-- Edit Modal -->
+<!-- Edit Salesperson Team Modal -->
 <div id="editModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
+        <!-- Modal Header -->
         <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
             <div class="flex items-center">
                 <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
@@ -334,70 +273,78 @@
                 </div>
                 <h3 class="text-xl font-semibold">Edit Salesperson Team</h3>
             </div>
-            <button type="button" onclick="hideEditModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+            <button type="button" onclick="closeEditModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
-        <form id="editForm" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="p-4">
-                <div class="mb-3">
-                    <label for="edit_salesperson_code" class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code</label>
+
+        <!-- Form Content -->
+        <div class="p-6">
+            <form id="editForm" class="space-y-4">
+                @csrf
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="PUT">
+                
+                <div>
+                    <label for="edit_s_person_code" class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code:</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                             <i class="fas fa-hashtag"></i>
                         </span>
-                        <input type="text" id="edit_salesperson_code" class="pl-10 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" readonly>
+                        <input id="edit_s_person_code" name="s_person_code" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label for="edit_salesperson_name" class="block text-sm font-medium text-gray-700 mb-1">Salesperson Name</label>
+                
+                <div>
+                    <label for="edit_salesperson_name" class="block text-sm font-medium text-gray-700 mb-1">Salesperson Name:</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                            <i class="fas fa-user-tie"></i>
+                            <i class="fas fa-user"></i>
                         </span>
-                        <input type="text" name="salesperson_name" id="edit_salesperson_name" required class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <input id="edit_salesperson_name" name="salesperson_name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label for="edit_sales_team_id" class="block text-sm font-medium text-gray-700 mb-1">Sales Team</label>
+
+                <div>
+                    <label for="edit_sales_team_id" class="block text-sm font-medium text-gray-700 mb-1">Sales Team:</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                             <i class="fas fa-users"></i>
                         </span>
                         <select name="sales_team_id" id="edit_sales_team_id" required class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        <option value="">Pilih Sales Team</option>
-                        @foreach ($salesTeams as $team)
-                        <option value="{{ $team->id }}">{{ $team->code }} - {{ $team->name }}</option>
-                        @endforeach
-                    </select>
+                            <option value="">Pilih Sales Team</option>
+                            @foreach ($salesTeams as $team)
+                            <option value="{{ $team->id }}">{{ $team->code }} - {{ $team->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label for="edit_position" class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+
+                <div>
+                    <label for="edit_position" class="block text-sm font-medium text-gray-700 mb-1">Position:</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                             <i class="fas fa-briefcase"></i>
                         </span>
                         <select name="position" id="edit_position" required class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        <option value="">Pilih Position</option>
-                        <option value="E - Executive">E - Executive</option>
-                        <option value="M - Manager">M - Manager</option>
-                        <option value="T - Team Leader">T - Team Leader</option>
-                    </select>
+                            <option value="">Pilih Position</option>
+                            <option value="E-Executive">E-Executive</option>
+                            <option value="M-Manager">M-Manager</option>
+                            <option value="S-Supervisor">S-Supervisor</option>
+                        </select>
                     </div>
                 </div>
-            </div>
-            <div class="p-3 border-t border-gray-200 flex justify-end space-x-2 bg-gray-50">
-                <button type="button" onclick="hideEditModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
-                    <i class="fas fa-times mr-2"></i>Cancel
-                </button>
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
-                    <i class="fas fa-save mr-2"></i>Save Changes
-                </button>
-            </div>
-        </form>
+                
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </button>
+                    <button type="button" onclick="saveSalespersonTeamChanges(this.form)" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
+                        <i class="fas fa-save mr-2"></i>Save
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -410,7 +357,7 @@
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
                 <h3 class="text-xl font-semibold">Confirm Delete</h3>
-        </div>
+            </div>
             <button type="button" onclick="hideDeleteModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
                 <i class="fas fa-times text-xl"></i>
             </button>
@@ -430,6 +377,91 @@
                     </button>
             </form>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Modal -->
+<div id="searchModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 max-w-2xl mx-auto transform transition-transform duration-300">
+        <!-- Modal Header - Title Bar -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center">
+                <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="text-xl font-semibold">Search Salesperson Team</h3>
+            </div>
+            <button type="button" onclick="closeSearchModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- Search Content -->
+        <div class="p-5 overflow-auto" style="max-height: calc(80vh - 130px);">
+            <div class="mb-4">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" id="searchSalespersonInput" placeholder="Search salesperson teams..."
+                        class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                </div>
+            </div>
+            
+            <!-- Table Content -->
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200" id="searchSalespersonTable">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team Code</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($salespersons as $person)
+                            <tr class="hover:bg-blue-50 cursor-pointer"
+                                data-id="{{ $person->id }}"
+                                data-code="{{ $person->s_person_code }}"
+                                data-name="{{ $person->salesperson_name }}"
+                                data-team-code="{{ $person->st_code }}"
+                                data-team-name="{{ $person->sales_team_name }}"
+                                data-position="{{ $person->sales_team_position }}"
+                                onclick="selectRow(this)"
+                                ondblclick="handleRowDoubleClick(this)">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{{ $person->s_person_code }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $person->salesperson_name }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $person->st_code }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $person->sales_team_name }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $person->sales_team_position }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-4 py-3 text-center text-gray-500">Tidak ada data salesperson team yang tersedia.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Bottom Buttons -->
+        <div class="mt-4 grid grid-cols-4 gap-2 p-4 border-t border-gray-200">
+            <button type="button" onclick="sortSearchTable(0)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                <i class="fas fa-sort mr-1"></i>By Code
+            </button>
+            <button type="button" onclick="sortSearchTable(1)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                <i class="fas fa-sort mr-1"></i>By Name
+            </button>
+            <button type="button" onclick="selectSearchResult()" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
+                <i class="fas fa-check mr-1"></i>Select
+            </button>
+            <button type="button" onclick="closeSearchModal()" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
+                <i class="fas fa-times mr-1"></i>Exit
+            </button>
         </div>
     </div>
 </div>
