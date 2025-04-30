@@ -110,6 +110,7 @@ Route::middleware('auth')->group(function () {
 
     // Scoring Tool Routes
     Route::get('/scoring-tool', [ScoringToolController::class, 'index'])->name('scoring-tool.index');
+    Route::get('/scoring-tool/json', [ScoringToolController::class, 'index'])->name('scoring-tool.json');
     Route::post('/scoring-tool', [ScoringToolController::class, 'store'])->name('scoring-tool.store');
     Route::get('/scoring-tool/{id}/edit', [ScoringToolController::class, 'edit'])->name('scoring-tool.edit');
     Route::put('/scoring-tool/{id}', [ScoringToolController::class, 'update'])->name('scoring-tool.update');
@@ -300,4 +301,8 @@ Route::post('/run-paper-quality-seeder', function () {
 // Add a route to run the product design seeder
 Route::post('/run-product-design-seeder', [ProductDesignController::class, 'loadSeedData'])
     ->name('run.product-design.seeder');
+
+// Scoring Tool Routes
+Route::get('/run-scoringtool-seeder', [App\Http\Controllers\ScoringToolController::class, 'getSeederData'])->name('run.scoringtool.seeder');
+Route::post('/update-scoringtool-seeder', [App\Http\Controllers\ScoringToolController::class, 'updateSeederData'])->name('update.scoringtool.seeder');
 

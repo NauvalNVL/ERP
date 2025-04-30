@@ -1,77 +1,103 @@
 // ScoringTool.js - Functions for scoring tool management
 
-// Define seed data for scoring tools
-const seedScoringTools = [
-    { code: '0', name: 'N/A', scores: 0.0, gap: 0.0 },
-    { code: '1', name: 'MALE MALE', scores: 0.0, gap: 0.0 },
-    { code: '2', name: 'MALE FEMALE 10MM', scores: 0.0, gap: 0.0 },
-    { code: '3', name: 'MALE FLAT', scores: 0.0, gap: 0.0 },
-    { code: '4', name: 'MALE FEMALE 8MM', scores: 0.0, gap: 0.0 }
-];
-
-// Function to populate scoring tool table with seed data
+// Function to populate scoring tool table with data from database
 function populateScoringToolTable() {
     console.log('Populating scoring tool table');
     
-    // Check if table already has data
+    // Remove "no data" message if present
     const tbody = document.querySelector('#scoringToolDataTable tbody');
-    const rows = tbody.querySelectorAll('tr');
-    const isEmpty = rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'));
+    tbody.innerHTML = '';
     
-    if (isEmpty) {
-        console.log('Table is empty, populating with seed data');
-        
-        // Remove "no data" message if present
-        tbody.innerHTML = '';
-        
-        // Fill table with data from seedScoringTools
-        seedScoringTools.forEach(tool => {
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-blue-50 cursor-pointer';
-            row.setAttribute('data-tool-code', tool.code);
-            row.setAttribute('data-tool-name', tool.name);
-            row.setAttribute('data-tool-scores', tool.scores);
-            row.setAttribute('data-tool-gap', tool.gap);
-            row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
-            row.ondblclick = function() { openEditScoringToolModal(this); };
+    // Show loading message
+    tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Loading data...</td></tr>';
+    
+    // Fetch data from the database
+    fetch('/scoring-tool', {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Clear loading message
+            tbody.innerHTML = '';
             
-            // Create columns for each cell
-            const codeCell = document.createElement('td');
-            codeCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
-            codeCell.textContent = tool.code;
+            if (!Array.isArray(data) || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Tidak ada data scoring tool yang tersedia.</td></tr>';
+                return;
+            }
+
+            // Fill table with data from database
+            data.forEach(tool => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-blue-50 cursor-pointer';
+                row.setAttribute('data-tool-code', tool.code);
+                row.setAttribute('data-tool-name', tool.name);
+                row.setAttribute('data-tool-scores', tool.scores);
+                row.setAttribute('data-tool-gap', tool.gap);
+                row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
+                row.ondblclick = function() { openEditScoringToolModal(this); };
+                
+                // Create columns for each cell
+                const codeCell = document.createElement('td');
+                codeCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
+                codeCell.textContent = tool.code;
+                
+                const nameCell = document.createElement('td');
+                nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                nameCell.textContent = tool.name;
+                
+                const scoresCell = document.createElement('td');
+                scoresCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700 text-right';
+                scoresCell.textContent = parseFloat(tool.scores).toFixed(1);
+                
+                const gapCell = document.createElement('td');
+                gapCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700 text-right';
+                gapCell.textContent = parseFloat(tool.gap).toFixed(1);
+                
+                // Add all cells to row
+                row.appendChild(codeCell);
+                row.appendChild(nameCell);
+                row.appendChild(scoresCell);
+                row.appendChild(gapCell);
+                
+                // Add row to table
+                tbody.appendChild(row);
+            });
             
-            const nameCell = document.createElement('td');
-            nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
-            nameCell.textContent = tool.name;
+            console.log('Table populated with database data:', data);
             
-            const scoresCell = document.createElement('td');
-            scoresCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700 text-right';
-            scoresCell.textContent = tool.scores.toFixed(1);
+            // Setup event handlers for the table rows
+            setupTableRowEvents();
             
-            const gapCell = document.createElement('td');
-            gapCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700 text-right';
-            gapCell.textContent = tool.gap.toFixed(1);
+            // Sort table by Code by default
+            sortTableDirectly(0);
             
-            // Add all cells to row
-            row.appendChild(codeCell);
-            row.appendChild(nameCell);
-            row.appendChild(scoresCell);
-            row.appendChild(gapCell);
-            
-            // Add row to table
-            tbody.appendChild(row);
+            // Update the data status message
+            const dbStatusElement = document.querySelector('.bg-yellow-100, .bg-green-100');
+            if (dbStatusElement) {
+                dbStatusElement.className = 'mt-4 bg-green-100 p-3 rounded';
+                dbStatusElement.innerHTML = `
+                    <p class="text-sm font-medium text-green-800">Data tersedia: ${data.length} scoring tool ditemukan.</p>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching database data:', error);
+            tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-4 text-center text-red-500">
+                Error loading data from database. ${error.message}
+                <br>
+                <button onclick="populateScoringToolTable()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    <i class="fas fa-sync-alt mr-2"></i>Coba Lagi
+                </button>
+            </td></tr>`;
         });
-        
-        console.log('Table populated with seed data');
-        
-        // Setup event handlers for the table rows
-        setupTableRowEvents();
-        
-        // Sort table by Code by default
-        sortTableDirectly(0);
-    } else {
-        console.log('Table already has data, no need to populate');
-    }
 }
 
 // Function to sort table
@@ -164,6 +190,10 @@ function selectRow(row) {
     
     // Add highlighting to selected row
     row.classList.add('bg-blue-600', 'text-white');
+
+    // Update the main code input field with the selected row's code
+    const code = row.getAttribute('data-tool-code');
+    document.getElementById('code').value = code;
 }
 
 // Function to open edit modal
@@ -278,105 +308,68 @@ function saveScoringToolChanges() {
     // Show loading overlay
     document.getElementById('loadingOverlay').classList.remove('hidden');
     
-    // Update row in table immediately to provide visual feedback
-    const row = document.querySelector(`#scoringToolDataTable tbody tr[data-tool-code="${code}"]`);
-    if (row) {
-        console.log('Found row to update:', row);
-        
-        try {
-            // Direct DOM manipulation for cell updates
-            const cells = row.cells;
+    // Send update to server
+    fetch('/scoring-tool/' + code, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            code: code,
+            name: name,
+            scores: scores,
+            gap: gap,
+            specification: '',
+            description: name,
+            is_active: true
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Scoring tool updated successfully:', data);
             
-            if (cells.length >= 4) {
-                // Update cell text directly
-                cells[1].textContent = name;
-                cells[2].textContent = scores.toFixed(1);
-                cells[3].textContent = gap.toFixed(1);
-                
-                // Update data attributes
-                row.setAttribute('data-tool-code', code);
-                row.setAttribute('data-tool-name', name);
-                row.setAttribute('data-tool-scores', scores);
-                row.setAttribute('data-tool-gap', gap);
-                
-                // Highlight row with Tailwind classes to ensure visibility
-                row.classList.add('bg-blue-600', 'text-white');
-                
-                // Also update seedScoringTools array to keep data in sync
-                updateSeedScoringToolData(code, name, scores, gap);
-            } else {
-                console.error('Row does not have enough cells:', cells.length);
+            // Update row in table
+            const row = document.querySelector(`#scoringToolDataTable tbody tr[data-tool-code="${code}"]`);
+            if (row) {
+                const cells = row.cells;
+                if (cells.length >= 4) {
+                    cells[1].textContent = name;
+                    cells[2].textContent = scores.toFixed(1);
+                    cells[3].textContent = gap.toFixed(1);
+                    
+                    row.setAttribute('data-tool-name', name);
+                    row.setAttribute('data-tool-scores', scores);
+                    row.setAttribute('data-tool-gap', gap);
+                }
             }
-        } catch (error) {
-            console.error('Error updating row cells:', error);
+            
+            // Update the main code input field
+            document.getElementById('code').value = code;
+            
+            // Close the edit modal
+            closeEditScoringToolModal();
+            
+            // Refresh the table data
+            populateScoringToolTable();
+            
+            alert('Data scoring tool berhasil diperbarui');
+        } else {
+            console.error('Error updating scoring tool:', data.message);
+            alert('Error updating scoring tool: ' + data.message);
         }
-        
-        console.log('Row updated successfully in the table');
-    } else {
-        console.log('Row not found, creating new row');
-        
-        // Create a new row if it doesn't exist
-        const tbody = document.querySelector('#scoringToolDataTable tbody');
-        
-        // Create a new row
-        const newRow = document.createElement('tr');
-        newRow.className = 'hover:bg-blue-50 cursor-pointer';
-        newRow.setAttribute('data-tool-code', code);
-        newRow.setAttribute('data-tool-name', name);
-        newRow.setAttribute('data-tool-scores', scores);
-        newRow.setAttribute('data-tool-gap', gap);
-        newRow.onclick = function(e) { selectRow(this); e.stopPropagation(); };
-        newRow.ondblclick = function() { openEditScoringToolModal(this); };
-        
-        // Create cells
-        const codeCell = document.createElement('td');
-        codeCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
-        codeCell.textContent = code;
-        
-        const nameCell = document.createElement('td');
-        nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
-        nameCell.textContent = name;
-        
-        const scoresCell = document.createElement('td');
-        scoresCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700 text-right';
-        scoresCell.textContent = scores.toFixed(1);
-        
-        const gapCell = document.createElement('td');
-        gapCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700 text-right';
-        gapCell.textContent = gap.toFixed(1);
-        
-        // Add cells to row
-        newRow.appendChild(codeCell);
-        newRow.appendChild(nameCell);
-        newRow.appendChild(scoresCell);
-        newRow.appendChild(gapCell);
-        
-        // Add row to table
-        tbody.appendChild(newRow);
-        
-        // Select the new row
-        selectRow(newRow);
-        
-        // Add to seedScoringTools
-        updateSeedScoringToolData(code, name, scores, gap);
-    }
-    
-    // Update main form inputs
-    document.getElementById('code').value = code;
-    document.getElementById('name').value = name;
-    document.getElementById('scores').value = scores.toFixed(1);
-    document.getElementById('gap').value = gap.toFixed(1);
-    
-    // Show success message and close modal
-    setTimeout(() => {
-        alert('Data scoring tool berhasil diperbarui');
-        closeEditScoringToolModal();
-        
+    })
+    .catch(error => {
+        console.error('Error updating scoring tool:', error);
+        alert('Error updating scoring tool. Please try again.');
+    })
+    .finally(() => {
         // Reset button state and hide loading overlay
         saveButton.innerHTML = originalText;
         saveButton.disabled = false;
         document.getElementById('loadingOverlay').classList.add('hidden');
-    }, 500);
+    });
 }
 
 // Function to update data in seedScoringTools array
@@ -408,7 +401,7 @@ function updateSeedScoringToolData(code, name, scores, gap) {
     }
 }
 
-// Function to make seed data available without database
+// Function to load seed data
 function loadSeedData() {
     // Check if data is already loaded
     const tbody = document.querySelector('#scoringToolDataTable tbody');
@@ -423,32 +416,70 @@ function loadSeedData() {
     // Empty the table
     tbody.innerHTML = '';
     
-    // Simulate loading
-    setTimeout(() => {
-        // Fill table with data from seedScoringTools
-        populateScoringToolTable();
-        
-        // Show notification
-        alert('Data scoring tool berhasil dimuat dari ScoringToolSeeder');
-        
-        // Hide loading overlay
-        if (loadingOverlay) {
-            loadingOverlay.classList.add('hidden');
-        }
-        
-        // Update notification on main page
-        const dbStatusElement = document.querySelector('.bg-yellow-100');
-        if (dbStatusElement) {
-            dbStatusElement.classList.remove('bg-yellow-100');
-            dbStatusElement.classList.add('bg-green-100');
-            dbStatusElement.innerHTML = `
-                <p class="text-sm font-medium text-green-800">Data tersedia: ${seedScoringTools.length} scoring tool ditemukan (dari JavaScript).</p>
-            `;
-        }
-        
-        // Open modal to display data
-        openScoringToolModal();
-    }, 1000);
+    // Fetch data from the database
+    fetch('/scoring-tool')
+        .then(response => response.json())
+        .then(data => {
+            // Fill table with data from database
+            data.forEach(tool => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-blue-50 cursor-pointer';
+                row.setAttribute('data-tool-code', tool.code);
+                row.setAttribute('data-tool-name', tool.name);
+                row.setAttribute('data-tool-scores', tool.scores);
+                row.setAttribute('data-tool-gap', tool.gap);
+                row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
+                row.ondblclick = function() { openEditScoringToolModal(this); };
+                
+                // Create cells
+                const codeCell = document.createElement('td');
+                codeCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
+                codeCell.textContent = tool.code;
+                
+                const nameCell = document.createElement('td');
+                nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                nameCell.textContent = tool.name;
+                
+                const scoresCell = document.createElement('td');
+                scoresCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700 text-right';
+                scoresCell.textContent = tool.scores.toFixed(1);
+                
+                const gapCell = document.createElement('td');
+                gapCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700 text-right';
+                gapCell.textContent = tool.gap.toFixed(1);
+                
+                // Add cells to row
+                row.appendChild(codeCell);
+                row.appendChild(nameCell);
+                row.appendChild(scoresCell);
+                row.appendChild(gapCell);
+                
+                // Add row to table
+                tbody.appendChild(row);
+            });
+            
+            // Show notification
+            alert('Data scoring tool berhasil dimuat dari database');
+            
+            // Hide loading overlay
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+            }
+            
+            // Open modal to display data
+            openScoringToolModal();
+        })
+        .catch(error => {
+            console.error('Error loading data:', error);
+            tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Error loading data from database.</td></tr>';
+            
+            // Hide loading overlay
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+            }
+            
+            alert('Error loading data from database. Please try again.');
+        });
 }
 
 // Initialize event handlers when document loads

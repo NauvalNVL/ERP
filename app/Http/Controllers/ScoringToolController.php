@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Database\Seeders\ScoringToolSeeder;
 
 class ScoringToolController extends Controller
 {
@@ -15,19 +16,36 @@ class ScoringToolController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ScoringTool::query();
-        
-        if ($request->has('search')) {
-            $search = $request->input('search');
-            $query->where(function($q) use ($search) {
-                $q->where('code', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%");
-            });
+        try {
+            // Always load from database, ordered by code
+            $scoringTools = ScoringTool::orderBy('code')->get();
+            
+            // If there are no tools in the database, seed them
+            if ($scoringTools->isEmpty()) {
+                $seeder = new ScoringToolSeeder();
+                $seeder->run();
+                $scoringTools = ScoringTool::orderBy('code')->get();
+            }
+            
+            // If the request wants JSON, return JSON response
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json($scoringTools);
+            }
+            
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.scoringtool', compact('scoringTools'));
+        } catch (\Exception $e) {
+            Log::error('Error loading scoring tools: ' . $e->getMessage());
+            
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Error loading data from database: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            // Return view with error message using session flash
+            return redirect()->back()->with('error', 'Error loading data from database: ' . $e->getMessage());
         }
-        
-        $scoringTools = $query->orderBy('code')->paginate(10);
-        
-        return view('sales-management.system-requirement.system-requirement.standard-requirement.scoringtool', compact('scoringTools'));
     }
 
     /**
@@ -71,26 +89,93 @@ class ScoringToolController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $scoringTool = ScoringTool::findOrFail($id);
-        
-        $validator = Validator::make($request->all(), [
-            'code' => 'required|string|max:10|unique:scoring_tools,code,' . $id,
-            'name' => 'required|string|max:100',
-            'specification' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
-        ]);
+        try {
+            $scoringTool = ScoringTool::findOrFail($id);
+            
+            $validator = Validator::make($request->all(), [
+                'code' => 'required|string|max:10|unique:scoring_tools,code,' . $id,
+                'name' => 'required|string|max:100',
+                'scores' => 'required|numeric',
+                'gap' => 'required|numeric',
+                'specification' => 'nullable|string|max:255',
+                'description' => 'nullable|string',
+                'is_active' => 'boolean',
+            ]);
 
-        if ($validator->fails()) {
-            return redirect()->route('scoring-tool.edit', $id)
-                ->withErrors($validator)
-                ->withInput();
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            // Update the scoring tool
+            $scoringTool->update($request->all());
+
+            // Update the seeder file
+            $this->updateSeederFile($scoringTool);
+
+            // Get the updated data
+            $updatedTool = ScoringTool::find($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Scoring Tool berhasil diperbarui.',
+                'data' => $updatedTool
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating scoring tool: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating scoring tool: ' . $e->getMessage()
+            ], 500);
         }
+    }
 
-        $scoringTool->update($request->all());
+    /**
+     * Update the seeder file with new data.
+     */
+    protected function updateSeederFile($scoringTool)
+    {
+        try {
+            $seederPath = database_path('seeders/ScoringToolSeeder.php');
+            $seederContent = file_get_contents($seederPath);
 
-        return redirect()->route('scoring-tool.index')
-            ->with('success', 'Scoring Tool berhasil diperbarui.');
+            // Create the new tool data string
+            $newToolData = "            [
+                'code' => '{$scoringTool->code}',
+                'name' => '{$scoringTool->name}',
+                'scores' => {$scoringTool->scores},
+                'gap' => {$scoringTool->gap},
+                'specification' => '{$scoringTool->specification}',
+                'description' => '{$scoringTool->description}',
+                'is_active' => " . ($scoringTool->is_active ? 'true' : 'false') . ",
+            ],";
+
+            // Find the existing tool data in the seeder file
+            $pattern = "/\[\s*'code'\s*=>\s*'{$scoringTool->code}'.*?\]/s";
+            
+            if (preg_match($pattern, $seederContent)) {
+                // Replace existing tool data
+                $newContent = preg_replace($pattern, $newToolData, $seederContent);
+            } else {
+                // Add new tool data before the closing bracket of the array
+                $newContent = str_replace(
+                    "    protected \$scoringTools = [\n",
+                    "    protected \$scoringTools = [\n" . $newToolData . "\n",
+                    $seederContent
+                );
+            }
+
+            // Write the updated content back to the file
+            file_put_contents($seederPath, $newContent);
+
+            Log::info('Seeder file updated successfully for scoring tool: ' . $scoringTool->code);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Error updating seeder file: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -124,5 +209,82 @@ class ScoringToolController extends Controller
         // Ambil semua data scoring tool, urutkan berdasarkan code
         $scoringTools = ScoringTool::orderBy('code')->get(); 
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintscoringtool', compact('scoringTools')); 
+    }
+
+    /**
+     * Get seeder data for scoring tools.
+     */
+    public function getSeederData()
+    {
+        // Get the seeder instance
+        $seeder = new ScoringToolSeeder();
+        
+        // Get the data from the seeder
+        $scoringTools = $seeder->getSeederData();
+        
+        return response()->json($scoringTools);
+    }
+
+    /**
+     * Update seeder data for scoring tools.
+     */
+    public function updateSeederData(Request $request)
+    {
+        try {
+            $data = $request->all();
+            
+            // Update the seeder file
+            $seederPath = database_path('seeders/ScoringToolSeeder.php');
+            $seederContent = file_get_contents($seederPath);
+            
+            // Find the scoring tools array in the seeder file
+            $pattern = '/\$scoringTools\s*=\s*\[(.*?)\];/s';
+            
+            // Create new scoring tools array content
+            $newToolsArray = "[\n";
+            foreach ($data as $tool) {
+                $newToolsArray .= "            [\n";
+                $newToolsArray .= "                'code' => '{$tool['code']}',\n";
+                $newToolsArray .= "                'name' => '{$tool['name']}',\n";
+                $newToolsArray .= "                'scores' => {$tool['scores']},\n";
+                $newToolsArray .= "                'gap' => {$tool['gap']},\n";
+                $newToolsArray .= "                'specification' => '',\n";
+                $newToolsArray .= "                'description' => '{$tool['name']}',\n";
+                $newToolsArray .= "                'is_active' => true,\n";
+                $newToolsArray .= "            ],\n";
+            }
+            $newToolsArray .= "        ]";
+            
+            // Replace the old array with the new one
+            $newContent = preg_replace($pattern, '$scoringTools = ' . $newToolsArray . ';', $seederContent);
+            
+            // Write the updated content back to the file
+            file_put_contents($seederPath, $newContent);
+
+            // Also update the database
+            foreach ($data as $tool) {
+                ScoringTool::updateOrCreate(
+                    ['code' => $tool['code']],
+                    [
+                        'name' => $tool['name'],
+                        'scores' => $tool['scores'],
+                        'gap' => $tool['gap'],
+                        'specification' => '',
+                        'description' => $tool['name'],
+                        'is_active' => true
+                    ]
+                );
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Seeder data updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating seeder data: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

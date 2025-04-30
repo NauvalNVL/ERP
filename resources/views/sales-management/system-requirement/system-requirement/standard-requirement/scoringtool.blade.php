@@ -3,7 +3,24 @@
 @section('title', 'Define Scoring Tool')
 
 @section('content')
+<!-- Add CSRF Token -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <script src="{{ asset('js/scoringtool.js') }}"></script>
+
+<!-- Error Messages -->
+@if(session('error'))
+<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+    <strong class="font-bold">Error!</strong>
+    <span class="block sm:inline">{{ session('error') }}</span>
+</div>
+@endif
+
+@if(session('success'))
+<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+    <strong class="font-bold">Success!</strong>
+    <span class="block sm:inline">{{ session('success') }}</span>
+</div>
+@endif
 
 <!-- Header Section -->
 <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
@@ -11,7 +28,7 @@
         <i class="fas fa-tools mr-3"></i> Define Scoring Tool
     </h2>
     <p class="text-cyan-100">Definisikan scoring tool untuk proses produksi</p>
-    </div>
+</div>
 
 <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
     <!-- Main Content -->
@@ -24,7 +41,7 @@
                         <i class="fas fa-edit text-white"></i>
                     </div>
                     <h3 class="text-xl font-semibold text-gray-800">Scoring Tool Management</h3>
-    </div>
+                </div>
                 
                 <!-- Header with navigation buttons -->
                 <div class="flex items-center space-x-2 mb-6">
@@ -36,13 +53,13 @@
                     </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                         <i class="fas fa-arrow-left"></i>
-                </button>
+                    </button>
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                         <i class="fas fa-search"></i>
-                </button>
+                    </button>
                     <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                    <i class="fas fa-save"></i>
-                </button>
+                        <i class="fas fa-save"></i>
+                    </button>
                 </div>
 
                 <!-- Search Section -->
@@ -56,78 +73,15 @@
                             <input type="text" id="code" name="code" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                             <button type="button" id="showScoringToolTableBtn" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                 <i class="fas fa-table"></i>
-                </button>
-            </div>
-        </div>
+                            </button>
+                        </div>
+                    </div>
 
                     <div class="col-span-1">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
                         <button type="button" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
                             <i class="fas fa-list-ul mr-2"></i> Select Record
                         </button>
-                    </div>
-                </div>
-
-                <!-- Form Fields -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name:</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                <i class="fas fa-font"></i>
-                            </span>
-                            <input type="text" id="name" name="name" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="scores" class="block text-sm font-medium text-gray-700 mb-1">Scores:</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                <i class="fas fa-star"></i>
-                            </span>
-                            <input type="number" step="0.1" id="scores" name="scores" value="0.0" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="gap" class="block text-sm font-medium text-gray-700 mb-1">Gap:</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                <i class="fas fa-ruler-horizontal"></i>
-                            </span>
-                            <input type="number" step="0.1" id="gap" name="gap" value="0.0" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="is_active" class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                <i class="fas fa-toggle-on"></i>
-                            </span>
-                            <select id="is_active" name="is_active" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                                <option value="1">Aktif</option>
-                                <option value="0">Tidak Aktif</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 gap-5 mb-6">
-                    <div>
-                        <label for="specification" class="block text-sm font-medium text-gray-700 mb-1">Specification:</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                <i class="fas fa-clipboard-list"></i>
-                            </span>
-                            <input type="text" id="specification" name="specification" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
-                        <textarea id="description" name="description" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"></textarea>
                     </div>
                 </div>
 
@@ -193,7 +147,7 @@
                         </div>
                     </div>
                 </div>
-                </div>
+            </div>
 
             <!-- Quick Links -->
             <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
@@ -238,7 +192,7 @@
             </div>
         </div>
     </div>
-                </div>
+</div>
 
 <!-- Scoring Tool Table Window -->
 <div id="scoringToolTableWindow" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
@@ -292,12 +246,12 @@
                                     <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $tool->name }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-gray-700 text-right">{{ number_format($tool->scores, 1) }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-gray-700 text-right">{{ number_format($tool->gap, 1) }}</td>
-                        </tr>
+                                </tr>
                             @endforeach
                         @else
-                        <tr>
+                            <tr>
                                 <td colspan="4" class="px-4 py-4 text-center text-gray-500">Tidak ada data scoring tool yang tersedia.</td>
-                        </tr>
+                            </tr>
                         @endif
                     </tbody>
                 </table>
@@ -333,7 +287,7 @@
             <div class="flex items-center">
                 <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                     <i class="fas fa-tools"></i>
-        </div>
+                </div>
                 <h3 class="text-xl font-semibold">Define Scoring Tool</h3>
             </div>
             <button type="button" onclick="closeEditScoringToolModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
@@ -351,8 +305,8 @@
                             <i class="fas fa-hashtag"></i>
                         </span>
                         <input id="edit_tool_code" type="text" class="pl-10 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" readonly>
-    </div>
-</div>
+                    </div>
+                </div>
 
                 <div>
                     <label for="edit_tool_name" class="block text-sm font-medium text-gray-700 mb-1">Tool Name:</label>
@@ -361,9 +315,9 @@
                             <i class="fas fa-font"></i>
                         </span>
                         <input id="edit_tool_name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
-            </div>
-        </div>
-        
+                    </div>
+                </div>
+                
                 <div>
                     <label for="edit_tool_scores" class="block text-sm font-medium text-gray-700 mb-1">Scores:</label>
                     <div class="relative">
@@ -372,8 +326,8 @@
                         </span>
                         <input id="edit_tool_scores" type="number" step="0.1" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
                     </div>
-            </div>
-            
+                </div>
+                
                 <div>
                     <label for="edit_tool_gap" class="block text-sm font-medium text-gray-700 mb-1">Gap:</label>
                     <div class="relative">
@@ -382,8 +336,8 @@
                         </span>
                         <input id="edit_tool_gap" type="number" step="0.1" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
                     </div>
-            </div>
-            
+                </div>
+                
                 <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
                     <button type="button" onclick="closeEditScoringToolModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
                         <i class="fas fa-times mr-2"></i>Cancel
@@ -391,7 +345,7 @@
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
                         <i class="fas fa-save mr-2"></i>Save
                     </button>
-            </div>
+                </div>
             </form>
         </div>
     </div>
