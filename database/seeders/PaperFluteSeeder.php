@@ -240,8 +240,11 @@ class PaperFluteSeeder extends Seeder
             ],
         ];
 
-        foreach ($flutes as $flute) {
-            PaperFlute::create($flute);
+        foreach ($flutes as $fluteData) {
+            PaperFlute::updateOrCreate(
+                ['code' => $fluteData['code']],
+                $fluteData
+            );
         }
     }
 }

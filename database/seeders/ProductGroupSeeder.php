@@ -42,8 +42,11 @@ class ProductGroupSeeder extends Seeder
             ],
         ];
 
-        foreach ($productGroups as $group) {
-            ProductGroup::create($group);
+        foreach ($productGroups as $groupData) {
+            ProductGroup::updateOrCreate(
+                ['product_group_id' => $groupData['product_group_id']],
+                $groupData
+            );
         }
     }
 }

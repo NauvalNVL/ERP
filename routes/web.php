@@ -123,11 +123,11 @@ Route::middleware('auth')->group(function () {
     });
 
     // Paper Management
-    Route::resource('paper-size', PaperSizeController::class);
     Route::get('/paper-size/view-print', [PaperSizeController::class, 'viewAndPrint'])->name('paper-size.view-print');
+    Route::resource('paper-size', PaperSizeController::class);
 
-    Route::resource('paper-flute', PaperFluteController::class);
     Route::get('/paper-flute/view-print', [PaperFluteController::class, 'viewAndPrint'])->name('paper-flute.view-print');
+    Route::resource('paper-flute', PaperFluteController::class);
 
     // Paper Quality
     Route::prefix('paper-quality')->group(function () {
@@ -150,16 +150,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}/edit', [ScoringToolController::class, 'edit'])->name('scoring-tool.edit');
         Route::put('/{id}', [ScoringToolController::class, 'update'])->name('scoring-tool.update');
         Route::delete('/{id}', [ScoringToolController::class, 'destroy'])->name('scoring-tool.destroy');
-        Route::get('/{id}', [ScoringToolController::class, 'show'])->name('scoring-tool.show');
         Route::get('/view-print', [ScoringToolController::class, 'viewAndPrint'])->name('scoring-tool.view-print');
+        Route::get('/{id}', [ScoringToolController::class, 'show'])->name('scoring-tool.show');
     });
 
     // Color Management
     Route::resource('color', ColorController::class);
     Route::get('/color/view-print', [ColorController::class, 'viewAndPrint'])->name('color.view-print');
 
-    Route::resource('color-group', ColorGroupController::class);
+    // Definisikan route spesifik sebelum resource
     Route::get('/color-group/view-print', [ColorGroupController::class, 'viewAndPrint'])->name('color-group.view-print');
+    Route::resource('color-group', ColorGroupController::class);
 
     // Finishing
     Route::prefix('finishing')->group(function () {

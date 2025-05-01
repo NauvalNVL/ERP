@@ -113,6 +113,17 @@ class ColorGroupController extends Controller
         }
     }
 
+    /**
+     * Display the specified resource.
+     *
+     * @param  \\App\\Models\\ColorGroup  $colorGroup
+     * @return \\Illuminate\\Http\\RedirectResponse
+     */
+    public function show(ColorGroup $colorGroup)
+    {
+        return Redirect::route('color-group.index');
+    }
+
     public function vueIndex()
     {
         try {

@@ -20,24 +20,24 @@ class ScoringToolSeeder extends Seeder
             'description' => 'N/A',
             'is_active' => true,
         ],
-                                                                                [
-                'code' => '2',
-                'name' => 'MALE MALE',
-                'scores' => 0,
-                'gap' => -0.6,
-                'specification' => '',
-                'description' => 'MALE MALE',
-                'is_active' => true,
-            ],,,,,,,
-                                [
-                'code' => '3',
-                'name' => 'MALE FEMALE 10MM',
-                'scores' => 0,
-                'gap' => 0,
-                'specification' => '',
-                'description' => 'MALE FEMALE 10MM',
-                'is_active' => true,
-            ],,,
+        [
+            'code' => '2',
+            'name' => 'MALE MALE',
+            'scores' => 0,
+            'gap' => -0.6,
+            'specification' => '',
+            'description' => 'MALE MALE',
+            'is_active' => true,
+        ],
+        [
+            'code' => '3',
+            'name' => 'MALE FEMALE 10MM',
+            'scores' => 0,
+            'gap' => 0,
+            'specification' => '',
+            'description' => 'MALE FEMALE 10MM',
+            'is_active' => true,
+        ],
         [
             'code' => '4',
             'name' => 'MALE FEMALE 9MM',
@@ -55,7 +55,10 @@ class ScoringToolSeeder extends Seeder
     public function run(): void
     {
         foreach ($this->scoringTools as $tool) {
-            ScoringTool::create($tool);
+            ScoringTool::updateOrCreate(
+                ['code' => $tool['code']],
+                $tool
+            );
         }
     }
 
