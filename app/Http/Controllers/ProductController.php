@@ -86,6 +86,18 @@ class ProductController extends Controller
         return redirect()->route('product.index')->with('success', 'Produk berhasil dihapus');
     }
 
+    /**
+     * Display the specified resource.
+     *
+     * @param  string  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show($id)
+    {
+        $product = Product::where('product_code', $id)->firstOrFail();
+        return response()->json($product);
+    }
+
     private function getCategories()
     {
         return [

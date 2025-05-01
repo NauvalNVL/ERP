@@ -100,8 +100,16 @@ Route::middleware('auth')->group(function () {
     });
 
     // Product Routes
-    Route::resource('product', ProductController::class);
-    Route::get('/product/view-print', [ProductController::class, 'viewAndPrint'])->name('product.view-print');
+    Route::prefix('product')->group(function () {
+        Route::get('/', [ProductController::class, 'index'])->name('product.index');
+        Route::get('/create', [ProductController::class, 'create'])->name('product.create');
+        Route::post('/', [ProductController::class, 'store'])->name('product.store');
+        Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
+        Route::put('/{id}', [ProductController::class, 'update'])->name('product.update');
+        Route::delete('/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
+        Route::get('/view-print', [ProductController::class, 'viewAndPrint'])->name('product.view-print');
+        Route::get('/{id}', [ProductController::class, 'show'])->name('product.show');
+    });
 
     // Product Design
     Route::prefix('product-design')->group(function () {
