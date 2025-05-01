@@ -1,114 +1,123 @@
 // Color.js - Functions for color management
 
-// Define seed data for colors
-const seedColors = [
-    { color_id: 'C001', color_name: 'Black Standard', origin: '1', color_group_id: '01', cg_type: 'X-Flexo' },
-    { color_id: 'C002', color_name: 'White Premium', origin: '2', color_group_id: '02', cg_type: 'X-Flexo' },
-    { color_id: 'C003', color_name: 'Red Bright', origin: '1', color_group_id: '03', cg_type: 'X-Flexo' },
-    { color_id: 'C004', color_name: 'Blue Ocean', origin: '3', color_group_id: '04', cg_type: 'X-Flexo' },
-    { color_id: 'C005', color_name: 'Green Forest', origin: '2', color_group_id: '05', cg_type: 'X-Flexo' },
-    { color_id: 'C006', color_name: 'Cyan Sky', origin: '1', color_group_id: '06', cg_type: 'X-Flexo' },
-    { color_id: 'C007', color_name: 'Magenta Deep', origin: '3', color_group_id: '07', cg_type: 'X-Flexo' },
-    { color_id: 'C008', color_name: 'Pink Soft', origin: '2', color_group_id: '08', cg_type: 'X-Flexo' },
-    { color_id: 'C009', color_name: 'Black Matte', origin: '1', color_group_id: '01', cg_type: 'X-Flexo' },
-    { color_id: 'C010', color_name: 'White Matte', origin: '2', color_group_id: '02', cg_type: 'X-Flexo' }
-];
-
-// Define seed data for color groups (based on ColorGroupSeeder)
-const seedColorGroups = [
-    { cg: '01', cg_name: 'BLACK', cg_type: 'X-Flex' },
-    { cg: '02', cg_name: 'WHITE', cg_type: 'X-Flex' },
-    { cg: '03', cg_name: 'RED', cg_type: 'X-Flex' },
-    { cg: '04', cg_name: 'BLUE', cg_type: 'X-Flex' },
-    { cg: '05', cg_name: 'GREEN', cg_type: 'X-Flex' },
-    { cg: '06', cg_name: 'YELLOW', cg_type: 'X-Flex' },
-    { cg: '07', cg_name: 'MAGENTA', cg_type: 'X-Flex' },
-    { cg: '08', cg_name: 'CYAN', cg_type: 'X-Flex' },
-    { cg: '09', cg_name: 'ORANGE', cg_type: 'C-Coating' },
-    { cg: '10', cg_name: 'BROWN', cg_type: 'S-Offset' },
-    { cg: '11', cg_name: 'GRAY', cg_type: 'S-Offset' },
-    { cg: '12', cg_name: 'PURPLE', cg_type: 'C-Coating' },
-    { cg: '13', cg_name: 'VIOLET', cg_type: 'S-Offset' },
-    { cg: '14', cg_name: 'CREAM', cg_type: 'S-Offset' },
-    { cg: '15', cg_name: 'PANTONE', cg_type: 'S-Offset' }
-];
-
+// Function to populate color table
 function populateColorTable() {
     console.log('Populating color table');
     
-    // Check if table already has data
+    // Get the table body
     const tbody = document.querySelector('#colorDataTable tbody');
-    const rows = tbody.querySelectorAll('tr');
-    const isEmpty = rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'));
-    
-    if (isEmpty) {
-        console.log('Table is empty, populating with seed data');
-        
-        // Remove "no data" message if present
-        tbody.innerHTML = '';
-        
-        // Fill table with data from seedColors
-        seedColors.forEach(color => {
-            const row = document.createElement('tr');
-            row.className = 'cursor-pointer';
-            row.setAttribute('data-color-id', color.color_id);
-            row.setAttribute('data-color-name', color.color_name);
-            row.setAttribute('data-origin', color.origin);
-            row.setAttribute('data-cg-id', color.color_group_id);
-            row.setAttribute('data-cg-type', color.cg_type);
-            row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
-            row.ondblclick = function() { openEditColorModal(this); };
-            
-            // Create columns for each cell
-            const idCell = document.createElement('td');
-            idCell.className = 'px-2 py-0.5 border-b border-r border-gray-300';
-            idCell.textContent = color.color_id;
-            
-            const nameCell = document.createElement('td');
-            nameCell.className = 'px-2 py-0.5 border-b border-r border-gray-300';
-            nameCell.textContent = color.color_name;
-            
-            const originCell = document.createElement('td');
-            originCell.className = 'px-2 py-0.5 border-b border-r border-gray-300';
-            originCell.textContent = color.origin;
-            
-            const cgIdCell = document.createElement('td');
-            cgIdCell.className = 'px-2 py-0.5 border-b border-r border-gray-300';
-            cgIdCell.textContent = color.color_group_id;
-            
-            const cgNameCell = document.createElement('td');
-            cgNameCell.className = 'px-2 py-0.5 border-b border-r border-gray-300';
-            cgNameCell.textContent = getCGName(color.color_group_id);
-            
-            const cgTypeCell = document.createElement('td');
-            cgTypeCell.className = 'px-2 py-0.5 border-b border-gray-300';
-            cgTypeCell.textContent = color.cg_type;
-            
-            // Add all cells to row
-            row.appendChild(idCell);
-            row.appendChild(nameCell);
-            row.appendChild(originCell);
-            row.appendChild(cgIdCell);
-            row.appendChild(cgNameCell);
-            row.appendChild(cgTypeCell);
-            
-            // Add row to table
-            tbody.appendChild(row);
-        });
-        
-        console.log('Table populated with seed data');
-        
-        // Setup event handlers for the table rows
-        setupTableRowEvents();
-        
-        // Apply blue highlighting to rows
-        highlightBlueRows();
-        
-        // Sort table by Color#
-        sortTableDirectly(0);
-    } else {
-        console.log('Table already has data, no need to populate');
+    if (!tbody) {
+        console.error('Color table body not found');
+        return;
     }
+    
+    // Remove "no data" message if present
+    tbody.innerHTML = '';
+    
+    // Show loading message
+    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-4 text-center text-gray-500">Loading data...</td></tr>';
+    
+    // Fetch data from the database
+    fetch('/color', {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Clear loading message
+            tbody.innerHTML = '';
+            
+            if (!Array.isArray(data) || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-4 text-center text-gray-500">Tidak ada data warna yang tersedia.</td></tr>';
+                return;
+            }
+            
+            // Fill table with data from database
+            data.forEach(color => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-blue-50 cursor-pointer';
+                row.setAttribute('data-color-id', color.color_id);
+                row.setAttribute('data-color-name', color.color_name);
+                row.setAttribute('data-origin', color.origin);
+                row.setAttribute('data-cg-id', color.color_group_id);
+                row.setAttribute('data-cg-type', color.cg_type || 'X-Flexo');
+                row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
+                row.ondblclick = function() { openEditColorModal(this); };
+                
+                // Create columns for each cell
+                const idCell = document.createElement('td');
+                idCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
+                idCell.textContent = color.color_id;
+                
+                const nameCell = document.createElement('td');
+                nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                nameCell.textContent = color.color_name;
+                
+                const originCell = document.createElement('td');
+                originCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                originCell.textContent = color.origin;
+                
+                const cgIdCell = document.createElement('td');
+                cgIdCell.className = 'px-4 py-3 whitespace-nowrap';
+                cgIdCell.innerHTML = `<span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">${color.color_group_id}</span>`;
+                
+                const cgNameCell = document.createElement('td');
+                cgNameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                cgNameCell.textContent = color.color_group ? color.color_group.cg_name : '';
+                
+                const cgTypeCell = document.createElement('td');
+                cgTypeCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                cgTypeCell.textContent = color.cg_type || 'X-Flexo';
+                
+                // Add all cells to row
+                row.appendChild(idCell);
+                row.appendChild(nameCell);
+                row.appendChild(originCell);
+                row.appendChild(cgIdCell);
+                row.appendChild(cgNameCell);
+                row.appendChild(cgTypeCell);
+                
+                // Add row to table
+                tbody.appendChild(row);
+            });
+            
+            console.log('Table populated with database data:', data);
+            
+            // Setup event handlers for the table rows
+            setupTableRowEvents();
+            
+            // Apply blue highlighting to rows
+            highlightBlueRows();
+            
+            // Sort table by Color# by default
+            sortTableDirectly(0);
+            
+            // Update the data status message
+            const dbStatusElement = document.querySelector('.bg-yellow-100, .bg-green-100');
+            if (dbStatusElement) {
+                dbStatusElement.className = 'mt-4 bg-green-100 p-3 rounded';
+                dbStatusElement.innerHTML = `
+                    <p class="text-sm font-medium text-green-800">Data tersedia: ${data.length} warna ditemukan.</p>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching database data:', error);
+            tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-4 text-center text-red-500">
+                Error loading data from database. ${error.message}
+                <br>
+                <button onclick="populateColorTable()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    <i class="fas fa-sync-alt mr-2"></i>Coba Lagi
+                </button>
+            </td></tr>`;
+        });
 }
 
 // Function to sort table
@@ -178,6 +187,176 @@ function sortTableDirectly(columnIndex) {
     console.log("Sorting complete");
 }
 
+// Function to sort by Color#
+function sortByColorId() {
+    console.log("Sorting by Color#");
+    var table = document.getElementById('colorDataTable');
+    if (!table) {
+        console.error("Table not found");
+        return;
+    }
+    
+    var tbody = table.querySelector('tbody');
+    if (!tbody) {
+        console.error("Table body not found");
+        return;
+    }
+    
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Don't sort if there's no data or only a "no data" message
+    if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'))) {
+        console.log("No data to sort");
+        return;
+    }
+    
+    // Sort rows based on color ID (column 0)
+    rows.sort(function(a, b) {
+        var idA = parseInt(a.cells[0].textContent.trim());
+        var idB = parseInt(b.cells[0].textContent.trim());
+        return idA - idB;
+    });
+    
+    // Remove all rows from table
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    
+    // Add sorted rows to table
+    rows.forEach(function(row) {
+        tbody.appendChild(row);
+    });
+    
+    // Highlight first row after sorting
+    if (rows.length > 0) {
+        rows.forEach(function(row) {
+            row.classList.remove('bg-blue-600', 'text-white');
+        });
+        rows[0].classList.add('bg-blue-600', 'text-white');
+    }
+    
+    // Highlight color rows based on color group
+    highlightBlueRows();
+}
+
+// Function to sort by CG# + Color#
+function sortByCGAndColor() {
+    console.log("Sorting by CG# + Color#");
+    var table = document.getElementById('colorDataTable');
+    if (!table) {
+        console.error("Table not found");
+        return;
+    }
+    
+    var tbody = table.querySelector('tbody');
+    if (!tbody) {
+        console.error("Table body not found");
+        return;
+    }
+    
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Don't sort if there's no data or only a "no data" message
+    if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'))) {
+        console.log("No data to sort");
+        return;
+    }
+    
+    // Sort rows based on CG# (column 3) and then Color# (column 0)
+    rows.sort(function(a, b) {
+        var cgA = parseInt(a.cells[3].textContent.trim());
+        var cgB = parseInt(b.cells[3].textContent.trim());
+        
+        if (cgA !== cgB) {
+            return cgA - cgB;
+        }
+        
+        var idA = parseInt(a.cells[0].textContent.trim());
+        var idB = parseInt(b.cells[0].textContent.trim());
+        return idA - idB;
+    });
+    
+    // Remove all rows from table
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    
+    // Add sorted rows to table
+    rows.forEach(function(row) {
+        tbody.appendChild(row);
+    });
+    
+    // Highlight first row after sorting
+    if (rows.length > 0) {
+        rows.forEach(function(row) {
+            row.classList.remove('bg-blue-600', 'text-white');
+        });
+        rows[0].classList.add('bg-blue-600', 'text-white');
+    }
+    
+    // Highlight color rows based on color group
+    highlightBlueRows();
+}
+
+// Function to sort by CG Type + Color#
+function sortByCGTypeAndColor() {
+    console.log("Sorting by CG Type + Color#");
+    var table = document.getElementById('colorDataTable');
+    if (!table) {
+        console.error("Table not found");
+        return;
+    }
+    
+    var tbody = table.querySelector('tbody');
+    if (!tbody) {
+        console.error("Table body not found");
+        return;
+    }
+    
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Don't sort if there's no data or only a "no data" message
+    if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'))) {
+        console.log("No data to sort");
+        return;
+    }
+    
+    // Sort rows based on CG Type (column 5) and then Color# (column 0)
+    rows.sort(function(a, b) {
+        var typeA = a.cells[5].textContent.trim();
+        var typeB = b.cells[5].textContent.trim();
+        
+        if (typeA !== typeB) {
+            return typeA.localeCompare(typeB);
+        }
+        
+        var idA = parseInt(a.cells[0].textContent.trim());
+        var idB = parseInt(b.cells[0].textContent.trim());
+        return idA - idB;
+    });
+    
+    // Remove all rows from table
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    
+    // Add sorted rows to table
+    rows.forEach(function(row) {
+        tbody.appendChild(row);
+    });
+    
+    // Highlight first row after sorting
+    if (rows.length > 0) {
+        rows.forEach(function(row) {
+            row.classList.remove('bg-blue-600', 'text-white');
+        });
+        rows[0].classList.add('bg-blue-600', 'text-white');
+    }
+    
+    // Highlight color rows based on color group
+    highlightBlueRows();
+}
+
 // Function to edit selected row (Edit button)
 function editSelectedRow() {
     var selectedRow = document.querySelector('#colorDataTable tbody tr.bg-blue-600');
@@ -238,7 +417,7 @@ function closeEditColorModal() {
     editModal.style.display = 'none';
 }
 
-// Function to display modal
+// Function to open color modal
 function openColorModal() {
     console.log('Opening color modal');
     var modal = document.getElementById('colorTableWindow');
@@ -251,11 +430,8 @@ function openColorModal() {
     modal.style.display = 'block';
     modal.classList.remove('hidden');
     
-    // Populate table with data from ColorSeeder if needed
+    // Populate table with data from database
     populateColorTable();
-    
-    // Sort by Color# by default
-    sortTableDirectly(0);
     
     console.log('Modal opened successfully');
 }
@@ -339,124 +515,121 @@ function saveColorChanges() {
     
     console.log('Form data to save:', { colorId, colorName, origin, colorGroup, cgType, kgPerM2 });
     
+    // Validate input
+    if (!colorName) {
+        alert('Nama warna tidak boleh kosong');
+        return;
+    }
+    
     // Display loading indicator on button and overlay
     const saveButton = document.querySelector('#editColorForm button[type="submit"]');
-    const originalText = saveButton.innerText;
-    saveButton.innerText = 'Menyimpan...';
+    const originalText = saveButton.innerHTML;
+    saveButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyimpan...';
     saveButton.disabled = true;
     
     // Show loading overlay
     document.getElementById('loadingOverlay').classList.remove('hidden');
     
-    // Update row in table immediately to provide visual feedback
-    const row = document.querySelector(`#colorDataTable tbody tr[data-color-id="${colorId}"]`);
-    if (row) {
-        console.log('Found row to update:', row);
-        
-        try {
-            // Direct DOM manipulation for cell updates
-            const cells = row.cells;
-            console.log('Row has cells:', cells.length);
-            
-            if (cells.length >= 6) {
-                console.log('Original cell values:');
-                console.log('- Cell 1 (Color Name):', cells[1].textContent);
-                console.log('- Cell 2 (Origin):', cells[2].textContent);
-                console.log('- Cell 3 (CG#):', cells[3].textContent);
-                console.log('- Cell 5 (CG Type):', cells[5].textContent);
-                
-                // Update cell text directly
-                cells[1].textContent = colorName;
-                cells[2].textContent = origin;
-                cells[3].textContent = colorGroup;
-                cells[5].textContent = cgType;
-                
-                // Get the color group name from JS function
-                const cgName = getCGName(colorGroup);
-                cells[4].textContent = cgName;
-                
-                console.log('After update:');
-                console.log('- Cell 1 (Color Name):', cells[1].textContent);
-                console.log('- Cell 2 (Origin):', cells[2].textContent);
-                console.log('- Cell 3 (CG#):', cells[3].textContent);
-                console.log('- Cell 4 (CG Name):', cells[4].textContent);
-                console.log('- Cell 5 (CG Type):', cells[5].textContent);
-                
-                // Update data attributes
-                row.setAttribute('data-color-name', colorName);
-                row.setAttribute('data-origin', origin);
-                row.setAttribute('data-cg-id', colorGroup);
-                row.setAttribute('data-cg-type', cgType);
-                
-                // Highlight row with Tailwind classes to ensure visibility
-                row.classList.add('bg-blue-600', 'text-white');
-                
-                // Reapply blue row highlighting
-                highlightBlueRows();
-                
-                // Also update seedColors array to keep data in sync
-                updateSeedColorData(colorId, colorName, origin, colorGroup, cgType, kgPerM2);
-            } else {
-                console.error('Row does not have enough cells:', cells.length);
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('color_name', colorName);
+    formData.append('origin', origin);
+    formData.append('color_group_id', colorGroup);
+    formData.append('cg_type', cgType);
+    formData.append('_method', 'PUT'); // For Laravel method spoofing
+    
+    // Send data to server
+    fetch(`/color/${colorId}`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json().then(data => {
+            if (!response.ok) {
+                throw new Error(data.message || 'Network response was not ok');
             }
-        } catch (error) {
-            console.error('Error updating row cells:', error);
+            return data;
+        });
+    })
+    .then(data => {
+        console.log('Server response:', data);
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Unknown error occurred');
         }
         
-        console.log('Row updated successfully in the table');
-    } else {
-        console.error('Row not found in table for color ID:', colorId);
-    }
-    
-    // Show success message and close modal
-    alert('Data warna berhasil diperbarui');
-    closeEditColorModal();
-    
-    // Reset button state and hide loading overlay after a short delay
-    setTimeout(() => {
-        saveButton.innerText = originalText;
+        // Update row in table
+        const row = document.querySelector(`#colorDataTable tbody tr[data-color-id="${colorId}"]`);
+        if (row) {
+            console.log('Found row to update:', row);
+            
+            try {
+                // Direct DOM manipulation for cell updates
+                const cells = row.cells;
+                console.log('Row has cells:', cells.length);
+                
+                if (cells.length >= 6) {
+                    // Update cell text directly
+                    cells[1].textContent = colorName;
+                    cells[2].textContent = origin;
+                    cells[3].innerHTML = `<span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">${colorGroup}</span>`;
+                    cells[5].textContent = cgType;
+                    
+                    // Get the color group name from JS function
+                    const cgName = getCGName(colorGroup);
+                    cells[4].textContent = cgName;
+                    
+                    // Update data attributes
+                    row.setAttribute('data-color-name', colorName);
+                    row.setAttribute('data-origin', origin);
+                    row.setAttribute('data-cg-id', colorGroup);
+                    row.setAttribute('data-cg-type', cgType);
+                    
+                    // Highlight row with Tailwind classes to ensure visibility
+                    row.classList.add('bg-blue-600', 'text-white');
+                    
+                    // Reapply blue row highlighting
+                    highlightBlueRows();
+                } else {
+                    console.error('Row does not have enough cells:', cells.length);
+                }
+            } catch (error) {
+                console.error('Error updating row cells:', error);
+            }
+            
+            console.log('Row updated successfully in the table');
+        } else {
+            console.error('Row not found in table for color ID:', colorId);
+        }
+        
+        // Show success message and close modal
+        alert('Data warna berhasil diperbarui');
+        closeEditColorModal();
+        
+        // Refresh the table data
+        populateColorTable();
+    })
+    .catch(error => {
+        console.error('Error saving data:', error);
+        alert('Error menyimpan data: ' + error.message);
+    })
+    .finally(() => {
+        // Reset button state and hide loading overlay
+        saveButton.innerHTML = originalText;
         saveButton.disabled = false;
         document.getElementById('loadingOverlay').classList.add('hidden');
-    }, 500);
+    });
 }
 
-// Function to update data in seedColors array
-function updateSeedColorData(colorId, colorName, origin, colorGroup, cgType, kgPerM2) {
-    // Find color with matching ID in seedColors array
-    const colorIndex = seedColors.findIndex(color => color.color_id === colorId);
-    
-    // Always use X-Flexo for cg_type
-    const finalCgType = "X-Flexo";
-    
-    if (colorIndex !== -1) {
-        console.log(`Updating seedColors[${colorIndex}] with new data`);
-        
-        // Update data in array
-        seedColors[colorIndex].color_name = colorName;
-        seedColors[colorIndex].origin = origin;
-        seedColors[colorIndex].color_group_id = colorGroup;
-        seedColors[colorIndex].cg_type = finalCgType;
-        
-        console.log('Updated seedColors:', seedColors[colorIndex]);
-    } else {
-        console.log(`Color with ID ${colorId} not found in seedColors array`);
-        
-        // If not found, add as new item
-        seedColors.push({
-            color_id: colorId,
-            color_name: colorName,
-            origin: origin,
-            color_group_id: colorGroup,
-            cg_type: finalCgType
-        });
-        
-        console.log('Added new color to seedColors array');
-    }
-}
-
-// Function to make seed data available without database
+// Function to load data from database
 function loadSeedData() {
-    // Check if data is already loaded
+    // Check if table body exists
     const tbody = document.querySelector('#colorDataTable tbody');
     if (!tbody) return;
     
@@ -466,40 +639,53 @@ function loadSeedData() {
         loadingOverlay.classList.remove('hidden');
     }
     
-    // Empty the table
-    tbody.innerHTML = '';
-    
-    // Simulate loading
-    setTimeout(() => {
-        // Fill table with data from seedColors
-        populateColorTable();
-        
-        // Show notification
-        alert('Data warna berhasil dimuat dari ColorSeeder');
-        
-        // Hide loading overlay
-        if (loadingOverlay) {
-            loadingOverlay.classList.add('hidden');
-        }
-        
-        // Update notification on main page
-        const dbStatusElement = document.querySelector('.bg-yellow-100');
-        if (dbStatusElement) {
-            dbStatusElement.classList.remove('bg-yellow-100');
-            dbStatusElement.classList.add('bg-green-100');
-            dbStatusElement.innerHTML = `
-                <p class="text-sm font-medium text-green-800">Data tersedia: ${seedColors.length} warna ditemukan (dari JavaScript).</p>
-            `;
-        }
-        
-        // Open modal to display data
-        openColorModal();
-    }, 1000);
+    // Use database seeder if available
+    fetch('/run-color-seeder')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Seeder response:', data);
+            
+            // Refresh color table with fresh data
+            populateColorTable();
+            
+            // Show notification
+            alert('Data warna berhasil dimuat dari database');
+            
+            // Hide loading overlay
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+            }
+            
+            // Open modal to display data
+            openColorModal();
+        })
+        .catch(error => {
+            console.error('Error running seeder:', error);
+            
+            // Fallback to just loading whatever data is in the database
+            populateColorTable();
+            
+            // Show notification
+            alert('Tidak dapat menjalankan seeder, memuat data yang tersedia dari database');
+            
+            // Hide loading overlay
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+            }
+            
+            // Open modal to display data
+            openColorModal();
+        });
 }
 
 // Initialize event handlers when document loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM content loaded');
+    console.log('DOM content loaded for color management');
     
     // Setup row events initially
     setupTableRowEvents();
@@ -507,7 +693,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize color table if open button exists
     const showBtn = document.getElementById('showColorTableBtn');
     if (showBtn) {
-        console.log('Show button found, setting up event listener');
+        showBtn.addEventListener('click', openColorModal);
+    }
+    
+    // Setup load data button if it exists
+    const loadDataBtn = document.querySelector('button[onclick="loadSeedData()"]');
+    if (loadDataBtn) {
+        loadDataBtn.addEventListener('click', loadSeedData);
     }
     
     // Close modal when clicking outside table
@@ -626,50 +818,89 @@ function populateColorGroupTable() {
     // Clear existing rows
     tbody.innerHTML = '';
     
-    // Add rows from seed data
-    seedColorGroups.forEach(group => {
-        const row = document.createElement('tr');
-        row.className = 'hover:bg-blue-50 cursor-pointer';
-        row.setAttribute('data-cg', group.cg);
-        row.setAttribute('data-cg-name', group.cg_name);
-        row.setAttribute('data-cg-type', group.cg_type);
-        
-        // Set click event to select row
-        row.onclick = function(e) {
-            selectColorGroupRow(this);
-            e.stopPropagation();
-        };
-        
-        // Set double-click event to select and close modal
-        row.ondblclick = function() {
-            selectColorGroupRow(this);
-            selectColorGroup();
-        };
-        
-        // Create cells
-        const cgCell = document.createElement('td');
-        cgCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
-        cgCell.textContent = group.cg;
-        
-        const nameCell = document.createElement('td');
-        nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
-        nameCell.textContent = group.cg_name;
-        
-        const typeCell = document.createElement('td');
-        typeCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
-        typeCell.textContent = group.cg_type;
-        
-        // Add cells to row
-        row.appendChild(cgCell);
-        row.appendChild(nameCell);
-        row.appendChild(typeCell);
-        
-        // Add row to table
-        tbody.appendChild(row);
-    });
+    // Show loading message
+    tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">Loading data...</td></tr>';
     
-    // Add search functionality
-    setupColorGroupSearch();
+    // Fetch color groups from database
+    fetch('/color-group', {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Color group data received:', data);
+        
+        // Clear loading message
+        tbody.innerHTML = '';
+        
+        if (!Array.isArray(data) || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">Tidak ada data grup warna yang tersedia.</td></tr>';
+            return;
+        }
+        
+        // Add rows from database
+        data.forEach(group => {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-blue-50 cursor-pointer';
+            row.setAttribute('data-cg', group.cg_id);
+            row.setAttribute('data-cg-name', group.cg_name);
+            row.setAttribute('data-cg-type', group.cg_type);
+            
+            // Set click event to select row
+            row.onclick = function(e) {
+                selectColorGroupRow(this);
+                e.stopPropagation();
+            };
+            
+            // Set double-click event to select and close modal
+            row.ondblclick = function() {
+                selectColorGroupRow(this);
+                selectColorGroup();
+            };
+            
+            // Create cells
+            const cgCell = document.createElement('td');
+            cgCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
+            cgCell.textContent = group.cg_id;
+            
+            const nameCell = document.createElement('td');
+            nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+            nameCell.textContent = group.cg_name;
+            
+            const typeCell = document.createElement('td');
+            typeCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+            typeCell.textContent = group.cg_type;
+            
+            // Add cells to row
+            row.appendChild(cgCell);
+            row.appendChild(nameCell);
+            row.appendChild(typeCell);
+            
+            // Add row to table
+            tbody.appendChild(row);
+        });
+        
+        // Add search functionality
+        setupColorGroupSearch();
+    })
+    .catch(error => {
+        console.error('Error fetching color groups:', error);
+        tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-4 text-center text-red-500">
+            Error loading color groups: ${error.message}
+            <br>
+            <button onclick="populateColorGroupTable()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                <i class="fas fa-sync-alt mr-2"></i>Coba Lagi
+            </button>
+        </td></tr>`;
+    });
 }
 
 // Function to select a color group row

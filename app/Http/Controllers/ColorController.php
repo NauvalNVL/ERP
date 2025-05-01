@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ColorController extends Controller
 {
@@ -51,12 +52,25 @@ class ColorController extends Controller
                 Log::info('Found ' . $colors->count() . ' colors in the database');
             }
             
+            // Return JSON if requested
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json($colors);
+            }
+            
             return view('sales-management.system-requirement.system-requirement.standard-requirement.color', [
                 'colors' => $colors,
                 'colorGroups' => $colorGroups
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ColorController@index: ' . $e->getMessage());
+            
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Error loading data from database: ' . $e->getMessage()
+                ], 500);
+            }
+            
             return view('sales-management.system-requirement.system-requirement.standard-requirement.color', [
                 'colors' => [],
                 'colorGroups' => [],
@@ -125,39 +139,136 @@ class ColorController extends Controller
 
     /**
      * Update the specified color in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $id
-     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         try {
-            $validated = $request->validate([
+            Log::info('Updating color with ID: ' . $id);
+            Log::info('Request data:', $request->all());
+
+            $validator = Validator::make($request->all(), [
                 'color_name' => 'required|string|max:100',
-                'origin' => 'required|string|max:2',
-                'color_group_id' => 'required|string|max:5',
-                'cg_type' => 'nullable|string|max:50',
+                'origin' => 'required|string|max:50',
+                'color_group_id' => 'required|string|max:10',
+                'cg_type' => 'required|string|max:20',
             ]);
 
-            $affected = DB::table('colors')
+            if ($validator->fails()) {
+                Log::warning('Validation failed:', $validator->errors()->toArray());
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            // Find the color using DB facade since we're using color_id as primary key
+            $color = DB::table('colors')->where('color_id', $id)->first();
+            
+            if (!$color) {
+                Log::warning('Color not found with ID: ' . $id);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Color tidak ditemukan'
+                ], 404);
+            }
+
+            // Update the color using DB facade
+            $updated = DB::table('colors')
                 ->where('color_id', $id)
                 ->update([
-                    'color_name' => $validated['color_name'],
-                    'origin' => $validated['origin'],
-                    'color_group_id' => $validated['color_group_id'],
-                    'cg_type' => $validated['cg_type'] ?? null,
+                    'color_name' => $request->color_name,
+                    'origin' => $request->origin,
+                    'color_group_id' => $request->color_group_id,
+                    'cg_type' => $request->cg_type,
                     'updated_at' => now()
                 ]);
 
-            if ($affected) {
-                return redirect()->route('color.index')->with('success', 'Warna berhasil diperbarui');
-            } else {
-                return back()->with('error', 'Tidak ada perubahan data');
+            if (!$updated) {
+                Log::warning('No changes made to color with ID: ' . $id);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada perubahan data'
+                ], 400);
             }
+
+            // Get the updated color data
+            $updatedColor = DB::table('colors')->where('color_id', $id)->first();
+
+            // Update the seeder file
+            $this->updateSeederFile($updatedColor);
+
+            Log::info('Color updated successfully:', ['color_id' => $id]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Color berhasil diperbarui',
+                'data' => $updatedColor
+            ]);
+
         } catch (\Exception $e) {
-            Log::error('Error in ColorController@update: ' . $e->getMessage());
-            return back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            Log::error('Error updating color: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating color: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update the seeder file with new data.
+     */
+    protected function updateSeederFile($color)
+    {
+        try {
+            $seederPath = database_path('seeders/ColorSeeder.php');
+            
+            if (!file_exists($seederPath)) {
+                Log::error('Seeder file not found at: ' . $seederPath);
+                return false;
+            }
+
+            $seederContent = file_get_contents($seederPath);
+            
+            // Create the new color data string
+            $newColorData = "            [
+                'color_id' => '{$color->color_id}',
+                'color_name' => '{$color->color_name}',
+                'origin' => '{$color->origin}',
+                'color_group_id' => '{$color->color_group_id}',
+                'cg_type' => '{$color->cg_type}',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],";
+
+            // Find the existing color data in the seeder file
+            $pattern = "/\[\s*'color_id'\s*=>\s*'{$color->color_id}'.*?\]/s";
+            
+            if (preg_match($pattern, $seederContent)) {
+                // Replace existing color data
+                $newContent = preg_replace($pattern, $newColorData, $seederContent);
+            } else {
+                // Add new color data before the closing bracket of the array
+                $newContent = str_replace(
+                    "    protected \$colors = [\n",
+                    "    protected \$colors = [\n" . $newColorData . "\n",
+                    $seederContent
+                );
+            }
+
+            // Write the updated content back to the file
+            if (file_put_contents($seederPath, $newContent) === false) {
+                Log::error('Failed to write to seeder file');
+                return false;
+            }
+
+            Log::info('Seeder file updated successfully for color: ' . $color->color_id);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Error updating seeder file: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return false;
         }
     }
 

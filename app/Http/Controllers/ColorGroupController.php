@@ -14,20 +14,25 @@ class ColorGroupController extends Controller
     public function index(Request $request)
     {
         try {
-            if ($request->has('search')) {
-                $searchTerm = $request->search;
-                $colorGroups = ColorGroup::where('cg', 'LIKE', "%{$searchTerm}%")
-                                    ->orWhere('cg_name', 'LIKE', "%{$searchTerm}%")
-                                    ->orWhere('cg_type', 'LIKE', "%{$searchTerm}%")
-                                    ->paginate(10);
-            } else {
-                $colorGroups = ColorGroup::paginate(10);
+            if ($request->ajax()) {
+                $colorGroups = ColorGroup::select('cg as cg_id', 'cg_name', 'cg_type')
+                    ->orderBy('cg')
+                    ->get();
+                
+                return response()->json($colorGroups);
             }
 
+            $colorGroups = ColorGroup::paginate(10);
             return view('sales-management.system-requirement.system-requirement.standard-requirement.color-group', compact('colorGroups'));
         } catch (\Exception $e) {
             Log::error('Error in ColorGroupController@index: ' . $e->getMessage());
-            return view('sales-management.system-requirement.system-requirement.standard-requirement.color-group')->with('error', 'Failed to load color groups data');
+            
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Failed to load color groups data'], 500);
+            }
+            
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.color-group')
+                ->with('error', 'Failed to load color groups data');
         }
     }
 

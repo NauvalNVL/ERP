@@ -273,13 +273,13 @@
 
                 <!-- Bottom Buttons -->
                 <div class="mt-4 grid grid-cols-5 gap-2">
-                    <button type="button" onclick="sortTableDirectly(0)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                    <button type="button" onclick="sortByColorId()" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
                         <i class="fas fa-sort mr-1"></i>By Color#
                     </button>
-                    <button type="button" onclick="sortTableDirectly(3)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                    <button type="button" onclick="sortByCGAndColor()" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
                         <i class="fas fa-sort mr-1"></i>By CG# + Color#
                     </button>
-                    <button type="button" onclick="sortTableDirectly(5)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                    <button type="button" onclick="sortByCGTypeAndColor()" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
                         <i class="fas fa-sort mr-1"></i>By CG Type + Color#
                     </button>
                     <button type="button" onclick="editSelectedRow()" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
