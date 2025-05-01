@@ -123,32 +123,54 @@ async function saveProductGroup(event) {
     }
 }
 
-async function deleteProductGroup(id) {
-    try {
-        const response = await fetch(`/product-group/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        });
-
+async function deleteProductGroup() {
+    const selectedRow = document.querySelector('#productGroupDataTable tbody tr.bg-blue-600');
+    if (!selectedRow) {
+        alert('Please select a product group first');
+        return;
+    }
+    
+    const pgId = selectedRow.getAttribute('data-pg-id');
+    if (!confirm(`Are you sure you want to delete product group ${pgId}?`)) {
+        return;
+    }
+    
+    // Show loading overlay
+    showLoadingOverlay();
+    
+    fetch(`/product-group/${pgId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-
-        const data = await response.json();
+        return response.json();
+    })
+    .then(data => {
         if (data.success) {
-            alert('Product group deleted successfully!');
+            // Refresh the table
             populateProductGroupTable();
+            
+            // Show success message
+            alert('Product group deleted successfully!');
         } else {
             throw new Error(data.message || 'Failed to delete data');
         }
-    } catch (error) {
-        console.error('Error deleting data:', error);
-        alert('Error deleting data. ' + error.message);
-    }
+    })
+    .catch(error => {
+        console.error('Error deleting product group:', error);
+        alert('Error: ' + error.message);
+    })
+    .finally(() => {
+        // Hide loading overlay
+        hideLoadingOverlay();
+    });
 }
 
 // Function to sort table
@@ -313,8 +335,7 @@ function openEditProductGroupModal(row) {
     saveButton.innerHTML = '<i class="fas fa-save mr-2"></i>Update';
     
     const editModal = document.getElementById('editProductGroupModal');
-    editModal.style.display = 'block';
-    editModal.classList.remove('hidden');
+    editModal.style.display = 'flex';
     
     console.log('Edit modal opened');
 }
@@ -323,7 +344,6 @@ function openEditProductGroupModal(row) {
 function closeEditProductGroupModal() {
     console.log('Closing edit product group modal');
     const editModal = document.getElementById('editProductGroupModal');
-    editModal.classList.add('hidden');
     editModal.style.display = 'none';
 }
 
@@ -337,8 +357,7 @@ function openProductGroupModal() {
     }
     
     // Show modal
-    modal.style.display = 'block';
-    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
     
     // Populate table with data if needed
     populateProductGroupTable();
@@ -354,7 +373,6 @@ function closeProductGroupModal() {
     var modal = document.getElementById('productGroupTableWindow');
     if (modal) {
         modal.style.display = 'none';
-        modal.classList.add('hidden');
     }
 }
 
@@ -386,108 +404,14 @@ function setupTableRowEvents() {
     });
 }
 
-// Function to save product group changes
-function saveProductGroupChanges() {
-    console.log('Saving product group changes');
-    
-    const pgId = document.getElementById('edit_pg_id').value;
-    const pgName = document.getElementById('edit_pg_name').value;
-    const pgActive = document.getElementById('edit_pg_active').value === 'true';
-    
-    console.log('Form data to save:', { pgId, pgName, pgActive });
-    
-    // Display loading indicator on button and overlay
-    const saveButton = document.querySelector('#editProductGroupForm button[type="submit"]');
-    const originalText = saveButton.innerText;
-    saveButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyimpan...';
-    saveButton.disabled = true;
-    
-    // Show loading overlay
-    document.getElementById('loadingOverlay').classList.remove('hidden');
-    
-    // Send update to server
-    fetch('/product-group/' + pgId, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({
-            product_group_id: pgId,
-            product_group_name: pgName,
-            is_active: pgActive
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error(data.message || `HTTP error! status: ${response.status}`);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            console.log('Product group updated successfully:', data);
-            
-            // Update row in table
-            const row = document.querySelector(`#productGroupDataTable tbody tr[data-pg-id="${pgId}"]`);
-            if (row) {
-                const cells = row.cells;
-                if (cells.length >= 3) {
-                    cells[1].textContent = pgName;
-                    cells[2].textContent = pgActive ? 'Active' : 'Inactive';
-                    
-                    row.setAttribute('data-pg-name', pgName);
-                    row.setAttribute('data-pg-active', pgActive.toString());
-                }
-            }
-            
-            // Close the edit modal
-            closeEditProductGroupModal();
-            
-            // Refresh the table data
-            populateProductGroupTable();
-            
-            alert('Data product group berhasil diperbarui');
-        } else {
-            console.error('Error updating product group:', data.message);
-            alert('Error updating product group: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error updating product group:', error);
-        alert('Error updating product group: ' + error.message);
-    })
-    .finally(() => {
-        // Reset button state and hide loading overlay
-        saveButton.innerHTML = originalText;
-        saveButton.disabled = false;
-        document.getElementById('loadingOverlay').classList.add('hidden');
-    });
+// Function to show loading overlay
+function showLoadingOverlay() {
+    document.getElementById('loadingOverlay').style.display = 'flex';
 }
 
-// Function to add a new product group
-function openAddProductGroupModal() {
-    // Clear form
-    document.getElementById('edit_pg_id').value = '';
-    document.getElementById('edit_pg_id').readOnly = false;
-    document.getElementById('edit_pg_name').value = '';
-    document.getElementById('edit_pg_active').value = 'true';
-    
-    // Change button text
-    const saveButton = document.querySelector('#editProductGroupForm button[type="submit"]');
-    saveButton.innerHTML = '<i class="fas fa-plus mr-2"></i>Add';
-    
-    // Show modal
-    const editModal = document.getElementById('editProductGroupModal');
-    editModal.classList.remove('hidden');
-    editModal.style.display = 'block';
-    
-    // Set focus to the first field
-    document.getElementById('edit_pg_id').focus();
+// Function to hide loading overlay
+function hideLoadingOverlay() {
+    document.getElementById('loadingOverlay').style.display = 'none';
 }
 
 // Enhancement to handle both add and edit
@@ -521,7 +445,7 @@ function handleProductGroupFormSubmit(event) {
     saveButton.disabled = true;
     
     // Show loading overlay
-    document.getElementById('loadingOverlay').classList.remove('hidden');
+    showLoadingOverlay();
     
     // Determine if this is an add or update operation
     const isAdd = document.getElementById('edit_pg_id').readOnly === false;
@@ -609,59 +533,28 @@ function handleProductGroupFormSubmit(event) {
         saveButton.disabled = false;
         
         // Hide loading overlay
-        document.getElementById('loadingOverlay').classList.add('hidden');
+        hideLoadingOverlay();
     });
 }
 
-// Function to delete a product group
-function deleteProductGroup() {
-    const selectedRow = document.querySelector('#productGroupDataTable tbody tr.bg-blue-600');
-    if (!selectedRow) {
-        alert('Please select a product group first');
-        return;
-    }
+// Function to add a new product group
+function openAddProductGroupModal() {
+    // Clear form
+    document.getElementById('edit_pg_id').value = '';
+    document.getElementById('edit_pg_id').readOnly = false;
+    document.getElementById('edit_pg_name').value = '';
+    document.getElementById('edit_pg_active').value = 'true';
     
-    const pgId = selectedRow.getAttribute('data-pg-id');
-    if (!confirm(`Are you sure you want to delete product group ${pgId}?`)) {
-        return;
-    }
+    // Change button text
+    const saveButton = document.querySelector('#editProductGroupForm button[type="submit"]');
+    saveButton.innerHTML = '<i class="fas fa-plus mr-2"></i>Add';
     
-    // Show loading overlay
-    document.getElementById('loadingOverlay').classList.remove('hidden');
+    // Show modal
+    const editModal = document.getElementById('editProductGroupModal');
+    editModal.style.display = 'flex';
     
-    fetch(`/product-group/${pgId}`, {
-        method: 'DELETE',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            // Refresh the table
-            populateProductGroupTable();
-            
-            // Show success message
-            alert('Product group deleted successfully!');
-        } else {
-            throw new Error(data.message || 'Failed to delete data');
-        }
-    })
-    .catch(error => {
-        console.error('Error deleting product group:', error);
-        alert('Error: ' + error.message);
-    })
-    .finally(() => {
-        // Hide loading overlay
-        document.getElementById('loadingOverlay').classList.add('hidden');
-    });
+    // Set focus to the first field
+    document.getElementById('edit_pg_id').focus();
 }
 
 // Initialize event handlers when document loads
