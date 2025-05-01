@@ -1,89 +1,153 @@
 // ProductGroup.js - Functions for product group management
 
-// Define seed data for product groups
-const seedProductGroups = [
-    {
-        product_group_id: 'B',
-        product_group_name: 'BOX',
-        is_active: true
-    },
-    {
-        product_group_id: 'OF',
-        product_group_name: 'OFFSET',
-        is_active: true
-    },
-    {
-        product_group_id: 'OT',
-        product_group_name: 'OTHER',
-        is_active: true
-    },
-    {
-        product_group_id: 'R',
-        product_group_name: 'PAPER ROLL',
-        is_active: true
-    },
-    {
-        product_group_id: 'S',
-        product_group_name: 'SHEET BOARD',
-        is_active: true
-    }
-];
-
-function populateProductGroupTable() {
-    console.log('Populating product group table');
-    
-    // Check if table already has data
-    const tbody = document.querySelector('#productGroupDataTable tbody');
-    const rows = tbody.querySelectorAll('tr');
-    const isEmpty = rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'));
-    
-    if (isEmpty) {
-        console.log('Table is empty, populating with seed data');
-        
-        // Remove "no data" message if present
-        tbody.innerHTML = '';
-        
-        // Fill table with data from seedProductGroups
-        seedProductGroups.forEach(group => {
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-blue-50 cursor-pointer';
-            row.setAttribute('data-pg-id', group.product_group_id);
-            row.setAttribute('data-pg-name', group.product_group_name);
-            row.setAttribute('data-pg-active', group.is_active);
-            row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
-            row.ondblclick = function() { openEditProductGroupModal(this); };
-            
-            // Create cells
-            const idCell = document.createElement('td');
-            idCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
-            idCell.textContent = group.product_group_id;
-            
-            const nameCell = document.createElement('td');
-            nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
-            nameCell.textContent = group.product_group_name;
-            
-            const statusCell = document.createElement('td');
-            statusCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
-            statusCell.textContent = group.is_active ? 'Active' : 'Inactive';
-            
-            // Add cells to row
-            row.appendChild(idCell);
-            row.appendChild(nameCell);
-            row.appendChild(statusCell);
-            
-            // Add row to table
-            tbody.appendChild(row);
+async function populateProductGroupTable() {
+    try {
+        const response = await fetch('/product-group', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Product groups data from server:', data);
         
-        console.log('Table populated with seed data');
-        
-        // Setup event handlers for the table rows
-        setupTableRowEvents();
-        
-        // Sort table based on PG#
-        sortTableDirectly(0);
-    } else {
-        console.log('Table already has data, no need to populate');
+        if (data.success) {
+            const productGroups = data.data;
+            const tbody = document.querySelector('#productGroupDataTable tbody');
+            if (!tbody) {
+                throw new Error('Table body element not found');
+            }
+            tbody.innerHTML = '';
+
+            productGroups.forEach(group => {
+                // Convert is_active to a boolean if it's not already
+                const isActive = typeof group.is_active === 'boolean' ? group.is_active : 
+                               (group.is_active === 1 || group.is_active === '1' || group.is_active === 'true');
+                
+                console.log(`Product Group ${group.product_group_id}: is_active = ${group.is_active}, converted to ${isActive}`);
+                
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-blue-50 cursor-pointer';
+                row.setAttribute('data-pg-id', group.product_group_id);
+                row.setAttribute('data-pg-name', group.product_group_name);
+                row.setAttribute('data-pg-active', isActive);
+                row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
+                row.ondblclick = function() { openEditProductGroupModal(this); };
+                
+                row.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${group.product_group_id}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-gray-700">${group.product_group_name}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-gray-700">${isActive ? 'Active' : 'Inactive'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Setup event handlers for the table rows
+            setupTableRowEvents();
+            
+            // Sort table based on PG# by default
+            sortTableDirectly(0);
+            
+            // Update the data status message
+            const dbStatusElement = document.querySelector('.bg-yellow-100, .bg-green-100');
+            if (dbStatusElement) {
+                dbStatusElement.className = 'mt-4 bg-green-100 p-3 rounded';
+                dbStatusElement.innerHTML = `
+                    <p class="text-sm font-medium text-green-800">Data tersedia: ${productGroups.length} product group ditemukan.</p>
+                `;
+            }
+        } else {
+            throw new Error(data.message || 'Failed to load data');
+        }
+    } catch (error) {
+        console.error('Error loading data:', error);
+        const tbody = document.querySelector('#productGroupDataTable tbody');
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-4 text-center text-red-500">
+                Error loading data from database. ${error.message}
+                <br>
+                <button onclick="populateProductGroupTable()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    <i class="fas fa-sync-alt mr-2"></i>Coba Lagi
+                </button>
+            </td></tr>`;
+        }
+    }
+}
+
+async function saveProductGroup(event) {
+    event.preventDefault();
+    const id = document.getElementById('productGroupId').value;
+    const name = document.getElementById('productGroupName').value;
+    const description = document.getElementById('productGroupDescription').value;
+
+    try {
+        const url = id ? `/product-group/${id}` : '/product-group';
+        const method = id ? 'PUT' : 'POST';
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                product_group_name: name,
+                product_group_description: description
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            alert(id ? 'Product group updated successfully!' : 'Product group created successfully!');
+            document.getElementById('productGroupForm').reset();
+            document.getElementById('productGroupId').value = '';
+            document.getElementById('saveBtn').textContent = 'Save';
+            populateProductGroupTable();
+        } else {
+            throw new Error(data.message || 'Failed to save data');
+        }
+    } catch (error) {
+        console.error('Error saving data:', error);
+        alert('Error saving data. ' + error.message);
+    }
+}
+
+async function deleteProductGroup(id) {
+    try {
+        const response = await fetch(`/product-group/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            alert('Product group deleted successfully!');
+            populateProductGroupTable();
+        } else {
+            throw new Error(data.message || 'Failed to delete data');
+        }
+    } catch (error) {
+        console.error('Error deleting data:', error);
+        alert('Error deleting data. ' + error.message);
     }
 }
 
@@ -237,9 +301,16 @@ function openEditProductGroupModal(row) {
     
     console.log('Product group data:', { pgId, pgName, pgActive });
     
-    document.getElementById('edit_pg_id').value = pgId;
+    const idField = document.getElementById('edit_pg_id');
+    idField.value = pgId;
+    idField.readOnly = true; // Set to read-only for edit mode
+    
     document.getElementById('edit_pg_name').value = pgName;
     document.getElementById('edit_pg_active').value = pgActive;
+    
+    // Change button text for edit mode
+    const saveButton = document.querySelector('#editProductGroupForm button[type="submit"]');
+    saveButton.innerHTML = '<i class="fas fa-save mr-2"></i>Update';
     
     const editModal = document.getElementById('editProductGroupModal');
     editModal.style.display = 'block';
@@ -291,194 +362,6 @@ function closeModalX() {
     closeProductGroupModal();
 }
 
-// Function to make seed data available without database
-function loadSeedData() {
-    // Check if data is already loaded
-    const tbody = document.querySelector('#productGroupDataTable tbody');
-    if (!tbody) return;
-    
-    // Show loading overlay
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.classList.remove('hidden');
-    }
-    
-    // Empty the table
-    tbody.innerHTML = '';
-    
-    // Simulate loading
-    setTimeout(() => {
-        // Fill table with data from seedProductGroups
-        populateProductGroupTable();
-        
-        // Show notification
-        alert('Product group data loaded successfully from ProductGroupSeeder');
-        
-        // Hide loading overlay
-        if (loadingOverlay) {
-            loadingOverlay.classList.add('hidden');
-        }
-        
-        // Update notification on main page
-        const dbStatusElement = document.querySelector('.bg-yellow-100');
-        if (dbStatusElement) {
-            dbStatusElement.classList.remove('bg-yellow-100');
-            dbStatusElement.classList.add('bg-green-100');
-            dbStatusElement.innerHTML = `
-                <p class="text-sm font-medium text-green-800">Data available: ${seedProductGroups.length} product groups found (from JavaScript).</p>
-            `;
-        }
-        
-        // Open modal to display data
-        openProductGroupModal();
-    }, 1000);
-}
-
-// Function to save product group changes
-function saveProductGroupChanges() {
-    console.log('Saving product group changes');
-    
-    const pgId = document.getElementById('edit_pg_id').value;
-    const pgName = document.getElementById('edit_pg_name').value;
-    const pgActive = document.getElementById('edit_pg_active').value === 'true';
-    
-    console.log('Form data to save:', { pgId, pgName, pgActive });
-    
-    // Display loading indicator on button and overlay
-    const saveButton = document.querySelector('#editProductGroupForm button[type="submit"]');
-    const originalText = saveButton.innerText;
-    saveButton.innerText = 'Saving...';
-    saveButton.disabled = true;
-    
-    // Show loading overlay
-    document.getElementById('loadingOverlay').classList.remove('hidden');
-    
-    // Update row in table immediately to provide visual feedback
-    const row = document.querySelector(`#productGroupDataTable tbody tr[data-pg-id="${pgId}"]`);
-    if (row) {
-        console.log('Found row to update:', row);
-        
-        try {
-            // Direct DOM manipulation for cell updates
-            const cells = row.cells;
-            console.log('Row has cells:', cells.length);
-            
-            if (cells.length >= 3) {
-                console.log('Original cell values:');
-                console.log('- Cell 0 (PG#):', cells[0].textContent);
-                console.log('- Cell 1 (PG Name):', cells[1].textContent);
-                console.log('- Cell 2 (Status):', cells[2].textContent);
-                
-                // Update cell text directly
-                cells[0].textContent = pgId;
-                cells[1].textContent = pgName;
-                cells[2].textContent = pgActive ? 'Active' : 'Inactive';
-                
-                console.log('After update:');
-                console.log('- Cell 0 (PG#):', cells[0].textContent);
-                console.log('- Cell 1 (PG Name):', cells[1].textContent);
-                console.log('- Cell 2 (Status):', cells[2].textContent);
-                
-                // Update data attributes
-                row.setAttribute('data-pg-id', pgId);
-                row.setAttribute('data-pg-name', pgName);
-                row.setAttribute('data-pg-active', pgActive.toString());
-                
-                // Highlight row with Tailwind classes to ensure visibility
-                row.classList.add('bg-blue-600', 'text-white');
-                
-                // Also update seedProductGroups array to keep data in sync
-                updateSeedProductGroupData(pgId, pgName, pgActive);
-            } else {
-                console.error('Row does not have enough cells:', cells.length);
-            }
-        } catch (error) {
-            console.error('Error updating row cells:', error);
-        }
-        
-        console.log('Row updated successfully in the table');
-    } else {
-        console.log('Row not found, creating new row');
-        
-        // Create a new row if it doesn't exist
-        const tbody = document.querySelector('#productGroupDataTable tbody');
-        
-        // Create a new row
-        const newRow = document.createElement('tr');
-        newRow.className = 'hover:bg-blue-50 cursor-pointer';
-        newRow.setAttribute('data-pg-id', pgId);
-        newRow.setAttribute('data-pg-name', pgName);
-        newRow.setAttribute('data-pg-active', pgActive.toString());
-        newRow.onclick = function(e) { selectRow(this); e.stopPropagation(); };
-        newRow.ondblclick = function() { openEditProductGroupModal(this); };
-        
-        // Create cells
-        const idCell = document.createElement('td');
-        idCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
-        idCell.textContent = pgId;
-        
-        const nameCell = document.createElement('td');
-        nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
-        nameCell.textContent = pgName;
-        
-        const statusCell = document.createElement('td');
-        statusCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
-        statusCell.textContent = pgActive ? 'Active' : 'Inactive';
-        
-        // Add cells to row
-        newRow.appendChild(idCell);
-        newRow.appendChild(nameCell);
-        newRow.appendChild(statusCell);
-        
-        // Add row to table
-        tbody.appendChild(newRow);
-        
-        // Select the new row
-        selectRow(newRow);
-        
-        // Add to seedProductGroups
-        updateSeedProductGroupData(pgId, pgName, pgActive);
-    }
-    
-    // Show success message and close modal
-    alert('Product group data updated successfully');
-    closeEditProductGroupModal();
-    
-    // Reset button state and hide loading overlay after a short delay
-    setTimeout(() => {
-        saveButton.innerText = originalText;
-        saveButton.disabled = false;
-        document.getElementById('loadingOverlay').classList.add('hidden');
-    }, 500);
-}
-
-// Function to update data in seedProductGroups array
-function updateSeedProductGroupData(pgId, pgName, pgActive) {
-    // Find product group with matching ID in seedProductGroups array
-    const groupIndex = seedProductGroups.findIndex(group => group.product_group_id === pgId);
-    
-    if (groupIndex !== -1) {
-        console.log(`Updating seedProductGroups[${groupIndex}] with new data`);
-        
-        // Update data in array
-        seedProductGroups[groupIndex].product_group_name = pgName;
-        seedProductGroups[groupIndex].is_active = pgActive;
-        
-        console.log('Updated seedProductGroups:', seedProductGroups[groupIndex]);
-    } else {
-        console.log(`Product group with ID ${pgId} not found in seedProductGroups array`);
-        
-        // If not found, add as new item
-        seedProductGroups.push({
-            product_group_id: pgId,
-            product_group_name: pgName,
-            is_active: pgActive
-        });
-        
-        console.log('Added new product group to seedProductGroups array');
-    }
-}
-
 // Function to set up events on table rows
 function setupTableRowEvents() {
     console.log('Setting up table row events');
@@ -503,9 +386,287 @@ function setupTableRowEvents() {
     });
 }
 
+// Function to save product group changes
+function saveProductGroupChanges() {
+    console.log('Saving product group changes');
+    
+    const pgId = document.getElementById('edit_pg_id').value;
+    const pgName = document.getElementById('edit_pg_name').value;
+    const pgActive = document.getElementById('edit_pg_active').value === 'true';
+    
+    console.log('Form data to save:', { pgId, pgName, pgActive });
+    
+    // Display loading indicator on button and overlay
+    const saveButton = document.querySelector('#editProductGroupForm button[type="submit"]');
+    const originalText = saveButton.innerText;
+    saveButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyimpan...';
+    saveButton.disabled = true;
+    
+    // Show loading overlay
+    document.getElementById('loadingOverlay').classList.remove('hidden');
+    
+    // Send update to server
+    fetch('/product-group/' + pgId, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            product_group_id: pgId,
+            product_group_name: pgName,
+            is_active: pgActive
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.message || `HTTP error! status: ${response.status}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            console.log('Product group updated successfully:', data);
+            
+            // Update row in table
+            const row = document.querySelector(`#productGroupDataTable tbody tr[data-pg-id="${pgId}"]`);
+            if (row) {
+                const cells = row.cells;
+                if (cells.length >= 3) {
+                    cells[1].textContent = pgName;
+                    cells[2].textContent = pgActive ? 'Active' : 'Inactive';
+                    
+                    row.setAttribute('data-pg-name', pgName);
+                    row.setAttribute('data-pg-active', pgActive.toString());
+                }
+            }
+            
+            // Close the edit modal
+            closeEditProductGroupModal();
+            
+            // Refresh the table data
+            populateProductGroupTable();
+            
+            alert('Data product group berhasil diperbarui');
+        } else {
+            console.error('Error updating product group:', data.message);
+            alert('Error updating product group: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating product group:', error);
+        alert('Error updating product group: ' + error.message);
+    })
+    .finally(() => {
+        // Reset button state and hide loading overlay
+        saveButton.innerHTML = originalText;
+        saveButton.disabled = false;
+        document.getElementById('loadingOverlay').classList.add('hidden');
+    });
+}
+
+// Function to add a new product group
+function openAddProductGroupModal() {
+    // Clear form
+    document.getElementById('edit_pg_id').value = '';
+    document.getElementById('edit_pg_id').readOnly = false;
+    document.getElementById('edit_pg_name').value = '';
+    document.getElementById('edit_pg_active').value = 'true';
+    
+    // Change button text
+    const saveButton = document.querySelector('#editProductGroupForm button[type="submit"]');
+    saveButton.innerHTML = '<i class="fas fa-plus mr-2"></i>Add';
+    
+    // Show modal
+    const editModal = document.getElementById('editProductGroupModal');
+    editModal.classList.remove('hidden');
+    editModal.style.display = 'block';
+    
+    // Set focus to the first field
+    document.getElementById('edit_pg_id').focus();
+}
+
+// Enhancement to handle both add and edit
+function handleProductGroupFormSubmit(event) {
+    event.preventDefault();
+    
+    const pgId = document.getElementById('edit_pg_id').value;
+    const pgName = document.getElementById('edit_pg_name').value;
+    // Get the value from the dropdown
+    const pgActiveValue = document.getElementById('edit_pg_active').value;
+    // Convert string to boolean for server
+    const pgActive = pgActiveValue === 'true';
+    
+    console.log(`Form data: pgActiveValue=${pgActiveValue}, converted to pgActive=${pgActive}`);
+    
+    // Validate input
+    if (!pgId) {
+        alert('Product Group ID tidak boleh kosong');
+        return;
+    }
+    
+    if (!pgName) {
+        alert('Product Group Name tidak boleh kosong');
+        return;
+    }
+    
+    // Display loading indicator
+    const saveButton = document.querySelector('#editProductGroupForm button[type="submit"]');
+    const originalText = saveButton.innerHTML;
+    saveButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyimpan...';
+    saveButton.disabled = true;
+    
+    // Show loading overlay
+    document.getElementById('loadingOverlay').classList.remove('hidden');
+    
+    // Determine if this is an add or update operation
+    const isAdd = document.getElementById('edit_pg_id').readOnly === false;
+    const method = isAdd ? 'POST' : 'PUT';
+    const url = isAdd ? '/product-group' : `/product-group/${pgId}`;
+    
+    console.log('Submitting data:', { 
+        url, 
+        method, 
+        isAdd,
+        data: {
+            product_group_id: pgId,
+            product_group_name: pgName,
+            is_active: pgActive
+        }
+    });
+    
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            product_group_id: pgId,
+            product_group_name: pgName,
+            is_active: pgActive
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.message || `HTTP error! status: ${response.status}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            console.log('Save successful, server response:', data);
+            
+            // If this was an update, update the row in the table
+            if (!isAdd && data.data) {
+                const updatedGroup = data.data;
+                const isActive = typeof updatedGroup.is_active === 'boolean' ? updatedGroup.is_active : 
+                               (updatedGroup.is_active === 1 || updatedGroup.is_active === '1' || updatedGroup.is_active === 'true');
+                
+                // Update the row in the table
+                const row = document.querySelector(`#productGroupDataTable tbody tr[data-pg-id="${pgId}"]`);
+                if (row) {
+                    // Update the row attributes
+                    row.setAttribute('data-pg-name', updatedGroup.product_group_name);
+                    row.setAttribute('data-pg-active', isActive);
+                    
+                    // Update the cells
+                    const cells = row.cells;
+                    if (cells.length >= 3) {
+                        cells[1].textContent = updatedGroup.product_group_name;
+                        cells[2].textContent = isActive ? 'Active' : 'Inactive';
+                    }
+                }
+            }
+            
+            // Close the modal
+            closeEditProductGroupModal();
+            
+            // Refresh the table to ensure it's up to date
+            populateProductGroupTable();
+            
+            // Show success message
+            alert(isAdd ? 'Product group added successfully!' : 'Product group updated successfully!');
+        } else {
+            throw new Error(data.message || 'Failed to save data');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving product group:', error);
+        alert('Error: ' + error.message);
+    })
+    .finally(() => {
+        // Reset button state
+        saveButton.innerHTML = originalText;
+        saveButton.disabled = false;
+        
+        // Hide loading overlay
+        document.getElementById('loadingOverlay').classList.add('hidden');
+    });
+}
+
+// Function to delete a product group
+function deleteProductGroup() {
+    const selectedRow = document.querySelector('#productGroupDataTable tbody tr.bg-blue-600');
+    if (!selectedRow) {
+        alert('Please select a product group first');
+        return;
+    }
+    
+    const pgId = selectedRow.getAttribute('data-pg-id');
+    if (!confirm(`Are you sure you want to delete product group ${pgId}?`)) {
+        return;
+    }
+    
+    // Show loading overlay
+    document.getElementById('loadingOverlay').classList.remove('hidden');
+    
+    fetch(`/product-group/${pgId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Refresh the table
+            populateProductGroupTable();
+            
+            // Show success message
+            alert('Product group deleted successfully!');
+        } else {
+            throw new Error(data.message || 'Failed to delete data');
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting product group:', error);
+        alert('Error: ' + error.message);
+    })
+    .finally(() => {
+        // Hide loading overlay
+        document.getElementById('loadingOverlay').classList.add('hidden');
+    });
+}
+
 // Initialize event handlers when document loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM content loaded');
+    console.log('DOM content loaded for product group');
     
     // Setup row events initially
     setupTableRowEvents();
@@ -514,6 +675,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const showBtn = document.getElementById('showProductGroupTableBtn');
     if (showBtn) {
         console.log('Show button found, setting up event listener');
+        // showBtn is already bound in HTML with onclick="openProductGroupModal()"
+    }
+    
+    // Add New button functionality
+    const addNewBtn = document.getElementById('addProductGroupBtn');
+    if (addNewBtn) {
+        addNewBtn.addEventListener('click', openAddProductGroupModal);
+    }
+    
+    // Delete button functionality
+    const deleteBtn = document.getElementById('deleteProductGroupBtn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', deleteProductGroup);
+    }
+    
+    // Override the form submit handler
+    const editForm = document.getElementById('editProductGroupForm');
+    if (editForm) {
+        editForm.onsubmit = handleProductGroupFormSubmit;
     }
     
     // Close modal when clicking outside table
@@ -543,7 +723,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             rows.forEach(row => {
                 // Skip the "no data" row if it exists
-                if (row.querySelector('td[colspan="3"]')) return;
+                if (row.querySelector('td[colspan]')) return;
                 
                 const pgId = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
                 const pgName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();

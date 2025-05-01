@@ -5,13 +5,38 @@ namespace App\Http\Controllers;
 use App\Models\ProductGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class ProductGroupController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $productGroups = ProductGroup::all();
-        return view('sales-management.system-requirement.system-requirement.standard-requirement.productgroup', compact('productGroups'));
+        try {
+            // Always load from database, ordered by product_group_id
+            $productGroups = ProductGroup::orderBy('product_group_id')->get();
+            
+            // If the request wants JSON, return JSON response
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $productGroups
+                ]);
+            }
+            
+            return view('sales-management.system-requirement.system-requirement.standard-requirement.productgroup', compact('productGroups'));
+        } catch (\Exception $e) {
+            Log::error('Error loading product groups: ' . $e->getMessage());
+            
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error loading data from database: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            // Return view with error message using session flash
+            return redirect()->back()->with('error', 'Error loading data from database: ' . $e->getMessage());
+        }
     }
 
     public function store(Request $request)
@@ -22,18 +47,46 @@ class ProductGroupController extends Controller
         ]);
 
         if ($validator->fails()) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+            
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
         }
 
-        ProductGroup::create([
-            'product_group_id' => $request->product_group_id,
-            'product_group_name' => $request->product_group_name,
-            'is_active' => true
-        ]);
+        try {
+            $productGroup = ProductGroup::create([
+                'product_group_id' => $request->product_group_id,
+                'product_group_name' => $request->product_group_name,
+                'is_active' => $request->has('is_active') ? $request->is_active : true
+            ]);
 
-        return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil ditambahkan');
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product group created successfully',
+                    'data' => $productGroup
+                ]);
+            }
+
+            return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil ditambahkan');
+        } catch (\Exception $e) {
+            Log::error('Error creating product group: ' . $e->getMessage());
+            
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error creating product group: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->back()->with('error', 'Error creating product group: ' . $e->getMessage());
+        }
     }
 
     public function edit($id)
@@ -45,36 +98,91 @@ class ProductGroupController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'product_group_name' => 'required|string|max:100',
-        ]);
+        try {
+            $productGroup = ProductGroup::where('product_group_id', $id)->firstOrFail();
+            
+            // Log the incoming request data to debug
+            Log::info('Update product group request data', [
+                'id' => $id,
+                'request_data' => $request->all()
+            ]);
+            
+            $validator = Validator::make($request->all(), [
+                'product_group_name' => 'required|string|max:100',
+                'is_active' => 'required|boolean',
+            ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            if ($validator->fails()) {
+                Log::warning('Product group validation failed', [
+                    'errors' => $validator->errors()->toArray()
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            // Update the product group
+            $productGroup->update([
+                'product_group_name' => $request->product_group_name,
+                'is_active' => $request->is_active
+            ]);
+
+            Log::info('Product group updated successfully', [
+                'id' => $id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product group updated successfully',
+                'data' => $productGroup
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating product group: ' . $e->getMessage(), [
+                'id' => $id,
+                'exception' => $e
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating product group: ' . $e->getMessage()
+            ], 500);
         }
-
-        $productGroup = ProductGroup::where('product_group_id', $id)->firstOrFail();
-        $productGroup->update([
-            'product_group_name' => $request->product_group_name,
-        ]);
-
-        return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil diperbarui');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $productGroup = ProductGroup::where('product_group_id', $id)->firstOrFail();
-        $productGroup->delete();
+        try {
+            $productGroup = ProductGroup::where('product_group_id', $id)->firstOrFail();
+            $productGroup->delete();
 
-        return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil dihapus');
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product group deleted successfully'
+                ]);
+            }
+
+            return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil dihapus');
+        } catch (\Exception $e) {
+            Log::error('Error deleting product group: ' . $e->getMessage());
+            
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting product group: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->back()->with('error', 'Error deleting product group: ' . $e->getMessage());
+        }
     }
 
     /**
      * Display a listing of the resource for printing.
      *
-     * @return \\Illuminate\\View\\View
+     * @return \Illuminate\View\View
      */
     public function viewAndPrint()
     {

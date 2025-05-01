@@ -37,11 +37,14 @@
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                     <i class="fas fa-arrow-left"></i>
                 </button>
-                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" onclick="openProductGroupModal()">
                     <i class="fas fa-search"></i>
                     </button>
-                    <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                    <i class="fas fa-save"></i>
+                    <button type="button" id="addProductGroupBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                    <i class="fas fa-plus"></i>
+                </button>
+                    <button type="button" id="deleteProductGroupBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                    <i class="fas fa-trash"></i>
                 </button>
     </div>
 
@@ -244,15 +247,18 @@
             </div>
 
             <!-- Bottom Buttons -->
-            <div class="mt-4 grid grid-cols-4 gap-2">
+            <div class="mt-4 grid grid-cols-5 gap-2">
                 <button type="button" onclick="sortTableDirectly(0)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-                    <i class="fas fa-sort mr-1"></i>By PG#
+                    <i class="fas fa-sort mr-1"></i>By Code
                 </button>
                 <button type="button" onclick="sortTableDirectly(1)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-                    <i class="fas fa-sort mr-1"></i>By PG Name
+                    <i class="fas fa-sort mr-1"></i>By Name
+                </button>
+                <button type="button" onclick="sortTableDirectly(2)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                    <i class="fas fa-sort mr-1"></i>By Status
                 </button>
                 <button type="button" onclick="editSelectedRow()" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
-                    <i class="fas fa-edit mr-1"></i>Select
+                    <i class="fas fa-edit mr-1"></i>Edit
                 </button>
                 <button type="button" onclick="closeProductGroupModal()" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
                     <i class="fas fa-times mr-1"></i>Exit
@@ -280,7 +286,7 @@
 
         <!-- Form Content -->
         <div class="p-6">
-            <form id="editProductGroupForm" onsubmit="saveProductGroupChanges(); return false;" class="space-y-4">
+            <form id="editProductGroupForm" onsubmit="handleProductGroupFormSubmit(event); return false;" class="space-y-4">
                 <div class="grid grid-cols-1 gap-4">
                     <div>
                         <label for="edit_pg_id" class="block text-sm font-medium text-gray-700 mb-1">PG#:</label>
@@ -288,7 +294,7 @@
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                 <i class="fas fa-hashtag"></i>
                             </span>
-                            <input id="edit_pg_id" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                            <input id="edit_pg_id" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required readonly>
                         </div>
                     </div>
                     
