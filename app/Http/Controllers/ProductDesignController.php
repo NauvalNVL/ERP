@@ -49,7 +49,7 @@ class ProductDesignController extends Controller
         $design = ProductDesign::findOrFail($id);
         
         $validated = $request->validate([
-            'pd_code' => 'required|unique:product_designs,pd_code,' . $id,
+            'pd_code' => 'required|unique:product_designs,pd_code,' . $id . ',id',
             'pd_name' => 'required',
             'product_code' => 'required',
             'dimension' => 'required',
@@ -57,6 +57,14 @@ class ProductDesignController extends Controller
         ]);
 
         $design->update($validated);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Product design updated successfully.',
+                'data' => $design->fresh()
+            ]);
+        }
 
         return redirect()->route('product-design.index')
             ->with('success', 'Product design updated successfully.');

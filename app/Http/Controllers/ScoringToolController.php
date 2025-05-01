@@ -90,19 +90,19 @@ class ScoringToolController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $scoringTool = ScoringTool::findOrFail($id);
-            
-            $validator = Validator::make($request->all(), [
-                'code' => 'required|string|max:10|unique:scoring_tools,code,' . $id,
-                'name' => 'required|string|max:100',
+        $scoringTool = ScoringTool::findOrFail($id);
+        
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|string|max:10|unique:scoring_tools,code,' . $id,
+            'name' => 'required|string|max:100',
                 'scores' => 'required|numeric',
                 'gap' => 'required|numeric',
-                'specification' => 'nullable|string|max:255',
-                'description' => 'nullable|string',
-                'is_active' => 'boolean',
-            ]);
+            'specification' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'is_active' => 'boolean',
+        ]);
 
-            if ($validator->fails()) {
+        if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
                     'message' => $validator->errors()->first()

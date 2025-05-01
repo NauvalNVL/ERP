@@ -23,7 +23,7 @@ class SalespersonController extends Controller
             if ($salespersons->isEmpty()) {
                 $seeder = new SalespersonSeeder();
                 $seeder->run();
-                $salespersons = Salesperson::orderBy('code')->get();
+        $salespersons = Salesperson::orderBy('code')->get();
             }
             
             // If the request wants JSON, return JSON response
@@ -108,15 +108,15 @@ class SalespersonController extends Controller
         try {
             $salesperson = Salesperson::where('code', $code)->firstOrFail();
             
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:100',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:100',
                 'sales_team_id' => 'required|exists:sales_team,id',
                 'position' => 'required|string|max:50',
                 'user_id' => 'nullable|string|max:20',
                 'is_active' => 'required|boolean'
-            ]);
+        ]);
 
-            if ($validator->fails()) {
+        if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
                     'message' => $validator->errors()->first()
@@ -166,14 +166,14 @@ class SalespersonController extends Controller
     public function search(Request $request)
     {
         try {
-            $query = $request->get('query', '');
+        $query = $request->get('query', '');
             
-            $salespersons = Salesperson::where('code', 'like', "%{$query}%")
-                ->orWhere('name', 'like', "%{$query}%")
-                ->orderBy('code')
-                ->get();
+        $salespersons = Salesperson::where('code', 'like', "%{$query}%")
+            ->orWhere('name', 'like', "%{$query}%")
+            ->orderBy('code')
+            ->get();
 
-            return response()->json($salespersons);
+        return response()->json($salespersons);
         } catch (\Exception $e) {
             Log::error('Error searching salespersons: ' . $e->getMessage());
             
@@ -187,8 +187,8 @@ class SalespersonController extends Controller
     public function getDetails($code)
     {
         try {
-            $salesperson = Salesperson::with('salesTeam')
-                ->where('code', $code)
+        $salesperson = Salesperson::with('salesTeam')
+            ->where('code', $code)
                 ->firstOrFail();
 
             return response()->json([

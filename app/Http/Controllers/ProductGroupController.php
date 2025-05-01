@@ -61,8 +61,8 @@ class ProductGroupController extends Controller
 
         try {
             $productGroup = ProductGroup::create([
-                'product_group_id' => $request->product_group_id,
-                'product_group_name' => $request->product_group_name,
+            'product_group_id' => $request->product_group_id,
+            'product_group_name' => $request->product_group_name,
                 'is_active' => $request->has('is_active') ? $request->is_active : true
             ]);
 
@@ -74,7 +74,7 @@ class ProductGroupController extends Controller
                 ]);
             }
 
-            return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil ditambahkan');
+        return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil ditambahkan');
         } catch (\Exception $e) {
             Log::error('Error creating product group: ' . $e->getMessage());
             
@@ -107,12 +107,12 @@ class ProductGroupController extends Controller
                 'request_data' => $request->all()
             ]);
             
-            $validator = Validator::make($request->all(), [
-                'product_group_name' => 'required|string|max:100',
+        $validator = Validator::make($request->all(), [
+            'product_group_name' => 'required|string|max:100',
                 'is_active' => 'required|boolean',
-            ]);
+        ]);
 
-            if ($validator->fails()) {
+        if ($validator->fails()) {
                 Log::warning('Product group validation failed', [
                     'errors' => $validator->errors()->toArray()
                 ]);
@@ -124,8 +124,8 @@ class ProductGroupController extends Controller
             }
 
             // Update the product group
-            $productGroup->update([
-                'product_group_name' => $request->product_group_name,
+        $productGroup->update([
+            'product_group_name' => $request->product_group_name,
                 'is_active' => $request->is_active
             ]);
 
@@ -154,8 +154,8 @@ class ProductGroupController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            $productGroup = ProductGroup::where('product_group_id', $id)->firstOrFail();
-            $productGroup->delete();
+        $productGroup = ProductGroup::where('product_group_id', $id)->firstOrFail();
+        $productGroup->delete();
 
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
@@ -164,7 +164,7 @@ class ProductGroupController extends Controller
                 ]);
             }
 
-            return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil dihapus');
+        return redirect()->route('product-group.index')->with('success', 'Grup Produk berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error deleting product group: ' . $e->getMessage());
             

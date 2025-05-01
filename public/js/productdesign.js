@@ -3,6 +3,7 @@
 // Product Design data management
 let productDesignData = [];
 let currentProductDesignId = null;
+let currentEditingDesignId = null; // Simpan ID saat edit
 
 // Seed data for Product Designs
 const seedProductDesigns = [
@@ -195,13 +196,15 @@ function selectDesign(code, name) {
 function openEditProductDesignModal(row) {
     console.log('Opening edit product design modal for row:', row);
     
+    currentEditingDesignId = row.getAttribute('data-id'); 
+    
     const pdCode = row.getAttribute('data-pd-code');
     const pdName = row.getAttribute('data-pd-name');
     const productCode = row.getAttribute('data-product-code');
     const dimension = row.getAttribute('data-dimension');
     const idc = row.getAttribute('data-idc');
     
-    console.log('Product design data:', { pdCode, pdName, productCode, dimension, idc });
+    console.log('Product design data:', { id: currentEditingDesignId, pdCode, pdName, productCode, dimension, idc });
     
     document.getElementById('edit_pd_code').value = pdCode;
     document.getElementById('edit_pd_name').value = pdName;
@@ -210,7 +213,7 @@ function openEditProductDesignModal(row) {
     document.getElementById('edit_idc').value = idc;
     
     const editModal = document.getElementById('editProductDesignModal');
-    editModal.style.display = 'block';
+    editModal.style.display = 'flex';
     editModal.classList.remove('hidden');
     
     console.log('Edit modal opened');
@@ -222,6 +225,7 @@ function closeEditModal() {
     const editModal = document.getElementById('editProductDesignModal');
     editModal.classList.add('hidden');
     editModal.style.display = 'none';
+    currentEditingDesignId = null;
 }
 
 // Function to display modal
@@ -283,9 +287,23 @@ function setupTableRowEvents() {
     });
 }
 
-// Function to save product design changes
-function saveProductDesignChanges() {
-    console.log('Saving product design changes');
+// Function to save changes from edit modal
+async function saveProductDesignChanges() {
+    console.log('Saving product design changes...');
+    
+    if (!currentEditingDesignId) {
+        console.error('Error: No design ID available for update.');
+        alert('Error: Tidak dapat menemukan ID desain untuk diperbarui.');
+        return;
+    }
+    const designId = currentEditingDesignId;
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (!csrfToken) {
+        console.error('CSRF token not found!');
+        alert('Error: CSRF token tidak ditemukan. Tidak dapat menyimpan perubahan.');
+        return;
+    }
     
     const pdCode = document.getElementById('edit_pd_code').value;
     const pdName = document.getElementById('edit_pd_name').value;
@@ -293,74 +311,66 @@ function saveProductDesignChanges() {
     const dimension = document.getElementById('edit_dimension').value;
     const idc = document.getElementById('edit_idc').value;
     
-    console.log('Form data to save:', { pdCode, pdName, productCode, dimension, idc });
-    
-    // Display loading indicator on button and overlay
-    const saveButton = document.querySelector('#editProductDesignForm button[type="submit"]');
-    const originalText = saveButton.innerText;
-    saveButton.innerText = 'Saving...';
-    saveButton.disabled = true;
-    
-    // Show loading overlay
-    document.getElementById('loadingOverlay').classList.remove('hidden');
-    
-    // Update row in table immediately to provide visual feedback
-    const row = document.querySelector(`#productDesignTable tbody tr[data-pd-code="${pdCode}"]`);
-    if (row) {
-        console.log('Found row to update:', row);
-        
-        try {
-            // Direct DOM manipulation for cell updates
-            const cells = row.cells;
-            console.log('Row has cells:', cells.length);
-            
-            if (cells.length >= 5) {
-                // Update cell text directly
-                cells[1].textContent = pdName;
-                cells[2].textContent = productCode;
-                cells[3].textContent = dimension;
-                
-                // For the IDC cell, update the span inside it
-                const idcSpan = cells[4].querySelector('span');
-                if (idcSpan) {
-                    idcSpan.textContent = idc;
-                } else {
-                    cells[4].textContent = idc;
-                }
-                
-                // Update data attributes
-                row.setAttribute('data-pd-name', pdName);
-                row.setAttribute('data-product-code', productCode);
-                row.setAttribute('data-dimension', dimension);
-                row.setAttribute('data-idc', idc);
-                
-                // Highlight row with Tailwind classes to ensure visibility
-                row.classList.add('bg-blue-600', 'text-white');
-                
-                // Also update seedProductDesigns array to keep data in sync
-                updateSeedProductDesignData(pdCode, pdName, productCode, dimension, idc);
-            } else {
-                console.error('Row does not have enough cells:', cells.length);
-            }
-        } catch (error) {
-            console.error('Error updating row cells:', error);
-        }
-        
-        console.log('Row updated successfully in the table');
-    } else {
-        console.error('Row not found in table for product design code:', pdCode);
+    const updatedData = {
+        pd_code: pdCode, // Kirim juga pd_code jika diperlukan validasi unik di backend
+        pd_name: pdName,
+        product_code: productCode,
+        dimension: dimension,
+        idc: idc
+    };
+
+    console.log('Sending update request for ID:', designId, 'with data:', updatedData);
+    showLoadingOverlay();
+
+    // --- TAMBAH LOGGING --- 
+    console.log('Check designId before fetch:', designId, typeof designId);
+    if (!designId) {
+        alert('CRITICAL ERROR: designId is missing before fetch!');
+        hideLoadingOverlay();
+        return; // Hentikan eksekusi jika ID tidak ada
     }
-    
-    // Show success message and close modal
-    alert('Product design data updated successfully');
-    closeEditModal();
-    
-    // Reset button state and hide loading overlay after a short delay
-    setTimeout(() => {
-        saveButton.innerText = originalText;
-        saveButton.disabled = false;
-        document.getElementById('loadingOverlay').classList.add('hidden');
-    }, 500);
+    const fetchUrl = `/product-design/${designId}`;
+    console.log('Constructed Fetch URL:', fetchUrl);
+    // --- AKHIR LOGGING ---
+
+    try {
+        const response = await fetch(fetchUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken 
+            },
+            body: JSON.stringify(updatedData)
+        });
+
+        const responseData = await response.json();
+        console.log('Update response:', responseData);
+
+        if (!response.ok) {
+            let errorMessage = `HTTP error! status: ${response.status}.`;
+            if (responseData && responseData.message) {
+                errorMessage += ` Pesan: ${responseData.message}`;
+                // Cek jika ada error validasi detail
+                if (responseData.errors) {
+                    const errors = Object.values(responseData.errors).flat().join('\n');
+                    errorMessage += `\nDetails:\n${errors}`;
+                }
+            }
+            throw new Error(errorMessage);
+        }
+
+        alert('Product design updated successfully!');
+        closeEditModal();
+        window.location.reload(); // Reload halaman untuk refresh data
+
+    } catch (error) {
+        console.error('Error saving product design changes:', error);
+        alert('Error saving changes:\n' + error.message);
+    } finally {
+        hideLoadingOverlay();
+    }
 }
 
 // Function to update data in seedProductDesigns array
@@ -437,6 +447,18 @@ function loadSeedData() {
     }, 1000);
 }
 
+// Helper function to show loading overlay (jika belum ada)
+function showLoadingOverlay() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.style.display = 'flex';
+}
+
+// Helper function to hide loading overlay (jika belum ada)
+function hideLoadingOverlay() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
 // Initialize event handlers when document loads
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM content loaded for Product Design');
@@ -497,3 +519,51 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Function to delete a product design
+async function deleteProductDesign(designId) {
+    console.log('Attempting to delete product design with ID:', designId);
+    if (!confirm(`Apakah Anda yakin ingin menghapus Product Design dengan ID ${designId}? Data yang terhapus tidak dapat dikembalikan.`)) {
+        return;
+    }
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (!csrfToken) {
+        console.error('CSRF token not found!');
+        alert('Error: CSRF token tidak ditemukan. Tidak dapat menghapus data.');
+        return;
+    }
+
+    showLoadingOverlay();
+
+    try {
+        const response = await fetch(`/product-design/${designId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        });
+
+        const responseData = await response.json();
+        console.log('Delete response:', responseData);
+
+        if (!response.ok) {
+            let errorMessage = `HTTP error! status: ${response.status}.`;
+            if (responseData && responseData.message) {
+                errorMessage += ` Pesan: ${responseData.message}`;
+            }
+            throw new Error(errorMessage);
+        }
+
+        alert('Product design deleted successfully!');
+        window.location.reload(); // Reload halaman untuk refresh data
+
+    } catch (error) {
+        console.error('Error deleting product design:', error);
+        alert('Error deleting data: ' + error.message);
+    } finally {
+        hideLoadingOverlay();
+    }
+}

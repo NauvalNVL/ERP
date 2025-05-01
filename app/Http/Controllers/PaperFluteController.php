@@ -91,11 +91,11 @@ class PaperFluteController extends Controller
     {
         try {
             $paperFlute = PaperFlute::where('code', $code)->firstOrFail();
-            
+
             $validator = Validator::make($request->all(), [
                 'code' => 'required|string|max:20|unique:paper_flutes,code,' . $paperFlute->id,
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
                 'flute_height' => 'required|numeric',
                 'is_active' => 'boolean',
             ]);

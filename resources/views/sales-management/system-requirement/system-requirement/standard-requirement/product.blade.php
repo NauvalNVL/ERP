@@ -476,91 +476,46 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50 sticky top-0">
                         <tr>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode</th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grup#</th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Kode</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Deskripsi</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Grup#</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Kategori</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">Status</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200" id="productTableBody">
-                        <tr class="hover:bg-cyan-50 cursor-pointer product-row" data-code="001" data-description="BOX" data-group="B" data-category="1">
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold mr-2">001</div>
-                                    <span class="font-medium text-gray-900">001</span>
-                                </div>
+                        @forelse ($products as $item)
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->product_code }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $item->description }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $item->product_group_id }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $item->category }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
+                                @if($item->is_active)
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>
+                                @else
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Nonaktif</span>
+                                @endif
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">BOX</td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">B</span>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                <a href="{{ route('product.edit', $item->product_code) }}" class="text-indigo-600 hover:text-indigo-900 transition-colors mr-3" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('product.destroy', $item->product_code) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:text-red-900 transition-colors" title="Hapus">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">1</td>
                         </tr>
-                        <tr class="hover:bg-cyan-50 cursor-pointer product-row" data-code="002" data-description="SHEET BOARD" data-group="S" data-category="5">
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold mr-2">002</div>
-                                    <span class="font-medium text-gray-900">002</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">SHEET BOARD</td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800">S</span>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">5</td>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Tidak ada data produk yang ditemukan.</td>
                         </tr>
-                        <tr class="hover:bg-cyan-50 cursor-pointer product-row" data-code="003" data-description="BUTT ROLL" data-group="R" data-category="3">
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-teal-500 text-white rounded-full flex items-center justify-center font-bold mr-2">003</div>
-                                    <span class="font-medium text-gray-900">003</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">BUTT ROLL</td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-teal-100 text-teal-800">R</span>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">3</td>
-                        </tr>
-                        <tr class="hover:bg-cyan-50 cursor-pointer product-row" data-code="004" data-description="PENJUALAN WASTE" data-group="OT" data-category="X">
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold mr-2">004</div>
-                                    <span class="font-medium text-gray-900">004</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">PENJUALAN WASTE</td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">OT</span>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">X</td>
-                        </tr>
-                        <tr class="hover:bg-cyan-50 cursor-pointer product-row" data-code="005" data-description="PENJUALAN LAIN LAIN PC5" data-group="OT" data-category="X">
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold mr-2">005</div>
-                                    <span class="font-medium text-gray-900">005</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">PENJUALAN LAIN LAIN PC5</td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">OT</span>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">X</td>
-                        </tr>
-                        <tr class="hover:bg-cyan-50 cursor-pointer product-row" data-code="019" data-description="DIGITAL PRINT" data-group="OF" data-category="1">
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold mr-2">019</div>
-                                    <span class="font-medium text-gray-900">019</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">DIGITAL PRINT</td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">OF</span>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">1</td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

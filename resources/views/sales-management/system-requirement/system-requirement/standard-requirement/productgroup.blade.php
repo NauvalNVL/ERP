@@ -219,6 +219,7 @@
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PG#</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PG Name</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -226,7 +227,7 @@
                         <!-- Jika tidak ada data dari database, JavaScript akan mengisi dengan data dari ProductGroupSeeder -->
                         @if(isset($productGroups) && count($productGroups) > 0)
                         @foreach($productGroups as $group)
-                            <tr class="hover:bg-blue-50 cursor-pointer" 
+                            <tr class="hover:bg-blue-50 cursor-pointer product-group-row" 
                                 data-pg-id="{{ $group->product_group_id }}"
                                 data-pg-name="{{ $group->product_group_name }}"
                                 data-pg-active="{{ $group->is_active ? 'true' : 'false' }}"
@@ -235,11 +236,19 @@
                                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $group->product_group_id }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $group->product_group_name }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $group->is_active ? 'Active' : 'Inactive' }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-center">
+                                    <button type="button" onclick="openEditProductGroupModal(this.closest('tr'))" class="text-indigo-600 hover:text-indigo-900 transition-colors mr-2" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" onclick="deleteProductGroup('{{ $group->product_group_id }}')" class="text-red-600 hover:text-red-900 transition-colors" title="Hapus">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
                         </tr>
                         @endforeach
                         @else
                             <tr>
-                                <td colspan="3" class="px-4 py-4 text-center text-gray-500">Tidak ada data product group yang tersedia.</td>
+                                <td colspan="4" class="px-4 py-4 text-center text-gray-500">Tidak ada data product group yang tersedia.</td>
                             </tr>
                         @endif
                     </tbody>

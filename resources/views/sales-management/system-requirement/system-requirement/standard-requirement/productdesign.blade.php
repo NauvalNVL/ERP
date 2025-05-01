@@ -252,36 +252,44 @@
                 <table class="min-w-full divide-y divide-gray-200" id="productDesignTable">
                     <thead class="bg-gray-50 sticky top-0">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design#</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design Name</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Code</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PD#</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PD Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product#</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dimension</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IDC</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200 text-xs">
                         @if(isset($productDesigns) && count($productDesigns) > 0)
                         @foreach($productDesigns as $design)
-                            <tr class="hover:bg-blue-50 cursor-pointer" 
+                            <tr class="hover:bg-blue-50 cursor-pointer product-design-row"
+                                data-id="{{ $design->id }}"
                             data-pd-code="{{ $design->pd_code }}"
                             data-pd-name="{{ $design->pd_name }}"
                             data-product-code="{{ $design->product_code }}"
-                            data-dimension="{{ $design->dimension ?? '' }}"
+                                data-dimension="{{ $design->dimension }}"
                             data-idc="{{ $design->idc }}"
-                            onclick="selectRow(this); event.stopPropagation();"
-                            ondblclick="selectDesign('{{ $design->pd_code }}', '{{ $design->pd_name }}')">
+                                onclick="selectDesignRow(this); event.stopPropagation();"
+                                ondblclick="editProductDesign(this)">
                                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $design->pd_code }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $design->pd_name }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $design->product_code }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $design->dimension ?? '' }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ $design->idc }}</span>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $design->dimension }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $design->idc }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-center">
+                                    <button type="button" onclick="openEditProductDesignModal(this.closest('tr'))" class="text-indigo-600 hover:text-indigo-900 transition-colors mr-2" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" onclick="deleteProductDesign('{{ $design->id }}')" class="text-red-600 hover:text-red-900 transition-colors" title="Hapus">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
                                 </td>
                         </tr>
                         @endforeach
                         @else
                             <tr>
-                                <td colspan="5" class="px-4 py-4 text-center text-gray-500">Tidak ada data desain produk yang tersedia.</td>
+                                <td colspan="6" class="px-4 py-4 text-center text-gray-500">Tidak ada data desain produk yang tersedia.</td>
                             </tr>
                         @endif
                     </tbody>

@@ -82,12 +82,12 @@ class ColorGroupController extends Controller
                 ], 404);
             }
             
-            $validator = Validator::make($request->all(), [
-                'cg_name' => 'required|string|max:255',
-                'cg_type' => 'required|string|max:255',
-            ]);
+        $validator = Validator::make($request->all(), [
+            'cg_name' => 'required|string|max:255',
+            'cg_type' => 'required|string|max:255',
+        ]);
 
-            if ($validator->fails()) {
+        if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
                     'message' => $validator->errors()->first()

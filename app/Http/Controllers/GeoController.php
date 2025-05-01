@@ -15,7 +15,7 @@ class GeoController extends Controller
                 return response()->json($geos);
             }
             
-            $geoData = Geo::all();
+        $geoData = Geo::all();
             return view('sales-management.system-requirement.system-requirement.standard-requirement.geo', compact('geoData'));
         } catch (\Exception $e) {
             if ($request->ajax()) {
@@ -55,13 +55,13 @@ class GeoController extends Controller
     public function update(Request $request, $code)
     {
         try {
-            $request->validate([
-                'country' => 'required',
-                'state' => 'required',
-                'town' => 'required',
-                'town_section' => 'required',
-                'area' => 'required',
-            ]);
+        $request->validate([
+            'country' => 'required',
+            'state' => 'required',
+            'town' => 'required',
+            'town_section' => 'required',
+            'area' => 'required',
+        ]);
 
             $geo = Geo::where('code', $code)->firstOrFail();
             $geo->update($request->all());
