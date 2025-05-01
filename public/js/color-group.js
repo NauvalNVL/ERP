@@ -26,25 +26,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Function to populate color group table with seed data if empty
+// Function to populate color group table with data from database
 function populateColorGroupTable() {
-    // Sample seed data
-    const seedData = [
-        { cg: 'F1', cg_name: 'Flexo Standard', cg_type: 'X-Flex' },
-        { cg: 'C1', cg_name: 'Coating Gloss', cg_type: 'C-Coating' },
-        { cg: 'S1', cg_name: 'Offset CMYK', cg_type: 'S-Offset' },
-        { cg: 'D1', cg_name: 'Digital Print', cg_type: 'D-Digital' },
-        { cg: 'P1', cg_name: 'Pantone Spot', cg_type: 'P-Pantone' }
-    ];
+    console.log('Populating color group table');
     
-    const table = document.getElementById('colorGroupDataTable');
-    const tbody = table.querySelector('tbody');
-    
-    // Clear any existing no-data message
+    // Remove "no data" message if present
+    const tbody = document.querySelector('#colorGroupDataTable tbody');
     tbody.innerHTML = '';
     
-    // Add seed data rows
-    seedData.forEach(group => {
+    // Show loading message
+    tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">Loading data...</td></tr>';
+    
+    // Fetch data from the database
+    fetch('/color-group', {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Clear loading message
+            tbody.innerHTML = '';
+            
+            if (!Array.isArray(data) || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">Tidak ada data color group yang tersedia.</td></tr>';
+                return;
+            }
+
+            // Fill table with data from database
+            data.forEach(group => {
         const row = document.createElement('tr');
         row.className = 'hover:bg-blue-50 cursor-pointer';
         row.setAttribute('data-cg-id', group.cg);
@@ -62,8 +78,30 @@ function populateColorGroupTable() {
         tbody.appendChild(row);
     });
     
-    // Update the global array
+            console.log('Table populated with database data:', data);
+            
+            // Update the data status message
+            const dbStatusElement = document.querySelector('.bg-yellow-100, .bg-green-100');
+            if (dbStatusElement) {
+                dbStatusElement.className = 'mt-4 bg-green-100 p-3 rounded';
+                dbStatusElement.innerHTML = `
+                    <p class="text-sm font-medium text-green-800">Data tersedia: ${data.length} color group ditemukan.</p>
+                `;
+            }
+            
+            // Capture the data for sorting
     captureExistingData();
+        })
+        .catch(error => {
+            console.error('Error fetching database data:', error);
+            tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-4 text-center text-red-500">
+                Error loading data from database. ${error.message}
+                <br>
+                <button onclick="populateColorGroupTable()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    <i class="fas fa-sync-alt mr-2"></i>Coba Lagi
+                </button>
+            </td></tr>`;
+        });
 }
 
 // Function to capture existing data from the table
@@ -209,10 +247,18 @@ function closeModalX() {
 
 // Function to open the edit color group modal
 function openEditColorGroupModal(row) {
+    console.log('Opening edit color group modal for row:', row);
+    
+    const cgId = row.getAttribute('data-cg-id');
+    const cgName = row.getAttribute('data-cg-name');
+    const cgType = row.getAttribute('data-cg-type');
+    
+    console.log('Color group data:', { cgId, cgName, cgType });
+    
     // Populate the form with the row data
-    document.getElementById('edit_cg_id').value = row.getAttribute('data-cg-id');
-    document.getElementById('edit_cg_name').value = row.getAttribute('data-cg-name');
-    document.getElementById('edit_cg_type').value = row.getAttribute('data-cg-type');
+    document.getElementById('edit_cg_id').value = cgId;
+    document.getElementById('edit_cg_name').value = cgName;
+    document.getElementById('edit_cg_type').value = cgType;
     
     // Make the CG# field read-only for existing rows (editing)
     document.getElementById('edit_cg_id').readOnly = true;
@@ -226,14 +272,24 @@ function openEditColorGroupModal(row) {
     
     // Close the color group table window
     closeColorGroupModal();
+    
+    console.log('Edit modal opened');
 }
 
 // Function to close the edit color group modal
 function closeEditColorGroupModal() {
+    console.log('Closing edit color group modal');
     const modal = document.getElementById('editColorGroupModal');
     if (modal) {
         modal.classList.add('hidden');
     }
+    
+    // Reset form fields
+    document.getElementById('edit_cg_id').value = '';
+    document.getElementById('edit_cg_name').value = '';
+    document.getElementById('edit_cg_type').value = '';
+    document.getElementById('edit_cg_id').readOnly = false;
+    document.getElementById('edit_cg_id').classList.remove('bg-gray-100');
 }
 
 // Function to save color group changes
@@ -244,8 +300,35 @@ function saveColorGroupChanges() {
     const cgName = document.getElementById('edit_cg_name').value;
     const cgType = document.getElementById('edit_cg_type').value;
     
-    // Simulate an AJAX request
-    setTimeout(() => {
+    // Validate input
+    if (!cgName || !cgType) {
+        alert('Please fill in all required fields');
+        hideLoading();
+        return;
+    }
+    
+    // Display loading indicator on button and overlay
+    const saveButton = document.querySelector('#editColorGroupForm button[type="submit"]');
+    const originalText = saveButton.innerHTML;
+    saveButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyimpan...';
+    saveButton.disabled = true;
+    
+    // Send update to server
+    fetch('/color-group/' + cgId, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            cg: cgId,
+            cg_name: cgName,
+            cg_type: cgType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
         // Update the table row if it exists
         const table = document.getElementById('colorGroupDataTable');
         const rows = table.querySelectorAll('tbody tr');
@@ -297,11 +380,25 @@ function saveColorGroupChanges() {
         // Close the edit modal
         closeEditColorGroupModal();
         
-        // Hide loading indicator
+            // Show success message
+            alert('Color group updated successfully');
+            
+            // Refresh the table data
+            populateColorGroupTable();
+        } else {
+            alert('Error updating color group: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating color group:', error);
+        alert('Error updating color group. Please try again.');
+    })
+    .finally(() => {
+        // Reset button state and hide loading overlay
+        saveButton.innerHTML = originalText;
+        saveButton.disabled = false;
         hideLoading();
-    }, 500);
-    
-    return false; // Prevent form submission
+    });
 }
 
 // Function to delete a color group
@@ -309,8 +406,15 @@ function deleteColorGroup(cgId) {
     if (confirm(`Are you sure you want to delete color group "${cgId}"?`)) {
         showLoading();
         
-        // Simulate an AJAX request
-        setTimeout(() => {
+        fetch('/color-group/' + cgId, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
             // Remove the row from the table
             const table = document.getElementById('colorGroupDataTable');
             const rows = table.querySelectorAll('tbody tr');
@@ -334,9 +438,22 @@ function deleteColorGroup(cgId) {
             // Update the captured data
             captureExistingData();
             
-            // Hide loading indicator
+                // Show success message
+                alert('Color group deleted successfully');
+                
+                // Refresh the table data
+                populateColorGroupTable();
+            } else {
+                alert('Error deleting color group: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting color group:', error);
+            alert('Error deleting color group. Please try again.');
+        })
+        .finally(() => {
             hideLoading();
-        }, 500);
+        });
     }
 }
 

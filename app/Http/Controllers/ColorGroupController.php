@@ -71,50 +71,76 @@ class ColorGroupController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'cg_name' => 'required|string|max:255',
-            'cg_type' => 'required|string|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()
-                ->route('system-requirement.color-group.index')
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         try {
-            $colorGroup = ColorGroup::where('cg', $id)->firstOrFail();
+            // Find the color group by cg field instead of id
+            $colorGroup = ColorGroup::where('cg', $id)->first();
+            
+            if (!$colorGroup) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Color group not found'
+                ], 404);
+            }
+            
+            $validator = Validator::make($request->all(), [
+                'cg_name' => 'required|string|max:255',
+                'cg_type' => 'required|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            // Update the color group
             $colorGroup->update([
                 'cg_name' => $request->cg_name,
                 'cg_type' => $request->cg_type,
             ]);
 
-            return redirect()
-                ->route('system-requirement.color-group.index')
-                ->with('success', 'Color group updated successfully');
+            // Get the updated data
+            $updatedGroup = ColorGroup::where('cg', $id)->first();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Color group updated successfully',
+                'data' => $updatedGroup
+            ]);
         } catch (\Exception $e) {
-            Log::error('Error in ColorGroupController@update: ' . $e->getMessage());
-            return redirect()
-                ->route('system-requirement.color-group.index')
-                ->with('error', 'Failed to update color group');
+            Log::error('Error updating color group: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating color group: ' . $e->getMessage()
+            ], 500);
         }
     }
 
     public function destroy($id)
     {
         try {
-            $colorGroup = ColorGroup::where('cg', $id)->firstOrFail();
+            $colorGroup = ColorGroup::where('cg', $id)->first();
+            
+            if (!$colorGroup) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Color group not found'
+                ], 404);
+            }
+            
             $colorGroup->delete();
 
-            return redirect()
-                ->route('system-requirement.color-group.index')
-                ->with('success', 'Color group deleted successfully');
+            return response()->json([
+                'success' => true,
+                'message' => 'Color group deleted successfully'
+            ]);
         } catch (\Exception $e) {
             Log::error('Error in ColorGroupController@destroy: ' . $e->getMessage());
-            return redirect()
-                ->route('system-requirement.color-group.index')
-                ->with('error', 'Failed to delete color group');
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete color group'
+            ], 500);
         }
     }
 
