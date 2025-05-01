@@ -1,93 +1,115 @@
 // Paperflute.js - Functions for paper flute management
 
-// Define seed data for paper flutes
-const seedFlutes = [
-    { flute_id: 'F001', flute_name: 'Single Face', description: 'Standard fluting paper', flute_height: '3.0', is_active: true },
-    { flute_id: 'F002', flute_name: 'Single Wall', description: 'Medium strength fluting', flute_height: '3.6', is_active: true },
-    { flute_id: 'F003', flute_name: 'Double Wall', description: 'Heavy duty fluting paper', flute_height: '7.0', is_active: true },
-    { flute_id: 'F004', flute_name: 'Triple Wall', description: 'Extra heavy duty fluting', flute_height: '10.5', is_active: true },
-    { flute_id: 'F005', flute_name: 'A Flute', description: 'Offers excellent cushioning', flute_height: '4.8', is_active: true },
-    { flute_id: 'F006', flute_name: 'B Flute', description: 'Good crush resistance', flute_height: '3.2', is_active: true },
-    { flute_id: 'F007', flute_name: 'C Flute', description: 'Standard shipping boxes', flute_height: '4.0', is_active: true },
-    { flute_id: 'F008', flute_name: 'E Flute', description: 'Thin profile, good printability', flute_height: '1.6', is_active: true },
-    { flute_id: 'F009', flute_name: 'F Flute', description: 'Very thin profile', flute_height: '0.8', is_active: true },
-    { flute_id: 'F010', flute_name: 'BC Flute', description: 'Combined B and C flutes', flute_height: '6.5', is_active: false }
-];
-
+// Function to populate flute table with data from database
 function populateFluteTable() {
     console.log('Populating flute table');
     
-    // Check if table already has data
+    // Remove "no data" message if present
     const tbody = document.querySelector('#fluteDataTable tbody');
-    const rows = tbody.querySelectorAll('tr');
-    const isEmpty = rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'));
+    tbody.innerHTML = '';
     
-    if (isEmpty) {
-        console.log('Table is empty, populating with seed data');
-        
-        // Remove "no data" message if present
-        tbody.innerHTML = '';
-        
-        // Fill table with data from seedFlutes
-        seedFlutes.forEach(flute => {
-            const row = document.createElement('tr');
-            row.className = 'cursor-pointer hover:bg-blue-50';
-            row.setAttribute('data-flute-id', flute.flute_id);
-            row.setAttribute('data-flute-name', flute.flute_name);
-            row.setAttribute('data-description', flute.description);
-            row.setAttribute('data-flute-height', flute.flute_height);
-            row.setAttribute('data-is-active', flute.is_active);
-            row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
-            row.ondblclick = function() { openEditFluteModal(this); };
+    // Show loading message
+    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-gray-500">Loading data...</td></tr>';
+    
+    // Fetch data from the database
+    fetch('/paper-flute', {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Clear loading message
+            tbody.innerHTML = '';
             
-            // Create columns for each cell
-            const idCell = document.createElement('td');
-            idCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
-            idCell.textContent = flute.flute_id;
+            if (!Array.isArray(data) || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-gray-500">Tidak ada data paper flute yang tersedia.</td></tr>';
+                return;
+            }
+
+            // Fill table with data from database
+            data.forEach(flute => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-blue-50 cursor-pointer';
+                row.setAttribute('data-flute-id', flute.code);
+                row.setAttribute('data-flute-name', flute.name);
+                row.setAttribute('data-description', flute.description);
+                row.setAttribute('data-flute-height', flute.flute_height);
+                row.setAttribute('data-is-active', flute.is_active);
+                row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
+                row.ondblclick = function() { openEditFluteModal(this); };
+                
+                // Create columns for each cell
+                const idCell = document.createElement('td');
+                idCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
+                idCell.textContent = flute.code;
+                
+                const nameCell = document.createElement('td');
+                nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                nameCell.textContent = flute.name;
+                
+                const descriptionCell = document.createElement('td');
+                descriptionCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                descriptionCell.textContent = flute.description;
+                
+                const heightCell = document.createElement('td');
+                heightCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                heightCell.textContent = flute.flute_height;
+                
+                const statusCell = document.createElement('td');
+                statusCell.className = 'px-4 py-3 whitespace-nowrap';
+                
+                const statusBadge = document.createElement('span');
+                statusBadge.className = flute.is_active 
+                    ? 'px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800' 
+                    : 'px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800';
+                statusBadge.textContent = flute.is_active ? 'Active' : 'Inactive';
+                statusCell.appendChild(statusBadge);
+                
+                // Add all cells to row
+                row.appendChild(idCell);
+                row.appendChild(nameCell);
+                row.appendChild(descriptionCell);
+                row.appendChild(heightCell);
+                row.appendChild(statusCell);
+                
+                // Add row to table
+                tbody.appendChild(row);
+            });
             
-            const nameCell = document.createElement('td');
-            nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
-            nameCell.textContent = flute.flute_name;
+            console.log('Table populated with database data:', data);
             
-            const descriptionCell = document.createElement('td');
-            descriptionCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
-            descriptionCell.textContent = flute.description;
+            // Setup event handlers for the table rows
+            setupTableRowEvents();
             
-            const heightCell = document.createElement('td');
-            heightCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
-            heightCell.textContent = flute.flute_height;
+            // Sort table by Code by default
+            sortTableDirectly(0);
             
-            const statusCell = document.createElement('td');
-            statusCell.className = 'px-4 py-3 whitespace-nowrap';
-            
-            const statusBadge = document.createElement('span');
-            statusBadge.className = flute.is_active 
-                ? 'px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800' 
-                : 'px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800';
-            statusBadge.textContent = flute.is_active ? 'Active' : 'Inactive';
-            statusCell.appendChild(statusBadge);
-            
-            // Add all cells to row
-            row.appendChild(idCell);
-            row.appendChild(nameCell);
-            row.appendChild(descriptionCell);
-            row.appendChild(heightCell);
-            row.appendChild(statusCell);
-            
-            // Add row to table
-            tbody.appendChild(row);
+            // Update the data status message
+            const dbStatusElement = document.querySelector('.bg-yellow-100, .bg-green-100');
+            if (dbStatusElement) {
+                dbStatusElement.className = 'mt-4 bg-green-100 p-3 rounded';
+                dbStatusElement.innerHTML = `
+                    <p class="text-sm font-medium text-green-800">Data tersedia: ${data.length} paper flute ditemukan.</p>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching database data:', error);
+            tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-4 text-center text-red-500">
+                Error loading data from database. ${error.message}
+                <br>
+                <button onclick="populateFluteTable()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    <i class="fas fa-sync-alt mr-2"></i>Coba Lagi
+                </button>
+            </td></tr>`;
         });
-        
-        console.log('Table populated with seed data');
-        
-        // Setup event handlers for the table rows
-        setupTableRowEvents();
-        
-        // Sort table by Flute ID
-        sortTableDirectly(0);
-    } else {
-        console.log('Table already has data, no need to populate');
-    }
 }
 
 // Function to sort table
@@ -154,12 +176,12 @@ function sortTableDirectly(columnIndex) {
     console.log("Sorting complete");
 }
 
-// Function to edit selected row (Edit button)
+// Function to edit selected row
 function editSelectedRow() {
     var selectedRow = document.querySelector('#fluteDataTable tbody tr.bg-blue-600');
     if (!selectedRow) {
         console.log("No row selected");
-        alert("Please select a flute first");
+        alert("Silahkan pilih paper flute terlebih dahulu");
         return;
     }
     
@@ -180,6 +202,10 @@ function selectRow(row) {
     
     // Add highlighting to selected row
     row.classList.add('bg-blue-600', 'text-white');
+
+    // Update the main code input field with the selected row's code
+    const code = row.getAttribute('data-flute-id');
+    document.getElementById('code').value = code;
 }
 
 // Function to open edit modal
@@ -201,7 +227,6 @@ function openEditFluteModal(row) {
     document.getElementById('edit_is_active').checked = isActive;
     
     const editModal = document.getElementById('editFluteModal');
-    editModal.style.display = 'block';
     editModal.classList.remove('hidden');
     
     console.log('Edit modal opened');
@@ -212,7 +237,6 @@ function closeEditFluteModal() {
     console.log('Closing edit flute modal');
     const editModal = document.getElementById('editFluteModal');
     editModal.classList.add('hidden');
-    editModal.style.display = 'none';
 }
 
 // Function to display modal
@@ -225,13 +249,12 @@ function openFluteModal() {
     }
     
     // Show modal
-    modal.style.display = 'block';
     modal.classList.remove('hidden');
     
-    // Populate table with data from seed data if needed
+    // Populate table with data if needed
     populateFluteTable();
     
-    // Sort by Flute ID by default
+    // Sort by Code by default
     sortTableDirectly(0);
     
     console.log('Modal opened successfully');
@@ -241,7 +264,6 @@ function openFluteModal() {
 function closeFluteModal() {
     var modal = document.getElementById('fluteTableWindow');
     if (modal) {
-        modal.style.display = 'none';
         modal.classList.add('hidden');
     }
 }
@@ -278,113 +300,154 @@ function setupTableRowEvents() {
 function saveFluteChanges() {
     console.log('Saving flute changes');
     
-    const fluteId = document.getElementById('edit_flute_id').value;
-    const fluteName = document.getElementById('edit_flute_name').value;
-    const description = document.getElementById('edit_description').value;
-    const fluteHeight = document.getElementById('edit_flute_height').value;
-    const isActive = document.getElementById('edit_is_active').checked;
+    // Get form elements
+    const editFluteId = document.getElementById('edit_flute_id');
+    const editFluteName = document.getElementById('edit_flute_name');
+    const editDescription = document.getElementById('edit_description');
+    const editFluteHeight = document.getElementById('edit_flute_height');
+    const editIsActive = document.getElementById('edit_is_active');
     
-    console.log('Form data to save:', { fluteId, fluteName, description, fluteHeight, isActive });
+    // Check if all required elements exist
+    if (!editFluteId || !editFluteName || !editDescription || !editFluteHeight || !editIsActive) {
+        console.error('Required form elements not found');
+        alert('Error: Form elements not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    const code = editFluteId.value;
+    const name = editFluteName.value;
+    const description = editDescription.value;
+    const fluteHeight = editFluteHeight.value;
+    const isActive = editIsActive.checked;
+    
+    console.log('Form data to save:', { code, name, description, fluteHeight, isActive });
+    
+    // Validate input
+    if (!name) {
+        alert('Nama paper flute tidak boleh kosong');
+        return;
+    }
+    
+    // Get save button and loading overlay
+    const saveButton = document.querySelector('#editFluteForm button[type="submit"]');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    
+    if (!saveButton || !loadingOverlay) {
+        console.error('Required UI elements not found');
+        alert('Error: UI elements not found. Please refresh the page and try again.');
+        return;
+    }
     
     // Display loading indicator on button and overlay
-    const saveButton = document.querySelector('#editFluteForm button[type="submit"]');
-    const originalText = saveButton.innerText;
-    saveButton.innerText = 'Saving...';
+    const originalText = saveButton.innerHTML;
+    saveButton.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyimpan...';
     saveButton.disabled = true;
     
     // Show loading overlay
-    document.getElementById('loadingOverlay').classList.remove('hidden');
+    loadingOverlay.classList.remove('hidden');
     
-    // Update row in table immediately to provide visual feedback
-    const row = document.querySelector(`#fluteDataTable tbody tr[data-flute-id="${fluteId}"]`);
-    if (row) {
-        console.log('Found row to update:', row);
-        
-        try {
-            // Direct DOM manipulation for cell updates
-            const cells = row.cells;
-            console.log('Row has cells:', cells.length);
-            
-            if (cells.length >= 5) {
-                // Update cell text directly
-                cells[1].textContent = fluteName;
-                cells[2].textContent = description;
-                cells[3].textContent = fluteHeight;
-                
-                // Update status badge
-                const statusBadge = cells[4].querySelector('span');
-                statusBadge.className = isActive 
-                    ? 'px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800' 
-                    : 'px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800';
-                statusBadge.textContent = isActive ? 'Active' : 'Inactive';
-                
-                // Update data attributes
-                row.setAttribute('data-flute-name', fluteName);
-                row.setAttribute('data-description', description);
-                row.setAttribute('data-flute-height', fluteHeight);
-                row.setAttribute('data-is-active', isActive);
-                
-                // Highlight row with Tailwind classes to ensure visibility
-                row.classList.add('bg-blue-600', 'text-white');
-                
-                // Also update seedFlutes array to keep data in sync
-                updateSeedFluteData(fluteId, fluteName, description, fluteHeight, isActive);
-            } else {
-                console.error('Row does not have enough cells:', cells.length);
-            }
-        } catch (error) {
-            console.error('Error updating row cells:', error);
-        }
-        
-        console.log('Row updated successfully in the table');
-    } else {
-        console.error('Row not found in table for flute ID:', fluteId);
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        console.error('CSRF token not found');
+        alert('Error: Security token not found. Please refresh the page and try again.');
+        return;
     }
     
-    // Show success message and close modal
-    alert('Paper flute data updated successfully');
-    closeEditFluteModal();
-    
-    // Reset button state and hide loading overlay after a short delay
-    setTimeout(() => {
-        saveButton.innerText = originalText;
-        saveButton.disabled = false;
-        document.getElementById('loadingOverlay').classList.add('hidden');
-    }, 500);
-}
-
-// Function to update data in seedFlutes array
-function updateSeedFluteData(fluteId, fluteName, description, fluteHeight, isActive) {
-    // Find flute with matching ID in seedFlutes array
-    const fluteIndex = seedFlutes.findIndex(flute => flute.flute_id === fluteId);
-    
-    if (fluteIndex !== -1) {
-        console.log(`Updating seedFlutes[${fluteIndex}] with new data`);
-        
-        // Update data in array
-        seedFlutes[fluteIndex].flute_name = fluteName;
-        seedFlutes[fluteIndex].description = description;
-        seedFlutes[fluteIndex].flute_height = fluteHeight;
-        seedFlutes[fluteIndex].is_active = isActive;
-        
-        console.log('Updated seedFlutes:', seedFlutes[fluteIndex]);
-    } else {
-        console.log(`Flute with ID ${fluteId} not found in seedFlutes array`);
-        
-        // If not found, add as new item
-        seedFlutes.push({
-            flute_id: fluteId,
-            flute_name: fluteName,
+    // Send update to server
+    fetch('/paper-flute/' + code, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken.content,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            code: code,
+            name: name,
             description: description,
             flute_height: fluteHeight,
-            is_active: isActive
-        });
-        
-        console.log('Added new flute to seedFlutes array');
-    }
+            is_active: isActive,
+            tur_l2b: 1.00,
+            tur_l3: 1.40,
+            tur_l1: 1.00,
+            tur_ace: 1.50,
+            tur_2l: 1.00,
+            starch_consumption: 0.00
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.message || 'Error updating paper flute');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            console.log('Paper flute updated successfully:', data);
+            
+            // Update row in table
+            const row = document.querySelector(`#fluteDataTable tbody tr[data-flute-id="${code}"]`);
+            if (row) {
+                const cells = row.cells;
+                if (cells.length >= 5) {
+                    cells[1].textContent = name;
+                    cells[2].textContent = description;
+                    cells[3].textContent = fluteHeight;
+                    
+                    // Update status badge
+                    const statusBadge = cells[4].querySelector('span');
+                    if (statusBadge) {
+                        statusBadge.className = isActive 
+                            ? 'px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800' 
+                            : 'px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800';
+                        statusBadge.textContent = isActive ? 'Active' : 'Inactive';
+                    }
+                    
+                    // Update data attributes
+                    row.setAttribute('data-flute-name', name);
+                    row.setAttribute('data-description', description);
+                    row.setAttribute('data-flute-height', fluteHeight);
+                    row.setAttribute('data-is-active', isActive);
+                }
+            }
+            
+            // Update the main code input field
+            const mainCodeInput = document.getElementById('code');
+            if (mainCodeInput) {
+                mainCodeInput.value = code;
+            }
+            
+            // Close the edit modal
+            closeEditFluteModal();
+            
+            // Refresh the table data
+            populateFluteTable();
+            
+            alert('Data paper flute berhasil diperbarui');
+        } else {
+            throw new Error(data.message || 'Error updating paper flute');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating paper flute:', error);
+        alert('Error updating paper flute: ' + error.message);
+    })
+    .finally(() => {
+        // Reset button state and hide loading overlay
+        if (saveButton) {
+            saveButton.innerHTML = originalText;
+            saveButton.disabled = false;
+        }
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('hidden');
+        }
+    });
 }
 
-// Function to make seed data available without database
+// Function to load seed data
 function loadSeedData() {
     // Check if data is already loaded
     const tbody = document.querySelector('#fluteDataTable tbody');
@@ -399,46 +462,101 @@ function loadSeedData() {
     // Empty the table
     tbody.innerHTML = '';
     
-    // Simulate loading
-    setTimeout(() => {
-        // Fill table with data from seedFlutes
-        populateFluteTable();
-        
-        // Show notification
-        alert('Paper flute data loaded successfully');
-        
-        // Hide loading overlay
-        if (loadingOverlay) {
-            loadingOverlay.classList.add('hidden');
-        }
-        
-        // Update notification on main page
-        const dbStatusElement = document.querySelector('.bg-yellow-100');
-        if (dbStatusElement) {
-            dbStatusElement.classList.remove('bg-yellow-100');
-            dbStatusElement.classList.add('bg-green-100');
-            dbStatusElement.innerHTML = `
-                <p class="text-sm font-medium text-green-800">Data available: ${seedFlutes.length} paper flutes found (from JavaScript).</p>
-            `;
-        }
-        
-        // Open modal to display data
-        openFluteModal();
-    }, 1000);
+    // Fetch data from the database
+    fetch('/paper-flute')
+        .then(response => response.json())
+        .then(data => {
+            // Fill table with data from database
+            data.forEach(flute => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-blue-50 cursor-pointer';
+                row.setAttribute('data-flute-id', flute.code);
+                row.setAttribute('data-flute-name', flute.name);
+                row.setAttribute('data-description', flute.description);
+                row.setAttribute('data-flute-height', flute.flute_height);
+                row.setAttribute('data-is-active', flute.is_active);
+                row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
+                row.ondblclick = function() { openEditFluteModal(this); };
+                
+                // Create cells
+                const idCell = document.createElement('td');
+                idCell.className = 'px-4 py-3 whitespace-nowrap font-medium text-gray-900';
+                idCell.textContent = flute.code;
+                
+                const nameCell = document.createElement('td');
+                nameCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                nameCell.textContent = flute.name;
+                
+                const descriptionCell = document.createElement('td');
+                descriptionCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                descriptionCell.textContent = flute.description;
+                
+                const heightCell = document.createElement('td');
+                heightCell.className = 'px-4 py-3 whitespace-nowrap text-gray-700';
+                heightCell.textContent = flute.flute_height;
+                
+                const statusCell = document.createElement('td');
+                statusCell.className = 'px-4 py-3 whitespace-nowrap';
+                
+                const statusBadge = document.createElement('span');
+                statusBadge.className = flute.is_active 
+                    ? 'px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800' 
+                    : 'px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800';
+                statusBadge.textContent = flute.is_active ? 'Active' : 'Inactive';
+                statusCell.appendChild(statusBadge);
+                
+                // Add cells to row
+                row.appendChild(idCell);
+                row.appendChild(nameCell);
+                row.appendChild(descriptionCell);
+                row.appendChild(heightCell);
+                row.appendChild(statusCell);
+                
+                // Add row to table
+                tbody.appendChild(row);
+            });
+            
+            // Show notification
+            alert('Data paper flute berhasil dimuat dari database');
+            
+            // Hide loading overlay
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+            }
+            
+            // Open modal to display data
+            openFluteModal();
+        })
+        .catch(error => {
+            console.error('Error loading data:', error);
+            tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-gray-500">Error loading data from database.</td></tr>';
+            
+            // Hide loading overlay
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+            }
+            
+            alert('Error loading data from database. Please try again.');
+        });
 }
 
 // Initialize event handlers when document loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM content loaded for Paper Flute');
+    console.log('DOM content loaded for paper flute');
     
     // Setup row events initially
     setupTableRowEvents();
     
-    // Initialize flute table if open button exists
+    // Initialize flute table if show button exists
     const showBtn = document.getElementById('showFluteTableBtn');
     if (showBtn) {
-        console.log('Show button found, setting up event listener');
         showBtn.addEventListener('click', openFluteModal);
+    }
+    
+    // Setup load data button if it exists
+    const loadDataBtn = document.getElementById('loadDataJsBtn');
+    if (loadDataBtn) {
+        loadDataBtn.addEventListener('click', loadSeedData);
     }
     
     // Close modal when clicking outside table
@@ -458,30 +576,5 @@ document.addEventListener('DOMContentLoaded', function() {
             closeEditFluteModal();
         }
     };
-    
-    // Add event listener for search functionality
-    const searchInput = document.getElementById('searchFluteInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#fluteDataTable tbody tr');
-            
-            rows.forEach(row => {
-                // Skip the "no data" row if it exists
-                if (row.querySelector('td[colspan]')) return;
-                
-                const fluteId = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-                const fluteName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                const description = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-                
-                if (fluteId.includes(searchTerm) || 
-                    fluteName.includes(searchTerm) || 
-                    description.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    }
 });
+
