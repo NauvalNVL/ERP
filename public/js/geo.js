@@ -4,83 +4,391 @@
 let selectedRow = null;
 let geoData = [];
 
-// Sample seed data for geo areas
-const seedGeoData = [
-    { code: '0001', country: 'INDONESIA', state: 'ACEH', town: 'BANDA ACEH', town_section: 'BANDA ACEH', area: 'ACH' },
-    { code: '0002', country: 'INDONESIA', state: 'ACEH', town: 'SABANG', town_section: 'SABANG', area: 'ACH' },
-    { code: '0003', country: 'INDONESIA', state: 'ACEH', town: 'LANGSA', town_section: 'LANGSA', area: 'ACH' },
-    { code: '0004', country: 'INDONESIA', state: 'SUMATERA', town: 'MEDAN', town_section: 'MEDAN', area: 'MDN' },
-    { code: 'B110', country: 'INDONESIA', state: 'BANTEN', town: 'CILEGON', town_section: 'CILEGON', area: 'BTNW' },
-    { code: 'B111', country: 'INDONESIA', state: 'BANTEN', town: 'CILEGON', town_section: 'CILEGON', area: 'BTNE' },
-    { code: 'J001', country: 'INDONESIA', state: 'JAKARTA', town: 'JAKARTA PUSAT', town_section: 'MENTENG', area: 'JKT' },
-    { code: 'J002', country: 'INDONESIA', state: 'JAKARTA', town: 'JAKARTA SELATAN', town_section: 'KEBAYORAN', area: 'JKT' },
-    { code: 'S001', country: 'SINGAPORE', state: 'SINGAPORE', town: 'SINGAPORE', town_section: 'CENTRAL', area: 'SG' },
-    { code: 'M001', country: 'MALAYSIA', state: 'KUALA LUMPUR', town: 'KUALA LUMPUR', town_section: 'CENTRAL', area: 'MY' }
-];
-
-// Initialize event handlers when document loads
+// Initialize when document is ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM content loaded for Geo.js');
+    console.log('Initializing geo.js');
     
-    // Load geo data for local search and table population
+    // Initialize geo data
     initializeGeoData();
     
-    // Set up event listeners
-    setupEventListeners();
-});
-
-// Initialize geo data from table or seed data
-function initializeGeoData() {
-    const rows = document.querySelectorAll('#geoTableBody tr:not(.empty-message)');
+    // Setup sort buttons
+    setupSortButtons();
     
-    // If no data in the table, we'll use our seed data
-    if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'))) {
-        geoData = [...seedGeoData]; // Use seed data
-        console.log('Using seed data for geo');
-    } else {
-        // Extract data from the existing table
-        geoData = [];
-        rows.forEach(row => {
-            if (row.getAttribute('data-code')) {
-                geoData.push({
-                    code: row.getAttribute('data-code'),
-                    area: row.getAttribute('data-area'),
-                    country: row.querySelector('td:nth-child(3)').textContent.trim(),
-                    state: row.querySelector('td:nth-child(4)').textContent.trim(),
-                    town: row.querySelector('td:nth-child(5)').textContent.trim(),
-                    town_section: row.querySelector('td:nth-child(6)').textContent.trim()
-                });
+    // Setup modal triggers
+    const showGeoTableBtn = document.getElementById('showGeoTableBtn');
+    if (showGeoTableBtn) {
+        showGeoTableBtn.addEventListener('click', function() {
+            const geoModal = document.getElementById('geoModal');
+            if (geoModal) {
+                geoModal.classList.remove('hidden');
+                // Refresh data when opening modal
+                initializeGeoData();
             }
         });
-        console.log('Extracted data from table, found ' + geoData.length + ' records');
+    }
+    
+    // Setup review button
+    const btnReview = document.getElementById('btnReview');
+    if (btnReview) {
+        btnReview.addEventListener('click', function(e) {
+            e.preventDefault();
+            reviewGeoData();
+        });
+    }
+    
+    // Setup modal close buttons
+    document.querySelectorAll('[onclick*="toggleModal"]').forEach(button => {
+        const modalId = button.getAttribute('onclick').match(/'([^']+)'/)?.[1];
+        if (modalId) {
+            button.onclick = (e) => {
+                e.preventDefault();
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.add('hidden');
+                }
+            };
+        }
+    });
+    
+    // Setup click outside modal to close
+    window.addEventListener('click', function(e) {
+        const geoModal = document.getElementById('geoModal');
+        const editGeoModal = document.getElementById('editGeoModal');
+        const reviewGeoModal = document.getElementById('reviewGeoModal');
+        
+        [geoModal, editGeoModal, reviewGeoModal].forEach(modal => {
+            if (modal && e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    });
+    
+    // Setup search functionality
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            filterGeoTable(this.value);
+        });
+    }
+});
+
+// Initialize geo data from database
+function initializeGeoData() {
+    const tbody = document.querySelector('#geoTableBody');
+    if (!tbody) return;
+    
+    // Show loading message
+    tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-4 text-center text-gray-500">Loading data...</td></tr>';
+    
+    // Get CSRF token
+    const token = document.querySelector('meta[name="csrf-token"]')?.content;
+    
+    if (!token) {
+        tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-4 text-center text-red-500">Error: CSRF token not found</td></tr>';
+        return;
+    }
+    
+    // Fetch data from the database
+    fetch('/geo', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': token
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Store data globally
+        window.geoData = data;
+        
+        // Clear loading message
+        tbody.innerHTML = '';
+        
+        if (!Array.isArray(data)) {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            throw new Error('Invalid response format');
+        }
+        
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-4 text-center text-gray-500">Tidak ada data geo yang tersedia.</td></tr>';
+            return;
+        }
+
+        // Fill table with data
+        data.forEach((geo, index) => {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-blue-50 cursor-pointer';
+            row.setAttribute('data-code', geo.code);
+            row.setAttribute('data-area', geo.area);
+            
+            // Add click handlers
+            row.onclick = (e) => {
+                e.stopPropagation();
+                selectGeoRow(row);
+            };
+            
+            row.ondblclick = (e) => {
+                e.stopPropagation();
+                editGeoData(geo.code);
+            };
+            
+            row.innerHTML = `
+                <td class="px-4 py-3 whitespace-nowrap">${index + 1}</td>
+                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${geo.code}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">${geo.country}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">${geo.state}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">${geo.town}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">${geo.town_section}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">${geo.area}</span>
+                </td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+        
+        // Update status message
+        const dbStatusElement = document.querySelector('.bg-yellow-100, .bg-green-100');
+        if (dbStatusElement) {
+            dbStatusElement.className = 'mt-4 bg-green-100 p-3 rounded';
+            dbStatusElement.innerHTML = `
+                <p class="text-sm font-medium text-green-800">Data tersedia: ${data.length} geo ditemukan.</p>
+            `;
+        }
+
+        // Setup event handlers for the table
+        setupTableEventHandlers();
+    })
+    .catch(error => {
+        console.error('Error fetching geo data:', error);
+        tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-4 text-center text-red-500">
+            Error loading data from database: ${error.message}
+            <br>
+            <button onclick="initializeGeoData()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                <i class="fas fa-sync-alt mr-2"></i>Coba Lagi
+            </button>
+        </td></tr>`;
+    });
+}
+
+// Function to setup modal triggers
+function setupModalTriggers() {
+    // Setup show table button
+    const showTableBtn = document.getElementById('showGeoTableBtn');
+    if (showTableBtn) {
+        showTableBtn.addEventListener('click', function() {
+            toggleModal('geoModal');
+        });
+    }
+    
+    // Setup close buttons
+    document.querySelectorAll('[data-modal-close]').forEach(button => {
+        button.addEventListener('click', function() {
+            const modalId = this.getAttribute('data-modal-close');
+            toggleModal(modalId);
+        });
+    });
+}
+
+// Function to setup table event handlers
+function setupTableEventHandlers() {
+    const tbody = document.querySelector('#geoTableBody');
+    if (!tbody) return;
+
+    // Remove existing event listeners
+    const oldRows = tbody.getElementsByTagName('tr');
+    Array.from(oldRows).forEach(row => {
+        row.onclick = null;
+        row.ondblclick = null;
+    });
+
+    // Add new event listeners
+    const rows = tbody.getElementsByTagName('tr');
+    Array.from(rows).forEach(row => {
+        if (!row.querySelector('td[colspan]')) { // Skip message rows
+            row.onclick = (e) => {
+                e.stopPropagation();
+                selectGeoRow(row);
+            };
+            
+            row.ondblclick = (e) => {
+                e.stopPropagation();
+                const code = row.getAttribute('data-code');
+                if (code) {
+                    editGeoData(code);
+                }
+            };
+        }
+    });
+}
+
+// Function to initialize search functionality
+function initializeSearch() {
+    const searchInput = document.querySelector('#geoModal input[type="search"]');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            filterTable(this.value);
+        });
     }
 }
 
-// Set up event listeners for various elements
-function setupEventListeners() {
-    // Search input in modal
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('keyup', function(e) {
-            filterGeoTable(this.value);
-            
-            // Handle enter key for single result selection
-            if (e.key === 'Enter') {
-                selectSingleResult();
-            }
-        });
+// Function to toggle modal visibility
+function toggleModal(modalId) {
+    console.log('Toggling modal:', modalId);
+    const modal = document.getElementById(modalId);
+    if (!modal) {
+        console.error('Modal not found:', modalId);
+        return;
     }
     
-    // Add double-click handler for table rows
-    setupTableRowEvents();
+    const isHidden = modal.classList.contains('hidden');
     
-    // Add keyboard navigation
-    document.addEventListener('keydown', handleKeyboardNavigation);
+    // Hide all other modals first
+    ['geoModal', 'editGeoModal', 'reviewGeoModal'].forEach(id => {
+        if (id !== modalId) {
+            const otherModal = document.getElementById(id);
+            if (otherModal) {
+                otherModal.classList.add('hidden');
+            }
+        }
+    });
     
-    // Review button
-    const btnReview = document.getElementById('btnReview');
-    if (btnReview) {
-        btnReview.addEventListener('click', reviewGeoData);
+    // Toggle target modal
+    if (isHidden) {
+        modal.classList.remove('hidden');
+        if (modalId === 'geoModal') {
+            // Refresh data when opening main geo modal
+            initializeGeoData();
+        }
+    } else {
+        modal.classList.add('hidden');
+    }
+    
+    console.log(`Modal ${modalId} is now ${isHidden ? 'visible' : 'hidden'}`);
+}
+
+// Function to edit geo data
+function editGeoData(code) {
+    console.log('Editing geo data for code:', code);
+    
+    // Find the geo item in data
+    const geoItem = window.geoData?.find(item => item.code === code);
+    
+    if (geoItem) {
+        // Fill the form with data
+        const editGeoCode = document.getElementById('editGeoCode');
+        if (!editGeoCode) {
+            console.error('Edit form elements not found');
+            showNotification('error', 'Terjadi kesalahan saat membuka form edit');
+            return;
+        }
+
+        try {
+            // Fill form fields
+            editGeoCode.value = geoItem.code;
+            editGeoCode.setAttribute('data-original-code', geoItem.code);
+            
+            document.getElementById('editCountry').value = geoItem.country;
+            document.getElementById('editState').value = geoItem.state;
+            document.getElementById('editTown').value = geoItem.town;
+            document.getElementById('editTownSection').value = geoItem.town_section;
+            document.getElementById('editGeoArea').value = geoItem.area;
+            
+            // Close geo table modal first if it's open
+            const geoModal = document.getElementById('geoModal');
+            if (geoModal && !geoModal.classList.contains('hidden')) {
+                geoModal.classList.add('hidden');
+            }
+            
+            // Show edit modal
+            const editModal = document.getElementById('editGeoModal');
+            if (editModal) {
+                editModal.classList.remove('hidden');
+                console.log('Edit modal opened successfully');
+            } else {
+                console.error('Edit modal element not found');
+                showNotification('error', 'Terjadi kesalahan saat membuka form edit');
+            }
+        } catch (error) {
+            console.error('Error while setting up edit form:', error);
+            showNotification('error', 'Terjadi kesalahan saat menyiapkan form edit');
+        }
+    } else {
+        console.error('Geo data not found for code:', code);
+        showNotification('error', 'Data geo tidak ditemukan');
+    }
+}
+
+// Function to select a row in the table
+function selectGeoRow(row) {
+    console.log('Selecting row:', row);
+    
+    // Remove highlight from previously selected row
+    const previouslySelected = document.querySelector('#geoTableBody tr.selected');
+    if (previouslySelected) {
+        previouslySelected.classList.remove('selected', 'bg-blue-100');
+    }
+    
+    // Add highlight to selected row
+    row.classList.add('selected', 'bg-blue-100');
+    
+    // Update the main input field with the selected code
+    const code = row.getAttribute('data-code');
+    if (code) {
+        document.getElementById('geoCode').value = code;
+    }
+}
+
+// Function to filter table based on search input
+function filterTable(searchTerm) {
+    const tbody = document.querySelector('#geoTableBody');
+    if (!tbody) return;
+    
+    const rows = tbody.getElementsByTagName('tr');
+    const searchTermLower = searchTerm.toLowerCase();
+    let hasResults = false;
+    
+    for (const row of rows) {
+        // Skip "no results" row
+        if (row.classList.contains('no-results')) continue;
+        
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTermLower)) {
+            row.style.display = '';
+            hasResults = true;
+        } else {
+            row.style.display = 'none';
+        }
+    }
+    
+    // Show/hide no results message
+    let noResultsRow = tbody.querySelector('.no-results');
+    if (!hasResults) {
+        if (!noResultsRow) {
+            noResultsRow = document.createElement('tr');
+            noResultsRow.className = 'no-results';
+            noResultsRow.innerHTML = `
+                <td colspan="7" class="px-4 py-4 text-center text-gray-500">
+                    Tidak ada hasil untuk pencarian "${searchTerm}"
+                </td>
+            `;
+            tbody.appendChild(noResultsRow);
+        } else {
+            noResultsRow.style.display = '';
+        }
+    } else if (noResultsRow) {
+        noResultsRow.style.display = 'none';
     }
 }
 
@@ -188,25 +496,6 @@ function selectGeoByCode(code) {
     }
 }
 
-// Function to edit geo data
-function editGeoData(code) {
-    // Find the geo item in data
-    const geoItem = geoData.find(item => item.code === code);
-    
-    if (geoItem) {
-        // Fill the form with data
-        document.getElementById('editGeoCode').value = geoItem.code;
-        document.getElementById('editCountry').value = geoItem.country;
-        document.getElementById('editState').value = geoItem.state;
-        document.getElementById('editTown').value = geoItem.town;
-        document.getElementById('editTownSection').value = geoItem.town_section;
-        document.getElementById('editGeoArea').value = geoItem.area;
-        
-        // Show the edit modal
-        toggleModal('editGeoModal');
-    }
-}
-
 // Function to create new geo
 function createNewGeo(code) {
     // Reset form
@@ -228,10 +517,10 @@ function reviewGeoData() {
     const town = document.getElementById('editTown').value;
     const townSection = document.getElementById('editTownSection').value;
     const geoArea = document.getElementById('editGeoArea').value;
-    
+
     // Validate data
     if (!geoCode || !country) {
-        alert('Kode Geo dan Negara harus diisi!');
+        showNotification('error', 'Kode Geo dan Negara harus diisi!');
         return;
     }
     
@@ -254,155 +543,245 @@ function confirmAndSave() {
     saveGeoData();
 }
 
+// Function to validate geo code before saving
+function validateGeoCode(code, isEdit = false, originalCode = null) {
+    // If editing, skip validation if code hasn't changed
+    if (isEdit && code === originalCode) {
+        return { valid: true };
+    }
+
+    // Check if code already exists in current data
+    const existingGeo = window.geoData?.find(item => item.code === code);
+    if (existingGeo) {
+        return {
+            valid: false,
+            message: 'Kode geo sudah digunakan. Silakan gunakan kode lain.'
+        };
+    }
+    return { valid: true };
+}
+
 // Function to save geo data
 function saveGeoData() {
     // Get form data
     const geoCode = document.getElementById('editGeoCode').value;
+    const originalCode = document.getElementById('editGeoCode').getAttribute('data-original-code');
     const country = document.getElementById('editCountry').value;
     const state = document.getElementById('editState').value;
     const town = document.getElementById('editTown').value;
     const townSection = document.getElementById('editTownSection').value;
     const geoArea = document.getElementById('editGeoArea').value;
     
-    // Validate data
+    // Basic validation
     if (!geoCode || !country) {
-        alert('Kode Geo dan Negara harus diisi!');
+        showNotification('error', 'Kode Geo dan Negara harus diisi!');
         return;
     }
-    
-    // Set code to input field
-    document.getElementById('geoCode').value = geoCode;
-    
-    // Hide modal
-    toggleModal('editGeoModal');
-    
-    // Check if this is an update or new record
-    const existingIndex = geoData.findIndex(item => item.code === geoCode);
-    
-    if (existingIndex !== -1) {
-        // Update existing record
-        geoData[existingIndex] = {
-            code: geoCode,
-            country: country,
-            state: state,
-            town: town,
-            town_section: townSection,
-            area: geoArea
-        };
-        
-        // Show success message
-        document.getElementById('geoCodeResult').innerHTML = `
-            <div class="p-3 bg-green-100 rounded-lg mt-2">
-                <p class="text-sm text-green-800">Data berhasil diperbarui: <span class="font-semibold">${geoCode}</span> - ${geoArea}</p>
-            </div>
-        `;
-    } else {
-        // Add new record
-        const newGeoData = {
-            code: geoCode,
-            country: country,
-            state: state,
-            town: town,
-            town_section: townSection,
-            area: geoArea
-        };
-        
-        geoData.push(newGeoData);
-        
-        // Show success message
-        document.getElementById('geoCodeResult').innerHTML = `
-            <div class="p-3 bg-green-100 rounded-lg mt-2">
-                <p class="text-sm text-green-800">Data baru berhasil ditambahkan: <span class="font-semibold">${geoCode}</span> - ${geoArea}</p>
-            </div>
-        `;
-    }
-    
-    // Update table with new data
-    updateGeoTable();
-    
-    // Show success message
-    alert('Data berhasil disimpan!');
-}
 
-// Function to update the geo table with current data
-function updateGeoTable() {
-    const tableBody = document.getElementById('geoTableBody');
-    
-    // Clear table
-    tableBody.innerHTML = '';
-    
-    // If no data, show message
-    if (geoData.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="7" class="py-6 px-6 text-center text-gray-500">Tidak ada data yang tersedia</td></tr>';
+    // Validate geo code format
+    if (!/^[A-Z0-9]+$/i.test(geoCode)) {
+        showNotification('error', 'Kode Geo hanya boleh berisi huruf dan angka');
         return;
     }
-    
-    // Fill table with data
-    geoData.forEach((geo, index) => {
-        const row = document.createElement('tr');
-        row.className = 'border-b border-gray-200 hover:bg-blue-50 cursor-pointer transition-colors duration-150';
-        row.setAttribute('data-code', geo.code);
-        row.setAttribute('data-area', geo.area);
-        row.onclick = function() { selectGeoRow(this); };
-        
-        row.innerHTML = `
-            <td class="py-3.5 px-6">${index + 1}</td>
-            <td class="py-3.5 px-6 font-medium text-blue-800">${geo.code}</td>
-            <td class="py-3.5 px-6">${geo.country}</td>
-            <td class="py-3.5 px-6">${geo.state || ''}</td>
-            <td class="py-3.5 px-6">${geo.town || ''}</td>
-            <td class="py-3.5 px-6">${geo.town_section || ''}</td>
-            <td class="py-3.5 px-6">${geo.area || ''}</td>
-        `;
-        
-        tableBody.appendChild(row);
-    });
-    
-    // Add event handlers to the new rows
-    setupTableRowEvents();
-}
 
-// Toggle modal visibility with animation
-function toggleModal(modalId) {
-    const modal = document.getElementById(modalId);
-    const modalContent = modal.querySelector('.modal-content');
-    const modalOverlay = modal.querySelector('.modal-overlay');
+    // Show loading overlay with message
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.innerHTML = `
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-50">
+                <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p class="text-white text-lg">Menyimpan perubahan...</p>
+            </div>
+        `;
+        loadingOverlay.classList.remove('hidden');
+    }
+
+    // Cache the current table state
+    const currentTableState = document.querySelector('#geoTableBody').innerHTML;
     
-    if (modal.classList.contains('hidden')) {
-        // Show modal with animation
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            modalOverlay.classList.add('opacity-100');
-            modalContent.classList.add('opacity-100', 'scale-100');
-            modalContent.classList.remove('opacity-0', 'scale-95');
-        }, 10);
+    // Prepare data for API
+    const geoData = {
+        code: geoCode,
+        country: country,
+        state: state,
+        town: town,
+        town_section: townSection,
+        area: geoArea
+    };
         
-        // Focus search input if opening the geo table modal
-        if (modalId === 'geoModal' && document.getElementById('searchInput')) {
-            document.getElementById('searchInput').focus();
+    // Determine if this is a new record or update
+    const isEdit = originalCode != null;
+    const isNew = !isEdit;
+
+    // Validate code uniqueness
+    const validation = validateGeoCode(geoCode, isEdit, originalCode);
+    if (!validation.valid) {
+        showNotification('error', validation.message);
+        if (loadingOverlay) loadingOverlay.classList.add('hidden');
+        return;
+    }
+
+    const method = isNew ? 'POST' : 'PUT';
+    const url = isNew ? '/geo' : `/geo/${originalCode || geoCode}`;
+    
+    // Send request to server
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(geoData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.message || 'Terjadi kesalahan saat menyimpan data');
+            });
         }
-    } else {
-        // Hide modal with animation
-        modalOverlay.classList.remove('opacity-100');
-        modalContent.classList.remove('opacity-100', 'scale-100');
-        modalContent.classList.add('opacity-0', 'scale-95');
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Update local data
+            if (isNew) {
+                window.geoData = window.geoData || [];
+                window.geoData.push(geoData);
+            } else {
+                const index = window.geoData.findIndex(item => item.code === originalCode);
+                if (index !== -1) {
+                    window.geoData[index] = geoData;
+                }
+            }
+
+            // Update UI immediately
+            updateTableRow(geoData, isNew, originalCode);
+            
+            // Set code to input field
+            document.getElementById('geoCode').value = geoCode;
         
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
+            // Show success message
+            document.getElementById('geoCodeResult').innerHTML = `
+                <div class="p-3 bg-green-100 rounded-lg mt-2">
+                    <p class="text-sm text-green-800">Data berhasil ${isNew ? 'ditambahkan' : 'diperbarui'}: <span class="font-semibold">${geoCode}</span> - ${geoArea}</p>
+                </div>
+            `;
+            
+            // Close modal
+            toggleModal('editGeoModal');
+            
+            // Show success notification
+            showNotification('success', `Data geo berhasil ${isNew ? 'ditambahkan' : 'diperbarui'}!`);
+        } else {
+            throw new Error(data.message || 'Terjadi kesalahan saat menyimpan data');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving geo data:', error);
+        // Restore previous table state on error
+        document.querySelector('#geoTableBody').innerHTML = currentTableState;
+        
+        // Show user-friendly error message
+        let errorMessage = error.message;
+        if (error.message.includes('already been taken')) {
+            errorMessage = 'Kode geo sudah digunakan. Silakan gunakan kode lain.';
+        }
+        showNotification('error', errorMessage);
+    })
+    .finally(() => {
+        // Hide loading overlay
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('hidden');
+        }
+    });
+}
+
+// Function to update a single table row
+function updateTableRow(geoData, isNew, originalCode = null) {
+    const tbody = document.querySelector('#geoTableBody');
+    const existingRow = tbody.querySelector(`tr[data-code="${originalCode || geoData.code}"]`);
+    
+    const row = document.createElement('tr');
+    row.className = 'hover:bg-blue-50 cursor-pointer';
+    row.setAttribute('data-code', geoData.code);
+    row.setAttribute('data-area', geoData.area);
+    row.onclick = function() { selectGeoRow(this); };
+    row.ondblclick = function() { editGeoData(geoData.code); };
+    
+    const rowNumber = isNew ? tbody.children.length + 1 : Array.from(tbody.children).indexOf(existingRow) + 1;
+    
+    row.innerHTML = `
+        <td class="px-4 py-3 whitespace-nowrap">${rowNumber}</td>
+        <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${geoData.code}</td>
+        <td class="px-4 py-3 whitespace-nowrap text-gray-700">${geoData.country}</td>
+        <td class="px-4 py-3 whitespace-nowrap text-gray-700">${geoData.state}</td>
+        <td class="px-4 py-3 whitespace-nowrap text-gray-700">${geoData.town}</td>
+        <td class="px-4 py-3 whitespace-nowrap text-gray-700">${geoData.town_section}</td>
+        <td class="px-4 py-3 whitespace-nowrap">
+            <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">${geoData.area}</span>
+        </td>
+    `;
+    
+    if (existingRow) {
+        tbody.replaceChild(row, existingRow);
+    } else {
+        tbody.appendChild(row);
     }
 }
 
-// Function to select a row in the table
-function selectGeoRow(row) {
-    // Remove highlight from previously selected row
-    if (selectedRow) {
-        selectedRow.classList.remove('bg-blue-100');
-    }
+// Function to show notification with auto-dismiss and optional action button
+function showNotification(type, message, action = null) {
+    // Remove any existing notifications first
+    const existingNotifications = document.querySelectorAll('.notification-toast');
+    existingNotifications.forEach(notification => notification.remove());
+
+    const notification = document.createElement('div');
+    notification.className = `notification-toast fixed bottom-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    } text-white max-w-md transform transition-all duration-300 ease-in-out`;
     
-    // Highlight the selected row
-    selectedRow = row;
-    selectedRow.classList.add('bg-blue-100');
+    let notificationContent = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+                <p class="pr-4">${message}</p>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+
+    if (action) {
+        notificationContent += `
+            <div class="mt-2 flex justify-end">
+                <button onclick="${action.handler}" class="px-4 py-2 bg-white text-${
+                    type === 'success' ? 'green' : 'red'
+                }-500 rounded hover:bg-gray-100">
+                    ${action.text}
+                </button>
+            </div>
+        `;
+    }
+
+    notification.innerHTML = notificationContent;
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => {
+        notification.classList.add('translate-y-0');
+        notification.classList.remove('translate-y-full');
+    }, 100);
+
+    // Auto dismiss after 5 seconds if it's a success message
+    if (type === 'success') {
+        setTimeout(() => {
+            notification.classList.add('translate-y-full');
+            notification.classList.add('opacity-0');
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    }
 }
 
 // Function to confirm selection and close modal
@@ -495,29 +874,6 @@ function selectSingleResult() {
     }
 }
 
-// Set up event handlers for table rows
-function setupTableRowEvents() {
-    document.querySelectorAll('#geoTableBody tr').forEach(row => {
-        // Skip if it's a "no data" message row
-        if (row.querySelector('td[colspan]')) return;
-        
-        // Click to select
-        row.addEventListener('click', function() {
-            selectGeoRow(this);
-        });
-        
-        // Double-click to select and close modal
-        row.addEventListener('dblclick', function() {
-            const code = this.getAttribute('data-code');
-            if (code) {
-                document.getElementById('geoCode').value = code;
-                toggleModal('geoModal');
-                editGeoData(code);
-            }
-        });
-    });
-}
-
 // Handle keyboard navigation in the modal
 function handleKeyboardNavigation(e) {
     const modal = document.getElementById('geoModal');
@@ -550,40 +906,68 @@ function handleKeyboardNavigation(e) {
     }
 }
 
-// Function to load seed data if table is empty
-function loadSeedData() {
-    const tableBody = document.getElementById('geoTableBody');
-    
-    // Show loading overlay if available
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.classList.remove('hidden');
+function closePreviewModal() {
+    const previewModal = document.getElementById('previewModal');
+    if (previewModal) {
+        previewModal.classList.add('hidden');
     }
+}
+
+// Function to sort table by column
+function sortTableByColumn(columnIndex) {
+    const tbody = document.querySelector('#geoTableBody');
+    if (!tbody) return;
+
+    const rows = Array.from(tbody.getElementsByTagName('tr'));
     
-    // Clear current data
-    tableBody.innerHTML = '';
-    geoData = [...seedGeoData];
+    // Skip if no rows or only one row
+    if (rows.length <= 1) return;
+
+    // Get the current sort direction from the button
+    const button = document.querySelector(`button[data-sort="${columnIndex}"]`);
+    const currentDirection = button.getAttribute('data-direction') || 'asc';
+    const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
     
-    // Update the table
-    setTimeout(() => {
-        updateGeoTable();
+    // Update button direction
+    button.setAttribute('data-direction', newDirection);
+    
+    // Update button icon
+    const icon = button.querySelector('i');
+    if (icon) {
+        icon.className = `fas fa-sort-${newDirection === 'asc' ? 'up' : 'down'} mr-1`;
+    }
+
+    // Sort the rows
+    rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex].textContent.trim();
+        const bValue = b.cells[columnIndex].textContent.trim();
         
-        // Update notification on main page
-        const dbStatusElement = document.querySelector('.bg-yellow-100');
-        if (dbStatusElement) {
-            dbStatusElement.classList.remove('bg-yellow-100');
-            dbStatusElement.classList.add('bg-green-100');
-            dbStatusElement.innerHTML = `
-                <p class="text-sm font-medium text-green-800">Data tersedia: ${geoData.length} geo ditemukan (dari JavaScript).</p>
-            `;
+        if (newDirection === 'asc') {
+            return aValue.localeCompare(bValue);
+        } else {
+            return bValue.localeCompare(aValue);
         }
-        
-        // Hide loading overlay
-        if (loadingOverlay) {
-            loadingOverlay.classList.add('hidden');
-        }
-        
-        // Show success message
-        alert('Data geo berhasil dimuat!');
-    }, 500);
+    });
+
+    // Reorder the rows in the table
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+// Function to setup sort buttons
+function setupSortButtons() {
+    // Setup By Code button
+    const byCodeBtn = document.querySelector('button[onclick="sortTableByColumn(1)"]');
+    if (byCodeBtn) {
+        byCodeBtn.setAttribute('data-sort', '1');
+        byCodeBtn.setAttribute('data-direction', 'asc');
+        byCodeBtn.innerHTML = '<i class="fas fa-sort mr-1"></i>By Code';
+    }
+
+    // Setup By Country button
+    const byCountryBtn = document.querySelector('button[onclick="sortTableByColumn(2)"]');
+    if (byCountryBtn) {
+        byCountryBtn.setAttribute('data-sort', '2');
+        byCountryBtn.setAttribute('data-direction', 'asc');
+        byCountryBtn.innerHTML = '<i class="fas fa-sort mr-1"></i>By Country';
+    }
 }

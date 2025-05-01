@@ -3,6 +3,7 @@
 @section('title', 'Define Geo')
 
 @section('content')
+<div class="container mx-auto px-4 py-6">
     <script src="{{ asset('js/geo.js') }}"></script>
 
     <!-- Header Section -->
@@ -293,11 +294,11 @@
 
                 <!-- Bottom Buttons -->
                 <div class="mt-4 grid grid-cols-3 gap-2">
-                    <button type="button"
+                    <button type="button" onclick="sortTableByColumn(1)"
                         class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
                         <i class="fas fa-sort mr-1"></i>By Code
                     </button>
-                    <button type="button"
+                    <button type="button" onclick="sortTableByColumn(2)"
                         class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
                         <i class="fas fa-sort mr-1"></i>By Country
                     </button>
@@ -493,4 +494,9 @@
             <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
     </div>
+</div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/geo.js') }}"></script>
+@endpush
