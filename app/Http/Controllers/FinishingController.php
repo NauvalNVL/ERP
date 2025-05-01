@@ -58,9 +58,21 @@ class FinishingController extends Controller
     }
 
     /**
+     * Display the specified finishing.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show($id)
+    {
+        $finishing = Finishing::findOrFail($id);
+        return response()->json($finishing);
+    }
+
+    /**
      * Display a listing of the resource for printing.
      *
-     * @return \\Illuminate\\View\\View
+     * @return \Illuminate\View\View
      */
     public function viewAndPrint()
     {

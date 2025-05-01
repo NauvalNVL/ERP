@@ -154,8 +154,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/color-group/view-print', [ColorGroupController::class, 'viewAndPrint'])->name('color-group.view-print');
 
     // Finishing
-    Route::resource('finishing', FinishingController::class);
-    Route::get('/finishing/view-print', [FinishingController::class, 'viewAndPrint'])->name('finishing.view-print');
+    Route::prefix('finishing')->group(function () {
+        Route::get('/', [FinishingController::class, 'index'])->name('finishing.index');
+        Route::get('/create', [FinishingController::class, 'create'])->name('finishing.create');
+        Route::post('/', [FinishingController::class, 'store'])->name('finishing.store');
+        Route::get('/{finishing}/edit', [FinishingController::class, 'edit'])->name('finishing.edit');
+        Route::put('/{finishing}', [FinishingController::class, 'update'])->name('finishing.update');
+        Route::delete('/{finishing}', [FinishingController::class, 'destroy'])->name('finishing.destroy');
+        Route::get('/view-print', [FinishingController::class, 'viewAndPrint'])->name('finishing.view-print');
+        Route::get('/{id}', [FinishingController::class, 'show'])->name('finishing.show');
+    });
 
     // System Manager
     Route::prefix('system-manager')->group(function () {
