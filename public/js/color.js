@@ -212,9 +212,9 @@ function sortByColorId() {
     
     // Sort rows based on color ID (column 0)
     rows.sort(function(a, b) {
-        var idA = parseInt(a.cells[0].textContent.trim());
-        var idB = parseInt(b.cells[0].textContent.trim());
-        return idA - idB;
+        var idA = a.cells[0].textContent.trim();
+        var idB = b.cells[0].textContent.trim();
+        return idA.localeCompare(idB, undefined, { numeric: true });
     });
     
     // Remove all rows from table
@@ -227,13 +227,8 @@ function sortByColorId() {
         tbody.appendChild(row);
     });
     
-    // Highlight first row after sorting
-    if (rows.length > 0) {
-        rows.forEach(function(row) {
-            row.classList.remove('bg-blue-600', 'text-white');
-        });
-        rows[0].classList.add('bg-blue-600', 'text-white');
-    }
+    // Update button styles
+    updateSortButtonStyles('colorId');
     
     // Highlight color rows based on color group
     highlightBlueRows();
@@ -264,16 +259,16 @@ function sortByCGAndColor() {
     
     // Sort rows based on CG# (column 3) and then Color# (column 0)
     rows.sort(function(a, b) {
-        var cgA = parseInt(a.cells[3].textContent.trim());
-        var cgB = parseInt(b.cells[3].textContent.trim());
+        var cgA = a.cells[3].textContent.trim();
+        var cgB = b.cells[3].textContent.trim();
         
         if (cgA !== cgB) {
-            return cgA - cgB;
+            return cgA.localeCompare(cgB, undefined, { numeric: true });
         }
         
-        var idA = parseInt(a.cells[0].textContent.trim());
-        var idB = parseInt(b.cells[0].textContent.trim());
-        return idA - idB;
+        var idA = a.cells[0].textContent.trim();
+        var idB = b.cells[0].textContent.trim();
+        return idA.localeCompare(idB, undefined, { numeric: true });
     });
     
     // Remove all rows from table
@@ -286,13 +281,8 @@ function sortByCGAndColor() {
         tbody.appendChild(row);
     });
     
-    // Highlight first row after sorting
-    if (rows.length > 0) {
-        rows.forEach(function(row) {
-            row.classList.remove('bg-blue-600', 'text-white');
-        });
-        rows[0].classList.add('bg-blue-600', 'text-white');
-    }
+    // Update button styles
+    updateSortButtonStyles('cgAndColor');
     
     // Highlight color rows based on color group
     highlightBlueRows();
@@ -330,9 +320,9 @@ function sortByCGTypeAndColor() {
             return typeA.localeCompare(typeB);
         }
         
-        var idA = parseInt(a.cells[0].textContent.trim());
-        var idB = parseInt(b.cells[0].textContent.trim());
-        return idA - idB;
+        var idA = a.cells[0].textContent.trim();
+        var idB = b.cells[0].textContent.trim();
+        return idA.localeCompare(idB, undefined, { numeric: true });
     });
     
     // Remove all rows from table
@@ -345,16 +335,40 @@ function sortByCGTypeAndColor() {
         tbody.appendChild(row);
     });
     
-    // Highlight first row after sorting
-    if (rows.length > 0) {
-        rows.forEach(function(row) {
-            row.classList.remove('bg-blue-600', 'text-white');
-        });
-        rows[0].classList.add('bg-blue-600', 'text-white');
-    }
+    // Update button styles
+    updateSortButtonStyles('cgTypeAndColor');
     
     // Highlight color rows based on color group
     highlightBlueRows();
+}
+
+// Function to update sort button styles
+function updateSortButtonStyles(activeSort) {
+    // Reset all sort buttons
+    const sortButtons = document.querySelectorAll('button[onclick^="sort"]');
+    sortButtons.forEach(button => {
+        button.classList.remove('bg-blue-500', 'text-white');
+        button.classList.add('bg-gray-100', 'text-gray-800');
+    });
+    
+    // Highlight active sort button
+    let activeButton;
+    switch(activeSort) {
+        case 'colorId':
+            activeButton = document.querySelector('button[onclick="sortByColorId()"]');
+            break;
+        case 'cgAndColor':
+            activeButton = document.querySelector('button[onclick="sortByCGAndColor()"]');
+            break;
+        case 'cgTypeAndColor':
+            activeButton = document.querySelector('button[onclick="sortByCGTypeAndColor()"]');
+            break;
+    }
+    
+    if (activeButton) {
+        activeButton.classList.remove('bg-gray-100', 'text-gray-800');
+        activeButton.classList.add('bg-blue-500', 'text-white');
+    }
 }
 
 // Function to edit selected row (Edit button)
