@@ -201,7 +201,7 @@ function selectFinishing() {
 function openFinishingModal() {
     const modal = document.getElementById('finishingModal');
     if (modal) {
-        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
         // Focus on the search input
         const searchInput = document.getElementById('searchFinishingInput');
         if (searchInput) {
@@ -214,7 +214,7 @@ function openFinishingModal() {
 function closeFinishingModal() {
     const modal = document.getElementById('finishingModal');
     if (modal) {
-        modal.classList.add('hidden');
+        modal.style.display = 'none';
     }
 }
 
@@ -240,7 +240,7 @@ function openEditFinishingModal(row) {
 function closeEditFinishingModal() {
     const modal = document.getElementById('editFinishingModal');
     if (modal) {
-        modal.classList.add('hidden');
+        modal.style.display = 'none';
     }
 }
 
@@ -336,7 +336,7 @@ function selectFinishingItem(code) {
 function showLoading() {
     const loading = document.getElementById('loadingOverlay');
     if (loading) {
-        loading.classList.remove('hidden');
+        loading.style.display = 'flex';
     }
 }
 
@@ -344,7 +344,7 @@ function showLoading() {
 function hideLoading() {
     const loading = document.getElementById('loadingOverlay');
     if (loading) {
-        loading.classList.add('hidden');
+        loading.style.display = 'none';
     }
 }
 
