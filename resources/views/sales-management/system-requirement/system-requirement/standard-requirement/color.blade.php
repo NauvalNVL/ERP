@@ -198,7 +198,7 @@
                     </div>
                     <h3 class="text-xl font-semibold">Color Table</h3>
                 </div>
-                <button type="button" onclick="closeModalX()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                <button type="button" onclick="closeColorModal()" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
