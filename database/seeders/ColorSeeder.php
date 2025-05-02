@@ -18,7 +18,7 @@ class ColorSeeder extends Seeder
         DB::table('colors')->truncate();
 
         $colors = [
-                                                            [
+            [
                 'color_id' => '00001',
                 'color_name' => 'Black',
                 'origin' => '01',
@@ -26,7 +26,7 @@ class ColorSeeder extends Seeder
                 'cg_type' => 'X-Flexo',
                 'created_at' => now(),
                 'updated_at' => now(),
-            ],,,,,
+            ],
             [
                 'color_id' => '00002',
                 'color_name' => 'White',
