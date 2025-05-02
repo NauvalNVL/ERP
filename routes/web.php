@@ -238,3 +238,11 @@ Route::post('/system-security/amend-password', [UserController::class, 'updatePa
 Route::get('/run-scoringtool-seeder', [ScoringToolController::class, 'getSeederData'])->name('run.scoringtool.seeder');
 Route::post('/update-scoringtool-seeder', [ScoringToolController::class, 'updateSeederData'])->name('update.scoringtool.seeder');
 
+Route::get('/run-salespersonteam-seeder', function () {
+    Artisan::call('db:seed', [
+        '--class' => 'Database\\Seeders\\SalespersonTeamSeeder',
+        '--force' => true
+    ]);
+    return redirect()->back()->with('success', 'Salesperson Team Seeder berhasil dijalankan!');
+})->name('run.salespersonteam.seeder');
+
