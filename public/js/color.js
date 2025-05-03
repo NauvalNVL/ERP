@@ -1,5 +1,7 @@
 // Color.js - Functions for color management
 
+let currentlySelectedColorRow = null; // Variabel untuk menyimpan baris terpilih
+
 // Function to populate color table
 function populateColorTable() {
     console.log('Populating color table');
@@ -48,8 +50,17 @@ function populateColorTable() {
                 row.setAttribute('data-origin', color.origin);
                 row.setAttribute('data-cg-id', color.color_group_id);
                 row.setAttribute('data-cg-type', color.cg_type || 'X-Flexo');
-                row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
-                row.ondblclick = function() { openEditColorModal(this); };
+                
+                // --- Tambahkan Listener Langsung Di Sini ---
+                row.onclick = function(e) { 
+                    selectColorRow(this); 
+                    e.stopPropagation(); 
+                };
+                row.ondblclick = function() { 
+                    openEditColorModal(this); 
+                };
+                console.log('Attached listeners to row for color:', color.color_id);
+                // --- Akhir Penambahan Listener ---
                 
                 // Create columns for each cell
                 const idCell = document.createElement('td');
@@ -89,9 +100,6 @@ function populateColorTable() {
             });
             
             console.log('Table populated with database data:', data);
-            
-            // Setup event handlers for the table rows
-            setupTableRowEvents();
             
             // Apply blue highlighting to rows
             highlightBlueRows();
@@ -372,7 +380,7 @@ function updateSortButtonStyles(activeSort) {
 }
 
 // Function to edit selected row (Edit button)
-function editSelectedRow() {
+function editSelectedColorRow() {
     var selectedRow = document.querySelector('#colorDataTable tbody tr.bg-blue-600');
     if (!selectedRow) {
         console.log("No row selected");
@@ -387,20 +395,25 @@ function editSelectedRow() {
 }
 
 // Function to select a row
-function selectRow(row) {
-    // Remove highlight from all rows
-    var allRows = document.querySelectorAll('#colorDataTable tbody tr');
-    allRows.forEach(function(r) {
-        r.classList.remove('selected');
-        r.classList.remove('bg-blue-600', 'text-white');
-    });
-    
-    // Add highlighting to selected row
+function selectColorRow(row) {
+    console.log('selectColorRow called for:', row);
+    // Remove highlight from previously selected row if exists
+    if (currentlySelectedColorRow) {
+        currentlySelectedColorRow.classList.remove('bg-blue-600', 'text-white');
+        currentlySelectedColorRow.classList.remove('selected'); // Pastikan kelas 'selected' juga dihapus jika digunakan
+    }
+
+    // Add highlighting to the newly selected row
     row.classList.add('bg-blue-600', 'text-white');
+
+    // Update the reference to the currently selected row
+    currentlySelectedColorRow = row;
+    console.log('currentlySelectedColorRow is now:', currentlySelectedColorRow);
 }
 
 // Function to open edit modal
 function openEditColorModal(row) {
+    console.log('openEditColorModal called with row:', row);
     console.log('Opening edit color modal for row:', row);
     
     const colorId = row.getAttribute('data-color-id');
@@ -490,30 +503,6 @@ function highlightBlueRows() {
 function getCGName(cgId) {
     const colorGroup = seedColorGroups.find(cg => cg.cg === cgId);
     return colorGroup ? colorGroup.cg_name : 'Unknown';
-}
-
-// Function to set up events on table rows
-function setupTableRowEvents() {
-    console.log('Setting up table row events');
-    var tableRows = document.querySelectorAll('#colorDataTable tbody tr');
-    console.log('Table rows found:', tableRows.length);
-    
-    tableRows.forEach(function(row) {
-        // Skip "no data" row
-        if (row.querySelector('td[colspan]')) return;
-        
-        // Click event to select row
-        row.onclick = function(e) {
-            e.stopPropagation();
-            selectRow(this);
-        };
-        
-        // Double-click event to open edit modal
-        row.ondblclick = function() {
-            console.log('Double-click detected on row:', this);
-            openEditColorModal(this);
-        };
-    });
 }
 
 // Function to save color changes
@@ -701,9 +690,6 @@ function loadSeedData() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM content loaded for color management');
     
-    // Setup row events initially
-    setupTableRowEvents();
-    
     // Initialize color table if open button exists
     const showBtn = document.getElementById('showColorTableBtn');
     if (showBtn) {
@@ -789,6 +775,21 @@ document.addEventListener('DOMContentLoaded', function() {
         colorGroupModal.addEventListener('click', function(e) {
             if (e.target === this) {
                 closeColorGroupModal();
+            }
+        });
+    }
+    
+    // Add event listener for the Select button inside the color table modal
+    const modalSelectButton = document.getElementById('modalSelectColorButton');
+    if (modalSelectButton) {
+        modalSelectButton.addEventListener('click', function() {
+            console.log('#modalSelectColorButton clicked. Checking currentlySelectedColorRow:', currentlySelectedColorRow);
+            if (currentlySelectedColorRow) {
+                console.log('Selected row found. Calling openEditColorModal.');
+                openEditColorModal(currentlySelectedColorRow);
+                closeColorModal(); // Close the table modal after selecting
+            } else {
+                alert('Silahkan pilih baris warna terlebih dahulu.');
             }
         });
     }

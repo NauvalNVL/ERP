@@ -363,3 +363,7 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/scoringtool.js') }}"></script>
+@endpush
