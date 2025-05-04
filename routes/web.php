@@ -25,6 +25,7 @@ use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\ForeignCurrencyController;
 use App\Http\Controllers\BusinessFormController;
+use App\Http\Controllers\SalesManagement\SystemRequirement\SystemRequirementController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -231,6 +232,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/view-print', [IndustryController::class, 'viewAndPrint'])->name('industry.view-print');
         Route::get('/search/{code}', [IndustryController::class, 'search'])->name('industry.search');
     });
+
+    // New route for view and print salesperson team functionality
+    Route::get('/salesperson-team/view-print', [SystemRequirementController::class, 'viewPrintSalespersonTeam'])->name('salesperson-team.view-print');
 });
 
 // Password Management

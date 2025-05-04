@@ -258,6 +258,10 @@
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Salesperson</span>
                                 </a>
+                                <a href="{{ route('salesperson-team.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                    <i class="fas fa-print w-3 h-3 mr-3"></i>
+                                    <span>View & Print Salesperson Team</span>
+                                </a>
                                 <a href="{{ route('industry.view-print') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-print w-3 h-3 mr-3"></i>
                                     <span>View & Print Industry</span>
