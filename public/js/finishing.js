@@ -24,7 +24,54 @@ document.addEventListener('DOMContentLoaded', function() {
             filterFinishingTable();
         });
     }
+
+    // Add event listener for the main finishing code input for enter key
+    const finishingCodeInput = document.getElementById('finishingCode');
+    if (finishingCodeInput) {
+        finishingCodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSearchAndCreate();
+            }
+        });
+    }
 });
+
+// Handle search and create flow
+async function handleSearchAndCreate() {
+    const finishingCodeInput = document.getElementById('finishingCode');
+    const searchValue = finishingCodeInput.value.trim().toUpperCase();
+    if (!searchValue) return;
+
+    try {
+        // Show loading overlay
+        showLoading();
+        
+        // Search for the finishing code
+        const response = await fetch(`/finishing/search/${searchValue}`);
+        const data = await response.json();
+        
+        if (data.exists) {
+            // Finishing exists, just confirm and continue
+            if (confirm('Confirm selecting this finishing code?')) {
+                // Just keep the code in the input field and close any open dialogs
+                closeFinishingModal();
+            }
+        } else {
+            // Finishing doesn't exist, show create modal
+            openEditFinishingModal({
+                code: searchValue,
+                description: ''
+            });
+        }
+    } catch (error) {
+        console.error('Error searching finishing:', error);
+        alert('Error searching finishing. Please try again.');
+    } finally {
+        // Hide loading overlay
+        hideLoading();
+    }
+}
 
 // Function to populate finishing table with data from database
 function populateFinishingTable() {
@@ -35,10 +82,10 @@ function populateFinishingTable() {
     tbody.innerHTML = '';
     
     // Show loading message
-    tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Loading data...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">Loading data...</td></tr>';
     
     // Fetch data from the database
-    fetch('/finishing', {
+    fetch('/finishing/json/all', {
         headers: {
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
@@ -55,12 +102,12 @@ function populateFinishingTable() {
         tbody.innerHTML = '';
         
         if (!Array.isArray(data) || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Tidak ada data finishing yang tersedia.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">Tidak ada data finishing yang tersedia.</td></tr>';
             return;
         }
 
         // Fill table with data from database
-        data.forEach(finish => {
+        data.forEach((finish, index) => {
             const row = document.createElement('tr');
             row.className = 'hover:bg-blue-50 cursor-pointer';
             row.setAttribute('data-code', finish.code);
@@ -68,12 +115,9 @@ function populateFinishingTable() {
             row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
             
             row.innerHTML = `
+                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${index + 1}</td>
                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${finish.code}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">${finish.description}</td>
-                <td class="px-4 py-3 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">N/A</span>
-                </td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">N/A</td>
             `;
             
             tbody.appendChild(row);
@@ -96,7 +140,7 @@ function populateFinishingTable() {
     })
     .catch(error => {
         console.error('Error fetching database data:', error);
-        tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-4 text-center text-red-500">
+        tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-4 text-center text-red-500">
             Error loading data from database. ${error.message}
             <br>
             <button onclick="populateFinishingTable()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
@@ -171,8 +215,13 @@ function sortTable(columnIndex) {
     // Remove all rows
     rows.forEach(row => row.remove());
     
-    // Add sorted rows back
-    rows.forEach(row => tbody.appendChild(row));
+    // Add sorted rows back and update row numbers
+    rows.forEach((row, index) => {
+        if (row.cells.length >= 3) {
+            row.cells[0].textContent = index + 1;
+        }
+        tbody.appendChild(row);
+    });
 }
 
 // Function to filter the finishing table based on search input
@@ -241,19 +290,30 @@ function closeFinishingModal() {
     }
 }
 
-// Function to open the edit finishing modal
-function openEditFinishingModal(row) {
-    // Populate the form with the row data
-    document.getElementById('edit_code').value = row.getAttribute('data-code');
-    document.getElementById('edit_description').value = row.getAttribute('data-description');
+// Function to open the edit finishing modal with existing data or for creating new
+function openEditFinishingModal(data = null) {
+    if (data) {
+        // Populate the form with the provided data
+        document.getElementById('edit_code').value = data.code || '';
+        document.getElementById('edit_description').value = data.description || '';
+    } else if (selectedRow) {
+        // Populate with selected row data
+        document.getElementById('edit_code').value = selectedRow.getAttribute('data-code');
+        document.getElementById('edit_description').value = selectedRow.getAttribute('data-description');
+    } else {
+        // Clear form for new entry
+        document.getElementById('edit_code').value = '';
+        document.getElementById('edit_description').value = '';
+    }
     
     // Show the modal
     const modal = document.getElementById('editFinishingModal');
     if (modal) {
         modal.classList.remove('hidden');
+        modal.style.display = 'flex';
     }
     
-    // Close the finishing table window
+    // Close the finishing table window if open
     closeFinishingModal();
 }
 
@@ -262,6 +322,7 @@ function closeEditFinishingModal() {
     const modal = document.getElementById('editFinishingModal');
     if (modal) {
         modal.style.display = 'none';
+        modal.classList.add('hidden');
     }
 }
 
@@ -272,85 +333,120 @@ function saveFinishingChanges() {
     const code = document.getElementById('edit_code').value;
     const description = document.getElementById('edit_description').value;
     
-    // Send update to server
-    fetch('/finishing/' + code, {
-        method: 'PUT',
+    if (!code || !description) {
+        alert('Both code and description are required');
+        hideLoading();
+        return false;
+    }
+
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    
+    // Check if finishing with this code exists
+    fetch(`/finishing/search/${code}`, {
         headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: JSON.stringify({
-            code: code,
-            description: description
-        })
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Determine if we should create or update based on existence
+        const method = data.exists ? 'PUT' : 'POST';
+        const url = data.exists 
+            ? `/finishing/${code}`  // Update existing
+            : `/finishing`;         // Create new
+        
+        // Send request to server
+        return fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                code: code,
+                description: description
+            })
+        });
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Update the table row if it exists
-            const table = document.getElementById('finishingDataTable');
-            const rows = table.querySelectorAll('tbody tr');
-            let rowFound = false;
-            
-            rows.forEach(row => {
-                if (row.getAttribute('data-code') === code) {
-                    row.setAttribute('data-description', description);
-                    
-                    // Update the displayed text
-                    row.cells[1].textContent = description;
-                    
-                    rowFound = true;
-                }
-            });
-            
-            // If row not found, add a new one
-            if (!rowFound) {
-                const tbody = table.querySelector('tbody');
-                
-                // Remove the "No data" row if it exists
-                if (tbody.children.length === 1 && tbody.children[0].textContent.includes('Tidak ada data')) {
-                    tbody.innerHTML = '';
-                }
-                
-                // Create a new row
-                const newRow = document.createElement('tr');
-                newRow.className = 'hover:bg-blue-50 cursor-pointer';
-                newRow.setAttribute('data-code', code);
-                newRow.setAttribute('data-description', description);
-                newRow.onclick = function(e) { selectRow(this); e.stopPropagation(); };
-                
-                newRow.innerHTML = `
-                    <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${code}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-gray-700">${description}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">N/A</span>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-gray-700">N/A</td>
-                `;
-                
-                tbody.appendChild(newRow);
-            }
-            
-            // Update the captured data
-            captureExistingData();
+            // Update UI based on the response
+            updateUIAfterSave(code, description);
             
             // Close the edit modal
             closeEditFinishingModal();
+
+            // Set the code in the input field
+            document.getElementById('finishingCode').value = code;
             
-            alert('Data finishing berhasil diperbarui');
+            alert(data.message || 'Data finishing berhasil disimpan');
         } else {
-            alert('Error updating finishing: ' + data.message);
+            alert('Error saving finishing: ' + (data.message || 'Unknown error'));
         }
     })
     .catch(error => {
-        console.error('Error updating finishing:', error);
-        alert('Error updating finishing. Please try again.');
+        console.error('Error saving finishing:', error);
+        alert('Error saving finishing. Please try again.');
     })
     .finally(() => {
         hideLoading();
     });
     
     return false; // Prevent form submission
+}
+
+// Helper function to update UI after successful save
+function updateUIAfterSave(code, description) {
+    // Update the table row if it exists
+    const table = document.getElementById('finishingDataTable');
+    if (!table) return;
+    
+    const rows = table.querySelectorAll('tbody tr');
+    let rowFound = false;
+    
+    rows.forEach(row => {
+        if (row.getAttribute('data-code') === code) {
+            row.setAttribute('data-description', description);
+            
+            // Update the displayed text
+            row.cells[2].textContent = description;
+            
+            rowFound = true;
+        }
+    });
+    
+    // If row not found, add a new one
+    if (!rowFound) {
+        const tbody = table.querySelector('tbody');
+        const rows = tbody.querySelectorAll('tr');
+        
+        // Remove the "No data" row if it exists
+        if (tbody.children.length === 1 && tbody.children[0].textContent.includes('Tidak ada data')) {
+            tbody.innerHTML = '';
+        }
+        
+        // Create a new row
+        const newRow = document.createElement('tr');
+        newRow.className = 'hover:bg-blue-50 cursor-pointer';
+        newRow.setAttribute('data-code', code);
+        newRow.setAttribute('data-description', description);
+        newRow.onclick = function(e) { selectRow(this); e.stopPropagation(); };
+        
+        newRow.innerHTML = `
+            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${rows.length + 1}</td>
+            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${code}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${description}</td>
+        `;
+        
+        tbody.appendChild(newRow);
+    }
+    
+    // Update the captured data
+    captureExistingData();
 }
 
 // Function to select a specific finishing item

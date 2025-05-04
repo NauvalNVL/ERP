@@ -25,7 +25,15 @@ class FinishingController extends Controller
             'description' => 'required',
         ]);
 
-        Finishing::create($request->all());
+        $finishing = Finishing::create($request->all());
+        
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Finishing berhasil ditambahkan',
+                'data' => $finishing
+            ]);
+        }
         
         return redirect()->route('finishing.index')
             ->with('success', 'Finishing berhasil ditambahkan');
@@ -44,6 +52,13 @@ class FinishingController extends Controller
         ]);
 
         $finishing->update($request->all());
+        
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Finishing berhasil diupdate'
+            ]);
+        }
         
         return redirect()->route('finishing.index')
             ->with('success', 'Finishing berhasil diupdate');
@@ -79,5 +94,36 @@ class FinishingController extends Controller
         // Ambil semua data finishing, urutkan berdasarkan code
         $finishings = Finishing::orderBy('code')->get(); 
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintfinishing', compact('finishings')); 
+    }
+
+    /**
+     * Get finishings for JSON API - add row numbers
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getFinishingsJson()
+    {
+        $finishings = Finishing::orderBy('code')->get();
+        $numberedFinishings = [];
+        
+        foreach ($finishings as $index => $finishing) {
+            $item = $finishing->toArray();
+            $item['row_number'] = $index + 1;
+            $numberedFinishings[] = $item;
+        }
+        
+        return response()->json($numberedFinishings);
+    }
+
+    /**
+     * Search for a finishing by code.
+     *
+     * @param string $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search($code)
+    {
+        $exists = Finishing::where('code', strtoupper($code))->exists();
+        return response()->json(['exists' => $exists]);
     }
 }

@@ -13,9 +13,9 @@ class FinishingSeeder extends Seeder
             ['code' => '001', 'description' => 'GLUE'],
             ['code' => '002', 'description' => 'STITCH'],
             ['code' => '003', 'description' => 'ASSEMBLY'],
-            ['code' => '004', 'description' => 'TEXT'],
+            ['code' => '004', 'description' => 'HEAT'],
             ['code' => '005', 'description' => 'STRIPPING'],
-            ['code' => '006', 'description' => 'SHRINKING'],
+            ['code' => '006', 'description' => 'WRAPPING'],
             ['code' => '007', 'description' => 'PALLET'],
         ];
 

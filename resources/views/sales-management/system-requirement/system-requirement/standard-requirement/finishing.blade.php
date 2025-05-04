@@ -218,31 +218,27 @@
                 <table class="min-w-full divide-y divide-gray-200" id="finishingDataTable">
                     <thead class="bg-gray-50 sticky top-0">
                         <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200 text-xs">
                         <!-- Data dari database akan ditampilkan di sini jika tersedia -->
                         @if(isset($finishings) && count($finishings) > 0)
-                        @foreach($finishings as $finishing)
+                        @foreach($finishings as $index => $finishing)
                             <tr class="hover:bg-blue-50 cursor-pointer" 
                                 data-code="{{ $finishing->code }}"
                                 data-description="{{ $finishing->description }}"
                                 onclick="selectFinishingItem('{{ $finishing->code }}'); event.stopPropagation();">
+                                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $index + 1 }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $finishing->code }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $finishing->description }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ $finishing->category ?? 'N/A' }}</span>
-                                </td>
-                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $finishing->cost ?? 'N/A' }}</td>
                         </tr>
                         @endforeach
                         @else
                             <tr>
-                                <td colspan="4" class="px-4 py-4 text-center text-gray-500">Tidak ada data finishing yang tersedia.</td>
+                                <td colspan="3" class="px-4 py-4 text-center text-gray-500">Tidak ada data finishing yang tersedia.</td>
                             </tr>
                         @endif
                     </tbody>
@@ -250,12 +246,9 @@
             </div>
             
             <!-- Bottom Buttons -->
-            <div class="mt-4 grid grid-cols-4 gap-2">
+            <div class="mt-4 grid grid-cols-3 gap-2">
                 <button type="button" onclick="sortTable(0)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
                     <i class="fas fa-sort mr-1"></i>By Code
-                </button>
-                <button type="button" onclick="sortTable(1)" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-                    <i class="fas fa-sort mr-1"></i>By Description
                 </button>
                 <button type="button" onclick="selectFinishing()" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
                     <i class="fas fa-check mr-1"></i>Select
@@ -286,7 +279,7 @@
 
         <!-- Form Content -->
         <div class="p-6">
-            <form id="editFinishingForm" onsubmit="saveFinishingChanges(); return false;" class="space-y-4">
+            <form id="editFinishingForm" onsubmit="saveFinishingChanges(); return false;" class="space-y-4" data-store-url="{{ route('finishing.store') }}" data-base-url="{{ url('/finishing') }}">
                 <div class="grid grid-cols-1 gap-4">
                     <div>
                         <label for="edit_code" class="block text-sm font-medium text-gray-700 mb-1">Code:</label>
@@ -294,7 +287,7 @@
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                 <i class="fas fa-hashtag"></i>
                             </span>
-                            <input id="edit_code" type="text" class="pl-10 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" readonly>
+                            <input id="edit_code" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
                         </div>
                     </div>
                     
@@ -305,32 +298,6 @@
                                 <i class="fas fa-font"></i>
                             </span>
                             <input id="edit_description" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="edit_category" class="block text-sm font-medium text-gray-700 mb-1">Category:</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                <i class="fas fa-tag"></i>
-                            </span>
-                            <select id="edit_category" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
-                                <option value="LAMINATION">Lamination</option>
-                                <option value="VARNISH">Varnish</option>
-                                <option value="EMBOSS">Emboss</option>
-                                <option value="FOIL">Foil</option>
-                                <option value="DIE_CUT">Die Cut</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="edit_cost" class="block text-sm font-medium text-gray-700 mb-1">Cost:</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                <i class="fas fa-dollar-sign"></i>
-                            </span>
-                            <input id="edit_cost" type="number" step="0.01" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
                         </div>
                     </div>
                     

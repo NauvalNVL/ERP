@@ -171,6 +171,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/{finishing}', [FinishingController::class, 'update'])->name('finishing.update');
         Route::delete('/{finishing}', [FinishingController::class, 'destroy'])->name('finishing.destroy');
         Route::get('/view-print', [FinishingController::class, 'viewAndPrint'])->name('finishing.view-print');
+        Route::get('/json/all', [FinishingController::class, 'getFinishingsJson'])->name('finishing.json');
+        Route::get('/search/{code}', [FinishingController::class, 'search'])->name('finishing.search');
         Route::get('/{id}', [FinishingController::class, 'show'])->name('finishing.show');
     });
 
