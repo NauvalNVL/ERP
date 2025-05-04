@@ -19,6 +19,7 @@ return new class extends Migration
                 $table->string('color_group_id', 5)->nullable();
                 $table->string('cg_type', 50)->nullable();
                 $table->timestamps();
+                $table->softDeletes();
             });
         }
     }

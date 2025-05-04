@@ -34,7 +34,7 @@ class Color extends Model
      */
     public function colorGroup()
     {
-        return $this->belongsTo(ColorGroup::class, 'color_group_id', 'cg_id');
+        return $this->belongsTo(ColorGroup::class, 'color_group_id', 'cg');
     }
 
     /**

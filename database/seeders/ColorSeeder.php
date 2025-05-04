@@ -176,7 +176,7 @@ class ColorSeeder extends Seeder
                 'color_name' => 'Pink',
                 'origin' => '08',
                 'color_group_id' => '08',
-                'cg_type' => '',
+                'cg_type' => 'X-Flexo',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

@@ -155,7 +155,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Color Management
-    Route::resource('color', ColorController::class);
+    Route::resource('color', ColorController::class)->except(['show']);
     Route::get('/color/view-print', [ColorController::class, 'viewAndPrint'])->name('color.view-print');
 
     // Definisikan route spesifik sebelum resource
