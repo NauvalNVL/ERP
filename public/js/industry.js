@@ -52,6 +52,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
+        // Add form submit handler
+        if (industryForm) {
+            industryForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleFormSubmit();
+            });
+        }
+
         // Close industry dialog
         if (closeDialog && cancelSelectBtn) {
             [closeDialog, cancelSelectBtn].forEach(btn => {
@@ -299,6 +307,45 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Error searching industry. Please try again.');
         } finally {
             // Hide loading overlay
+            hideLoading();
+        }
+    }
+
+    // Handle form submission
+    async function handleFormSubmit() {
+        try {
+            showLoading();
+
+            const formData = new FormData(industryForm);
+
+            // Ambil CSRF token dari meta tag
+            const csrfToken = document.querySelector('meta[name=\"csrf-token\"]').getAttribute('content');
+
+            const response = await fetch(industryForm.action, {
+                method: industryForm.method,
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+
+            if (!response.ok) {
+                // Coba ambil pesan error dari response
+                let errorMsg = 'Error saving industry. Please try again.';
+                try {
+                    const data = await response.json();
+                    if (data && data.message) errorMsg = data.message;
+                } catch {}
+                throw new Error(errorMsg);
+            }
+
+            closeIndustryFormModal();
+            window.location.reload();
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert(error.message || 'Error saving industry. Please try again.');
+        } finally {
             hideLoading();
         }
     }
