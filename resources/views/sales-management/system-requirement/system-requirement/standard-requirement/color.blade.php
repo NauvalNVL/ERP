@@ -54,7 +54,7 @@
                                 <i class="fas fa-palette"></i>
                             </span>
                             <input type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                            <button type="button" id="showColorTableBtn" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px" onclick="openColorModal()">
+                            <button type="button" id="showColorTableBtn" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                 <i class="fas fa-table"></i>
                 </button>
             </div>
@@ -62,8 +62,8 @@
                     
                     <div class="col-span-1">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                        <button type="button" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
-                            <i class="fas fa-list-ul mr-2"></i> Select Record
+                        <button type="button" id="selectColorButton" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                            <i class="fas fa-edit mr-2"></i> Edit Selected
                 </button>
             </div>
         </div>
@@ -151,7 +151,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 gap-3">
-                    <a href="#" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                    <a href="{{ route('color-group.index') }}" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                         <div class="p-2 bg-purple-500 rounded-full mr-3">
                             <i class="fas fa-layer-group text-white text-sm"></i>
                         </div>
@@ -171,7 +171,7 @@
                         </div>
                     </a>
 
-                    <a href="#" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                    <a href="{{ route('color.view-print') }}" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                         <div class="p-2 bg-green-500 rounded-full mr-3">
                             <i class="fas fa-print text-white text-sm"></i>
                         </div>
@@ -237,9 +237,7 @@
                                 data-color-name="{{ $color->color_name }}"
                                 data-origin="{{ $color->origin }}"
                                     data-cg-id="{{ $color->color_group_id }}"
-                                    data-cg-type="{{ $color->cg_type ?? '' }}"
-                                    onclick="selectRow(this); event.stopPropagation();"
-                                    ondblclick="openEditColorModal(this)">
+                                    data-cg-type="{{ $color->cg_type ?? '' }}">
                                     <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $color->color_id }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $color->color_name }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $color->origin }}</td>
@@ -282,7 +280,7 @@
                     <button type="button" onclick="sortByCGTypeAndColor()" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
                         <i class="fas fa-sort mr-1"></i>By CG Type + Color#
                     </button>
-                    <button type="button" onclick="editSelectedRow()" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
+                    <button type="button" id="modalSelectColorButton" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
                         <i class="fas fa-edit mr-1"></i>Select
                     </button>
                     <button type="button" onclick="closeColorModal()" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
