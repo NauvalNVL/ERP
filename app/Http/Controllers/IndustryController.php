@@ -69,4 +69,16 @@ class IndustryController extends Controller
         $industries = Industry::orderBy('code')->get();
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintindustry', compact('industries'));
     }
+
+    /**
+     * Search for an industry by code.
+     *
+     * @param string $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search($code)
+    {
+        $exists = Industry::where('code', strtoupper($code))->exists();
+        return response()->json(['exists' => $exists]);
+    }
 }

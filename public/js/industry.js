@@ -42,6 +42,16 @@ document.addEventListener('DOMContentLoaded', function() {
             searchBtn.addEventListener('click', openIndustryModal);
         }
 
+        // Add enter key handler for search input
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSearchAndCreate();
+                }
+            });
+        }
+
         // Close industry dialog
         if (closeDialog && cancelSelectBtn) {
             [closeDialog, cancelSelectBtn].forEach(btn => {
@@ -250,6 +260,43 @@ document.addEventListener('DOMContentLoaded', function() {
         const loadingOverlay = document.getElementById('loadingOverlay');
         if (loadingOverlay) {
             loadingOverlay.classList.add('hidden');
+        }
+    }
+
+    // Handle search and create flow
+    async function handleSearchAndCreate() {
+        const searchValue = searchInput.value.trim().toUpperCase();
+        if (!searchValue) return;
+
+        try {
+            // Show loading overlay
+            showLoading();
+            
+            // Search for the industry
+            const response = await fetch(`/industry/search/${searchValue}`);
+            const data = await response.json();
+            
+            if (data.exists) {
+                // Industry exists, just close the modal
+                closeIndustryModal();
+            } else {
+                // Industry doesn't exist, show create modal
+                if (modalTitle) modalTitle.textContent = 'Add Industry';
+                if (methodField) methodField.innerHTML = '';
+                if (industryForm) {
+                    const baseUrl = industryForm.getAttribute('data-store-url') || '/industry';
+                    industryForm.action = baseUrl;
+                }
+                if (codeInput) codeInput.value = searchValue;
+                if (nameInput) nameInput.value = '';
+                if (industryFormModal) industryFormModal.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error searching industry:', error);
+            alert('Error searching industry. Please try again.');
+        } finally {
+            // Hide loading overlay
+            hideLoading();
         }
     }
 });

@@ -227,6 +227,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/{id}', [IndustryController::class, 'update'])->name('industry.update');
         Route::delete('/{id}', [IndustryController::class, 'destroy'])->name('industry.destroy');
         Route::get('/view-print', [IndustryController::class, 'viewAndPrint'])->name('industry.view-print');
+        Route::get('/search/{code}', [IndustryController::class, 'search'])->name('industry.search');
     });
 });
 
