@@ -277,8 +277,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             if (data.exists) {
-                // Industry exists, just close the modal
-                closeIndustryModal();
+                // Show confirmation dialog
+                if (confirm('Confirm saving this industry code?')) {
+                    // Industry exists, just close the modal
+                    closeIndustryModal();
+                }
             } else {
                 // Industry doesn't exist, show create modal
                 if (modalTitle) modalTitle.textContent = 'Add Industry';
