@@ -26,58 +26,84 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Function to populate finishing table with seed data if empty
+// Function to populate finishing table with data from database
 function populateFinishingTable() {
-    // Sample seed data
-    const seedData = [
-        { code: 'LAM001', description: 'Glossy Lamination', category: 'LAMINATION', cost: 2.50 },
-        { code: 'LAM002', description: 'Matte Lamination', category: 'LAMINATION', cost: 2.75 },
-        { code: 'VAR001', description: 'UV Varnish', category: 'VARNISH', cost: 1.80 },
-        { code: 'EMB001', description: 'Emboss Pattern 1', category: 'EMBOSS', cost: 3.20 },
-        { code: 'FOIL001', description: 'Gold Foil', category: 'FOIL', cost: 4.50 },
-        { code: 'DIE001', description: 'Standard Die Cut', category: 'DIE_CUT', cost: 2.00 }
-    ];
+    console.log('Populating finishing table');
     
-    const table = document.getElementById('finishingDataTable');
-    const tbody = table.querySelector('tbody');
-    
-    // Clear any existing no-data message
+    // Remove "no data" message if present
+    const tbody = document.querySelector('#finishingDataTable tbody');
     tbody.innerHTML = '';
     
-    // Add seed data rows
-    seedData.forEach(finish => {
-        const row = document.createElement('tr');
-        row.className = 'hover:bg-blue-50 cursor-pointer';
-        row.setAttribute('data-code', finish.code);
-        row.setAttribute('data-description', finish.description);
-        row.setAttribute('data-category', finish.category);
-        row.setAttribute('data-cost', finish.cost);
-        row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
+    // Show loading message
+    tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Loading data...</td></tr>';
+    
+    // Fetch data from the database
+    fetch('/finishing', {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Clear loading message
+        tbody.innerHTML = '';
         
-        row.innerHTML = `
-            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${finish.code}</td>
-            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${finish.description}</td>
-            <td class="px-4 py-3 whitespace-nowrap">
-                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">${finish.category}</span>
-            </td>
-            <td class="px-4 py-3 whitespace-nowrap text-gray-700">${finish.cost}</td>
-        `;
+        if (!Array.isArray(data) || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Tidak ada data finishing yang tersedia.</td></tr>';
+            return;
+        }
+
+        // Fill table with data from database
+        data.forEach(finish => {
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-blue-50 cursor-pointer';
+            row.setAttribute('data-code', finish.code);
+            row.setAttribute('data-description', finish.description);
+            row.onclick = function(e) { selectRow(this); e.stopPropagation(); };
+            
+            row.innerHTML = `
+                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${finish.code}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">${finish.description}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">N/A</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">N/A</td>
+            `;
+            
+            tbody.appendChild(row);
+        });
         
-        tbody.appendChild(row);
+        console.log('Table populated with database data:', data);
+        
+        // Update the notification area
+        const notificationArea = document.querySelector('.bg-yellow-100');
+        if (notificationArea) {
+            notificationArea.classList.remove('bg-yellow-100');
+            notificationArea.classList.add('bg-green-100');
+            notificationArea.innerHTML = `
+                <p class="text-sm font-medium text-green-800">Data tersedia: ${data.length} finishing ditemukan.</p>
+            `;
+        }
+        
+        // Update the global array
+        captureExistingData();
+    })
+    .catch(error => {
+        console.error('Error fetching database data:', error);
+        tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-4 text-center text-red-500">
+            Error loading data from database. ${error.message}
+            <br>
+            <button onclick="populateFinishingTable()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                <i class="fas fa-sync-alt mr-2"></i>Coba Lagi
+            </button>
+        </td></tr>`;
     });
-    
-    // Update the notification area
-    const notificationArea = document.querySelector('.bg-yellow-100');
-    if (notificationArea) {
-        notificationArea.classList.remove('bg-yellow-100');
-        notificationArea.classList.add('bg-green-100');
-        notificationArea.innerHTML = `
-            <p class="text-sm font-medium text-green-800">Data tersedia: ${seedData.length} finishing ditemukan (dari JavaScript).</p>
-        `;
-    }
-    
-    // Update the global array
-    captureExistingData();
 }
 
 // Function to capture existing data from the table
@@ -92,9 +118,7 @@ function captureExistingData() {
         if (!row.querySelector('td').textContent.includes('Tidak ada data')) {
             const finish = {
                 code: row.getAttribute('data-code'),
-                description: row.getAttribute('data-description'),
-                category: row.getAttribute('data-category'),
-                cost: row.getAttribute('data-cost')
+                description: row.getAttribute('data-description')
             };
             finishings.push(finish);
             originalFinishings.push({...finish});
@@ -164,9 +188,8 @@ function filterFinishingTable() {
         
         const code = row.getAttribute('data-code').toLowerCase();
         const description = row.getAttribute('data-description').toLowerCase();
-        const category = row.getAttribute('data-category').toLowerCase();
         
-        if (code.includes(searchValue) || description.includes(searchValue) || category.includes(searchValue)) {
+        if (code.includes(searchValue) || description.includes(searchValue)) {
             row.style.display = '';
         } else {
             row.style.display = 'none';
@@ -223,8 +246,6 @@ function openEditFinishingModal(row) {
     // Populate the form with the row data
     document.getElementById('edit_code').value = row.getAttribute('data-code');
     document.getElementById('edit_description').value = row.getAttribute('data-description');
-    document.getElementById('edit_category').value = row.getAttribute('data-category');
-    document.getElementById('edit_cost').value = row.getAttribute('data-cost');
     
     // Show the modal
     const modal = document.getElementById('editFinishingModal');
@@ -250,70 +271,84 @@ function saveFinishingChanges() {
     
     const code = document.getElementById('edit_code').value;
     const description = document.getElementById('edit_description').value;
-    const category = document.getElementById('edit_category').value;
-    const cost = document.getElementById('edit_cost').value;
     
-    // Simulate an AJAX request
-    setTimeout(() => {
-        // Update the table row if it exists
-        const table = document.getElementById('finishingDataTable');
-        const rows = table.querySelectorAll('tbody tr');
-        let rowFound = false;
-        
-        rows.forEach(row => {
-            if (row.getAttribute('data-code') === code) {
-                row.setAttribute('data-description', description);
-                row.setAttribute('data-category', category);
-                row.setAttribute('data-cost', cost);
+    // Send update to server
+    fetch('/finishing/' + code, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            code: code,
+            description: description
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the table row if it exists
+            const table = document.getElementById('finishingDataTable');
+            const rows = table.querySelectorAll('tbody tr');
+            let rowFound = false;
+            
+            rows.forEach(row => {
+                if (row.getAttribute('data-code') === code) {
+                    row.setAttribute('data-description', description);
+                    
+                    // Update the displayed text
+                    row.cells[1].textContent = description;
+                    
+                    rowFound = true;
+                }
+            });
+            
+            // If row not found, add a new one
+            if (!rowFound) {
+                const tbody = table.querySelector('tbody');
                 
-                // Update the displayed text
-                row.cells[1].textContent = description;
-                row.cells[2].innerHTML = `<span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">${category}</span>`;
-                row.cells[3].textContent = cost;
+                // Remove the "No data" row if it exists
+                if (tbody.children.length === 1 && tbody.children[0].textContent.includes('Tidak ada data')) {
+                    tbody.innerHTML = '';
+                }
                 
-                rowFound = true;
+                // Create a new row
+                const newRow = document.createElement('tr');
+                newRow.className = 'hover:bg-blue-50 cursor-pointer';
+                newRow.setAttribute('data-code', code);
+                newRow.setAttribute('data-description', description);
+                newRow.onclick = function(e) { selectRow(this); e.stopPropagation(); };
+                
+                newRow.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${code}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-gray-700">${description}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">N/A</span>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-gray-700">N/A</td>
+                `;
+                
+                tbody.appendChild(newRow);
             }
-        });
-        
-        // If row not found, add a new one
-        if (!rowFound) {
-            const tbody = table.querySelector('tbody');
             
-            // Remove the "No data" row if it exists
-            if (tbody.children.length === 1 && tbody.children[0].textContent.includes('Tidak ada data')) {
-                tbody.innerHTML = '';
-            }
+            // Update the captured data
+            captureExistingData();
             
-            // Create a new row
-            const newRow = document.createElement('tr');
-            newRow.className = 'hover:bg-blue-50 cursor-pointer';
-            newRow.setAttribute('data-code', code);
-            newRow.setAttribute('data-description', description);
-            newRow.setAttribute('data-category', category);
-            newRow.setAttribute('data-cost', cost);
-            newRow.onclick = function(e) { selectRow(this); e.stopPropagation(); };
+            // Close the edit modal
+            closeEditFinishingModal();
             
-            newRow.innerHTML = `
-                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${code}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">${description}</td>
-                <td class="px-4 py-3 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">${category}</span>
-                </td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">${cost}</td>
-            `;
-            
-            tbody.appendChild(newRow);
+            alert('Data finishing berhasil diperbarui');
+        } else {
+            alert('Error updating finishing: ' + data.message);
         }
-        
-        // Update the captured data
-        captureExistingData();
-        
-        // Close the edit modal
-        closeEditFinishingModal();
-        
-        // Hide loading indicator
+    })
+    .catch(error => {
+        console.error('Error updating finishing:', error);
+        alert('Error updating finishing. Please try again.');
+    })
+    .finally(() => {
         hideLoading();
-    }, 500);
+    });
     
     return false; // Prevent form submission
 }
@@ -351,6 +386,25 @@ function hideLoading() {
 // Function to load seed data (used by the button in the debug section)
 function loadSeedData() {
     if (confirm('This will load seed data for finishings. Continue?')) {
-        populateFinishingTable();
+        fetch('/run-finishing-seeder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateFinishingTable();
+                alert('Seed data loaded successfully');
+            } else {
+                alert('Error loading seed data: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading seed data:', error);
+            alert('Error loading seed data. Please try again.');
+        });
     }
 } 

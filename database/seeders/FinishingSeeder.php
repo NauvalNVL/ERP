@@ -10,7 +10,7 @@ class FinishingSeeder extends Seeder
     public function run()
     {
         $finishings = [
-            ['code' => '001', 'description' => 'BLUE'],
+            ['code' => '001', 'description' => 'GLUE'],
             ['code' => '002', 'description' => 'STITCH'],
             ['code' => '003', 'description' => 'ASSEMBLY'],
             ['code' => '004', 'description' => 'TEXT'],
