@@ -25,7 +25,9 @@ use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\ForeignCurrencyController;
 use App\Http\Controllers\BusinessFormController;
+use App\Http\Controllers\CustomerGroupController;
 use App\Http\Controllers\SalesManagement\SystemRequirement\SystemRequirementController;
+use App\Http\Controllers\UpdateCustomerAccountController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -233,8 +235,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/search/{code}', [IndustryController::class, 'search'])->name('industry.search');
     });
 
+    // Customer Group Routes
+    Route::prefix('customer-group')->group(function () {
+        Route::get('/', [CustomerGroupController::class, 'index'])->name('customer-group.index');
+        Route::post('/', [CustomerGroupController::class, 'store'])->name('customer-group.store');
+        Route::put('/{group_code}', [CustomerGroupController::class, 'update'])->name('customer-group.update');
+        Route::delete('/{group_code}', [CustomerGroupController::class, 'destroy'])->name('customer-group.destroy');
+        Route::get('/view-print', [CustomerGroupController::class, 'viewAndPrint'])->name('customer-group.view-print');
+    });
+
     // New route for view and print salesperson team functionality
     Route::get('/salesperson-team/view-print', [SystemRequirementController::class, 'viewPrintSalespersonTeam'])->name('salesperson-team.view-print');
+
+    // Update Customer Account
+    Route::get('/update-customer-account', [UpdateCustomerAccountController::class, 'index'])->name('update-customer-account.index');
 });
 
 // Password Management

@@ -325,11 +325,11 @@
 
                             <!-- Customer Account Nested Submenu -->
                             <div x-show="customerAccOpen" x-collapse class="pl-4 mt-1 space-y-1">
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('customer-group.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-users w-3 h-3 mr-3"></i>
                                     <span>Define Customer Group</span>
                                 </a>
-                                <a href="#" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
+                                <a href="{{ route('update-customer-account.index') }}" class="flex items-center px-4 py-2 text-xs text-gray-300 hover:bg-gray-700 rounded-lg transition-colors">
                                     <i class="fas fa-user-edit w-3 h-3 mr-3"></i>
                                     <span>Update Customer Account</span>
                                 </a>
