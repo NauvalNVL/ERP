@@ -196,7 +196,7 @@
                                 <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
                             @enderror
                         </div>
-                        
+                        <!-- Max Tax Adj -->
                         <!-- Max Tax Adj -->
                         <div>
                             <label for="max_tax_adj" class="block text-sm font-medium text-gray-700 mb-1">Max +/- Tax ADJ:</label>
