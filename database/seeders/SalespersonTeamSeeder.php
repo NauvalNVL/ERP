@@ -13,6 +13,8 @@ class SalespersonTeamSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::table('salesperson_teams')->truncate();
+        
         $now = Carbon::now();
         
         $salespersonTeams = [

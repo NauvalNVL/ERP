@@ -46,7 +46,7 @@ class ScoringToolSeeder extends Seeder
                 'specification' => '',
                 'description' => 'MALE FEMALE 9MM',
                 'is_active' => true,
-            ],,
+            ]
     ];
 
     /**
