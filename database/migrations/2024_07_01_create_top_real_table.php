@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('top_real', function (Blueprint $table) {
-            $table->id();
-            $table->integer('ID');
+            $table->integer('ID')->primary();
             $table->string('AC_Num', 50);
             $table->string('AC_Name', 100);
             $table->integer('AVG_Bayar');

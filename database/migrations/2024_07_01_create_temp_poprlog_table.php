@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('temp_poprlog', function (Blueprint $table) {
-            $table->id();
-            $table->float('ID');
+            $table->float('ID')->primary();
             $table->string('PO', 255);
             $table->string('PO_STS', 255);
             $table->string('PO_DATE', 255);
