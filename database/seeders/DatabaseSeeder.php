@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             BusinessFormSeeder::class,
             ProductDesignSeeder::class,
             IndustrySeeder::class,
+            CustomerGroupSeeder::class,
         ]);
     }
 }
