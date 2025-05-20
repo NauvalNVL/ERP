@@ -159,7 +159,9 @@ class ColorGroupController extends Controller
     {
         try {
             $colorGroups = ColorGroup::all();
-            return response()->json($colorGroups);
+            return Inertia::render('sales-management/system-requirement/standard-requirement/color-group', [
+                'colorGroups' => $colorGroups
+            ]);
         } catch (\Exception $e) {
             Log::error('Error in ColorGroupController@vueIndex: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load color groups data'], 500);

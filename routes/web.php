@@ -59,6 +59,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('vue')->group(function () {
          Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
          Route::get('/system-requirement/color', [ColorController::class, 'vueIndex'])->name('vue.color.index');
+         Route::get('/sales-configuration', [SalesConfigurationController::class, 'vueIndex'])->name('vue.sales-configuration');
+         Route::get('/color-group', [ColorGroupController::class, 'vueIndex'])->name('vue.color-group.index');
     });
 
     // Auth Routes
@@ -81,6 +83,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/sales-configuration', [SalesConfigurationController::class, 'index'])->name('sales-configuration.index');
     Route::post('/sales-configuration', [SalesConfigurationController::class, 'store'])->name('sales-configuration.store');
     Route::put('/sales-configuration', [SalesConfigurationController::class, 'update'])->name('sales-configuration.update');
+    Route::get('/sales-configuration/vue', [SalesConfigurationController::class, 'vueIndex'])->name('sales-configuration.vue');
 
     // Salesperson Team
     Route::prefix('salesperson-team')->group(function () {
