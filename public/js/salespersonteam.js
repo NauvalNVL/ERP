@@ -110,7 +110,7 @@ function sortSearchTable(columnIndex) {
 }
 
 // Function to select a row in search table
-function selectSearchRow(row) {
+function selectRow(row) {
     // Remove highlight from all rows
     const allRows = document.querySelectorAll('#searchSalespersonTable tbody tr');
     allRows.forEach(function(r) {
@@ -122,25 +122,34 @@ function selectSearchRow(row) {
 }
 
 // Function to select search result
-function selectSearchResult(row = null) {
-    // Jika row tidak dikirim, ambil yang ter-highlight
-    if (!row) {
-        row = document.querySelector('#searchSalespersonTable tbody tr.bg-blue-600');
-    }
-    if (!row) {
-        alert("Please select a salesperson team first");
+function selectSearchResult() {
+    const selectedRow = document.querySelector('#searchSalespersonTable tbody tr.bg-blue-600');
+    if (!selectedRow) {
+        // Show error message if no row is selected
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+        errorDiv.innerHTML = `
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">Please select a salesperson team first</span>
+        `;
+        document.body.appendChild(errorDiv);
+        
+        // Remove error message after 3 seconds
+        setTimeout(() => {
+            errorDiv.remove();
+        }, 3000);
         return;
     }
 
-    // Ambil data dari baris
-    const code = row.getAttribute('data-code');
-    const name = row.getAttribute('data-name');
-    const teamCode = row.getAttribute('data-team-code');
-    const teamName = row.getAttribute('data-team-name');
-    const position = row.getAttribute('data-position');
-    const id = row.getAttribute('data-id');
+    // Get data from selected row
+    const code = selectedRow.getAttribute('data-code');
+    const name = selectedRow.getAttribute('data-name');
+    const teamCode = selectedRow.getAttribute('data-team-code');
+    const teamName = selectedRow.getAttribute('data-team-name');
+    const position = selectedRow.getAttribute('data-position');
+    const id = selectedRow.getAttribute('data-id');
 
-    // Tutup modal search
+    // Close search modal
     closeSearchModal();
 
     // Get edit form and set data-id
@@ -149,11 +158,11 @@ function selectSearchResult(row = null) {
         editForm.setAttribute('data-id', id);
     }
 
-    // Isi field di modal edit
-    document.getElementById('edit_salesperson_code').value = code;
+    // Fill fields in edit modal
+    document.getElementById('edit_s_person_code').value = code;
     document.getElementById('edit_salesperson_name').value = name;
 
-    // Pilih sales team yang sesuai
+    // Select matching sales team
     const teamSelect = document.getElementById('edit_sales_team_id');
     for (let i = 0; i < teamSelect.options.length; i++) {
         if (teamSelect.options[i].text.startsWith(teamCode)) {
@@ -162,7 +171,7 @@ function selectSearchResult(row = null) {
         }
     }
 
-    // Pilih posisi yang sesuai
+    // Select matching position
     const posSelect = document.getElementById('edit_position');
     for (let i = 0; i < posSelect.options.length; i++) {
         if (posSelect.options[i].value === position) {
@@ -171,10 +180,10 @@ function selectSearchResult(row = null) {
         }
     }
 
-    // Set action form edit (jika pakai form action dinamis)
+    // Set form action
     editForm.action = `/salesperson-team/${id}`;
 
-    // Tampilkan modal edit
+    // Show edit modal
     showEditModal();
 }
 
@@ -254,48 +263,6 @@ function loadSeedData() {
             loadingOverlay.classList.add('hidden');
         }
     }, 1000);
-}
-
-// Function to handle double-click on search table row
-function handleRowDoubleClick(row) {
-    const id = row.getAttribute('data-id');
-    const code = row.getAttribute('data-code');
-    const name = row.getAttribute('data-name');
-    const teamCode = row.getAttribute('data-team-code');
-    const teamName = row.getAttribute('data-team-name');
-    const position = row.getAttribute('data-position');
-
-    // Close search modal
-    closeSearchModal();
-
-    // Populate edit form
-    const editForm = document.getElementById('editForm');
-    editForm.setAttribute('data-id', id);
-    document.getElementById('edit_s_person_code').value = code;
-    document.getElementById('edit_salesperson_name').value = name;
-
-    // Set sales team selection
-    const salesTeamSelect = document.getElementById('edit_sales_team_id');
-    for (let i = 0; i < salesTeamSelect.options.length; i++) {
-        const option = salesTeamSelect.options[i];
-        if (option.text.includes(teamCode)) {
-            salesTeamSelect.selectedIndex = i;
-            break;
-        }
-    }
-
-    // Set position selection
-    const positionSelect = document.getElementById('edit_position');
-    for (let i = 0; i < positionSelect.options.length; i++) {
-        const option = positionSelect.options[i];
-        if (option.value === position) {
-            positionSelect.selectedIndex = i;
-            break;
-        }
-    }
-
-    // Show edit modal
-    document.getElementById('editModal').classList.remove('hidden');
 }
 
 // Function to save changes

@@ -430,8 +430,7 @@
                                 data-team-code="{{ $person->st_code }}"
                                 data-team-name="{{ $person->sales_team_name }}"
                                 data-position="{{ $person->sales_team_position }}"
-                                onclick="selectRow(this)"
-                                ondblclick="handleRowDoubleClick(this)">
+                                onclick="selectRow(this)">
                                 <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{{ $person->s_person_code }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $person->salesperson_name }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">{{ $person->st_code }}</td>
