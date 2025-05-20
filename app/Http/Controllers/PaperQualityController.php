@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class PaperQualityController extends Controller
 {
@@ -225,10 +226,68 @@ class PaperQualityController extends Controller
      */
     public function manageStatus()
     {
-        // Menggunakan pagination, mengambil 15 item per halaman, diurutkan berdasarkan paper_quality
+        // Using pagination, fetching 15 items per page, sorted by paper_quality
         $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->paginate(15);
         
-        // Memperbaiki path view, menghapus titik ekstra setelah 'obsolate'
+        // Return JSON response for AJAX requests
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($paperQualities);
+        }
+        
+        // Return view for regular requests
         return view('sales-management.system-requirement.system-requirement.standard-requirement.obsolateunobsolatepaperquality', compact('paperQualities'));
+    }
+    
+    /**
+     * Display the Vue version of paper quality status management page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueManageStatus()
+    {
+        try {
+            $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')
+                ->paginate(15);
+                
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-paper-quality', [
+                'paperQualities' => $paperQualities->items(),
+                'pagination' => [
+                    'currentPage' => $paperQualities->currentPage(),
+                    'perPage' => $paperQualities->perPage(),
+                    'total' => $paperQualities->total()
+                ],
+                'header' => 'Manage Paper Quality Status'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in PaperQualityController@vueManageStatus: ' . $e->getMessage());
+            
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-paper-quality', [
+                'paperQualities' => [],
+                'pagination' => [
+                    'currentPage' => 1,
+                    'perPage' => 15,
+                    'total' => 0
+                ],
+                'header' => 'Manage Paper Quality Status',
+                'error' => 'Error displaying paper qualities: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Display a listing of the resource for Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/paper-quality', [
+                'header' => 'Paper Quality Management'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in PaperQualityController@vueIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load paper quality data'], 500);
+        }
     }
 }

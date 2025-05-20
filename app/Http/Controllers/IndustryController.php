@@ -81,4 +81,31 @@ class IndustryController extends Controller
         $exists = Industry::where('code', strtoupper($code))->exists();
         return response()->json(['exists' => $exists]);
     }
+
+    /**
+     * Display the Vue index page for industry management
+     *
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            $industries = Industry::select('id', 'code', 'name')
+                ->orderBy('code')
+                ->get();
+                
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/industry', [
+                'industries' => $industries,
+                'header' => 'Industry Management'
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in IndustryController@vueIndex: ' . $e->getMessage());
+            
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/industry', [
+                'industries' => [],
+                'header' => 'Industry Management',
+                'error' => 'Error displaying industry data: ' . $e->getMessage()
+            ]);
+        }
+    }
 }

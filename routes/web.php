@@ -58,9 +58,16 @@ Route::middleware('auth')->group(function () {
     // Vue Routes
     Route::prefix('vue')->group(function () {
          Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-         Route::get('/system-requirement/color', [ColorController::class, 'vueIndex'])->name('vue.color.index');
+         Route::get('/color', [ColorController::class, 'vueIndex'])->name('vue.color.index');
          Route::get('/sales-configuration', [SalesConfigurationController::class, 'vueIndex'])->name('vue.sales-configuration');
          Route::get('/color-group', [ColorGroupController::class, 'vueIndex'])->name('vue.color-group.index');
+         Route::get('/finishing', [FinishingController::class, 'vueIndex'])->name('vue.finishing.index');
+         Route::get('/geo', [GeoController::class, 'vueIndex'])->name('vue.geo.index');
+         Route::get('/industry', [IndustryController::class, 'vueIndex'])->name('vue.industry.index');
+         Route::get('/paper-quality/manage-status', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.manage-status');
+         Route::get('/paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.paper-flute.index');
+         Route::get('/paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.paper-quality.index');
+         Route::get('/paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.paper-size.index');
     });
 
     // Auth Routes

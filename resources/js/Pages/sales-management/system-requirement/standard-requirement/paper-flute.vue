@@ -1,12 +1,12 @@
 <template>
-    <Head title="Color Group Management" />
+    <Head title="Paper Flute Management" />
 
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-layer-group mr-3"></i> Define Color Group
+            <i class="fas fa-layer-group mr-3"></i> Define Paper Flute
         </h2>
-        <p class="text-cyan-100">Define color groups for specific product categories</p>
+        <p class="text-cyan-100">Define flute thickness for corrugated cardboard</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
@@ -18,7 +18,7 @@
                         <div class="p-2 bg-blue-500 rounded-lg mr-3">
                             <i class="fas fa-edit text-white"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Color Group Management</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">Paper Flute Management</h3>
                     </div>
                     <!-- Header with navigation buttons -->
                     <div class="flex items-center space-x-2 mb-6">
@@ -37,14 +37,14 @@
                         <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="editSelectedRow">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewColorGroup">
+                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewFlute">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Color Group#:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Flute#:</label>
                             <div class="relative flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-layer-group"></i>
@@ -68,68 +68,68 @@
                             <div class="mr-3">
                                 <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
                             </div>
-                            <p class="text-sm font-medium text-yellow-800">Loading color group data...</p>
+                            <p class="text-sm font-medium text-yellow-800">Loading paper flute data...</p>
                         </div>
                     </div>
-                    <div v-else-if="colorGroups.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
-                        <p class="text-sm font-medium text-yellow-800">No color group data available.</p>
+                    <div v-else-if="flutes.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
+                        <p class="text-sm font-medium text-yellow-800">No paper flute data available.</p>
                         <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
                         <div class="mt-2 flex items-center space-x-3">
-                            <button @click="fetchColorGroups" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Reload Data</button>
+                            <button @click="fetchFlutes" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Reload Data</button>
                         </div>
                     </div>
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
-                        <p class="text-sm font-medium text-green-800">Data available: {{ colorGroups.length }} color groups found.</p>
+                        <p class="text-sm font-medium text-green-800">Data available: {{ flutes.length }} paper flutes found.</p>
                         <p v-if="selectedRow" class="text-xs text-green-700 mt-1">
-                            Selected: <span class="font-semibold">{{ selectedRow.cg }}</span> - {{ selectedRow.cg_name }} ({{ selectedRow.cg_type }})
+                            Selected: <span class="font-semibold">{{ selectedRow.code }}</span> - {{ selectedRow.name }} ({{ selectedRow.flute_height }} mm)
                         </p>
                     </div>
                 </div>
             </div>
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
-                <!-- Color Group Info Card -->
+                <!-- Flute Info Card -->
                 <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
                         <div class="p-2 bg-teal-500 rounded-lg mr-3">
                             <i class="fas fa-info-circle text-white"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Info Color Group</h3>
+                        <h3 class="text-lg font-semibold text-gray-800">Flute Information</h3>
                     </div>
 
                     <div class="space-y-4">
                         <div class="p-4 bg-teal-50 rounded-lg">
                             <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
                             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                                <li>Color group code must be unique and cannot be changed</li>
-                                <li>Use the <span class="font-medium">search</span> button to select a color group</li>
-                                <li>CG type determines the group characteristics</li>
+                                <li>Flute code must be unique and cannot be changed</li>
+                                <li>Use the <span class="font-medium">search</span> button to select a flute</li>
+                                <li>Flute height is measured in millimeters</li>
                                 <li>Any changes must be saved</li>
                             </ul>
                         </div>
 
                         <div class="p-4 bg-blue-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common CG Types</h4>
+                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common Flutes</h4>
                             <div class="grid grid-cols-2 gap-2 text-sm">
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">F</span>
-                                    <span>Flexo</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">A</span>
+                                    <span>A Flute</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-purple-500 text-white rounded-full font-bold mr-2">O</span>
-                                    <span>Offset</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">B</span>
+                                    <span>B Flute</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">C</span>
-                                    <span>Coating</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">C</span>
+                                    <span>C Flute</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-red-500 text-white rounded-full font-bold mr-2">D</span>
-                                    <span>Digital</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">E</span>
+                                    <span>E Flute</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-yellow-500 text-white rounded-full font-bold mr-2">S</span>
-                                    <span>Special</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">F</span>
+                                    <span>F Flute</span>
                                 </div>
                             </div>
                         </div>
@@ -146,13 +146,13 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <Link href="/color" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <Link href="/paper-size" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                             <div class="p-2 bg-purple-500 rounded-full mr-3">
-                                <i class="fas fa-palette text-white text-sm"></i>
+                                <i class="fas fa-box text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-purple-900">Colors</p>
-                                <p class="text-xs text-purple-700">Manage individual colors</p>
+                                <p class="font-medium text-purple-900">Paper Size</p>
+                                <p class="text-xs text-purple-700">Manage paper sizes</p>
                             </div>
                         </Link>
 
@@ -161,18 +161,18 @@
                                 <i class="fas fa-th-list text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">CG Types</p>
-                                <p class="text-xs text-blue-700">View color group types</p>
+                                <p class="font-medium text-blue-900">Flute Types</p>
+                                <p class="text-xs text-blue-700">View flute types</p>
                             </div>
                         </a>
 
-                        <Link href="/color-group/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <Link href="/paper-flute/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                             <div class="p-2 bg-green-500 rounded-full mr-3">
                                 <i class="fas fa-print text-white text-sm"></i>
                             </div>
                             <div>
                                 <p class="font-medium text-green-900">Print List</p>
-                                <p class="text-xs text-green-700">Print color group list</p>
+                                <p class="text-xs text-green-700">Print flute list</p>
                             </div>
                         </Link>
                     </div>
@@ -182,11 +182,11 @@
     </div>
 
     <!-- Modal Table -->
-    <ColorGroupModal
+    <PaperFluteModal
         :show="showModal"
-        :colorGroups="colorGroups"
+        :flutes="flutes"
         @close="showModal = false"
-        @select="onColorGroupSelected"
+        @select="onFluteSelected"
     />
 
     <!-- Edit Modal -->
@@ -197,42 +197,44 @@
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                         <i class="fas fa-layer-group"></i>
                     </div>
-                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Color Group' : 'Edit Color Group' }}</h3>
+                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Paper Flute' : 'Edit Paper Flute' }}</h3>
                 </div>
                 <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
             <div class="p-6">
-                <form @submit.prevent="saveColorGroupChanges" class="space-y-4">
+                <form @submit.prevent="saveFluteChanges" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">CG#:</label>
-                            <input v-model="editForm.cg" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Flute#:</label>
+                            <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">CG Name:</label>
-                            <input v-model="editForm.cg_name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Flute Name:</label>
+                            <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">CG Type:</label>
-                            <select v-model="editForm.cg_type" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                                <option value="X-Flex">X-Flex</option>
-                                <option value="C-Coating">C-Coating</option>
-                                <option value="S-Offset">S-Offset</option>
-                                <option value="D-Digital">D-Digital</option>
-                                <option value="P-Pantone">P-Pantone</option>
-                            </select>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
+                            <input v-model="editForm.description" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Flute Height (mm):</label>
+                            <input v-model="editForm.flute_height" type="number" step="0.01" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input id="is_active" v-model="editForm.is_active" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="is_active" class="font-medium text-gray-700">Active</label>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Note:</label>
                             <div class="border border-gray-300 rounded-md p-3 bg-gray-50 h-16 overflow-auto text-sm">
-                                <p>Color Group determines color characteristics in the printing process</p>
+                                <p>Paper flute height should be measured in millimeters (mm). Standard flutes range from 0.5mm to 12mm.</p>
                             </div>
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteColorGroup(editForm.cg)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                        <button type="button" v-if="!isCreating" @click="deleteFlute(editForm.code)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                             <i class="fas fa-trash-alt mr-2"></i>Delete
                         </button>
                         <div v-else class="w-24"></div>
@@ -278,31 +280,43 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
-import ColorGroupModal from '@/Components/color-group-modal.vue';
+import PaperFluteModal from '@/Components/paper-flute-modal.vue';
 
 // Get the header from props
 const props = defineProps({
     header: {
         type: String,
-        default: 'Color Group Management'
+        default: 'Paper Flute Management'
     }
 });
 
-const colorGroups = ref([]);
+const flutes = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref('');
-const editForm = ref({ cg: '', cg_name: '', cg_type: '' });
+const editForm = ref({
+    code: '',
+    name: '',
+    description: '',
+    flute_height: '',
+    is_active: true,
+    tur_l2b: 1.00,
+    tur_l3: 1.40,
+    tur_l1: 1.00,
+    tur_ace: 1.50,
+    tur_2l: 1.00,
+    starch_consumption: 0.00
+});
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
-const fetchColorGroups = async () => {
+const fetchFlutes = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/color-group', { 
+        const res = await fetch('/paper-flute', { 
             headers: { 
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -316,48 +330,43 @@ const fetchColorGroups = async () => {
         const data = await res.json();
         
         if (Array.isArray(data)) {
-            colorGroups.value = data.map(group => ({
-                cg: group.cg_id || group.cg,
-                cg_name: group.cg_name,
-                cg_type: group.cg_type
-            }));
+            flutes.value = data;
         } else {
-            colorGroups.value = [];
+            flutes.value = [];
             console.error('Unexpected data format:', data);
         }
     } catch (e) {
-        console.error('Error fetching color groups:', e);
-        colorGroups.value = [];
+        console.error('Error fetching paper flutes:', e);
+        flutes.value = [];
     } finally {
         loading.value = false;
     }
 };
 
-onMounted(fetchColorGroups);
+onMounted(fetchFlutes);
 
 // Watch for changes in search query to filter the data
 watch(searchQuery, (newQuery) => {
-    if (newQuery && colorGroups.value.length > 0) {
-        const foundGroup = colorGroups.value.find(group => 
-            group.cg.toLowerCase().includes(newQuery.toLowerCase()) ||
-            group.cg_name.toLowerCase().includes(newQuery.toLowerCase()) ||
-            group.cg_type.toLowerCase().includes(newQuery.toLowerCase())
+    if (newQuery && flutes.value.length > 0) {
+        const foundFlute = flutes.value.find(flute => 
+            flute.code.toLowerCase().includes(newQuery.toLowerCase()) ||
+            flute.name.toLowerCase().includes(newQuery.toLowerCase())
         );
         
-        if (foundGroup) {
-            selectedRow.value = foundGroup;
+        if (foundFlute) {
+            selectedRow.value = foundFlute;
         }
     }
 });
 
-const onColorGroupSelected = (group) => {
-    selectedRow.value = group;
-    searchQuery.value = group.cg;
+const onFluteSelected = (flute) => {
+    selectedRow.value = flute;
+    searchQuery.value = flute.code;
     showModal.value = false;
     
     // Automatically open the edit modal for the selected row
     isCreating.value = false;
-    editForm.value = { ...group };
+    editForm.value = { ...flute };
     showEditModal.value = true;
 };
 
@@ -367,29 +376,53 @@ const editSelectedRow = () => {
         editForm.value = { ...selectedRow.value };
         showEditModal.value = true;
     } else {
-        showNotification('Please select a color group first', 'error');
+        showNotification('Please select a paper flute first', 'error');
     }
 };
 
-const createNewColorGroup = () => {
+const createNewFlute = () => {
     isCreating.value = true;
-    editForm.value = { cg: '', cg_name: '', cg_type: 'X-Flex' };
+    editForm.value = {
+        code: '',
+        name: '',
+        description: '',
+        flute_height: '',
+        is_active: true,
+        tur_l2b: 1.00,
+        tur_l3: 1.40,
+        tur_l1: 1.00,
+        tur_ace: 1.50,
+        tur_2l: 1.00,
+        starch_consumption: 0.00
+    };
     showEditModal.value = true;
 };
 
 const closeEditModal = () => {
     showEditModal.value = false;
-    editForm.value = { cg: '', cg_name: '', cg_type: '' };
+    editForm.value = {
+        code: '',
+        name: '',
+        description: '',
+        flute_height: '',
+        is_active: true,
+        tur_l2b: 1.00,
+        tur_l3: 1.40,
+        tur_l1: 1.00,
+        tur_ace: 1.50,
+        tur_2l: 1.00,
+        starch_consumption: 0.00
+    };
     isCreating.value = false;
 };
 
-const saveColorGroupChanges = async () => {
+const saveFluteChanges = async () => {
     saving.value = true;
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
         // Different API call for create vs update
-        let url = isCreating.value ? '/color-group' : `/color-group/${editForm.value.cg}`;
+        let url = isCreating.value ? '/paper-flute' : `/paper-flute/${editForm.value.code}`;
         let method = isCreating.value ? 'POST' : 'PUT';
         
         const response = await fetch(url, {
@@ -399,14 +432,7 @@ const saveColorGroupChanges = async () => {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
-            body: JSON.stringify(isCreating.value ? {
-                cg: editForm.value.cg,
-                cg_name: editForm.value.cg_name,
-                cg_type: editForm.value.cg_type
-            } : {
-                cg_name: editForm.value.cg_name,
-                cg_type: editForm.value.cg_type
-            })
+            body: JSON.stringify(editForm.value)
         });
         
         const result = await response.json();
@@ -414,31 +440,33 @@ const saveColorGroupChanges = async () => {
         if (response.ok) {
             // Update the local data with the changes or add new item
             if (isCreating.value) {
-                showNotification('Color group created successfully', 'success');
+                showNotification('Paper flute created successfully', 'success');
             } else {
                 if (selectedRow.value) {
-                    selectedRow.value.cg_name = editForm.value.cg_name;
-                    selectedRow.value.cg_type = editForm.value.cg_type;
+                    selectedRow.value.name = editForm.value.name;
+                    selectedRow.value.description = editForm.value.description;
+                    selectedRow.value.flute_height = editForm.value.flute_height;
+                    selectedRow.value.is_active = editForm.value.is_active;
                 }
-                showNotification('Color group updated successfully', 'success');
+                showNotification('Paper flute updated successfully', 'success');
             }
             
             // Refresh the full data list to ensure we're in sync with the database
-            await fetchColorGroups();
+            await fetchFlutes();
             closeEditModal();
         } else {
             showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {
-        console.error('Error saving color group changes:', e);
-        showNotification('Error saving color group. Please try again.', 'error');
+        console.error('Error saving paper flute changes:', e);
+        showNotification('Error saving paper flute. Please try again.', 'error');
     } finally {
         saving.value = false;
     }
 };
 
-const deleteColorGroup = async (cgId) => {
-    if (!confirm(`Are you sure you want to delete color group "${cgId}"?`)) {
+const deleteFlute = async (code) => {
+    if (!confirm(`Are you sure you want to delete paper flute "${code}"?`)) {
         return;
     }
     
@@ -446,7 +474,7 @@ const deleteColorGroup = async (cgId) => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch(`/color-group/${cgId}`, {
+        const response = await fetch(`/paper-flute/${code}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -454,25 +482,24 @@ const deleteColorGroup = async (cgId) => {
             }
         });
         
-        const result = await response.json();
-        
-        if (result.success) {
+        if (response.ok) {
             // Remove the item from the local array
-            colorGroups.value = colorGroups.value.filter(group => group.cg !== cgId);
+            flutes.value = flutes.value.filter(flute => flute.code !== code);
             
-            if (selectedRow.value && selectedRow.value.cg === cgId) {
+            if (selectedRow.value && selectedRow.value.code === code) {
                 selectedRow.value = null;
                 searchQuery.value = '';
             }
             
             closeEditModal();
-            showNotification('Color group deleted successfully', 'success');
+            showNotification('Paper flute deleted successfully', 'success');
         } else {
-            showNotification('Error deleting color group: ' + (result.message || 'Unknown error'), 'error');
+            const result = await response.json();
+            showNotification('Error deleting paper flute: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {
-        console.error('Error deleting color group:', e);
-        showNotification('Error deleting color group. Please try again.', 'error');
+        console.error('Error deleting paper flute:', e);
+        showNotification('Error deleting paper flute. Please try again.', 'error');
     } finally {
         saving.value = false;
     }

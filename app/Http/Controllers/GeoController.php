@@ -125,4 +125,29 @@ class GeoController extends Controller
         $geos = Geo::orderBy('country')->orderBy('state')->get(); 
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintgeo', compact('geos')); 
     }
+
+    /**
+     * Display the Vue index page for geo management
+     *
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            $geos = Geo::orderBy('country')->orderBy('state')->get();
+            
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/geo', [
+                'geos' => $geos,
+                'header' => 'Geo Management'
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in GeoController@vueIndex: ' . $e->getMessage());
+            
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/geo', [
+                'geos' => [],
+                'header' => 'Geo Management',
+                'error' => 'Error displaying geo data: ' . $e->getMessage()
+            ]);
+        }
+    }
 }

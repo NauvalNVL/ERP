@@ -78,7 +78,13 @@
                         <button @click="sidebarOpen = !sidebarOpen" class="mr-4 text-gray-500 lg:hidden">
                             <i class="fas fa-bars text-xl"></i>
                         </button>
-                        <h2 class="text-xl font-semibold">@yield('header', 'Dashboard')</h2>
+                        <h2 class="text-xl font-semibold">
+                            @if(Request::is('vue/*'))
+                            {{ $page['props']['header'] ?? 'Dashboard' }}
+                            @else
+                            @yield('header', 'Dashboard')
+                            @endif
+                        </h2>
                     </div>
                 </div>
 

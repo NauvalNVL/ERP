@@ -316,16 +316,18 @@ class ColorController extends Controller
             
             $colorGroups = ColorGroup::all();
             
-            return Inertia::render('sales-management/system-requirement/system-requirement/standard-requirement/color', [
+            return Inertia::render('sales-management/system-requirement/standard-requirement/color', [
                 'colors' => $colors,
-                'colorGroups' => $colorGroups
+                'colorGroups' => $colorGroups,
+                'header' => 'Color Management'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ColorController@vueIndex: ' . $e->getMessage());
-            return Inertia::render('sales-management/system-requirement/system-requirement/standard-requirement/color', [
+            return Inertia::render('sales-management/system-requirement/standard-requirement/color', [
                 'colors' => [],
                 'colorGroups' => [],
-                'error' => 'Terjadi kesalahan dalam menampilkan data warna: ' . $e->getMessage()
+                'header' => 'Color Management',
+                'error' => 'Error displaying color data: ' . $e->getMessage()
             ]);
         }
     }

@@ -7,16 +7,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class PaperSizeController extends Controller
 {
     public function index()
     {
         try {
+            // Jika request adalah AJAX, kembalikan data dalam format JSON
+            if (request()->ajax() || request()->wantsJson()) {
+                $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+                return response()->json($paperSizes);
+            }
+            
             $paperSizes = PaperSize::orderBy('size', 'asc')->get();
             return view('sales-management.system-requirement.system-requirement.standard-requirement.papersize', compact('paperSizes'));
         } catch (\Exception $e) {
             Log::error('Error in PaperSizeController@index: ' . $e->getMessage());
+            
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['error' => 'Failed to load paper size data'], 500);
+            }
+            
             return view('sales-management.system-requirement.system-requirement.standard-requirement.papersize', ['paperSizes' => collect([])])
                 ->with('error', 'Terjadi kesalahan saat memuat data');
         }
@@ -141,5 +153,37 @@ class PaperSizeController extends Controller
         // Ambil semua data paper size, urutkan berdasarkan size
         $paperSizes = PaperSize::orderBy('size')->get(); 
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpapersize', compact('paperSizes')); 
+    }
+    
+    /**
+     * Display a listing of the resource using Vue.
+     *
+     * @return \\Inertia\\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            // Ambil data paper size
+            $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+            
+            // Konversi data untuk format yang benar di frontend
+            $formattedPaperSizes = $paperSizes->map(function($size) {
+                return [
+                    'id' => $size->id,
+                    'size' => $size->size,
+                    'inches' => $size->inches,
+                    'unit' => $size->unit,
+                    'description' => $size->description
+                ];
+            });
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/paper-size', [
+                'header' => 'Paper Size Management',
+                'initialPaperSizes' => $formattedPaperSizes
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in PaperSizeController@vueIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load paper size data'], 500);
+        }
     }
 }

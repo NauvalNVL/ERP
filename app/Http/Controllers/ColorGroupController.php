@@ -14,8 +14,8 @@ class ColorGroupController extends Controller
     public function index(Request $request)
     {
         try {
-            if ($request->ajax()) {
-                $colorGroups = ColorGroup::select('cg as cg_id', 'cg_name', 'cg_type')
+            if ($request->ajax() || $request->wantsJson()) {
+                $colorGroups = ColorGroup::select('cg', 'cg_name', 'cg_type')
                     ->orderBy('cg')
                     ->get();
                 
@@ -27,7 +27,7 @@ class ColorGroupController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in ColorGroupController@index: ' . $e->getMessage());
             
-            if ($request->ajax()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['error' => 'Failed to load color groups data'], 500);
             }
             
@@ -158,9 +158,8 @@ class ColorGroupController extends Controller
     public function vueIndex()
     {
         try {
-            $colorGroups = ColorGroup::all();
             return Inertia::render('sales-management/system-requirement/standard-requirement/color-group', [
-                'colorGroups' => $colorGroups
+                'header' => 'Color Group Management'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ColorGroupController@vueIndex: ' . $e->getMessage());

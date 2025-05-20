@@ -126,4 +126,31 @@ class FinishingController extends Controller
         $exists = Finishing::where('code', strtoupper($code))->exists();
         return response()->json(['exists' => $exists]);
     }
+    
+    /**
+     * Display the Vue index page for finishing management
+     *
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            $finishings = Finishing::select('code', 'description')
+                ->orderBy('code')
+                ->get();
+                
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/finishing', [
+                'finishings' => $finishings,
+                'header' => 'Finishing Management'
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in FinishingController@vueIndex: ' . $e->getMessage());
+            
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/finishing', [
+                'finishings' => [],
+                'header' => 'Finishing Management',
+                'error' => 'Error displaying finishing data: ' . $e->getMessage()
+            ]);
+        }
+    }
 }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Database\Seeders\PaperFluteSeeder;
+use Inertia\Inertia;
 
 class PaperFluteController extends Controller
 {
@@ -211,6 +212,23 @@ class PaperFluteController extends Controller
         // Ambil semua data paper flute, urutkan berdasarkan code
         $paperFlutes = PaperFlute::orderBy('code')->get(); 
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpaperflute', compact('paperFlutes')); 
+    }
+
+    /**
+     * Display a listing of the resource using Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/paper-flute', [
+                'header' => 'Paper Flute Management'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in PaperFluteController@vueIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load paper flute data'], 500);
+        }
     }
 
     /**
