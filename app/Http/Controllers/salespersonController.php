@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Database\Seeders\SalespersonSeeder;
+use Inertia\Inertia;
 
 class SalespersonController extends Controller
 {
@@ -247,6 +248,23 @@ class SalespersonController extends Controller
                 'success' => false,
                 'message' => 'Error seeding salesperson data: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Render the Vue component for salesperson management.
+     * 
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/salesperson', [
+                'header' => 'Salesperson Management'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in SalespersonController@vueIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load salesperson data'], 500);
         }
     }
 }

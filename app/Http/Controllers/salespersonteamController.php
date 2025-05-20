@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Schema;
+use Inertia\Inertia;
 
 class SalespersonTeamController extends Controller
 {
@@ -237,6 +238,167 @@ class SalespersonTeamController extends Controller
             return response()->json($salespersons);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Render the Vue component for salesperson team management.
+     * 
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/salesperson-team', [
+                'header' => 'Salesperson Team Management'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in SalespersonTeamController@vueIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load salesperson team data'], 500);
+        }
+    }
+    
+    /**
+     * API endpoint to get all salesperson teams for Vue component.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $salespersonTeams = DB::table('salesperson_teams')
+                ->select(
+                    'id',
+                    's_person_code',
+                    'salesperson_name',
+                    'st_code',
+                    'sales_team_name',
+                    'sales_team_position'
+                )
+                ->orderBy('s_person_code')
+                ->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $salespersonTeams
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in SalespersonTeamController@apiIndex: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load salesperson team data'
+            ], 500);
+        }
+    }
+    
+    /**
+     * API endpoint to store a new salesperson team.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiStore(Request $request)
+    {
+        try {
+            // Validate input
+            $validator = Validator::make($request->all(), [
+                's_person_code' => 'required|string|max:10|unique:salesperson_teams,s_person_code',
+                'salesperson_name' => 'required|string|max:100',
+                'st_code' => 'required|string|max:10',
+                'sales_team_name' => 'required|string|max:100',
+                'sales_team_position' => 'required|string|max:50',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            
+            // Insert new record
+            $id = DB::table('salesperson_teams')->insertGetId([
+                's_person_code' => strtoupper($request->s_person_code),
+                'salesperson_name' => strtoupper($request->salesperson_name),
+                'st_code' => $request->st_code,
+                'sales_team_name' => $request->sales_team_name,
+                'sales_team_position' => $request->sales_team_position,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            
+            // Get the newly created record
+            $salespersonTeam = DB::table('salesperson_teams')->where('id', $id)->first();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Salesperson team created successfully',
+                'data' => $salespersonTeam
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in SalespersonTeamController@apiStore: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create salesperson team: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * API endpoint to seed sample data for the Vue component.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiSeed()
+    {
+        try {
+            $sampleData = [
+                [
+                    's_person_code' => 'SP001',
+                    'salesperson_name' => 'JOHN DOE',
+                    'st_code' => '01',
+                    'sales_team_name' => 'MBI',
+                    'sales_team_position' => 'E-Executive',
+                ],
+                [
+                    's_person_code' => 'SP002',
+                    'salesperson_name' => 'JANE SMITH',
+                    'st_code' => '02',
+                    'sales_team_name' => 'MANAGEMENT LOCAL',
+                    'sales_team_position' => 'M-Manager',
+                ],
+                [
+                    's_person_code' => 'SP003',
+                    'salesperson_name' => 'ROBERT JOHNSON',
+                    'st_code' => '03',
+                    'sales_team_name' => 'MANAGEMENT MNC',
+                    'sales_team_position' => 'S-Supervisor',
+                ]
+            ];
+            
+            // Clear existing data first
+            DB::table('salesperson_teams')->truncate();
+            
+            // Insert sample data
+            foreach ($sampleData as $data) {
+                DB::table('salesperson_teams')->insert(array_merge($data, [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]));
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Sample data seeded successfully',
+                'count' => count($sampleData)
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in SalespersonTeamController@apiSeed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to seed sample data: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

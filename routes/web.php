@@ -68,6 +68,10 @@ Route::middleware('auth')->group(function () {
          Route::get('/paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.paper-flute.index');
          Route::get('/paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.paper-quality.index');
          Route::get('/paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.paper-size.index');
+         Route::get('/product', [ProductController::class, 'vueIndex'])->name('vue.product.index');
+         Route::get('/product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.product-group.index');
+         Route::get('/salesperson', [SalespersonController::class, 'vueIndex'])->name('vue.salesperson.index');
+         Route::get('/salesperson-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.salesperson-team');
     });
 
     // Auth Routes
@@ -117,10 +121,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('product.index');
         Route::get('/create', [ProductController::class, 'create'])->name('product.create');
         Route::post('/', [ProductController::class, 'store'])->name('product.store');
+        Route::get('/view-print', [ProductController::class, 'viewAndPrint'])->name('product.view-print');
+        Route::get('/categories', [ProductController::class, 'getCategoriesJson'])->name('product.categories');
         Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
         Route::put('/{id}', [ProductController::class, 'update'])->name('product.update');
         Route::delete('/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
-        Route::get('/view-print', [ProductController::class, 'viewAndPrint'])->name('product.view-print');
         Route::get('/{id}', [ProductController::class, 'show'])->name('product.show');
     });
 
@@ -276,4 +281,51 @@ Route::get('/run-salespersonteam-seeder', function () {
     ]);
     return redirect()->back()->with('success', 'Salesperson Team Seeder berhasil dijalankan!');
 })->name('run.salespersonteam.seeder');
+
+// API endpoints para el frontend Vue
+Route::get('/api/products', [ProductController::class, 'getProductsJson'])->name('api.products');
+Route::post('/api/products', [ProductController::class, 'apiStore'])->name('api.products.store');
+Route::put('/api/products/{id}', [ProductController::class, 'apiUpdate'])->name('api.products.update');
+Route::delete('/api/products/{id}', [ProductController::class, 'apiDestroy'])->name('api.products.destroy');
+Route::get('/api/product-categories', [ProductController::class, 'getCategoriesJson'])->name('api.product.categories');
+
+// Add these routes for the Vue product design component
+
+// API routes for Vue components
+Route::get('/api/products', [ProductController::class, 'getProductsJson']);
+Route::get('/api/product-categories', [ProductController::class, 'getCategoriesJson']);
+Route::post('/api/products', [ProductController::class, 'apiStore']);
+Route::put('/api/products/{id}', [ProductController::class, 'apiUpdate']);
+Route::delete('/api/products/{id}', [ProductController::class, 'apiDestroy']);
+
+// Product Design API routes
+Route::get('/api/product-designs', [ProductDesignController::class, 'getDesignsJson']);
+Route::post('/api/product-designs', [ProductDesignController::class, 'apiStore']);
+Route::put('/api/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
+Route::delete('/api/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
+
+// Vue routes
+Route::get('/vue/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design');
+
+// Product Group API routes
+Route::get('/api/product-groups', [ProductGroupController::class, 'index']);
+
+// API Routes for Vue Components
+Route::get('/api/colors', [ColorController::class, 'index']);
+Route::get('/api/geo', [GeoController::class, 'index']);
+Route::get('/api/color-groups', [ColorGroupController::class, 'index']);
+Route::get('/api/industry', [IndustryController::class, 'index']);
+Route::get('/api/paper-flutes', [PaperFluteController::class, 'index']);
+Route::get('/api/paper-qualities', [PaperQualityController::class, 'index']);
+Route::get('/api/paper-sizes', [PaperSizeController::class, 'index']);
+Route::get('/api/product-designs', [ProductDesignController::class, 'index']);
+Route::get('/api/product-groups', [ProductGroupController::class, 'index']);
+Route::get('/api/salespersons', [SalespersonController::class, 'index']);
+
+// Salesperson Team API routes
+Route::get('/api/salesperson-teams', [SalespersonTeamController::class, 'apiIndex']);
+Route::post('/api/salesperson-teams', [SalespersonTeamController::class, 'apiStore']);
+Route::put('/api/salesperson-teams/{id}', [SalespersonTeamController::class, 'update']);
+Route::delete('/api/salesperson-teams/{id}', [SalespersonTeamController::class, 'destroy']);
+Route::post('/api/salesperson-teams/seed', [SalespersonTeamController::class, 'apiSeed']);
 

@@ -6,6 +6,9 @@ use App\Models\Product;
 use App\Models\ProductGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -122,5 +125,239 @@ class ProductController extends Controller
         // Eager load ProductGroup jika ingin menampilkan nama grup di view
         $products = Product::with('productGroup')->orderBy('description')->get();
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintproduct', compact('products')); 
+    }
+
+    public function vueIndex()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/product', [
+                'header' => 'Product Management'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductController@vueIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load product data'], 500);
+        }
+    }
+
+    /**
+     * Get product categories as JSON
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getCategoriesJson()
+    {
+        try {
+            // Get unique categories from products table
+            $categories = DB::table('products')
+                ->select('category')
+                ->distinct()
+                ->orderBy('category')
+                ->get();
+            
+            // Transform to format expected by Vue component
+            $transformedCategories = $categories->map(function($category) {
+                return [
+                    'id' => $category->category,
+                    'name' => $category->category,
+                    'category_code' => $category->category
+                ];
+            });
+            
+            return response()->json($transformedCategories);
+        } catch (\Exception $e) {
+            Log::error('Error fetching product categories: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch product categories'], 500);
+        }
+    }
+
+    /**
+     * Get products as JSON
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProductsJson()
+    {
+        try {
+            $products = Product::select(
+                    'id',
+                    'product_code',
+                    'description',
+                    'category',
+                    'product_group_id'
+                )
+                ->orderBy('product_code')
+                ->get();
+            
+            // Transform data to match Vue component expectations
+            $transformedProducts = $products->map(function($product) {
+                return [
+                    'id' => $product->id,
+                    'product_code' => $product->product_code,
+                    'name' => $product->description, // Vue component uses 'name' for what is 'description' in DB
+                    'description' => $product->description,
+                    'category_id' => $product->category,
+                    'category_code' => $product->category,
+                    'product_group_id' => $product->product_group_id,
+                    'unit' => ''
+                ];
+            });
+            
+            return response()->json($transformedProducts);
+        } catch (\Exception $e) {
+            Log::error('Error fetching products: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch products'], 500);
+        }
+    }
+
+    /**
+     * Store a new product via API
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiStore(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'product_code' => 'required|string|max:10|unique:products,product_code',
+                'name' => 'required|string|max:255', // Vue sends 'name' but DB uses 'description'
+                'category_id' => 'required|string', // Vue sends 'category_id' but DB uses 'category'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $product = Product::create([
+                'product_code' => strtoupper($request->product_code),
+                'description' => $request->name, // Map Vue 'name' to DB 'description'
+                'category' => $request->category_id, // Map Vue 'category_id' to DB 'category'
+                'product_group_id' => $request->product_group_id ?? '',
+                'is_active' => true
+            ]);
+
+            // Transform for response
+            $responseData = [
+                'id' => $product->id,
+                'product_code' => $product->product_code,
+                'name' => $product->description,
+                'description' => $product->description,
+                'category_id' => $product->category,
+                'category_code' => $product->category,
+                'product_group_id' => $product->product_group_id,
+                'unit' => ''
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product created successfully',
+                'data' => $responseData
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating product: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create product: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update a product via API
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiUpdate(Request $request, $id)
+    {
+        try {
+            $product = Product::find($id);
+            
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product not found'
+                ], 404);
+            }
+            
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255', // Vue sends 'name' but DB uses 'description'
+                'category_id' => 'required|string', // Vue sends 'category_id' but DB uses 'category'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $product->update([
+                'description' => $request->name, // Map Vue 'name' to DB 'description'
+                'category' => $request->category_id, // Map Vue 'category_id' to DB 'category'
+                'product_group_id' => $request->product_group_id ?? $product->product_group_id
+            ]);
+
+            // Transform for response
+            $responseData = [
+                'id' => $product->id,
+                'product_code' => $product->product_code,
+                'name' => $product->description,
+                'description' => $product->description,
+                'category_id' => $product->category,
+                'category_code' => $product->category,
+                'product_group_id' => $product->product_group_id,
+                'unit' => ''
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product updated successfully',
+                'data' => $responseData
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating product: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update product: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete a product via API
+     * 
+     * @param  string  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiDestroy($id)
+    {
+        try {
+            $product = Product::where('product_code', $id)->first();
+            
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product not found'
+                ], 404);
+            }
+            
+            $product->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting product: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete product: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

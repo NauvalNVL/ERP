@@ -6,6 +6,7 @@ use App\Models\ProductGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class ProductGroupController extends Controller
 {
@@ -188,5 +189,22 @@ class ProductGroupController extends Controller
     {
         $productGroups = ProductGroup::orderBy('product_group_name')->get();
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintproductgroup', compact('productGroups'));
+    }
+    
+    /**
+     * Render the Vue component for product group management.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/product-group', [
+                'header' => 'Product Group Management'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductGroupController@vueIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load product groups data'], 500);
+        }
     }
 } 
