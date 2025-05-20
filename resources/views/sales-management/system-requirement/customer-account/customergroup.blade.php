@@ -135,7 +135,7 @@
 
 <!-- Modal Customer Group Table -->
 <div id="customerGroupTableModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center hidden">
-    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 max-w-xl mx-auto transform transition-transform duration-300 scale-95">
+    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-3/4 max-w-4xl mx-auto">
         <!-- Modal Header -->
         <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
             <h3 class="text-xl font-semibold flex items-center"><i class="fas fa-list mr-3"></i>Customer Group Table</h3>
@@ -144,30 +144,32 @@
             </button>
         </div>
         <!-- Modal Body -->
-        <div class="p-5 overflow-y-auto" style="max-height: 60vh;">
-            <div class="overflow-x-auto rounded-lg border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200" id="customerGroupModalTable">
-                    <thead class="bg-gray-100 sticky top-0">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Code</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach($customerGroups as $group)
-                        <tr class="hover:bg-blue-50 cursor-pointer modal-row" onclick="selectCustomerGroupRow(this)" data-code="{{ $group->group_code }}" data-description="{{ $group->description }}">
-                            <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $group->group_code }}</td>
-                            <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $group->description }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+        <div class="p-2 overflow-y-auto" style="max-height: 60vh;">
+            <table class="min-w-full text-xs border border-gray-300" id="customerGroupModalTable">
+                <thead class="bg-gray-200 sticky top-0">
+                    <tr>
+                        <th class="px-2 py-1 border border-gray-300 text-left">Group Code</th>
+                        <th class="px-2 py-1 border border-gray-300 text-left">Description</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach($customerGroups as $group)
+                    <tr class="hover:bg-blue-100 cursor-pointer modal-row" onclick="selectCustomerGroupRow(this)"
+                        data-code="{{ $group->group_code }}"
+                        data-description="{{ $group->description }}">
+                        <td class="px-2 py-1 border border-gray-300 font-medium text-gray-900">{{ $group->group_code }}</td>
+                        <td class="px-2 py-1 border border-gray-300">{{ $group->description }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
         <!-- Modal Footer -->
-        <div class="flex items-center justify-end p-4 border-t border-gray-200 rounded-b-lg bg-gray-50">
-            <button id="selectCustomerGroupBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2" disabled>Select</button>
-            <button type="button" onclick="closeCustomerGroupTableModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Exit</button>
+        <div class="flex items-center justify-end gap-2 p-2 border-t border-gray-200 bg-gray-100 rounded-b-lg">
+            <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">More Options</button>
+            <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">Zoom</button>
+            <button id="selectCustomerGroupBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs" disabled>Select</button>
+            <button type="button" onclick="closeCustomerGroupTableModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">Exit</button>
         </div>
     </div>
 </div>
@@ -186,49 +188,72 @@ function closeEditModal() {
 // Modal logic
 let selectedCustomerGroupRow = null;
 function openCustomerGroupTableModal() {
+    console.log('Opening modal...');
     const modal = document.getElementById('customerGroupTableModal');
+    if (!modal) {
+        console.error('Customer group modal not found');
+        return;
+    }
     modal.classList.remove('hidden');
-    setTimeout(() => { modal.querySelector('.scale-95').classList.remove('scale-95'); }, 10); // Animation
     if(selectedCustomerGroupRow) selectedCustomerGroupRow.classList.remove('bg-blue-200');
     selectedCustomerGroupRow = null;
-    document.getElementById('selectCustomerGroupBtn').disabled = true;
+    const selectBtn = document.getElementById('selectCustomerGroupBtn');
+    if (selectBtn) selectBtn.disabled = true;
 }
 function closeCustomerGroupTableModal() {
+    console.log('Closing modal...');
     const modal = document.getElementById('customerGroupTableModal');
-    const modalContent = modal.querySelector('div');
-    if (modalContent) modalContent.classList.add('scale-95');
-    setTimeout(() => { modal.classList.add('hidden'); }, 150); // Animation
+    if (modal) modal.classList.add('hidden');
 }
 function selectCustomerGroupRow(row) {
+    console.log('Selecting row:', row);
+    if (!row) return;
     document.querySelectorAll('#customerGroupModalTable .modal-row').forEach(r => r.classList.remove('bg-blue-200'));
     selectedCustomerGroupRow = row;
     row.classList.add('bg-blue-200');
-    document.getElementById('selectCustomerGroupBtn').disabled = false;
+    const selectBtn = document.getElementById('selectCustomerGroupBtn');
+    if (selectBtn) selectBtn.disabled = false;
 }
-document.querySelectorAll('button[type="button"] i.fas.fa-table').forEach(btn => {
-    btn.closest('button').onclick = openCustomerGroupTableModal;
-});
-document.getElementById('selectCustomerGroupBtn').onclick = function() {
-    if(selectedCustomerGroupRow) {
-        const code = selectedCustomerGroupRow.getAttribute('data-code');
-        const desc = selectedCustomerGroupRow.getAttribute('data-description');
-        document.getElementById('group_code').value = code;
-        document.getElementById('description').value = desc;
-        closeCustomerGroupTableModal();
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing...');
+    
+    // Find the table button
+    const tableBtn = document.querySelector('button[type="button"] i.fas.fa-table')?.closest('button');
+    console.log('Table button found:', tableBtn);
+    
+    if (tableBtn) {
+        tableBtn.addEventListener('click', function(e) {
+            console.log('Table button clicked');
+            e.preventDefault();
+            openCustomerGroupTableModal();
+        });
+    } else {
+        console.error('Table button not found');
     }
-};
-// Close modal on escape key
-window.addEventListener('keydown', function(event) {
-    const modal = document.getElementById('customerGroupTableModal');
-    if (event.key === "Escape" && !modal.classList.contains('hidden')) {
-        closeCustomerGroupTableModal();
-    }
-});
-// Close modal when clicking outside
-window.addEventListener('click', function(e) {
-    const modal = document.getElementById('customerGroupTableModal');
-    if (e.target === modal) {
-        closeCustomerGroupTableModal();
+
+    // Set up select button
+    const selectBtn = document.getElementById('selectCustomerGroupBtn');
+    console.log('Select button found:', selectBtn);
+    
+    if (selectBtn) {
+        selectBtn.addEventListener('click', function() {
+            console.log('Select button clicked');
+            if(selectedCustomerGroupRow) {
+                const code = selectedCustomerGroupRow.getAttribute('data-code');
+                const desc = selectedCustomerGroupRow.getAttribute('data-description');
+                console.log('Selected group:', { code, desc });
+                
+                const codeInput = document.getElementById('group_code');
+                const descInput = document.getElementById('description');
+                
+                if (codeInput) codeInput.value = code || '';
+                if (descInput) descInput.value = desc || '';
+                
+                closeCustomerGroupTableModal();
+            }
+        });
+    } else {
+        console.error('Select button not found');
     }
 });
 </script>
