@@ -124,6 +124,28 @@ function selectRow(row) {
     document.getElementById('code').value = row.getAttribute('data-person-code');
 }
 
+function editSelectedRow() {
+    const selectedRow = document.querySelector('#salespersonDataTable tbody tr.bg-blue-100');
+    if (selectedRow) {
+        openEditSalespersonModal(selectedRow);
+        closeSalespersonModal();
+    } else {
+        // Show error message if no row is selected
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+        errorDiv.innerHTML = `
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">Please select a row first</span>
+        `;
+        document.body.appendChild(errorDiv);
+        
+        // Remove error message after 3 seconds
+        setTimeout(() => {
+            errorDiv.remove();
+        }, 3000);
+    }
+}
+
 function getTeamName(teamId) {
     const teams = {
         1: 'MBI',

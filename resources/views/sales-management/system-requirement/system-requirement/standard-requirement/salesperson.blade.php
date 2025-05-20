@@ -200,8 +200,7 @@
                                     data-person-position="{{ $person->position }}"
                                     data-person-user-id="{{ $person->user_id }}"
                                     data-person-is-active="{{ $person->is_active ? '1' : '0' }}"
-                                    onclick="selectRow(this); event.stopPropagation();"
-                                    ondblclick="openEditSalespersonModal(this)">
+                                    onclick="selectRow(this); event.stopPropagation();">
                                     <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $person->code }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $person->name }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ $person->salesTeam ? $person->salesTeam->name : '' }}</td>
