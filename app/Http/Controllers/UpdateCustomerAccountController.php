@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\UpdateCustomerAccount;
 use App\Models\Industry;
 use App\Models\Geo;
+use App\Models\CustomerGroup;
 
 class UpdateCustomerAccountController extends Controller
 {
@@ -14,6 +15,7 @@ class UpdateCustomerAccountController extends Controller
         $accounts = \App\Models\UpdateCustomerAccount::all();
         $industries = Industry::all();
         $geoData = Geo::all();
-        return view('sales-management.system-requirement.system-requirement.customer account.updatecustomeraccount', compact('accounts', 'industries', 'geoData'));
+        $customerGroups = CustomerGroup::all();
+        return view('sales-management.system-requirement.system-requirement.customer account.updatecustomeraccount', compact('accounts', 'industries', 'geoData', 'customerGroups'));
     }
 }

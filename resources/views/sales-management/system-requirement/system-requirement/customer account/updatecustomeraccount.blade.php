@@ -473,6 +473,40 @@
                     </div>
                 </div>
 
+                {{-- Modal Customer Group Table --}}
+                <div id="customerGroupTableModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center hidden">
+                    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-3/4 max-w-4xl mx-auto">
+                        <!-- Modal Header -->
+                        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                            <h3 class="text-xl font-semibold flex items-center"><i class="fas fa-list mr-3"></i>Customer Group Table</h3>
+                            <button type="button" onclick="closeCustomerGroupTableModal()" class="text-white hover:text-gray-200 focus:outline-none">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        <!-- Modal Body -->
+                        <div class="p-2 overflow-y-auto" style="max-height: 60vh;">
+                            <table class="min-w-full text-xs border border-gray-300" id="customerGroupModalTable">
+                                <thead class="bg-gray-200 sticky top-0">
+                                    <tr>
+                                        <th class="px-2 py-1 border border-gray-300 text-left">Group Code</th>
+                                        <th class="px-2 py-1 border border-gray-300 text-left">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    {{-- Data will be loaded here via JavaScript/Ajax or passed from controller --}}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Modal Footer -->
+                        <div class="flex items-center justify-end gap-2 p-2 border-t border-gray-200 bg-gray-100 rounded-b-lg">
+                            <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">More Options</button>
+                            <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">Zoom</button>
+                            <button id="selectCustomerGroupBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs" disabled>Select</button>
+                            <button type="button" onclick="closeCustomerGroupTableModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">Exit</button>
+                        </div>
+                    </div>
+                </div>
+
                 <script>
                 let selectedCustomerAccountRow = null;
                 let selectedSalespersonRow = null;
@@ -1071,7 +1105,151 @@
 
                     // --- End Geo Modal Setup ---
 
+                    // --- Customer Group Modal Setup ---
+
+                    // Find the grouping code table button
+                    const groupingCodeTableBtn = document.querySelector('#grouping_code').nextElementSibling;
+                     console.log('Grouping Code Table button found:', groupingCodeTableBtn);
+
+                    if (groupingCodeTableBtn) {
+                         groupingCodeTableBtn.addEventListener('click', function(e) {
+                             console.log('Grouping Code Table button clicked');
+                             e.preventDefault();
+                             openCustomerGroupTableModal();
+                         });
+                     } else {
+                         console.error('Grouping Code Table button not found');
+                     }
+
+                    // Set up select button for Customer Group Modal
+                    const selectCustomerGroupBtn = document.getElementById('selectCustomerGroupBtn');
+                     console.log('Select Customer Group button found:', selectCustomerGroupBtn);
+
+                    if (selectCustomerGroupBtn) {
+                         selectCustomerGroupBtn.addEventListener('click', function() {
+                             console.log('Select Customer Group button clicked');
+                             if(selectedCustomerGroupRow) {
+                                 const groupCode = selectedCustomerGroupRow.getAttribute('data-group-code');
+                                 const groupDescription = selectedCustomerGroupRow.getAttribute('data-group-description'); // Get description if needed for display
+                                  console.log('Selected group:', { code: groupCode, description: groupDescription });
+
+                                 // Populate the Grouping Code input in the main form
+                                 const groupingCodeInput = document.getElementById('grouping_code');
+                                 if (groupingCodeInput) {
+                                     groupingCodeInput.value = groupCode || '';
+                                 }
+
+                                 closeCustomerGroupTableModal();
+                             }
+                         });
+                     } else {
+                         console.error('Select button for Customer Group Modal not found');
+                     }
+
+                    // Initial data load for customer group modal (optional, depends on your setup)
+                    loadCustomerGroupData(); // Ensure data is loaded when the DOM is ready
+
+                    // --- End Customer Group Modal Setup ---
+
                 });
+
+                // --- Customer Group Modal Logic ---
+                let selectedCustomerGroupRow = null;
+
+                function openCustomerGroupTableModal() {
+                    console.log('Opening customer group modal...');
+                    const modal = document.getElementById('customerGroupTableModal');
+                    if (!modal) {
+                        console.error('Customer group modal not found');
+                        return;
+                    }
+                    modal.classList.remove('hidden');
+                    // Reset selected row and disable select button
+                    if(selectedCustomerGroupRow) selectedCustomerGroupRow.classList.remove('bg-blue-200');
+                    selectedCustomerGroupRow = null;
+                    const selectBtn = document.getElementById('selectCustomerGroupBtn');
+                    if (selectBtn) selectBtn.disabled = true;
+
+                    // Load data when modal opens
+                    loadCustomerGroupData(); // Call function to load data
+                }
+
+                function closeCustomerGroupTableModal() {
+                    console.log('Closing customer group modal...');
+                    const modal = document.getElementById('customerGroupTableModal');
+                    if (modal) modal.classList.add('hidden');
+                }
+
+                function selectCustomerGroupRow(row) {
+                     console.log('Selecting customer group row:', row);
+                    if (!row) return;
+                     // Remove highlight from previously selected row
+                   document.querySelectorAll('#customerGroupModalTable tr').forEach(r => r.classList.remove('bg-blue-200'));
+                   // Highlight the newly selected row
+                   selectedCustomerGroupRow = row;
+                   row.classList.add('bg-blue-200');
+                    // Enable the select button
+                   const selectBtn = document.getElementById('selectCustomerGroupBtn');
+                   if (selectBtn) selectBtn.disabled = false;
+                }
+
+                // Function to load customer group data
+                function loadCustomerGroupData() {
+                     console.log('Loading customer group data...');
+                     const tbody = document.querySelector('#customerGroupModalTable tbody');
+                     if (!tbody) {
+                        console.error('Customer group table body not found');
+                        return;
+                     }
+                     tbody.innerHTML = ''; // Clear existing rows
+
+                     // Check if customer group data is passed from the controller
+                     @if(isset($customerGroups) && count($customerGroups) > 0)
+                         console.log('Using server-side customer group data.');
+                         const customerGroups = @json($customerGroups);
+                         customerGroups.forEach(group => {
+                             const row = `
+                                 <tr class="hover:bg-blue-50 cursor-pointer modal-row" 
+                                     data-group-code="${group.group_code}"
+                                     data-group-description="${group.description ?? ''}"
+                                     onclick="selectCustomerGroupRow(this)">
+                                     <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${group.group_code}</td>
+                                     <td class="px-4 py-3 whitespace-nowrap text-gray-700">${group.description ?? ''}</td>
+                                 </tr>
+                             `;
+                             tbody.innerHTML += row;
+                         });
+                     @else
+                         console.log('No server-side customer group data found. Using sample data.');
+                         // --- Temporary: Populate with sample data if no server-side data ---
+                         const sampleCustomerGroups = [
+                              { group_code: 'CG01', description: 'Retail Customers' },
+                              { group_code: 'CG02', description: 'Wholesale Customers' },
+                              { group_code: 'CG03', description: 'Online Customers' },
+                         ];
+
+                         if (sampleCustomerGroups.length > 0) {
+                             sampleCustomerGroups.forEach(group => {
+                                 const row = `
+                                     <tr class="hover:bg-blue-50 cursor-pointer modal-row" 
+                                         data-group-code="${group.group_code}"
+                                         data-group-description="${group.description ?? ''}"
+                                         onclick="selectCustomerGroupRow(this)">
+                                         <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${group.group_code}</td>
+                                         <td class="px-4 py-3 whitespace-nowrap text-gray-700">${group.description ?? ''}</td>
+                                     </tr>
+                                 `;
+                                 tbody.innerHTML += row;
+                             });
+                          } else {
+                              tbody.innerHTML = `<tr><td colspan="2" class="px-4 py-4 text-center text-gray-500">Tidak ada data customer group yang tersedia.</td></tr>`;
+                          }
+                         // --- End Temporary ---
+                     @endif
+                }
+
+                // --- End Customer Group Modal Logic ---
+
                 </script>
             </div>
         </div>
