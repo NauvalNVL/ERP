@@ -150,4 +150,19 @@ class GeoController extends Controller
             ]);
         }
     }
+
+    /**
+     * Display the Vue version of the view and print page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-geo');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in GeoController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load geo data for printing'], 500);
+        }
+    }
 }

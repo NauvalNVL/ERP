@@ -28,6 +28,7 @@ use App\Http\Controllers\BusinessFormController;
 use App\Http\Controllers\CustomerGroupController;
 use App\Http\Controllers\SalesManagement\SystemRequirement\SystemRequirementController;
 use App\Http\Controllers\UpdateCustomerAccountController;
+use App\Http\Controllers\ISOCurrencyController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -64,14 +65,55 @@ Route::middleware('auth')->group(function () {
          Route::get('/finishing', [FinishingController::class, 'vueIndex'])->name('vue.finishing.index');
          Route::get('/geo', [GeoController::class, 'vueIndex'])->name('vue.geo.index');
          Route::get('/industry', [IndustryController::class, 'vueIndex'])->name('vue.industry.index');
-         Route::get('/paper-quality/manage-status', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.manage-status');
-         Route::get('/paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.paper-flute.index');
          Route::get('/paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.paper-quality.index');
+         Route::get('/paper-quality/status', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.status');
          Route::get('/paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.paper-size.index');
          Route::get('/product', [ProductController::class, 'vueIndex'])->name('vue.product.index');
+         Route::get('/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design.index');
          Route::get('/product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.product-group.index');
-         Route::get('/salesperson', [SalespersonController::class, 'vueIndex'])->name('vue.salesperson.index');
-         Route::get('/salesperson-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.salesperson-team');
+         Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team.index');
+         Route::get('/sales-person', [SalespersonController::class, 'vueIndex'])->name('vue.sales-person.index');
+         Route::get('/sales-person-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.sales-person-team.index');
+         Route::get('/scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.scoring-tool.index');
+
+         // View and print routes
+         Route::get('/salesperson-team/view-print', [SystemRequirementController::class, 'vueViewPrintSalespersonTeam'])->name('vue.salesperson-team.view-print');
+         Route::get('/color/view-print', [ColorController::class, 'vueViewAndPrint'])->name('vue.color.view-print');
+         Route::get('/color-group/view-print', [ColorGroupController::class, 'vueViewAndPrint'])->name('vue.color-group.view-print');
+         Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
+         Route::get('/geo/view-print', [GeoController::class, 'vueViewAndPrint'])->name('vue.geo.view-print');
+         Route::get('/industry/view-print', [IndustryController::class, 'vueViewAndPrint'])->name('vue.industry.view-print');
+         Route::get('/paper-flute/view-print', [PaperFluteController::class, 'vueViewAndPrint'])->name('vue.paper-flute.view-print');
+         Route::get('/paper-quality/view-print', [PaperQualityController::class, 'vueViewAndPrint'])->name('vue.paper-quality.view-print');
+         Route::get('/paper-size/view-print', [PaperSizeController::class, 'vueViewAndPrint'])->name('vue.paper-size.view-print');
+         Route::get('/product/view-print', [ProductController::class, 'vueViewAndPrint'])->name('vue.product.view-print');
+         Route::get('/product-design/view-print', [ProductDesignController::class, 'vueViewAndPrint'])->name('vue.product-design.view-print');
+         Route::get('/product-group/view-print', [ProductGroupController::class, 'vueViewAndPrint'])->name('vue.product-group.view-print');
+         Route::get('/salesperson/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.salesperson.view-print');
+         Route::get('/sales-team/view-print', [SalesTeamController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');
+         Route::get('/scoring-tool/view-print', [ScoringToolController::class, 'vueViewAndPrint'])->name('vue.scoring-tool.view-print');
+
+         // Business Form routes
+         Route::get('/business-form', function() {
+             return Inertia::render('system-manager/system-maintenance/business-form', [
+                 'header' => 'Define Business Form'
+             ]);
+         })->name('vue.business-form');
+         
+         Route::get('/business-form/view-print', function() {
+             return Inertia::render('system-manager/system-maintenance/view-and-print-business-form', [
+                 'header' => 'View & Print Business Forms'
+             ]);
+         })->name('vue.business-form.view-print');
+
+         // ISO Currency Vue routes
+         Route::get('/iso-currency', function () {
+             return Inertia::render('system-manager/system-maintenance/iso-currency');
+         })->name('vue.iso-currency');
+
+         Route::get('/view-and-print-iso-currency', function () {
+             return Inertia::render('system-manager/system-maintenance/view-and-print-iso-currency');
+         })->name('vue.view-and-print-iso-currency');
     });
 
     // Auth Routes
@@ -205,6 +247,18 @@ Route::middleware('auth')->group(function () {
             Route::get('business-form/view-print', [BusinessFormController::class, 'viewAndPrint'])->name('business-form.view-print');
             Route::get('business-form-search', [BusinessFormController::class, 'search'])->name('business-form.search');
             Route::resource('business-form', BusinessFormController::class);
+
+            // ISO Currency
+            Route::get('/vue/iso-currency', function () {
+                return Inertia::render('system-manager/system-maintenance/iso-currency');
+            })->name('iso-currency');
+
+            Route::get('/vue/view-and-print-iso-currency', function () {
+                return Inertia::render('system-manager/system-maintenance/view-and-print-iso-currency');
+            })->name('view-and-print-iso-currency');
+            
+            // Add resource routes for ISO Currency
+            Route::resource('iso-currency', ISOCurrencyController::class)->except(['create', 'show', 'edit']);
         });
     });
 
@@ -316,11 +370,11 @@ Route::get('/api/geo', [GeoController::class, 'index']);
 Route::get('/api/color-groups', [ColorGroupController::class, 'index']);
 Route::get('/api/industry', [IndustryController::class, 'index']);
 Route::get('/api/paper-flutes', [PaperFluteController::class, 'index']);
-Route::get('/api/paper-qualities', [PaperQualityController::class, 'index']);
-Route::get('/api/paper-sizes', [PaperSizeController::class, 'index']);
+Route::get('/api/paper-qualities', [PaperQualityController::class, 'apiIndex']);
+Route::get('/api/paper-sizes', [PaperSizeController::class, 'apiIndex']);
 Route::get('/api/product-designs', [ProductDesignController::class, 'index']);
 Route::get('/api/product-groups', [ProductGroupController::class, 'index']);
-Route::get('/api/salespersons', [SalespersonController::class, 'index']);
+Route::get('/api/salespersons', [SalespersonController::class, 'apiIndex']);
 
 // Salesperson Team API routes
 Route::get('/api/salesperson-teams', [SalespersonTeamController::class, 'apiIndex']);
@@ -328,4 +382,81 @@ Route::post('/api/salesperson-teams', [SalespersonTeamController::class, 'apiSto
 Route::put('/api/salesperson-teams/{id}', [SalespersonTeamController::class, 'update']);
 Route::delete('/api/salesperson-teams/{id}', [SalespersonTeamController::class, 'destroy']);
 Route::post('/api/salesperson-teams/seed', [SalespersonTeamController::class, 'apiSeed']);
+
+// Sales Team API routes
+Route::get('/api/sales-teams', [SalesTeamController::class, 'index']);
+Route::post('/api/sales-teams', [SalesTeamController::class, 'store']);
+Route::put('/api/sales-teams/{id}', [SalesTeamController::class, 'update']);
+Route::delete('/api/sales-teams/{id}', [SalesTeamController::class, 'destroy']);
+Route::post('/api/sales-teams/seed', [SalesTeamController::class, 'seed']);
+
+// Scoring Tool API routes
+Route::get('/api/scoring-tools', [ScoringToolController::class, 'index']);
+Route::post('/api/scoring-tools', [ScoringToolController::class, 'store']);
+Route::put('/api/scoring-tools/{id}', [ScoringToolController::class, 'update']);
+Route::delete('/api/scoring-tools/{id}', [ScoringToolController::class, 'destroy']);
+Route::post('/api/scoring-tools/seed', [ScoringToolController::class, 'seed']);
+
+// API Routes for Vue components
+Route::prefix('api')->group(function () {
+    Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
+    Route::get('/products', [ProductController::class, 'getProductsJson']);
+    Route::post('/products', [ProductController::class, 'apiStore']);
+    Route::put('/products/{id}', [ProductController::class, 'apiUpdate']);
+    Route::delete('/products/{id}', [ProductController::class, 'apiDestroy']);
+    
+    Route::get('/product-designs', [ProductDesignController::class, 'getDesignsJson']);
+    Route::post('/product-designs', [ProductDesignController::class, 'apiStore']);
+    Route::put('/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
+    Route::delete('/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
+    
+    Route::get('/paper-qualities', [PaperQualityController::class, 'apiIndex']);
+    
+    Route::get('/paper-sizes', [PaperSizeController::class, 'apiIndex']);
+    
+    Route::get('/product-groups', [ProductGroupController::class, 'index']);
+    
+    Route::get('/sales-teams', [SalesTeamController::class, 'apiIndex']);
+    
+    Route::get('/salespersons', [SalespersonController::class, 'apiIndex']);
+    
+    Route::get('/scoring-tools', [ScoringToolController::class, 'apiIndex']);
+    
+    // Business Form API routes
+    Route::get('/business-forms', [BusinessFormController::class, 'apiIndex']);
+    Route::post('/business-forms', [BusinessFormController::class, 'apiStore']);
+    Route::get('/business-forms/{id}', [BusinessFormController::class, 'apiShow']);
+    Route::put('/business-forms/{id}', [BusinessFormController::class, 'apiUpdate']);
+    Route::delete('/business-forms/{id}', [BusinessFormController::class, 'apiDestroy']);
+
+    // ISO Currency API endpoints
+    Route::get('/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiIndex']);
+    Route::get('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiShow']);
+    Route::post('/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiStore']);
+    Route::put('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiUpdate']);
+    Route::delete('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiDestroy']);
+});
+
+// Business Form search endpoint (for modal)
+Route::get('/business-form-search', [BusinessFormController::class, 'search'])->name('business-form.search');
+
+// Foreign Currency Vue routes
+Route::get('/vue/foreign-currency', function () {
+    return Inertia::render('system-manager/system-maintenance/foreign-currency');
+})->name('vue.foreign-currency');
+
+Route::get('/vue/foreign-currency/view-print', function () {
+    return Inertia::render('system-manager/system-maintenance/view-and-print-foreign-currency');
+})->name('vue.foreign-currency.view-print');
+
+// Foreign Currency API endpoints
+Route::get('/api/foreign-currencies', [App\Http\Controllers\ForeignCurrencyController::class, 'apiIndex']);
+Route::get('/api/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyController::class, 'apiShow']);
+
+// API Routes for ISO Currency
+Route::get('/api/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiIndex']);
+Route::get('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiShow']);
+Route::post('/api/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiStore']);
+Route::put('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiUpdate']);
+Route::delete('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiDestroy']);
 

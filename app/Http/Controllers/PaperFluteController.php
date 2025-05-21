@@ -232,6 +232,21 @@ class PaperFluteController extends Controller
     }
 
     /**
+     * Display a listing of the resource for printing in Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-paper-flute');
+        } catch (\Exception $e) {
+            Log::error('Error in PaperFluteController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load paper flute data for printing'], 500);
+        }
+    }
+
+    /**
      * Get seeder data for paper flutes.
      */
     public function getSeederData()

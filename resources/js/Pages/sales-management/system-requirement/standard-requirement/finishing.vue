@@ -166,7 +166,7 @@
                             </div>
                         </Link>
 
-                        <Link href="/finishing/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <Link href="/vue/finishing/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                             <div class="p-2 bg-green-500 rounded-full mr-3">
                                 <i class="fas fa-print text-white text-sm"></i>
                             </div>

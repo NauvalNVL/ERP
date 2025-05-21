@@ -209,19 +209,45 @@ class SalespersonController extends Controller
     /**
      * Display a listing of the resource for printing.
      *
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     * @return \Illuminate\View\View
      */
     public function viewAndPrint()
     {
+        $salespersons = Salesperson::with('salesTeam')->orderBy('name')->get();
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintsalesperson', compact('salespersons'));
+    }
+
+    /**
+     * Display a listing of the resource for printing in Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-salesperson');
+        } catch (\Exception $e) {
+            Log::error('Error in SalespersonController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load salesperson data for printing'], 500);
+        }
+    }
+
+    /**
+     * API endpoint to get salespersons in JSON format.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
         try {
             $salespersons = Salesperson::with('salesTeam')
-                ->orderBy('code')
+                ->orderBy('name')
                 ->get();
-                
-            return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintsalesperson', compact('salespersons'));
+            
+            return response()->json($salespersons);
         } catch (\Exception $e) {
-            Log::error('Error viewing salespersons: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Error loading data: ' . $e->getMessage());
+            Log::error('Error in SalespersonController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load salesperson data'], 500);
         }
     }
 

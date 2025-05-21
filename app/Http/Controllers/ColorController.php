@@ -344,4 +344,21 @@ class ColorController extends Controller
         $colors = Color::with('colorGroup')->orderBy('color_name')->get(); 
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintcolor', compact('colors')); 
     }
+    
+    /**
+     * Display a listing of the resource for printing with Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-color', [
+                'header' => 'View & Print Colors'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load color data for printing'], 500);
+        }
+    }
 }

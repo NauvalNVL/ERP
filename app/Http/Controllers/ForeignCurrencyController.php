@@ -140,4 +140,35 @@ class ForeignCurrencyController extends Controller
         // Assuming a view exists at: system-manager.system-maintenance.viewandprintforeigncurrency
         return view('system-manager.system-maintenance.viewandprintforeigncurrency', compact('currencies'));
     }
+
+    /**
+     * API method to get all foreign currencies
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $currencies = ForeignCurrency::all();
+            return response()->json($currencies);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch currencies: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * API method to get a specific foreign currency
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiShow($id)
+    {
+        try {
+            $currency = ForeignCurrency::findOrFail($id);
+            return response()->json($currency);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Currency not found'], 404);
+        }
+    }
 }

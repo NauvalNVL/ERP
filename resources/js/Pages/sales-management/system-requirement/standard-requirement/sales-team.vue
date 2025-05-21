@@ -1,12 +1,12 @@
 <template>
-    <Head title="Color Group Management" />
+    <Head title="Sales Team Management" />
 
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-layer-group mr-3"></i> Define Color Group
+            <i class="fas fa-users mr-3"></i> Define Sales Team
         </h2>
-        <p class="text-cyan-100">Define color groups for specific product categories</p>
+        <p class="text-cyan-100">Define sales teams for organizing salespersons</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
@@ -18,7 +18,7 @@
                         <div class="p-2 bg-blue-500 rounded-lg mr-3">
                             <i class="fas fa-edit text-white"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Color Group Management</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">Sales Team Management</h3>
                     </div>
                     <!-- Header with navigation buttons -->
                     <div class="flex items-center space-x-2 mb-6">
@@ -37,17 +37,17 @@
                         <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="editSelectedRow">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewColorGroup">
+                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewSalesTeam">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Color Group#:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sales Team:</label>
                             <div class="relative flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-layer-group"></i>
+                                    <i class="fas fa-users"></i>
                                 </span>
                                 <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                                 <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md">
@@ -56,9 +56,9 @@
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                            <button type="button" @click="editSelectedRow" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
-                                <i class="fas fa-edit mr-2"></i> Edit Selected
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                            <button type="button" @click="createNewSalesTeam" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
+                                <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
                     </div>
@@ -68,68 +68,60 @@
                             <div class="mr-3">
                                 <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
                             </div>
-                            <p class="text-sm font-medium text-yellow-800">Loading color group data...</p>
+                            <p class="text-sm font-medium text-yellow-800">Loading sales team data...</p>
                         </div>
                     </div>
-                    <div v-else-if="colorGroups.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
-                        <p class="text-sm font-medium text-yellow-800">No color group data available.</p>
+                    <div v-else-if="salesTeams.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
+                        <p class="text-sm font-medium text-yellow-800">No sales team data available.</p>
                         <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
                         <div class="mt-2 flex items-center space-x-3">
-                            <button @click="fetchColorGroups" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Reload Data</button>
+                            <button @click="loadSeedData" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Run Sales Team Seeder</button>
                         </div>
                     </div>
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
-                        <p class="text-sm font-medium text-green-800">Data available: {{ colorGroups.length }} color groups found.</p>
+                        <p class="text-sm font-medium text-green-800">Data available: {{ salesTeams.length }} sales teams found.</p>
                         <p v-if="selectedRow" class="text-xs text-green-700 mt-1">
-                            Selected: <span class="font-semibold">{{ selectedRow.cg }}</span> - {{ selectedRow.cg_name }} ({{ selectedRow.cg_type }})
+                            Selected: <span class="font-semibold">{{ selectedRow.code }}</span> - {{ selectedRow.name }}
                         </p>
                     </div>
                 </div>
             </div>
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
-                <!-- Color Group Info Card -->
+                <!-- Sales Team Info Card -->
                 <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
                         <div class="p-2 bg-teal-500 rounded-lg mr-3">
                             <i class="fas fa-info-circle text-white"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Info Color Group</h3>
+                        <h3 class="text-lg font-semibold text-gray-800">Info Sales Team</h3>
                     </div>
 
                     <div class="space-y-4">
                         <div class="p-4 bg-teal-50 rounded-lg">
                             <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
                             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                                <li>Color group code must be unique and cannot be changed</li>
-                                <li>Use the <span class="font-medium">search</span> button to select a color group</li>
-                                <li>CG type determines the group characteristics</li>
-                                <li>Any changes must be saved</li>
+                                <li>Sales team code must be unique and cannot be changed</li>
+                                <li>Use the <span class="font-medium">search</span> button to find teams</li>
+                                <li>Teams are used to organize salespersons</li>
+                                <li>Teams can have multiple salespersons assigned</li>
                             </ul>
                         </div>
 
                         <div class="p-4 bg-blue-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common CG Types</h4>
-                            <div class="grid grid-cols-2 gap-2 text-sm">
+                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common Teams</h4>
+                            <div class="grid grid-cols-1 gap-2 text-sm">
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">F</span>
-                                    <span>Flexo</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-green-600 text-white rounded-full font-bold mr-2">01</span>
+                                    <span>MBI</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-purple-500 text-white rounded-full font-bold mr-2">O</span>
-                                    <span>Offset</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">02</span>
+                                    <span>MANAGEMENT LOCAL</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">C</span>
-                                    <span>Coating</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-red-500 text-white rounded-full font-bold mr-2">D</span>
-                                    <span>Digital</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-yellow-500 text-white rounded-full font-bold mr-2">S</span>
-                                    <span>Special</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-purple-600 text-white rounded-full font-bold mr-2">03</span>
+                                    <span>MANAGEMENT MNC</span>
                                 </div>
                             </div>
                         </div>
@@ -146,33 +138,33 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <Link href="/color" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                            <div class="p-2 bg-purple-500 rounded-full mr-3">
-                                <i class="fas fa-palette text-white text-sm"></i>
+                        <Link href="/vue/salesperson" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                            <div class="p-2 bg-blue-500 rounded-full mr-3">
+                                <i class="fas fa-user-tie text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-purple-900">Colors</p>
-                                <p class="text-xs text-purple-700">Manage individual colors</p>
+                                <p class="font-medium text-blue-900">Salespersons</p>
+                                <p class="text-xs text-blue-700">Manage salespersons</p>
                             </div>
                         </Link>
 
-                        <a href="#" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                            <div class="p-2 bg-blue-500 rounded-full mr-3">
-                                <i class="fas fa-th-list text-white text-sm"></i>
+                        <Link href="/vue/salesperson-team" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                            <div class="p-2 bg-purple-500 rounded-full mr-3">
+                                <i class="fas fa-users text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">CG Types</p>
-                                <p class="text-xs text-blue-700">View color group types</p>
+                                <p class="font-medium text-purple-900">Salesperson Teams</p>
+                                <p class="text-xs text-purple-700">Manage team assignments</p>
                             </div>
-                        </a>
+                        </Link>
 
-                        <Link href="/vue/color-group/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <Link href="/sales-team/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                             <div class="p-2 bg-green-500 rounded-full mr-3">
                                 <i class="fas fa-print text-white text-sm"></i>
                             </div>
                             <div>
                                 <p class="font-medium text-green-900">Print List</p>
-                                <p class="text-xs text-green-700">Print color group list</p>
+                                <p class="text-xs text-green-700">Print team list</p>
                             </div>
                         </Link>
                     </div>
@@ -182,11 +174,11 @@
     </div>
 
     <!-- Modal Table -->
-    <ColorGroupModal
+    <SalesTeamModal
         :show="showModal"
-        :colorGroups="colorGroups"
+        :sales-teams="salesTeams"
         @close="showModal = false"
-        @select="onColorGroupSelected"
+        @select="onSalesTeamSelected"
     />
 
     <!-- Edit Modal -->
@@ -195,50 +187,39 @@
             <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
-                        <i class="fas fa-layer-group"></i>
+                        <i class="fas fa-users"></i>
                     </div>
-                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Color Group' : 'Edit Color Group' }}</h3>
+                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Sales Team' : 'Edit Sales Team' }}</h3>
                 </div>
                 <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
             <div class="p-6">
-                <form @submit.prevent="saveColorGroupChanges" class="space-y-4">
+                <form @submit.prevent="saveSalesTeamChanges" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">CG#:</label>
-                            <input v-model="editForm.cg" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Code:</label>
+                            <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <span class="text-xs text-gray-500">Team code must be unique</span>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">CG Name:</label>
-                            <input v-model="editForm.cg_name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Name:</label>
+                            <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">CG Type:</label>
-                            <select v-model="editForm.cg_type" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                                <option value="X-Flex">X-Flex</option>
-                                <option value="C-Coating">C-Coating</option>
-                                <option value="S-Offset">S-Offset</option>
-                                <option value="D-Digital">D-Digital</option>
-                                <option value="P-Pantone">P-Pantone</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Note:</label>
-                            <div class="border border-gray-300 rounded-md p-3 bg-gray-50 h-16 overflow-auto text-sm">
-                                <p>Color Group determines color characteristics in the printing process</p>
-                            </div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
+                            <textarea v-model="editForm.description" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm"></textarea>
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteColorGroup(editForm.cg)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                        <button type="button" v-if="!isCreating" @click="deleteSalesTeam(editForm.code)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                             <i class="fas fa-trash-alt mr-2"></i>Delete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
-                        <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
+                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
                         </div>
                     </div>
                 </form>
@@ -276,33 +257,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
-import ColorGroupModal from '@/Components/color-group-modal.vue';
+import SalesTeamModal from '@/Components/sales-team-modal.vue';
 
 // Get the header from props
 const props = defineProps({
     header: {
         type: String,
-        default: 'Color Group Management'
+        default: 'Sales Team Management'
     }
 });
 
-const colorGroups = ref([]);
+const salesTeams = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref('');
-const editForm = ref({ cg: '', cg_name: '', cg_type: '' });
+const editForm = ref({ code: '', name: '', description: '' });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
-const fetchColorGroups = async () => {
+const fetchSalesTeams = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/color-group', { 
+        const res = await fetch('/api/sales-teams', { 
             headers: { 
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -316,48 +297,47 @@ const fetchColorGroups = async () => {
         const data = await res.json();
         
         if (Array.isArray(data)) {
-            colorGroups.value = data.map(group => ({
-                cg: group.cg_id || group.cg,
-                cg_name: group.cg_name,
-                cg_type: group.cg_type
-            }));
+            salesTeams.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            salesTeams.value = data.data;
         } else {
-            colorGroups.value = [];
+            salesTeams.value = [];
             console.error('Unexpected data format:', data);
         }
     } catch (e) {
-        console.error('Error fetching color groups:', e);
-        colorGroups.value = [];
+        console.error('Error fetching sales teams:', e);
+        salesTeams.value = [];
     } finally {
         loading.value = false;
     }
 };
 
-onMounted(fetchColorGroups);
+onMounted(() => {
+    fetchSalesTeams();
+});
 
 // Watch for changes in search query to filter the data
 watch(searchQuery, (newQuery) => {
-    if (newQuery && colorGroups.value.length > 0) {
-        const foundGroup = colorGroups.value.find(group => 
-            group.cg.toLowerCase().includes(newQuery.toLowerCase()) ||
-            group.cg_name.toLowerCase().includes(newQuery.toLowerCase()) ||
-            group.cg_type.toLowerCase().includes(newQuery.toLowerCase())
+    if (newQuery && salesTeams.value.length > 0) {
+        const foundTeam = salesTeams.value.find(team => 
+            team.code.toLowerCase().includes(newQuery.toLowerCase()) ||
+            team.name.toLowerCase().includes(newQuery.toLowerCase())
         );
         
-        if (foundGroup) {
-            selectedRow.value = foundGroup;
+        if (foundTeam) {
+            selectedRow.value = foundTeam;
         }
     }
 });
 
-const onColorGroupSelected = (group) => {
-    selectedRow.value = group;
-    searchQuery.value = group.cg;
+const onSalesTeamSelected = (team) => {
+    selectedRow.value = team;
+    searchQuery.value = team.code;
     showModal.value = false;
     
     // Automatically open the edit modal for the selected row
     isCreating.value = false;
-    editForm.value = { ...group };
+    editForm.value = { ...team };
     showEditModal.value = true;
 };
 
@@ -367,29 +347,29 @@ const editSelectedRow = () => {
         editForm.value = { ...selectedRow.value };
         showEditModal.value = true;
     } else {
-        showNotification('Please select a color group first', 'error');
+        showNotification('Please select a sales team first', 'error');
     }
 };
 
-const createNewColorGroup = () => {
+const createNewSalesTeam = () => {
     isCreating.value = true;
-    editForm.value = { cg: '', cg_name: '', cg_type: 'X-Flex' };
+    editForm.value = { code: '', name: '', description: '' };
     showEditModal.value = true;
 };
 
 const closeEditModal = () => {
     showEditModal.value = false;
-    editForm.value = { cg: '', cg_name: '', cg_type: '' };
+    editForm.value = { code: '', name: '', description: '' };
     isCreating.value = false;
 };
 
-const saveColorGroupChanges = async () => {
+const saveSalesTeamChanges = async () => {
     saving.value = true;
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
         // Different API call for create vs update
-        let url = isCreating.value ? '/color-group' : `/color-group/${editForm.value.cg}`;
+        let url = isCreating.value ? '/api/sales-teams' : `/api/sales-teams/${editForm.value.id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
         
         const response = await fetch(url, {
@@ -399,46 +379,43 @@ const saveColorGroupChanges = async () => {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
-            body: JSON.stringify(isCreating.value ? {
-                cg: editForm.value.cg,
-                cg_name: editForm.value.cg_name,
-                cg_type: editForm.value.cg_type
-            } : {
-                cg_name: editForm.value.cg_name,
-                cg_type: editForm.value.cg_type
+            body: JSON.stringify({
+                code: editForm.value.code,
+                name: editForm.value.name,
+                description: editForm.value.description || ''
             })
         });
         
         const result = await response.json();
         
-        if (response.ok) {
+        if (result.success) {
             // Update the local data with the changes or add new item
             if (isCreating.value) {
-                showNotification('Color group created successfully', 'success');
+                showNotification('Sales team created successfully', 'success');
             } else {
                 if (selectedRow.value) {
-                    selectedRow.value.cg_name = editForm.value.cg_name;
-                    selectedRow.value.cg_type = editForm.value.cg_type;
+                    selectedRow.value.name = editForm.value.name;
+                    selectedRow.value.description = editForm.value.description;
                 }
-                showNotification('Color group updated successfully', 'success');
+                showNotification('Sales team updated successfully', 'success');
             }
             
             // Refresh the full data list to ensure we're in sync with the database
-        await fetchColorGroups();
-        closeEditModal();
+            await fetchSalesTeams();
+            closeEditModal();
         } else {
             showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {
-        console.error('Error saving color group changes:', e);
-        showNotification('Error saving color group. Please try again.', 'error');
+        console.error('Error saving sales team changes:', e);
+        showNotification('Error saving sales team. Please try again.', 'error');
     } finally {
         saving.value = false;
     }
 };
 
-const deleteColorGroup = async (cgId) => {
-    if (!confirm(`Are you sure you want to delete color group "${cgId}"?`)) {
+const deleteSalesTeam = async (code) => {
+    if (!confirm(`Are you sure you want to delete sales team "${code}"?`)) {
         return;
     }
     
@@ -446,7 +423,7 @@ const deleteColorGroup = async (cgId) => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch(`/color-group/${cgId}`, {
+        const response = await fetch(`/api/sales-teams/${editForm.value.id}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -458,23 +435,52 @@ const deleteColorGroup = async (cgId) => {
         
         if (result.success) {
             // Remove the item from the local array
-            colorGroups.value = colorGroups.value.filter(group => group.cg !== cgId);
+            salesTeams.value = salesTeams.value.filter(team => team.id !== editForm.value.id);
             
-            if (selectedRow.value && selectedRow.value.cg === cgId) {
+            if (selectedRow.value && selectedRow.value.id === editForm.value.id) {
                 selectedRow.value = null;
                 searchQuery.value = '';
             }
             
             closeEditModal();
-            showNotification('Color group deleted successfully', 'success');
+            showNotification('Sales team deleted successfully', 'success');
         } else {
-            showNotification('Error deleting color group: ' + (result.message || 'Unknown error'), 'error');
-    }
+            showNotification('Error deleting sales team: ' + (result.message || 'Unknown error'), 'error');
+        }
     } catch (e) {
-        console.error('Error deleting color group:', e);
-        showNotification('Error deleting color group. Please try again.', 'error');
+        console.error('Error deleting sales team:', e);
+        showNotification('Error deleting sales team. Please try again.', 'error');
     } finally {
-    saving.value = false;
+        saving.value = false;
+    }
+};
+
+const loadSeedData = async () => {
+    saving.value = true;
+    try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        
+        const response = await fetch('/api/sales-teams/seed', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('Sales team data seeded successfully', 'success');
+            await fetchSalesTeams();
+        } else {
+            showNotification('Error seeding data: ' + (result.message || 'Unknown error'), 'error');
+        }
+    } catch (e) {
+        console.error('Error seeding data:', e);
+        showNotification('Error seeding data. Please try again.', 'error');
+    } finally {
+        saving.value = false;
     }
 };
 

@@ -9,6 +9,11 @@ class BusinessForm extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'bf_code',
         'bf_name',

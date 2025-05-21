@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Industry;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class IndustryController extends Controller
 {
     public function index()
     {
         $industries = Industry::orderBy('code')->get();
+        
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($industries);
+        }
+        
         return view('sales-management.system-requirement.system-requirement.standard-requirement.industry', compact('industries'));
     }
 
@@ -94,18 +101,33 @@ class IndustryController extends Controller
                 ->orderBy('code')
                 ->get();
                 
-            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/industry', [
+            return Inertia::render('sales-management/system-requirement/standard-requirement/industry', [
                 'industries' => $industries,
                 'header' => 'Industry Management'
             ]);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error in IndustryController@vueIndex: ' . $e->getMessage());
+            Log::error('Error in IndustryController@vueIndex: ' . $e->getMessage());
             
-            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/industry', [
+            return Inertia::render('sales-management/system-requirement/standard-requirement/industry', [
                 'industries' => [],
                 'header' => 'Industry Management',
                 'error' => 'Error displaying industry data: ' . $e->getMessage()
             ]);
+        }
+    }
+
+    /**
+     * Display the Vue version of the view and print page
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-industry');
+        } catch (\Exception $e) {
+            Log::error('Error in IndustryController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load industry data for printing'], 500);
         }
     }
 }

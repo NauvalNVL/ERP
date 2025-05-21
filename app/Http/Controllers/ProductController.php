@@ -140,6 +140,21 @@ class ProductController extends Controller
     }
 
     /**
+     * Display a listing of the resource for printing in Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-product');
+        } catch (\Exception $e) {
+            Log::error('Error in ProductController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load product data for printing'], 500);
+        }
+    }
+
+    /**
      * Get product categories as JSON
      * 
      * @return \Illuminate\Http\JsonResponse

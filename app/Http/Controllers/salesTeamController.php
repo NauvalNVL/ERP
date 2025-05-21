@@ -162,4 +162,93 @@ class SalesTeamController extends Controller
             return redirect()->back()->with('error', 'Error loading data: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Display a listing of the resource for printing in Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-sales-team');
+        } catch (\Exception $e) {
+            Log::error('Error in SalesTeamController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load sales team data for printing'], 500);
+        }
+    }
+
+    /**
+     * Display the Vue component for sales team management.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/sales-team', [
+                'header' => 'Sales Team Management'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in SalesTeamController@vueIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load sales team data'], 500);
+        }
+    }
+
+    /**
+     * Get all sales teams as JSON for API.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $salesTeams = SalesTeam::orderBy('code')->get();
+            return response()->json($salesTeams);
+        } catch (\Exception $e) {
+            Log::error('Error in SalesTeamController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load sales team data'], 500);
+        }
+    }
+
+    /**
+     * Seed sales team data.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function seed()
+    {
+        try {
+            // Default sales teams
+            $defaultTeams = [
+                ['code' => '01', 'name' => 'MBI'],
+                ['code' => '02', 'name' => 'MANAGEMENT LOCAL'],
+                ['code' => '03', 'name' => 'MANAGEMENT MNC']
+            ];
+
+            $created = [];
+
+            foreach ($defaultTeams as $team) {
+                $exists = SalesTeam::where('code', $team['code'])->exists();
+                if (!$exists) {
+                    $created[] = SalesTeam::create([
+                        'code' => $team['code'],
+                        'name' => $team['name']
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sales team seed data created successfully',
+                'created' => $created
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error seeding sales team data: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error seeding sales team data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
