@@ -72,6 +72,8 @@ Route::middleware('auth')->group(function () {
          Route::get('/product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.product-group.index');
          Route::get('/salesperson', [SalespersonController::class, 'vueIndex'])->name('vue.salesperson.index');
          Route::get('/salesperson-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.salesperson-team');
+         Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team');
+         Route::get('/scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.scoring-tool');
     });
 
     // Auth Routes
@@ -328,4 +330,18 @@ Route::post('/api/salesperson-teams', [SalespersonTeamController::class, 'apiSto
 Route::put('/api/salesperson-teams/{id}', [SalespersonTeamController::class, 'update']);
 Route::delete('/api/salesperson-teams/{id}', [SalespersonTeamController::class, 'destroy']);
 Route::post('/api/salesperson-teams/seed', [SalespersonTeamController::class, 'apiSeed']);
+
+// Sales Team API routes
+Route::get('/api/sales-teams', [SalesTeamController::class, 'index']);
+Route::post('/api/sales-teams', [SalesTeamController::class, 'store']);
+Route::put('/api/sales-teams/{id}', [SalesTeamController::class, 'update']);
+Route::delete('/api/sales-teams/{id}', [SalesTeamController::class, 'destroy']);
+Route::post('/api/sales-teams/seed', [SalesTeamController::class, 'seed']);
+
+// Scoring Tool API routes
+Route::get('/api/scoring-tools', [ScoringToolController::class, 'index']);
+Route::post('/api/scoring-tools', [ScoringToolController::class, 'store']);
+Route::put('/api/scoring-tools/{id}', [ScoringToolController::class, 'update']);
+Route::delete('/api/scoring-tools/{id}', [ScoringToolController::class, 'destroy']);
+Route::post('/api/scoring-tools/seed', [ScoringToolController::class, 'seed']);
 

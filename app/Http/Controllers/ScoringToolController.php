@@ -287,4 +287,45 @@ class ScoringToolController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Display the Vue component for scoring tool management.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/scoring-tool', [
+                'header' => 'Scoring Tool Management'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ScoringToolController@vueIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load scoring tool data'], 500);
+        }
+    }
+    
+    /**
+     * Run the scoring tool seeder.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function seed()
+    {
+        try {
+            $seeder = new ScoringToolSeeder();
+            $seeder->run();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Scoring tool data seeded successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ScoringToolController@seed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to seed scoring tool data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
