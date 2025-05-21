@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             ProductDesignSeeder::class,
             IndustrySeeder::class,
             CustomerGroupSeeder::class,
+            UpdateCustomerAccountSeeder::class,
         ]);
     }
 }

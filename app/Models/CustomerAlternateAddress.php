@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CustomerAlternateAddress extends Model
 {
-    use HasFactory;
-
-    protected $table = 'ALT_ADDRESS';
-
-    // Define fillable fields, table name, etc. as needed
-    // protected $fillable = ['field1', 'field2'];
+    protected $table = 'customer_alternate_addresses';
+    
+    protected $fillable = [
+        'customer_code',
+        'address',
+        'contact_person',
+        'telephone_no',
+        'fax_no',
+        'email'
+    ];
 }

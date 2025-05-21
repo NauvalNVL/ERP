@@ -17,6 +17,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000680-06',
@@ -25,6 +26,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000585-01',
@@ -33,6 +35,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000283',
@@ -41,6 +44,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000903',
@@ -49,6 +53,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000507',
@@ -57,6 +62,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000581',
@@ -65,6 +71,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000004',
@@ -73,6 +80,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000676',
@@ -81,6 +89,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000839',
@@ -89,6 +98,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000767',
@@ -97,6 +107,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000212-24',
@@ -105,6 +116,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000861-03',
@@ -113,6 +125,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000138-01',
@@ -121,6 +134,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000909-05',
@@ -129,6 +143,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000774',
@@ -137,6 +152,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000211-07',
@@ -145,6 +161,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000701',
@@ -153,6 +170,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000729',
@@ -161,6 +179,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
             [
                 'customer_code' => '000648',
@@ -169,6 +188,7 @@ class UpdateCustomerAccountSeeder extends Seeder
                 'ac_type' => 'Local',
                 'currency' => 'IDR',
                 'status' => 'Active',
+                'print_ar_aging' => 'N-No',
             ],
         ];
 

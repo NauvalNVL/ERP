@@ -12,9 +12,23 @@ class UpdateCustomerAccount extends Model
     protected $fillable = [
         'customer_code',
         'customer_name',
-        'salesperson',
+        'short_name',
+        'address',
+        'contact_person',
+        'telephone_no',
+        'fax_no',
+        'co_email',
+        'credit_limit',
+        'credit_terms',
         'ac_type',
+        'currency_code',
+        'salesperson_code',
+        'industrial_code',
+        'geographical',
+        'grouping_code',
+        'print_ar_aging',
+        'salesperson',
         'currency',
-        'status',
+        'status'
     ];
 }

@@ -6,6 +6,7 @@ use App\Models\CustomerGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CustomerGroupController extends Controller
 {
@@ -80,5 +81,17 @@ class CustomerGroupController extends Controller
     {
         $customerGroups = CustomerGroup::orderBy('group_code')->get();
         return view('sales-management.system-requirement.customer-account.customergroup-print', compact('customerGroups'));
+    }
+
+    public function apiIndex()
+    {
+        try {
+            $customerGroups = CustomerGroup::orderBy('group_code')->get();
+            Log::info('Customer Groups API Response:', ['data' => $customerGroups->toArray()]);
+            return response()->json($customerGroups);
+        } catch (\Exception $e) {
+            Log::error('Error in CustomerGroup API:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

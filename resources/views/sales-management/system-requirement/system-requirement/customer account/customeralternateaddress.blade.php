@@ -21,29 +21,31 @@
             <h3 class="text-xl font-semibold text-gray-800">Customer Alternate Address Form</h3>
         </div>
 
-        <!-- Header with navigation buttons - Adjust icons/colors as needed -->
+        <!-- Header with navigation buttons -->
         <div class="flex items-center space-x-2 mb-6">
             <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" onclick="window.location.href='{{ route('dashboard') }}'">
                 <i class="fas fa-power-off"></i>
             </button>
-            {{-- Example Navigation/Action Buttons --}}
-            <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+            <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" title="Next">
                 <i class="fas fa-arrow-right"></i>
             </button>
-            <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+            <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" title="Previous">
                 <i class="fas fa-arrow-left"></i>
             </button>
-            <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+            <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" title="Search">
                 <i class="fas fa-search"></i>
             </button>
-            <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+            <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" title="Save">
                 <i class="fas fa-save"></i>
             </button>
+            <button type="button" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" title="Refresh">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+             <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded ml-auto">Record: Review</button>
         </div>
 
         <form method="POST" action="{{-- Add your store route here --}}" class="space-y-6">
             @csrf
-            <!-- Add form fields here based on your Customer Alternate Address table structure -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="customer_code" class="block text-sm font-medium text-gray-700 mb-1">Customer Code</label>
@@ -53,27 +55,95 @@
                          </span>
                          <input type="text" name="customer_code" id="customer_code" required maxlength="20"
                              class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                         <button type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
-                             <i class="fas fa-table"></i> {{-- Assuming this opens a customer selection modal --}}
+                         <button type="button" id="openCustomerAccountModalBtn" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                             <i class="fas fa-table"></i>
                          </button>
                      </div>
                 </div>
+                 <div>
+                     <label for="delivery_code" class="block text-sm font-medium text-gray-700 mb-1">Delivery Code</label>
+                     <input type="text" name="delivery_code" id="delivery_code" maxlength="20"
+                         class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                 </div>
                 <div>
-                    <label for="alternate_address_code" class="block text-sm font-medium text-gray-700 mb-1">Alternate Address Code</label>
-                    <input type="text" name="alternate_address_code" id="alternate_address_code" required maxlength="20"
+                    <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                    <input type="text" name="country" id="country" maxlength="50"
                         class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                 </div>
+                 <div>
+                     <label for="town" class="block text-sm font-medium text-gray-700 mb-1">Town</label>
+                     <input type="text" name="town" id="town" maxlength="50"
+                         class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                 </div>
+                <div>
+                    <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                    <input type="text" name="state" id="state" maxlength="50"
+                        class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                </div>
+                 <div>
+                     <label for="town_section" class="block text-sm font-medium text-gray-700 mb-1">Town Section</label>
+                     <input type="text" name="town_section" id="town_section" maxlength="50"
+                         class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                 </div>
             </div>
 
-             <div>
-                 <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                 <textarea name="address" id="address" rows="3"
-                     class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"></textarea>
-             </div>
+            <!-- Bill To Section -->
+             <fieldset class="border rounded-md p-4 mt-4">
+                 <legend class="text-base font-semibold text-gray-900">Bill To</legend>
+                 <div class="grid grid-cols-1 gap-6 mt-4">
+                     <div>
+                         <label for="bill_to_name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                         <input type="text" name="bill_to_name" id="bill_to_name" maxlength="100"
+                             class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                     </div>
+                     <div>
+                         <label for="bill_to_address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                         <textarea name="bill_to_address" id="bill_to_address" rows="3"
+                             class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"></textarea>
+                     </div>
+                 </div>
+             </fieldset>
 
-            <!-- Add more fields like City, State, Country, Postal Code as needed -->
+            <!-- Ship To Section -->
+             <fieldset class="border rounded-md p-4 mt-6">
+                 <legend class="text-base font-semibold text-gray-900">Ship To</legend>
+                 <div class="grid grid-cols-1 gap-6 mt-4">
+                     <div>
+                         <label for="ship_to_name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                         <input type="text" name="ship_to_name" id="ship_to_name" maxlength="100"
+                             class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                     </div>
+                     <div>
+                         <label for="ship_to_address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                         <textarea name="ship_to_address" id="ship_to_address" rows="3"
+                             class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"></textarea>
+                     </div>
+                     <div>
+                         <label for="contact_person" class="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+                         <input type="text" name="contact_person" id="contact_person" maxlength="100"
+                             class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                     </div>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                              <label for="tel_no" class="block text-sm font-medium text-gray-700 mb-1">Tel No</label>
+                              <input type="text" name="tel_no" id="tel_no" maxlength="50"
+                                  class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                          </div>
+                          <div>
+                              <label for="fax_no" class="block text-sm font-medium text-gray-700 mb-1">Fax No</label>
+                              <input type="text" name="fax_no" id="fax_no" maxlength="50"
+                                  class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                          </div>
+                      </div>
+                     <div>
+                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                         <input type="email" name="email" id="email" maxlength="100"
+                             class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                     </div>
+                 </div>
+             </fieldset>
 
-            <div class="flex justify-end">
+            <div class="flex justify-end mt-6">
                 <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                     Save Alternate Address
                 </button>
@@ -81,6 +151,12 @@
         </form>
     </div>
 
-    {{-- Removed Table Section --}}
+    {{-- Customer Account Modal --}}
+    @include('sales-management.system-requirement.system-requirement.customer account.partials.customer-account-modal')
+
 </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/customer-alternate-address.js') }}"></script>
+@endpush

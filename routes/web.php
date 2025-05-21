@@ -29,7 +29,6 @@ use App\Http\Controllers\CustomerGroupController;
 use App\Http\Controllers\SalesManagement\SystemRequirement\SystemRequirementController;
 use App\Http\Controllers\UpdateCustomerAccountController;
 use App\Http\Controllers\ISOCurrencyController;
-use App\Http\Controllers\ObsoleteReactiveCustomerAccountController;
 use App\Http\Controllers\CustomerAlternateAddressController;
 
 // Test Routes
@@ -116,6 +115,15 @@ Route::middleware('auth')->group(function () {
          Route::get('/view-and-print-iso-currency', function () {
              return Inertia::render('system-manager/system-maintenance/view-and-print-iso-currency');
          })->name('vue.view-and-print-iso-currency');
+
+         // Customer Group Vue routes
+         Route::get('/customer-group', function () {
+             return Inertia::render('sales-management/system-requirement/customer-account/customer-group');
+         })->name('vue.customer-group');
+
+         Route::get('/update-customer-account', function () {
+             return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
+         })->name('vue.update-customer-account');
     });
 
     // Auth Routes
@@ -313,6 +321,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/{group_code}', [CustomerGroupController::class, 'update'])->name('customer-group.update');
         Route::delete('/{group_code}', [CustomerGroupController::class, 'destroy'])->name('customer-group.destroy');
         Route::get('/view-print', [CustomerGroupController::class, 'viewAndPrint'])->name('customer-group.view-print');
+        
+        // API Routes
+        Route::get('/api/index', [CustomerGroupController::class, 'apiIndex'])->name('customer-group.api.index');
     });
 
     // New route for view and print salesperson team functionality
@@ -321,11 +332,12 @@ Route::middleware('auth')->group(function () {
     // Update Customer Account
     Route::get('/update-customer-account', [UpdateCustomerAccountController::class, 'index'])->name('update-customer-account.index');
 
-    // Obsolete/Reactive Customer Account
-    Route::get('/obsolete-reactive-customer-account', [ObsoleteReactiveCustomerAccountController::class, 'index'])->name('obsolete-reactive-customer-account.index');
-
-    // Define Customer Alternate Address
-    Route::get('/customer-alternate-address', [CustomerAlternateAddressController::class, 'index'])->name('customer-alternate-address.index');
+    // Customer Alternate Address Routes
+    Route::prefix('customer-alternate-address')->group(function () {
+        Route::get('/', [CustomerAlternateAddressController::class, 'index'])->name('customer-alternate-address.index');
+        Route::get('/api/customer-accounts', [CustomerAlternateAddressController::class, 'apiIndex'])->name('customer-alternate-address.api.customer-accounts');
+        Route::get('/api/customer-accounts/search', [CustomerAlternateAddressController::class, 'apiSearch'])->name('customer-alternate-address.api.customer-accounts.search');
+    });
 });
 
 // Password Management
@@ -365,6 +377,9 @@ Route::get('/api/product-designs', [ProductDesignController::class, 'getDesignsJ
 Route::post('/api/product-designs', [ProductDesignController::class, 'apiStore']);
 Route::put('/api/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
 Route::delete('/api/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
+
+// Vue routes
+Route::get('/vue/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design');
 
 // Product Group API routes
 Route::get('/api/product-groups', [ProductGroupController::class, 'index']);
@@ -438,8 +453,15 @@ Route::prefix('api')->group(function () {
     Route::get('/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiIndex']);
     Route::get('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiShow']);
     Route::post('/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiStore']);
-    Route::put('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiUpdate']);
-    Route::delete('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiDestroy']);
+    Route::put('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiUpdate']);
+    Route::delete('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiDestroy']);
+
+    // Customer Groups API routes
+    Route::get('/customer-groups', [CustomerGroupController::class, 'apiIndex']);
+
+    Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
+    Route::post('/customer-accounts', [UpdateCustomerAccountController::class, 'apiStore']);
+    Route::put('/customer-accounts/{id}', [UpdateCustomerAccountController::class, 'apiUpdate']);
 });
 
 // Business Form search endpoint (for modal)
