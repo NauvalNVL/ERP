@@ -183,4 +183,135 @@ class BusinessFormController extends Controller
 
         return view('system-manager.system-maintenance.viewandprintbusinessform', compact('businessForms', 'search_group', 'search_code'));
     }
+
+    /**
+     * API: Get all business forms
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $businessForms = BusinessForm::orderBy('bf_code')->get();
+            return response()->json($businessForms);
+        } catch (\Exception $e) {
+            Log::error('Error in BusinessFormController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch business forms'], 500);
+        }
+    }
+
+    /**
+     * API: Get a specific business form
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiShow($id)
+    {
+        try {
+            $businessForm = BusinessForm::findOrFail($id);
+            return response()->json($businessForm);
+        } catch (\Exception $e) {
+            Log::error('Error in BusinessFormController@apiShow: ' . $e->getMessage());
+            return response()->json(['error' => 'Business form not found'], 404);
+        }
+    }
+
+    /**
+     * API: Store a new business form
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiStore(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'bf_code' => 'required|string|max:255|unique:business_forms,bf_code',
+            'bf_name' => 'required|string|max:255',
+            'bf_group' => 'required|string|max:255',
+            'bf_iso' => 'nullable|string|max:255',
+            'check_by_name' => 'nullable|string|max:255',
+            'check_by_title' => 'nullable|string|max:255',
+            'approve_by_name' => 'nullable|string|max:255',
+            'approve_by_title' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $businessForm = BusinessForm::create($request->all());
+            return response()->json([
+                'success' => true,
+                'message' => 'Business form created successfully',
+                'data' => $businessForm
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error in BusinessFormController@apiStore: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to create business form'], 500);
+        }
+    }
+
+    /**
+     * API: Update a business form
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiUpdate(Request $request, $id)
+    {
+        try {
+            $businessForm = BusinessForm::findOrFail($id);
+            
+            $validator = Validator::make($request->all(), [
+                'bf_code' => 'required|string|max:255|unique:business_forms,bf_code,' . $id,
+                'bf_name' => 'required|string|max:255',
+                'bf_group' => 'required|string|max:255',
+                'bf_iso' => 'nullable|string|max:255',
+                'check_by_name' => 'nullable|string|max:255',
+                'check_by_title' => 'nullable|string|max:255',
+                'approve_by_name' => 'nullable|string|max:255',
+                'approve_by_title' => 'nullable|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $businessForm->update($request->all());
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Business form updated successfully',
+                'data' => $businessForm
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in BusinessFormController@apiUpdate: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to update business form'], 500);
+        }
+    }
+
+    /**
+     * API: Delete a business form
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiDestroy($id)
+    {
+        try {
+            $businessForm = BusinessForm::findOrFail($id);
+            $businessForm->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Business form deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in BusinessFormController@apiDestroy: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to delete business form'], 500);
+        }
+    }
 }

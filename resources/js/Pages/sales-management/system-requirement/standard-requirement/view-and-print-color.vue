@@ -15,7 +15,7 @@
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-print mr-2"></i> Print List
-                </button>
+            </button>
                 <Link href="/vue/color" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Colors
                 </Link>
@@ -47,12 +47,12 @@
                             <p class="text-sm opacity-80">View and print color data</p>
                         </div>
                     </div>
-                </div>
+        </div>
 
                 <!-- Table Content -->
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
-                        <tr>
+                    <tr>
                             <th @click="sortTable('color_id')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                                 Color ID <i :class="getSortIcon('color_id')"></i>
                             </th>
@@ -74,8 +74,8 @@
                             <th @click="sortTable('updated_at')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                                 Updated At <i :class="getSortIcon('updated_at')"></i>
                             </th>
-                        </tr>
-                    </thead>
+                    </tr>
+                </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-if="loading" class="hover:bg-gray-50">
                             <td colspan="7" class="px-3 py-4 text-center text-gray-500">
@@ -84,16 +84,16 @@
                                 </div>
                                 <p class="mt-2">Loading color data...</p>
                             </td>
-                        </tr>
+                    </tr>
                         <tr v-else-if="filteredColors.length === 0" class="hover:bg-gray-50">
                             <td colspan="7" class="px-3 py-4 text-center text-gray-500">
-                                No colors found. 
+                            No colors found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
                                     <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
                                 </template>
-                            </td>
-                        </tr>
+                        </td>
+                    </tr>
                         <tr v-for="(color, index) in filteredColors" :key="color.color_id" 
                             :class="{'bg-blue-50': index % 2 === 0}" 
                             class="hover:bg-blue-100">
@@ -104,9 +104,9 @@
                             <td class="px-3 py-4 whitespace-nowrap text-sm">{{ color.cg_type || 'N/A' }}</td>
                             <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(color.created_at) }}</td>
                             <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(color.updated_at) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                    </tr>
+                </tbody>
+            </table>
 
                 <!-- Table Footer -->
                 <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">

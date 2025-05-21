@@ -28,6 +28,7 @@ use App\Http\Controllers\BusinessFormController;
 use App\Http\Controllers\CustomerGroupController;
 use App\Http\Controllers\SalesManagement\SystemRequirement\SystemRequirementController;
 use App\Http\Controllers\UpdateCustomerAccountController;
+use App\Http\Controllers\ISOCurrencyController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -91,6 +92,28 @@ Route::middleware('auth')->group(function () {
          Route::get('/salesperson/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.salesperson.view-print');
          Route::get('/sales-team/view-print', [SalesTeamController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');
          Route::get('/scoring-tool/view-print', [ScoringToolController::class, 'vueViewAndPrint'])->name('vue.scoring-tool.view-print');
+
+         // Business Form routes
+         Route::get('/business-form', function() {
+             return Inertia::render('system-manager/system-maintenance/business-form', [
+                 'header' => 'Define Business Form'
+             ]);
+         })->name('vue.business-form');
+         
+         Route::get('/business-form/view-print', function() {
+             return Inertia::render('system-manager/system-maintenance/view-and-print-business-form', [
+                 'header' => 'View & Print Business Forms'
+             ]);
+         })->name('vue.business-form.view-print');
+
+         // ISO Currency Vue routes
+         Route::get('/iso-currency', function () {
+             return Inertia::render('system-manager/system-maintenance/iso-currency');
+         })->name('vue.iso-currency');
+
+         Route::get('/view-and-print-iso-currency', function () {
+             return Inertia::render('system-manager/system-maintenance/view-and-print-iso-currency');
+         })->name('vue.view-and-print-iso-currency');
     });
 
     // Auth Routes
@@ -224,6 +247,18 @@ Route::middleware('auth')->group(function () {
             Route::get('business-form/view-print', [BusinessFormController::class, 'viewAndPrint'])->name('business-form.view-print');
             Route::get('business-form-search', [BusinessFormController::class, 'search'])->name('business-form.search');
             Route::resource('business-form', BusinessFormController::class);
+
+            // ISO Currency
+            Route::get('/vue/iso-currency', function () {
+                return Inertia::render('system-manager/system-maintenance/iso-currency');
+            })->name('iso-currency');
+
+            Route::get('/vue/view-and-print-iso-currency', function () {
+                return Inertia::render('system-manager/system-maintenance/view-and-print-iso-currency');
+            })->name('view-and-print-iso-currency');
+            
+            // Add resource routes for ISO Currency
+            Route::resource('iso-currency', ISOCurrencyController::class)->except(['create', 'show', 'edit']);
         });
     });
 
@@ -386,5 +421,42 @@ Route::prefix('api')->group(function () {
     Route::get('/salespersons', [SalespersonController::class, 'apiIndex']);
     
     Route::get('/scoring-tools', [ScoringToolController::class, 'apiIndex']);
+    
+    // Business Form API routes
+    Route::get('/business-forms', [BusinessFormController::class, 'apiIndex']);
+    Route::post('/business-forms', [BusinessFormController::class, 'apiStore']);
+    Route::get('/business-forms/{id}', [BusinessFormController::class, 'apiShow']);
+    Route::put('/business-forms/{id}', [BusinessFormController::class, 'apiUpdate']);
+    Route::delete('/business-forms/{id}', [BusinessFormController::class, 'apiDestroy']);
+
+    // ISO Currency API endpoints
+    Route::get('/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiIndex']);
+    Route::get('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiShow']);
+    Route::post('/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiStore']);
+    Route::put('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiUpdate']);
+    Route::delete('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiDestroy']);
 });
+
+// Business Form search endpoint (for modal)
+Route::get('/business-form-search', [BusinessFormController::class, 'search'])->name('business-form.search');
+
+// Foreign Currency Vue routes
+Route::get('/vue/foreign-currency', function () {
+    return Inertia::render('system-manager/system-maintenance/foreign-currency');
+})->name('vue.foreign-currency');
+
+Route::get('/vue/foreign-currency/view-print', function () {
+    return Inertia::render('system-manager/system-maintenance/view-and-print-foreign-currency');
+})->name('vue.foreign-currency.view-print');
+
+// Foreign Currency API endpoints
+Route::get('/api/foreign-currencies', [App\Http\Controllers\ForeignCurrencyController::class, 'apiIndex']);
+Route::get('/api/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyController::class, 'apiShow']);
+
+// API Routes for ISO Currency
+Route::get('/api/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiIndex']);
+Route::get('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiShow']);
+Route::post('/api/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiStore']);
+Route::put('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiUpdate']);
+Route::delete('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiDestroy']);
 
