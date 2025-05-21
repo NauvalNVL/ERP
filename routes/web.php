@@ -29,6 +29,8 @@ use App\Http\Controllers\CustomerGroupController;
 use App\Http\Controllers\SalesManagement\SystemRequirement\SystemRequirementController;
 use App\Http\Controllers\UpdateCustomerAccountController;
 use App\Http\Controllers\ISOCurrencyController;
+use App\Http\Controllers\ObsoleteReactiveCustomerAccountController;
+use App\Http\Controllers\CustomerAlternateAddressController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -318,6 +320,12 @@ Route::middleware('auth')->group(function () {
 
     // Update Customer Account
     Route::get('/update-customer-account', [UpdateCustomerAccountController::class, 'index'])->name('update-customer-account.index');
+
+    // Obsolete/Reactive Customer Account
+    Route::get('/obsolete-reactive-customer-account', [ObsoleteReactiveCustomerAccountController::class, 'index'])->name('obsolete-reactive-customer-account.index');
+
+    // Define Customer Alternate Address
+    Route::get('/customer-alternate-address', [CustomerAlternateAddressController::class, 'index'])->name('customer-alternate-address.index');
 });
 
 // Password Management
@@ -357,9 +365,6 @@ Route::get('/api/product-designs', [ProductDesignController::class, 'getDesignsJ
 Route::post('/api/product-designs', [ProductDesignController::class, 'apiStore']);
 Route::put('/api/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
 Route::delete('/api/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
-
-// Vue routes
-Route::get('/vue/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design');
 
 // Product Group API routes
 Route::get('/api/product-groups', [ProductGroupController::class, 'index']);
@@ -433,8 +438,8 @@ Route::prefix('api')->group(function () {
     Route::get('/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiIndex']);
     Route::get('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiShow']);
     Route::post('/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiStore']);
-    Route::put('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiUpdate']);
-    Route::delete('/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiDestroy']);
+    Route::put('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiUpdate']);
+    Route::delete('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiDestroy']);
 });
 
 // Business Form search endpoint (for modal)
