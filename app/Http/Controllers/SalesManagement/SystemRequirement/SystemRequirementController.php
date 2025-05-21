@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SalesManagement\SystemRequirement;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class SystemRequirementController extends Controller
 {
@@ -16,5 +17,12 @@ class SystemRequirementController extends Controller
             ->get();
 
         return view('sales-management.system-requirement.system-requirement.viewandprintsalespersonteam', compact('salespersonTeams'));
+    }
+    
+    public function vueViewPrintSalespersonTeam()
+    {
+        return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-salesperson-team', [
+            'header' => 'View & Print Salesperson Team'
+        ]);
     }
 } 

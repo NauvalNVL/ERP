@@ -76,6 +76,7 @@ Route::middleware('auth')->group(function () {
          Route::get('/scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.scoring-tool.index');
 
          // View and print routes
+         Route::get('/salesperson-team/view-print', [SystemRequirementController::class, 'vueViewPrintSalespersonTeam'])->name('vue.salesperson-team.view-print');
          Route::get('/color/view-print', [ColorController::class, 'vueViewAndPrint'])->name('vue.color.view-print');
          Route::get('/color-group/view-print', [ColorGroupController::class, 'vueViewAndPrint'])->name('vue.color-group.view-print');
          Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');

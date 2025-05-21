@@ -1,12 +1,12 @@
 <template>
-    <Head title="View & Print Sales Teams" />
-    
-        <!-- Header Section -->
+    <Head title="View & Print Salesperson Team" />
+
+    <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-print mr-3"></i> View & Print Sales Teams
+            <i class="fas fa-print mr-3"></i> View & Print Salesperson Team
         </h2>
-        <p class="text-cyan-100">Preview and print sales team data</p>
+        <p class="text-cyan-100">Preview and print salesperson team data</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
@@ -16,11 +16,11 @@
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-print mr-2"></i> Print List
                 </button>
-                <Link href="/vue/sales-team" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Sales Teams
+                <Link href="/vue/sales-person-team" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Salesperson Team
                 </Link>
             </div>
-                <div class="relative">
+            <div class="relative">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
@@ -28,7 +28,7 @@
                     type="text" 
                     v-model="searchQuery" 
                     class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Search sales teams..."
+                    placeholder="Search salesperson teams..."
                 >
             </div>
         </div>
@@ -40,71 +40,71 @@
                 <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 flex items-center">
                     <div class="flex items-center">
                         <div class="mr-4">
-                            <i class="fas fa-users-cog text-3xl"></i>
+                            <i class="fas fa-users text-3xl"></i>
                         </div>
                         <div>
-                            <h2 class="text-xl font-bold">SALES TEAM LIST</h2>
-                            <p class="text-sm opacity-80">View and print sales team data</p>
+                            <h2 class="text-xl font-bold">SALESPERSON TEAM LIST</h2>
+                            <p class="text-sm opacity-80">View and print salesperson team data</p>
                         </div>
-            </div>
-        </div>
+                    </div>
+                </div>
 
                 <!-- Table Content -->
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
-                    <tr>
-                            <th @click="sortTable('id')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            ID <i :class="getSortIcon('id')"></i>
-                        </th>
-                            <th @click="sortTable('code')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            Code <i :class="getSortIcon('code')"></i>
-                        </th>
-                            <th @click="sortTable('name')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            Name <i :class="getSortIcon('name')"></i>
-                        </th>
-                            <th @click="sortTable('created_at')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            Created At <i :class="getSortIcon('created_at')"></i>
-                        </th>
-                            <th @click="sortTable('updated_at')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            Updated At <i :class="getSortIcon('updated_at')"></i>
-                        </th>
-                    </tr>
-                </thead>
+                        <tr>
+                            <th @click="sortTable('s_person_code')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Salesperson Code <i :class="getSortIcon('s_person_code')"></i>
+                            </th>
+                            <th @click="sortTable('salesperson_name')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Salesperson Name <i :class="getSortIcon('salesperson_name')"></i>
+                            </th>
+                            <th @click="sortTable('st_code')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Team Code <i :class="getSortIcon('st_code')"></i>
+                            </th>
+                            <th @click="sortTable('sales_team_name')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Team Name <i :class="getSortIcon('sales_team_name')"></i>
+                            </th>
+                            <th @click="sortTable('sales_team_position')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Position <i :class="getSortIcon('sales_team_position')"></i>
+                            </th>
+                        </tr>
+                    </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-if="loading" class="hover:bg-gray-50">
                             <td colspan="5" class="px-3 py-4 text-center text-gray-500">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
-                                <p class="mt-2">Loading sales team data...</p>
+                                <p class="mt-2">Loading salesperson team data...</p>
                             </td>
-                    </tr>
-                        <tr v-else-if="filteredSalesTeams.length === 0" class="hover:bg-gray-50">
+                        </tr>
+                        <tr v-else-if="filteredSalespersonTeams.length === 0" class="hover:bg-gray-50">
                             <td colspan="5" class="px-3 py-4 text-center text-gray-500">
-                            No sales teams found.
+                                No salesperson teams found. 
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
                                     <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
                                 </template>
-                        </td>
-                    </tr>
-                        <tr v-for="(team, index) in filteredSalesTeams" :key="team.id" 
+                            </td>
+                        </tr>
+                        <tr v-for="(team, index) in filteredSalespersonTeams" :key="team.id" 
                             :class="{'bg-blue-50': index % 2 === 0}" 
                             class="hover:bg-blue-100">
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ team.id || 'N/A' }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">{{ team.code || 'N/A' }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ team.name || 'N/A' }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(team.created_at) }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(team.updated_at) }}</td>
-                    </tr>
-                </tbody>
-            </table>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">{{ team.s_person_code || 'N/A' }}</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ team.salesperson_name || 'N/A' }}</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ team.st_code || 'N/A' }}</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ team.sales_team_name || 'N/A' }}</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ team.sales_team_position || 'N/A' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
 
                 <!-- Table Footer -->
                 <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
                     <div class="flex items-center justify-between">
-                        <div>Total Sales Teams: {{ filteredSalesTeams.length }}</div>
-                        <div v-if="searchQuery">Filtered from {{ salesTeams.length }} total records</div>
+                        <div>Total Salesperson Teams: {{ filteredSalespersonTeams.length }}</div>
+                        <div v-if="searchQuery">Filtered from {{ salespersonTeams.length }} total records</div>
                         <div class="text-xs text-gray-400">Generated: {{ currentDate }}</div>
                     </div>
                 </div>
@@ -117,7 +117,7 @@
                 <i class="fas fa-info-circle mr-2"></i> Print Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Click the "Print List" button above to print this sales team list</li>
+                <li>Click the "Print List" button above to print this salesperson team list</li>
                 <li>Use landscape orientation for better results</li>
                 <li>You can search or sort data before printing</li>
                 <li>Only the table will be included in the print output</li>
@@ -131,18 +131,18 @@ import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 
 // Data
-const salesTeams = ref([]);
+const salespersonTeams = ref([]);
 const loading = ref(true);
 const searchQuery = ref('');
-const sortColumn = ref('code');
+const sortColumn = ref('s_person_code');
 const sortDirection = ref('asc');
 const currentDate = new Date().toLocaleString();
 
-// Fetch sales teams from the API
-const fetchSalesTeams = async () => {
+// Fetch salesperson teams from the API
+const fetchSalespersonTeams = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/sales-teams', {
+        const response = await fetch('/api/salesperson-teams', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -150,32 +150,26 @@ const fetchSalesTeams = async () => {
         });
         
         if (!response.ok) {
-            throw new Error('Failed to fetch sales teams');
+            throw new Error('Failed to fetch salesperson teams');
         }
         
         const data = await response.json();
         
         // Handle different API response formats
         if (data.data) {
-            salesTeams.value = data.data;
+            salespersonTeams.value = data.data;
         } else if (Array.isArray(data)) {
-            salesTeams.value = data;
+            salespersonTeams.value = data;
         } else {
             console.error('Unexpected API response format:', data);
-            salesTeams.value = [];
+            salespersonTeams.value = [];
         }
     } catch (error) {
-        console.error('Error fetching sales teams:', error);
-        salesTeams.value = [];
+        console.error('Error fetching salesperson teams:', error);
+        salespersonTeams.value = [];
     } finally {
         loading.value = false;
     }
-};
-
-// Format date
-const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
 };
 
 // Sort table
@@ -199,17 +193,19 @@ const getSortIcon = (column) => {
         : 'fas fa-sort-down text-blue-500';
 };
 
-// Filtered and sorted sales teams
-const filteredSalesTeams = computed(() => {
-    let filtered = [...salesTeams.value];
+// Filtered and sorted salesperson teams
+const filteredSalespersonTeams = computed(() => {
+    let filtered = [...salespersonTeams.value];
     
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(team => 
-            (team.id && String(team.id).includes(query)) ||
-            (team.code && team.code.toLowerCase().includes(query)) ||
-            (team.name && team.name.toLowerCase().includes(query))
+            (team.s_person_code && team.s_person_code.toLowerCase().includes(query)) ||
+            (team.salesperson_name && team.salesperson_name.toLowerCase().includes(query)) ||
+            (team.st_code && team.st_code.toLowerCase().includes(query)) ||
+            (team.sales_team_name && team.sales_team_name.toLowerCase().includes(query)) ||
+            (team.sales_team_position && team.sales_team_position.toLowerCase().includes(query))
         );
     }
     
@@ -221,18 +217,6 @@ const filteredSalesTeams = computed(() => {
         // Handle null values
         if (valueA === null || valueA === undefined) valueA = '';
         if (valueB === null || valueB === undefined) valueB = '';
-        
-        // Handle date columns
-        if (['created_at', 'updated_at'].includes(sortColumn.value)) {
-            const dateA = valueA ? new Date(valueA).getTime() : 0;
-            const dateB = valueB ? new Date(valueB).getTime() : 0;
-            
-            if (sortDirection.value === 'asc') {
-                return dateA - dateB;
-            } else {
-                return dateB - dateA;
-            }
-        }
         
         // Convert to string for comparison if not already
         if (typeof valueA !== 'string') valueA = String(valueA || '');
@@ -258,7 +242,7 @@ const printTable = () => {
     const printContent = document.getElementById('printableTable');
     const newWin = window.open('', '_blank');
 
-    newWin.document.write('<html><head><title>Print Sales Teams</title>');
+    newWin.document.write('<html><head><title>Print Salesperson Teams</title>');
     newWin.document.write('<style>');
     newWin.document.write('body { font-family: Arial, sans-serif; }');
     newWin.document.write('@page { size: landscape; }');
@@ -279,7 +263,7 @@ const printTable = () => {
 
 // Fetch data on component mount
 onMounted(() => {
-    fetchSalesTeams();
+    fetchSalespersonTeams();
 });
 </script>
 

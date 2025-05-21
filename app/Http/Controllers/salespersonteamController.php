@@ -401,4 +401,33 @@ class SalespersonTeamController extends Controller
             ], 500);
         }
     }
+    
+    /**
+     * Blade version of the view and print functionality
+     * 
+     * @return \Illuminate\View\View
+     */
+    public function viewAndPrint()
+    {
+        try {
+            $salespersonTeams = DB::table('salesperson_teams')
+                ->select(
+                    's_person_code',
+                    'salesperson_name',
+                    'st_code',
+                    'sales_team_name',
+                    'sales_team_position'
+                )
+                ->orderBy('s_person_code')
+                ->get();
+            
+            return view('sales-management.system-requirement.system-requirement.viewandprintsalespersonteam', compact('salespersonTeams'));
+        } catch (\Exception $e) {
+            Log::error('Error in viewAndPrint method: ' . $e->getMessage());
+            return view('sales-management.system-requirement.system-requirement.viewandprintsalespersonteam', [
+                'salespersonTeams' => collect([]),
+                'error' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
 }

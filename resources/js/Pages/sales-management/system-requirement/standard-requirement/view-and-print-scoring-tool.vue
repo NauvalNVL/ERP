@@ -1,95 +1,142 @@
 <template>
-    <Head title="View & Print Scoring Tools" />
-    
-    <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8">
-        <!-- Header Section -->
-        <div class="flex justify-between items-center mb-6 print:hidden">
-            <h1 class="text-2xl font-semibold text-gray-700">View & Print Scoring Tools</h1>
-            <div class="flex space-x-4">
-                <div class="relative">
-                    <input 
-                        v-model="searchQuery" 
-                        type="text" 
-                        placeholder="Search scoring tools..." 
-                        class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span class="absolute right-3 top-2 text-gray-400">
-                        <i class="fas fa-search"></i>
-                    </span>
-                </div>
-                <button 
-                    @click="printTable" 
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-150 ease-in-out flex items-center"
-                >
-                    <i class="fas fa-print mr-2"></i> Print
+    <Head title="View & Print Scoring Tool" />
+
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+            <i class="fas fa-print mr-3"></i> View & Print Scoring Tool
+        </h2>
+        <p class="text-cyan-100">Preview and print scoring tool data</p>
+    </div>
+
+    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+        <!-- Actions Bar -->
+        <div class="flex flex-wrap items-center justify-between mb-6">
+            <div class="flex items-center space-x-2 mb-3 sm:mb-0">
+                <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                    <i class="fas fa-print mr-2"></i> Print List
                 </button>
+                <Link href="/vue/scoring-tool" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Scoring Tool
+                </Link>
+            </div>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-search text-gray-400"></i>
+                </div>
+                <input 
+                    type="text" 
+                    v-model="searchQuery" 
+                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Search scoring tools..."
+                >
             </div>
         </div>
 
-        <!-- Loading State -->
-        <div v-if="loading" class="bg-white p-8 rounded-lg shadow-md text-center">
-            <div class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm transition ease-in-out duration-150">
-                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Loading scoring tools...
+        <!-- Table Section -->
+        <div class="overflow-x-auto">
+            <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <!-- Table Header -->
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 flex items-center">
+                    <div class="flex items-center">
+                        <div class="mr-4">
+                            <i class="fas fa-tools text-3xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold">SCORING TOOL LIST</h2>
+                            <p class="text-sm opacity-80">View and print scoring tool data</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Content -->
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th @click="sortTable('code')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Tool Code <i :class="getSortIcon('code')"></i>
+                            </th>
+                            <th @click="sortTable('name')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Tool Name <i :class="getSortIcon('name')"></i>
+                            </th>
+                            <th @click="sortTable('description')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Description <i :class="getSortIcon('description')"></i>
+                            </th>
+                            <th @click="sortTable('is_active')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Status <i :class="getSortIcon('is_active')"></i>
+                            </th>
+                            <th @click="sortTable('created_at')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Created At <i :class="getSortIcon('created_at')"></i>
+                            </th>
+                            <th @click="sortTable('updated_at')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Updated At <i :class="getSortIcon('updated_at')"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr v-if="loading" class="hover:bg-gray-50">
+                            <td colspan="6" class="px-3 py-4 text-center text-gray-500">
+                                <div class="flex justify-center">
+                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                </div>
+                                <p class="mt-2">Loading scoring tool data...</p>
+                            </td>
+                        </tr>
+                        <tr v-else-if="filteredScoringTools.length === 0" class="hover:bg-gray-50">
+                            <td colspan="6" class="px-3 py-4 text-center text-gray-500">
+                                No scoring tools found. 
+                                <template v-if="searchQuery">
+                                    <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
+                                    <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
+                                </template>
+                            </td>
+                        </tr>
+                        <tr v-for="(tool, index) in filteredScoringTools" :key="tool.id" 
+                            :class="{'bg-blue-50': index % 2 === 0}" 
+                            class="hover:bg-blue-100">
+                            <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">{{ tool.code || 'N/A' }}</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ tool.name || 'N/A' }}</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ tool.description || 'N/A' }}</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm">
+                                <span :class="tool.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
+                                    {{ tool.is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(tool.created_at) }}</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(tool.updated_at) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Table Footer -->
+                <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
+                    <div class="flex items-center justify-between">
+                        <div>Total Scoring Tools: {{ filteredScoringTools.length }}</div>
+                        <div v-if="searchQuery">Filtered from {{ scoringTools.length }} total records</div>
+                        <div class="text-xs text-gray-400">Generated: {{ currentDate }}</div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Table -->
-        <div v-else class="bg-white shadow-md rounded-lg overflow-x-auto">
-            <table class="min-w-full leading-normal">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th @click="sortTable('id')" class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer">
-                            ID <i :class="getSortIcon('id')"></i>
-                        </th>
-                        <th @click="sortTable('code')" class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer">
-                            Code <i :class="getSortIcon('code')"></i>
-                        </th>
-                        <th @click="sortTable('name')" class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer">
-                            Name <i :class="getSortIcon('name')"></i>
-                        </th>
-                        <th @click="sortTable('scores')" class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer">
-                            Scores <i :class="getSortIcon('scores')"></i>
-                        </th>
-                        <th @click="sortTable('gap')" class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer">
-                            Gap <i :class="getSortIcon('gap')"></i>
-                        </th>
-                        <th @click="sortTable('created_at')" class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer">
-                            Created At <i :class="getSortIcon('created_at')"></i>
-                        </th>
-                        <th @click="sortTable('updated_at')" class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer">
-                            Updated At <i :class="getSortIcon('updated_at')"></i>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="tool in filteredScoringTools" :key="tool.id" class="hover:bg-gray-50">
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ tool.id }}</td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm font-medium">{{ tool.code }}</td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ tool.name }}</td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ tool.scores }}</td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ tool.gap }}</td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ formatDate(tool.created_at) }}</td>
-                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ formatDate(tool.updated_at) }}</td>
-                    </tr>
-                    <tr v-if="filteredScoringTools.length === 0">
-                        <td colspan="7" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center text-gray-500">
-                            No scoring tools found.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Print Instructions -->
+        <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+                <i class="fas fa-info-circle mr-2"></i> Print Instructions
+            </h3>
+            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                <li>Click the "Print List" button above to print this scoring tool list</li>
+                <li>Use landscape orientation for better results</li>
+                <li>You can search or sort data before printing</li>
+                <li>Only the table will be included in the print output</li>
+            </ul>
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 
 // Data
 const scoringTools = ref([]);
@@ -97,11 +144,19 @@ const loading = ref(true);
 const searchQuery = ref('');
 const sortColumn = ref('code');
 const sortDirection = ref('asc');
+const currentDate = new Date().toLocaleString();
 
 // Fetch scoring tools from the API
 const fetchScoringTools = async () => {
+    loading.value = true;
     try {
-        const response = await fetch('/api/scoring-tools');
+        const response = await fetch('/api/scoring-tools', {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
         if (!response.ok) {
             throw new Error('Failed to fetch scoring tools');
         }
@@ -117,11 +172,10 @@ const fetchScoringTools = async () => {
             console.error('Unexpected API response format:', data);
             scoringTools.value = [];
         }
-        
-        loading.value = false;
     } catch (error) {
         console.error('Error fetching scoring tools:', error);
         scoringTools.value = [];
+    } finally {
         loading.value = false;
     }
 };
@@ -129,16 +183,7 @@ const fetchScoringTools = async () => {
 // Format date
 const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    
-    const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    });
+    return new Date(dateString).toLocaleString();
 };
 
 // Sort table
@@ -170,11 +215,9 @@ const filteredScoringTools = computed(() => {
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(tool => 
-            (tool.id && String(tool.id).includes(query)) ||
             (tool.code && tool.code.toLowerCase().includes(query)) ||
             (tool.name && tool.name.toLowerCase().includes(query)) ||
-            (tool.scores && String(tool.scores).toLowerCase().includes(query)) ||
-            (tool.gap && String(tool.gap).toLowerCase().includes(query))
+            (tool.description && tool.description.toLowerCase().includes(query))
         );
     }
     
@@ -187,26 +230,68 @@ const filteredScoringTools = computed(() => {
         if (valueA === null || valueA === undefined) valueA = '';
         if (valueB === null || valueB === undefined) valueB = '';
         
-        // Convert to strings for comparison (except numbers)
-        if (typeof valueA !== 'number') {
-            valueA = String(valueA).toLowerCase();
-        }
-        if (typeof valueB !== 'number') {
-            valueB = String(valueB).toLowerCase();
+        // Handle boolean column
+        if (sortColumn.value === 'is_active') {
+            if (sortDirection.value === 'asc') {
+                return valueA === valueB ? 0 : valueA ? -1 : 1;
+            } else {
+                return valueA === valueB ? 0 : valueA ? 1 : -1;
+            }
         }
         
-        // Compare and apply sort direction
-        if (valueA < valueB) return sortDirection.value === 'asc' ? -1 : 1;
-        if (valueA > valueB) return sortDirection.value === 'asc' ? 1 : -1;
-        return 0;
+        // Handle date columns
+        if (['created_at', 'updated_at'].includes(sortColumn.value)) {
+            const dateA = valueA ? new Date(valueA).getTime() : 0;
+            const dateB = valueB ? new Date(valueB).getTime() : 0;
+            
+            if (sortDirection.value === 'asc') {
+                return dateA - dateB;
+            } else {
+                return dateB - dateA;
+            }
+        }
+        
+        // Convert to string for comparison if not already
+        if (typeof valueA !== 'string') valueA = String(valueA || '');
+        if (typeof valueB !== 'string') valueB = String(valueB || '');
+        
+        // Case insensitive comparison
+        valueA = valueA.toLowerCase();
+        valueB = valueB.toLowerCase();
+        
+        // Sort direction
+        if (sortDirection.value === 'asc') {
+            return valueA.localeCompare(valueB);
+        } else {
+            return valueB.localeCompare(valueA);
+        }
     });
     
     return filtered;
 });
 
-// Print table
+// Print function
 const printTable = () => {
-    window.print();
+    const printContent = document.getElementById('printableTable');
+    const newWin = window.open('', '_blank');
+
+    newWin.document.write('<html><head><title>Print Scoring Tools</title>');
+    newWin.document.write('<style>');
+    newWin.document.write('body { font-family: Arial, sans-serif; }');
+    newWin.document.write('@page { size: landscape; }');
+    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
+    newWin.document.write('th, td { border: 1px solid #ddd; padding: 4px; text-align: left; font-size: 10pt; }');
+    newWin.document.write('th { background-color: #f2f2f2; font-weight: bold; }');
+    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
+    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
+    newWin.document.write('.header-text { margin-left: 15px; }');
+    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
+    newWin.document.write('</style></head><body>');
+    newWin.document.write(printContent.outerHTML);
+    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
+    newWin.document.write('</body></html>');
+    
+    newWin.document.close();
 };
 
 // Fetch data on component mount
@@ -215,45 +300,19 @@ onMounted(() => {
 });
 </script>
 
-<style>
+<style scoped>
 @media print {
     body * {
         visibility: hidden;
     }
-    .container, .container * {
+    #printableTable, #printableTable * {
         visibility: visible;
     }
-    .container {
+    #printableTable {
         position: absolute;
         left: 0;
         top: 0;
         width: 100%;
-        margin: 0;
-        padding: 5px;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    th, td {
-        border: 1px solid #ccc;
-        padding: 4px;
-        font-size: 10pt;
-        color: #000;
-    }
-    thead {
-        background-color: #eee !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-        display: table-header-group;
-    }
-    h1 {
-        font-size: 12pt;
-        margin-bottom: 0.5rem;
-        text-align: center;
-    }
-    .print\:hidden {
-        display: none !important;
     }
 }
 </style> 
