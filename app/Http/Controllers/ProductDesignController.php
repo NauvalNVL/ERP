@@ -198,6 +198,21 @@ class ProductDesignController extends Controller
     }
 
     /**
+     * Display a listing of the resource for printing in Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-product-design');
+        } catch (\Exception $e) {
+            Log::error('Error in ProductDesignController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load product design data for printing'], 500);
+        }
+    }
+
+    /**
      * Display product designs page using Vue.
      *
      * @return \Inertia\Response

@@ -177,4 +177,19 @@ class ColorGroupController extends Controller
         $colorGroups = ColorGroup::orderBy('cg_name')->get();
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintcolorgroup', compact('colorGroups'));
     }
+
+    /**
+     * Display a listing of the resource for printing in Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-color-group');
+        } catch (\Exception $e) {
+            Log::error('Error in ColorGroupController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load color groups data for printing'], 500);
+        }
+    }
 } 

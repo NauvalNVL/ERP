@@ -164,6 +164,21 @@ class SalesTeamController extends Controller
     }
 
     /**
+     * Display a listing of the resource for printing in Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-sales-team');
+        } catch (\Exception $e) {
+            Log::error('Error in SalesTeamController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load sales team data for printing'], 500);
+        }
+    }
+
+    /**
      * Display the Vue component for sales team management.
      *
      * @return \Inertia\Response
@@ -176,6 +191,22 @@ class SalesTeamController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error in SalesTeamController@vueIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load sales team data'], 500);
+        }
+    }
+
+    /**
+     * Get all sales teams as JSON for API.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $salesTeams = SalesTeam::orderBy('code')->get();
+            return response()->json($salesTeams);
+        } catch (\Exception $e) {
+            Log::error('Error in SalesTeamController@apiIndex: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load sales team data'], 500);
         }
     }

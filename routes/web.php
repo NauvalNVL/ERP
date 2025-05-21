@@ -64,16 +64,32 @@ Route::middleware('auth')->group(function () {
          Route::get('/finishing', [FinishingController::class, 'vueIndex'])->name('vue.finishing.index');
          Route::get('/geo', [GeoController::class, 'vueIndex'])->name('vue.geo.index');
          Route::get('/industry', [IndustryController::class, 'vueIndex'])->name('vue.industry.index');
-         Route::get('/paper-quality/manage-status', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.manage-status');
-         Route::get('/paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.paper-flute.index');
          Route::get('/paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.paper-quality.index');
+         Route::get('/paper-quality/status', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.status');
          Route::get('/paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.paper-size.index');
          Route::get('/product', [ProductController::class, 'vueIndex'])->name('vue.product.index');
+         Route::get('/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design.index');
          Route::get('/product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.product-group.index');
-         Route::get('/salesperson', [SalespersonController::class, 'vueIndex'])->name('vue.salesperson.index');
-         Route::get('/salesperson-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.salesperson-team');
-         Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team');
-         Route::get('/scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.scoring-tool');
+         Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team.index');
+         Route::get('/sales-person', [SalespersonController::class, 'vueIndex'])->name('vue.sales-person.index');
+         Route::get('/sales-person-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.sales-person-team.index');
+         Route::get('/scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.scoring-tool.index');
+
+         // View and print routes
+         Route::get('/color/view-print', [ColorController::class, 'vueViewAndPrint'])->name('vue.color.view-print');
+         Route::get('/color-group/view-print', [ColorGroupController::class, 'vueViewAndPrint'])->name('vue.color-group.view-print');
+         Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
+         Route::get('/geo/view-print', [GeoController::class, 'vueViewAndPrint'])->name('vue.geo.view-print');
+         Route::get('/industry/view-print', [IndustryController::class, 'vueViewAndPrint'])->name('vue.industry.view-print');
+         Route::get('/paper-flute/view-print', [PaperFluteController::class, 'vueViewAndPrint'])->name('vue.paper-flute.view-print');
+         Route::get('/paper-quality/view-print', [PaperQualityController::class, 'vueViewAndPrint'])->name('vue.paper-quality.view-print');
+         Route::get('/paper-size/view-print', [PaperSizeController::class, 'vueViewAndPrint'])->name('vue.paper-size.view-print');
+         Route::get('/product/view-print', [ProductController::class, 'vueViewAndPrint'])->name('vue.product.view-print');
+         Route::get('/product-design/view-print', [ProductDesignController::class, 'vueViewAndPrint'])->name('vue.product-design.view-print');
+         Route::get('/product-group/view-print', [ProductGroupController::class, 'vueViewAndPrint'])->name('vue.product-group.view-print');
+         Route::get('/salesperson/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.salesperson.view-print');
+         Route::get('/sales-team/view-print', [SalesTeamController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');
+         Route::get('/scoring-tool/view-print', [ScoringToolController::class, 'vueViewAndPrint'])->name('vue.scoring-tool.view-print');
     });
 
     // Auth Routes
@@ -318,11 +334,11 @@ Route::get('/api/geo', [GeoController::class, 'index']);
 Route::get('/api/color-groups', [ColorGroupController::class, 'index']);
 Route::get('/api/industry', [IndustryController::class, 'index']);
 Route::get('/api/paper-flutes', [PaperFluteController::class, 'index']);
-Route::get('/api/paper-qualities', [PaperQualityController::class, 'index']);
-Route::get('/api/paper-sizes', [PaperSizeController::class, 'index']);
+Route::get('/api/paper-qualities', [PaperQualityController::class, 'apiIndex']);
+Route::get('/api/paper-sizes', [PaperSizeController::class, 'apiIndex']);
 Route::get('/api/product-designs', [ProductDesignController::class, 'index']);
 Route::get('/api/product-groups', [ProductGroupController::class, 'index']);
-Route::get('/api/salespersons', [SalespersonController::class, 'index']);
+Route::get('/api/salespersons', [SalespersonController::class, 'apiIndex']);
 
 // Salesperson Team API routes
 Route::get('/api/salesperson-teams', [SalespersonTeamController::class, 'apiIndex']);
@@ -344,4 +360,30 @@ Route::post('/api/scoring-tools', [ScoringToolController::class, 'store']);
 Route::put('/api/scoring-tools/{id}', [ScoringToolController::class, 'update']);
 Route::delete('/api/scoring-tools/{id}', [ScoringToolController::class, 'destroy']);
 Route::post('/api/scoring-tools/seed', [ScoringToolController::class, 'seed']);
+
+// API Routes for Vue components
+Route::prefix('api')->group(function () {
+    Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
+    Route::get('/products', [ProductController::class, 'getProductsJson']);
+    Route::post('/products', [ProductController::class, 'apiStore']);
+    Route::put('/products/{id}', [ProductController::class, 'apiUpdate']);
+    Route::delete('/products/{id}', [ProductController::class, 'apiDestroy']);
+    
+    Route::get('/product-designs', [ProductDesignController::class, 'getDesignsJson']);
+    Route::post('/product-designs', [ProductDesignController::class, 'apiStore']);
+    Route::put('/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
+    Route::delete('/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
+    
+    Route::get('/paper-qualities', [PaperQualityController::class, 'apiIndex']);
+    
+    Route::get('/paper-sizes', [PaperSizeController::class, 'apiIndex']);
+    
+    Route::get('/product-groups', [ProductGroupController::class, 'index']);
+    
+    Route::get('/sales-teams', [SalesTeamController::class, 'apiIndex']);
+    
+    Route::get('/salespersons', [SalespersonController::class, 'apiIndex']);
+    
+    Route::get('/scoring-tools', [ScoringToolController::class, 'apiIndex']);
+});
 

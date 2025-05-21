@@ -290,4 +290,35 @@ class PaperQualityController extends Controller
             return response()->json(['error' => 'Failed to load paper quality data'], 500);
         }
     }
+
+    /**
+     * Display a listing of the resource for printing in Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-paper-quality');
+        } catch (\Exception $e) {
+            Log::error('Error in PaperQualityController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load paper quality data for printing'], 500);
+        }
+    }
+
+    /**
+     * Return all paper qualities as JSON for the API.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->get();
+            return response()->json($paperQualities);
+        } catch (\Exception $e) {
+            Log::error('Error in PaperQualityController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load paper quality data'], 500);
+        }
+    }
 }

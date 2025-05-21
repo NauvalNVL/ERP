@@ -17,18 +17,15 @@ class ProductGroupController extends Controller
             $productGroups = ProductGroup::orderBy('product_group_id')->get();
             
             // If the request wants JSON, return JSON response
-            if ($request->wantsJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'data' => $productGroups
-                ]);
+            if ($request->wantsJson() || $request->ajax() || $request->is('api/*')) {
+                return response()->json($productGroups);
             }
             
             return view('sales-management.system-requirement.system-requirement.standard-requirement.productgroup', compact('productGroups'));
         } catch (\Exception $e) {
             Log::error('Error loading product groups: ' . $e->getMessage());
             
-            if ($request->wantsJson() || $request->ajax()) {
+            if ($request->wantsJson() || $request->ajax() || $request->is('api/*')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Error loading data from database: ' . $e->getMessage()
@@ -189,6 +186,21 @@ class ProductGroupController extends Controller
     {
         $productGroups = ProductGroup::orderBy('product_group_name')->get();
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintproductgroup', compact('productGroups'));
+    }
+    
+    /**
+     * Display a listing of the resource for printing in Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-product-group');
+        } catch (\Exception $e) {
+            Log::error('Error in ProductGroupController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load product group data for printing'], 500);
+        }
     }
     
     /**

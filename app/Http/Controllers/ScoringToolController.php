@@ -212,6 +212,21 @@ class ScoringToolController extends Controller
     }
 
     /**
+     * Display a listing of the resource for printing in Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-scoring-tool');
+        } catch (\Exception $e) {
+            Log::error('Error in ScoringToolController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load scoring tool data for printing'], 500);
+        }
+    }
+
+    /**
      * Get seeder data for scoring tools.
      */
     public function getSeederData()
@@ -301,6 +316,22 @@ class ScoringToolController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ScoringToolController@vueIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load scoring tool data'], 500);
+        }
+    }
+    
+    /**
+     * Get all scoring tools as JSON for API.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $scoringTools = ScoringTool::orderBy('code')->get();
+            return response()->json($scoringTools);
+        } catch (\Exception $e) {
+            Log::error('Error in ScoringToolController@apiIndex: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load scoring tool data'], 500);
         }
     }

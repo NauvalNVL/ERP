@@ -186,4 +186,35 @@ class PaperSizeController extends Controller
             return response()->json(['error' => 'Failed to load paper size data'], 500);
         }
     }
+
+    /**
+     * Display a listing of the resource for printing in Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-paper-size');
+        } catch (\Exception $e) {
+            Log::error('Error in PaperSizeController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load paper size data for printing'], 500);
+        }
+    }
+
+    /**
+     * Return all paper sizes as JSON for the API.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+            return response()->json($paperSizes);
+        } catch (\Exception $e) {
+            Log::error('Error in PaperSizeController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load paper size data'], 500);
+        }
+    }
 }

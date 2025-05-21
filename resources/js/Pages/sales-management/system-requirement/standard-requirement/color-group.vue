@@ -166,7 +166,7 @@
                             </div>
                         </a>
 
-                        <Link href="/color-group/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <Link href="/vue/color-group/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                             <div class="p-2 bg-green-500 rounded-full mr-3">
                                 <i class="fas fa-print text-white text-sm"></i>
                             </div>
@@ -237,8 +237,8 @@
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
-                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
+                        <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
                         </div>
                     </div>
                 </form>
@@ -424,8 +424,8 @@ const saveColorGroupChanges = async () => {
             }
             
             // Refresh the full data list to ensure we're in sync with the database
-            await fetchColorGroups();
-            closeEditModal();
+        await fetchColorGroups();
+        closeEditModal();
         } else {
             showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
         }
@@ -469,12 +469,12 @@ const deleteColorGroup = async (cgId) => {
             showNotification('Color group deleted successfully', 'success');
         } else {
             showNotification('Error deleting color group: ' + (result.message || 'Unknown error'), 'error');
-        }
+    }
     } catch (e) {
         console.error('Error deleting color group:', e);
         showNotification('Error deleting color group. Please try again.', 'error');
     } finally {
-        saving.value = false;
+    saving.value = false;
     }
 };
 

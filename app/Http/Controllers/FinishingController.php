@@ -153,4 +153,21 @@ class FinishingController extends Controller
             ]);
         }
     }
+    
+    /**
+     * Display the Vue view and print page for finishing
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-finishing', [
+                'header' => 'View & Print Finishings'
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in FinishingController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load finishing data for printing'], 500);
+        }
+    }
 }
