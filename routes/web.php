@@ -462,6 +462,10 @@ Route::prefix('api')->group(function () {
     Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
     Route::post('/customer-accounts', [UpdateCustomerAccountController::class, 'apiStore']);
     Route::put('/customer-accounts/{id}', [UpdateCustomerAccountController::class, 'apiUpdate']);
+
+    // User Search dan Permissions API
+    Route::get('/users/search', [UserController::class, 'searchUser']);
+    Route::get('/users/{user}/permissions', [UserController::class, 'getUserPermissions']);
 });
 
 // Business Form search endpoint (for modal)
@@ -486,4 +490,19 @@ Route::get('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyControll
 Route::post('/api/iso-currencies', [App\Http\Controllers\ISOCurrencyController::class, 'apiStore']);
 Route::put('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiUpdate']);
 Route::delete('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiDestroy']);
+
+// System Security Vue Routes
+Route::prefix('vue/system-security')->middleware('auth')->group(function () {
+    Route::get('/', [UserController::class, 'vueIndex'])->name('vue.system-security.index');
+    Route::get('/user', [UserController::class, 'vueIndex'])->name('vue.system-security.user');
+    Route::get('/create', [UserController::class, 'vueCreate'])->name('vue.system-security.create');
+    Route::post('/', [UserController::class, 'store'])->name('vue.system-security.store');
+    Route::get('/{user}/edit', [UserController::class, 'vueEdit'])->name('vue.system-security.edit');
+    Route::put('/{user}', [UserController::class, 'update'])->name('vue.system-security.update');
+    Route::delete('/{user}', [UserController::class, 'destroy'])->name('vue.system-security.destroy');
+    Route::get('/amend-password', [UserController::class, 'vueAmendPassword'])->name('vue.system-security.amend-password');
+    Route::put('/amend-password', [UserController::class, 'updatePassword'])->name('vue.system-security.update-password');
+    Route::get('/define-access', [UserController::class, 'vueDefineAccess'])->name('vue.system-security.define-access');
+    Route::put('/define-access/{user}', [UserController::class, 'updateAccess'])->name('vue.system-security.update-access');
+});
 

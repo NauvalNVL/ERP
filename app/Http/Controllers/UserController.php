@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class UserController extends Controller
 {
@@ -190,6 +191,116 @@ class UserController extends Controller
             return redirect()->route('users.amend-password')
                 ->withInput()
                 ->with('error', 'Gagal memperbarui password: '.$e->getMessage());
+        }
+    }
+
+    public function vueIndex()
+    {
+        $users = User::paginate(10);
+        return Inertia::render('system-manager/system-security/Index', [
+            'users' => $users,
+            'header' => 'Define User'
+        ]);
+    }
+
+    public function vueCreate()
+    {
+        return Inertia::render('system-manager/system-security/Create', [
+            'header' => 'Tambah User Baru'
+        ]);
+    }
+
+    public function vueEdit(User $user)
+    {
+        return Inertia::render('system-manager/system-security/Edit', [
+            'user' => $user,
+            'header' => 'Edit User'
+        ]);
+    }
+
+    public function vueAmendPassword()
+    {
+        $user = null;
+        
+        if(request()->has('search_user_id')) {
+            $user = User::where('user_id', request()->search_user_id)->first();
+        }
+        
+        return Inertia::render('system-manager/system-security/AmendPassword', [
+            'user' => $user,
+            'header' => 'Amend Password'
+        ]);
+    }
+
+    public function vueDefineAccess()
+    {
+        return Inertia::render('system-manager/system-security/DefineAccess', [
+            'header' => 'Define User Access'
+        ]);
+    }
+
+    public function searchUser(Request $request)
+    {
+        $user = User::where('user_id', $request->user_id)->first();
+        
+        if (!$user) {
+            return response()->json([
+                'user' => null,
+                'message' => 'User tidak ditemukan'
+            ], 404);
+        }
+        
+        return response()->json([
+            'user' => $user
+        ]);
+    }
+
+    public function getUserPermissions(User $user)
+    {
+        // Implementasi untuk mendapatkan daftar permission user
+        // Ini hanya contoh, sesuaikan dengan struktur database Anda
+        $permissions = DB::table('user_permissions')
+            ->where('user_id', $user->id)
+            ->pluck('permission_name')
+            ->toArray();
+        
+        // Jika tabel belum ada, kita berikan array kosong sebagai fallback
+        if (empty($permissions)) {
+            $permissions = [];
+        }
+        
+        return response()->json($permissions);
+    }
+
+    public function updateAccess(Request $request, User $user)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            'permissions' => 'required|array'
+        ]);
+        
+        try {
+            // Hapus permission lama
+            DB::table('user_permissions')
+                ->where('user_id', $user->id)
+                ->delete();
+            
+            // Tambahkan permission baru
+            foreach ($validated['permissions'] as $permission) {
+                DB::table('user_permissions')->insert([
+                    'user_id' => $user->id,
+                    'permission_name' => $permission,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+            
+            return redirect()->route('vue.system-security.define-access')
+                ->with('success', 'Permissions berhasil diperbarui untuk user: ' . $user->user_id);
+        } catch (\Exception $e) {
+            Log::error('Error updating permissions: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Gagal memperbarui permissions: ' . $e->getMessage());
         }
     }
 }
