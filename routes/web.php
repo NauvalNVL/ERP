@@ -51,14 +51,16 @@ Route::get('/test-db', function () {
 
 // Guest Routes
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::get('/login', function() {
+        return Inertia::render('Auth/login');
+    })->name('login');
     Route::post('/login', [LoginController::class, 'login']);
 });
 
 // Authenticated Routes
 Route::middleware('auth')->group(function () {
     // Vue Routes
-    Route::prefix('vue')->group(function () {
+    // Route::prefix('vue')->group(function () {
          Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
          Route::get('/color', [ColorController::class, 'vueIndex'])->name('vue.color.index');
          Route::get('/sales-configuration', [SalesConfigurationController::class, 'vueIndex'])->name('vue.sales-configuration');
@@ -124,7 +126,7 @@ Route::middleware('auth')->group(function () {
          Route::get('/update-customer-account', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
          })->name('vue.update-customer-account');
-    });
+    // });
 
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -259,11 +261,11 @@ Route::middleware('auth')->group(function () {
             Route::resource('business-form', BusinessFormController::class);
 
             // ISO Currency
-            Route::get('/vue/iso-currency', function () {
+            Route::get('/iso-currency', function () {
                 return Inertia::render('system-manager/system-maintenance/iso-currency');
             })->name('iso-currency');
 
-            Route::get('/vue/view-and-print-iso-currency', function () {
+            Route::get('/view-and-print-iso-currency', function () {
                 return Inertia::render('system-manager/system-maintenance/view-and-print-iso-currency');
             })->name('view-and-print-iso-currency');
             
@@ -379,7 +381,7 @@ Route::put('/api/product-designs/{id}', [ProductDesignController::class, 'apiUpd
 Route::delete('/api/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
 
 // Vue routes
-Route::get('/vue/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design');
+Route::get('/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design');
 
 // Product Group API routes
 Route::get('/api/product-groups', [ProductGroupController::class, 'index']);
@@ -472,11 +474,11 @@ Route::prefix('api')->group(function () {
 Route::get('/business-form-search', [BusinessFormController::class, 'search'])->name('business-form.search');
 
 // Foreign Currency Vue routes
-Route::get('/vue/foreign-currency', function () {
+Route::get('/foreign-currency', function () {
     return Inertia::render('system-manager/system-maintenance/foreign-currency');
 })->name('vue.foreign-currency');
 
-Route::get('/vue/foreign-currency/view-print', function () {
+Route::get('/foreign-currency/view-print', function () {
     return Inertia::render('system-manager/system-maintenance/view-and-print-foreign-currency');
 })->name('vue.foreign-currency.view-print');
 
@@ -492,7 +494,7 @@ Route::put('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyControll
 Route::delete('/api/iso-currencies/{id}', [App\Http\Controllers\ISOCurrencyController::class, 'apiDestroy']);
 
 // System Security Vue Routes
-Route::prefix('vue/system-security')->middleware('auth')->group(function () {
+Route::prefix('system-security')->middleware('auth')->group(function () {
     Route::get('/', [UserController::class, 'vueIndex'])->name('vue.system-security.index');
     Route::get('/user', [UserController::class, 'vueIndex'])->name('vue.system-security.user');
     Route::get('/create', [UserController::class, 'vueCreate'])->name('vue.system-security.create');
@@ -504,5 +506,29 @@ Route::prefix('vue/system-security')->middleware('auth')->group(function () {
     Route::put('/amend-password', [UserController::class, 'updatePassword'])->name('vue.system-security.update-password');
     Route::get('/define-access', [UserController::class, 'vueDefineAccess'])->name('vue.system-security.define-access');
     Route::put('/define-access/{user}', [UserController::class, 'updateAccess'])->name('vue.system-security.update-access');
+});
+
+// Vue routes with '' prefix
+Route::prefix('vue')->group(function () {
+    Route::get('/dashboard', function () {
+        return inertia('Dashboard');
+    })->name('dashboard');
+
+    // System Manager routes
+    Route::prefix('system-manager')->group(function () {
+        // Users
+        Route::get('/users', function () {
+            return inertia('system-manager/users/Index');
+        })->name('users.index');
+        
+        Route::get('/users/amend-password', function () {
+            return inertia('system-manager/users/AmendPassword');
+        })->name('users.amend-password');
+    });
+
+    // Auth routes
+    Route::get('/login', function () {
+        return inertia('Auth/Login');
+    })->name('login');
 });
 

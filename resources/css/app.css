@@ -6,4 +6,194 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global Animation Classes */
+@layer utilities {
+    /* Page Transitions */
+    .page-enter-active,
+    .page-leave-active {
+        transition: opacity 0.3s, transform 0.3s;
+    }
+    .page-enter-from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    .page-leave-to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    /* Fade animations */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    .fade-out {
+        animation: fadeOut 0.5s ease-in-out;
+    }
+
+    /* Slide animations */
+    .slide-in-right {
+        animation: slideInRight 0.5s ease-out;
+    }
+    .slide-out-right {
+        animation: slideOutRight 0.5s ease-in;
+    }
+    .slide-in-left {
+        animation: slideInLeft 0.5s ease-out;
+    }
+    .slide-out-left {
+        animation: slideOutLeft 0.5s ease-in;
+    }
+    .slide-in-up {
+        animation: slideInUp 0.5s ease-out;
+    }
+    .slide-out-up {
+        animation: slideOutUp 0.5s ease-in;
+    }
+    .slide-in-down {
+        animation: slideInDown 0.5s ease-out;
+    }
+    .slide-out-down {
+        animation: slideOutDown 0.5s ease-in;
+    }
+
+    /* Scale animations */
+    .scale-in {
+        animation: scaleIn 0.3s ease-out;
+    }
+    .scale-out {
+        animation: scaleOut 0.3s ease-in;
+    }
+
+    /* Attention seekers */
+    .pulse {
+        animation: pulse 1.5s infinite;
+    }
+    .bounce {
+        animation: bounce 1s ease infinite;
+    }
+    .shake {
+        animation: shake 0.5s ease-in-out;
+    }
+    .tada {
+        animation: tada 1s ease-in-out;
+    }
+    .swing {
+        animation: swing 1s ease-in-out;
+    }
+
+    /* Hover effects */
+    .hover-scale {
+        transition: transform 0.3s ease;
+    }
+    .hover-scale:hover {
+        transform: scale(1.05);
+    }
+    .hover-rotate {
+        transition: transform 0.3s ease;
+    }
+    .hover-rotate:hover {
+        transform: rotate(5deg);
+    }
+    .hover-float {
+        transition: transform 0.3s ease;
+    }
+    .hover-float:hover {
+        transform: translateY(-5px);
+    }
+}
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutLeft {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(-100%); opacity: 0; }
+}
+
+@keyframes slideInUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideOutUp {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-100%); opacity: 0; }
+}
+
+@keyframes slideInDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideOutDown {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes scaleOut {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(0.8); opacity: 0; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-15px); }
+    60% { transform: translateY(-7px); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes tada {
+    0% { transform: scale(1); }
+    10%, 20% { transform: scale(0.9) rotate(-3deg); }
+    30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+    40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes swing {
+    20% { transform: rotate(15deg); }
+    40% { transform: rotate(-10deg); }
+    60% { transform: rotate(5deg); }
+    80% { transform: rotate(-5deg); }
+    100% { transform: rotate(0deg); }
+}
+
 

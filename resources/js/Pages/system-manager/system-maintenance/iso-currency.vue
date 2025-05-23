@@ -1,6 +1,9 @@
 <template>
+    <AppLayout header="ISO Currency Management">
     <Head title="Define ISO Currency" />
 
+        <!-- Content -->
+        <div class="container mx-auto px-4 py-6">
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-6 mb-6">
         <div class="flex items-center justify-between">
@@ -353,12 +356,16 @@
             <i class="fas fa-times"></i>
         </button>
     </div>
+        </div>
+    </AppLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import ISOCurrencyModal from '@/Components/ISOCurrencyModal.vue';
+import { Head } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 // State
 const currencies = ref([]);

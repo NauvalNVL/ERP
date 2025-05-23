@@ -25,7 +25,7 @@ class LoginController extends Controller
         try {
             if (Auth::attempt($credentials, $request->remember)) {
                 $request->session()->regenerate();
-                return redirect()->intended('/dashboard');
+                return redirect('/vue/dashboard');
             }
         } catch (\Exception $e) {
             Log::error('Login error: '.$e->getMessage());

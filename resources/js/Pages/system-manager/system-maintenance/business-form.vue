@@ -1,6 +1,8 @@
 <template>
+    <AppLayout header="Define Business Form">
     <Head title="Define Business Form" />
 
+        <div class="container mx-auto px-4 py-6">
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
@@ -314,6 +316,8 @@
             </div>
         </div>
     </div>
+        </div>
+    </AppLayout>
 
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -351,6 +355,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import BusinessFormModal from '@/Components/BusinessFormModal.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 const businessForms = ref([]);
 const loading = ref(true);
