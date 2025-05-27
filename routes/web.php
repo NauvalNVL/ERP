@@ -96,7 +96,7 @@ Route::middleware('auth')->group(function () {
                  'header' => 'View & Print Business Forms'
              ]);
          })->name('vue.business-form.view-print');
-         
+
          // Sales Management Routes
          // Sales Configuration
          Route::get('/sales-configuration', [SalesConfigurationController::class, 'vueIndex'])->name('vue.sales-configuration.index');
@@ -152,7 +152,7 @@ Route::middleware('auth')->group(function () {
          Route::get('/customer-group', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/customer-group');
          })->name('vue.customer-group.index');
-         
+
          Route::get('/update-customer-account', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
          })->name('vue.update-customer-account.index');
