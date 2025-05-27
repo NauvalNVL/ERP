@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'View & Print Paper Sizes'">
     <Head title="View & Print Paper Sizes" />
 
     <!-- Header Section -->
@@ -140,6 +141,7 @@
             </ul>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

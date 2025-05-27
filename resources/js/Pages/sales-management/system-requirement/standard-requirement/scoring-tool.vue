@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'Scoring Tool'">
     <Head title="Scoring Tool Management" />
 
     <!-- Header Section -->
@@ -265,6 +266,7 @@
             </div>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

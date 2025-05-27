@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'Geo'">
     <Head title="Geo Management" />
 
     <!-- Header Section -->
@@ -331,6 +332,7 @@
             </div>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

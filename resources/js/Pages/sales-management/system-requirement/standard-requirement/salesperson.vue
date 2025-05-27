@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'Salesperson'">
     <Head title="Salesperson Management" />
 
     <!-- Header Section -->
@@ -275,6 +276,7 @@
             </div>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

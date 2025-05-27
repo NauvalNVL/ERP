@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'View & Print Color Groups'">
     <Head title="View & Print Color Groups" />
 
     <!-- Header Section -->
@@ -125,6 +126,7 @@
             </ul>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

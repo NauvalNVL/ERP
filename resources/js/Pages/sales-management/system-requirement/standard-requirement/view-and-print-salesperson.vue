@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'View & Print Salespersons'">
     <Head title="View & Print Salespersons" />
     
         <!-- Header Section -->
@@ -146,6 +147,7 @@
             </ul>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

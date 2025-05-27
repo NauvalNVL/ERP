@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'Sales Team'">
     <Head title="Sales Team Management" />
 
     <!-- Header Section -->
@@ -254,12 +255,14 @@
             </div>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import SalesTeamModal from '@/Components/sales-team-modal.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Get the header from props
 const props = defineProps({

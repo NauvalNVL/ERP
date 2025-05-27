@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'Manage Paper Quality Status'">
     <Head title="Manage Paper Quality Status" />
 
     <!-- Header Section -->
@@ -130,7 +131,7 @@
             <p>Updating status...</p>
         </div>
     </div>
-
+    </AppLayout>
 </template>
 
 <script setup>

@@ -1,4 +1,5 @@
 <template>
+  <AppLayout :header="'Customer Group'">
   <div>
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg mb-0">
@@ -105,6 +106,7 @@
       @select="handleSelect"
     />
   </div>
+  </AppLayout>
 </template>
 
 <script>

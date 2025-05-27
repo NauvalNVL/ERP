@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'View & Print Geo Data'">
     <Head title="View & Print Geo Data" />
 
     <!-- Header Section -->
@@ -148,6 +149,7 @@
             </ul>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

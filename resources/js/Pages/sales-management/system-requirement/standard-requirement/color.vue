@@ -1,5 +1,6 @@
 <template>
-    <Head title="Color Management" />
+    <AppLayout :header="'Define Color'">
+    <Head title="Define Color" />
 
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
@@ -18,7 +19,6 @@
                         <div class="p-2 bg-blue-500 rounded-lg mr-3">
                             <i class="fas fa-edit text-white"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Color Management</h3>
                     </div>
                     <!-- Header with navigation buttons -->
                     <div class="flex items-center space-x-2 mb-6">
@@ -341,6 +341,7 @@
             </div>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

@@ -43,7 +43,7 @@
         }
     }
     </style>
-        @if(Request::is('vue/*'))
+        @if(Request::is('/*'))
         {{-- @routes --}}
         @inertiaHead
         @endif
@@ -85,7 +85,7 @@
                             </button>
                             <h2 class="text-xl font-semibold">
                                 {{-- @if(Request::is('vue/*')) --}}
-                                {{ $page['props']['header'] ?? '' }}
+                                {{-- {{ $page['props']['header'] ?? '' }} --}}
                                 {{-- @else
                                 @yield('header', )
                                 @endif --}}

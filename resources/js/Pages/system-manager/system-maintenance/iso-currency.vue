@@ -10,7 +10,7 @@
             <div class="flex items-center">
                 <i class="fas fa-globe text-white text-3xl mr-4"></i>
                 <div>
-                    <h1 class="text-2xl font-bold text-white">ISO Currency Management</h1>
+                    <h1 class="text-2xl font-bold text-white">ISO Currency Management vue</h1>
                     <p class="text-blue-100">Manage international standard currency codes</p>
                 </div>
             </div>

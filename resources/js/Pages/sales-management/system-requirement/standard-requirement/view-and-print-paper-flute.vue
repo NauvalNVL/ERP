@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'View & Print Paper Flutes'">
     <Head title="View & Print Paper Flutes" />
 
     <!-- Header Section -->
@@ -172,6 +173,7 @@
             </ul>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

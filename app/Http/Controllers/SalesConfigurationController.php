@@ -14,7 +14,7 @@ class SalesConfigurationController extends Controller
 
     public function vueIndex()
     {
-        return Inertia::render('sales-management/sales-configuration', [
+        return Inertia::render('sales-management/system-requirement/sales-configuration/sales-configuration', [
             'title' => 'Define Sales Configuration'
         ]);
     }

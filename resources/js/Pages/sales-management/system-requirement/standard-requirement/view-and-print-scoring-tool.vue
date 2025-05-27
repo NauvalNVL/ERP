@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'View & Print Scoring Tool'">
     <Head title="View & Print Scoring Tool" />
 
     <!-- Header Section -->
@@ -132,6 +133,7 @@
             </ul>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

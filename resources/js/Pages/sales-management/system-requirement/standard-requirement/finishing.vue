@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'Finishing'">
     <Head title="Finishing Management" />
 
     <!-- Header Section -->
@@ -263,6 +264,7 @@
             </div>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'View & Print Product Groups'">
     <Head title="View & Print Product Groups" />
 
     <!-- Header Section -->
@@ -120,6 +121,7 @@
             </ul>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

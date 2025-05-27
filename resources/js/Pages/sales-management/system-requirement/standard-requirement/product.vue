@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'Product'">
     <Head title="Product Management" />
 
     <!-- Header Section -->
@@ -275,6 +276,7 @@
             </div>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

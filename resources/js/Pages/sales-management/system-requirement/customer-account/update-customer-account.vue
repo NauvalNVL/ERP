@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'Update Customer Account'">
     <div>
         <!-- Header Section -->
         <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg mb-0">
@@ -266,6 +267,7 @@
             @select="selectCustomerGroup"
         />
     </div>
+    </AppLayout>
 </template>
 
 <script>

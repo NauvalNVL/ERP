@@ -1,5 +1,5 @@
 <template>
-    <Head title="Color Group Management" />
+    <AppLayout :header="'Color Group Management'">
 
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
@@ -273,6 +273,7 @@
             </div>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>

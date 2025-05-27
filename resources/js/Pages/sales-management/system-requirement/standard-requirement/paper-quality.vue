@@ -1,4 +1,5 @@
 <template>
+    <AppLayout :header="'Paper Quality'">
     <Head title="Paper Quality Management" />
 
     <!-- Header Section -->
@@ -295,6 +296,7 @@
             </div>
         </div>
     </div>
+    </AppLayout>
 </template>
 
 <script setup>
