@@ -104,10 +104,10 @@
 
                     <!-- Buttons -->
                     <div class="flex justify-end space-x-3">
-                        <a @click="$inertia.visit(route('vue.system-security.index'))" 
+                        <Link href="/user" 
                             class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
                             Cancel
-                        </a>
+                        </Link>
                         <button type="submit" 
                             class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                             Update User
@@ -120,13 +120,14 @@
 </template>
 
 <script>
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 export default {
     components: {
         AppLayout,
-        Head
+        Head,
+        Link
     },
     props: {
         user: Object
@@ -150,7 +151,7 @@ export default {
     },
     methods: {
         submitForm() {
-            this.$inertia.put(route('vue.system-security.update', this.user.id), this.form);
+            this.$inertia.put(`/user/${this.user.id}`, this.form);
         }
     }
 }

@@ -8,10 +8,10 @@
                     <h2 class="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">
                         <i class="fas fa-users-cog text-blue-600 mr-2"></i>Daftar Pengguna Sistem
                     </h2>
-                    <a @click="$inertia.visit(route('vue.system-security.create'))" 
+                    <Link href="/user/create"
                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all flex items-center cursor-pointer">
                         <i class="fas fa-user-plus mr-2"></i>Tambah User Baru
-                    </a>
+                    </Link>
                 </div>
 
                 <!-- Success/Error Messages -->
@@ -61,26 +61,26 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     <div class="flex items-center space-x-3">
-                                        <a @click="$inertia.visit(route('vue.system-security.edit', user.id))" 
+                                        <Link :href="`/user/${user.id}/edit`" 
                                            class="text-blue-600 hover:text-blue-900 transition-colors cursor-pointer"
                                            title="Edit User">
                                             <i class="fas fa-edit"></i>
-                                        </a>
+                                        </Link>
                                         <a @click="confirmDelete(user.id)" 
                                            class="text-red-600 hover:text-red-900 transition-colors cursor-pointer"
                                            title="Hapus User">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
-                                        <a @click="$inertia.visit(route('vue.system-security.amend-password', {search_user_id: user.user_id}))" 
+                                        <Link :href="`/system-security/amend-password?search_user_id=${user.user_id}`"
                                            class="text-green-600 hover:text-green-900 transition-colors cursor-pointer"
                                            title="Ubah Password">
                                             <i class="fas fa-key"></i>
-                                        </a>
-                                        <a @click="$inertia.visit(route('vue.system-security.define-access'))" 
+                                        </Link>
+                                        <Link href="/system-security/define-access"
                                            class="text-purple-600 hover:text-purple-900 transition-colors cursor-pointer"
                                            title="Define Access">
                                             <i class="fas fa-user-lock"></i>
-                                        </a>
+                                        </Link>
                                     </div>
                                 </td>
                             </tr>
@@ -101,12 +101,12 @@
                               class="px-4 py-2 mx-1 text-gray-500 bg-white rounded-md cursor-not-allowed"
                               v-html="link.label">
                             </a>
-                            <a v-else 
+                            <Link v-else 
+                              :href="link.url"
                               :class="{'bg-blue-600 text-white': link.active}"
                               class="px-4 py-2 mx-1 bg-white text-gray-700 hover:bg-blue-600 hover:text-white rounded-md" 
-                              @click="$inertia.visit(link.url)"
                               v-html="link.label">
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -116,13 +116,14 @@
 </template>
 
 <script>
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 export default {
     components: {
         AppLayout,
-        Head
+        Head,
+        Link
     },
     props: {
         users: Object
@@ -130,7 +131,7 @@ export default {
     methods: {
         confirmDelete(userId) {
             if (confirm('Apakah Anda yakin ingin menghapus user ini?')) {
-                this.$inertia.delete(route('vue.system-security.destroy', userId));
+                this.$inertia.delete(`/user/${userId}`);
             }
         }
     }

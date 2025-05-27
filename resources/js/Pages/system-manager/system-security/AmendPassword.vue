@@ -82,6 +82,10 @@
                 </div>
 
                 <!-- Feedback Messages -->
+                <div v-if="message" class="mt-6" :class="messageClass">
+                    <i :class="messageIcon + ' mr-2'"></i>{{ message }}
+                </div>
+
                 <div v-if="$page.props.flash.success" class="mt-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg animate-fade-in">
                     <i class="fas fa-check-circle mr-2"></i>{{ $page.props.flash.success }}
                 </div>
@@ -92,9 +96,9 @@
 
                 <!-- Kembali ke Daftar User -->
                 <div class="mt-6 text-center">
-                    <a @click="$inertia.visit(route('vue.system-security.index'))" class="text-blue-600 hover:text-blue-800 cursor-pointer">
+                    <Link href="/user" class="text-blue-600 hover:text-blue-800 cursor-pointer">
                         <i class="fas fa-arrow-left mr-1"></i> Kembali ke Daftar User
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>
@@ -102,13 +106,15 @@
 </template>
 
 <script>
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import axios from 'axios';
 
 export default {
     components: {
         AppLayout,
-        Head
+        Head,
+        Link
     },
     props: {
         user: Object
@@ -121,22 +127,60 @@ export default {
                 user_id: this.user ? this.user.user_id : '',
                 new_password: '',
                 new_password_confirmation: ''
-            }
+            },
+            message: null,
+            messageClass: '',
+            messageIcon: ''
         }
     },
     methods: {
         searchUser() {
             if (!this.search_user_id) return;
             
-            this.$inertia.visit(route('vue.system-security.amend-password'), {
-                method: 'get',
-                data: { search_user_id: this.search_user_id },
-                preserveState: false,
-                replace: true
-            });
+            // Reset message
+            this.message = null;
+            
+            // Use axios to search for user
+            axios.get(`/api/users?search=${this.search_user_id}`)
+                .then(response => {
+                    if (response.data && response.data.length > 0) {
+                        this.foundUser = response.data[0];
+                        this.form.user_id = this.foundUser.user_id;
+                        this.message = `User ${this.foundUser.official_name} ditemukan.`;
+                        this.messageClass = 'bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg animate-fade-in';
+                        this.messageIcon = 'fas fa-check-circle';
+                    } else {
+                        this.foundUser = null;
+                        this.message = `User dengan ID "${this.search_user_id}" tidak ditemukan.`;
+                        this.messageClass = 'bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg';
+                        this.messageIcon = 'fas fa-exclamation-triangle';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error searching user:', error);
+                    this.foundUser = null;
+                    this.message = 'Terjadi kesalahan saat mencari user.';
+                    this.messageClass = 'bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg';
+                    this.messageIcon = 'fas fa-times-circle';
+                });
         },
         updatePassword() {
-            this.$inertia.put(route('vue.system-security.update-password'), this.form);
+            if (!this.foundUser) return;
+            
+            this.$inertia.post('/api/users/update-password', this.form, {
+                onSuccess: () => {
+                    this.message = 'Password berhasil diperbarui.';
+                    this.messageClass = 'bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg animate-fade-in';
+                    this.messageIcon = 'fas fa-check-circle';
+                    this.form.new_password = '';
+                    this.form.new_password_confirmation = '';
+                },
+                onError: (errors) => {
+                    this.message = Object.values(errors)[0];
+                    this.messageClass = 'bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg';
+                    this.messageIcon = 'fas fa-times-circle';
+                }
+            });
         }
     }
 }

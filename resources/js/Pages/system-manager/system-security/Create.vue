@@ -157,10 +157,10 @@
 
                     <!-- Buttons -->
                     <div class="flex justify-end space-x-3 pt-6">
-                        <button type="button" @click="$inertia.visit(route('vue.system-security.index'))" 
+                        <Link href="/user" 
                                 class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition-all">
                             <i class="fas fa-times mr-2"></i>Batal
-                        </button>
+                        </Link>
                         <button type="submit" 
                                 class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
                             <i class="fas fa-save mr-2"></i>Simpan
@@ -173,13 +173,14 @@
 </template>
 
 <script>
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 export default {
     components: {
         AppLayout,
-        Head
+        Head,
+        Link
     },
     data() {
         return {
@@ -198,7 +199,7 @@ export default {
     },
     methods: {
         submitForm() {
-            this.$inertia.post(route('vue.system-security.store'), this.form);
+            this.$inertia.post('/user', this.form);
         }
     }
 }

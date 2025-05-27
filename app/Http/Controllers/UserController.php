@@ -59,12 +59,12 @@ class UserController extends Controller
                 'updated_at' => now()
             ]);
 
-            return redirect()->route('users.index')
+            return redirect()->route('vue.system-security.index')
                 ->with('success', 'User '.$user->user_id.' berhasil dibuat');
 
         } catch (\Exception $e) {
             Log::error('Error creating user: '.$e->getMessage());
-            return redirect()->back()
+            return back()
                 ->withInput()
                 ->with('error', 'Gagal membuat user: '.$e->getMessage());
         }
@@ -120,7 +120,7 @@ class UserController extends Controller
 
             $user->update($updateData);
 
-            return redirect()->route('users.index')
+            return redirect()->route('vue.system-security.index')
                 ->with('success', 'User berhasil diperbarui');
 
         } catch (\Exception $e) {
@@ -138,7 +138,7 @@ class UserController extends Controller
             }
 
             $user->delete();
-            return redirect()->route('users.index')
+            return redirect()->route('vue.system-security.index')
                 ->with('success', 'User berhasil dihapus');
         } catch (\Exception $e) {
             Log::error('Error deleting user: '.$e->getMessage());
@@ -165,7 +165,7 @@ class UserController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'user_id' => 'required|exists:users,user_id',
             'new_password' => 'required|min:8|confirmed',
         ]);
@@ -183,14 +183,16 @@ class UserController extends Controller
                 'password_expiry_date' => $daysDifference
             ]);
 
-            return redirect()->route('users.amend-password', ['search_user_id' => $user->user_id])
-                ->with('success', 'Password berhasil diperbarui untuk user: '.$user->user_id);
-
+            return response()->json([
+                'success' => true,
+                'message' => 'Password berhasil diperbarui untuk user: '.$user->user_id
+            ], 200);
         } catch (\Exception $e) {
             Log::error('Password update error: '.$e->getMessage());
-            return redirect()->route('users.amend-password')
-                ->withInput()
-                ->with('error', 'Gagal memperbarui password: '.$e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui password: '.$e->getMessage()
+            ], 500);
         }
     }
 
@@ -239,20 +241,21 @@ class UserController extends Controller
         ]);
     }
 
-    public function searchUser(Request $request)
+    public function searchUsers(Request $request)
     {
-        $user = User::where('user_id', $request->user_id)->first();
+        $search = $request->query('search');
         
-        if (!$user) {
-            return response()->json([
-                'user' => null,
-                'message' => 'User tidak ditemukan'
-            ], 404);
+        if (empty($search)) {
+            return response()->json([]);
         }
         
-        return response()->json([
-            'user' => $user
-        ]);
+        $users = User::where('user_id', 'LIKE', "%{$search}%")
+            ->orWhere('username', 'LIKE', "%{$search}%")
+            ->orWhere('official_name', 'LIKE', "%{$search}%")
+            ->limit(10)
+            ->get();
+            
+        return response()->json($users);
     }
 
     public function getUserPermissions(User $user)

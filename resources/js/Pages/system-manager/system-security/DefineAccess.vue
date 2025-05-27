@@ -38,7 +38,7 @@
                                  class="w-12 h-12 rounded-full mr-4" alt="Avatar">
                             <div>
                                 <h3 class="text-lg font-semibold">{{ foundUser.official_name }}</h3>
-                                <p class="text-sm text-gray-600">{{ foundUser.user_id }}</p>
+                                <p class="text-sm text-gray-600">{{ foundUser.user_id }} - {{ foundUser.official_title || 'No Title' }}</p>
                             </div>
                         </div>
 
@@ -51,11 +51,42 @@
                                 </h4>
                                 <div class="space-y-2">
                                     <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="system_manager" 
-                                               id="system_manager" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="system_manager" class="ml-2 block text-sm text-gray-900">
+                                        <input type="checkbox" v-model="permissions" value="system_manager_full" 
+                                               id="system_manager_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                        <label for="system_manager_full" class="ml-2 block text-sm text-gray-900 font-bold">
                                             Akses Penuh System Manager
                                         </label>
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="ml-4 space-y-2">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="system_security" 
+                                                id="system_security" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="system_security" class="ml-2 block text-sm text-gray-900">
+                                                System Security
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="system_maintenance" 
+                                                id="system_maintenance" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="system_maintenance" class="ml-2 block text-sm text-gray-900">
+                                                System Maintenance
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="system_administrator" 
+                                                id="system_administrator" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="system_administrator" class="ml-2 block text-sm text-gray-900">
+                                                System Administrator
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="db_integrity" 
+                                                id="db_integrity" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="db_integrity" class="ml-2 block text-sm text-gray-900">
+                                                DB Integrity Check
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -67,18 +98,42 @@
                                 </h4>
                                 <div class="space-y-2">
                                     <div class="flex items-center">
+                                        <input type="checkbox" v-model="permissions" value="sales_management_full" 
+                                               id="sales_management_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                        <label for="sales_management_full" class="ml-2 block text-sm text-gray-900 font-bold">
+                                            Akses Penuh Sales Management
+                                        </label>
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="ml-4 space-y-2">
+                                    <div class="flex items-center">
                                         <input type="checkbox" v-model="permissions" value="sales_dashboard" 
                                                id="sales_dashboard" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
                                         <label for="sales_dashboard" class="ml-2 block text-sm text-gray-900">
                                             Dashboard Sales
                                         </label>
                                     </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="sales_orders" 
+                                                id="sales_orders" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="sales_orders" class="ml-2 block text-sm text-gray-900">
+                                                Sales Orders
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="customer_management" 
+                                                id="customer_management" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="customer_management" class="ml-2 block text-sm text-gray-900">
+                                                Customer Management
+                                        </label>
+                                    </div>
                                     <div class="flex items-center">
                                         <input type="checkbox" v-model="permissions" value="sales_report" 
                                                id="sales_report" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
                                         <label for="sales_report" class="ml-2 block text-sm text-gray-900">
-                                            Laporan Penjualan
+                                                Sales Reports
                                         </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -90,18 +145,42 @@
                                 </h4>
                                 <div class="space-y-2">
                                     <div class="flex items-center">
+                                        <input type="checkbox" v-model="permissions" value="material_management_full" 
+                                               id="material_management_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                        <label for="material_management_full" class="ml-2 block text-sm text-gray-900 font-bold">
+                                            Akses Penuh Material Management
+                                        </label>
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="ml-4 space-y-2">
+                                    <div class="flex items-center">
                                         <input type="checkbox" v-model="permissions" value="material_inventory" 
                                                id="material_inventory" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
                                         <label for="material_inventory" class="ml-2 block text-sm text-gray-900">
-                                            Manajemen Inventory
+                                                Inventory Management
                                         </label>
                                     </div>
                                     <div class="flex items-center">
                                         <input type="checkbox" v-model="permissions" value="material_orders" 
                                                id="material_orders" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
                                         <label for="material_orders" class="ml-2 block text-sm text-gray-900">
-                                            Manajemen Purchase Order
+                                                Purchase Orders
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="material_suppliers" 
+                                                id="material_suppliers" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="material_suppliers" class="ml-2 block text-sm text-gray-900">
+                                                Supplier Management
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="material_report" 
+                                                id="material_report" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="material_report" class="ml-2 block text-sm text-gray-900">
+                                                Material Reports
                                         </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -113,11 +192,136 @@
                                 </h4>
                                 <div class="space-y-2">
                                     <div class="flex items-center">
+                                        <input type="checkbox" v-model="permissions" value="production_management_full" 
+                                               id="production_management_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                        <label for="production_management_full" class="ml-2 block text-sm text-gray-900 font-bold">
+                                            Akses Penuh Production Management
+                                        </label>
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="ml-4 space-y-2">
+                                    <div class="flex items-center">
                                         <input type="checkbox" v-model="permissions" value="production_schedule" 
                                                id="production_schedule" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
                                         <label for="production_schedule" class="ml-2 block text-sm text-gray-900">
-                                            Jadwal Produksi
+                                                Production Schedule
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="production_workorders" 
+                                                id="production_workorders" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="production_workorders" class="ml-2 block text-sm text-gray-900">
+                                                Work Orders
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="production_quality" 
+                                                id="production_quality" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="production_quality" class="ml-2 block text-sm text-gray-900">
+                                                Quality Control
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="production_report" 
+                                                id="production_report" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="production_report" class="ml-2 block text-sm text-gray-900">
+                                                Production Reports
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Warehouse Management -->
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <h4 class="font-semibold text-lg mb-4 text-yellow-600">
+                                    <i class="fas fa-warehouse mr-2"></i>Warehouse Management
+                                </h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" v-model="permissions" value="warehouse_management_full" 
+                                               id="warehouse_management_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                        <label for="warehouse_management_full" class="ml-2 block text-sm text-gray-900 font-bold">
+                                            Akses Penuh Warehouse Management
                                         </label>
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="ml-4 space-y-2">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="warehouse_inventory" 
+                                                id="warehouse_inventory" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="warehouse_inventory" class="ml-2 block text-sm text-gray-900">
+                                                Warehouse Inventory
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="warehouse_receiving" 
+                                                id="warehouse_receiving" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="warehouse_receiving" class="ml-2 block text-sm text-gray-900">
+                                                Receiving & Putaway
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="warehouse_shipping" 
+                                                id="warehouse_shipping" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="warehouse_shipping" class="ml-2 block text-sm text-gray-900">
+                                                Shipping & Fulfillment
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="warehouse_report" 
+                                                id="warehouse_report" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="warehouse_report" class="ml-2 block text-sm text-gray-900">
+                                                Warehouse Reports
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Data Mining -->
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <h4 class="font-semibold text-lg mb-4 text-indigo-600">
+                                    <i class="fas fa-chart-pie mr-2"></i>Data Mining
+                                </h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" v-model="permissions" value="data_mining_full" 
+                                               id="data_mining_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                        <label for="data_mining_full" class="ml-2 block text-sm text-gray-900 font-bold">
+                                            Akses Penuh Data Mining
+                                        </label>
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="ml-4 space-y-2">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="data_analytics" 
+                                                id="data_analytics" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="data_analytics" class="ml-2 block text-sm text-gray-900">
+                                                Analytics Dashboard
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="data_reports" 
+                                                id="data_reports" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="data_reports" class="ml-2 block text-sm text-gray-900">
+                                                Custom Reports
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="data_export" 
+                                                id="data_export" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="data_export" class="ml-2 block text-sm text-gray-900">
+                                                Data Export
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" v-model="permissions" value="data_forecasts" 
+                                                id="data_forecasts" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
+                                            <label for="data_forecasts" class="ml-2 block text-sm text-gray-900">
+                                                Forecasting Tools
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -133,6 +337,10 @@
                     </form>
                 </div>
 
+                <div v-if="searchMessage" class="mt-6 py-4 px-6 rounded-lg" :class="searchMessageClass">
+                    <i :class="searchMessageIcon + ' mr-2'"></i>{{ searchMessage }}
+                </div>
+
                 <div v-if="$page.props.flash.success" class="mt-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg">
                     <i class="fas fa-check-circle mr-2"></i>{{ $page.props.flash.success }}
                 </div>
@@ -143,9 +351,9 @@
 
                 <!-- Kembali ke Daftar User -->
                 <div class="mt-6 text-center">
-                    <a @click="$inertia.visit(route('vue.system-security.index'))" class="text-blue-600 hover:text-blue-800 cursor-pointer">
+                    <Link href="/user" class="text-blue-600 hover:text-blue-800 cursor-pointer">
                         <i class="fas fa-arrow-left mr-1"></i> Kembali ke Daftar User
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>
@@ -153,13 +361,15 @@
 </template>
 
 <script>
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import axios from 'axios';
 
 export default {
     components: {
         AppLayout,
-        Head
+        Head,
+        Link
     },
     props: {
         user: Object
@@ -170,7 +380,10 @@ export default {
                 user_id: '',
             },
             foundUser: null,
-            permissions: []
+            permissions: [],
+            searchMessage: null,
+            searchMessageClass: '',
+            searchMessageIcon: ''
         }
     },
     mounted() {
@@ -182,16 +395,30 @@ export default {
     },
     methods: {
         searchUser() {
+            this.searchMessage = null;
+            
             // Pencarian user berdasarkan user_id
-            axios.get(`/api/users/search?user_id=${this.form.user_id}`)
+            axios.get(`/api/users?search=${this.form.user_id}`)
                 .then(response => {
-                    this.foundUser = response.data.user;
-                    if (this.foundUser) {
+                    if (response.data && response.data.length > 0) {
+                        this.foundUser = response.data[0];
                         this.loadUserPermissions();
+                        this.searchMessage = `User ${this.foundUser.official_name} ditemukan.`;
+                        this.searchMessageClass = 'bg-green-100 text-green-700';
+                        this.searchMessageIcon = 'fas fa-check-circle';
+                    } else {
+                        this.foundUser = null;
+                        this.searchMessage = `User dengan ID "${this.form.user_id}" tidak ditemukan.`;
+                        this.searchMessageClass = 'bg-yellow-100 text-yellow-700';
+                        this.searchMessageIcon = 'fas fa-exclamation-triangle';
                     }
                 })
                 .catch(error => {
                     console.error('Error searching user:', error);
+                    this.foundUser = null;
+                    this.searchMessage = 'Terjadi kesalahan saat mencari user.';
+                    this.searchMessageClass = 'bg-red-100 text-red-700';
+                    this.searchMessageIcon = 'fas fa-times-circle';
                 });
         },
         loadUserPermissions() {
@@ -204,13 +431,49 @@ export default {
                 })
                 .catch(error => {
                     console.error('Error loading permissions:', error);
+                    this.searchMessage = 'Terjadi kesalahan saat mengambil data permission.';
+                    this.searchMessageClass = 'bg-red-100 text-red-700';
+                    this.searchMessageIcon = 'fas fa-times-circle';
                 });
         },
         savePermissions() {
-            this.$inertia.put(route('vue.system-security.update-access', this.foundUser.id), {
+            if (!this.foundUser) return;
+            
+            this.$inertia.post(`/api/users/${this.foundUser.id}/permissions`, {
                 permissions: this.permissions
+            }, {
+                onSuccess: () => {
+                    this.searchMessage = 'Permissions berhasil diperbarui.';
+                    this.searchMessageClass = 'bg-green-100 text-green-700';
+                    this.searchMessageIcon = 'fas fa-check-circle';
+                },
+                onError: () => {
+                    this.searchMessage = 'Terjadi kesalahan saat menyimpan permissions.';
+                    this.searchMessageClass = 'bg-red-100 text-red-700';
+                    this.searchMessageIcon = 'fas fa-times-circle';
+                }
             });
+        },
+        selectAllInCategory(category) {
+            // This is a function that could be implemented to select all permissions in a category
+            const categoryPermissions = this.getPermissionsByCategory(category);
+            categoryPermissions.forEach(permission => {
+                if (!this.permissions.includes(permission)) {
+                    this.permissions.push(permission);
+                }
+            });
+        },
+        getPermissionsByCategory(category) {
+            // This would return all permissions that belong to a specific category
+            // Implementation would depend on how you structure your permissions
+            return [];
         }
     }
 }
 </script> 
+
+<style scoped>
+.permission-group:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+</style> 

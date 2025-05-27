@@ -63,7 +63,9 @@ Route::middleware('auth')->group(function () {
          // System Security Routes
          Route::get('/user', [UserController::class, 'vueIndex'])->name('vue.system-security.index');
          Route::get('/user/create', [UserController::class, 'vueCreate'])->name('vue.system-security.create');
+         Route::post('/user', [UserController::class, 'store'])->name('vue.system-security.store');
          Route::get('/user/{user}/edit', [UserController::class, 'vueEdit'])->name('vue.system-security.edit');
+         Route::put('/user/{user}', [UserController::class, 'update'])->name('vue.system-security.update');
          Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('vue.system-security.destroy');
          Route::get('/system-security/amend-password', [UserController::class, 'vueAmendPassword'])->name('vue.system-security.amend-password');
          Route::get('/system-security/define-access', [UserController::class, 'vueDefineAccess'])->name('vue.system-security.define-access');
@@ -166,7 +168,7 @@ Route::middleware('auth')->group(function () {
 // API Routes for Vue components
 Route::prefix('api')->group(function () {
     // User API routes
-    Route::get('/users', [UserController::class, 'searchUser']);
+    Route::get('/users', [UserController::class, 'searchUsers']);
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::get('/users/{user}/permissions', [UserController::class, 'getUserPermissions']);

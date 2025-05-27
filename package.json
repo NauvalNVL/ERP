@@ -20,6 +20,7 @@
         "@inertiajs/vue3": "^2.0.8",
         "@tailwindcss/postcss": "^4.0.12",
         "chart.js": "^4.4.9",
-        "vue": "^3.5.13"
+        "vue": "^3.5.13",
+        "ziggy-js": "^2.5.3"
     }
 }
