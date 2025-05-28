@@ -233,14 +233,14 @@ const salesManagementItems = [
         children: [
           { title: 'Define Customer Group', icon: 'fas fa-users', route: '/customer-group' },
           { title: 'Update Customer Account', icon: 'fas fa-user-edit', route: '/update-customer-account' },
-          { title: 'Obsolete/Reactive Customer A/C', icon: 'fas fa-user-clock', route: null },
+          { title: 'Obsolete/Reactive Customer A/C', icon: 'fas fa-user-clock', route: '/obsolete-reactive-customer-account' },
           { title: 'Define Customer Alternate Address', icon: 'fas fa-map-marked-alt', route: '/customer-alternate-address' },
-          { title: 'Define Customer Sales Type', icon: 'fas fa-tags', route: null },
-          { title: 'View & Print Customer Group', icon: 'fas fa-list', route: null },
-          { title: 'View & Print Customer Account', icon: 'fas fa-list', route: null },
-          { title: 'View & Print Customer Alternate Address', icon: 'fas fa-list', route: null },
-          { title: 'View & Print Customer Sales Type', icon: 'fas fa-list', route: null },
-          { title: 'View & Print Non-Active Customer', icon: 'fas fa-list', route: null }
+          { title: 'Define Customer Sales Type', icon: 'fas fa-tags', route: '/customer-sales-type' },
+          { title: 'View & Print Customer Group', icon: 'fas fa-list', route: '/customer-group/view-print' },
+          { title: 'View & Print Customer Account', icon: 'fas fa-list', route: '/update-customer-account/view-print' },
+          { title: 'View & Print Customer Alternate Address', icon: 'fas fa-list', route: '/customer-alternate-address/view-print' },
+          { title: 'View & Print Customer Sales Type', icon: 'fas fa-list', route: '/customer-sales-type/view-print' },
+          { title: 'View & Print Non-Active Customer', icon: 'fas fa-list', route: '/obsolete-reactive-customer-account/view-print' }
         ]
       },
       {
