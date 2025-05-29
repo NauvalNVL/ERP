@@ -80,7 +80,7 @@
             <span class="text-sm font-medium">{{ userInitial }}</span>
           </div>
           <div class="ml-3">
-            <span class="text-sm font-medium">{{ user?.name || 'Guest' }}</span>
+            <span class="text-sm font-medium">{{ user?.username || 'Guest' }}</span>
             <p class="text-xs text-gray-400" v-if="user">
               <i class="fas fa-id-badge mr-1"></i>
               <span class="font-mono">{{ user.user_id }}</span>
@@ -109,7 +109,7 @@ import SidebarDropdown from './SidebarDropdown.vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
-const userInitial = computed(() => user.value?.name ? user.value.name.charAt(0) : 'G');
+const userInitial = computed(() => user.value?.username ? user.value.username.charAt(0).toUpperCase() : 'G');
 const currentPath = computed(() => page.url);
 
 // Extract the base path from the URL (e.g., '/foreign-currency/view-print' -> '/foreign-currency')
