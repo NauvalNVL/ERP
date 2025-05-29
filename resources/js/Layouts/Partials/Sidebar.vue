@@ -126,21 +126,16 @@ const isActive = (route) => {
 };
 
 const logout = () => {
-  // Gunakan form submission langsung
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = '/logout';
-  
-  // Tambahkan CSRF token
-  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-  const csrfInput = document.createElement('input');
-  csrfInput.type = 'hidden';
-  csrfInput.name = '_token';
-  csrfInput.value = csrfToken;
-  
-  form.appendChild(csrfInput);
-  document.body.appendChild(form);
-  form.submit();
+  // Use Inertia router for logout
+  router.post('/logout', {}, {
+    preserveScroll: true,
+    onSuccess: () => {
+      window.location.href = '/login';
+    },
+    onError: () => {
+      console.error('Logout failed');
+    }
+  });
 };
 
 // System Manager Items
