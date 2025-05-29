@@ -164,7 +164,6 @@ Route::middleware('auth')->group(function () {
          })->name('vue.update-customer-account.index');
          
          Route::get('/customer-alternate-address', [CustomerAlternateAddressController::class, 'index'])->name('vue.customer-alternate-address.index');
-<<<<<<< HEAD
 
          // Master Card Routes
          Route::get('/sales-management/system-requirement/master-card/update-mc', [UpdateMcController::class, 'index'])->name('vue.master-card.update-mc');
@@ -173,8 +172,6 @@ Route::middleware('auth')->group(function () {
 
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-=======
->>>>>>> de31e67a21a8c15cf0c43d284350c32df5b3a7ac
 });
 
 // API Routes for Vue components
