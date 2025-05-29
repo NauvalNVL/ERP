@@ -55,6 +55,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
 });
 
+// Logout Route (accessible to authenticated users)
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
 // Authenticated Routes
 Route::middleware('auth')->group(function () {
     // Vue Routes
@@ -160,9 +163,6 @@ Route::middleware('auth')->group(function () {
          })->name('vue.update-customer-account.index');
          
          Route::get('/customer-alternate-address', [CustomerAlternateAddressController::class, 'index'])->name('vue.customer-alternate-address.index');
-
-    // Auth Routes
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
 
 // API Routes for Vue components
