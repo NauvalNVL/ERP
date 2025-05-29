@@ -45,6 +45,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 import Sidebar from './Partials/Sidebar.vue';
 import sidebarStore from './Partials/sidebarStore';
 
@@ -56,6 +57,8 @@ const props = defineProps({
 });
 
 const isDesktop = ref(window.innerWidth >= 1024);
+const page = usePage();
+const currentPath = computed(() => page.url);
 
 const toggleSidebar = () => {
   sidebarStore.toggleMobile();
@@ -72,6 +75,22 @@ onMounted(() => {
   const mainContent = document.querySelector('.flex-1');
   if (mainContent) {
     mainContent.classList.add('fade-in');
+  }
+  
+  // Auto-open parent menus based on current route
+  const currentRouteUrl = window.location.pathname;
+  
+  // Get the menu structure from sidebar components
+  // For now, we'll handle common paths that might need parent menus opened
+  if (currentRouteUrl.includes('/sales-management/system-requirement/master-card')) {
+    // Ensure Sales Management menu is open
+    sidebarStore.toggle('sales-management');
+    
+    // Ensure System Requirement submenu is open
+    sidebarStore.toggle('system-requirement');
+    
+    // Ensure Master Card submenu is open
+    sidebarStore.toggle('master-card');
   }
 });
 

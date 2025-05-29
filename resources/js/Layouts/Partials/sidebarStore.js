@@ -33,12 +33,62 @@ export const useSidebarStore = () => {
     mobileOpen.value = !mobileOpen.value;
   };
 
+  // Find menu ID based on current path
+  const getMenuId = (path, structure) => {
+    if (!path) return null;
+    
+    for (const item of structure) {
+      if (item.route === path) {
+        return item.id;
+      } 
+      if (item.children) {
+        const childId = getMenuId(path, item.children);
+        if (childId) return childId;
+      }
+    }
+    return null;
+  };
+
+  // Set parent menus to open state
+  const openParentMenus = (currentPath, structure, parentIds = []) => {
+    let found = false;
+    
+    for (const item of structure) {
+      const currentIds = [...parentIds];
+      
+      if (item.id) {
+        currentIds.push(item.id);
+      }
+      
+      if (item.route === currentPath) {
+        found = true;
+        break;
+      }
+      
+      if (item.children) {
+        const childFound = openParentMenus(currentPath, item.children, currentIds);
+        if (childFound) {
+          found = true;
+          // Open all parent menus
+          currentIds.forEach(id => {
+            state[id] = true;
+          });
+          break;
+        }
+      }
+    }
+    
+    return found;
+  };
+
   return {
     state,
     mobileOpen,
     isOpen,
     toggle,
-    toggleMobile
+    toggleMobile,
+    getMenuId,
+    openParentMenus
   };
 };
 

@@ -30,6 +30,7 @@ use App\Http\Controllers\SalesManagement\SystemRequirement\SystemRequirementCont
 use App\Http\Controllers\UpdateCustomerAccountController;
 use App\Http\Controllers\ISOCurrencyController;
 use App\Http\Controllers\CustomerAlternateAddressController;
+use App\Http\Controllers\UpdateMcController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -163,6 +164,14 @@ Route::middleware('auth')->group(function () {
          })->name('vue.update-customer-account.index');
          
          Route::get('/customer-alternate-address', [CustomerAlternateAddressController::class, 'index'])->name('vue.customer-alternate-address.index');
+
+         // Master Card Routes
+         Route::get('/sales-management/system-requirement/master-card/update-mc', [UpdateMcController::class, 'index'])->name('vue.master-card.update-mc');
+         Route::post('/api/update-mc/search-ac', [UpdateMcController::class, 'searchAc']);
+         Route::post('/api/update-mc/search-mcs', [UpdateMcController::class, 'searchMcs']);
+
+    // Auth Routes
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
 
 // API Routes for Vue components

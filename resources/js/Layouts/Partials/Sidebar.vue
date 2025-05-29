@@ -242,7 +242,7 @@ const salesManagementItems = [
         title: 'Master Card',
         icon: 'fas fa-id-card',
         children: [
-          { title: 'Update MC', icon: 'fas fa-edit', route: null },
+          { title: 'Update MC', icon: 'fas fa-edit', route: '/sales-management/system-requirement/master-card/update-mc' },
           { title: 'Approve MC', icon: 'fas fa-check', route: null },
           { title: 'Release Approved MC', icon: 'fas fa-unlock', route: null },
           { title: 'Obsolate & Reactive MC', icon: 'fas fa-ban', route: null },
