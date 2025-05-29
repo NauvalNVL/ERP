@@ -106,6 +106,12 @@ const isActive = (route) => {
 // For parent highlighting, check if the current path's base matches the route's base
 const isActiveParent = (route) => {
   if (!route) return false;
+  
+  // Check if the current path contains the route path for deep nested routes
+  if (currentPath.value.includes(route)) {
+    return true;
+  }
+  
   const currentBase = getBasePath(currentPath.value);
   const routeBase = getBasePath(route);
   return currentBase === routeBase && currentPath.value !== route;
