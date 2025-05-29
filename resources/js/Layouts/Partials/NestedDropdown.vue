@@ -137,7 +137,7 @@ const hasActiveChild = computed(() => {
 const toggleMenu = () => {
   sidebarStore.toggle(menuId.value);
 };
-</script>
+</script> 
 
 <style scoped>
 .nested-dropdown-menu {

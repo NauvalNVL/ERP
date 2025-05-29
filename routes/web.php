@@ -209,6 +209,12 @@ Route::prefix('api')->group(function () {
     Route::get('/industry', [IndustryController::class, 'index']);
     Route::get('/paper-flutes', [PaperFluteController::class, 'index']);
     
+    // Product Group API routes
+    Route::post('/product-groups', [ProductGroupController::class, 'apiStore']);
+    Route::put('/product-groups/{id}', [ProductGroupController::class, 'apiUpdate']);
+    Route::delete('/product-groups/{id}', [ProductGroupController::class, 'apiDestroy']);
+    Route::post('/product-groups/seed', [ProductGroupController::class, 'apiSeed']);
+    
     // Salesperson Team API routes
     Route::get('/salesperson-teams', [SalespersonTeamController::class, 'apiIndex']);
     Route::post('/salesperson-teams', [SalespersonTeamController::class, 'apiStore']);
