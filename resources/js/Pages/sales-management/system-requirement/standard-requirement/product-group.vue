@@ -57,9 +57,9 @@
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                            <button type="button" @click="editSelectedRow" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
-                                <i class="fas fa-edit mr-2"></i> Edit Selected
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                            <button type="button" @click="createNewGroup" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
+                                <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
                     </div>
@@ -76,13 +76,13 @@
                         <p class="text-sm font-medium text-yellow-800">No product group data available.</p>
                         <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
                         <div class="mt-2 flex items-center space-x-3">
-                            <button @click="fetchProductGroups" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Reload Data</button>
+                            <button @click="loadSeedData" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Run Product Group Seeder</button>
                         </div>
                     </div>
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
                         <p class="text-sm font-medium text-green-800">Data available: {{ productGroups.length }} groups found.</p>
                         <p v-if="selectedRow" class="text-xs text-green-700 mt-1">
-                            Selected: <span class="font-semibold">{{ selectedRow.product_group_id }}</span> - {{ selectedRow.product_group_name }}
+                            Selected: <span class="font-semibold">{{ selectedRow.code }}</span> - {{ selectedRow.name }}
                         </p>
                     </div>
                 </div>
@@ -114,9 +114,9 @@
                             <div class="space-y-2 text-sm">
                                 <div v-if="selectedRow" class="grid grid-cols-2 gap-2">
                                     <div class="font-medium text-gray-700">Group ID:</div>
-                                    <div>{{ selectedRow.product_group_id }}</div>
+                                    <div>{{ selectedRow.code }}</div>
                                     <div class="font-medium text-gray-700">Group Name:</div>
-                                    <div>{{ selectedRow.product_group_name }}</div>
+                                    <div>{{ selectedRow.name }}</div>
                                     <div class="font-medium text-gray-700">Status:</div>
                                     <div>
                                         <span v-if="selectedRow.is_active" class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Active</span>
@@ -202,13 +202,13 @@
                 <form @submit.prevent="saveGroupChanges" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Group ID:</label>
-                            <input v-model="editForm.product_group_id" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Group Code:</label>
+                            <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
                             <p class="mt-1 text-xs text-gray-500">Short code like "B" for Box or "P" for Paper</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Group Name:</label>
-                            <input v-model="editForm.product_group_name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
                         </div>
                         <div>
                             <label class="flex items-center">
@@ -218,7 +218,7 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteGroup(editForm.product_group_id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                        <button type="button" v-if="!isCreating" @click="deleteGroup(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                             <i class="fas fa-trash-alt mr-2"></i>Delete
                         </button>
                         <div v-else class="w-24"></div>
@@ -266,6 +266,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import ProductGroupModal from '@/Components/product-group-modal.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Get the header from props
 const props = defineProps({
@@ -283,8 +284,9 @@ const showEditModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref('');
 const editForm = ref({ 
-    product_group_id: '', 
-    product_group_name: '', 
+    id: '',
+    code: '', 
+    name: '', 
     is_active: true
 });
 const isCreating = ref(false);
@@ -293,7 +295,7 @@ const notification = ref({ show: false, message: '', type: 'success' });
 const fetchProductGroups = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/product-group', { 
+        const res = await fetch('/api/product-groups', { 
             headers: { 
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -306,7 +308,9 @@ const fetchProductGroups = async () => {
         
         const data = await res.json();
         
-        if (data.success && Array.isArray(data.data)) {
+        if (Array.isArray(data)) {
+            productGroups.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
             productGroups.value = data.data;
         } else {
             productGroups.value = [];
@@ -328,8 +332,8 @@ onMounted(() => {
 watch(searchQuery, (newQuery) => {
     if (newQuery && productGroups.value.length > 0) {
         const foundGroup = productGroups.value.find(group => 
-            group.product_group_id.toLowerCase().includes(newQuery.toLowerCase()) ||
-            group.product_group_name.toLowerCase().includes(newQuery.toLowerCase())
+            group.code.toLowerCase().includes(newQuery.toLowerCase()) ||
+            group.name.toLowerCase().includes(newQuery.toLowerCase())
         );
         
         if (foundGroup) {
@@ -340,7 +344,7 @@ watch(searchQuery, (newQuery) => {
 
 const onGroupSelected = (group) => {
     selectedRow.value = group;
-    searchQuery.value = group.product_group_id;
+    searchQuery.value = group.code;
     showModal.value = false;
     
     // Automatically open the edit modal for the selected row
@@ -362,8 +366,9 @@ const editSelectedRow = () => {
 const createNewGroup = () => {
     isCreating.value = true;
     editForm.value = { 
-        product_group_id: '', 
-        product_group_name: '', 
+        id: '',
+        code: '', 
+        name: '', 
         is_active: true
     };
     showEditModal.value = true;
@@ -372,8 +377,9 @@ const createNewGroup = () => {
 const closeEditModal = () => {
     showEditModal.value = false;
     editForm.value = { 
-        product_group_id: '', 
-        product_group_name: '', 
+        id: '',
+        code: '', 
+        name: '', 
         is_active: true
     };
     isCreating.value = false;
@@ -385,7 +391,7 @@ const saveGroupChanges = async () => {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
         // Different API call for create vs update
-        let url = isCreating.value ? '/product-group' : `/product-group/${editForm.value.product_group_id}`;
+        let url = isCreating.value ? '/api/product-groups' : `/api/product-groups/${editForm.value.id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
         
         const response = await fetch(url, {
@@ -395,7 +401,11 @@ const saveGroupChanges = async () => {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
-            body: JSON.stringify(editForm.value)
+            body: JSON.stringify({
+                code: editForm.value.code,
+                name: editForm.value.name,
+                is_active: editForm.value.is_active
+            })
         });
         
         const result = await response.json();
@@ -406,7 +416,7 @@ const saveGroupChanges = async () => {
                 showNotification('Product group created successfully', 'success');
             } else {
                 if (selectedRow.value) {
-                    selectedRow.value.product_group_name = editForm.value.product_group_name;
+                    selectedRow.value.name = editForm.value.name;
                     selectedRow.value.is_active = editForm.value.is_active;
                 }
                 showNotification('Product group updated successfully', 'success');
@@ -426,8 +436,8 @@ const saveGroupChanges = async () => {
     }
 };
 
-const deleteGroup = async (groupId) => {
-    if (!confirm(`Are you sure you want to delete product group "${groupId}"?`)) {
+const deleteGroup = async (id) => {
+    if (!confirm(`Are you sure you want to delete this product group?`)) {
         return;
     }
     
@@ -435,7 +445,7 @@ const deleteGroup = async (groupId) => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch(`/product-group/${groupId}`, {
+        const response = await fetch(`/api/product-groups/${id}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -447,9 +457,9 @@ const deleteGroup = async (groupId) => {
         
         if (result.success) {
             // Remove the item from the local array
-            productGroups.value = productGroups.value.filter(group => group.product_group_id !== groupId);
+            productGroups.value = productGroups.value.filter(group => group.id !== id);
             
-            if (selectedRow.value && selectedRow.value.product_group_id === groupId) {
+            if (selectedRow.value && selectedRow.value.id === id) {
                 selectedRow.value = null;
                 searchQuery.value = '';
             }
@@ -462,6 +472,35 @@ const deleteGroup = async (groupId) => {
     } catch (e) {
         console.error('Error deleting product group:', e);
         showNotification('Error deleting product group. Please try again.', 'error');
+    } finally {
+        saving.value = false;
+    }
+};
+
+const loadSeedData = async () => {
+    saving.value = true;
+    try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        
+        const response = await fetch('/api/product-groups/seed', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('Product group data seeded successfully', 'success');
+            await fetchProductGroups();
+        } else {
+            showNotification('Error seeding data: ' + (result.message || 'Unknown error'), 'error');
+        }
+    } catch (e) {
+        console.error('Error seeding data:', e);
+        showNotification('Error seeding data. Please try again.', 'error');
     } finally {
         saving.value = false;
     }

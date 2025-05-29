@@ -25,13 +25,13 @@
           </div>
         </div>
         <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
-          <table class="w-full divide-y divide-gray-200 table-fixed">
+          <table class="w-full divide-y divide-gray-200">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('product_code')">Code</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20 cursor-pointer" @click="sortTable('product_code')">Code</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('name')">Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('category_id')">Category</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5 cursor-pointer" @click="sortTable('description')">Description</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 cursor-pointer" @click="sortTable('category_id')">Category</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('description')">Description</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -42,11 +42,11 @@
                 <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ product.product_code }}</td>
                 <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ product.name }}</td>
                 <td class="px-6 py-3 whitespace-nowrap">
-                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                  <div class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 max-w-full overflow-hidden">
                     {{ getCategoryName(product.category_id) }}
-                  </span>
+                  </div>
                 </td>
-                <td class="px-6 py-3 text-gray-700 truncate">{{ product.description }}</td>
+                <td class="px-6 py-3 text-gray-700 truncate max-w-xs">{{ product.description }}</td>
               </tr>
               <tr v-if="filteredProducts.length === 0">
                 <td colspan="4" class="px-6 py-4 text-center text-gray-500">No product data available.</td>
@@ -143,6 +143,13 @@ const filteredProducts = computed(() => {
 // Get category name by ID
 function getCategoryName(categoryId) {
   if (!categoryId) return 'Uncategorized';
+  
+  // Try to find category in the categories prop
+  if (props.categories && props.categories.length > 0) {
+    const category = props.categories.find(c => c.id === categoryId);
+    if (category) return category.name;
+  }
+  
   return categoryId;
 }
 
@@ -182,4 +189,24 @@ watch(() => props.show, (val) => {
     searchQuery.value = '';
   }
 });
-</script> 
+</script>
+
+<style scoped>
+/* Add some custom styles to prevent text overflow */
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ensure proper spacing in table cells */
+td {
+  vertical-align: middle;
+}
+
+/* Improve category pill display */
+.inline-flex {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+</style> 

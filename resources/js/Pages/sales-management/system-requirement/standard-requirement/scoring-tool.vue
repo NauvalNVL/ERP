@@ -225,7 +225,7 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteScoringTool(editForm.code)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                        <button type="button" v-if="!isCreating" @click="deleteScoringTool(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                             <i class="fas fa-trash-alt mr-2"></i>Delete
                         </button>
                         <div v-else class="w-24"></div>
@@ -273,6 +273,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import ScoringToolModal from '@/Components/scoring-tool-modal.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Get the header from props
 const props = defineProps({
@@ -290,6 +291,7 @@ const showEditModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref('');
 const editForm = ref({ 
+    id: '',
     code: '', 
     name: '', 
     scores: 0,
@@ -304,7 +306,7 @@ const notification = ref({ show: false, message: '', type: 'success' });
 const fetchScoringTools = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/scoring-tool', { 
+        const res = await fetch('/api/scoring-tools', { 
             headers: { 
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -316,7 +318,15 @@ const fetchScoringTools = async () => {
         }
         
         const data = await res.json();
-        scoringTools.value = data;
+        
+        if (Array.isArray(data)) {
+            scoringTools.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            scoringTools.value = data.data;
+        } else {
+            scoringTools.value = [];
+            console.error('Unexpected data format:', data);
+        }
     } catch (e) {
         console.error('Error fetching scoring tools:', e);
         scoringTools.value = [];
@@ -367,6 +377,7 @@ const editSelectedRow = () => {
 const createNewScoringTool = () => {
     isCreating.value = true;
     editForm.value = { 
+        id: '',
         code: '', 
         name: '', 
         scores: 1.0,
@@ -381,6 +392,7 @@ const createNewScoringTool = () => {
 const closeEditModal = () => {
     showEditModal.value = false;
     editForm.value = { 
+        id: '',
         code: '', 
         name: '', 
         scores: 0,
@@ -398,7 +410,7 @@ const saveScoringToolChanges = async () => {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
         // Different API call for create vs update
-        let url = isCreating.value ? '/scoring-tool' : `/scoring-tool/${editForm.value.id || editForm.value.code}`;
+        let url = isCreating.value ? '/api/scoring-tools' : `/api/scoring-tools/${editForm.value.id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
         
         const response = await fetch(url, {
@@ -450,8 +462,8 @@ const saveScoringToolChanges = async () => {
     }
 };
 
-const deleteScoringTool = async (code) => {
-    if (!confirm(`Are you sure you want to delete scoring tool "${code}"?`)) {
+const deleteScoringTool = async (id) => {
+    if (!confirm(`Are you sure you want to delete this scoring tool?`)) {
         return;
     }
     
@@ -459,7 +471,7 @@ const deleteScoringTool = async (code) => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch(`/scoring-tool/${code}`, {
+        const response = await fetch(`/api/scoring-tools/${id}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -467,11 +479,13 @@ const deleteScoringTool = async (code) => {
             }
         });
         
-        if (response.ok) {
+        const result = await response.json();
+        
+        if (result.success) {
             // Remove the item from the local array
-            scoringTools.value = scoringTools.value.filter(tool => tool.code !== code);
+            scoringTools.value = scoringTools.value.filter(tool => tool.id !== id);
             
-            if (selectedRow.value && selectedRow.value.code === code) {
+            if (selectedRow.value && selectedRow.value.id === id) {
                 selectedRow.value = null;
                 searchQuery.value = '';
             }
@@ -479,7 +493,6 @@ const deleteScoringTool = async (code) => {
             closeEditModal();
             showNotification('Scoring tool deleted successfully', 'success');
         } else {
-            const result = await response.json();
             showNotification('Error deleting scoring tool: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {
@@ -495,18 +508,20 @@ const loadSeedData = async () => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch('/run-scoringtool-seeder', {
+        const response = await fetch('/api/scoring-tools/seed', {
+            method: 'POST',
             headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
             }
         });
         
-        if (response.ok) {
+        const result = await response.json();
+        
+        if (result.success) {
             showNotification('Scoring tool data seeded successfully', 'success');
             await fetchScoringTools();
         } else {
-            const result = await response.json();
             showNotification('Error seeding data: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {

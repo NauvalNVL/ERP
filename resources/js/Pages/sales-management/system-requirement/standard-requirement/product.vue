@@ -344,7 +344,7 @@ const fetchProducts = async () => {
 
 const fetchCategories = async () => {
     try {
-        const res = await fetch('/api/product-categories', { 
+        const res = await fetch('/categories', { 
             headers: { 
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -358,7 +358,15 @@ const fetchCategories = async () => {
         const data = await res.json();
         
         if (Array.isArray(data)) {
-            categories.value = data;
+            categories.value = data.map(category => ({
+                id: category.id,
+                name: category.name || category.category_name || 'Unknown'
+            }));
+        } else if (data.data && Array.isArray(data.data)) {
+            categories.value = data.data.map(category => ({
+                id: category.id,
+                name: category.name || category.category_name || 'Unknown'
+            }));
         } else {
             categories.value = [];
             console.error('Unexpected data format:', data);

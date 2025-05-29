@@ -359,4 +359,54 @@ class ScoringToolController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * API method to seed scoring tools data
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiSeed()
+    {
+        try {
+            $sampleTools = [
+                ['code' => 'MM01', 'name' => 'MALE MALE', 'scores' => 1.0, 'gap' => 0.5, 'specification' => 'Standard', 'description' => 'Male Male scoring tool'],
+                ['code' => 'MF10', 'name' => 'MALE FEMALE 10MM', 'scores' => 1.5, 'gap' => 1.0, 'specification' => 'Medium', 'description' => 'Male Female 10mm scoring tool'],
+                ['code' => 'MF15', 'name' => 'MALE FEMALE 15MM', 'scores' => 2.0, 'gap' => 1.5, 'specification' => 'Large', 'description' => 'Male Female 15mm scoring tool'],
+                ['code' => 'MF20', 'name' => 'MALE FLAT', 'scores' => 2.5, 'gap' => 2.0, 'specification' => 'Special', 'description' => 'Male Flat scoring tool'],
+                ['code' => 'FF01', 'name' => 'FEMALE FLAT', 'scores' => 3.0, 'gap' => 2.5, 'specification' => 'Custom', 'description' => 'Female Flat scoring tool'],
+            ];
+
+            $createdTools = [];
+            foreach ($sampleTools as $tool) {
+                // Check if the tool already exists
+                $existingTool = ScoringTool::where('code', $tool['code'])->first();
+                
+                if (!$existingTool) {
+                    $newTool = ScoringTool::create([
+                        'code' => $tool['code'],
+                        'name' => $tool['name'],
+                        'scores' => $tool['scores'],
+                        'gap' => $tool['gap'],
+                        'specification' => $tool['specification'],
+                        'description' => $tool['description'],
+                        'is_active' => true
+                    ]);
+                    
+                    $createdTools[] = $newTool;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => count($createdTools) . ' scoring tools seeded successfully',
+                'data' => $createdTools
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ScoringToolController@apiSeed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error seeding scoring tools: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

@@ -210,9 +210,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Sales Team:</label>
                             <select v-model="editForm.sales_team_id" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                                <option value="1">MBI</option>
-                                <option value="2">MANAGEMENT LOCAL</option>
-                                <option value="3">MANAGEMENT MNC</option>
+                                <option v-for="team in salesTeams" :value="team.id">{{ team.name }}</option>
                             </select>
                         </div>
                         <div>
@@ -235,7 +233,7 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteSalesperson(editForm.code)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                        <button type="button" v-if="!isCreating" @click="deleteSalesperson(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                             <i class="fas fa-trash-alt mr-2"></i>Delete
                         </button>
                         <div v-else class="w-24"></div>
@@ -283,6 +281,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import SalespersonModal from '@/Components/salesperson-modal.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Get the header from props
 const props = defineProps({
@@ -293,6 +292,7 @@ const props = defineProps({
 });
 
 const salespersons = ref([]);
+const salesTeams = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
@@ -300,9 +300,10 @@ const showEditModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref('');
 const editForm = ref({
+    id: '',
     code: '',
     name: '',
-    sales_team_id: '1',
+    sales_team_id: '',
     position: 'E - Executive',
     user_id: '',
     is_active: true
@@ -313,7 +314,7 @@ const notification = ref({ show: false, message: '', type: 'success' });
 const fetchSalespersons = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/salesperson', { 
+        const res = await fetch('/api/salespersons', { 
             headers: { 
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -328,6 +329,8 @@ const fetchSalespersons = async () => {
         
         if (Array.isArray(data)) {
             salespersons.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            salespersons.value = data.data;
         } else {
             salespersons.value = [];
             console.error('Unexpected data format:', data);
@@ -340,8 +343,38 @@ const fetchSalespersons = async () => {
     }
 };
 
-onMounted(() => {
-    fetchSalespersons();
+const fetchSalesTeams = async () => {
+    try {
+        const res = await fetch('/api/sales-teams', { 
+            headers: { 
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            } 
+        });
+        
+        if (!res.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await res.json();
+        
+        if (Array.isArray(data)) {
+            salesTeams.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            salesTeams.value = data.data;
+        } else {
+            salesTeams.value = [];
+            console.error('Unexpected data format for sales teams:', data);
+        }
+    } catch (e) {
+        console.error('Error fetching sales teams:', e);
+        salesTeams.value = [];
+    }
+};
+
+onMounted(async () => {
+    await fetchSalesTeams();
+    await fetchSalespersons();
 });
 
 // Watch for changes in search query to filter the data
@@ -360,12 +393,8 @@ watch(searchQuery, (newQuery) => {
 
 // Helper function to get team name
 function getTeamName(teamId) {
-    const teams = {
-        1: 'MBI',
-        2: 'MANAGEMENT LOCAL',
-        3: 'MANAGEMENT MNC'
-    };
-    return teams[teamId] || '';
+    const team = salesTeams.value.find(team => team.id === teamId);
+    return team ? team.name : '';
 }
 
 const onSalespersonSelected = (person) => {
@@ -398,9 +427,10 @@ const editSelectedRow = () => {
 const createNewSalesperson = () => {
     isCreating.value = true;
     editForm.value = {
+        id: '',
         code: '',
         name: '',
-        sales_team_id: '1',
+        sales_team_id: salesTeams.value.length > 0 ? salesTeams.value[0].id : '',
         position: 'E - Executive',
         user_id: '',
         is_active: true
@@ -411,9 +441,10 @@ const createNewSalesperson = () => {
 const closeEditModal = () => {
     showEditModal.value = false;
     editForm.value = {
+        id: '',
         code: '',
         name: '',
-        sales_team_id: '1',
+        sales_team_id: salesTeams.value.length > 0 ? salesTeams.value[0].id : '',
         position: 'E - Executive',
         user_id: '',
         is_active: true
@@ -427,8 +458,8 @@ const saveSalespersonChanges = async () => {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
         // Different API call for create vs update
-        let url = isCreating.value ? '/salesperson' : `/salesperson/update/${editForm.value.code}`;
-        let method = 'POST';
+        let url = isCreating.value ? '/api/salespersons' : `/api/salespersons/${editForm.value.id}`;
+        let method = isCreating.value ? 'POST' : 'PUT';
         
         const response = await fetch(url, {
             method: method,
@@ -478,8 +509,8 @@ const saveSalespersonChanges = async () => {
     }
 };
 
-const deleteSalesperson = async (code) => {
-    if (!confirm(`Are you sure you want to delete salesperson "${code}"?`)) {
+const deleteSalesperson = async (id) => {
+    if (!confirm(`Are you sure you want to delete this salesperson?`)) {
         return;
     }
     
@@ -487,7 +518,7 @@ const deleteSalesperson = async (code) => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch(`/salesperson/${code}`, {
+        const response = await fetch(`/api/salespersons/${id}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -499,9 +530,9 @@ const deleteSalesperson = async (code) => {
         
         if (result.success) {
             // Remove the item from the local array
-            salespersons.value = salespersons.value.filter(person => person.code !== code);
+            salespersons.value = salespersons.value.filter(person => person.id !== id);
             
-            if (selectedRow.value && selectedRow.value.code === code) {
+            if (selectedRow.value && selectedRow.value.id === id) {
                 selectedRow.value = null;
                 searchQuery.value = '';
             }
@@ -524,7 +555,7 @@ const loadSeedData = async () => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch('/salesperson/seed', {
+        const response = await fetch('/api/salespersons/seed', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,

@@ -37,6 +37,183 @@ class ProductGroupController extends Controller
         }
     }
 
+    /**
+     * API method to store a new product group
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiStore(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'code' => 'required|string|max:10|unique:product_groups,product_group_id',
+                'name' => 'required|string|max:100',
+                'is_active' => 'boolean',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $productGroup = ProductGroup::create([
+                'product_group_id' => $request->code,
+                'product_group_name' => $request->name,
+                'is_active' => $request->has('is_active') ? $request->is_active : true
+            ]);
+
+            // Transform the data to match the expected format
+            $responseData = [
+                'id' => $productGroup->id,
+                'code' => $productGroup->product_group_id,
+                'name' => $productGroup->product_group_name,
+                'is_active' => $productGroup->is_active
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product group created successfully',
+                'data' => $responseData
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductGroupController@apiStore: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating product group: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API method to update a product group
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiUpdate(Request $request, $id)
+    {
+        try {
+            $productGroup = ProductGroup::findOrFail($id);
+            
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:100',
+                'is_active' => 'boolean',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $productGroup->update([
+                'product_group_name' => $request->name,
+                'is_active' => $request->is_active
+            ]);
+
+            // Transform the data to match the expected format
+            $responseData = [
+                'id' => $productGroup->id,
+                'code' => $productGroup->product_group_id,
+                'name' => $productGroup->product_group_name,
+                'is_active' => $productGroup->is_active
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product group updated successfully',
+                'data' => $responseData
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductGroupController@apiUpdate: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating product group: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API method to delete a product group
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiDestroy($id)
+    {
+        try {
+            $productGroup = ProductGroup::findOrFail($id);
+            $productGroup->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product group deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductGroupController@apiDestroy: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting product group: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API method to seed product groups data
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiSeed()
+    {
+        try {
+            $sampleGroups = [
+                ['code' => 'B', 'name' => 'Box', 'is_active' => true],
+                ['code' => 'P', 'name' => 'Paper', 'is_active' => true],
+                ['code' => 'C', 'name' => 'Carton', 'is_active' => true],
+                ['code' => 'L', 'name' => 'Label', 'is_active' => true],
+                ['code' => 'F', 'name' => 'Film', 'is_active' => true],
+            ];
+
+            $createdGroups = [];
+            foreach ($sampleGroups as $group) {
+                // Check if the group already exists
+                $existingGroup = ProductGroup::where('product_group_id', $group['code'])->first();
+                
+                if (!$existingGroup) {
+                    $newGroup = ProductGroup::create([
+                        'product_group_id' => $group['code'],
+                        'product_group_name' => $group['name'],
+                        'is_active' => $group['is_active']
+                    ]);
+                    
+                    $createdGroups[] = [
+                        'id' => $newGroup->id,
+                        'code' => $newGroup->product_group_id,
+                        'name' => $newGroup->product_group_name,
+                        'is_active' => $newGroup->is_active
+                    ];
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => count($createdGroups) . ' product groups seeded successfully',
+                'data' => $createdGroups
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ProductGroupController@apiSeed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error seeding product groups: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
