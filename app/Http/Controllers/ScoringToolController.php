@@ -183,11 +183,49 @@ class ScoringToolController extends Controller
      */
     public function destroy($id)
     {
-        $scoringTool = ScoringTool::findOrFail($id);
-        $scoringTool->delete();
-
-        return redirect()->route('scoring-tool.index')
-            ->with('success', 'Scoring Tool berhasil dihapus.');
+        try {
+            Log::info('Attempting to delete scoring tool with ID/code: ' . $id);
+            
+            // Try to find by ID first (if it's a number)
+            if (is_numeric($id)) {
+                $scoringTool = ScoringTool::find($id);
+            } else {
+                // If not found or not numeric, try to find by code
+                $scoringTool = ScoringTool::where('code', $id)->first();
+            }
+            
+            if (!$scoringTool) {
+                Log::warning('Scoring tool not found with ID/code: ' . $id);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Scoring tool not found with identifier: ' . $id
+                ], 404);
+            }
+            
+            Log::info('Found scoring tool to delete: ' . json_encode($scoringTool));
+            
+            // Store info before deletion for the response
+            $toolInfo = [
+                'id' => $scoringTool->id,
+                'code' => $scoringTool->code,
+                'name' => $scoringTool->name
+            ];
+            
+            $scoringTool->delete();
+            Log::info('Successfully deleted scoring tool: ' . json_encode($toolInfo));
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Scoring Tool berhasil dihapus.',
+                'data' => $toolInfo
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting scoring tool: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting scoring tool: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -406,6 +444,59 @@ class ScoringToolController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error seeding scoring tools: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API method to store a scoring tool
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiStore(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'code' => 'required|string|max:10|unique:scoring_tools',
+                'name' => 'required|string|max:100',
+                'scores' => 'required|numeric',
+                'gap' => 'required|numeric',
+                'specification' => 'nullable|string|max:255',
+                'description' => 'nullable|string',
+                'is_active' => 'boolean',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $scoringTool = ScoringTool::create([
+                'code' => strtoupper($request->code),
+                'name' => $request->name,
+                'scores' => $request->scores,
+                'gap' => $request->gap,
+                'specification' => $request->specification,
+                'description' => $request->description,
+                'is_active' => $request->is_active ?? true,
+            ]);
+            
+            // Update the seeder file
+            $this->updateSeederFile($scoringTool);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Scoring Tool created successfully',
+                'data' => $scoringTool
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating scoring tool: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create scoring tool: ' . $e->getMessage()
             ], 500);
         }
     }

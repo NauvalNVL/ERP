@@ -28,18 +28,18 @@
           <table class="w-full divide-y divide-gray-200 table-fixed">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('product_group_id')">Group ID</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2 cursor-pointer" @click="sortTable('product_group_name')">Group Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('code')">Group ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2 cursor-pointer" @click="sortTable('name')">Group Name</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('is_active')">Status</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
-              <tr v-for="group in filteredGroups" :key="group.product_group_id"
-                :class="['hover:bg-blue-50 cursor-pointer', selectedGroup && selectedGroup.product_group_id === group.product_group_id ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
+              <tr v-for="group in filteredGroups" :key="group.id"
+                :class="['hover:bg-blue-50 cursor-pointer', selectedGroup && selectedGroup.id === group.id ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
                 @click="selectRow(group)"
                 @dblclick="selectAndClose(group)">
-                <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ group.product_group_id }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ group.product_group_name }}</td>
+                <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ group.code }}</td>
+                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ group.name }}</td>
                 <td class="px-6 py-3 whitespace-nowrap">
                   <span 
                     :class="[
@@ -49,7 +49,15 @@
                   >{{ group.is_active ? 'Active' : 'Inactive' }}</span>
                 </td>
               </tr>
-              <tr v-if="filteredGroups.length === 0">
+              <tr v-if="loading">
+                <td colspan="3" class="px-6 py-4 text-center">
+                  <div class="flex items-center justify-center">
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                    <span class="ml-2 text-gray-500">Loading data...</span>
+                  </div>
+                </td>
+              </tr>
+              <tr v-else-if="filteredGroups.length === 0">
                 <td colspan="3" class="px-6 py-4 text-center text-gray-500">No product group data available.</td>
               </tr>
             </tbody>
@@ -59,10 +67,10 @@
           <p>Click on a row to select and edit its details.</p>
         </div>
         <div class="mt-4 grid grid-cols-4 gap-2">
-          <button type="button" @click="sortTable('product_group_id')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+          <button type="button" @click="sortTable('code')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Group ID
           </button>
-          <button type="button" @click="sortTable('product_group_name')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+          <button type="button" @click="sortTable('name')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Group Name
           </button>
           <button type="button" @click="selectAndClose(selectedGroup)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
@@ -85,42 +93,47 @@ const props = defineProps({
   productGroups: {
     type: Array,
     default: () => []
-  }
+  },
+  loading: Boolean
 });
 
 const emit = defineEmits(['close', 'select']);
 
 const searchQuery = ref('');
 const selectedGroup = ref(null);
-const sortKey = ref('product_group_id');
+const sortKey = ref('code');
 const sortAsc = ref(true);
+const loading = computed(() => props.loading);
 
 // Compute filtered groups based on search query
 const filteredGroups = computed(() => {
-  let groups = props.productGroups;
+  let groups = props.productGroups || [];
+  
   if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase();
+    const query = searchQuery.value.toLowerCase();
     groups = groups.filter(group =>
-      group.product_group_id.toLowerCase().includes(q) ||
-      group.product_group_name.toLowerCase().includes(q)
+      (group.code && group.code.toLowerCase().includes(query)) ||
+      (group.name && group.name.toLowerCase().includes(query))
     );
   }
   
   // Apply sorting
   return [...groups].sort((a, b) => {
-    if (sortKey.value === 'product_group_id') {
-      if (a.product_group_id < b.product_group_id) return sortAsc.value ? -1 : 1;
-      if (a.product_group_id > b.product_group_id) return sortAsc.value ? 1 : -1;
-      return 0;
-    } else if (sortKey.value === 'is_active') {
+    if (sortKey.value === 'is_active') {
       // For boolean values, active should come first if ascending
       return sortAsc.value ? 
         (a.is_active === b.is_active ? 0 : a.is_active ? -1 : 1) : 
         (a.is_active === b.is_active ? 0 : a.is_active ? 1 : -1);
     }
     
-    if (a[sortKey.value] < b[sortKey.value]) return sortAsc.value ? -1 : 1;
-    if (a[sortKey.value] > b[sortKey.value]) return sortAsc.value ? 1 : -1;
+    let valueA = a[sortKey.value] || '';
+    let valueB = b[sortKey.value] || '';
+    
+    if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+    if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+    
+    if (valueA < valueB) return sortAsc.value ? -1 : 1;
+    if (valueA > valueB) return sortAsc.value ? 1 : -1;
     return 0;
   });
 });
@@ -135,6 +148,8 @@ function selectAndClose(group) {
   if (group) {
     emit('select', group);
     emit('close');
+  } else {
+    console.log('No group selected for edit');
   }
 }
 
@@ -155,4 +170,9 @@ watch(() => props.show, (val) => {
     searchQuery.value = '';
   }
 });
+
+// Watch for changes in product groups
+watch(() => props.productGroups, (newGroups) => {
+  console.log('Product groups updated in modal:', newGroups);
+}, { deep: true });
 </script>

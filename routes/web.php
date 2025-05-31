@@ -247,7 +247,7 @@ Route::prefix('api')->group(function () {
     Route::post('/sales-teams/seed', [SalesTeamController::class, 'seed']);
 
     // Scoring Tool API routes
-    Route::post('/scoring-tools', [ScoringToolController::class, 'store']);
+    Route::post('/scoring-tools', [ScoringToolController::class, 'apiStore']);
     Route::put('/scoring-tools/{id}', [ScoringToolController::class, 'update']);
     Route::delete('/scoring-tools/{id}', [ScoringToolController::class, 'destroy']);
     Route::post('/scoring-tools/seed', [ScoringToolController::class, 'seed']);

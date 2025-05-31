@@ -21,27 +21,7 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Product Group Management</h3>
                     </div>
-                    <!-- Header with navigation buttons -->
-                    <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="showModal = true">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="editSelectedRow">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewGroup">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                    
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -180,6 +160,7 @@
     <ProductGroupModal
         :show="showModal"
         :product-groups="productGroups"
+        :loading="loading"
         @close="showModal = false"
         @select="onGroupSelected"
     />
@@ -295,6 +276,7 @@ const notification = ref({ show: false, message: '', type: 'success' });
 const fetchProductGroups = async () => {
     loading.value = true;
     try {
+        console.log('Fetching product groups from API...');
         const res = await fetch('/api/product-groups', { 
             headers: { 
                 'Accept': 'application/json',
@@ -307,15 +289,31 @@ const fetchProductGroups = async () => {
         }
         
         const data = await res.json();
+        console.log('API response raw data:', data);
+        
+        // Process the data to ensure we have consistent object structure
+        let processedData = [];
         
         if (Array.isArray(data)) {
-            productGroups.value = data;
+            processedData = data.map(item => ({
+                id: item.id,
+                code: item.product_group_id || item.code,
+                name: item.product_group_name || item.name,
+                is_active: typeof item.is_active !== 'undefined' ? item.is_active : true
+            }));
         } else if (data.data && Array.isArray(data.data)) {
-            productGroups.value = data.data;
+            processedData = data.data.map(item => ({
+                id: item.id,
+                code: item.product_group_id || item.code,
+                name: item.product_group_name || item.name,
+                is_active: typeof item.is_active !== 'undefined' ? item.is_active : true
+            }));
         } else {
-            productGroups.value = [];
             console.error('Unexpected data format:', data);
         }
+        
+        console.log('Processed product groups data:', processedData);
+        productGroups.value = processedData;
     } catch (e) {
         console.error('Error fetching product groups:', e);
         productGroups.value = [];
@@ -325,6 +323,8 @@ const fetchProductGroups = async () => {
 };
 
 onMounted(() => {
+    console.log('Product group component mounted, fetching data...');
+    // Immediately fetch product groups when the component is mounted
     fetchProductGroups();
 });
 
@@ -347,16 +347,30 @@ const onGroupSelected = (group) => {
     searchQuery.value = group.code;
     showModal.value = false;
     
-    // Automatically open the edit modal for the selected row
-    isCreating.value = false;
-    editForm.value = { ...group };
-    showEditModal.value = true;
+    // Only open the edit modal if we received a complete group object
+    if (group && group.id) {
+        isCreating.value = false;
+        editForm.value = { 
+            id: group.id,
+            code: group.code, 
+            name: group.name,
+            is_active: group.is_active 
+        };
+        console.log('Editing group:', editForm.value);
+        showEditModal.value = true;
+    }
 };
 
 const editSelectedRow = () => {
     if (selectedRow.value) {
         isCreating.value = false;
-        editForm.value = { ...selectedRow.value };
+        editForm.value = { 
+            id: selectedRow.value.id,
+            code: selectedRow.value.code,
+            name: selectedRow.value.name,
+            is_active: selectedRow.value.is_active
+        };
+        console.log('Editing selected row:', editForm.value);
         showEditModal.value = true;
     } else {
         showNotification('Please select a product group first', 'error');
@@ -394,6 +408,14 @@ const saveGroupChanges = async () => {
         let url = isCreating.value ? '/api/product-groups' : `/api/product-groups/${editForm.value.id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
         
+        console.log('Saving product group with URL:', url);
+        console.log('Method:', method);
+        console.log('Data:', {
+            code: editForm.value.code,
+            name: editForm.value.name,
+            is_active: editForm.value.is_active
+        });
+        
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -409,6 +431,8 @@ const saveGroupChanges = async () => {
         });
         
         const result = await response.json();
+        
+        console.log('API response:', result);
         
         if (result.success) {
             // Update the local data with the changes or add new item

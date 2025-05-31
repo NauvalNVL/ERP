@@ -603,17 +603,17 @@ const saveColorGroup = async () => {
         await fetchColorGroups();
         
         // Show success notification
-        if (isCreating.value) {
-            showNotification('Color group created successfully', 'success');
+            if (isCreating.value) {
+                showNotification('Color group created successfully', 'success');
             // Find and select the newly created group
             const newGroup = colorGroups.value.find(g => g.cg === form.value.cg);
             if (newGroup) {
                 selectGroup(newGroup);
             }
-        } else {
-            showNotification('Color group updated successfully', 'success');
-        }
-        
+            } else {
+                showNotification('Color group updated successfully', 'success');
+            }
+            
         // Close the edit modal
         closeEditModal();
     } catch (e) {
@@ -658,15 +658,15 @@ const deleteColorGroup = async () => {
         
         // Reset selection and form
         selectedGroup.value = null;
-        searchQuery.value = '';
+                searchQuery.value = '';
         closeEditModal();
-        
-        showNotification('Color group deleted successfully', 'success');
+            
+            showNotification('Color group deleted successfully', 'success');
     } catch (e) {
         console.error('Error deleting color group:', e);
         showNotification('Error: ' + e.message, 'error');
     } finally {
-        saving.value = false;
+    saving.value = false;
     }
 };
 

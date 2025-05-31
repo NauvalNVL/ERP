@@ -25,13 +25,24 @@
           </div>
         </div>
         <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
-          <table class="w-full divide-y divide-gray-200">
+          <table class="w-full divide-y divide-gray-200 table-fixed">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20 cursor-pointer" @click="sortTable('product_code')">Code</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('name')">Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 cursor-pointer" @click="sortTable('category_id')">Category</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('description')">Description</th>
+                <th @click="sortTable('product_code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer">
+                  Product Code <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer">
+                  Description <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th @click="sortTable('category')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer">
+                  Category <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th @click="sortTable('product_group_id')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer">
+                  Group <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th @click="sortTable('is_active')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12 cursor-pointer">
+                  Status <i class="fas fa-sort ml-1"></i>
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -40,38 +51,54 @@
                 @click="selectRow(product)"
                 @dblclick="selectAndClose(product)">
                 <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ product.product_code }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ product.name }}</td>
+                <td class="px-6 py-3 whitespace-nowrap text-gray-700 truncate">{{ product.description }}</td>
                 <td class="px-6 py-3 whitespace-nowrap">
                   <div class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 max-w-full overflow-hidden">
-                    {{ getCategoryName(product.category_id) }}
+                    {{ product.category || '1-Corrugated Carton Box' }}
                   </div>
                 </td>
-                <td class="px-6 py-3 text-gray-700 truncate max-w-xs">{{ product.description }}</td>
+                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ product.product_group_id }}</td>
+                <td class="px-6 py-3 whitespace-nowrap">
+                  <span 
+                    :class="[
+                      'px-2 py-1 text-xs font-medium rounded-full', 
+                      product.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    ]"
+                  >{{ product.is_active ? 'Active' : 'Inactive' }}</span>
+                </td>
               </tr>
-              <tr v-if="filteredProducts.length === 0">
-                <td colspan="4" class="px-6 py-4 text-center text-gray-500">No product data available.</td>
+              <tr v-if="loading">
+                <td colspan="5" class="px-6 py-4 text-center">
+                  <div class="flex items-center justify-center">
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                    <span class="ml-2 text-gray-500">Loading data...</span>
+                  </div>
+                </td>
+              </tr>
+              <tr v-else-if="filteredProducts.length === 0">
+                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No product data available.</td>
               </tr>
             </tbody>
           </table>
         </div>
         <div class="mt-2 text-xs text-gray-500 italic">
-          <p>Click on a row to select and edit its details.</p>
+          <p>Click on a row to select, double-click to select and close the modal.</p>
         </div>
         <div class="mt-4 grid grid-cols-5 gap-2">
           <button type="button" @click="sortTable('product_code')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Code
           </button>
-          <button type="button" @click="sortTable('name')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-            <i class="fas fa-sort mr-1"></i>By Name
+          <button type="button" @click="sortTable('description')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+            <i class="fas fa-sort mr-1"></i>By Description
           </button>
-          <button type="button" @click="sortByCategoryAndName()" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+          <button type="button" @click="sortTable('category')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Category
           </button>
           <button type="button" @click="selectAndClose(selectedProduct)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-edit mr-1"></i>Select
           </button>
           <button type="button" @click="$emit('close')" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
-            <i class="fas fa-times mr-1"></i>Exit
+            <i class="fas fa-times mr-1"></i>Close
           </button>
         </div>
       </div>
@@ -91,6 +118,10 @@ const props = defineProps({
   categories: {
     type: Array,
     default: () => []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -108,9 +139,9 @@ const filteredProducts = computed(() => {
     const q = searchQuery.value.toLowerCase();
     products = products.filter(p =>
       (p.product_code && p.product_code.toLowerCase().includes(q)) ||
-      (p.name && p.name.toLowerCase().includes(q)) ||
       (p.description && p.description.toLowerCase().includes(q)) ||
-      (getCategoryName(p.category_id) && getCategoryName(p.category_id).toLowerCase().includes(q))
+      (p.category && p.category.toLowerCase().includes(q)) ||
+      (p.product_group_id && p.product_group_id.toLowerCase().includes(q))
     );
   }
   
@@ -118,18 +149,17 @@ const filteredProducts = computed(() => {
   return [...products].sort((a, b) => {
     let valA, valB;
     
-    if (sortKey.value === 'product_code') {
-      valA = a.product_code || '';
-      valB = b.product_code || '';
-    } else if (sortKey.value === 'category_id') {
-      valA = getCategoryName(a.category_id) || '';
-      valB = getCategoryName(b.category_id) || '';
-    } else {
-      valA = a[sortKey.value] || '';
-      valB = b[sortKey.value] || '';
+    if (sortKey.value === 'is_active') {
+      // For boolean values, active should come first if ascending
+      return sortAsc.value ? 
+        (a.is_active === b.is_active ? 0 : a.is_active ? -1 : 1) : 
+        (a.is_active === b.is_active ? 0 : a.is_active ? 1 : -1);
     }
+
+    valA = a[sortKey.value] || '';
+    valB = b[sortKey.value] || '';
     
-    if (valA.toLowerCase && valB.toLowerCase) {
+    if (typeof valA === 'string' && typeof valB === 'string') {
       valA = valA.toLowerCase();
       valB = valB.toLowerCase();
     }
@@ -139,19 +169,6 @@ const filteredProducts = computed(() => {
     return 0;
   });
 });
-
-// Get category name by ID
-function getCategoryName(categoryId) {
-  if (!categoryId) return 'Uncategorized';
-  
-  // Try to find category in the categories prop
-  if (props.categories && props.categories.length > 0) {
-    const category = props.categories.find(c => c.id === categoryId);
-    if (category) return category.name;
-  }
-  
-  return categoryId;
-}
 
 // Select a row
 function selectRow(product) {
@@ -163,6 +180,8 @@ function selectAndClose(product) {
   if (product) {
     emit('select', product);
     emit('close');
+  } else {
+    console.log('No product selected for edit');
   }
 }
 
@@ -176,12 +195,6 @@ function sortTable(key) {
   }
 }
 
-// Sort by category and name
-function sortByCategoryAndName() {
-  sortKey.value = 'category_id';
-  sortAsc.value = true;
-}
-
 // Reset selection when modal is opened
 watch(() => props.show, (val) => {
   if (val) {
@@ -189,6 +202,11 @@ watch(() => props.show, (val) => {
     searchQuery.value = '';
   }
 });
+
+// Watch for changes in product data
+watch(() => props.products, (newProducts) => {
+  console.log('Products updated in modal:', newProducts.length);
+}, { deep: true });
 </script>
 
 <style scoped>
@@ -202,11 +220,5 @@ watch(() => props.show, (val) => {
 /* Ensure proper spacing in table cells */
 td {
   vertical-align: middle;
-}
-
-/* Improve category pill display */
-.inline-flex {
-  text-overflow: ellipsis;
-  overflow: hidden;
 }
 </style> 

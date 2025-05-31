@@ -381,7 +381,7 @@ class ProductDesignController extends Controller
     public function apiDestroy($id)
     {
         try {
-            $productDesign = ProductDesign::where('design_code', $id)->first();
+            $productDesign = ProductDesign::where('pd_code', $id)->first();
             
             if (!$productDesign) {
                 return response()->json([

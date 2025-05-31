@@ -21,27 +21,7 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Scoring Tool Management</h3>
                     </div>
-                    <!-- Header with navigation buttons -->
-                    <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="showModal = true">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="editSelectedRow">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewScoringTool">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                    
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -57,9 +37,9 @@
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                            <button type="button" @click="editSelectedRow" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
-                                <i class="fas fa-edit mr-2"></i> Edit Selected
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                            <button type="button" @click="createNewScoringTool" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
+                                <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
                     </div>
@@ -467,11 +447,22 @@ const deleteScoringTool = async (id) => {
         return;
     }
     
+    if (!id) {
+        showNotification('Invalid scoring tool ID', 'error');
+        return;
+    }
+    
+    console.log('Deleting scoring tool with ID:', id);
+    
     saving.value = true;
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch(`/api/scoring-tools/${id}`, {
+        // Use the code field as a fallback if id is not a number
+        const identifier = isNaN(parseInt(id)) ? editForm.value.code : id;
+        console.log('Using identifier for deletion:', identifier);
+        
+        const response = await fetch(`/api/scoring-tools/${identifier}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -480,12 +471,15 @@ const deleteScoringTool = async (id) => {
         });
         
         const result = await response.json();
+        console.log('Delete API response:', result);
         
         if (result.success) {
             // Remove the item from the local array
-            scoringTools.value = scoringTools.value.filter(tool => tool.id !== id);
+            scoringTools.value = scoringTools.value.filter(tool => 
+                tool.id !== id && tool.code !== identifier
+            );
             
-            if (selectedRow.value && selectedRow.value.id === id) {
+            if (selectedRow.value && (selectedRow.value.id === id || selectedRow.value.code === identifier)) {
                 selectedRow.value = null;
                 searchQuery.value = '';
             }

@@ -21,27 +21,7 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Product Management</h3>
                     </div>
-                    <!-- Header with navigation buttons -->
-                    <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="showModal = true">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="editSelectedRow">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewProduct">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                    
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -57,9 +37,9 @@
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                            <button type="button" @click="editSelectedRow" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
-                                <i class="fas fa-edit mr-2"></i> Edit Selected
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                            <button type="button" @click="createNewProduct" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
+                                <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
                     </div>
@@ -82,7 +62,7 @@
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
                         <p class="text-sm font-medium text-green-800">Data available: {{ products.length }} products found.</p>
                         <p v-if="selectedRow" class="text-xs text-green-700 mt-1">
-                            Selected: <span class="font-semibold">{{ selectedRow.id }}</span> - {{ selectedRow.name }} ({{ selectedRow.category_name }})
+                            Selected: <span class="font-semibold">{{ selectedRow.product_code }}</span> - {{ selectedRow.description }} ({{ selectedRow.category }})
                         </p>
                     </div>
                 </div>
@@ -114,19 +94,19 @@
                             <div class="grid grid-cols-1 gap-2 text-sm">
                                 <div class="flex items-center">
                                     <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">1</span>
-                                    <span>Carton Box</span>
+                                    <span>Corrugated Carton Box</span>
                                 </div>
                                 <div class="flex items-center">
                                     <span class="w-6 h-6 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">2</span>
-                                    <span>Labels</span>
+                                    <span>Single Facer Roll</span>
                                 </div>
                                 <div class="flex items-center">
                                     <span class="w-6 h-6 flex items-center justify-center bg-purple-500 text-white rounded-full font-bold mr-2">3</span>
-                                    <span>Packaging</span>
+                                    <span>Single Facer Roll/KG</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-yellow-500 text-white rounded-full font-bold mr-2">4</span>
-                                    <span>Other</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-yellow-500 text-white rounded-full font-bold mr-2">7</span>
+                                    <span>Other Packaging Products</span>
                                 </div>
                             </div>
                         </div>
@@ -183,6 +163,7 @@
         :show="showModal"
         :products="products"
         :categories="categories"
+        :loading="loading"
         @close="showModal = false"
         @select="onProductSelected"
     />
@@ -207,31 +188,47 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Product Code:</label>
                             <input v-model="editForm.product_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Product Name:</label>
-                            <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Category:</label>
-                            <select v-model="editForm.category_id" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                                <option value="">Select a category</option>
-                                <option v-for="category in categories" :key="category.id" :value="category.id">
-                                    {{ category.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Product Group ID (optional):</label>
-                            <input v-model="editForm.product_group_id" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
+                            <span class="text-xs text-gray-500">Product code must be unique</span>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
-                            <textarea v-model="editForm.description" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm"></textarea>
+                            <input v-model="editForm.description" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Unit:</label>
-                            <input v-model="editForm.unit" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Category:</label>
+                            <template v-if="isCreating">
+                                <select v-model="editForm.category" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                                    <option value="">Select a category</option>
+                                    <option value="1-Corrugated Carton Box">1-Corrugated Carton Box</option>
+                                    <option value="2-Single Facer Roll">2-Single Facer Roll</option>
+                                    <option value="3-Single Facer Roll/KG">3-Single Facer Roll/KG</option>
+                                    <option value="4-Single Facer Sheet">4-Single Facer Sheet</option>
+                                    <option value="5-Corrugated Sheet Board/Piece">5-Corrugated Sheet Board/Piece</option>
+                                    <option value="6-Corrugated Sheet Board/M2">6-Corrugated Sheet Board/M2</option>
+                                    <option value="7-Other Packaging Products">7-Other Packaging Products</option>
+                                </select>
+                                <span class="text-xs text-gray-500">Select from one of the predefined product categories</span>
+                            </template>
+                            <template v-else>
+                                <input type="text" :value="editForm.category" class="block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" readonly>
+                                <span class="text-xs text-gray-500">Category cannot be changed after creation</span>
+                            </template>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Product Group ID:</label>
+                            <select v-model="editForm.product_group_id" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                                <option value="">Select a product group</option>
+                                <option v-for="group in productGroups" :key="group.id || group.product_group_id" :value="group.product_group_id">
+                                    {{ group.product_group_id }} - {{ group.product_group_name }}
+                                </option>
+                            </select>
+                            <span class="text-xs text-gray-500 mt-1">Required: Select a valid product group (e.g., B for Box, R for Roll)</span>
+                        </div>
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" v-model="editForm.is_active" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                <span class="ml-2 text-sm text-gray-700">Active</span>
+                            </label>
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
@@ -303,18 +300,19 @@ const searchQuery = ref('');
 const editForm = ref({ 
     id: '', 
     product_code: '', 
-    name: '', 
     description: '',
-    category_id: '',
+    category: '',
     product_group_id: '',
-    unit: ''
+    is_active: true
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
+const productGroups = ref([]);
 
 const fetchProducts = async () => {
     loading.value = true;
     try {
+        console.log('Fetching products from API...');
         const res = await fetch('/api/products', { 
             headers: { 
                 'Accept': 'application/json',
@@ -327,9 +325,18 @@ const fetchProducts = async () => {
         }
         
         const data = await res.json();
+        console.log('API response raw data:', data);
         
         if (Array.isArray(data)) {
-            products.value = data;
+            products.value = data.map(product => ({
+                id: product.id,
+                product_code: product.product_code,
+                description: product.description,
+                category: product.category || '1-Corrugated Carton Box', // Default to standard category if empty
+                product_group_id: product.product_group_id,
+                is_active: typeof product.is_active !== 'undefined' ? product.is_active : true
+            }));
+            console.log('Processed products data:', products.value);
         } else {
             products.value = [];
             console.error('Unexpected data format:', data);
@@ -344,6 +351,7 @@ const fetchProducts = async () => {
 
 const fetchCategories = async () => {
     try {
+        // Use the correct endpoint for categories
         const res = await fetch('/categories', { 
             headers: { 
                 'Accept': 'application/json',
@@ -356,30 +364,76 @@ const fetchCategories = async () => {
         }
         
         const data = await res.json();
+        console.log('Categories API response:', data);
         
+        // Transform the data to match our component needs
         if (Array.isArray(data)) {
             categories.value = data.map(category => ({
-                id: category.id,
-                name: category.name || category.category_name || 'Unknown'
-            }));
-        } else if (data.data && Array.isArray(data.data)) {
-            categories.value = data.data.map(category => ({
-                id: category.id,
-                name: category.name || category.category_name || 'Unknown'
+                id: category.id || category.category_code || category,
+                name: category.name || category.id || category
             }));
         } else {
-            categories.value = [];
-            console.error('Unexpected data format:', data);
+            // Fallback to hardcoded categories matching ProductSeeder.php if API fails
+            categories.value = [
+                { id: '1-Corrugated Carton Box', name: '1-Corrugated Carton Box' },
+                { id: '2-Single Facer Roll', name: '2-Single Facer Roll' },
+                { id: '3-Single Facer Roll/KG', name: '3-Single Facer Roll/KG' },
+                { id: '4-Single Facer Sheet', name: '4-Single Facer Sheet' },
+                { id: '5-Corrugated Sheet Board/Piece', name: '5-Corrugated Sheet Board/Piece' },
+                { id: '6-Corrugated Sheet Board/M2', name: '6-Corrugated Sheet Board/M2' },
+                { id: '7-Other Packaging Products', name: '7-Other Packaging Products' }
+            ];
         }
+        console.log('Processed categories:', categories.value);
     } catch (e) {
         console.error('Error fetching categories:', e);
-        categories.value = [];
+        // Fallback to hardcoded categories matching ProductSeeder.php
+        categories.value = [
+            { id: '1-Corrugated Carton Box', name: '1-Corrugated Carton Box' },
+            { id: '2-Single Facer Roll', name: '2-Single Facer Roll' },
+            { id: '3-Single Facer Roll/KG', name: '3-Single Facer Roll/KG' },
+            { id: '4-Single Facer Sheet', name: '4-Single Facer Sheet' },
+            { id: '5-Corrugated Sheet Board/Piece', name: '5-Corrugated Sheet Board/Piece' },
+            { id: '6-Corrugated Sheet Board/M2', name: '6-Corrugated Sheet Board/M2' },
+            { id: '7-Other Packaging Products', name: '7-Other Packaging Products' }
+        ];
+    }
+};
+
+const fetchProductGroups = async () => {
+    try {
+        console.log('Fetching product groups from API...');
+        const res = await fetch('/api/product-groups', { 
+            headers: { 
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            } 
+        });
+        
+        if (!res.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await res.json();
+        console.log('Product Groups API response:', data);
+        
+        if (Array.isArray(data)) {
+            productGroups.value = data;
+            console.log('Processed product groups:', productGroups.value);
+        } else {
+            productGroups.value = [];
+            console.error('Unexpected data format for product groups:', data);
+        }
+    } catch (e) {
+        console.error('Error fetching product groups:', e);
+        productGroups.value = [];
     }
 };
 
 onMounted(() => {
     fetchProducts();
     fetchCategories();
+    fetchProductGroups();
 });
 
 // Watch for changes in search query to filter the data
@@ -387,7 +441,7 @@ watch(searchQuery, (newQuery) => {
     if (newQuery && products.value.length > 0) {
         const foundProduct = products.value.find(product => 
             product.product_code.toLowerCase().includes(newQuery.toLowerCase()) ||
-            product.name.toLowerCase().includes(newQuery.toLowerCase())
+            product.description.toLowerCase().includes(newQuery.toLowerCase())
         );
         
         if (foundProduct) {
@@ -397,20 +451,37 @@ watch(searchQuery, (newQuery) => {
 });
 
 const onProductSelected = (product) => {
+    console.log('Product selected from modal:', product);
     selectedRow.value = product;
     searchQuery.value = product.product_code;
     showModal.value = false;
     
     // Automatically open the edit modal for the selected row
     isCreating.value = false;
-    editForm.value = { ...product };
+    editForm.value = {
+        id: product.id,
+        product_code: product.product_code,
+        description: product.description,
+        category: product.category,
+        product_group_id: product.product_group_id || '',
+        is_active: product.is_active
+    };
+    console.log('Editing product with category:', editForm.value.category);
     showEditModal.value = true;
 };
 
 const editSelectedRow = () => {
     if (selectedRow.value) {
         isCreating.value = false;
-        editForm.value = { ...selectedRow.value };
+        editForm.value = {
+            id: selectedRow.value.id,
+            product_code: selectedRow.value.product_code,
+            description: selectedRow.value.description,
+            category: selectedRow.value.category,
+            product_group_id: selectedRow.value.product_group_id,
+            is_active: selectedRow.value.is_active
+        };
+        console.log('Editing selected row:', editForm.value);
         showEditModal.value = true;
     } else {
         showNotification('Please select a product first', 'error');
@@ -422,12 +493,13 @@ const createNewProduct = () => {
     editForm.value = { 
         id: '', 
         product_code: '', 
-        name: '', 
         description: '',
-        category_id: '',
+        category: '1-Corrugated Carton Box', // Default to standard category
         product_group_id: '',
-        unit: ''
+        is_active: true
     };
+    console.log('Creating new product with categories:', categories.value);
+    console.log('Available product groups:', productGroups.value);
     showEditModal.value = true;
 };
 
@@ -436,11 +508,10 @@ const closeEditModal = () => {
     editForm.value = { 
         id: '', 
         product_code: '', 
-        name: '', 
         description: '',
-        category_id: '',
+        category: '1-Corrugated Carton Box', // Default to standard category
         product_group_id: '',
-        unit: ''
+        is_active: true
     };
     isCreating.value = false;
 };
@@ -454,6 +525,36 @@ const saveProductChanges = async () => {
         let url = isCreating.value ? '/api/products' : `/api/products/${editForm.value.id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
         
+        console.log('Saving product with URL:', url);
+        console.log('Method:', method);
+        console.log('Form data before save:', editForm.value);
+        
+        // Client-side validation
+        if (!editForm.value.description.trim()) {
+            showNotification('Description field is required', 'error');
+            saving.value = false;
+            return;
+        }
+        
+        if (!editForm.value.product_group_id) {
+            showNotification('Product Group ID is required', 'error');
+            saving.value = false;
+            return;
+        }
+        
+        // Prepare data for API request - key point: the API expects 'name' field but our form uses 'description'
+        const requestData = {
+            product_code: editForm.value.product_code,
+            name: editForm.value.description, // This mapping is critical - 'name' is required by the API
+            description: editForm.value.description,
+            category_id: editForm.value.category, // API expects category_id
+            category: editForm.value.category,
+            product_group_id: editForm.value.product_group_id,
+            is_active: editForm.value.is_active
+        };
+        
+        console.log('Sending data to API:', requestData);
+        
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -461,28 +562,22 @@ const saveProductChanges = async () => {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                product_code: editForm.value.product_code,
-                name: editForm.value.name,
-                description: editForm.value.description,
-                category_id: editForm.value.category_id,
-                product_group_id: editForm.value.product_group_id,
-                unit: editForm.value.unit
-            })
+            body: JSON.stringify(requestData)
         });
         
         const result = await response.json();
+        console.log('API response:', result);
         
-        if (response.ok) {
+        if (response.ok || result.success) {
             // Update the local data with the changes or add new item
             if (isCreating.value) {
                 showNotification('Product created successfully', 'success');
             } else {
                 if (selectedRow.value) {
-                    selectedRow.value.name = editForm.value.name;
                     selectedRow.value.description = editForm.value.description;
-                    selectedRow.value.category_id = editForm.value.category_id;
-                    selectedRow.value.unit = editForm.value.unit;
+                    selectedRow.value.category = editForm.value.category;
+                    selectedRow.value.product_group_id = editForm.value.product_group_id;
+                    selectedRow.value.is_active = editForm.value.is_active;
                 }
                 showNotification('Product updated successfully', 'success');
             }
@@ -491,7 +586,15 @@ const saveProductChanges = async () => {
             await fetchProducts();
             closeEditModal();
         } else {
-            showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
+            // Handle specific error messages from the API
+            let errorMessage = 'Unknown error';
+            
+            if (result.message) {
+                errorMessage = result.message;
+            }
+            
+            showNotification('Error: ' + errorMessage, 'error');
+            console.error('API error details:', result);
         }
     } catch (e) {
         console.error('Error saving product changes:', e);
@@ -510,7 +613,19 @@ const deleteProduct = async (productId) => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch(`/api/products/${productId}`, {
+        // Find the product in our local array to get its product_code
+        const productToDelete = products.value.find(p => p.id === productId);
+        if (!productToDelete) {
+            showNotification('Product not found in local data', 'error');
+            saving.value = false;
+            return;
+        }
+        
+        const productCode = productToDelete.product_code;
+        console.log('Deleting product with ID:', productId, 'and code:', productCode);
+        
+        // Use product_code in the API endpoint instead of id
+        const response = await fetch(`/api/products/${productCode}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -519,6 +634,7 @@ const deleteProduct = async (productId) => {
         });
         
         const result = await response.json();
+        console.log('Delete API response:', result);
         
         if (result.success) {
             // Remove the item from the local array
@@ -552,5 +668,10 @@ const showNotification = (message, type = 'success') => {
     setTimeout(() => {
         notification.value.show = false;
     }, 3000);
+};
+
+const getCategoryName = (categoryId) => {
+    const category = categories.value.find(c => c.id === categoryId);
+    return category ? category.name : 'Unknown';
 };
 </script>
