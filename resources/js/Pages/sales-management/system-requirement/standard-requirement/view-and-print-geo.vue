@@ -168,7 +168,7 @@ const currentDate = new Date().toLocaleString();
 const fetchGeos = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/geo', {
+        const response = await fetch('/api/geo', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

@@ -25,11 +25,15 @@
           </div>
         </div>
         <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
-          <table class="w-full divide-y divide-gray-200 table-fixed">
+          <table class="w-full divide-y divide-gray-200 table-fixed" id="industryDataTable">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('code')">Code</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-3/4 cursor-pointer" @click="sortTable('name')">Industry Name</th>
+                <th @click="sortTable('code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer">
+                  Code <i class="fas fa-sort ml-1"></i>
+                </th>
+                <th @click="sortTable('name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-3/4 cursor-pointer">
+                  Industry Name <i class="fas fa-sort ml-1"></i>
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -40,27 +44,35 @@
                 <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ industry.code }}</td>
                 <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ industry.name }}</td>
               </tr>
-              <tr v-if="filteredIndustries.length === 0">
+              <tr v-if="loading">
+                <td colspan="2" class="px-6 py-4 text-center">
+                  <div class="flex items-center justify-center">
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                    <span class="ml-2 text-gray-500">Loading data...</span>
+                  </div>
+                </td>
+              </tr>
+              <tr v-else-if="filteredIndustries.length === 0">
                 <td colspan="2" class="px-6 py-4 text-center text-gray-500">No industry data available.</td>
               </tr>
             </tbody>
           </table>
         </div>
         <div class="mt-2 text-xs text-gray-500 italic">
-          <p>Click on a row to select and edit its details.</p>
+          <p>Click on a row to select, double-click to edit the industry.</p>
         </div>
         <div class="mt-4 grid grid-cols-4 gap-2">
           <button type="button" @click="sortTable('code')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-            <i class="fas fa-sort mr-1"></i>By Code
+            <i class="fas fa-sort mr-1"></i>Sort by Code
           </button>
           <button type="button" @click="sortTable('name')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-            <i class="fas fa-sort mr-1"></i>By Name
+            <i class="fas fa-sort mr-1"></i>Sort by Name
           </button>
-          <button type="button" @click="selectAndClose(selectedIndustry)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
-            <i class="fas fa-edit mr-1"></i>Select
+          <button type="button" @click="selectAndClose(selectedIndustry)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px" :disabled="!selectedIndustry">
+            <i class="fas fa-check mr-1"></i>Select
           </button>
           <button type="button" @click="$emit('close')" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
-            <i class="fas fa-times mr-1"></i>Exit
+            <i class="fas fa-times mr-1"></i>Close
           </button>
         </div>
       </div>
@@ -79,35 +91,37 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'select']);
+const emit = defineEmits(['close', 'select', 'edit']);
 
 const searchQuery = ref('');
 const selectedIndustry = ref(null);
 const sortKey = ref('code');
 const sortAsc = ref(true);
+const loading = ref(false);
 
 // Compute filtered industries based on search query
 const filteredIndustries = computed(() => {
-  let industries = props.industries;
+  let industries = props.industries || [];
+  
   if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase();
+    const query = searchQuery.value.toLowerCase();
     industries = industries.filter(industry =>
-      industry.code.toLowerCase().includes(q) ||
-      industry.name.toLowerCase().includes(q)
+      (industry.code && industry.code.toLowerCase().includes(query)) ||
+      (industry.name && industry.name.toLowerCase().includes(query))
     );
   }
   
   // Apply sorting
   return [...industries].sort((a, b) => {
-    if (sortKey.value === 'code') {
-      if (a.code < b.code) return sortAsc.value ? -1 : 1;
-      if (a.code > b.code) return sortAsc.value ? 1 : -1;
-      return 0;
-    } else {
-      if (a.name < b.name) return sortAsc.value ? -1 : 1;
-      if (a.name > b.name) return sortAsc.value ? 1 : -1;
-      return 0;
-    }
+    let valueA = a[sortKey.value] || '';
+    let valueB = b[sortKey.value] || '';
+    
+    if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+    if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+    
+    if (valueA < valueB) return sortAsc.value ? -1 : 1;
+    if (valueA > valueB) return sortAsc.value ? 1 : -1;
+    return 0;
   });
 });
 
@@ -121,6 +135,19 @@ function selectAndClose(industry) {
   if (industry) {
     emit('select', industry);
     emit('close');
+  }
+}
+
+// Edit industry directly from the modal
+function editIndustry(industry) {
+  emit('edit', industry);
+  emit('close');
+}
+
+// Edit the selected industry
+function editSelected() {
+  if (selectedIndustry.value) {
+    editIndustry(selectedIndustry.value);
   }
 }
 
@@ -139,6 +166,11 @@ watch(() => props.show, (val) => {
   if (val) {
     selectedIndustry.value = null;
     searchQuery.value = '';
+    loading.value = true;
+    // Simulate loading time for better UX
+    setTimeout(() => {
+      loading.value = false;
+    }, 300);
   }
 });
 </script>

@@ -21,27 +21,7 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Industry Management</h3>
                     </div>
-                    <!-- Header with navigation buttons -->
-                    <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="showModal = true">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="editSelectedIndustry">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewIndustry">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                    
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -189,6 +169,7 @@
         :industries="industries"
         @close="showModal = false"
         @select="onIndustrySelected"
+        @edit="onIndustryEdit"
     />
 
     <!-- Edit/Create Modal -->
@@ -206,6 +187,9 @@
                 </button>
             </div>
             <div class="p-6">
+                <div v-if="!isCreating" class="mb-4 text-sm text-blue-700 bg-blue-50 p-3 rounded-lg">
+                    <p><i class="fas fa-info-circle mr-2"></i> You are editing industry <span class="font-bold">{{ editForm.code }}</span></p>
+                </div>
                 <form @submit.prevent="saveIndustryChanges" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
@@ -314,7 +298,7 @@ const notification = ref({ show: false, message: '', type: 'success' });
 const fetchIndustries = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/industry', { 
+        const res = await fetch('/api/industry', { 
             headers: { 
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -414,7 +398,7 @@ const handleSearchAndCreate = async () => {
     
     saving.value = true;
     try {
-        const res = await fetch(`/industry/search/${industryCode.value.toUpperCase()}`, {
+        const res = await fetch(`/api/industry/search/${industryCode.value.toUpperCase()}`, {
             headers: { 
                 'Accept': 'application/json'
             }
@@ -462,12 +446,38 @@ const onIndustrySelected = (industry) => {
     industryCode.value = industry.code;
     showModal.value = false;
     
+    // Open edit modal automatically
+    isCreating.value = false;
+    editForm.value = { ...industry };
+    showEditModal.value = true;
+    
     // Update search result
     searchResult.value = `
         <div class="p-3 bg-green-100 rounded-lg mt-2">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-sm text-green-800">Data found: <span class="font-semibold">${industry.code}</span> - ${industry.name}</p>
+                    <p class="text-sm text-green-800">Editing: <span class="font-semibold">${industry.code}</span> - ${industry.name}</p>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+const onIndustryEdit = (industry) => {
+    selectedIndustry.value = industry;
+    industryCode.value = industry.code;
+    
+    // Open the edit modal for the selected industry
+    isCreating.value = false;
+    editForm.value = { ...industry };
+    showEditModal.value = true;
+    
+    // Update search result
+    searchResult.value = `
+        <div class="p-3 bg-green-100 rounded-lg mt-2">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm text-green-800">Editing: <span class="font-semibold">${industry.code}</span> - ${industry.name}</p>
                 </div>
             </div>
         </div>
@@ -508,8 +518,10 @@ const saveIndustryChanges = async () => {
         }
         
         // Different API call for create vs update
-        let url = isCreating.value ? '/industry' : `/industry/${selectedIndustry.value ? selectedIndustry.value.id : ''}`;
+        let url = isCreating.value ? '/api/industry' : `/api/industry/${selectedIndustry.value ? selectedIndustry.value.id : ''}`;
         let method = isCreating.value ? 'POST' : 'PUT';
+        
+        console.log('Making API request to:', url, 'with method:', method);
         
         const formData = new FormData();
         formData.append('code', editForm.value.code.toUpperCase());
@@ -562,6 +574,7 @@ const saveIndustryChanges = async () => {
         closeEditModal();
     } catch (e) {
         console.error('Error saving industry:', e);
+        console.error('Error details:', e.message);
         showNotification(e.message || 'Error saving industry. Please try again.', 'error');
     } finally {
         saving.value = false;
@@ -589,7 +602,7 @@ const deleteIndustry = async () => {
         const formData = new FormData();
         formData.append('_method', 'DELETE');
         
-        const response = await fetch(`/industry/${selectedIndustry.value.id}`, {
+        const response = await fetch(`/api/industry/${selectedIndustry.value.id}`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -603,6 +616,9 @@ const deleteIndustry = async () => {
             throw new Error(result.message || 'Error deleting industry');
         }
         
+        // Get response data
+        const result = await response.json();
+        
         // Refresh the industry list
         await fetchIndustries();
         
@@ -611,7 +627,7 @@ const deleteIndustry = async () => {
         industryCode.value = '';
         searchResult.value = '';
         
-        showNotification('Industry deleted successfully', 'success');
+        showNotification(result.message || 'Industry deleted successfully', 'success');
         closeEditModal();
     } catch (e) {
         console.error('Error deleting industry:', e);

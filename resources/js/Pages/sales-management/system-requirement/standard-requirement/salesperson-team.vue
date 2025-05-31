@@ -2,6 +2,11 @@
     <AppLayout :header="'Salesperson Team'">
     <Head title="Salesperson Team Management" />
 
+    <!-- Hidden form with CSRF token -->
+    <form ref="csrfForm" class="hidden">
+        @csrf
+    </form>
+
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
@@ -21,27 +26,7 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Salesperson Team Management</h3>
                     </div>
-                    <!-- Header with navigation buttons -->
-                    <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="showModal = true">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="editSelectedRow">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewSalespersonTeam">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                    
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -283,6 +268,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import SalespersonTeamModal from '@/Components/salesperson-team-modal.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Get the header from props
 const props = defineProps({
@@ -318,6 +304,25 @@ const salesTeams = [
     { id: 3, code: '03', name: 'MANAGEMENT MNC' }
 ];
 
+// Reference to the CSRF form
+const csrfForm = ref(null);
+
+// Function to get fresh CSRF token from the form
+const getCsrfToken = () => {
+    // Try to get token from meta tag first
+    let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    // If token from meta tag is not available or we want a fresh token, get from the form
+    if (csrfForm.value) {
+        const tokenInput = csrfForm.value.querySelector('input[name="_token"]');
+        if (tokenInput) {
+            token = tokenInput.value;
+        }
+    }
+    
+    return token || '';
+};
+
 const fetchSalespersonTeams = async () => {
     loading.value = true;
     try {
@@ -325,7 +330,8 @@ const fetchSalespersonTeams = async () => {
             headers: { 
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
-            } 
+            },
+            credentials: 'same-origin' 
         });
         
         if (!res.ok) {
@@ -429,11 +435,13 @@ const updateTeamDetails = () => {
 const saveSalespersonTeamChanges = async () => {
     saving.value = true;
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const csrfToken = getCsrfToken();
         
         // Different API call for create vs update
         let url = isCreating.value ? '/api/salesperson-teams' : `/api/salesperson-teams/${editForm.value.id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
+        
+        console.log('Saving salesperson team with data:', editForm.value);
         
         // Prepare data for API
         const formData = {
@@ -449,10 +457,17 @@ const saveSalespersonTeamChanges = async () => {
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify(formData),
+            credentials: 'same-origin'
         });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error saving salesperson team');
+        }
         
         const result = await response.json();
         
@@ -478,7 +493,7 @@ const saveSalespersonTeamChanges = async () => {
         }
     } catch (e) {
         console.error('Error saving salesperson team changes:', e);
-        showNotification('Error saving salesperson team. Please try again.', 'error');
+        showNotification('Error saving salesperson team: ' + e.message, 'error');
     } finally {
         saving.value = false;
     }
@@ -491,17 +506,40 @@ const deleteSalespersonTeam = async (code) => {
     
     saving.value = true;
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        // Get a fresh CSRF token
+        const csrfToken = getCsrfToken();
+        if (!csrfToken) {
+            console.error('No CSRF token found - cannot proceed with deletion');
+            showNotification('Security token missing. Please refresh the page and try again.', 'error');
+            saving.value = false;
+            return;
+        }
         
-        const response = await fetch(`/api/salesperson-teams/${editForm.value.id}`, {
+        console.log('Deleting salesperson team with ID:', editForm.value.id);
+        const deleteUrl = `/api/salesperson-teams/${editForm.value.id}`;
+        console.log('Delete URL:', deleteUrl);
+        
+        const response = await fetch(deleteUrl, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            }
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
         });
         
+        console.log('Delete response status:', response.status);
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: 'Error parsing error response' }));
+            console.error('Error response data:', errorData);
+            throw new Error(errorData.message || `Error deleting salesperson team (Status: ${response.status})`);
+        }
+        
         const result = await response.json();
+        console.log('Delete operation result:', result);
         
         if (result.success) {
             // Remove the item from the local array
@@ -519,7 +557,7 @@ const deleteSalespersonTeam = async (code) => {
         }
     } catch (e) {
         console.error('Error deleting salesperson team member:', e);
-        showNotification('Error deleting salesperson team member. Please try again.', 'error');
+        showNotification('Error deleting salesperson team member: ' + e.message, 'error');
     } finally {
         saving.value = false;
     }
@@ -528,15 +566,22 @@ const deleteSalespersonTeam = async (code) => {
 const loadSeedData = async () => {
     saving.value = true;
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const csrfToken = getCsrfToken();
         
         const response = await fetch('/api/salesperson-teams/seed', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            }
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
         });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error seeding data');
+        }
         
         const result = await response.json();
         
@@ -548,7 +593,7 @@ const loadSeedData = async () => {
         }
     } catch (e) {
         console.error('Error seeding data:', e);
-        showNotification('Error seeding data. Please try again.', 'error');
+        showNotification('Error seeding data: ' + e.message, 'error');
     } finally {
         saving.value = false;
     }

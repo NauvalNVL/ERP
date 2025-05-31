@@ -27,12 +27,20 @@ class IndustryController extends Controller
             'name' => 'required|string|max:100',
         ]);
 
-        Industry::create([
+        $industry = Industry::create([
             'code' => strtoupper($request->code),
             'name' => strtoupper($request->name),
         ]);
 
-        return redirect()->route('industry.index')->with('success', 'Industry added successfully');
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Industry added successfully',
+                'data' => $industry
+            ]);
+        }
+
+        return redirect()->route('vue.industry.index')->with('success', 'Industry added successfully');
     }
 
     public function edit($id)
@@ -55,7 +63,15 @@ class IndustryController extends Controller
             'name' => strtoupper($request->name),
         ]);
 
-        return redirect()->route('industry.index')->with('success', 'Industry updated successfully');
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Industry updated successfully',
+                'data' => $industry
+            ]);
+        }
+
+        return redirect()->route('vue.industry.index')->with('success', 'Industry updated successfully');
     }
 
     public function destroy($id)
@@ -63,7 +79,14 @@ class IndustryController extends Controller
         $industry = Industry::findOrFail($id);
         $industry->delete();
         
-        return redirect()->route('industry.index')->with('success', 'Industry deleted successfully');
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Industry deleted successfully'
+            ]);
+        }
+        
+        return redirect()->route('vue.industry.index')->with('success', 'Industry deleted successfully');
     }
 
     /**

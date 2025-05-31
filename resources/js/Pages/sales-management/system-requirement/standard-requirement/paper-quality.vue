@@ -24,38 +24,37 @@
                     
                     <!-- Header with navigation buttons -->
                     <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-power-off"></i>
                         </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-arrow-right"></i>
                         </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-arrow-left"></i>
                         </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="showModal = true">
+                        <button type="button" @click="showModal = true" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-search"></i>
                         </button>
-                        <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="saveChanges">
-                            <i class="fas fa-save"></i>
+                        <button type="button" @click="editSelectedQuality" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" @click="createNewPaperQuality" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                            <i class="fas fa-plus"></i>
                         </button>
                     </div>
 
-                    <!-- Paper Quality Form -->
-                    <form @submit.prevent="saveChanges" class="grid grid-cols-1 gap-6">
-                        <!-- First Row - Code and Record Selection -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <!-- Search Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                             <div class="col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Paper Quality Code:</label>
                                 <div class="relative flex">
                                     <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                         <i class="fas fa-hashtag"></i>
                                     </span>
-                                    <input type="text" v-model="form.paper_quality" 
-                                        class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                                        :class="{'bg-gray-100': !isCreating}" 
-                                        :readonly="!isCreating">
-                                    <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors">
+                                <input type="text" v-model="searchQuery" 
+                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                         <i class="fas fa-table"></i>
                                     </button>
                                 </div>
@@ -63,88 +62,11 @@
                             
                             <div class="col-span-1">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                                <button type="button" @click="createNewPaperQuality" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors">
-                                    <i class="fas fa-plus mr-2"></i> Create New
+                            <button type="button" @click="editSelectedQuality" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                                <i class="fas fa-edit mr-2"></i> Edit Selected
                                 </button>
                             </div>
                         </div>
-
-                        <!-- Paper Quality Name -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Paper Quality Name:</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-font"></i>
-                                </span>
-                                <input type="text" v-model="form.paper_name" placeholder="Enter paper quality name" 
-                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-
-                        <!-- Weight KG/M -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Weight (KG/M):</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-weight"></i>
-                                </span>
-                                <input type="number" v-model="form.weight_kg_m" placeholder="Enter paper weight" 
-                                    min="0" step="0.0001" max="9.9999"
-                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-
-                        <!-- Commercial Code -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Commercial Code:</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-barcode"></i>
-                                </span>
-                                <input type="text" v-model="form.commercial_code" placeholder="Enter commercial code" 
-                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-
-                        <!-- Wet End Code -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Wet-End Code:</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-code"></i>
-                                </span>
-                                <input type="text" v-model="form.wet_end_code" placeholder="Enter wet-end code" 
-                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-
-                        <!-- DECC Code -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">DECC Code:</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-tag"></i>
-                                </span>
-                                <input type="text" v-model="form.decc_code" placeholder="Enter DECC code" 
-                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-
-                        <!-- Status -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
-                            <div class="grid grid-cols-2 gap-4">
-                                <label class="relative flex items-center p-3 rounded-lg border border-gray-200 hover:border-blue-500 cursor-pointer transition-colors">
-                                    <input type="radio" v-model="form.status" value="Act" class="h-4 w-4 text-blue-600 focus:ring-blue-500" @change="updateIsActive">
-                                    <span class="ml-3 text-gray-900">Active (Act)</span>
-                                </label>
-                                <label class="relative flex items-center p-3 rounded-lg border border-gray-200 hover:border-blue-500 cursor-pointer transition-colors">
-                                    <input type="radio" v-model="form.status" value="Obs" class="h-4 w-4 text-blue-600 focus:ring-blue-500" @change="updateIsActive">
-                                    <span class="ml-3 text-gray-900">Obsolete (Obs)</span>
-                                </label>
-                            </div>
-                        </div>
-                    </form>
 
                     <!-- Data Status Information -->
                     <div v-if="loading" class="mt-6 bg-yellow-100 p-3 rounded">
@@ -235,7 +157,7 @@
                             </div>
                         </Link>
 
-                        <Link href="/vue/paper-flute" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <Link href="/paper-flute" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <div class="p-2 bg-blue-500 rounded-full mr-3">
                                 <i class="fas fa-layer-group text-white text-sm"></i>
                             </div>
@@ -269,6 +191,78 @@
         @create="createNewPaperQuality"
     />
 
+    <!-- Edit Modal -->
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                <div class="flex items-center">
+                    <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                        <i class="fas fa-scroll"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Paper Quality' : 'Edit Paper Quality' }}</h3>
+                </div>
+                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form @submit.prevent="saveChanges" class="space-y-4">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Paper Quality Code:</label>
+                            <input v-model="form.paper_quality" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" 
+                                :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Paper Quality Name:</label>
+                            <input v-model="form.paper_name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Weight (KG/M):</label>
+                            <input v-model="form.weight_kg_m" type="number" step="0.0001" min="0" max="9.9999" 
+                                class="block w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Commercial Code:</label>
+                            <input v-model="form.commercial_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Wet-End Code:</label>
+                            <input v-model="form.wet_end_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">DECC Code:</label>
+                            <input v-model="form.decc_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="relative flex items-center p-3 rounded-lg border border-gray-200 hover:border-blue-500 cursor-pointer transition-colors">
+                                    <input type="radio" v-model="form.status" value="Act" class="h-4 w-4 text-blue-600 focus:ring-blue-500" @change="updateIsActive">
+                                    <span class="ml-3 text-gray-900">Active (Act)</span>
+                                </label>
+                                <label class="relative flex items-center p-3 rounded-lg border border-gray-200 hover:border-blue-500 cursor-pointer transition-colors">
+                                    <input type="radio" v-model="form.status" value="Obs" class="h-4 w-4 text-blue-600 focus:ring-blue-500" @change="updateIsActive">
+                                    <span class="ml-3 text-gray-900">Obsolete (Obs)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
+                        <button type="button" v-if="!isCreating" @click="deletePaperQuality" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        </button>
+                        <div v-else class="w-24"></div>
+                        <div class="flex space-x-3">
+                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Loading Overlay -->
     <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
         <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -300,8 +294,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import PaperQualityModal from '@/Components/paper-quality-modal.vue';
 
 // Get the header from props
@@ -316,8 +311,10 @@ const paperQualities = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
+const showEditModal = ref(false);
 const selectedQuality = ref(null);
-const isCreating = ref(true);
+const searchQuery = ref('');
+const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
 // Form state
@@ -336,21 +333,30 @@ const updateIsActive = () => {
     form.value.is_active = form.value.status === 'Act' ? 1 : 0;
 };
 
+// Watch for changes in search query to filter the data
+watch(searchQuery, (newQuery) => {
+    if (newQuery && paperQualities.value.length > 0) {
+        const foundQuality = paperQualities.value.find(quality => 
+            quality.paper_quality.toLowerCase().includes(newQuery.toLowerCase()) ||
+            quality.paper_name.toLowerCase().includes(newQuery.toLowerCase())
+        );
+        
+        if (foundQuality) {
+            selectedQuality.value = foundQuality;
+        }
+    }
+});
+
 const fetchPaperQualities = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/paper-quality', { 
-            headers: { 
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            } 
-        });
+        const response = await fetch('/api/paper-qualities');
         
-        if (!res.ok) {
+        if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         
-        const data = await res.json();
+        const data = await response.json();
         
         if (Array.isArray(data)) {
             paperQualities.value = data;
@@ -370,26 +376,27 @@ onMounted(fetchPaperQualities);
 
 const onPaperQualitySelected = (quality) => {
     selectedQuality.value = quality;
-    isCreating.value = false;
+    searchQuery.value = quality.paper_quality;
+    showModal.value = false;
     
-    // Fill the form with the selected paper quality data
-    form.value = {
-        paper_quality: quality.paper_quality,
-        paper_name: quality.paper_name,
-        weight_kg_m: quality.weight_kg_m,
-        commercial_code: quality.commercial_code || '',
-        wet_end_code: quality.wet_end_code || '',
-        decc_code: quality.decc_code || '',
-        status: quality.status || 'Act',
-        is_active: quality.is_active
-    };
+    // Automatically open the edit modal for the selected row
+    isCreating.value = false;
+    form.value = { ...quality };
+    showEditModal.value = true;
+};
+
+const editSelectedQuality = () => {
+    if (selectedQuality.value) {
+        isCreating.value = false;
+        form.value = { ...selectedQuality.value };
+        showEditModal.value = true;
+    } else {
+        showNotification('Please select a paper quality first', 'error');
+    }
 };
 
 const createNewPaperQuality = () => {
-    selectedQuality.value = null;
     isCreating.value = true;
-    
-    // Reset form to default values
     form.value = {
         paper_quality: '',
         paper_name: '',
@@ -400,6 +407,11 @@ const createNewPaperQuality = () => {
         status: 'Act',
         is_active: 1
     };
+    showEditModal.value = true;
+};
+
+const closeEditModal = () => {
+    showEditModal.value = false;
 };
 
 const saveChanges = async () => {
@@ -416,10 +428,10 @@ const saveChanges = async () => {
 
     saving.value = true;
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
         // Different API call for create vs update
-        let url = isCreating.value ? '/paper-quality' : `/paper-quality/${selectedQuality.value.id}`;
+        let url = isCreating.value ? '/api/paper-qualities' : `/api/paper-qualities/${selectedQuality.value.id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
         
         const response = await fetch(url, {
@@ -449,11 +461,14 @@ const saveChanges = async () => {
             const newQuality = paperQualities.value.find(q => q.paper_quality === form.value.paper_quality);
             if (newQuality) {
                 selectedQuality.value = newQuality;
-                isCreating.value = false;
+                searchQuery.value = newQuality.paper_quality;
             }
         } else {
             showNotification('Paper quality updated successfully', 'success');
         }
+        
+        // Close the edit modal
+        closeEditModal();
     } catch (e) {
         console.error('Error saving paper quality:', e);
         showNotification('Error: ' + e.message, 'error');
@@ -474,9 +489,9 @@ const deletePaperQuality = async () => {
     
     saving.value = true;
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
         
-        const response = await fetch(`/paper-quality/${selectedQuality.value.id}`, {
+        const response = await fetch(`/api/paper-qualities/${selectedQuality.value.id}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -494,7 +509,8 @@ const deletePaperQuality = async () => {
         
         // Reset selection and form
         selectedQuality.value = null;
-        createNewPaperQuality();
+        searchQuery.value = '';
+        closeEditModal();
         
         showNotification('Paper quality deleted successfully', 'success');
     } catch (e) {

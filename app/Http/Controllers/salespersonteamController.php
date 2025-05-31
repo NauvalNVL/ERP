@@ -204,12 +204,26 @@ class SalespersonTeamController extends Controller
     public function destroy($id)
     {
         try {
-            // Menghapus data salesperson
-            DB::table('salesperson')->where('id', $id)->delete();
+            // Delete salesperson team record from the correct table
+            $deleted = DB::table('salesperson_teams')->where('id', $id)->delete();
             
-            return redirect()->route('salesperson-team.index')->with('success', 'Salesperson berhasil dihapus dari tim');
+            if (!$deleted) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Salesperson team not found or could not be deleted'
+                ], 404);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Salesperson team deleted successfully'
+            ]);
         } catch (\Exception $e) {
-            return redirect()->route('salesperson-team.index')->with('error', 'Error: ' . $e->getMessage());
+            Log::error('Error deleting salesperson team: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting salesperson team: ' . $e->getMessage()
+            ], 500);
         }
     }
     

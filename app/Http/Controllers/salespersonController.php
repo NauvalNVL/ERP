@@ -55,46 +55,49 @@ class SalespersonController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'code' => 'required|string|max:10|unique:salespersons',
-            'name' => 'required|string|max:100',
-            'status' => 'required|in:active,inactive',
-            'email' => 'nullable|email|max:100',
-            'phone' => 'nullable|string|max:20',
-            'mobile' => 'nullable|string|max:20',
-            'notes' => 'nullable|string|max:500',
-            'sales_team_id' => 'nullable|exists:sales_teams,id',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         try {
+            $validator = Validator::make($request->all(), [
+                'code' => 'required|string|max:10|unique:salespersons,code',
+                'name' => 'required|string|max:100',
+                'sales_team_id' => 'required|exists:sales_team,id',
+                'position' => 'required|string|max:50',
+                'user_id' => 'nullable|string|max:20',
+                'is_active' => 'required|boolean'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
             DB::beginTransaction();
 
-            Salesperson::create([
+            $salesperson = Salesperson::create([
                 'code' => $request->code,
                 'name' => $request->name,
-                'status' => $request->status,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'mobile' => $request->mobile,
-                'notes' => $request->notes,
                 'sales_team_id' => $request->sales_team_id,
+                'position' => $request->position,
+                'user_id' => $request->user_id,
+                'is_active' => $request->is_active
             ]);
 
             DB::commit();
 
-            return redirect()->route('salesperson.index')
-                ->with('success', 'Salesperson created successfully');
+            return response()->json([
+                'success' => true,
+                'message' => 'Salesperson created successfully',
+                'data' => $salesperson
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()
-                ->with('error', 'Error creating salesperson: ' . $e->getMessage())
-                ->withInput();
+            Log::error('Error creating salesperson: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating salesperson: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -150,17 +153,23 @@ class SalespersonController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy($code)
     {
         try {
-            $salesperson = Salesperson::findOrFail($id);
+            $salesperson = Salesperson::where('code', $code)->firstOrFail();
             $salesperson->delete();
 
-            return redirect()->route('salesperson.index')
-                ->with('success', 'Salesperson deleted successfully');
+            return response()->json([
+                'success' => true,
+                'message' => 'Salesperson deleted successfully'
+            ]);
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Error deleting salesperson: ' . $e->getMessage());
+            Log::error('Error deleting salesperson: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting salesperson: ' . $e->getMessage()
+            ], 500);
         }
     }
 

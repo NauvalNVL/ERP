@@ -192,4 +192,51 @@ class ColorGroupController extends Controller
             return response()->json(['error' => 'Failed to load color groups data for printing'], 500);
         }
     }
+
+    /**
+     * Seed the database with sample color group data.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function seed()
+    {
+        try {
+            // Sample color group data
+            $sampleData = [
+                ['cg' => 'R', 'cg_name' => 'Red', 'cg_type' => 'Standard'],
+                ['cg' => 'B', 'cg_name' => 'Blue', 'cg_type' => 'Standard'],
+                ['cg' => 'G', 'cg_name' => 'Green', 'cg_type' => 'Standard'],
+                ['cg' => 'Y', 'cg_name' => 'Yellow', 'cg_type' => 'Standard'],
+                ['cg' => 'BK', 'cg_name' => 'Black', 'cg_type' => 'Standard'],
+                ['cg' => 'W', 'cg_name' => 'White', 'cg_type' => 'Standard'],
+                ['cg' => 'GD', 'cg_name' => 'Gold', 'cg_type' => 'Metallic'],
+                ['cg' => 'SL', 'cg_name' => 'Silver', 'cg_type' => 'Metallic'],
+                ['cg' => 'PM', 'cg_name' => 'Premium Mix', 'cg_type' => 'Custom'],
+                ['cg' => 'PNT', 'cg_name' => 'Pantone', 'cg_type' => 'Pantone'],
+            ];
+
+            $createdCount = 0;
+
+            foreach ($sampleData as $data) {
+                // Skip if color group already exists
+                if (ColorGroup::where('cg', $data['cg'])->exists()) {
+                    continue;
+                }
+
+                ColorGroup::create($data);
+                $createdCount++;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully seeded $createdCount color groups"
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorGroupController@seed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to seed color groups data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 } 

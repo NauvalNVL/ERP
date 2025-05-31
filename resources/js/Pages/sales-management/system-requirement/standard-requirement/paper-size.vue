@@ -24,143 +24,65 @@
                     
                     <!-- Header with navigation buttons -->
                     <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-power-off"></i>
                         </button>
-                        <button type="button" @click="fetchPaperSizes" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-sync"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-arrow-right"></i>
                         </button>
-                        <button type="button" @click="showModal = true" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <button type="button" @click="showModal = true" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-search"></i>
                         </button>
-                        <button type="button" @click="savePaperSize" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-save"></i>
+                        <button type="button" @click="editSelectedSize" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                            <i class="fas fa-edit"></i>
                         </button>
-                        <button type="button" v-if="!isCreating" @click="deletePaperSize" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-trash-alt"></i>
+                        <button type="button" @click="createNewPaperSize" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                            <i class="fas fa-plus"></i>
                         </button>
                     </div>
 
-                    <!-- Paper Size Form -->
-                    <form @submit.prevent="savePaperSize" class="grid grid-cols-1 gap-6">
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
-                            <!-- Size ID Field -->
+                    <!-- Search Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                             <div class="col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Size ID:</label>
-                                <div class="relative flex">
-                                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                        <i class="fas fa-hashtag"></i>
-                                    </span>
-                                    <input 
-                                        type="text" 
-                                        v-model="sizeDisplay" 
-                                        class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-gray-100" 
-                                        readonly>
-                                    <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors">
-                                        <i class="fas fa-table"></i>
-                                    </button>
-                                </div>
-                                <span class="text-xs text-gray-700 mt-1 block">Unique identifier for paper size</span>
-                            </div>
-
-                            <!-- Size in MM Field -->
-                            <div class="col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Paper Size (MM):</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Paper Size Code:</label>
                                 <div class="relative flex">
                                     <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                         <i class="fas fa-ruler-combined"></i>
                                     </span>
-                                    <input 
-                                        type="number" 
-                                        v-model="form.size" 
-                                        step="0.01" 
-                                        min="0.01"
-                                        @input="updateInches"
-                                        class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-right">
-                                </div>
-                                <span class="text-xs text-gray-700 mt-1 block">Size in Millimeters</span>
-                            </div>
-                            
-                            <!-- Action Button -->
-                            <div class="col-span-1">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
-                                <button type="button" @click="createNewPaperSize" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors">
-                                    <i class="fas fa-plus mr-2"></i> New
+                                <input type="text" v-model="searchQuery" 
+                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                    <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Size in Inches -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Size in Inches:</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-ruler"></i>
-                                </span>
-                                <input 
-                                    type="number" 
-                                    v-model="form.inches" 
-                                    step="0.01" 
-                                    min="0.01"
-                                    @input="updateMillimeters"
-                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-right">
-                            </div>
-                            <span class="text-xs text-gray-700 mt-1 block">Equivalent size in Inches</span>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
+                            <button type="button" @click="editSelectedSize" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                                <i class="fas fa-edit mr-2"></i> Edit Selected
+                            </button>
                         </div>
-
-                        <!-- Description -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-font"></i>
-                                </span>
-                                <input 
-                                    type="text" 
-                                    v-model="form.description" 
-                                    placeholder="e.g., A4 Width, Letter Height" 
-                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                            <span class="text-xs text-gray-700 mt-1 block">Optional description of this paper size</span>
-                        </div>
-
-                        <!-- Conversion Information -->
-                        <div class="p-4 mt-2 bg-blue-50 rounded-lg">
-                            <div class="flex items-center mb-2">
-                                <div class="p-2 bg-blue-500 rounded-lg mr-3">
-                                    <i class="fas fa-calculator text-white text-sm"></i>
-                                </div>
-                                <h4 class="text-md font-semibold text-blue-900">Automatic Conversion</h4>
-                            </div>
-                            <p class="text-xs text-blue-800 ml-10">
-                                1 inch = 25.4 millimeters <br>
-                                {{ form.size ? form.size : '0.00' }} mm = {{ form.inches ? form.inches : '0.00' }} inches
-                            </p>
                         </div>
 
                         <!-- Data Status Information -->
-                        <div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
+                    <div v-if="loading" class="mt-6 bg-yellow-100 p-3 rounded">
                             <div class="flex items-center">
-                                <div class="mr-3">
-                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
-                                </div>
+                            <div class="mr-3 animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
                                 <p class="text-sm font-medium text-yellow-800">Loading paper size data...</p>
                             </div>
                         </div>
-                        <div v-else-if="paperSizes.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
+                    <div v-else-if="paperSizes.length === 0" class="mt-6 bg-yellow-100 p-3 rounded">
                             <p class="text-sm font-medium text-yellow-800">No paper size data available.</p>
                             <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
                             <div class="mt-2 flex items-center space-x-3">
                                 <button @click="fetchPaperSizes" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Reload Data</button>
                             </div>
                         </div>
-                        <div v-else class="mt-4 bg-green-100 p-3 rounded">
+                    <div v-else class="mt-6 bg-green-100 p-3 rounded">
                             <p class="text-sm font-medium text-green-800">Data available: {{ paperSizes.length }} paper sizes found.</p>
                             <p v-if="selectedSize" class="text-xs text-green-700 mt-1">
                                 Selected: <span class="font-semibold">{{ sizeDisplay }}</span> - {{ selectedSize.description || 'No description' }}
@@ -180,7 +102,6 @@
                                 </span>
                             </div>
                         </div>
-                    </form>
                 </div>
             </div>
 
@@ -199,32 +120,31 @@
                         <div class="p-4 bg-teal-50 rounded-lg">
                             <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
                             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                                <li>All paper sizes are stored in millimeters</li>
-                                <li>Automatic conversion between mm and inches</li>
-                                <li>Use the search button to browse all sizes</li>
-                                <li>Click New to create a new paper size</li>
-                                <li>Adding descriptions helps identify sizes</li>
+                                <li>Paper size values must be unique</li>
+                                <li>Size can be entered in MM or inches</li>
+                                <li>Values are automatically converted</li>
+                                <li>Add clear descriptions for commonly used sizes</li>
                             </ul>
                         </div>
 
                         <div class="p-4 bg-blue-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Standard Sizes</h4>
+                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common Sizes</h4>
                             <div class="grid grid-cols-2 gap-2 text-sm">
                                 <div class="flex items-center">
                                     <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">A4</span>
-                                    <span>210 x 297 mm</span>
+                                    <span>210 × 297 mm</span>
                                 </div>
                                 <div class="flex items-center">
                                     <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">A3</span>
-                                    <span>297 x 420 mm</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">A5</span>
-                                    <span>148 x 210 mm</span>
+                                    <span>297 × 420 mm</span>
                                 </div>
                                 <div class="flex items-center">
                                     <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">LTR</span>
-                                    <span>216 x 279 mm</span>
+                                    <span>216 × 279 mm</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">B5</span>
+                                    <span>176 × 250 mm</span>
                                 </div>
                             </div>
                         </div>
@@ -251,7 +171,7 @@
                             </div>
                         </Link>
 
-                        <Link href="/vue/paper-quality" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <Link href="/paper-quality" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <div class="p-2 bg-blue-500 rounded-full mr-3">
                                 <i class="fas fa-scroll text-white text-sm"></i>
                             </div>
@@ -261,7 +181,7 @@
                             </div>
                         </Link>
 
-                        <Link href="/vue/paper-flute" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <Link href="/paper-flute" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                             <div class="p-2 bg-green-500 rounded-full mr-3">
                                 <i class="fas fa-layer-group text-white text-sm"></i>
                             </div>
@@ -279,10 +199,89 @@
     <!-- Modal for Paper Size Table -->
     <PaperSizeModal
         :show="showModal"
-        :paperSizes="paperSizes"
+        :paper-sizes="paperSizes"
         @close="showModal = false"
         @select="onPaperSizeSelected"
     />
+
+    <!-- Edit Modal -->
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                <div class="flex items-center">
+                    <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                        <i class="fas fa-ruler-combined"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Paper Size' : 'Edit Paper Size' }}</h3>
+                </div>
+                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form @submit.prevent="savePaperSize" class="space-y-4">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div v-if="!isCreating">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Size ID:</label>
+                            <input type="text" v-model="sizeDisplay" class="block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Size in Millimeters (MM):</label>
+                            <input 
+                                type="number" 
+                                v-model="form.size" 
+                                step="0.01" 
+                                min="0.01"
+                                @input="updateInches"
+                                class="block w-full rounded-md border-gray-300 shadow-sm"
+                                required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Size in Inches:</label>
+                            <input 
+                                type="number" 
+                                v-model="form.inches" 
+                                step="0.01" 
+                                min="0.01"
+                                @input="updateMillimeters"
+                                class="block w-full rounded-md border-gray-300 shadow-sm"
+                                required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
+                            <input 
+                                type="text" 
+                                v-model="form.description" 
+                                placeholder="e.g., A4 Width, Letter Height" 
+                                class="block w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div class="p-4 mt-2 bg-blue-50 rounded-lg">
+                            <div class="flex items-center mb-2">
+                                <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                                    <i class="fas fa-calculator text-white text-sm"></i>
+                                </div>
+                                <h4 class="text-md font-semibold text-blue-900">Automatic Conversion</h4>
+                            </div>
+                            <p class="text-xs text-blue-800 ml-10">
+                                1 inch = 25.4 millimeters <br>
+                                {{ form.size ? form.size : '0.00' }} mm = {{ form.inches ? form.inches : '0.00' }} inches
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
+                        <button type="button" v-if="!isCreating" @click="deletePaperSize" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                        </button>
+                        <div v-else class="w-24"></div>
+                        <div class="flex space-x-3">
+                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Loading Overlay -->
     <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
@@ -316,10 +315,11 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
-import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import PaperSizeModal from '@/Components/paper-size-modal.vue';
 
-// Get the header from props
+// Get any props passed from the controller
 const props = defineProps({
     header: {
         type: String,
@@ -335,8 +335,10 @@ const paperSizes = ref(props.initialPaperSizes || []);
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
+const showEditModal = ref(false);
 const selectedSize = ref(null);
-const isCreating = ref(true);
+const searchQuery = ref('');
+const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
 // Form state
@@ -345,71 +347,57 @@ const form = ref({
     size: '',
     inches: '',
     description: '',
-    unit: 'Millimeter'
+    unit: 'mm'
 });
 
-// Computed property for Size ID display
+// Display for size ID
 const sizeDisplay = computed(() => {
-    if (selectedSize.value && selectedSize.value.id) {
-        return 'PS' + String(selectedSize.value.id).padStart(3, '0');
-    }
-    return 'New';
+    if (!selectedSize.value) return '';
+    return `PS${String(selectedSize.value.id).padStart(3, '0')}`;
 });
 
-// Select a paper size directly from the chips
-const selectSize = (size) => {
-    selectedSize.value = size;
-    isCreating.value = false;
-    
-    form.value = {
-        id: size.id,
-        size: size.size,
-        inches: size.inches || (size.size / 25.4).toFixed(2),
-        description: size.description || '',
-        unit: size.unit || 'Millimeter'
-    };
+// Convert MM to Inches (1 inch = 25.4 mm)
+const updateInches = () => {
+    if (form.value.size) {
+        form.value.inches = (parseFloat(form.value.size) / 25.4).toFixed(2);
+    }
 };
 
-// Fetch paper sizes from API
+// Convert Inches to MM
+const updateMillimeters = () => {
+    if (form.value.inches) {
+        form.value.size = (parseFloat(form.value.inches) * 25.4).toFixed(2);
+    }
+};
+
+// Watch for changes in search query to filter the data
+watch(searchQuery, (newQuery) => {
+    if (newQuery && paperSizes.value.length > 0) {
+        const foundSize = paperSizes.value.find(size => 
+            String(size.id).includes(newQuery) ||
+            String(size.size).includes(newQuery) ||
+            (size.description && size.description.toLowerCase().includes(newQuery.toLowerCase()))
+        );
+        
+        if (foundSize) {
+            selectSize(foundSize);
+        }
+    }
+});
+
 const fetchPaperSizes = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/paper-size', { 
-            headers: { 
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            } 
-        });
+        const response = await fetch('/api/paper-sizes');
         
-        if (!res.ok) {
+        if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         
-        const data = await res.json();
+        const data = await response.json();
         
         if (Array.isArray(data)) {
-            paperSizes.value = data.map(size => ({
-                id: size.id,
-                size: size.size,
-                inches: size.inches || (size.size / 25.4).toFixed(2),
-                description: size.description || '',
-                unit: size.unit || 'Millimeter'
-            }));
-            
-            console.log('Loaded paper sizes:', paperSizes.value);
-            
-            if (paperSizes.value.length > 0 && !selectedSize.value) {
-                // Auto-select the first paper size if none is selected
-                selectedSize.value = paperSizes.value[0];
-                form.value = {
-                    id: selectedSize.value.id,
-                    size: selectedSize.value.size,
-                    inches: selectedSize.value.inches,
-                    description: selectedSize.value.description || '',
-                    unit: selectedSize.value.unit || 'Millimeter'
-                };
-                isCreating.value = false;
-            }
+            paperSizes.value = data;
         } else {
             paperSizes.value = [];
             console.error('Unexpected data format:', data);
@@ -417,97 +405,80 @@ const fetchPaperSizes = async () => {
     } catch (e) {
         console.error('Error fetching paper sizes:', e);
         paperSizes.value = [];
-        showNotification('Failed to load paper sizes: ' + e.message, 'error');
     } finally {
         loading.value = false;
     }
 };
 
 onMounted(() => {
-    // Jika data sudah ada dari props, gunakan itu
-    if (props.initialPaperSizes && props.initialPaperSizes.length > 0) {
-        console.log('Using initial paper sizes from props:', props.initialPaperSizes);
-        
-        // Jika belum ada yang dipilih, pilih yang pertama secara otomatis
-        if (!selectedSize.value && paperSizes.value.length > 0) {
-            selectedSize.value = paperSizes.value[0];
-            form.value = {
-                id: selectedSize.value.id,
-                size: selectedSize.value.size,
-                inches: selectedSize.value.inches,
-                description: selectedSize.value.description || '',
-                unit: selectedSize.value.unit || 'Millimeter'
-            };
-            isCreating.value = false;
-        }
-    } else {
-        // Jika tidak ada data dari props, fetch dari API
+    if (paperSizes.value.length === 0) {
         fetchPaperSizes();
     }
 });
 
-// Update inches when mm changes
-const updateInches = () => {
-    if (form.value.size && !isNaN(form.value.size)) {
-        form.value.inches = (parseFloat(form.value.size) / 25.4).toFixed(2);
-    } else {
-        form.value.inches = '';
-    }
-};
-
-// Update mm when inches changes
-const updateMillimeters = () => {
-    if (form.value.inches && !isNaN(form.value.inches)) {
-        form.value.size = (parseFloat(form.value.inches) * 25.4).toFixed(2);
-    } else {
-        form.value.size = '';
-    }
-};
-
-// Handle paper size selection from modal
 const onPaperSizeSelected = (size) => {
-    selectedSize.value = size;
-    isCreating.value = false;
+    selectSize(size);
+    showModal.value = false;
     
-    // Fill the form with the selected paper size data
-    form.value = {
-        id: size.id,
-        size: size.size,
-        inches: size.inches,
-        description: size.description || '',
-        unit: 'Millimeter'
-    };
+    // Automatically open the edit modal for the selected row
+    editSelectedSize();
 };
 
-// Create new paper size
+const selectSize = (size) => {
+    selectedSize.value = size;
+    searchQuery.value = size.size;
+};
+
+const editSelectedSize = () => {
+    if (selectedSize.value) {
+    isCreating.value = false;
+    form.value = {
+            id: selectedSize.value.id,
+            size: selectedSize.value.size,
+            inches: selectedSize.value.inches,
+            description: selectedSize.value.description || '',
+            unit: selectedSize.value.unit || 'mm'
+    };
+        showEditModal.value = true;
+    } else {
+        showNotification('Please select a paper size first', 'error');
+    }
+};
+
 const createNewPaperSize = () => {
-    selectedSize.value = null;
     isCreating.value = true;
-    
-    // Reset form to default values
     form.value = {
         id: null,
         size: '',
         inches: '',
         description: '',
-        unit: 'Millimeter'
+        unit: 'mm'
     };
+    showEditModal.value = true;
 };
 
-// Save paper size changes
+const closeEditModal = () => {
+    showEditModal.value = false;
+};
+
 const savePaperSize = async () => {
     // Validate form
-    if (!form.value.size || parseFloat(form.value.size) <= 0) {
-        showNotification('Please enter a valid size', 'error');
+    if (!form.value.size) {
+        showNotification('Paper size in millimeters is required', 'error');
+        return;
+    }
+
+    if (!form.value.inches) {
+        showNotification('Paper size in inches is required', 'error');
         return;
     }
 
     saving.value = true;
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
         // Different API call for create vs update
-        let url = isCreating.value ? '/paper-size' : `/paper-size/${form.value.id}`;
+        let url = isCreating.value ? '/api/paper-sizes' : `/api/paper-sizes/${form.value.id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
         
         const response = await fetch(url, {
@@ -517,10 +488,7 @@ const savePaperSize = async () => {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                size: form.value.size,
-                description: form.value.description
-            })
+            body: JSON.stringify(form.value)
         });
         
         if (!response.ok) {
@@ -537,15 +505,18 @@ const savePaperSize = async () => {
         if (isCreating.value) {
             showNotification('Paper size created successfully', 'success');
             // Find and select the newly created size
-            const newPaperSize = paperSizes.value.find(s => parseFloat(s.size) === parseFloat(form.value.size));
-            if (newPaperSize) {
-                selectedSize.value = newPaperSize;
-                isCreating.value = false;
-                form.value.id = newPaperSize.id;
+            if (result.id) {
+                const newSize = paperSizes.value.find(s => s.id === result.id);
+                if (newSize) {
+                    selectSize(newSize);
+                }
             }
         } else {
             showNotification('Paper size updated successfully', 'success');
         }
+        
+        // Close the edit modal
+        closeEditModal();
     } catch (e) {
         console.error('Error saving paper size:', e);
         showNotification('Error: ' + e.message, 'error');
@@ -554,22 +525,21 @@ const savePaperSize = async () => {
     }
 };
 
-// Delete paper size
 const deletePaperSize = async () => {
     if (!selectedSize.value) {
         showNotification('No paper size selected', 'error');
         return;
     }
     
-    if (!confirm(`Are you sure you want to delete paper size "${selectedSize.value.size}mm"?`)) {
+    if (!confirm(`Are you sure you want to delete paper size "${sizeDisplay.value}"?`)) {
         return;
     }
     
     saving.value = true;
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
         
-        const response = await fetch(`/paper-size/${selectedSize.value.id}`, {
+        const response = await fetch(`/api/paper-sizes/${selectedSize.value.id}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -587,7 +557,8 @@ const deletePaperSize = async () => {
         
         // Reset selection and form
         selectedSize.value = null;
-        createNewPaperSize();
+        searchQuery.value = '';
+        closeEditModal();
         
         showNotification('Paper size deleted successfully', 'success');
     } catch (e) {
@@ -598,7 +569,6 @@ const deletePaperSize = async () => {
     }
 };
 
-// Show notification
 const showNotification = (message, type = 'success') => {
     notification.value = {
         show: true,

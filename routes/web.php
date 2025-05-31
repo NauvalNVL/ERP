@@ -184,6 +184,19 @@ Route::prefix('api')->group(function () {
     Route::post('/users/{user}/permissions', [UserController::class, 'updateAccess']);
     Route::post('/users/update-password', [UserController::class, 'updatePassword']);
     
+    // Salesperson API routes
+    Route::get('/salesperson', [SalespersonController::class, 'apiIndex']);
+    Route::post('/salesperson/store', [SalespersonController::class, 'store']);
+    Route::post('/salesperson/update/{code}', [SalespersonController::class, 'update']);
+    Route::post('/salesperson/delete/{code}', [SalespersonController::class, 'destroy']);
+    Route::post('/salesperson/seed', [SalespersonController::class, 'seed']);
+    
+    // Paper Quality API routes
+    Route::get('/paper-qualities', [PaperQualityController::class, 'apiIndex']);
+    Route::post('/paper-qualities', [PaperQualityController::class, 'store']);
+    Route::put('/paper-qualities/{id}', [PaperQualityController::class, 'update']);
+    Route::delete('/paper-qualities/{id}', [PaperQualityController::class, 'destroy']);
+    
     Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
     Route::get('/products', [ProductController::class, 'getProductsJson']);
     Route::post('/products', [ProductController::class, 'apiStore']);
@@ -195,18 +208,23 @@ Route::prefix('api')->group(function () {
     Route::put('/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
     Route::delete('/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
     
-    Route::get('/paper-qualities', [PaperQualityController::class, 'apiIndex']);
     Route::get('/paper-sizes', [PaperSizeController::class, 'apiIndex']);
     Route::get('/product-groups', [ProductGroupController::class, 'index']);
     Route::get('/sales-teams', [SalesTeamController::class, 'apiIndex']);
-    Route::get('/salespersons', [SalespersonController::class, 'apiIndex']);
     Route::get('/scoring-tools', [ScoringToolController::class, 'apiIndex']);
     
     // API Routes for Vue Components
     Route::get('/colors', [ColorController::class, 'index']);
     Route::get('/geo', [GeoController::class, 'index']);
+    Route::post('/geo', [GeoController::class, 'store']);
+    Route::put('/geo/{code}', [GeoController::class, 'update']);
+    Route::delete('/geo/{code}', [GeoController::class, 'destroy']);
     Route::get('/color-groups', [ColorGroupController::class, 'index']);
     Route::get('/industry', [IndustryController::class, 'index']);
+    Route::post('/industry', [IndustryController::class, 'store']);
+    Route::put('/industry/{id}', [IndustryController::class, 'update']);
+    Route::delete('/industry/{id}', [IndustryController::class, 'destroy']);
+    Route::get('/industry/search/{code}', [IndustryController::class, 'search']);
     Route::get('/paper-flutes', [PaperFluteController::class, 'index']);
     
     // Product Group API routes
@@ -259,4 +277,11 @@ Route::prefix('api')->group(function () {
     // Foreign Currency API endpoints
     Route::get('/foreign-currencies', [ForeignCurrencyController::class, 'apiIndex']);
     Route::get('/foreign-currencies/{id}', [ForeignCurrencyController::class, 'apiShow']);
+
+    // Color Group API routes
+    Route::get('/color-groups', [ColorGroupController::class, 'index']);
+    Route::post('/color-groups', [ColorGroupController::class, 'store']);
+    Route::put('/color-groups/{id}', [ColorGroupController::class, 'update']);
+    Route::delete('/color-groups/{id}', [ColorGroupController::class, 'destroy']);
+    Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
 });

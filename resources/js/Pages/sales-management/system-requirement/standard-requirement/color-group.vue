@@ -1,17 +1,23 @@
 <template>
-    <AppLayout :header="'Color Group Management'">
+    <AppLayout :header="'Color Group'">
+    <Head title="Color Group Management" />
+
+    <!-- Hidden form with CSRF token -->
+    <form ref="csrfForm" class="hidden">
+        @csrf
+    </form>
 
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
             <i class="fas fa-layer-group mr-3"></i> Define Color Group
         </h2>
-        <p class="text-cyan-100">Define color groups for specific product categories</p>
+        <p class="text-cyan-100">Define color groups for production and inventory management</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Column -->
+            <!-- Left Column - Main Content -->
             <div class="lg:col-span-2">
                 <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
                     <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
@@ -20,27 +26,26 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Color Group Management</h3>
                     </div>
+                    
                     <!-- Header with navigation buttons -->
                     <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-power-off"></i>
                         </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-arrow-right"></i>
                         </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-arrow-left"></i>
                         </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="showModal = true">
+                        <button type="button" @click="showModal = true" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-search"></i>
                         </button>
-                        <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="editSelectedRow">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewColorGroup">
-                            <i class="fas fa-plus"></i>
+                        <button type="button" @click="saveColorGroup" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                            <i class="fas fa-save"></i>
                         </button>
                     </div>
+
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -49,25 +54,26 @@
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-layer-group"></i>
                                 </span>
-                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md">
+                                <input type="text" v-model="searchQuery" 
+                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
+                        
                         <div class="col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                            <button type="button" @click="editSelectedRow" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
-                                <i class="fas fa-edit mr-2"></i> Edit Selected
+                            <button type="button" @click="editSelectedGroup" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                                <i class="fas fa-list-ul mr-2"></i> Select Record
                             </button>
                         </div>
                     </div>
+
                     <!-- Data Status Information -->
                     <div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
                         <div class="flex items-center">
-                            <div class="mr-3">
-                                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
-                            </div>
+                            <div class="mr-3 animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
                             <p class="text-sm font-medium text-yellow-800">Loading color group data...</p>
                         </div>
                     </div>
@@ -75,17 +81,19 @@
                         <p class="text-sm font-medium text-yellow-800">No color group data available.</p>
                         <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
                         <div class="mt-2 flex items-center space-x-3">
-                            <button @click="fetchColorGroups" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Reload Data</button>
+                            <button @click="loadSeedData" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Run Color Group Seeder</button>
+                            <button @click="fetchColorGroups" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded">Reload Data</button>
                         </div>
                     </div>
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
                         <p class="text-sm font-medium text-green-800">Data available: {{ colorGroups.length }} color groups found.</p>
-                        <p v-if="selectedRow" class="text-xs text-green-700 mt-1">
-                            Selected: <span class="font-semibold">{{ selectedRow.cg }}</span> - {{ selectedRow.cg_name }} ({{ selectedRow.cg_type }})
+                        <p v-if="selectedGroup" class="text-xs text-green-700 mt-1">
+                            Selected: <span class="font-semibold">{{ selectedGroup.cg }}</span> - {{ selectedGroup.cg_name }} ({{ selectedGroup.cg_type }})
                         </p>
                     </div>
                 </div>
             </div>
+
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
                 <!-- Color Group Info Card -->
@@ -166,7 +174,7 @@
                             </div>
                         </a>
 
-                        <Link href="/vue/color-group/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <Link href="/color-group/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                             <div class="p-2 bg-green-500 rounded-full mr-3">
                                 <i class="fas fa-print text-white text-sm"></i>
                             </div>
@@ -181,42 +189,131 @@
         </div>
     </div>
 
-    <!-- Modal Table -->
-    <ColorGroupModal
-        :show="showModal"
-        :colorGroups="colorGroups"
-        @close="showModal = false"
-        @select="onColorGroupSelected"
-    />
-
-    <!-- Edit Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
+    <!-- Modal for Color Group Table -->
+    <div v-if="showModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 max-w-5xl mx-auto transform transition-transform duration-300" style="max-height: 80vh;">
+            <!-- Modal Header - Title Bar -->
             <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                         <i class="fas fa-layer-group"></i>
                     </div>
-                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Color Group' : 'Edit Color Group' }}</h3>
+                    <h3 class="text-xl font-semibold">Color Group Table</h3>
                 </div>
-                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                <button type="button" @click="showModal = false" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
+
+            <!-- Table Content -->
+            <div class="p-5 overflow-auto" style="max-height: calc(80vh - 130px);">
+                <div class="mb-4">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" v-model="modalSearchQuery" placeholder="Search color groups..."
+                            class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200" id="colorGroupDataTable">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('cg')">CG#</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('cg_name')">CG Name</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('cg_type')">CG Type</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200 text-xs">
+                            <tr v-for="group in filteredColorGroups" :key="group.cg" 
+                                :class="['hover:bg-blue-50 cursor-pointer', selectedGroup && selectedGroup.cg === group.cg ? 'bg-blue-100' : '']"
+                                @click="selectGroup(group)"
+                                @dblclick="onColorGroupSelected(group)">
+                                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ group.cg }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ group.cg_name }}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ group.cg_type }}</td>
+                            </tr>
+                            <tr v-if="filteredColorGroups.length === 0">
+                                <td colspan="3" class="px-4 py-4 text-center text-gray-500">No color group data available.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Bottom Buttons -->
+                <div class="mt-4 grid grid-cols-5 gap-2">
+                    <button type="button" @click="sortTable('cg')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                        <i class="fas fa-sort mr-1"></i>By CG#
+                    </button>
+                    <button type="button" @click="sortTable('cg_name')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                        <i class="fas fa-sort mr-1"></i>By CG Name
+                    </button>
+                    <button type="button" @click="sortTable('cg_type')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                        <i class="fas fa-sort mr-1"></i>By CG Type
+                    </button>
+                    <button type="button" @click="onColorGroupSelected(selectedGroup)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
+                        <i class="fas fa-edit mr-1"></i>Select
+                    </button>
+                    <button type="button" @click="showModal = false" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
+                        <i class="fas fa-times mr-1"></i>Exit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
+            <!-- Modal Header - Title Bar -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                <div class="flex items-center">
+                    <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold">Define Color Group</h3>
+                </div>
+                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Form Content -->
             <div class="p-6">
-                <form @submit.prevent="saveColorGroupChanges" class="space-y-4">
+                <form @submit.prevent="saveColorGroup" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">CG#:</label>
-                            <input v-model="editForm.cg" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-hashtag"></i>
+                                </span>
+                                <input type="text" v-model="form.cg" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm" 
+                                    :class="{ 'bg-gray-100': !isCreating }" 
+                                    :readonly="!isCreating" 
+                                    required>
+                            </div>
                         </div>
+                        
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">CG Name:</label>
-                            <input v-model="editForm.cg_name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-font"></i>
+                                </span>
+                                <input type="text" v-model="form.cg_name" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm" required>
+                            </div>
                         </div>
+                        
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">CG Type:</label>
-                            <select v-model="editForm.cg_type" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-tag"></i>
+                                </span>
+                                <select v-model="form.cg_type" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm" required>
                                 <option value="X-Flex">X-Flex</option>
                                 <option value="C-Coating">C-Coating</option>
                                 <option value="S-Offset">S-Offset</option>
@@ -224,6 +321,8 @@
                                 <option value="P-Pantone">P-Pantone</option>
                             </select>
                         </div>
+                        </div>
+                        
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Note:</label>
                             <div class="border border-gray-300 rounded-md p-3 bg-gray-50 h-16 overflow-auto text-sm">
@@ -231,15 +330,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteColorGroup(editForm.cg)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
+                    
+                    <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+                        <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-times mr-2"></i>Cancel
                         </button>
-                        <div v-else class="w-24"></div>
-                        <div class="flex space-x-3">
-                        <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
-                        </div>
+                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
+                            <i class="fas fa-save mr-2"></i>Save
+                        </button>
                     </div>
                 </form>
             </div>
@@ -277,11 +375,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
-import { Head, Link, usePage, router } from '@inertiajs/vue3';
-import ColorGroupModal from '@/Components/color-group-modal.vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
-// Get the header from props
+// Get any props passed from the controller
 const props = defineProps({
     header: {
         type: String,
@@ -289,39 +387,103 @@ const props = defineProps({
     }
 });
 
+// Reference to the CSRF form
+const csrfForm = ref(null);
+
+// Function to get fresh CSRF token from the form
+const getCsrfToken = () => {
+    // Try to get token from meta tag first
+    let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    // If token from meta tag is not available or we want a fresh token, get from the form
+    if (csrfForm.value) {
+        const tokenInput = csrfForm.value.querySelector('input[name="_token"]');
+        if (tokenInput) {
+            token = tokenInput.value;
+        }
+    }
+    
+    return token || '';
+};
+
 const colorGroups = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
-const selectedRow = ref(null);
+const selectedGroup = ref(null);
 const searchQuery = ref('');
-const editForm = ref({ cg: '', cg_name: '', cg_type: '' });
+const modalSearchQuery = ref('');
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
+const sortKey = ref('cg');
+const sortAsc = ref(true);
+
+// Form state
+const form = ref({
+    cg: '',
+    cg_name: '',
+    cg_type: 'X-Flex'
+});
+
+// Filtered and sorted color groups for the modal table
+const filteredColorGroups = computed(() => {
+    let groups = colorGroups.value;
+    
+    if (modalSearchQuery.value) {
+        const q = modalSearchQuery.value.toLowerCase();
+        groups = groups.filter(g =>
+            g.cg.toLowerCase().includes(q) ||
+            g.cg_name.toLowerCase().includes(q) ||
+            g.cg_type.toLowerCase().includes(q)
+        );
+    }
+    
+    // Sort
+    return [...groups].sort((a, b) => {
+        if (a[sortKey.value] < b[sortKey.value]) return sortAsc.value ? -1 : 1;
+        if (a[sortKey.value] > b[sortKey.value]) return sortAsc.value ? 1 : -1;
+        return 0;
+    });
+});
+
+// Watch for changes in search query to filter the data
+watch(searchQuery, (newQuery) => {
+    if (newQuery && colorGroups.value.length > 0) {
+        const foundGroup = colorGroups.value.find(group => 
+            group.cg.toLowerCase().includes(newQuery.toLowerCase()) ||
+            group.cg_name.toLowerCase().includes(newQuery.toLowerCase()) ||
+            group.cg_type.toLowerCase().includes(newQuery.toLowerCase())
+        );
+        
+        if (foundGroup) {
+            selectGroup(foundGroup);
+        }
+    }
+});
 
 const fetchColorGroups = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/color-group', { 
+        // Updated API path and headers to match how your backend expects the request
+        const response = await fetch('/api/color-groups', { 
             headers: { 
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
-            } 
+            },
+            credentials: 'same-origin' // Include cookies in the request
         });
         
-        if (!res.ok) {
+        if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         
-        const data = await res.json();
+        const data = await response.json();
         
         if (Array.isArray(data)) {
-            colorGroups.value = data.map(group => ({
-                cg: group.cg_id || group.cg,
-                cg_name: group.cg_name,
-                cg_type: group.cg_type
-            }));
+            colorGroups.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            colorGroups.value = data.data;
         } else {
             colorGroups.value = [];
             console.error('Unexpected data format:', data);
@@ -334,38 +496,36 @@ const fetchColorGroups = async () => {
     }
 };
 
-onMounted(fetchColorGroups);
-
-// Watch for changes in search query to filter the data
-watch(searchQuery, (newQuery) => {
-    if (newQuery && colorGroups.value.length > 0) {
-        const foundGroup = colorGroups.value.find(group => 
-            group.cg.toLowerCase().includes(newQuery.toLowerCase()) ||
-            group.cg_name.toLowerCase().includes(newQuery.toLowerCase()) ||
-            group.cg_type.toLowerCase().includes(newQuery.toLowerCase())
-        );
-        
-        if (foundGroup) {
-            selectedRow.value = foundGroup;
-        }
-    }
+onMounted(() => {
+    fetchColorGroups();
 });
 
 const onColorGroupSelected = (group) => {
-    selectedRow.value = group;
-    searchQuery.value = group.cg;
+    if (!group) {
+        showNotification('Please select a color group first', 'warning');
+        return;
+    }
+    
+    selectGroup(group);
     showModal.value = false;
     
     // Automatically open the edit modal for the selected row
-    isCreating.value = false;
-    editForm.value = { ...group };
-    showEditModal.value = true;
+    editSelectedGroup();
 };
 
-const editSelectedRow = () => {
-    if (selectedRow.value) {
+const selectGroup = (group) => {
+    selectedGroup.value = group;
+    searchQuery.value = group.cg;
+};
+
+const editSelectedGroup = () => {
+    if (selectedGroup.value) {
         isCreating.value = false;
-        editForm.value = { ...selectedRow.value };
+        form.value = {
+            cg: selectedGroup.value.cg,
+            cg_name: selectedGroup.value.cg_name,
+            cg_type: selectedGroup.value.cg_type
+        };
         showEditModal.value = true;
     } else {
         showNotification('Please select a color group first', 'error');
@@ -374,23 +534,50 @@ const editSelectedRow = () => {
 
 const createNewColorGroup = () => {
     isCreating.value = true;
-    editForm.value = { cg: '', cg_name: '', cg_type: 'X-Flex' };
+    form.value = {
+        cg: '',
+        cg_name: '',
+        cg_type: 'X-Flex'
+    };
     showEditModal.value = true;
 };
 
 const closeEditModal = () => {
     showEditModal.value = false;
-    editForm.value = { cg: '', cg_name: '', cg_type: '' };
-    isCreating.value = false;
 };
 
-const saveColorGroupChanges = async () => {
+const sortTable = (key) => {
+    if (sortKey.value === key) {
+        sortAsc.value = !sortAsc.value;
+    } else {
+        sortKey.value = key;
+        sortAsc.value = true;
+    }
+};
+
+const saveColorGroup = async () => {
+    // Validate form
+    if (!form.value.cg) {
+        showNotification('Color Group code is required', 'error');
+        return;
+    }
+
+    if (!form.value.cg_name) {
+        showNotification('Color Group name is required', 'error');
+        return;
+    }
+
+    if (!form.value.cg_type) {
+        showNotification('Color Group type is required', 'error');
+        return;
+    }
+
     saving.value = true;
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const csrfToken = getCsrfToken();
         
         // Different API call for create vs update
-        let url = isCreating.value ? '/color-group' : `/color-group/${editForm.value.cg}`;
+        let url = isCreating.value ? '/api/color-groups' : `/api/color-groups/${form.value.cg}`;
         let method = isCreating.value ? 'POST' : 'PUT';
         
         const response = await fetch(url, {
@@ -398,84 +585,88 @@ const saveColorGroupChanges = async () => {
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify(isCreating.value ? {
-                cg: editForm.value.cg,
-                cg_name: editForm.value.cg_name,
-                cg_type: editForm.value.cg_type
-            } : {
-                cg_name: editForm.value.cg_name,
-                cg_type: editForm.value.cg_type
-            })
+            body: JSON.stringify(form.value),
+            credentials: 'same-origin' // Include cookies in the request
         });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error saving color group');
+        }
         
         const result = await response.json();
         
-        if (response.ok) {
-            // Update the local data with the changes or add new item
-            if (isCreating.value) {
-                showNotification('Color group created successfully', 'success');
-            } else {
-                if (selectedRow.value) {
-                    selectedRow.value.cg_name = editForm.value.cg_name;
-                    selectedRow.value.cg_type = editForm.value.cg_type;
-                }
-                showNotification('Color group updated successfully', 'success');
-            }
-            
-            // Refresh the full data list to ensure we're in sync with the database
+        // Update the local data
         await fetchColorGroups();
-        closeEditModal();
+        
+        // Show success notification
+        if (isCreating.value) {
+            showNotification('Color group created successfully', 'success');
+            // Find and select the newly created group
+            const newGroup = colorGroups.value.find(g => g.cg === form.value.cg);
+            if (newGroup) {
+                selectGroup(newGroup);
+            }
         } else {
-            showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
+            showNotification('Color group updated successfully', 'success');
         }
+        
+        // Close the edit modal
+        closeEditModal();
     } catch (e) {
-        console.error('Error saving color group changes:', e);
-        showNotification('Error saving color group. Please try again.', 'error');
+        console.error('Error saving color group:', e);
+        showNotification('Error: ' + e.message, 'error');
     } finally {
         saving.value = false;
     }
 };
 
-const deleteColorGroup = async (cgId) => {
-    if (!confirm(`Are you sure you want to delete color group "${cgId}"?`)) {
+const deleteColorGroup = async () => {
+    if (!selectedGroup.value) {
+        showNotification('No color group selected', 'error');
+        return;
+    }
+    
+    if (!confirm(`Are you sure you want to delete color group "${selectedGroup.value.cg}"?`)) {
         return;
     }
     
     saving.value = true;
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const csrfToken = getCsrfToken();
         
-        const response = await fetch(`/color-group/${cgId}`, {
+        const response = await fetch(`/api/color-groups/${selectedGroup.value.cg}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            }
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin' // Include cookies in the request
         });
         
-        const result = await response.json();
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error deleting color group');
+        }
         
-        if (result.success) {
-            // Remove the item from the local array
-            colorGroups.value = colorGroups.value.filter(group => group.cg !== cgId);
-            
-            if (selectedRow.value && selectedRow.value.cg === cgId) {
-                selectedRow.value = null;
-                searchQuery.value = '';
-            }
-            
-            closeEditModal();
-            showNotification('Color group deleted successfully', 'success');
-        } else {
-            showNotification('Error deleting color group: ' + (result.message || 'Unknown error'), 'error');
-    }
+        // Remove from local array
+        colorGroups.value = colorGroups.value.filter(g => g.cg !== selectedGroup.value.cg);
+        
+        // Reset selection and form
+        selectedGroup.value = null;
+        searchQuery.value = '';
+        closeEditModal();
+        
+        showNotification('Color group deleted successfully', 'success');
     } catch (e) {
         console.error('Error deleting color group:', e);
-        showNotification('Error deleting color group. Please try again.', 'error');
+        showNotification('Error: ' + e.message, 'error');
     } finally {
-    saving.value = false;
+        saving.value = false;
     }
 };
 
@@ -489,5 +680,37 @@ const showNotification = (message, type = 'success') => {
     setTimeout(() => {
         notification.value.show = false;
     }, 3000);
+};
+
+const loadSeedData = async () => {
+    saving.value = true;
+    try {
+        const csrfToken = getCsrfToken();
+        
+        const response = await fetch('/api/color-groups/seed', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin' // Include cookies in the request
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('Color group data seeded successfully', 'success');
+            await fetchColorGroups();
+        } else {
+            showNotification('Error seeding data: ' + (result.message || 'Unknown error'), 'error');
+        }
+    } catch (e) {
+        console.error('Error seeding data:', e);
+        showNotification('Error seeding data. Please try again.', 'error');
+    } finally {
+        saving.value = false;
+    }
 };
 </script>
