@@ -102,12 +102,11 @@ class ColorController extends Controller
             Log::info('Creating new color with data:', $request->all());
 
             $validator = Validator::make($request->all(), [
-                'color_id' => 'required|unique:colors|max:10',
-                'color_name' => 'required|max:50',
-                'color_group_id' => 'required|max:10',
-                'origin' => 'nullable|max:100',
-                'cg_type' => 'required|max:20',
-                'kg_per_m2' => 'nullable|numeric'
+                'color_id' => 'required|unique:colors|max:5',
+                'color_name' => 'required|max:100',
+                'color_group_id' => 'required|max:5',
+                'origin' => 'nullable|max:2',
+                'cg_type' => 'required|max:50'
             ]);
 
             if ($validator->fails()) {
@@ -123,19 +122,25 @@ class ColorController extends Controller
                 return back()->withErrors($validator)->withInput();
             }
 
+            // Escape potentially harmful characters in string inputs
+            $colorId = trim($request->color_id);
+            $colorName = trim($request->color_name);
+            $origin = trim($request->origin);
+            $colorGroupId = trim($request->color_group_id);
+            $cgType = trim($request->cg_type);
+
             $color = new Color();
-            $color->color_id = $request->color_id;
-            $color->color_name = $request->color_name;
-            $color->color_group_id = $request->color_group_id;
-            $color->origin = $request->origin;
-            $color->cg_type = $request->cg_type;
-            $color->kg_per_m2 = $request->kg_per_m2;
+            $color->color_id = $colorId;
+            $color->color_name = $colorName;
+            $color->color_group_id = $colorGroupId;
+            $color->origin = $origin;
+            $color->cg_type = $cgType;
             $color->save();
 
             // Get the complete color data to return
-            $newColor = DB::table('colors')->where('color_id', $request->color_id)->first();
+            $newColor = DB::table('colors')->where('color_id', $colorId)->first();
             
-            Log::info('Color created successfully:', ['color_id' => $request->color_id]);
+            Log::info('Color created successfully:', ['color_id' => $colorId]);
             
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
@@ -194,9 +199,9 @@ class ColorController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'color_name' => 'required|string|max:100',
-                'origin' => 'required|string|max:50',
-                'color_group_id' => 'required|string|max:10',
-                'cg_type' => 'required|string|max:20',
+                'origin' => 'required|string|max:2',
+                'color_group_id' => 'required|string|max:5',
+                'cg_type' => 'required|string|max:50',
             ]);
 
             if ($validator->fails()) {
@@ -218,14 +223,20 @@ class ColorController extends Controller
                 ], 404);
             }
 
+            // Escape potentially harmful characters in string inputs
+            $colorName = trim($request->color_name);
+            $origin = trim($request->origin);
+            $colorGroupId = trim($request->color_group_id);
+            $cgType = trim($request->cg_type);
+
             // Update the color using DB facade
             $updated = DB::table('colors')
                 ->where('color_id', $color_id)
                 ->update([
-                    'color_name' => $request->color_name,
-                    'origin' => $request->origin,
-                    'color_group_id' => $request->color_group_id,
-                    'cg_type' => $request->cg_type,
+                    'color_name' => $colorName,
+                    'origin' => $origin,
+                    'color_group_id' => $colorGroupId,
+                    'cg_type' => $cgType,
                     'updated_at' => now()
                 ]);
 

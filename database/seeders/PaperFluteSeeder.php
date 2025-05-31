@@ -237,19 +237,19 @@ class PaperFluteSeeder extends Seeder
             'flute_height' => 0.00,
             'starch_consumption' => 0.00
         ],
-                                [
-                'code' => '2L',
-                'name' => '2L',
-                'description' => 'ROLL',
-                'tur_l2b' => 1.00,
-                'tur_l3' => 1.40,
-                'tur_l1' => 1.00,
-                'tur_ace' => 1.50,
-                'tur_2l' => 1.00,
-                'flute_height' => 0,
-                'starch_consumption' => .00,
-                'is_active' => false,
-            ],,
+        [
+            'code' => '2L',
+            'name' => '2L',
+            'description' => 'ROLL',
+            'tur_l2b' => 1.00,
+            'tur_l3' => 1.40,
+            'tur_l1' => 1.00,
+            'tur_ace' => 1.50,
+            'tur_2l' => 1.00,
+            'flute_height' => 0.00,
+            'starch_consumption' => 0.00,
+            'is_active' => false
+        ]
     ];
 
     public function run(): void
