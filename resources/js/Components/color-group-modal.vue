@@ -36,7 +36,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'select']);
+const emit = defineEmits(['close', 'select', 'refresh']);
 
 const searchQuery = ref('');
 const selectedGroup = ref(null);
@@ -86,6 +86,9 @@ watch(() => props.show, (val) => {
   if (val) {
     selectedGroup.value = null;
     searchQuery.value = '';
+    
+    // Emit event to parent component to refresh color groups data
+    emit('refresh');
   }
 });
 </script>

@@ -233,6 +233,16 @@ Route::prefix('api')->group(function () {
     Route::put('/geo/{code}', [GeoController::class, 'update']);
     Route::delete('/geo/{code}', [GeoController::class, 'destroy']);
     Route::get('/color-groups', [ColorGroupController::class, 'index']);
+    Route::post('/color-groups', [ColorGroupController::class, 'store']);
+    Route::put('/color-groups/{id}', [ColorGroupController::class, 'update']);
+    Route::delete('/color-groups/{id}', [ColorGroupController::class, 'destroy']);
+    Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
+    
+    // Colors API routes - Using color_id as parameter
+    Route::post('/colors', [ColorController::class, 'store']);
+    Route::put('/colors/{color_id}', [ColorController::class, 'update']);
+    Route::delete('/colors/{color_id}', [ColorController::class, 'destroy']);
+    
     Route::get('/industry', [IndustryController::class, 'index']);
     Route::post('/industry', [IndustryController::class, 'store']);
     Route::put('/industry/{id}', [IndustryController::class, 'update']);

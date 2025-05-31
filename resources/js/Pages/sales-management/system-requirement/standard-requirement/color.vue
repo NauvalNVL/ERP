@@ -19,55 +19,51 @@
                         <div class="p-2 bg-blue-500 rounded-lg mr-3">
                             <i class="fas fa-edit text-white"></i>
                         </div>
+                        <h3 class="text-xl font-semibold text-gray-800">Define Color</h3>
                     </div>
                     <!-- Header with navigation buttons -->
                     <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-power-off"></i>
                         </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-arrow-right"></i>
                         </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
                             <i class="fas fa-arrow-left"></i>
                         </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="showModal = true">
+                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" @click="showModal = true">
                             <i class="fas fa-search"></i>
                         </button>
-                        <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="editSelectedRow">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewColor">
-                            <i class="fas fa-plus"></i>
+                        <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" @click="saveColorChanges">
+                            <i class="fas fa-save"></i>
                         </button>
                     </div>
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Color#:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Color Code:</label>
                             <div class="relative flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-palette"></i>
                                 </span>
                                 <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md">
+                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                            <button type="button" @click="editSelectedRow" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
-                                <i class="fas fa-edit mr-2"></i> Edit Selected
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                            <button type="button" @click="createNewColor" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                                <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
                     </div>
                     <!-- Data Status Information -->
                     <div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
                         <div class="flex items-center">
-                            <div class="mr-3">
-                                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
-                            </div>
+                            <div class="mr-3 animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
                             <p class="text-sm font-medium text-yellow-800">Loading color data...</p>
                         </div>
                     </div>
@@ -181,18 +177,20 @@
         </div>
     </div>
 
-    <!-- Modal Table -->
-    <ColorModal
-        :show="showModal"
-        :colors="colors"
-        :color-groups="colorGroups"
-        @close="showModal = false"
-        @select="onColorSelected"
+    <!-- Gunakan komponen ColorModal yang telah diimpor -->
+    <ColorModal 
+      v-if="showModal"
+      :show="showModal"
+      :colors="colors"
+      :colorGroups="colorGroups"
+      @close="showModal = false"
+      @select="onColorSelected"
+      @refresh="refreshColors"
     />
 
     <!-- Edit Modal -->
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
@@ -200,7 +198,7 @@
                     </div>
                     <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Color' : 'Edit Color' }}</h3>
                 </div>
-                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
+                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200 transform active:translate-y-px">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -209,33 +207,61 @@
                     <div class="grid grid-cols-1 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Color#:</label>
-                            <input v-model="editForm.color_id" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-hashtag"></i>
+                                </span>
+                                <input v-model="editForm.color_id" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Color Name:</label>
-                            <input v-model="editForm.color_name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-font"></i>
+                                </span>
+                                <input v-model="editForm.color_name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Origin:</label>
-                            <input v-model="editForm.origin" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </span>
+                                <input v-model="editForm.origin" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Color Group:</label>
                             <div class="relative flex">
-                                <input v-model="editForm.color_group_id" type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500" required>
-                                <button type="button" @click="openColorGroupSelector" class="px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md">
+                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                                    <i class="fas fa-layer-group"></i>
+                                </span>
+                                <input v-model="editForm.color_group_id" type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                                <button type="button" @click="openColorGroupSelector" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">CG Type:</label>
-                            <input v-model="editForm.cg_type" type="text" class="block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" readonly>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-tag"></i>
+                                </span>
+                                <input v-model="editForm.cg_type" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:ring-blue-500 focus:border-blue-500 text-sm" readonly>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">KG per M2:</label>
-                            <input v-model="editForm.kg_per_m2" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
-                            <span class="text-xs text-gray-500 mt-1 block">Estimate KG per M2</span>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                    <i class="fas fa-weight"></i>
+                                </span>
+                                <input v-model="editForm.kg_per_m2" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <span class="text-xs text-gray-500 mt-1 block">Estimate KG per M2</span>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Note:</label>
@@ -245,13 +271,17 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteColor(editForm.color_id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                        <button type="button" v-if="!isCreating" @click="deleteColor(editForm.color_id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm transform active:translate-y-px">
                             <i class="fas fa-trash-alt mr-2"></i>Delete
                         </button>
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
-                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
+                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
+                                <i class="fas fa-times mr-2"></i>Cancel
+                            </button>
+                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
+                                <i class="fas fa-save mr-2"></i>Save
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -260,20 +290,20 @@
     </div>
     
     <!-- Color Group Selector Modal -->
-    <div v-if="showColorGroupModal" class="fixed inset-0 z-[60] bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl">
+    <div v-if="showColorGroupModal" class="fixed inset-0 z-[70] bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto transform transition-transform duration-300">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                         <i class="fas fa-layer-group"></i>
                     </div>
-                    <h3 class="text-xl font-semibold">Select Color Group</h3>
+                    <h3 class="text-xl font-semibold">Color Group Table</h3>
                 </div>
-                <button @click="showColorGroupModal = false" class="text-white hover:text-gray-200">
+                <button @click="showColorGroupModal = false" class="text-white hover:text-gray-200 transform active:translate-y-px">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div class="p-5">
+            <div class="p-5 overflow-auto" style="max-height: calc(80vh - 130px);">
                 <div class="mb-4">
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -284,7 +314,7 @@
                     </div>
                 </div>
                 
-                <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-80 overflow-y-auto">
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
                     <table class="min-w-full divide-y divide-gray-200 table-fixed">
                         <thead class="bg-gray-50 sticky top-0">
                             <tr>
@@ -295,19 +325,26 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-xs">
                             <tr v-for="group in filteredColorGroups" :key="group.cg"
-                                class="hover:bg-blue-50 cursor-pointer"
-                                @click="selectColorGroup(group)">
+                                :class="['hover:bg-blue-50 cursor-pointer', selectedColorGroup && selectedColorGroup.cg === group.cg ? 'bg-blue-100' : '']"
+                                @click="selectColorGroupRow(group)"
+                                @dblclick="selectColorGroup(group)">
                                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ group.cg }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ group.cg_name }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ group.cg_type }}</td>
+                            </tr>
+                            <tr v-if="filteredColorGroups.length === 0">
+                                <td colspan="3" class="px-4 py-4 text-center text-gray-500">No color group data available.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 
-                <div class="mt-4 flex justify-end space-x-3">
-                    <button @click="showColorGroupModal = false" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
-                        Cancel
+                <div class="mt-4 flex justify-center space-x-4">
+                    <button @click="confirmColorGroupSelection" class="py-2 px-6 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transform active:translate-y-px">
+                        <i class="fas fa-check mr-2"></i>Select
+                    </button>
+                    <button @click="showColorGroupModal = false" class="py-2 px-6 bg-gray-300 hover:bg-gray-400 text-gray-800 text-sm rounded-lg transform active:translate-y-px">
+                        <i class="fas fa-times mr-2"></i>Exit
                     </button>
                 </div>
             </div>
@@ -315,7 +352,7 @@
     </div>
 
     <!-- Loading Overlay -->
-    <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
+    <div v-if="saving" class="fixed inset-0 z-[80] bg-black bg-opacity-50 flex justify-center items-center">
         <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
     
@@ -347,6 +384,8 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import axios from 'axios';
 import ColorModal from '@/Components/color-modal.vue';
 
 // Get the header from props
@@ -373,8 +412,11 @@ const showModal = ref(false);
 const showEditModal = ref(false);
 const showColorGroupModal = ref(false);
 const selectedRow = ref(null);
+const selectedColorGroup = ref(null);
 const searchQuery = ref('');
 const cgSearchQuery = ref('');
+const modalSearchQuery = ref('');
+const sortOption = ref('colorId');
 const editForm = ref({ 
     color_id: '', 
     color_name: '', 
@@ -390,62 +432,45 @@ const notification = ref({ show: false, message: '', type: 'success' });
 const fetchColors = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/color', { 
-            headers: { 
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            } 
-        });
-        
-        if (!res.ok) {
-            throw new Error('Network response was not ok');
-        }
-        
-        const data = await res.json();
-        
-        if (Array.isArray(data)) {
-            colors.value = data;
-        } else {
-            colors.value = [];
-            console.error('Unexpected data format:', data);
-        }
-    } catch (e) {
-        console.error('Error fetching colors:', e);
-        colors.value = [];
+        console.log('Fetching colors from API...');
+        const response = await axios.get('/api/colors');
+        console.log('API Response:', response);
+        colors.value = response.data || [];
+        console.log("Fetched colors:", colors.value.length, "items");
+        console.log("First 3 colors:", colors.value.slice(0, 3));
+    } catch (error) {
+        console.error('Error fetching colors:', error);
+        showNotification('Failed to load colors data', 'error');
     } finally {
         loading.value = false;
     }
 };
 
+// Manually refresh colors - can be called after operations
+const refreshColors = async () => {
+    console.log('Manual refresh of colors data triggered');
+    await fetchColors();
+    console.log('Colors data has been refreshed, count:', colors.value.length);
+};
+
 // Fetch color groups from API
 const fetchColorGroups = async () => {
     try {
-        const res = await fetch('/color-group', { 
-            headers: { 
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            } 
-        });
-        
-        if (!res.ok) {
-            throw new Error('Network response was not ok');
-        }
-        
-        const data = await res.json();
-        
-        if (Array.isArray(data)) {
-            colorGroups.value = data.map(group => ({
+        const result = await axios.get('/api/color-groups');
+        if (Array.isArray(result.data)) {
+            colorGroups.value = result.data.map(group => ({
                 cg: group.cg_id || group.cg,
                 cg_name: group.cg_name,
                 cg_type: group.cg_type
             }));
         } else {
             colorGroups.value = [];
-            console.error('Unexpected data format:', data);
+            console.error('Unexpected data format:', result.data);
         }
     } catch (e) {
         console.error('Error fetching color groups:', e);
         colorGroups.value = [];
+        showNotification('Failed to load color groups data', 'error');
     }
 };
 
@@ -472,6 +497,14 @@ watch(searchQuery, (newQuery) => {
     }
 });
 
+// Watch for modal opening to refresh data
+watch(showModal, (isOpen) => {
+    if (isOpen) {
+        // Refresh colors data when modal opens
+        fetchColors();
+    }
+});
+
 // Filtered color groups based on search query
 const filteredColorGroups = computed(() => {
     if (!cgSearchQuery.value) return colorGroups.value;
@@ -483,6 +516,42 @@ const filteredColorGroups = computed(() => {
         group.cg_type.toLowerCase().includes(query)
     );
 });
+
+// Get color group name by ID
+const getColorGroupName = (cgId) => {
+    const group = colorGroups.value.find(g => g.cg === cgId);
+    return group ? group.cg_name : '';
+};
+
+// Sort by Color ID
+const sortByColorId = () => {
+    sortOption.value = 'colorId';
+    colors.value.sort((a, b) => {
+        return a.color_id.localeCompare(b.color_id, undefined, {numeric: true});
+    });
+};
+
+// Sort by Color Group + Color ID
+const sortByCGAndColor = () => {
+    sortOption.value = 'cgAndColor';
+    colors.value.sort((a, b) => {
+        if (a.color_group_id !== b.color_group_id) {
+            return a.color_group_id.localeCompare(b.color_group_id, undefined, {numeric: true});
+        }
+        return a.color_id.localeCompare(b.color_id, undefined, {numeric: true});
+    });
+};
+
+// Sort by CG Type + Color ID
+const sortByCGTypeAndColor = () => {
+    sortOption.value = 'cgTypeAndColor';
+    colors.value.sort((a, b) => {
+        if (a.cg_type !== b.cg_type) {
+            return a.cg_type.localeCompare(b.cg_type);
+        }
+        return a.color_id.localeCompare(b.color_id, undefined, {numeric: true});
+    });
+};
 
 const onColorSelected = (color) => {
     selectedRow.value = color;
@@ -533,6 +602,20 @@ const closeEditModal = () => {
 
 const openColorGroupSelector = () => {
     showColorGroupModal.value = true;
+    selectedColorGroup.value = null;
+    cgSearchQuery.value = '';
+};
+
+const selectColorGroupRow = (group) => {
+    selectedColorGroup.value = group;
+};
+
+const confirmColorGroupSelection = () => {
+    if (!selectedColorGroup.value) {
+        showNotification('Please select a color group first', 'warning');
+        return;
+    }
+    selectColorGroup(selectedColorGroup.value);
 };
 
 const selectColorGroup = (group) => {
@@ -543,104 +626,57 @@ const selectColorGroup = (group) => {
 
 const saveColorChanges = async () => {
     saving.value = true;
+    
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-        
-        // Create FormData object for multipart form data submission
-        const formData = new FormData();
-        formData.append('color_name', editForm.value.color_name);
-        formData.append('origin', editForm.value.origin);
-        formData.append('color_group_id', editForm.value.color_group_id);
-        formData.append('cg_type', editForm.value.cg_type);
-        
+        let response;
         if (isCreating.value) {
-            formData.append('color_id', editForm.value.color_id);
+            console.log('Sending POST request to create new color:', editForm.value);
+            response = await axios.post('/api/colors', editForm.value);
+            console.log('Response from create:', response.data);
+            showNotification('Color added successfully!', 'success');
         } else {
-            formData.append('_method', 'PUT'); // For Laravel method spoofing
+            console.log('Sending PUT request to update color:', editForm.value);
+            response = await axios.put(`/api/colors/${editForm.value.color_id}`, editForm.value);
+            console.log('Response from update:', response.data);
+            showNotification('Color updated successfully!', 'success');
         }
         
-        // Different API call for create vs update
-        let url = isCreating.value ? '/color' : `/color/${editForm.value.color_id}`;
+        // Refresh the colors data after save
+        console.log('Refreshing colors data after save');
+        await fetchColors();
+        console.log('Colors refreshed, current count:', colors.value.length);
         
-        const response = await fetch(url, {
-            method: 'POST', // Always POST with FormData
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (response.ok) {
-            // Update the local data with the changes or add new item
-            if (isCreating.value) {
-                showNotification('Color created successfully', 'success');
-            } else {
-                if (selectedRow.value) {
-                    selectedRow.value.color_name = editForm.value.color_name;
-                    selectedRow.value.origin = editForm.value.origin;
-                    selectedRow.value.color_group_id = editForm.value.color_group_id;
-                    selectedRow.value.cg_type = editForm.value.cg_type;
-                }
-                showNotification('Color updated successfully', 'success');
-            }
-            
-            // Refresh the full data list to ensure we're in sync with the database
-            await fetchColors();
-            closeEditModal();
-        } else {
-            showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
-        }
-    } catch (e) {
-        console.error('Error saving color changes:', e);
-        showNotification('Error saving color. Please try again.', 'error');
+        showEditModal.value = false;
+    } catch (error) {
+        console.error('Error saving color:', error);
+        console.error('Error response:', error.response?.data);
+        const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+        showNotification(`Error saving color: ${errorMessage}`, 'error');
     } finally {
         saving.value = false;
     }
 };
 
 const deleteColor = async (colorId) => {
-    if (!confirm(`Are you sure you want to delete color "${colorId}"?`)) {
-        return;
-    }
+    if (!confirm(`Are you sure you want to delete color "${colorId}"?`)) return;
     
     saving.value = true;
+    
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        await axios.delete(`/api/colors/${colorId}`);
+        showNotification('Color deleted successfully!', 'success');
+        await fetchColors();
         
-        const formData = new FormData();
-        formData.append('_method', 'DELETE');
-        
-        const response = await fetch(`/color/${colorId}`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            },
-            body: formData
-        });
-        
-        if (response.ok) {
-            // Remove the item from the local array
-            colors.value = colors.value.filter(color => color.color_id !== colorId);
-            
-            if (selectedRow.value && selectedRow.value.color_id === colorId) {
-                selectedRow.value = null;
-                searchQuery.value = '';
-            }
-            
-            closeEditModal();
-            showNotification('Color deleted successfully', 'success');
-        } else {
-            const result = await response.json();
-            showNotification('Error deleting color: ' + (result.message || 'Unknown error'), 'error');
+        if (selectedRow.value && selectedRow.value.color_id === colorId) {
+            selectedRow.value = null;
+            searchQuery.value = '';
         }
-    } catch (e) {
-        console.error('Error deleting color:', e);
-        showNotification('Error deleting color. Please try again.', 'error');
+        
+        closeEditModal();
+    } catch (error) {
+        console.error('Error deleting color:', error);
+        const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
+        showNotification(`Error deleting color: ${errorMessage}`, 'error');
     } finally {
         saving.value = false;
     }
@@ -657,4 +693,28 @@ const showNotification = (message, type = 'success') => {
         notification.value.show = false;
     }, 3000);
 };
+
+// Filtered colors based on search query
+const filteredColors = computed(() => {
+    if (!modalSearchQuery.value) return colors.value;
+    
+    const query = modalSearchQuery.value.toLowerCase();
+    return colors.value.filter(color => 
+        color.color_id.toLowerCase().includes(query) ||
+        color.color_name.toLowerCase().includes(query) ||
+        color.color_group_id.toLowerCase().includes(query) ||
+        (color.cg_type && color.cg_type.toLowerCase().includes(query)) ||
+        (color.origin && color.origin.toLowerCase().includes(query))
+    );
+});
+
+const selectColor = (color) => {
+    selectedRow.value = color;
+    searchQuery.value = color.color_id;
+};
+
+// Watch modal data changes
+watch(() => colors.value.length, (newCount, oldCount) => {
+    console.log(`Colors count changed from ${oldCount} to ${newCount}`);
+});
 </script>

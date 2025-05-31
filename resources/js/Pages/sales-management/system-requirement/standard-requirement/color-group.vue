@@ -27,29 +27,10 @@
                         <h3 class="text-xl font-semibold text-gray-800">Color Group Management</h3>
                     </div>
                     
-                    <!-- Header with navigation buttons -->
-                    <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" @click="showModal = true" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button type="button" @click="saveColorGroup" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-save"></i>
-                        </button>
-                    </div>
-
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Color Group#:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Color Group Code:</label>
                             <div class="relative flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-layer-group"></i>
@@ -63,9 +44,9 @@
                         </div>
                         
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                            <button type="button" @click="editSelectedGroup" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
-                                <i class="fas fa-list-ul mr-2"></i> Select Record
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                            <button type="button" @click="createNewColorGroup" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                                <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
                     </div>
@@ -190,97 +171,29 @@
     </div>
 
     <!-- Modal for Color Group Table -->
-    <div v-if="showModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-3/4 lg:w-2/3 max-w-5xl mx-auto transform transition-transform duration-300" style="max-height: 80vh;">
-            <!-- Modal Header - Title Bar -->
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-                <div class="flex items-center">
-                    <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
-                        <i class="fas fa-layer-group"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold">Color Group Table</h3>
-                </div>
-                <button type="button" @click="showModal = false" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-
-            <!-- Table Content -->
-            <div class="p-5 overflow-auto" style="max-height: calc(80vh - 130px);">
-                <div class="mb-4">
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                            <i class="fas fa-search"></i>
-                        </span>
-                        <input type="text" v-model="modalSearchQuery" placeholder="Search color groups..."
-                            class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
-                    </div>
-                </div>
-                
-                <div class="overflow-x-auto rounded-lg border border-gray-200">
-                    <table class="min-w-full divide-y divide-gray-200" id="colorGroupDataTable">
-                        <thead class="bg-gray-50 sticky top-0">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('cg')">CG#</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('cg_name')">CG Name</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('cg_type')">CG Type</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 text-xs">
-                            <tr v-for="group in filteredColorGroups" :key="group.cg" 
-                                :class="['hover:bg-blue-50 cursor-pointer', selectedGroup && selectedGroup.cg === group.cg ? 'bg-blue-100' : '']"
-                                @click="selectGroup(group)"
-                                @dblclick="onColorGroupSelected(group)">
-                                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ group.cg }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ group.cg_name }}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ group.cg_type }}</td>
-                            </tr>
-                            <tr v-if="filteredColorGroups.length === 0">
-                                <td colspan="3" class="px-4 py-4 text-center text-gray-500">No color group data available.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Bottom Buttons -->
-                <div class="mt-4 grid grid-cols-5 gap-2">
-                    <button type="button" @click="sortTable('cg')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-                        <i class="fas fa-sort mr-1"></i>By CG#
-                    </button>
-                    <button type="button" @click="sortTable('cg_name')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-                        <i class="fas fa-sort mr-1"></i>By CG Name
-                    </button>
-                    <button type="button" @click="sortTable('cg_type')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-                        <i class="fas fa-sort mr-1"></i>By CG Type
-                    </button>
-                    <button type="button" @click="onColorGroupSelected(selectedGroup)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
-                        <i class="fas fa-edit mr-1"></i>Select
-                    </button>
-                    <button type="button" @click="showModal = false" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
-                        <i class="fas fa-times mr-1"></i>Exit
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <ColorGroupModal
+        v-if="showModal"
+        :show="showModal"
+        :colorGroups="colorGroups"
+        @close="showModal = false"
+        @select="onColorGroupSelected"
+        @refresh="fetchColorGroups"
+    />
 
     <!-- Edit Modal -->
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
-            <!-- Modal Header - Title Bar -->
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                         <i class="fas fa-layer-group"></i>
                     </div>
-                    <h3 class="text-xl font-semibold">Define Color Group</h3>
+                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Color Group' : 'Edit Color Group' }}</h3>
                 </div>
-                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-
-            <!-- Form Content -->
             <div class="p-6">
                 <form @submit.prevent="saveColorGroup" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
@@ -314,13 +227,13 @@
                                     <i class="fas fa-tag"></i>
                                 </span>
                                 <select v-model="form.cg_type" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm" required>
-                                <option value="X-Flex">X-Flex</option>
-                                <option value="C-Coating">C-Coating</option>
-                                <option value="S-Offset">S-Offset</option>
-                                <option value="D-Digital">D-Digital</option>
-                                <option value="P-Pantone">P-Pantone</option>
-                            </select>
-                        </div>
+                                    <option value="X-Flex">X-Flex</option>
+                                    <option value="C-Coating">C-Coating</option>
+                                    <option value="S-Offset">S-Offset</option>
+                                    <option value="D-Digital">D-Digital</option>
+                                    <option value="P-Pantone">P-Pantone</option>
+                                </select>
+                            </div>
                         </div>
                         
                         <div>
@@ -331,13 +244,15 @@
                         </div>
                     </div>
                     
-                    <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
-                            <i class="fas fa-times mr-2"></i>Cancel
+                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
+                        <button type="button" v-if="!isCreating" @click="deleteColorGroup" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                            <i class="fas fa-trash-alt mr-2"></i>Delete
                         </button>
-                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
-                            <i class="fas fa-save mr-2"></i>Save
-                        </button>
+                        <div v-else class="w-24"></div>
+                        <div class="flex space-x-3">
+                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -378,6 +293,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import ColorGroupModal from '@/Components/color-group-modal.vue';
 
 // Get any props passed from the controller
 const props = defineProps({

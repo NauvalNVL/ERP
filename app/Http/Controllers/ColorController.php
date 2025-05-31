@@ -99,18 +99,64 @@ class ColorController extends Controller
     public function store(Request $request)
     {
         try {
-            $validatedData = $request->validate([
+            Log::info('Creating new color with data:', $request->all());
+
+            $validator = Validator::make($request->all(), [
                 'color_id' => 'required|unique:colors|max:10',
                 'color_name' => 'required|max:50',
-                'color_group_id' => 'required|exists:color_groups,id',
-                'origin' => 'nullable|max:100'
+                'color_group_id' => 'required|max:10',
+                'origin' => 'nullable|max:100',
+                'cg_type' => 'required|max:20',
+                'kg_per_m2' => 'nullable|numeric'
             ]);
 
-            Color::create($validatedData);
+            if ($validator->fails()) {
+                Log::warning('Validation failed:', $validator->errors()->toArray());
+                
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $validator->errors()->first()
+                    ], 422);
+                }
+                
+                return back()->withErrors($validator)->withInput();
+            }
+
+            $color = new Color();
+            $color->color_id = $request->color_id;
+            $color->color_name = $request->color_name;
+            $color->color_group_id = $request->color_group_id;
+            $color->origin = $request->origin;
+            $color->cg_type = $request->cg_type;
+            $color->kg_per_m2 = $request->kg_per_m2;
+            $color->save();
+
+            // Get the complete color data to return
+            $newColor = DB::table('colors')->where('color_id', $request->color_id)->first();
+            
+            Log::info('Color created successfully:', ['color_id' => $request->color_id]);
+            
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Color berhasil ditambahkan',
+                    'data' => $newColor
+                ]);
+            }
 
             return redirect()->route('colors.index')->with('success', 'Color created successfully');
         } catch (\Exception $e) {
             Log::error('Error in ColorController@store: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error creating color: ' . $e->getMessage()
+                ], 500);
+            }
+            
             return back()->withInput()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
         }
     }
@@ -140,10 +186,10 @@ class ColorController extends Controller
     /**
      * Update the specified color in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $color_id)
     {
         try {
-            Log::info('Updating color with ID: ' . $id);
+            Log::info('Updating color with ID: ' . $color_id);
             Log::info('Request data:', $request->all());
 
             $validator = Validator::make($request->all(), [
@@ -162,10 +208,10 @@ class ColorController extends Controller
             }
 
             // Find the color using DB facade since we're using color_id as primary key
-            $color = DB::table('colors')->where('color_id', $id)->first();
+            $color = DB::table('colors')->where('color_id', $color_id)->first();
             
             if (!$color) {
-                Log::warning('Color not found with ID: ' . $id);
+                Log::warning('Color not found with ID: ' . $color_id);
                 return response()->json([
                     'success' => false,
                     'message' => 'Color tidak ditemukan'
@@ -174,7 +220,7 @@ class ColorController extends Controller
 
             // Update the color using DB facade
             $updated = DB::table('colors')
-                ->where('color_id', $id)
+                ->where('color_id', $color_id)
                 ->update([
                     'color_name' => $request->color_name,
                     'origin' => $request->origin,
@@ -184,7 +230,7 @@ class ColorController extends Controller
                 ]);
 
             if (!$updated) {
-                Log::warning('No changes made to color with ID: ' . $id);
+                Log::warning('No changes made to color with ID: ' . $color_id);
                 return response()->json([
                     'success' => false,
                     'message' => 'Tidak ada perubahan data'
@@ -192,12 +238,12 @@ class ColorController extends Controller
             }
 
             // Get the updated color data
-            $updatedColor = DB::table('colors')->where('color_id', $id)->first();
+            $updatedColor = DB::table('colors')->where('color_id', $color_id)->first();
 
             // Update the seeder file
             $this->updateSeederFile($updatedColor);
 
-            Log::info('Color updated successfully:', ['color_id' => $id]);
+            Log::info('Color updated successfully:', ['color_id' => $color_id]);
             
             return response()->json([
                 'success' => true,
@@ -275,21 +321,43 @@ class ColorController extends Controller
     /**
      * Remove the specified color from storage.
      *
-     * @param  string  $id
+     * @param  string  $color_id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($color_id)
     {
         try {
-            $affected = DB::table('colors')->where('color_id', $id)->delete();
+            $affected = DB::table('colors')->where('color_id', $color_id)->delete();
             
             if ($affected) {
+                if (request()->wantsJson() || request()->ajax()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Warna berhasil dihapus'
+                    ]);
+                }
+                
                 return redirect()->route('color.index')->with('success', 'Warna berhasil dihapus');
             } else {
+                if (request()->wantsJson() || request()->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Warna tidak ditemukan'
+                    ], 404);
+                }
+                
                 return back()->with('error', 'Warna tidak ditemukan');
             }
         } catch (\Exception $e) {
             Log::error('Error in ColorController@destroy: ' . $e->getMessage());
+            
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting color: ' . $e->getMessage()
+                ], 500);
+            }
+            
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }

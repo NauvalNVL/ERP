@@ -94,7 +94,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'select']);
+const emit = defineEmits(['close', 'select', 'refresh']);
 
 const searchQuery = ref('');
 const selectedColor = ref(null);
@@ -192,6 +192,9 @@ watch(() => props.show, (val) => {
   if (val) {
     selectedColor.value = null;
     searchQuery.value = '';
+    
+    // Emit event to parent component to refresh colors data
+    emit('refresh');
   }
 });
 

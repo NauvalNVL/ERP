@@ -45,6 +45,13 @@ class ColorGroupController extends Controller
         ]);
 
         if ($validator->fails()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
             return redirect()
                 ->route('system-requirement.color-group.index')
                 ->withErrors($validator)
@@ -52,17 +59,33 @@ class ColorGroupController extends Controller
         }
 
         try {
-            ColorGroup::create([
+            $colorGroup = ColorGroup::create([
                 'cg' => $request->cg,
                 'cg_name' => $request->cg_name,
                 'cg_type' => $request->cg_type,
             ]);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Color group created successfully',
+                    'data' => $colorGroup
+                ]);
+            }
 
             return redirect()
                 ->route('system-requirement.color-group.index')
                 ->with('success', 'Color group created successfully');
         } catch (\Exception $e) {
             Log::error('Error in ColorGroupController@store: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to create color group: ' . $e->getMessage()
+                ], 500);
+            }
+            
             return redirect()
                 ->route('system-requirement.color-group.index')
                 ->with('error', 'Failed to create color group');
