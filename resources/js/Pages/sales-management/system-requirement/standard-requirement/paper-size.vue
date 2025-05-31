@@ -21,28 +21,6 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Paper Size Management</h3>
                     </div>
-                    
-                    <!-- Header with navigation buttons -->
-                    <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" @click="showModal = true" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button type="button" @click="editSelectedSize" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" @click="createNewPaperSize" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
 
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
@@ -61,46 +39,32 @@
                         </div>
 
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                            <button type="button" @click="editSelectedSize" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
-                                <i class="fas fa-edit mr-2"></i> Edit Selected
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                            <button type="button" @click="createNewPaperSize" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                                <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
                         </div>
 
                         <!-- Data Status Information -->
-                    <div v-if="loading" class="mt-6 bg-yellow-100 p-3 rounded">
+                    <div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
                             <div class="flex items-center">
                             <div class="mr-3 animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
                                 <p class="text-sm font-medium text-yellow-800">Loading paper size data...</p>
                             </div>
                         </div>
-                    <div v-else-if="paperSizes.length === 0" class="mt-6 bg-yellow-100 p-3 rounded">
+                    <div v-else-if="paperSizes.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
                             <p class="text-sm font-medium text-yellow-800">No paper size data available.</p>
                             <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
                             <div class="mt-2 flex items-center space-x-3">
                                 <button @click="fetchPaperSizes" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Reload Data</button>
                             </div>
                         </div>
-                    <div v-else class="mt-6 bg-green-100 p-3 rounded">
+                    <div v-else class="mt-4 bg-green-100 p-3 rounded">
                             <p class="text-sm font-medium text-green-800">Data available: {{ paperSizes.length }} paper sizes found.</p>
                             <p v-if="selectedSize" class="text-xs text-green-700 mt-1">
                                 Selected: <span class="font-semibold">{{ sizeDisplay }}</span> - {{ selectedSize.description || 'No description' }}
                             </p>
-
-                            <div class="mt-2 flex flex-wrap items-center gap-2">
-                                <span 
-                                    v-for="(size, index) in paperSizes.slice(0, 8)" 
-                                    :key="index" 
-                                    @click="selectSize(size)" 
-                                    class="px-2 py-1 text-xs cursor-pointer rounded-full"
-                                    :class="selectedSize && selectedSize.id === size.id ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'">
-                                    {{ size.size }}mm
-                                </span>
-                                <span v-if="paperSizes.length > 8" class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full">
-                                    +{{ paperSizes.length - 8 }} more
-                                </span>
-                            </div>
                         </div>
                 </div>
             </div>

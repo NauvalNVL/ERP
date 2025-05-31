@@ -54,24 +54,39 @@ class PaperFluteController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'code' => 'required|string|max:20|unique:paper_flutes',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'flute_height' => 'required|numeric',
-            'is_active' => 'boolean',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'code' => 'required|string|max:20|unique:paper_flutes',
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'flute_height' => 'required|numeric',
+                'is_active' => 'boolean',
+            ]);
 
-        if ($validator->fails()) {
-            return redirect()->route('paper-flute.index')
-                ->withErrors($validator)
-                ->withInput();
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $paperFlute = PaperFlute::create($request->all());
+
+            // Update the seeder file if needed
+            $this->updateSeederFile($paperFlute);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Paper flute berhasil ditambahkan.',
+                'data' => $paperFlute
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating paper flute: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating paper flute: ' . $e->getMessage()
+            ], 500);
         }
-
-        PaperFlute::create($request->all());
-
-        return redirect()->route('paper-flute.index')
-            ->with('success', 'Paper flute berhasil ditambahkan.');
     }
 
     /**
@@ -184,13 +199,32 @@ class PaperFluteController extends Controller
     /**
      * Remove the specified paper flute from storage.
      */
-    public function destroy($id)
+    public function destroy($code)
     {
-        $paperFlute = PaperFlute::findOrFail($id);
-        $paperFlute->delete();
-
-        return redirect()->route('paper-flute.index')
-            ->with('success', 'Paper flute berhasil dihapus.');
+        try {
+            $paperFlute = PaperFlute::where('code', $code)->firstOrFail();
+            
+            // Store information before deletion for the response
+            $fluteInfo = [
+                'id' => $paperFlute->id,
+                'code' => $paperFlute->code,
+                'name' => $paperFlute->name
+            ];
+            
+            $paperFlute->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Paper flute berhasil dihapus.',
+                'data' => $fluteInfo
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting paper flute: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting paper flute: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

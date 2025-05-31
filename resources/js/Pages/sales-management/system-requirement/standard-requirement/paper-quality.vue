@@ -21,52 +21,30 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Paper Quality Management</h3>
                     </div>
-                    
-                    <!-- Header with navigation buttons -->
-                    <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" @click="showModal = true" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button type="button" @click="editSelectedQuality" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" @click="createNewPaperQuality" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
 
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-                            <div class="col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Paper Quality Code:</label>
-                                <div class="relative flex">
-                                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                        <i class="fas fa-hashtag"></i>
-                                    </span>
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Paper Quality Code:</label>
+                            <div class="relative flex">
+                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                                    <i class="fas fa-hashtag"></i>
+                                </span>
                                 <input type="text" v-model="searchQuery" 
                                     class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                                 <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
-                                        <i class="fas fa-table"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="col-span-1">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                            <button type="button" @click="editSelectedQuality" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
-                                <i class="fas fa-edit mr-2"></i> Edit Selected
+                                    <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
+                        
+                        <div class="col-span-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                            <button type="button" @click="createNewPaperQuality" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                                <i class="fas fa-plus-circle mr-2"></i> Add New
+                            </button>
+                        </div>
+                    </div>
 
                     <!-- Data Status Information -->
                     <div v-if="loading" class="mt-6 bg-yellow-100 p-3 rounded">

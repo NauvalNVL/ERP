@@ -193,9 +193,17 @@ Route::prefix('api')->group(function () {
     
     // Paper Quality API routes
     Route::get('/paper-qualities', [PaperQualityController::class, 'apiIndex']);
-    Route::post('/paper-qualities', [PaperQualityController::class, 'store']);
-    Route::put('/paper-qualities/{id}', [PaperQualityController::class, 'update']);
-    Route::delete('/paper-qualities/{id}', [PaperQualityController::class, 'destroy']);
+    Route::post('/paper-qualities', [PaperQualityController::class, 'apiStore']);
+    Route::put('/paper-qualities/{id}', [PaperQualityController::class, 'apiUpdate']);
+    Route::delete('/paper-qualities/{id}', [PaperQualityController::class, 'apiDestroy']);
+    
+    // Paper Flute API routes
+    Route::get('/paper-flutes', [PaperFluteController::class, 'index']);
+    Route::post('/paper-flutes', [PaperFluteController::class, 'store']);
+    Route::put('/paper-flutes/{code}', [PaperFluteController::class, 'update']);
+    Route::delete('/paper-flutes/{code}', [PaperFluteController::class, 'destroy']);
+    Route::get('/paper-flutes/seeder-data', [PaperFluteController::class, 'getSeederData']);
+    Route::post('/paper-flutes/seeder-data', [PaperFluteController::class, 'updateSeederData']);
     
     Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
     Route::get('/products', [ProductController::class, 'getProductsJson']);
@@ -208,7 +216,12 @@ Route::prefix('api')->group(function () {
     Route::put('/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
     Route::delete('/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
     
+    // Paper Size API routes
     Route::get('/paper-sizes', [PaperSizeController::class, 'apiIndex']);
+    Route::post('/paper-sizes', [PaperSizeController::class, 'apiStore']);
+    Route::put('/paper-sizes/{id}', [PaperSizeController::class, 'apiUpdate']);
+    Route::delete('/paper-sizes/{id}', [PaperSizeController::class, 'apiDestroy']);
+    
     Route::get('/product-groups', [ProductGroupController::class, 'index']);
     Route::get('/sales-teams', [SalesTeamController::class, 'apiIndex']);
     Route::get('/scoring-tools', [ScoringToolController::class, 'apiIndex']);

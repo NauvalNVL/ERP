@@ -321,4 +321,176 @@ class PaperQualityController extends Controller
             return response()->json(['error' => 'Failed to load paper quality data'], 500);
         }
     }
+
+    /**
+     * Update the paper quality via API.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiUpdate(Request $request, $id)
+    {
+        try {
+            $paperQuality = PaperQuality::findOrFail($id);
+            
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'paper_quality' => [
+                    'required',
+                    'string',
+                    'max:10',
+                    Rule::unique('paper_qualities', 'paper_quality')->ignore($id)
+                ],
+                'paper_name' => 'required|string|max:50',
+                'weight_kg_m' => 'nullable|numeric|between:0,9.9999',
+                'commercial_code' => 'nullable|string|max:10',
+                'wet_end_code' => 'nullable|string|max:10',
+                'decc_code' => 'nullable|string|max:10',
+                'status' => 'nullable|string|max:3',
+                'is_active' => 'nullable|boolean'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+            
+            $updatedBy = Auth::check() ? Auth::user()->user_id : 'system';
+            
+            // Set status if not provided
+            if (!isset($request->status)) {
+                $status = $request->is_active ? 'Act' : 'Obs';
+            } else {
+                $status = $request->status;
+            }
+            
+            $paperQuality->update([
+                'paper_quality' => $request->paper_quality,
+                'paper_name' => $request->paper_name,
+                'weight_kg_m' => $request->weight_kg_m,
+                'commercial_code' => $request->commercial_code,
+                'wet_end_code' => $request->wet_end_code,
+                'decc_code' => $request->decc_code,
+                'status' => $status,
+                'is_active' => $request->is_active ?? ($status === 'Act'),
+                'updated_by' => $updatedBy
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Paper quality updated successfully',
+                'data' => $paperQuality
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating paper quality: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update paper quality: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Store a new paper quality via API.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiStore(Request $request)
+    {
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'paper_quality' => [
+                    'required',
+                    'string',
+                    'max:10',
+                    Rule::unique('paper_qualities', 'paper_quality')
+                ],
+                'paper_name' => 'required|string|max:50',
+                'weight_kg_m' => 'nullable|numeric|between:0,9.9999',
+                'commercial_code' => 'nullable|string|max:10',
+                'wet_end_code' => 'nullable|string|max:10',
+                'decc_code' => 'nullable|string|max:10',
+                'status' => 'nullable|string|max:3',
+                'is_active' => 'nullable|boolean'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+            
+            $createdBy = Auth::check() ? Auth::user()->user_id : 'system';
+            
+            // Set status if not provided
+            if (!isset($request->status)) {
+                $status = $request->is_active ? 'Act' : 'Obs';
+            } else {
+                $status = $request->status;
+            }
+            
+            $paperQuality = PaperQuality::create([
+                'paper_quality' => $request->paper_quality,
+                'paper_name' => $request->paper_name,
+                'weight_kg_m' => $request->weight_kg_m,
+                'commercial_code' => $request->commercial_code,
+                'wet_end_code' => $request->wet_end_code,
+                'decc_code' => $request->decc_code,
+                'status' => $status,
+                'is_active' => $request->is_active ?? ($status === 'Act'),
+                'created_by' => $createdBy,
+                'updated_by' => $createdBy
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Paper quality created successfully',
+                'data' => $paperQuality
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating paper quality: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create paper quality: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Delete a paper quality via API.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiDestroy($id)
+    {
+        try {
+            $paperQuality = PaperQuality::findOrFail($id);
+            
+            // Store info before deletion for the response
+            $qualityInfo = [
+                'id' => $paperQuality->id,
+                'paper_quality' => $paperQuality->paper_quality,
+                'paper_name' => $paperQuality->paper_name
+            ];
+            
+            $paperQuality->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Paper quality deleted successfully',
+                'data' => $qualityInfo
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting paper quality: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete paper quality: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

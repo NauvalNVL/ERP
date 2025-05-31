@@ -8,6 +8,19 @@ use Illuminate\Database\Seeder;
 class PaperFluteSeeder extends Seeder
 {
     protected $flutes = [
+            [
+                'code' => 'tes',
+                'name' => 'tes',
+                'description' => 'tes',
+                'tur_l2b' => 1,
+                'tur_l3' => 1.4,
+                'tur_l1' => 1,
+                'tur_ace' => 1.5,
+                'tur_2l' => 1,
+                'flute_height' => 0.01,
+                'starch_consumption' => 0,
+                'is_active' => true,
+            ],
         [
             'code' => 'AB',
             'name' => 'AB',
@@ -224,19 +237,19 @@ class PaperFluteSeeder extends Seeder
             'flute_height' => 0.00,
             'starch_consumption' => 0.00
         ],
-        [
-            'code' => '2L',
-            'name' => '2L',
-            'description' => 'ROLL',
-            'tur_l2b' => 1,
-            'tur_l3' => 1.4,
-            'tur_l1' => 1,
-            'tur_ace' => 1.5,
-            'tur_2l' => 1,
-            'flute_height' => 0.00,
-            'starch_consumption' => 0,
-            'is_active' => false
-        ]
+                                [
+                'code' => '2L',
+                'name' => '2L',
+                'description' => 'ROLL',
+                'tur_l2b' => 1.00,
+                'tur_l3' => 1.40,
+                'tur_l1' => 1.00,
+                'tur_ace' => 1.50,
+                'tur_2l' => 1.00,
+                'flute_height' => 0,
+                'starch_consumption' => .00,
+                'is_active' => false,
+            ],,
     ];
 
     public function run(): void

@@ -176,7 +176,7 @@ const fetchPaperQualities = async (page = 1) => {
     loading.value = true;
     
     try {
-        const response = await fetch(`/paper-quality/manage-status?page=${page}`, {
+        const response = await fetch(`/api/paper-qualities?page=${page}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -190,11 +190,11 @@ const fetchPaperQualities = async (page = 1) => {
         const data = await response.json();
         
         if (data) {
-            paperQualities.value = data.data;
+            paperQualities.value = data;
             pagination.value = {
-                currentPage: data.current_page,
-                perPage: data.per_page,
-                total: data.total
+                currentPage: page,
+                perPage: 15,
+                total: data.length
             };
         }
     } catch (error) {
@@ -244,16 +244,21 @@ const togglePaperQualityStatus = async (quality) => {
             throw new Error('CSRF token not found');
         }
         
-        const formData = new FormData();
-        formData.append('_method', 'PATCH');
+        // Toggle the is_active property
+        const updatedData = {
+            ...quality,
+            is_active: !quality.is_active,
+            status: !quality.is_active ? 'Act' : 'Obs'
+        };
         
-        const response = await fetch(`/paper-quality/${quality.id}/toggle-status`, {
-            method: 'POST',
+        const response = await fetch(`/api/paper-qualities/${quality.id}`, {
+            method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             },
-            body: formData
+            body: JSON.stringify(updatedData)
         });
         
         if (!response.ok) {

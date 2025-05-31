@@ -217,4 +217,138 @@ class PaperSizeController extends Controller
             return response()->json(['error' => 'Failed to load paper size data'], 500);
         }
     }
+    
+    /**
+     * Update the paper size via API.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiUpdate(Request $request, $id)
+    {
+        try {
+            $paperSize = PaperSize::findOrFail($id);
+            
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'size' => [
+                    'required',
+                    'numeric',
+                    'min:0.01',
+                    Rule::unique('paper_sizes', 'size')->ignore($id)
+                ],
+                'inches' => 'required|numeric|min:0.01',
+                'description' => 'nullable|string|max:255'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+            
+            $updatedBy = Auth::check() ? Auth::user()->user_id : 'system';
+            
+            $paperSize->update([
+                'size' => $request->size,
+                'inches' => $request->inches,
+                'description' => $request->description,
+                'updated_by' => $updatedBy
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Paper size updated successfully',
+                'data' => $paperSize
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating paper size: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update paper size: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Store a new paper size via API.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiStore(Request $request)
+    {
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'size' => 'required|numeric|min:0.01|unique:paper_sizes,size',
+                'inches' => 'required|numeric|min:0.01',
+                'description' => 'nullable|string|max:255'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+            
+            $createdBy = Auth::check() ? Auth::user()->user_id : 'system';
+            
+            $paperSize = PaperSize::create([
+                'size' => $request->size,
+                'inches' => $request->inches,
+                'description' => $request->description,
+                'unit' => $request->unit ?? 'mm',
+                'created_by' => $createdBy,
+                'updated_by' => $createdBy
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Paper size created successfully',
+                'data' => $paperSize
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating paper size: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create paper size: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Delete a paper size via API.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiDestroy($id)
+    {
+        try {
+            $paperSize = PaperSize::findOrFail($id);
+            
+            // Store info before deletion for the response
+            $sizeInfo = [
+                'id' => $paperSize->id,
+                'size' => $paperSize->size,
+                'description' => $paperSize->description
+            ];
+            
+            $paperSize->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Paper size deleted successfully',
+                'data' => $sizeInfo
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting paper size: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete paper size: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
