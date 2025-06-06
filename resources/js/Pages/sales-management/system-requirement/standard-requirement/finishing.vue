@@ -2,6 +2,11 @@
     <AppLayout :header="'Finishing'">
     <Head title="Finishing Management" />
 
+    <!-- Hidden form with CSRF token -->
+    <form ref="csrfForm" class="hidden">
+        @csrf
+    </form>
+
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
@@ -21,27 +26,7 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Finishing Management</h3>
                     </div>
-                    <!-- Header with navigation buttons -->
-                    <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="showModal = true">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="editSelectedRow">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded flex items-center space-x-2" @click="createNewFinishing">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                    
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -50,16 +35,16 @@
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-tools"></i>
                                 </span>
-                                <input type="text" v-model="finishingCode" @keyup.enter="handleSearchAndCreate" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                                 <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                            <button type="button" @click="handleSearchAndCreate" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
-                                <i class="fas fa-edit mr-2"></i> Search & Edit
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                            <button type="button" @click="createNewFinishing" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
+                                <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
                     </div>
@@ -76,7 +61,7 @@
                         <p class="text-sm font-medium text-yellow-800">No finishing data available.</p>
                         <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
                         <div class="mt-2 flex items-center space-x-3">
-                            <button @click="fetchFinishings" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Reload Data</button>
+                            <button @click="loadSeedData" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Run Finishing Seeder</button>
                         </div>
                     </div>
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
@@ -102,9 +87,9 @@
                         <div class="p-4 bg-teal-50 rounded-lg">
                             <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
                             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                                <li>Finishing code must be unique</li>
-                                <li>Use the <span class="font-medium">search</span> button to select a finishing method</li>
-                                <li>Enter a new code and press Enter to create a new finishing</li>
+                                <li>Finishing code must be unique and cannot be changed</li>
+                                <li>Use the <span class="font-medium">search</span> button to find finishing methods</li>
+                                <li>Enter a new code and press Add New to create a new finishing</li>
                                 <li>Any changes must be saved</li>
                             </ul>
                         </div>
@@ -208,18 +193,13 @@
                 <form @submit.prevent="saveFinishingChanges" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Finishing Code:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Code:</label>
                             <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <span class="text-xs text-gray-500">Finishing code must be unique</span>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
                             <input v-model="editForm.description" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Note:</label>
-                            <div class="border border-gray-300 rounded-md p-3 bg-gray-50 h-16 overflow-auto text-sm">
-                                <p>Finishing methods are applied in the production process to finalize the product.</p>
-                            </div>
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
@@ -271,6 +251,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import FinishingModal from '@/Components/finishing-modal.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Get the header from props
 const props = defineProps({
@@ -290,23 +271,39 @@ const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
 const selectedRow = ref(null);
-const finishingCode = ref('');
-const editForm = ref({ 
-    code: '', 
-    description: ''
-});
+const searchQuery = ref('');
+const editForm = ref({ code: '', description: '' });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
-// Fetch finishings from API
+// Reference to the CSRF form
+const csrfForm = ref(null);
+
+// Function to get fresh CSRF token from the form
+const getCsrfToken = () => {
+    // Try to get token from meta tag first
+    let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    // If token from meta tag is not available or we want a fresh token, get from the form
+    if (csrfForm.value) {
+        const tokenInput = csrfForm.value.querySelector('input[name="_token"]');
+        if (tokenInput) {
+            token = tokenInput.value;
+        }
+    }
+    
+    return token || '';
+};
+
 const fetchFinishings = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/finishing/json/all', { 
+        const res = await fetch('/api/finishings', { 
             headers: { 
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
-            } 
+            },
+            credentials: 'same-origin'
         });
         
         if (!res.ok) {
@@ -314,13 +311,33 @@ const fetchFinishings = async () => {
         }
         
         const data = await res.json();
+        console.log('Fetched finishings:', data);
         
         if (Array.isArray(data)) {
             finishings.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            finishings.value = data.data;
         } else {
             finishings.value = [];
             console.error('Unexpected data format:', data);
         }
+        
+        // Verify that each record has an ID
+        if (finishings.value.length > 0) {
+            if (finishings.value[0].id === undefined) {
+                console.warn('Warning: Finishing records do not have ID property!');
+                // Try to find another identifier to use as ID
+                if (finishings.value[0].code) {
+                    console.log('Using code as ID fallback');
+                    finishings.value = finishings.value.map(finishing => ({
+                        ...finishing,
+                        id: finishing.id || finishing.code // Use existing ID or fallback to code
+                    }));
+                }
+            }
+        }
+        
+        console.log('Processed finishings:', finishings.value);
     } catch (e) {
         console.error('Error fetching finishings:', e);
         finishings.value = [];
@@ -330,17 +347,15 @@ const fetchFinishings = async () => {
 };
 
 onMounted(() => {
-    if (finishings.value.length === 0) {
-        fetchFinishings();
-    }
+    fetchFinishings();
 });
 
-// Watch for changes in finishingCode to filter the data
-watch(finishingCode, (newQuery) => {
+// Watch for changes in search query to filter the data
+watch(searchQuery, (newQuery) => {
     if (newQuery && finishings.value.length > 0) {
-        const foundFinishing = finishings.value.find(finish => 
-            finish.code.toLowerCase().includes(newQuery.toLowerCase()) ||
-            finish.description.toLowerCase().includes(newQuery.toLowerCase())
+        const foundFinishing = finishings.value.find(finishing => 
+            finishing.code.toLowerCase().includes(newQuery.toLowerCase()) ||
+            finishing.description.toLowerCase().includes(newQuery.toLowerCase())
         );
         
         if (foundFinishing) {
@@ -349,100 +364,48 @@ watch(finishingCode, (newQuery) => {
     }
 });
 
-const handleSearchAndCreate = async () => {
-    if (!finishingCode.value) return;
-    
-    saving.value = true;
-    try {
-        const code = finishingCode.value.trim().toUpperCase();
-        
-        // Search for the finishing code
-        const response = await fetch(`/finishing/search/${code}`, {
-            headers: { 
-                'Accept': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        
-        const data = await response.json();
-        
-        if (data.exists) {
-            // Find the finishing in our list
-            const existingFinishing = finishings.value.find(f => f.code === code);
-            if (existingFinishing) {
-                selectedRow.value = existingFinishing;
-                editSelectedRow();
-            } else {
-                // Reload data to find this finishing
-                await fetchFinishings();
-                const reloadedFinishing = finishings.value.find(f => f.code === code);
-                if (reloadedFinishing) {
-                    selectedRow.value = reloadedFinishing;
-                    editSelectedRow();
-                }
-            }
-        } else {
-            // Create new finishing
-            createNewFinishing(code);
-        }
-    } catch (e) {
-        console.error('Error in search and create:', e);
-        showNotification('Error searching for finishing: ' + e.message, 'error');
-    } finally {
-        saving.value = false;
-    }
-};
-
 const onFinishingSelected = (finishing) => {
     selectedRow.value = finishing;
-    finishingCode.value = finishing.code;
+    searchQuery.value = finishing.code;
     showModal.value = false;
     
     // Automatically open the edit modal for the selected row
     isCreating.value = false;
-    editForm.value = { ...finishing };
+    editForm.value = { 
+        id: finishing.id,
+        code: finishing.code, 
+        description: finishing.description
+    };
+    console.log('Selected finishing for editing:', editForm.value);
     showEditModal.value = true;
 };
 
-const editSelectedRow = () => {
-    if (selectedRow.value) {
-        isCreating.value = false;
-        editForm.value = { ...selectedRow.value };
-        showEditModal.value = true;
-    } else {
-        showNotification('Please select a finishing first', 'error');
-    }
-};
-
-const createNewFinishing = (code = '') => {
+const createNewFinishing = () => {
     isCreating.value = true;
-    editForm.value = { 
-        code: code || '',
-        description: ''
-    };
+    editForm.value = { code: '', description: '' };
     showEditModal.value = true;
 };
 
 const closeEditModal = () => {
     showEditModal.value = false;
-    editForm.value = { 
-        code: '', 
-        description: ''
-    };
+    editForm.value = { code: '', description: '' };
     isCreating.value = false;
 };
 
 const saveFinishingChanges = async () => {
     saving.value = true;
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        // Get fresh CSRF token
+        const csrfToken = getCsrfToken();
         
         // Different API call for create vs update
-        let url = isCreating.value ? '/finishing' : `/finishing/${editForm.value.code}`;
+        // Use code as the identifier for updates instead of id
+        let url = isCreating.value ? '/api/finishings' : `/api/finishings/${editForm.value.code}`;
         let method = isCreating.value ? 'POST' : 'PUT';
+        
+        // Log what we're trying to update to help with debugging
+        console.log('Updating finishing with code:', editForm.value.code);
+        console.log('Update data:', editForm.value);
         
         const response = await fetch(url, {
             method: method,
@@ -455,8 +418,14 @@ const saveFinishingChanges = async () => {
             body: JSON.stringify({
                 code: editForm.value.code,
                 description: editForm.value.description
-            })
+            }),
+            credentials: 'same-origin' // Include cookies in the request
         });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error updating finishing');
+        }
         
         const result = await response.json();
         
@@ -471,9 +440,6 @@ const saveFinishingChanges = async () => {
                 showNotification('Finishing updated successfully', 'success');
             }
             
-            // Set the code in the input field
-            finishingCode.value = editForm.value.code;
-            
             // Refresh the full data list to ensure we're in sync with the database
             await fetchFinishings();
             closeEditModal();
@@ -482,7 +448,7 @@ const saveFinishingChanges = async () => {
         }
     } catch (e) {
         console.error('Error saving finishing changes:', e);
-        showNotification('Error saving finishing. Please try again.', 'error');
+        showNotification('Error saving finishing: ' + e.message, 'error');
     } finally {
         saving.value = false;
     }
@@ -495,34 +461,78 @@ const deleteFinishing = async (code) => {
     
     saving.value = true;
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        // Get fresh CSRF token
+        const csrfToken = getCsrfToken();
         
-        const response = await fetch(`/finishing/${code}`, {
+        console.log('Deleting finishing with code:', code);
+        
+        // Use code as the identifier instead of id
+        const response = await fetch(`/api/finishings/${code}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            }
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin' // Include cookies in the request
         });
         
-        if (response.ok) {
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error deleting finishing');
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
             // Remove the item from the local array
             finishings.value = finishings.value.filter(finishing => finishing.code !== code);
             
             if (selectedRow.value && selectedRow.value.code === code) {
                 selectedRow.value = null;
-                finishingCode.value = '';
+                searchQuery.value = '';
             }
             
             closeEditModal();
             showNotification('Finishing deleted successfully', 'success');
         } else {
-            const result = await response.json();
             showNotification('Error deleting finishing: ' + (result.message || 'Unknown error'), 'error');
         }
     } catch (e) {
         console.error('Error deleting finishing:', e);
-        showNotification('Error deleting finishing. Please try again.', 'error');
+        showNotification('Error deleting finishing: ' + e.message, 'error');
+    } finally {
+        saving.value = false;
+    }
+};
+
+const loadSeedData = async () => {
+    saving.value = true;
+    try {
+        // Get fresh CSRF token
+        const csrfToken = getCsrfToken();
+        
+        const response = await fetch('/api/finishings/seed', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin' // Include cookies in the request
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('Finishing data seeded successfully', 'success');
+            await fetchFinishings();
+        } else {
+            showNotification('Error seeding data: ' + (result.message || 'Unknown error'), 'error');
+        }
+    } catch (e) {
+        console.error('Error seeding data:', e);
+        showNotification('Error seeding data. Please try again.', 'error');
     } finally {
         saving.value = false;
     }

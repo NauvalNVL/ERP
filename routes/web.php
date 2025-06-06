@@ -307,4 +307,11 @@ Route::prefix('api')->group(function () {
     Route::put('/color-groups/{id}', [ColorGroupController::class, 'update']);
     Route::delete('/color-groups/{id}', [ColorGroupController::class, 'destroy']);
     Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
+    
+    // Finishing API routes
+    Route::get('/finishings', [FinishingController::class, 'apiIndex']);
+    Route::post('/finishings', [FinishingController::class, 'store']);
+    Route::put('/finishings/{code}', [FinishingController::class, 'update']);
+    Route::delete('/finishings/{code}', [FinishingController::class, 'destroy']);
+    Route::post('/finishings/seed', [FinishingController::class, 'seed']);
 });
