@@ -242,6 +242,7 @@ Route::prefix('api')->group(function () {
     Route::post('/colors', [ColorController::class, 'store']);
     Route::put('/colors/{color_id}', [ColorController::class, 'update']);
     Route::delete('/colors/{color_id}', [ColorController::class, 'destroy']);
+    Route::post('/colors/seed', [ColorController::class, 'seed']);
     
     Route::get('/industry', [IndustryController::class, 'index']);
     Route::post('/industry', [IndustryController::class, 'store']);

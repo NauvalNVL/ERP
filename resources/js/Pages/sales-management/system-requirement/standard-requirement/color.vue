@@ -2,6 +2,11 @@
     <AppLayout :header="'Define Color'">
     <Head title="Define Color" />
 
+    <!-- Hidden form with CSRF token -->
+    <form ref="csrfForm" class="hidden">
+        @csrf
+    </form>
+
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
@@ -54,7 +59,8 @@
                         <p class="text-sm font-medium text-yellow-800">No color data available.</p>
                         <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
                         <div class="mt-2 flex items-center space-x-3">
-                            <button @click="fetchColors" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Reload Data</button>
+                            <button @click="loadSeedData" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Run Color Seeder</button>
+                            <button @click="fetchColors" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded">Reload Data</button>
                         </div>
                     </div>
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
@@ -135,7 +141,7 @@
                             </div>
                         </Link>
 
-                        <a href="/finishing" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <Link href="/finishing" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <div class="p-2 bg-blue-500 rounded-full mr-3">
                                 <i class="fas fa-th-list text-white text-sm"></i>
                             </div>
@@ -143,7 +149,7 @@
                                 <p class="font-medium text-blue-900">Finishings</p>
                                 <p class="text-xs text-blue-700">Manage finishings</p>
                             </div>
-                        </a>
+                        </Link>
 
                         <Link href="/color/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                             <div class="p-2 bg-green-500 rounded-full mr-3">
@@ -366,9 +372,8 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
-import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import axios from 'axios';
 import ColorModal from '@/Components/color-modal.vue';
 
 // Get the header from props
@@ -387,6 +392,25 @@ const props = defineProps({
     }
 });
 
+// Reference to the CSRF form
+const csrfForm = ref(null);
+
+// Function to get fresh CSRF token from the form
+const getCsrfToken = () => {
+    // Try to get token from meta tag first
+    let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    // If token from meta tag is not available or we want a fresh token, get from the form
+    if (csrfForm.value) {
+        const tokenInput = csrfForm.value.querySelector('input[name="_token"]');
+        if (tokenInput) {
+            token = tokenInput.value;
+        }
+    }
+    
+    return token || '';
+};
+
 const colors = ref(props.colors || []);
 const colorGroups = ref(props.colorGroups || []);
 const loading = ref(false);
@@ -399,7 +423,8 @@ const selectedColorGroup = ref(null);
 const searchQuery = ref('');
 const cgSearchQuery = ref('');
 const modalSearchQuery = ref('');
-const sortOption = ref('colorId');
+const sortKey = ref('color_id');
+const sortAsc = ref(true);
 const editForm = ref({ 
     color_id: '', 
     color_name: '', 
@@ -415,15 +440,32 @@ const notification = ref({ show: false, message: '', type: 'success' });
 const fetchColors = async () => {
     loading.value = true;
     try {
-        console.log('Fetching colors from API...');
-        const response = await axios.get('/api/colors');
-        console.log('API Response:', response);
-        colors.value = response.data || [];
-        console.log("Fetched colors:", colors.value.length, "items");
-        console.log("First 3 colors:", colors.value.slice(0, 3));
+        const response = await fetch('/api/colors', { 
+            headers: { 
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin' // Include cookies in the request
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+            colors.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            colors.value = data.data;
+        } else {
+            colors.value = [];
+            console.error('Unexpected data format:', data);
+        }
     } catch (error) {
         console.error('Error fetching colors:', error);
         showNotification('Failed to load colors data', 'error');
+        colors.value = [];
     } finally {
         loading.value = false;
     }
@@ -431,24 +473,35 @@ const fetchColors = async () => {
 
 // Manually refresh colors - can be called after operations
 const refreshColors = async () => {
-    console.log('Manual refresh of colors data triggered');
     await fetchColors();
-    console.log('Colors data has been refreshed, count:', colors.value.length);
 };
 
 // Fetch color groups from API
 const fetchColorGroups = async () => {
     try {
-        const result = await axios.get('/api/color-groups');
-        if (Array.isArray(result.data)) {
-            colorGroups.value = result.data.map(group => ({
+        const response = await fetch('/api/color-groups', { 
+            headers: { 
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+            colorGroups.value = data.map(group => ({
                 cg: group.cg_id || group.cg,
                 cg_name: group.cg_name,
                 cg_type: group.cg_type
             }));
         } else {
             colorGroups.value = [];
-            console.error('Unexpected data format:', result.data);
+            console.error('Unexpected data format:', data);
         }
     } catch (e) {
         console.error('Error fetching color groups:', e);
@@ -506,34 +559,13 @@ const getColorGroupName = (cgId) => {
     return group ? group.cg_name : '';
 };
 
-// Sort by Color ID
-const sortByColorId = () => {
-    sortOption.value = 'colorId';
-    colors.value.sort((a, b) => {
-        return a.color_id.localeCompare(b.color_id, undefined, {numeric: true});
-    });
-};
-
-// Sort by Color Group + Color ID
-const sortByCGAndColor = () => {
-    sortOption.value = 'cgAndColor';
-    colors.value.sort((a, b) => {
-        if (a.color_group_id !== b.color_group_id) {
-            return a.color_group_id.localeCompare(b.color_group_id, undefined, {numeric: true});
-        }
-        return a.color_id.localeCompare(b.color_id, undefined, {numeric: true});
-    });
-};
-
-// Sort by CG Type + Color ID
-const sortByCGTypeAndColor = () => {
-    sortOption.value = 'cgTypeAndColor';
-    colors.value.sort((a, b) => {
-        if (a.cg_type !== b.cg_type) {
-            return a.cg_type.localeCompare(b.cg_type);
-        }
-        return a.color_id.localeCompare(b.color_id, undefined, {numeric: true});
-    });
+const sortTable = (key) => {
+    if (sortKey.value === key) {
+        sortAsc.value = !sortAsc.value;
+    } else {
+        sortKey.value = key;
+        sortAsc.value = true;
+    }
 };
 
 const onColorSelected = (color) => {
@@ -608,33 +640,71 @@ const selectColorGroup = (group) => {
 };
 
 const saveColorChanges = async () => {
+    // Validate form
+    if (!editForm.value.color_id) {
+        showNotification('Color code is required', 'error');
+        return;
+    }
+
+    if (!editForm.value.color_name) {
+        showNotification('Color name is required', 'error');
+        return;
+    }
+
+    if (!editForm.value.color_group_id) {
+        showNotification('Color group is required', 'error');
+        return;
+    }
+    
     saving.value = true;
     
     try {
-        let response;
-        if (isCreating.value) {
-            console.log('Sending POST request to create new color:', editForm.value);
-            response = await axios.post('/api/colors', editForm.value);
-            console.log('Response from create:', response.data);
-            showNotification('Color added successfully!', 'success');
-        } else {
-            console.log('Sending PUT request to update color:', editForm.value);
-            response = await axios.put(`/api/colors/${editForm.value.color_id}`, editForm.value);
-            console.log('Response from update:', response.data);
-            showNotification('Color updated successfully!', 'success');
+        const csrfToken = getCsrfToken();
+        
+        // Different API call for create vs update
+        let url = isCreating.value ? '/api/colors' : `/api/colors/${editForm.value.color_id}`;
+        let method = isCreating.value ? 'POST' : 'PUT';
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(editForm.value),
+            credentials: 'same-origin' // Include cookies in the request
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error saving color');
         }
         
-        // Refresh the colors data after save
-        console.log('Refreshing colors data after save');
-        await fetchColors();
-        console.log('Colors refreshed, current count:', colors.value.length);
+        const result = await response.json();
         
-        showEditModal.value = false;
+        // Update the local data
+        await fetchColors();
+        
+        // Show success notification
+        if (isCreating.value) {
+            showNotification('Color created successfully', 'success');
+            // Find and select the newly created color
+            const newColor = colors.value.find(c => c.color_id === editForm.value.color_id);
+            if (newColor) {
+                selectedRow.value = newColor;
+                searchQuery.value = newColor.color_id;
+            }
+        } else {
+            showNotification('Color updated successfully', 'success');
+        }
+        
+        // Close the edit modal
+        closeEditModal();
     } catch (error) {
         console.error('Error saving color:', error);
-        console.error('Error response:', error.response?.data);
-        const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
-        showNotification(`Error saving color: ${errorMessage}`, 'error');
+        showNotification('Error: ' + error.message, 'error');
     } finally {
         saving.value = false;
     }
@@ -646,7 +716,23 @@ const deleteColor = async (colorId) => {
     saving.value = true;
     
     try {
-        await axios.delete(`/api/colors/${colorId}`);
+        const csrfToken = getCsrfToken();
+        
+        const response = await fetch(`/api/colors/${colorId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin' // Include cookies in the request
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error deleting color');
+        }
+        
         showNotification('Color deleted successfully!', 'success');
         await fetchColors();
         
@@ -658,8 +744,7 @@ const deleteColor = async (colorId) => {
         closeEditModal();
     } catch (error) {
         console.error('Error deleting color:', error);
-        const errorMessage = error.response?.data?.message || 'An unexpected error occurred';
-        showNotification(`Error deleting color: ${errorMessage}`, 'error');
+        showNotification(`Error deleting color: ${error.message}`, 'error');
     } finally {
         saving.value = false;
     }
@@ -696,8 +781,36 @@ const selectColor = (color) => {
     searchQuery.value = color.color_id;
 };
 
-// Watch modal data changes
-watch(() => colors.value.length, (newCount, oldCount) => {
-    console.log(`Colors count changed from ${oldCount} to ${newCount}`);
-});
+// Load seed data function
+const loadSeedData = async () => {
+    saving.value = true;
+    try {
+        const csrfToken = getCsrfToken();
+        
+        const response = await fetch('/api/colors/seed', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin' // Include cookies in the request
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('Color data seeded successfully', 'success');
+            await fetchColors();
+        } else {
+            showNotification('Error seeding data: ' + (result.message || 'Unknown error'), 'error');
+        }
+    } catch (e) {
+        console.error('Error seeding data:', e);
+        showNotification('Error seeding data. Please try again.', 'error');
+    } finally {
+        saving.value = false;
+    }
+};
 </script>

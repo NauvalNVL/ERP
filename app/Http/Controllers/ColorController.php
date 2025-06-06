@@ -440,4 +440,54 @@ class ColorController extends Controller
             return response()->json(['error' => 'Failed to load color data for printing'], 500);
         }
     }
+
+    /**
+     * Seed the database with sample color data.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function seed()
+    {
+        try {
+            // Sample color data
+            $sampleData = [
+                ['color_id' => 'BK01', 'color_name' => 'Black Matte', 'origin' => 'ID', 'color_group_id' => 'BK', 'cg_type' => 'X-Flexo'],
+                ['color_id' => 'BK02', 'color_name' => 'Black Glossy', 'origin' => 'ID', 'color_group_id' => 'BK', 'cg_type' => 'X-Flexo'],
+                ['color_id' => 'RD01', 'color_name' => 'Red Standard', 'origin' => 'ID', 'color_group_id' => 'R', 'cg_type' => 'X-Flexo'],
+                ['color_id' => 'RD02', 'color_name' => 'Red Bright', 'origin' => 'ID', 'color_group_id' => 'R', 'cg_type' => 'X-Flexo'],
+                ['color_id' => 'BL01', 'color_name' => 'Blue Navy', 'origin' => 'ID', 'color_group_id' => 'B', 'cg_type' => 'X-Flexo'],
+                ['color_id' => 'BL02', 'color_name' => 'Blue Sky', 'origin' => 'ID', 'color_group_id' => 'B', 'cg_type' => 'X-Flexo'],
+                ['color_id' => 'GR01', 'color_name' => 'Green Forest', 'origin' => 'ID', 'color_group_id' => 'G', 'cg_type' => 'X-Flexo'],
+                ['color_id' => 'GR02', 'color_name' => 'Green Lime', 'origin' => 'ID', 'color_group_id' => 'G', 'cg_type' => 'X-Flexo'],
+                ['color_id' => 'YL01', 'color_name' => 'Yellow Standard', 'origin' => 'ID', 'color_group_id' => 'Y', 'cg_type' => 'X-Flexo'],
+                ['color_id' => 'WT01', 'color_name' => 'White Standard', 'origin' => 'ID', 'color_group_id' => 'W', 'cg_type' => 'X-Flexo'],
+            ];
+
+            $createdCount = 0;
+
+            foreach ($sampleData as $data) {
+                // Skip if color already exists
+                if (DB::table('colors')->where('color_id', $data['color_id'])->exists()) {
+                    continue;
+                }
+
+                DB::table('colors')->insert(array_merge($data, [
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]));
+                $createdCount++;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully seeded $createdCount colors"
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorController@seed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to seed colors data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
