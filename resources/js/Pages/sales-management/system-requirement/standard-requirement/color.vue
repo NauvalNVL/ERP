@@ -21,24 +21,7 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Define Color</h3>
                     </div>
-                    <!-- Header with navigation buttons -->
-                    <div class="flex items-center space-x-2 mb-6">
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" @click="showModal = true">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" @click="saveColorChanges">
-                            <i class="fas fa-save"></i>
-                        </button>
-                    </div>
+                    
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -152,13 +135,13 @@
                             </div>
                         </Link>
 
-                        <a href="#" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <a href="/finishing" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <div class="p-2 bg-blue-500 rounded-full mr-3">
                                 <i class="fas fa-th-list text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">Color Types</p>
-                                <p class="text-xs text-blue-700">View color types</p>
+                                <p class="font-medium text-blue-900">Finishings</p>
+                                <p class="text-xs text-blue-700">Manage finishings</p>
                             </div>
                         </a>
 

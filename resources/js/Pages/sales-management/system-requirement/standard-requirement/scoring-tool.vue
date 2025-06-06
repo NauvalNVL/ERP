@@ -119,23 +119,23 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <Link href="#" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <Link href="/paper-quality" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                             <div class="p-2 bg-purple-500 rounded-full mr-3">
                                 <i class="fas fa-cogs text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-purple-900">Machine Setup</p>
-                                <p class="text-xs text-purple-700">Setup production machines</p>
+                                <p class="font-medium text-purple-900">Paper Quality</p>
+                                <p class="text-xs text-purple-700">Manage paper quality</p>
                             </div>
                         </Link>
 
-                        <Link href="#" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <Link href="/paper-flute" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <div class="p-2 bg-blue-500 rounded-full mr-3">
                                 <i class="fas fa-cog text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">Tool Settings</p>
-                                <p class="text-xs text-blue-700">Scoring tool settings</p>
+                                <p class="font-medium text-blue-900">Paper Flute</p>
+                                <p class="text-xs text-blue-700">Manage paper flute</p>
                             </div>
                         </Link>
 

@@ -123,23 +123,23 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <Link href="/color-group" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <Link href="/product-group" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                             <div class="p-2 bg-purple-500 rounded-full mr-3">
                                 <i class="fas fa-layer-group text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-purple-900">Color Groups</p>
-                                <p class="text-xs text-purple-700">Manage color groups</p>
+                                <p class="font-medium text-purple-900">Product Groups</p>
+                                <p class="text-xs text-purple-700">Manage product groups</p>
                             </div>
                         </Link>
 
-                        <Link href="/categories" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <Link href="/product-design" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <div class="p-2 bg-blue-500 rounded-full mr-3">
                                 <i class="fas fa-th-list text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">Categories</p>
-                                <p class="text-xs text-blue-700">Manage product categories</p>
+                                <p class="font-medium text-blue-900">Product Designs</p>
+                                <p class="text-xs text-blue-700">Manage product designs</p>
                             </div>
                         </Link>
 

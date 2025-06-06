@@ -135,17 +135,17 @@
                             </div>
                         </Link>
 
-                        <Link href="/salesperson-team" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <Link href="/sales-person-team" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <div class="p-2 bg-blue-500 rounded-full mr-3">
                                 <i class="fas fa-user-plus text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">Team Assignment</p>
+                                <p class="font-medium text-blue-900">Salesperson Team</p>
                                 <p class="text-xs text-blue-700">Manage team assignments</p>
                             </div>
                         </Link>
 
-                        <Link href="/salesperson/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <Link href="/sales-person/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                             <div class="p-2 bg-green-500 rounded-full mr-3">
                                 <i class="fas fa-print text-white text-sm"></i>
                             </div>

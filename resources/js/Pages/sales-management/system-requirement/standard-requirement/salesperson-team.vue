@@ -134,17 +134,17 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <Link href="/vue/sales-team" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <Link href="/sales-team" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                             <div class="p-2 bg-purple-500 rounded-full mr-3">
                                 <i class="fas fa-users text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-purple-900">Teams</p>
+                                <p class="font-medium text-purple-900">Sales Teams</p>
                                 <p class="text-xs text-purple-700">Manage sales teams</p>
                             </div>
                         </Link>
 
-                        <Link href="/vue/salesperson" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <Link href="/sales-person" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <div class="p-2 bg-blue-500 rounded-full mr-3">
                                 <i class="fas fa-user-tie text-white text-sm"></i>
                             </div>
@@ -154,7 +154,7 @@
                             </div>
                         </Link>
 
-                        <Link href="/salesperson-team/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <Link href="/sales-person-team/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                             <div class="p-2 bg-green-500 rounded-full mr-3">
                                 <i class="fas fa-print text-white text-sm"></i>
                             </div>

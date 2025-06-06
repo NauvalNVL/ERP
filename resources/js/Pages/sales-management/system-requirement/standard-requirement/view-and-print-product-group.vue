@@ -17,7 +17,7 @@
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-print mr-2"></i> Print List
                 </button>
-                <Link href="/vue/product-group" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                <Link href="/product-group" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Product Groups
                 </Link>
             </div>

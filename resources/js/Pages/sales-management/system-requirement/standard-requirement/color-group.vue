@@ -145,13 +145,13 @@
                             </div>
                         </Link>
 
-                        <a href="#" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <a href="/finishing" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <div class="p-2 bg-blue-500 rounded-full mr-3">
                                 <i class="fas fa-th-list text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">CG Types</p>
-                                <p class="text-xs text-blue-700">View color group types</p>
+                                <p class="font-medium text-blue-900">Finishings</p>
+                                <p class="text-xs text-blue-700">Manage finishings</p>
                             </div>
                         </a>
 
