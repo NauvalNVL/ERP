@@ -145,7 +145,7 @@ const currentDate = new Date().toLocaleString();
 const fetchColorGroups = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/color-group', {
+        const response = await fetch('/api/color-groups', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -157,9 +157,18 @@ const fetchColorGroups = async () => {
         }
         
         const data = await response.json();
-        colorGroups.value = data;
+        
+        if (Array.isArray(data)) {
+            colorGroups.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            colorGroups.value = data.data;
+        } else {
+            console.error('Unexpected API response format:', data);
+            colorGroups.value = [];
+        }
     } catch (error) {
         console.error('Error fetching color groups:', error);
+        colorGroups.value = [];
     } finally {
         loading.value = false;
     }

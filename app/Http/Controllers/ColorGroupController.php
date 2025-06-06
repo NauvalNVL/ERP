@@ -217,6 +217,24 @@ class ColorGroupController extends Controller
     }
 
     /**
+     * API endpoint to get color groups in JSON format.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $colorGroups = ColorGroup::orderBy('cg')
+                ->get();
+            
+            return response()->json($colorGroups);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorGroupController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load color groups data'], 500);
+        }
+    }
+
+    /**
      * Seed the database with sample color group data.
      *
      * @return \Illuminate\Http\JsonResponse

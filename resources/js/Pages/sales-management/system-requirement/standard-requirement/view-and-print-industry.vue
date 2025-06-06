@@ -160,7 +160,7 @@ const formatDate = (dateString) => {
 const fetchIndustries = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/industry', {
+        const response = await fetch('/api/industry', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -172,11 +172,11 @@ const fetchIndustries = async () => {
         }
         
         const data = await response.json();
-        console.log('Data received from API:', data);
         
         if (Array.isArray(data)) {
             industries.value = data;
-            console.log('Industries loaded:', industries.value.length);
+        } else if (data.data && Array.isArray(data.data)) {
+            industries.value = data.data;
         } else {
             console.error('Expected array of industries but got:', data);
             industries.value = [];

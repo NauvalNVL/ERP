@@ -154,7 +154,7 @@ const currentDate = new Date().toLocaleString();
 const fetchFinishings = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/finishing/json/all', {
+        const response = await fetch('/api/finishings', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -166,9 +166,18 @@ const fetchFinishings = async () => {
         }
         
         const data = await response.json();
-        finishings.value = data;
+        
+        if (Array.isArray(data)) {
+            finishings.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            finishings.value = data.data;
+        } else {
+            console.error('Unexpected API response format:', data);
+            finishings.value = [];
+        }
     } catch (error) {
         console.error('Error fetching finishings:', error);
+        finishings.value = [];
     } finally {
         loading.value = false;
     }

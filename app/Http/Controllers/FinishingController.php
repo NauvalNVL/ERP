@@ -20,7 +20,7 @@ class FinishingController extends Controller
                 return response()->json($finishings);
             }
             
-            return view('sales-management.system-requirement.system-requirement.standard-requirement.finishing', compact('finishings'));
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.finishing', compact('finishings'));
         } catch (\Exception $e) {
             Log::error('Error loading finishings: ' . $e->getMessage());
             
@@ -44,9 +44,9 @@ class FinishingController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'code' => 'required|unique:finishings,code',
+            'code' => 'required|unique:finishings,code',
                 'description' => 'required|string|max:255',
-            ]);
+        ]);
 
             if ($validator->fails()) {
                 return response()->json([
@@ -87,7 +87,7 @@ class FinishingController extends Controller
             $validator = Validator::make($request->all(), [
                 'code' => 'required|string|max:10|unique:finishings,code,' . $finishing->id,
                 'description' => 'required|string|max:255',
-            ]);
+        ]);
 
             if ($validator->fails()) {
                 return response()->json([
@@ -124,8 +124,8 @@ class FinishingController extends Controller
     {
         try {
             $finishing = Finishing::where('code', $code)->firstOrFail();
-            $finishing->delete();
-            
+        $finishing->delete();
+        
             return response()->json([
                 'success' => true,
                 'message' => 'Finishing deleted successfully'
@@ -159,8 +159,8 @@ class FinishingController extends Controller
     public function viewAndPrint()
     {
         try {
-            $finishings = Finishing::orderBy('code')->get();
-            return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintfinishing', compact('finishings'));
+        $finishings = Finishing::orderBy('code')->get(); 
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintfinishing', compact('finishings')); 
         } catch (\Exception $e) {
             Log::error('Error viewing finishings: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Error loading data: ' . $e->getMessage());
@@ -178,7 +178,7 @@ class FinishingController extends Controller
         $exists = Finishing::where('code', strtoupper($code))->exists();
         return response()->json(['exists' => $exists]);
     }
-
+    
     /**
      * Display the Vue index page for finishing management
      *

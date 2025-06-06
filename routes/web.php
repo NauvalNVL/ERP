@@ -248,6 +248,7 @@ Route::prefix('api')->group(function () {
     Route::put('/industry/{id}', [IndustryController::class, 'update']);
     Route::delete('/industry/{id}', [IndustryController::class, 'destroy']);
     Route::get('/industry/search/{code}', [IndustryController::class, 'search']);
+    Route::get('/industries', [IndustryController::class, 'apiIndex']);
     Route::get('/paper-flutes', [PaperFluteController::class, 'index']);
     
     // Product Group API routes

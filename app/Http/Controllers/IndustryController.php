@@ -153,4 +153,22 @@ class IndustryController extends Controller
             return response()->json(['error' => 'Failed to load industry data for printing'], 500);
         }
     }
+
+    /**
+     * API endpoint to get industries in JSON format.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $industries = Industry::orderBy('code')
+                ->get();
+            
+            return response()->json($industries);
+        } catch (\Exception $e) {
+            Log::error('Error in IndustryController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load industry data'], 500);
+        }
+    }
 }

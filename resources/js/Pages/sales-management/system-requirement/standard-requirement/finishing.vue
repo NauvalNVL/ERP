@@ -347,7 +347,7 @@ const fetchFinishings = async () => {
 };
 
 onMounted(() => {
-    fetchFinishings();
+        fetchFinishings();
 });
 
 // Watch for changes in search query to filter the data
