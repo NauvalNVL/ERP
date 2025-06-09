@@ -20,41 +20,6 @@
                             <h3 class="text-xl font-semibold text-gray-800">Master Card Management</h3>
                         </div>
                         
-                        <!-- Header with action buttons -->
-                        <div class="flex items-center space-x-2 mb-6">
-                            <button 
-                                @click="closeRecord"
-                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px"
-                                title="Close"
-                            >
-                                <i class="fas fa-power-off"></i>
-                            </button>
-                            <button 
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px"
-                                title="Next Record"
-                            >
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                            <button 
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px"
-                                title="Previous Record"
-                            >
-                                <i class="fas fa-arrow-left"></i>
-                            </button>
-                            <button 
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px"
-                                title="Search"
-                            >
-                                <i class="fas fa-search"></i>
-                            </button>
-                            <button 
-                                @click="saveRecord"
-                                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px"
-                                title="Save"
-                            >
-                                <i class="fas fa-save"></i>
-                            </button>
-                        </div>
 
                         <!-- Form content -->
                         <form @submit.prevent="saveRecord" class="space-y-6">
@@ -87,8 +52,8 @@
                                         @click="selectRecord"
                                         class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px"
                                     >
-                                        <i class="fas fa-check-circle mr-2"></i>
-                                        <span>Record: Select</span>
+                                        <i class="fas fa-plus mr-2"></i>
+                                        <span>Add New</span>
                                     </button>
                                 </div>
                             </div>

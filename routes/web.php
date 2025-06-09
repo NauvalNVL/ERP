@@ -31,6 +31,7 @@ use App\Http\Controllers\UpdateCustomerAccountController;
 use App\Http\Controllers\ISOCurrencyController;
 use App\Http\Controllers\CustomerAlternateAddressController;
 use App\Http\Controllers\UpdateMcController;
+use App\Http\Controllers\ApproveMcController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -158,6 +159,8 @@ Route::middleware('auth')->group(function () {
          Route::get('/customer-group', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/customer-group');
          })->name('vue.customer-group.index');
+         
+         Route::get('/customer-group/view-print', [CustomerGroupController::class, 'vueViewAndPrint'])->name('vue.customer-group.view-print');
 
          Route::get('/update-customer-account', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
@@ -173,6 +176,9 @@ Route::middleware('auth')->group(function () {
          Route::get('/sales-management/system-requirement/master-card/update-mc', [UpdateMcController::class, 'index'])->name('vue.master-card.update-mc');
          Route::post('/api/update-mc/search-ac', [UpdateMcController::class, 'searchAc']);
          Route::post('/api/update-mc/search-mcs', [UpdateMcController::class, 'searchMcs']);
+         
+         // Add route for approve-mc
+         Route::get('/sales-management/system-requirement/master-card/approve-mc', [ApproveMcController::class, 'index'])->name('vue.master-card.approve-mc');
 
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -297,6 +303,10 @@ Route::prefix('api')->group(function () {
 
     // Customer Groups API routes
     Route::get('/customer-groups', [CustomerGroupController::class, 'apiIndex']);
+    Route::post('/customer-groups', [CustomerGroupController::class, 'apiStore']);
+    Route::put('/customer-groups/{group_code}', [CustomerGroupController::class, 'apiUpdate']);
+    Route::delete('/customer-groups/{group_code}', [CustomerGroupController::class, 'apiDestroy']);
+    Route::post('/customer-groups/seed', [CustomerGroupController::class, 'seed']);
 
     // Customer Accounts API routes
     Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
@@ -321,4 +331,12 @@ Route::prefix('api')->group(function () {
     Route::put('/finishings/{code}', [FinishingController::class, 'update']);
     Route::delete('/finishings/{code}', [FinishingController::class, 'destroy']);
     Route::post('/finishings/seed', [FinishingController::class, 'seed']);
+
+    // ApproveMC API routes
+    Route::get('/approve-mc', [ApproveMcController::class, 'apiIndex']);
+    Route::post('/approve-mc', [ApproveMcController::class, 'store']);
+    Route::put('/approve-mc/{id}', [ApproveMcController::class, 'update']);
+    Route::post('/approve-mc/approve/{id}', [ApproveMcController::class, 'approve']);
+    Route::post('/approve-mc/reject/{id}', [ApproveMcController::class, 'reject']);
+    Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);
 });
