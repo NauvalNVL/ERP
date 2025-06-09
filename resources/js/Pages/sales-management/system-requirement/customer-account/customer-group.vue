@@ -21,28 +21,7 @@
               <h3 class="text-xl font-semibold text-gray-800">Customer Group Management</h3>
             </div>
 
-            <!-- Header with navigation buttons -->
-            <div class="flex items-center space-x-2 mb-6">
-              <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" @click="goToDashboard">
-                <i class="fas fa-power-off"></i>
-              </button>
-              <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                <i class="fas fa-arrow-right"></i>
-              </button>
-              <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                <i class="fas fa-arrow-left"></i>
-              </button>
-              <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
-                <i class="fas fa-search"></i>
-              </button>
-              <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" @click="openModal">
-                <i class="fas fa-plus"></i>
-              </button>
-              <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" @click="deleteSelected">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-
+            
             <!-- Form Section -->
             <form @submit.prevent="handleSubmit" class="space-y-6">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
