@@ -158,6 +158,8 @@ Route::middleware('auth')->group(function () {
          Route::get('/customer-group', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/customer-group');
          })->name('vue.customer-group.index');
+         
+         Route::get('/customer-group/view-print', [CustomerGroupController::class, 'vueViewAndPrint'])->name('vue.customer-group.view-print');
 
          Route::get('/update-customer-account', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
@@ -293,6 +295,10 @@ Route::prefix('api')->group(function () {
 
     // Customer Groups API routes
     Route::get('/customer-groups', [CustomerGroupController::class, 'apiIndex']);
+    Route::post('/customer-groups', [CustomerGroupController::class, 'apiStore']);
+    Route::put('/customer-groups/{group_code}', [CustomerGroupController::class, 'apiUpdate']);
+    Route::delete('/customer-groups/{group_code}', [CustomerGroupController::class, 'apiDestroy']);
+    Route::post('/customer-groups/seed', [CustomerGroupController::class, 'seed']);
 
     // Customer Accounts API routes
     Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
