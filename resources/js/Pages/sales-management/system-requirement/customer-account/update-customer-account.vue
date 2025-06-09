@@ -205,7 +205,7 @@
 
                 <!-- Right Column - Information -->
                 <div class="lg:col-span-1">
-                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500 mb-6">
                         <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
                             <div class="p-2 bg-blue-500 rounded-lg mr-3">
                                 <i class="fas fa-info-circle text-white"></i>
@@ -225,6 +225,38 @@
                                     <li>Klik Save untuk menyimpan perubahan</li>
                                 </ul>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                        <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+                            <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                                <i class="fas fa-link text-white"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3">
+                            <Link href="/update-customer-account/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                                <div class="p-2 bg-green-500 rounded-full mr-3">
+                                    <i class="fas fa-print text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-green-900">View & Print</p>
+                                    <p class="text-xs text-green-700">Print customer list</p>
+                                </div>
+                            </Link>
+                            
+                            <Link href="/customer-group" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                                <div class="p-2 bg-blue-500 rounded-full mr-3">
+                                    <i class="fas fa-users text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-blue-900">Customer Groups</p>
+                                    <p class="text-xs text-blue-700">Manage customer groups</p>
+                                </div>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -272,12 +304,13 @@
 
 <script>
 import { ref, reactive } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, Link } from '@inertiajs/vue3'
 import CustomerAccountModal from '@/Components/customer-account-modal.vue'
 import SalespersonModal from '@/Components/salesperson-modal.vue'
 import IndustryModal from '@/Components/industry-modal.vue'
 import GeoModal from '@/Components/geo-modal.vue'
 import CustomerGroupModal from '@/Components/customer-group-modal.vue'
+import AppLayout from '@/Layouts/AppLayout.vue'
 
 export default {
     components: {
@@ -285,7 +318,9 @@ export default {
         SalespersonModal,
         IndustryModal,
         GeoModal,
-        CustomerGroupModal
+        CustomerGroupModal,
+        Link,
+        AppLayout
     },
     setup() {
         const showAdditionalFields = ref(false)
