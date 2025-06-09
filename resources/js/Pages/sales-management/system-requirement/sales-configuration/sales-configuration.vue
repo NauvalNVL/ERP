@@ -214,13 +214,24 @@
             </form>
         </div>
     </div>
+
+    <!-- Scoring Tool Modal -->
+    <ScoringToolModal
+        :show="showScoringToolModal"
+        :scoring-tools="scoringTools"
+        @close="showScoringToolModal = false"
+        @select="onScoringToolSelected"
+    />
+    
     </AppLayout>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import { router } from '@inertiajs/vue3';
+import ScoringToolModal from '@/Components/scoring-tool-modal.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Form data
 const form = reactive({
@@ -238,6 +249,45 @@ const form = reactive({
     board_availability: '1',
     fg_picking: '1',
     sheet_board_scoring: ''
+});
+
+// Scoring Tool Modal State
+const showScoringToolModal = ref(false);
+const scoringTools = ref([]);
+const currentScoringToolTarget = ref(''); // To track which scoring tool field is being updated
+
+// Fetch Scoring Tools Data
+const fetchScoringTools = async () => {
+    try {
+        const response = await fetch('/api/scoring-tools', {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch scoring tools');
+        }
+        
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+            scoringTools.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            scoringTools.value = data.data;
+        } else {
+            console.error('Unexpected data format:', data);
+            scoringTools.value = [];
+        }
+    } catch (error) {
+        console.error('Error fetching scoring tools:', error);
+        scoringTools.value = [];
+    }
+};
+
+onMounted(() => {
+    fetchScoringTools();
 });
 
 // Options data
@@ -303,13 +353,22 @@ const cancelForm = () => {
 };
 
 const searchScoringTool = () => {
-    // Implement scoring tool search functionality
-    console.log('Searching scoring tool...');
+    currentScoringToolTarget.value = 'main';
+    showScoringToolModal.value = true;
 };
 
 const searchSheetBoardScoring = () => {
-    // Implement sheet board scoring search functionality
-    console.log('Searching sheet board scoring...');
+    currentScoringToolTarget.value = 'sheet_board';
+    showScoringToolModal.value = true;
+};
+
+const onScoringToolSelected = (tool) => {
+    if (currentScoringToolTarget.value === 'main') {
+        form.scoring_tool = tool.code;
+    } else if (currentScoringToolTarget.value === 'sheet_board') {
+        form.sheet_board_scoring = tool.code;
+    }
+    showScoringToolModal.value = false;
 };
 
 // Props
