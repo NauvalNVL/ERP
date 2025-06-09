@@ -166,6 +166,10 @@ Route::middleware('auth')->group(function () {
              return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
          })->name('vue.update-customer-account.index');
          
+         Route::get('/update-customer-account/view-print', function () {
+             return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-account');
+         })->name('vue.update-customer-account.view-print');
+         
          Route::get('/obsolete-reactive-customer-account', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/obsolete-reactive-customer-ac');
          })->name('vue.obsolete-reactive-customer-account.index');

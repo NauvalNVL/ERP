@@ -26,7 +26,11 @@
               </div>
               <h3 class="text-xl font-semibold text-gray-800">Customer Group Management</h3>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 65f161ca2b81e80e3976279a36125c2f034523b2
             <!-- Search Section -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
               <div class="col-span-2">
