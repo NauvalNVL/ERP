@@ -163,6 +163,10 @@ Route::middleware('auth')->group(function () {
              return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
          })->name('vue.update-customer-account.index');
          
+         Route::get('/obsolete-reactive-customer-account', function () {
+             return Inertia::render('sales-management/system-requirement/customer-account/obsolete-reactive-customer-ac');
+         })->name('vue.obsolete-reactive-customer-account.index');
+         
          Route::get('/customer-alternate-address', [CustomerAlternateAddressController::class, 'index'])->name('vue.customer-alternate-address.index');
 
          // Master Card Routes
@@ -298,6 +302,7 @@ Route::prefix('api')->group(function () {
     Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
     Route::post('/customer-accounts', [UpdateCustomerAccountController::class, 'apiStore']);
     Route::put('/customer-accounts/{id}', [UpdateCustomerAccountController::class, 'apiUpdate']);
+    Route::put('/customer-accounts/{customer_code}/status', [UpdateCustomerAccountController::class, 'updateStatus']);
     
     // Foreign Currency API endpoints
     Route::get('/foreign-currencies', [ForeignCurrencyController::class, 'apiIndex']);

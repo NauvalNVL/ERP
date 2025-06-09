@@ -6,24 +6,49 @@
         <h3 class="text-xl font-semibold flex items-center">
           <i class="fas fa-list mr-3"></i>Customer Account Table
         </h3>
-        <button type="button" @click="$emit('close')" class="text-white hover:text-gray-200 focus:outline-none">
-          <i class="fas fa-times text-xl"></i>
-        </button>
+        <div class="flex space-x-3 items-center">
+          <div class="text-white text-sm mr-2">
+            <span class="mr-2">Sort:</span>
+            <select v-model="sortBy" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
+              <option value="customer_code">Customer Code</option>
+              <option value="customer_name">Customer Name</option>
+            </select>
+          </div>
+          <div class="text-white text-sm">
+            <span class="mr-2">Status:</span>
+            <select v-model="statusFilter" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
+              <option value="active" selected>Active</option>
+              <option value="obsolete">Obsolete</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+          <button type="button" @click="$emit('close')" class="text-white hover:text-gray-200 focus:outline-none">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Modal Body -->
       <div class="p-2 overflow-y-auto" style="max-height: 60vh;">
         <div v-if="loading" class="flex justify-center items-center p-4">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <span class="ml-2 text-gray-600">Loading data...</span>
         </div>
-        <div v-else-if="error" class="p-4 text-red-500">
-          {{ error }}
+        <div v-else-if="error" class="p-4 text-red-500 bg-red-50 rounded border border-red-200">
+          <div class="font-bold mb-1">Error:</div>
+          <div>{{ error }}</div>
+          <button @click="fetchCustomerAccounts" class="mt-2 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">
+            Try Again
+          </button>
+        </div>
+        <div v-else-if="filteredAccounts.length === 0" class="p-4 text-amber-700 bg-amber-50 rounded border border-amber-200">
+          No customer accounts found. Please adjust your filter criteria or add new accounts.
         </div>
         <table v-else class="min-w-full text-xs border border-gray-300">
           <thead class="bg-gray-200 sticky top-0">
             <tr>
-              <th class="px-2 py-1 border border-gray-300 text-left">Customer Name</th>
               <th class="px-2 py-1 border border-gray-300 text-left">Customer Code</th>
+              <th class="px-2 py-1 border border-gray-300 text-left">Customer Name</th>
               <th class="px-2 py-1 border border-gray-300 text-left">S/person</th>
               <th class="px-2 py-1 border border-gray-300 text-left">AC Type</th>
               <th class="px-2 py-1 border border-gray-300 text-left">Currency</th>
@@ -31,17 +56,23 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="account in customerAccounts" 
+            <tr v-for="account in filteredAccounts" 
                 :key="account.customer_code"
                 class="hover:bg-blue-100 cursor-pointer"
                 :class="{ 'bg-blue-200': selectedAccount?.customer_code === account.customer_code }"
                 @click="selectAccount(account)">
-              <td class="px-2 py-1 border border-gray-300">{{ account.customer_name }}</td>
               <td class="px-2 py-1 border border-gray-300">{{ account.customer_code }}</td>
+              <td class="px-2 py-1 border border-gray-300">{{ account.customer_name }}</td>
               <td class="px-2 py-1 border border-gray-300">{{ account.salesperson }}</td>
               <td class="px-2 py-1 border border-gray-300">{{ account.ac_type }}</td>
               <td class="px-2 py-1 border border-gray-300">{{ account.currency }}</td>
-              <td class="px-2 py-1 border border-gray-300">{{ account.status }}</td>
+              <td class="px-2 py-1 border border-gray-300">
+                <span 
+                  :class="account.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                  class="px-2 py-0.5 rounded-full text-xs">
+                  {{ account.status }}
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -49,8 +80,9 @@
 
       <!-- Modal Footer -->
       <div class="flex items-center justify-end gap-2 p-2 border-t border-gray-200 bg-gray-100 rounded-b-lg">
-        <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">More Options</button>
-        <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">Zoom</button>
+        <div class="text-xs text-gray-500 mr-auto" v-if="filteredAccounts.length > 0">
+          {{ filteredAccounts.length }} accounts found
+        </div>
         <button 
           @click="handleSelect" 
           :disabled="!selectedAccount"
@@ -64,7 +96,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
 
 export default {
@@ -72,35 +104,95 @@ export default {
     show: {
       type: Boolean,
       required: true
+    },
+    customerAccounts: {
+      type: Array,
+      default: () => []
     }
   },
-  emits: ['close', 'select'],
+  emits: ['close', 'select', 'sort'],
   setup(props, { emit }) {
-    const customerAccounts = ref([])
+    const allAccounts = ref([])
     const selectedAccount = ref(null)
     const loading = ref(false)
     const error = ref(null)
+    const sortBy = ref('customer_code')
+    const statusFilter = ref('active')
 
     const fetchCustomerAccounts = async () => {
+      if (props.customerAccounts && props.customerAccounts.length > 0) {
+        console.log('Using provided customer accounts:', props.customerAccounts.length)
+        allAccounts.value = props.customerAccounts
+        return
+      }
+      
       loading.value = true
       error.value = null
+      
       try {
-        console.log('Fetching customer accounts...')
-        const response = await axios.get('/api/customer-accounts')
-        console.log('Response:', response.data)
-        customerAccounts.value = response.data
-      } catch (err) {
-        console.error('Error details:', {
-          message: err.message,
-          response: err.response,
-          status: err.response?.status,
-          data: err.response?.data
+        console.log('Fetching customer accounts from API...')
+        
+        // Use fetch instead of axios for better debugging
+        const response = await fetch('/api/customer-accounts', {
+          headers: { 
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          credentials: 'same-origin'
         })
-        error.value = 'Gagal memuat data customer account. Silakan coba lagi.'
+        
+        console.log('Response status:', response.status)
+        
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}: ${response.statusText}`)
+        }
+        
+        const rawData = await response.json()
+        console.log('Raw API response:', typeof rawData, Array.isArray(rawData) ? rawData.length : 'not array')
+        
+        if (rawData.error) {
+          throw new Error(rawData.error)
+        }
+        
+        if (Array.isArray(rawData)) {
+          allAccounts.value = rawData
+          console.log(`Loaded ${rawData.length} accounts`)
+        } else if (rawData.data && Array.isArray(rawData.data)) {
+          allAccounts.value = rawData.data
+          console.log(`Loaded ${rawData.data.length} accounts from data property`)
+        } else {
+          console.error('Unexpected data format:', rawData)
+          throw new Error('Invalid data format returned from server')
+        }
+      } catch (err) {
+        console.error('Error details:', err)
+        error.value = `${err.message || 'Unknown error'}`
       } finally {
         loading.value = false
       }
     }
+
+    const filteredAccounts = computed(() => {
+      let filtered = [...allAccounts.value]
+      console.log(`Filtering ${filtered.length} accounts`)
+      
+      // Filter based on status
+      if (statusFilter.value === 'active') {
+        filtered = filtered.filter(account => account.status === 'Active' || account.status === undefined)
+      } else if (statusFilter.value === 'obsolete') {
+        filtered = filtered.filter(account => account.status === 'Inactive')
+      }
+      
+      // Sort based on selected field
+      filtered.sort((a, b) => {
+        const fieldA = a[sortBy.value]?.toString().toLowerCase() || ''
+        const fieldB = b[sortBy.value]?.toString().toLowerCase() || ''
+        return fieldA.localeCompare(fieldB)
+      })
+      
+      console.log(`Filtered to ${filtered.length} accounts`)
+      return filtered
+    })
 
     const selectAccount = (account) => {
       selectedAccount.value = account
@@ -111,20 +203,41 @@ export default {
         emit('select', selectedAccount.value)
       }
     }
-
-    onMounted(() => {
-      if (props.show) {
+    
+    // Watch for changes in sort options and emit sort event
+    watch([sortBy, statusFilter], () => {
+      emit('sort', {
+        sortBy: sortBy.value,
+        status: statusFilter.value
+      })
+    })
+    
+    // Watch for changes in the show prop to fetch data when modal is shown
+    watch(() => props.show, (newValue) => {
+      if (newValue === true) {
         fetchCustomerAccounts()
       }
-    })
+    }, { immediate: true })
+
+    // Watch for changes in external customer accounts
+    watch(() => props.customerAccounts, (newAccounts) => {
+      if (newAccounts && newAccounts.length > 0) {
+        console.log('Customer accounts prop updated:', newAccounts.length)
+        allAccounts.value = newAccounts
+      }
+    }, { deep: true })
 
     return {
-      customerAccounts,
+      allAccounts,
+      filteredAccounts,
       selectedAccount,
       loading,
       error,
+      sortBy,
+      statusFilter,
       selectAccount,
-      handleSelect
+      handleSelect,
+      fetchCustomerAccounts
     }
   }
 }
