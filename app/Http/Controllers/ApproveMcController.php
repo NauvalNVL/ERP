@@ -7,136 +7,309 @@ use App\Models\ApproveMC;
 use App\Models\UpdateCustomerAccount;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ApproveMcController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
         try {
-            // Fetch master cards data
+            // Fetch master cards data with proper error handling
             $masterCards = ApproveMC::orderBy('mc_seq')->get();
             $customers = UpdateCustomerAccount::orderBy('customer_name')->get();
             
-            Log::info('Retrieving master cards data for approval page');
-            
-            // Return Inertia response
             return Inertia::render('sales-management/system-requirement/master-card/approve-mc', [
                 'masterCards' => $masterCards,
                 'customers' => $customers
             ]);
-
         } catch (\Exception $e) {
-            Log::error('Error retrieving master cards data: ' . $e->getMessage());
-            return back()->with('error', 'An error occurred while retrieving master card data');
+            return Inertia::render('sales-management/system-requirement/master-card/approve-mc', [
+                'error' => 'Failed to load master cards: ' . $e->getMessage(),
+                'masterCards' => [],
+                'customers' => []
+            ]);
         }
     }
 
+    /**
+     * Get all master cards for API
+     */
     public function apiIndex()
     {
         try {
             $masterCards = ApproveMC::orderBy('mc_seq')->get();
-            Log::info('Retrieving master cards data for API');
             return response()->json($masterCards);
         } catch (\Exception $e) {
-            Log::error('Error retrieving master cards data: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to retrieve master card data'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load master cards: ' . $e->getMessage()
+            ], 500);
         }
     }
-    
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'mc_seq' => 'required|unique:approve_mcs,mc_seq',
+            'mc_model' => 'required',
+            'customer_code' => 'required',
+            'customer_name' => 'required',
+            'status' => 'required|in:pending,active,obsolete'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         try {
-            $validated = $request->validate([
-                'mc_seq' => 'required|string|max:255|unique:approve_mcs',
-                'mc_model' => 'required|string|max:255',
-                'customer_code' => 'required|string|max:255',
-                'customer_name' => 'required|string|max:255',
-                'status' => 'required|in:pending,active,obsolete',
+            $approveMc = ApproveMC::create($request->all());
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Master card created successfully',
+                'data' => $approveMc
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create master card: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(ApproveMC $approveMC)
+    {
+        return response()->json($approveMC);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(ApproveMC $approveMC)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $id)
+    {
+        Log::info('Updating master card', ['id' => $id, 'data' => $request->all()]);
+        
+        $approveMc = ApproveMC::findOrFail($id);
+        
+        $validator = Validator::make($request->all(), [
+            'mc_seq' => 'required|unique:approve_mcs,mc_seq,' . $id,
+            'mc_model' => 'required',
+            'customer_code' => 'required',
+            'customer_name' => 'required',
+            'status' => 'required|in:pending,active,obsolete'
+        ]);
+
+        if ($validator->fails()) {
+            Log::warning('Validation failed', ['errors' => $validator->errors()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Handle the status change separately if needed
+            $statusChanged = $request->status !== $approveMc->status;
+            Log::info('Status change detected', [
+                'previous' => $approveMc->status,
+                'new' => $request->status,
+                'changed' => $statusChanged
             ]);
             
-            $masterCard = ApproveMC::create($validated);
+            // Update the model with request data
+            $approveMc->fill($request->all());
             
-            Log::info('New master card created: ' . $masterCard->id);
-            return response()->json($masterCard, 201);
+            // If status is changing, update relevant fields
+            if ($statusChanged) {
+                if ($request->status === 'active') {
+                    $approveMc->approved_by = Auth::user() ? Auth::user()->user_id : 'SYSTEM';
+                    $approveMc->approved_date = now();
+                    // Clear rejection fields if previously rejected
+                    $approveMc->rejected_by = null;
+                    $approveMc->rejected_date = null;
+                    $approveMc->rejection_reason = null;
+                    
+                    Log::info('Master card activated', ['id' => $id, 'by' => $approveMc->approved_by]);
+                } 
+                elseif ($request->status === 'obsolete') {
+                    // In case of direct obsolete status change without going through reject API
+                    if (!$request->has('rejection_reason')) {
+                        $approveMc->rejection_reason = 'Set to obsolete during edit';
+                    }
+                    $approveMc->rejected_by = Auth::user() ? Auth::user()->user_id : 'SYSTEM';
+                    $approveMc->rejected_date = now();
+                    // Clear approval fields if previously approved
+                    $approveMc->approved_by = null;
+                    $approveMc->approved_date = null;
+                    
+                    Log::info('Master card marked obsolete', ['id' => $id, 'by' => $approveMc->rejected_by]);
+                }
+                elseif ($request->status === 'pending') {
+                    // Reset both approval and rejection fields
+                    $approveMc->approved_by = null;
+                    $approveMc->approved_date = null; 
+                    $approveMc->rejected_by = null;
+                    $approveMc->rejected_date = null;
+                    $approveMc->rejection_reason = null;
+                    
+                    Log::info('Master card reset to pending', ['id' => $id]);
+                }
+            }
+            
+            $approveMc->save();
+            
+            Log::info('Master card updated successfully', ['id' => $id]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Master card updated successfully',
+                'data' => $approveMc
+            ]);
         } catch (\Exception $e) {
-            Log::error('Error creating master card: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to create master card: ' . $e->getMessage()], 500);
+            Log::error('Failed to update master card', ['id' => $id, 'error' => $e->getMessage()]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update master card: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $approveMc = ApproveMC::findOrFail($id);
+        $approveMc->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Master card deleted successfully'
+        ]);
+    }
+    
+    /**
+     * Approve a master card
+     */
+    public function approve($id)
+    {
+        try {
+            $approveMc = ApproveMC::findOrFail($id);
+            
+            // Set approval fields
+            $approveMc->status = 'active';
+            $approveMc->approved_by = Auth::user() ? Auth::user()->user_id : 'SYSTEM';
+            $approveMc->approved_date = now();
+            $approveMc->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Master card approved successfully',
+                'approved_by' => $approveMc->approved_by,
+                'approved_date' => $approveMc->approved_date,
+                'data' => $approveMc
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to approve master card: ' . $e->getMessage()
+            ], 500);
         }
     }
     
-    public function update(Request $request, $id)
-    {
-        try {
-            $masterCard = ApproveMC::findOrFail($id);
-            
-            $validated = $request->validate([
-                'mc_seq' => 'required|string|max:255|unique:approve_mcs,mc_seq,' . $id,
-                'mc_model' => 'required|string|max:255',
-                'customer_code' => 'required|string|max:255',
-                'customer_name' => 'required|string|max:255',
-                'status' => 'required|in:pending,active,obsolete',
-            ]);
-            
-            $masterCard->update($validated);
-            
-            Log::info('Master card updated: ' . $id);
-            return response()->json($masterCard);
-        } catch (\Exception $e) {
-            Log::error('Error updating master card: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to update master card: ' . $e->getMessage()], 500);
-        }
-    }
-
-    public function approve(Request $request, $id)
-    {
-        try {
-            $masterCard = ApproveMC::findOrFail($id);
-            $masterCard->status = 'active';
-            $masterCard->approved_by = auth()->user()->user_id;
-            $masterCard->approved_date = now();
-            $masterCard->save();
-
-            Log::info('Master card approved: ' . $id);
-            return response()->json(['message' => 'Master card approved successfully']);
-        } catch (\Exception $e) {
-            Log::error('Error approving master card: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to approve master card'], 500);
-        }
-    }
-
+    /**
+     * Reject a master card
+     */
     public function reject(Request $request, $id)
     {
+        $validator = Validator::make($request->all(), [
+            'rejection_reason' => 'required|string|min:3'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed: A rejection reason is required',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        
         try {
-            $request->validate([
-                'rejection_reason' => 'required|string|max:255',
+            $approveMc = ApproveMC::findOrFail($id);
+            
+            // Set rejection fields
+            $approveMc->status = 'obsolete';
+            $approveMc->rejected_by = Auth::user() ? Auth::user()->user_id : 'SYSTEM';
+            $approveMc->rejected_date = now();
+            $approveMc->rejection_reason = $request->rejection_reason;
+            $approveMc->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Master card rejected successfully',
+                'rejected_by' => $approveMc->rejected_by,
+                'rejected_date' => $approveMc->rejected_date,
+                'data' => $approveMc
             ]);
-
-            $masterCard = ApproveMC::findOrFail($id);
-            $masterCard->status = 'obsolete';
-            $masterCard->rejected_by = auth()->user()->user_id;
-            $masterCard->rejected_date = now();
-            $masterCard->rejection_reason = $request->rejection_reason;
-            $masterCard->save();
-
-            Log::info('Master card rejected: ' . $id);
-            return response()->json(['message' => 'Master card rejected successfully']);
         } catch (\Exception $e) {
-            Log::error('Error rejecting master card: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to reject master card'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reject master card: ' . $e->getMessage()
+            ], 500);
         }
     }
-
+    
+    /**
+     * Get master cards by customer
+     */
     public function getByCustomer($customerId)
     {
         try {
             $masterCards = ApproveMC::where('customer_code', $customerId)
                 ->orderBy('mc_seq')
                 ->get();
-            
-            return response()->json($masterCards);
+                
+            return response()->json([
+                'success' => true,
+                'data' => $masterCards
+            ]);
         } catch (\Exception $e) {
-            Log::error('Error retrieving master cards by customer: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to retrieve master cards'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch master cards: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

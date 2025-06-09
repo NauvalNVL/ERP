@@ -85,7 +85,7 @@
               <div class="mb-4 col-span-1 md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
                 <div class="flex space-x-4">
-                  <label class="inline-flex items-center">
+                  <label class="inline-flex items-center px-3 py-2 rounded-md" :class="formData.status === 'pending' ? 'bg-yellow-50 border border-yellow-200' : ''">
                     <input 
                       type="radio" 
                       name="status" 
@@ -93,9 +93,9 @@
                       v-model="formData.status"
                       class="form-radio h-4 w-4 text-yellow-600"
                     >
-                    <span class="ml-2 text-sm text-gray-700">Pending</span>
+                    <span class="ml-2 text-sm" :class="formData.status === 'pending' ? 'text-yellow-800 font-medium' : 'text-gray-700'">Pending</span>
                   </label>
-                  <label class="inline-flex items-center">
+                  <label class="inline-flex items-center px-3 py-2 rounded-md" :class="formData.status === 'active' ? 'bg-green-50 border border-green-200' : ''">
                     <input 
                       type="radio" 
                       name="status" 
@@ -103,9 +103,9 @@
                       v-model="formData.status"
                       class="form-radio h-4 w-4 text-green-600"
                     >
-                    <span class="ml-2 text-sm text-gray-700">Active</span>
+                    <span class="ml-2 text-sm" :class="formData.status === 'active' ? 'text-green-800 font-medium' : 'text-gray-700'">Active</span>
                   </label>
-                  <label class="inline-flex items-center">
+                  <label class="inline-flex items-center px-3 py-2 rounded-md" :class="formData.status === 'obsolete' ? 'bg-red-50 border border-red-200' : ''">
                     <input 
                       type="radio" 
                       name="status" 
@@ -113,7 +113,7 @@
                       v-model="formData.status"
                       class="form-radio h-4 w-4 text-red-600"
                     >
-                    <span class="ml-2 text-sm text-gray-700">Obsolete</span>
+                    <span class="ml-2 text-sm" :class="formData.status === 'obsolete' ? 'text-red-800 font-medium' : 'text-gray-700'">Obsolete</span>
                   </label>
                 </div>
               </div>
@@ -163,6 +163,10 @@ import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import CustomerAccountModal from './customer-account-modal.vue';
 
+// Setup CSRF token for all axios requests
+axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+axios.defaults.headers.common['Accept'] = 'application/json';
+
 const props = defineProps({
   show: {
     type: Boolean,
@@ -195,7 +199,21 @@ const formData = ref({
 // Watch for changes in the masterCard prop
 watch(() => props.masterCard, (newVal) => {
   if (newVal) {
-    formData.value = { ...newVal };
+    // Create a deep copy of the master card data
+    formData.value = { 
+      ...newVal,
+      status: newVal.status || 'pending' // Ensure status is explicitly set
+    };
+    console.log('Form data initialized:', formData.value);
+  } else {
+    // Reset form if no master card is provided
+    formData.value = {
+      mc_seq: '',
+      mc_model: '',
+      customer_code: '',
+      customer_name: '',
+      status: 'pending'
+    };
   }
 }, { immediate: true });
 
@@ -209,24 +227,51 @@ const selectCustomer = (customer) => {
   showCustomerModal.value = false;
 };
 
+// This code snippet adds a debugging method and event handling to the script
+const debug = (message, data) => {
+  console.log(`[MasterCardModal] ${message}:`, data);
+};
+
+// Watch status changes for debugging
+watch(() => formData.value.status, (newVal, oldVal) => {
+  if (newVal !== oldVal) {
+    debug('Status changed', { from: oldVal, to: newVal });
+  }
+});
+
+// Enhanced handle submit with better error handling
 const handleSubmit = async () => {
   loading.value = true;
   error.value = null;
+  
+  debug('Submitting form data', formData.value);
   
   try {
     let response;
     if (props.mode === 'edit' && props.masterCard?.id) {
       // Update existing master card
+      debug('Updating master card', props.masterCard.id);
       response = await axios.put(`/api/approve-mc/${props.masterCard.id}`, formData.value);
     } else {
       // Create new master card
+      debug('Creating new master card');
       response = await axios.post('/api/approve-mc', formData.value);
     }
     
-    emit('update', response.data);
-    emit('close');
+    debug('API response', response.data);
+    
+    // Check for success property in response data
+    if (response.data.success) {
+      // Pass the actual data to the parent component
+      emit('update', response.data.data || response.data);
+      emit('close');
+    } else {
+      // Handle API error case
+      error.value = response.data.message || 'Failed to save master card data.';
+    }
   } catch (err) {
     console.error('Error saving master card:', err);
+    debug('API error', err.response?.data || err);
     error.value = err.response?.data?.message || 'Failed to save master card data.';
   } finally {
     loading.value = false;

@@ -181,7 +181,16 @@ Route::middleware('auth')->group(function () {
          Route::post('/api/update-mc/search-mcs', [UpdateMcController::class, 'searchMcs']);
          
          // Add route for approve-mc
-         Route::get('/sales-management/system-requirement/master-card/approve-mc', [ApproveMcController::class, 'index'])->name('vue.master-card.approve-mc');
+         Route::get('/sales-management/system-requirement/master-card/approve-mc', function () {
+             // Fetch master cards data
+             $masterCards = \App\Models\ApproveMC::orderBy('mc_seq')->get();
+             $customers = \App\Models\UpdateCustomerAccount::orderBy('customer_name')->get();
+             
+             return Inertia::render('sales-management/system-requirement/master-card/approve-mc', [
+                 'masterCards' => $masterCards,
+                 'customers' => $customers
+             ]);
+         })->name('vue.master-card.approve-mc');
 
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

@@ -69,11 +69,17 @@ import sidebarStore from './sidebarStore';
 const page = usePage();
 const currentPath = computed(() => page.url);
 
-// Extract the base path from the URL (e.g., '/foreign-currency/view-print' -> '/foreign-currency')
+// Extract the base path from the URL
 const getBasePath = (path) => {
   if (!path) return '';
-  const parts = path.split('/').filter(Boolean);
-  return parts.length > 0 ? `/${parts[0]}` : '';
+  // Normalize the path and split into segments
+  const normalizedPath = path.toLowerCase().replace(/^\/+|\/+$/g, '');
+  const parts = normalizedPath.split('/');
+  
+  // Return the first N segments for base path comparison
+  // This allows deeper paths to still match their parent routes
+  const segments = Math.min(3, parts.length);
+  return '/' + parts.slice(0, segments).join('/');
 };
 
 const props = defineProps({
@@ -101,21 +107,31 @@ const isMenuOpen = computed(() => sidebarStore.isOpen(menuId.value) || hasActive
 // Check if the current route matches the given route exactly
 const isActive = (route) => {
   if (!route) return false;
-  return currentPath.value === route;
+  
+  // Normalize both paths for comparison (remove trailing slash, lowercase)
+  const normalizedCurrent = currentPath.value.toLowerCase().replace(/\/+$/, '');
+  const normalizedRoute = route.toLowerCase().replace(/\/+$/, '');
+  
+  return normalizedCurrent === normalizedRoute;
 };
 
 // For parent highlighting, check if the current path's base matches the route's base
 const isActiveParent = (route) => {
   if (!route) return false;
   
+  // Normalize both paths for comparison
+  const normalizedCurrent = currentPath.value.toLowerCase().replace(/\/+$/, '');
+  const normalizedRoute = route.toLowerCase().replace(/\/+$/, '');
+  
   // Check if the current path contains the route path for deep nested routes
-  if (currentPath.value.includes(route)) {
+  if (normalizedCurrent.includes(normalizedRoute) && normalizedCurrent !== normalizedRoute) {
     return true;
   }
   
-  const currentBase = getBasePath(currentPath.value);
-  const routeBase = getBasePath(route);
-  return currentBase === routeBase && currentPath.value !== route;
+  // Check base path matching
+  const currentBase = getBasePath(normalizedCurrent);
+  const routeBase = getBasePath(normalizedRoute);
+  return currentBase === routeBase && normalizedCurrent !== normalizedRoute;
 };
 
 // Check if any child item is active
