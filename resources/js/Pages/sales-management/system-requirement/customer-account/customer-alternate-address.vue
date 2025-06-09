@@ -1,5 +1,5 @@
 <template>
-  <AppLayout :header="'Customer Alternate Address'">
+  <AppLayout :header="header">
     <Head title="Customer Alternate Address" />
 
     <!-- Hidden form with CSRF token -->
@@ -555,24 +555,48 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { Head, usePage } from '@inertiajs/vue3';
+import { ref, computed, onMounted, watch } from 'vue';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
 
 // Access props from Inertia
 const props = defineProps({
-  initialData: Object
+  initialData: Object,
+  header: {
+    type: String,
+    default: 'Customer Alternate Address'
+  }
 });
 
 // Access page data
 const page = usePage();
+
+// Reference to the CSRF form
+const csrfForm = ref(null);
+
+// Function to get fresh CSRF token from the form
+const getCsrfToken = () => {
+  // Try to get token from meta tag first
+  let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  
+  // If token from meta tag is not available or we want a fresh token, get from the form
+  if (csrfForm.value) {
+    const tokenInput = csrfForm.value.querySelector('input[name="_token"]');
+    if (tokenInput) {
+      token = tokenInput.value;
+    }
+  }
+  
+  return token || '';
+};
 
 // Define reactive state variables
 const customers = ref([]);
 const addresses = ref([]);
 const selectedCustomer = ref(null);
 const searchTerm = ref('');
+const modalSearchTerm = ref('');
 const loadingCustomers = ref(true);
 const loadingAddresses = ref(false);
 const errorMessage = ref('');
@@ -580,6 +604,7 @@ const successMessage = ref('');
 
 // Modal state
 const showModal = ref(false);
+const showCustomerModal = ref(false);
 const isEditing = ref(false);
 const addressForm = ref({
   address: '',
@@ -622,7 +647,21 @@ onMounted(async () => {
   }
 });
 
-// Computed property to filter customers based on search
+// Watch for changes in search query to filter the data
+watch(searchTerm, (newQuery) => {
+  if (newQuery && customers.value.length > 0) {
+    const foundCustomer = customers.value.find(customer => 
+      customer.customer_code.toLowerCase().includes(newQuery.toLowerCase()) ||
+      customer.customer_name.toLowerCase().includes(newQuery.toLowerCase())
+    );
+    
+    if (foundCustomer) {
+      selectCustomer(foundCustomer);
+    }
+  }
+});
+
+// Computed property for filtered customers in main view
 const filteredCustomers = computed(() => {
   if (!customers.value.length) return [];
   
@@ -654,12 +693,32 @@ const filteredCustomers = computed(() => {
   return filtered;
 });
 
+// Computed property for filtered customers in modal
+const filteredModalCustomers = computed(() => {
+  if (!customers.value.length) return [];
+  
+  // Filter by search term only for the modal
+  if (!modalSearchTerm.value) return customers.value;
+  
+  return customers.value.filter(customer => 
+    (customer.customer_name && customer.customer_name.toLowerCase().includes(modalSearchTerm.value.toLowerCase())) ||
+    (customer.customer_code && customer.customer_code.toLowerCase().includes(modalSearchTerm.value.toLowerCase()))
+  );
+});
+
 // Function to select a customer and fetch their addresses
 const selectCustomer = async (customer) => {
   selectedCustomer.value = customer;
   errorMessage.value = ''; // Clear any error messages
   successMessage.value = ''; // Clear any success messages
   fetchAddresses(customer.customer_code);
+};
+
+// Function to select a customer from the modal
+const selectCustomerFromModal = (customer) => {
+  selectCustomer(customer);
+  showCustomerModal.value = false;
+  searchTerm.value = customer.customer_code;
 };
 
 // Function to sort customers when clicking on table headers
@@ -736,21 +795,42 @@ const saveAddress = async () => {
   
   saving.value = true;
   try {
+    const csrfToken = getCsrfToken();
+    
     if (isEditing.value) {
       // Update existing address
-      await axios.put(`/api/customer-alternate-addresses/${editingAddressId.value}`, addressForm.value);
+      const response = await axios.put(`/api/customer-alternate-addresses/${editingAddressId.value}`, addressForm.value, {
+        headers: {
+          'X-CSRF-TOKEN': csrfToken
+        }
+      });
+      
+      if (response.data.success) {
+        successMessage.value = 'Address updated successfully';
+      } else {
+        throw new Error(response.data.message || 'Failed to update address');
+      }
     } else {
       // Create new address
-      await axios.post('/api/customer-alternate-addresses', {
+      const response = await axios.post('/api/customer-alternate-addresses', {
         ...addressForm.value,
         customer_code: selectedCustomer.value.customer_code,
+      }, {
+        headers: {
+          'X-CSRF-TOKEN': csrfToken
+        }
       });
+      
+      if (response.data.success) {
+        successMessage.value = 'New address added successfully';
+      } else {
+        throw new Error(response.data.message || 'Failed to add address');
+      }
     }
     
     // Refresh addresses
     await fetchAddresses(selectedCustomer.value.customer_code);
     closeModal();
-    successMessage.value = isEditing.value ? 'Address updated successfully' : 'New address added successfully';
   } catch (error) {
     console.error('Error saving address:', error);
     errorMessage.value = 'Failed to save address: ' + (error.response?.data?.message || error.message);
@@ -770,13 +850,23 @@ const deleteAddress = async () => {
   
   deleting.value = true;
   try {
-    await axios.delete(`/api/customer-alternate-addresses/${addressToDelete.value.id}`);
+    const csrfToken = getCsrfToken();
     
-    // Refresh addresses
-    await fetchAddresses(selectedCustomer.value.customer_code);
-    showDeleteModal.value = false;
-    addressToDelete.value = null;
-    successMessage.value = 'Address deleted successfully';
+    const response = await axios.delete(`/api/customer-alternate-addresses/${addressToDelete.value.id}`, {
+      headers: {
+        'X-CSRF-TOKEN': csrfToken
+      }
+    });
+    
+    if (response.data.success) {
+      // Refresh addresses
+      await fetchAddresses(selectedCustomer.value.customer_code);
+      showDeleteModal.value = false;
+      addressToDelete.value = null;
+      successMessage.value = 'Address deleted successfully';
+    } else {
+      throw new Error(response.data.message || 'Failed to delete address');
+    }
   } catch (error) {
     console.error('Error deleting address:', error);
     errorMessage.value = 'Failed to delete address: ' + (error.response?.data?.message || error.message);
