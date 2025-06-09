@@ -7,47 +7,47 @@
       @csrf
   </form>
 
-  <!-- Header Section -->
+    <!-- Header Section -->
   <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
-    <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-      <i class="fas fa-users mr-3"></i> Define Customer Group
-    </h2>
-    <p class="text-cyan-100">Definisikan kelompok pelanggan untuk pengelompokan customer di sistem</p>
-  </div>
+      <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-users mr-3"></i> Define Customer Group
+      </h2>
+    <p class="text-cyan-100">Define customer groups for categorizing customers in the system</p>
+    </div>
 
-  <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Left Column - Main Content -->
-      <div class="lg:col-span-2">
-        <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
-          <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-            <div class="p-2 bg-blue-500 rounded-lg mr-3">
-              <i class="fas fa-edit text-white"></i>
+    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column - Main Content -->
+        <div class="lg:col-span-2">
+          <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+            <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
+              <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                <i class="fas fa-edit text-white"></i>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800">Customer Group Management</h3>
             </div>
-            <h3 class="text-xl font-semibold text-gray-800">Customer Group Management</h3>
-          </div>
 
           <!-- Search Section -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
             <div class="col-span-2">
               <label class="block text-sm font-medium text-gray-700 mb-1">Customer Group:</label>
-              <div class="relative flex">
-                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                  <i class="fas fa-users"></i>
-                </span>
+                  <div class="relative flex">
+                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                      <i class="fas fa-users"></i>
+                    </span>
                 <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                 <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md">
-                  <i class="fas fa-table"></i>
-                </button>
-              </div>
-            </div>
+                      <i class="fas fa-table"></i>
+                    </button>
+                  </div>
+                </div>
             <div class="col-span-1">
               <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
               <button type="button" @click="createNewCustomerGroup" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
                 <i class="fas fa-plus-circle mr-2"></i> Add New
               </button>
-            </div>
-          </div>
+                </div>
+              </div>
 
           <!-- Data Status Information -->
           <div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
@@ -71,25 +71,25 @@
               Selected: <span class="font-semibold">{{ selectedRow.group_code }}</span> - {{ selectedRow.description }}
             </p>
           </div>
-        </div>
-      </div>
-
-      <!-- Right Column - Info/Help -->
-      <div class="lg:col-span-1">
-        <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
-          <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-            <div class="p-2 bg-teal-500 rounded-lg mr-3">
-              <i class="fas fa-info-circle text-white"></i>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-800">Info Customer Group</h3>
           </div>
+        </div>
+
+        <!-- Right Column - Info/Help -->
+        <div class="lg:col-span-1">
+          <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
+            <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+              <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                <i class="fas fa-info-circle text-white"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Info Customer Group</h3>
+            </div>
           <div class="space-y-4">
             <div class="p-4 bg-teal-50 rounded-lg">
-              <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Petunjuk</h4>
+              <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
               <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Kode customer group harus unik dan tidak berubah</li>
-                <li>Gunakan tombol <span class="font-medium">search</span> untuk memilih customer group</li>
-                <li>Perubahan apa pun harus disimpan</li>
+                <li>Customer group code must be unique and cannot be changed</li>
+                <li>Use the <span class="font-medium">search</span> button to select a customer group</li>
+                <li>Any changes must be saved</li>
               </ul>
             </div>
 
@@ -142,16 +142,16 @@
                 <p class="text-xs text-green-700">Print group list</p>
               </div>
             </Link>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Customer Group Modal Component -->
-  <CustomerGroupModal
-    v-if="showModal"
-    :show="showModal"
+    <!-- Customer Group Modal Component -->
+    <CustomerGroupModal
+      v-if="showModal"
+      :show="showModal"
     @close="showModal = false"
     @select="onCustomerGroupSelected"
   />

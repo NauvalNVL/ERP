@@ -166,6 +166,9 @@ Route::middleware('auth')->group(function () {
          })->name('vue.update-customer-account.index');
          
          Route::get('/customer-alternate-address', [CustomerAlternateAddressController::class, 'index'])->name('vue.customer-alternate-address.index');
+         Route::get('/customer-alternate-address/view-print', function () {
+             return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-alternate-address');
+         })->name('vue.customer-alternate-address.view-print');
 
          // Master Card Routes
          Route::get('/sales-management/system-requirement/master-card/update-mc', [UpdateMcController::class, 'index'])->name('vue.master-card.update-mc');
@@ -304,6 +307,13 @@ Route::prefix('api')->group(function () {
     Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
     Route::post('/customer-accounts', [UpdateCustomerAccountController::class, 'apiStore']);
     Route::put('/customer-accounts/{id}', [UpdateCustomerAccountController::class, 'apiUpdate']);
+    
+    // Customer Alternate Address API routes
+    Route::get('/customer-alternate-addresses', [CustomerAlternateAddressController::class, 'apiIndex']);
+    Route::get('/customer-alternate-addresses/{customerCode}', [CustomerAlternateAddressController::class, 'apiGetCustomerAddresses']);
+    Route::post('/customer-alternate-addresses', [CustomerAlternateAddressController::class, 'apiStore']);
+    Route::put('/customer-alternate-addresses/{id}', [CustomerAlternateAddressController::class, 'apiUpdate']);
+    Route::delete('/customer-alternate-addresses/{id}', [CustomerAlternateAddressController::class, 'apiDestroy']);
     
     // Foreign Currency API endpoints
     Route::get('/foreign-currencies', [ForeignCurrencyController::class, 'apiIndex']);

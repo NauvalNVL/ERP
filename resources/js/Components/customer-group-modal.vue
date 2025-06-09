@@ -22,20 +22,20 @@
             </span>
             <input type="text" v-model="searchQuery" placeholder="Search customer groups..."
               class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
-          </div>
+        </div>
         </div>
         <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
           <table class="w-full divide-y divide-gray-200 table-fixed" id="customerGroupDataTable">
             <thead class="bg-gray-50 sticky top-0">
-              <tr>
+            <tr>
                 <th @click="sortTable('group_code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer">
                   Group Code <i class="fas fa-sort ml-1"></i>
                 </th>
                 <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/3 cursor-pointer">
                   Description <i class="fas fa-sort ml-1"></i>
                 </th>
-              </tr>
-            </thead>
+            </tr>
+          </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
               <tr v-for="group in filteredGroups" :key="group.group_code"
                 :class="['hover:bg-blue-50 cursor-pointer', selectedGroup && selectedGroup.group_code === group.group_code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
@@ -54,10 +54,10 @@
               </tr>
               <tr v-else-if="filteredGroups.length === 0">
                 <td colspan="2" class="px-6 py-4 text-center text-gray-500">No customer group data available.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            </tr>
+          </tbody>
+        </table>
+      </div>
         <div class="mt-2 text-xs text-gray-500 italic">
           <p>Click on a row to select, double-click to select and close the modal.</p>
         </div>
@@ -70,7 +70,7 @@
           </button>
           <button type="button" @click="$emit('close')" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-times mr-1"></i>Close
-          </button>
+        </button>
         </div>
       </div>
     </div>
@@ -96,10 +96,10 @@ const loading = ref(false);
 const error = ref(null);
 
 // Fetch customer groups when the component is mounted or when show changes
-const fetchCustomerGroups = async () => {
+    const fetchCustomerGroups = async () => {
   loading.value = true;
   error.value = null;
-  try {
+      try {
     console.log('Fetching customer groups...');
     const response = await axios.get('/api/customer-groups');
     console.log('Response:', response.data);
@@ -107,9 +107,9 @@ const fetchCustomerGroups = async () => {
   } catch (err) {
     console.error('Error fetching customer groups:', err);
     error.value = 'Failed to load customer groups. Please try again.';
-  } finally {
+      } finally {
     loading.value = false;
-  }
+      }
 };
 
 // Compute filtered groups based on search query
@@ -166,12 +166,12 @@ watch(() => props.show, (val) => {
     selectedGroup.value = null;
     searchQuery.value = '';
     fetchCustomerGroups();
-  }
+      }
 });
 
-onMounted(() => {
-  if (props.show) {
+    onMounted(() => {
+      if (props.show) {
     fetchCustomerGroups();
-  }
+      }
 });
 </script> 

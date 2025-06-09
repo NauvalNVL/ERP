@@ -43,7 +43,7 @@
                         <div class="mr-4">
                             <i class="fas fa-users text-3xl"></i>
                         </div>
-                        <div>
+    <div>
                             <h2 class="text-xl font-bold">CUSTOMER GROUP LIST</h2>
                             <p class="text-sm opacity-80">View and print customer group data</p>
                         </div>
