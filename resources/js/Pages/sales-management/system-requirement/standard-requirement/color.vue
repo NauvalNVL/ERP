@@ -397,15 +397,27 @@ const csrfForm = ref(null);
 
 // Function to get fresh CSRF token from the form
 const getCsrfToken = () => {
-    // Try to get token from meta tag first
+    // Try to get token from meta tag first (prefer this method)
     let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     
-    // If token from meta tag is not available or we want a fresh token, get from the form
-    if (csrfForm.value) {
+    // Option 2: Try to get from Inertia usePage if available
+    if (!token && usePage().props.value?.csrf) {
+        token = usePage().props.value.csrf;
+    }
+    
+    // Option 3: Try to get from hidden form with @csrf directive
+    if (!token && csrfForm.value) {
         const tokenInput = csrfForm.value.querySelector('input[name="_token"]');
         if (tokenInput) {
             token = tokenInput.value;
         }
+    }
+    
+    // Debug log
+    console.log('CSRF Token acquired:', token ? 'Yes' : 'No');
+    
+    if (!token) {
+        console.error('Failed to acquire CSRF token from any source');
     }
     
     return token || '';

@@ -171,7 +171,7 @@ class ColorSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
+                                    [
                 'color_id' => '00018',
                 'color_name' => 'Pink',
                 'origin' => '08',
@@ -179,7 +179,7 @@ class ColorSeeder extends Seeder
                 'cg_type' => 'X-Flexo',
                 'created_at' => now(),
                 'updated_at' => now(),
-            ],
+            ],,,
             [
                 'color_id' => '00019',
                 'color_name' => 'Dark Pink',

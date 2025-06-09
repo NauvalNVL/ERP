@@ -9,6 +9,19 @@ class PaperFluteSeeder extends Seeder
 {
     protected $flutes = [
             [
+                'code' => '9589',
+                'name' => 'tkui',
+                'description' => 'tio',
+                'tur_l2b' => 1,
+                'tur_l3' => 1.4,
+                'tur_l1' => 1,
+                'tur_ace' => 1.5,
+                'tur_2l' => 1,
+                'flute_height' => 7,
+                'starch_consumption' => 0,
+                'is_active' => true,
+            ],
+            [
                 'code' => 'tes',
                 'name' => 'tes',
                 'description' => 'tes',

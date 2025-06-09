@@ -11,6 +11,15 @@ class ScoringToolSeeder extends Seeder
      * The scoring tools data.
      */
     protected $scoringTools = [
+            [
+                'code' => '86768',
+                'name' => 'hfgj',
+                'scores' => 1,
+                'gap' => 0.5,
+                'specification' => '8',
+                'description' => 'fjfghjk',
+                'is_active' => true,
+            ],
         [
             'code' => '5',
             'name' => 'tess1',

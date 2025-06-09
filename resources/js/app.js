@@ -3,6 +3,19 @@ import { createApp, h } from "vue";
 import { createInertiaApp, Link } from "@inertiajs/vue3";
 import AppLayout from "./Layouts/AppLayout.vue";
 
+// Fungsi global untuk mendapatkan CSRF token
+window.getCsrfToken = () => {
+    // Try to get token from meta tag first
+    let token = document.head.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    // Fallback to any token in the page
+    if (!token) {
+        token = document.querySelector('input[name="_token"]')?.value;
+    }
+    
+    return token || '';
+};
+
 createInertiaApp({
     resolve: (name) => {
         const pages = import.meta.glob("./Pages/**/*.vue", { eager: true });
@@ -36,6 +49,31 @@ createInertiaApp({
         
         app.component("AppLayout", AppLayout);
         app.component("Link", Link);
+        
+        // Global mixin to provide CSRF token to all components
+        app.mixin({
+            methods: {
+                getCsrfToken() {
+                    return window.getCsrfToken();
+                },
+                
+                // Helper for making API requests with CSRF token
+                async apiRequest(url, options = {}) {
+                    const csrfToken = this.getCsrfToken();
+                    const defaultOptions = {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        credentials: 'same-origin'
+                    };
+                    
+                    return fetch(url, { ...defaultOptions, ...options });
+                }
+            }
+        });
         
         // Add global page transition directive
         app.directive('page-transition', {
