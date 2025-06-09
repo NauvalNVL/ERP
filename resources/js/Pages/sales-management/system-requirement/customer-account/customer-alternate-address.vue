@@ -1,325 +1,416 @@
 <template>
   <AppLayout :header="'Customer Alternate Address'">
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div class="max-w-7xl mx-auto">
-        <!-- Error Notification -->
-        <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center justify-between">
-          <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-            </svg>
-            <span>{{ errorMessage }}</span>
-          </div>
-          <button @click="errorMessage = ''" class="text-red-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-          </button>
-        </div>
-        
-        <!-- Success Notification -->
-        <div v-if="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6 flex items-center justify-between">
-          <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
-            <span>{{ successMessage }}</span>
-          </div>
-          <button @click="successMessage = ''" class="text-green-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-          </button>
-        </div>
-        
-        <!-- Header -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                <!-- Map Pin Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+    <Head title="Customer Alternate Address" />
+
+    <!-- Hidden form with CSRF token -->
+    <form ref="csrfForm" class="hidden">
+        @csrf
+    </form>
+
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+            <i class="fas fa-map-marker-alt mr-3"></i> Define Customer Alternate Address
+        </h2>
+        <p class="text-cyan-100">Manage alternate addresses for customer accounts</p>
+    </div>
+
+    <!-- Error Notification -->
+    <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg my-3 flex items-center justify-between">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+      <button @click="errorMessage = ''" class="text-red-700">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Success Notification -->
+    <div v-if="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg my-3 flex items-center justify-between">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+        <span>{{ successMessage }}</span>
+      </div>
+      <button @click="successMessage = ''" class="text-green-700">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column -->
+        <div class="lg:col-span-2">
+          <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+            <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
+              <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                <i class="fas fa-users text-white"></i>
               </div>
+              <h3 class="text-xl font-semibold text-gray-800">Customer Management</h3>
+            </div>
+            
+            <!-- Search Section -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+              <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Customer Code:</label>
+                <div class="relative flex">
+                  <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                    <i class="fas fa-user"></i>
+                  </span>
+                  <input type="text" v-model="searchTerm" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                  <button type="button" @click="showCustomerModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                    <i class="fas fa-table"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="col-span-1">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Options:</label>
+                <button 
+                  @click="showOptions = !showOptions" 
+                  class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px"
+                >
+                  <i class="fas fa-cog mr-2"></i> Settings
+                </button>
+              </div>
+            </div>
+
+            <!-- Data Status Information -->
+            <div v-if="loadingCustomers" class="mt-4 bg-yellow-100 p-3 rounded">
+              <div class="flex items-center">
+                <div class="mr-3">
+                  <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
+                </div>
+                <p class="text-sm font-medium text-yellow-800">Loading customer data...</p>
+              </div>
+            </div>
+            <div v-else-if="customers.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
+              <p class="text-sm font-medium text-yellow-800">No customer data available.</p>
+              <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured.</p>
+            </div>
+            <div v-else class="mt-4 bg-green-100 p-3 rounded">
+              <p class="text-sm font-medium text-green-800">Data available: {{ customers.length }} customers found.</p>
+              <p v-if="selectedCustomer" class="text-xs text-green-700 mt-1">
+                Selected: <span class="font-semibold">{{ selectedCustomer.customer_code }}</span> - {{ selectedCustomer.customer_name }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Customer Table -->
+          <div class="mt-6 bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+            <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+              <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                <i class="fas fa-list text-white"></i>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800">Customers</h3>
+            </div>
+            
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th @click="sortCustomers('customer_name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                      Customer Name
+                      <i class="fas fa-sort ml-1" :class="{
+                        'fa-sort-up': sortBy === 'customer_name' && sortAsc,
+                        'fa-sort-down': sortBy === 'customer_name' && !sortAsc
+                      }"></i>
+                    </th>
+                    <th @click="sortCustomers('customer_code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                      Customer Code
+                      <i class="fas fa-sort ml-1" :class="{
+                        'fa-sort-up': sortBy === 'customer_code' && sortAsc,
+                        'fa-sort-down': sortBy === 'customer_code' && !sortAsc
+                      }"></i>
+                    </th>
+                    <th @click="sortCustomers('status')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                      Status
+                      <i class="fas fa-sort ml-1" :class="{
+                        'fa-sort-up': sortBy === 'status' && sortAsc,
+                        'fa-sort-down': sortBy === 'status' && !sortAsc
+                      }"></i>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-if="filteredCustomers.length === 0">
+                    <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                      No customers found matching your search criteria.
+                    </td>
+                  </tr>
+                  <tr 
+                    v-for="customer in filteredCustomers" 
+                    :key="customer.id"
+                    @click="selectCustomer(customer)"
+                    class="hover:bg-blue-50 cursor-pointer transition-colors"
+                    :class="{ 'bg-blue-50': selectedCustomer && selectedCustomer.id === customer.id }"
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {{ customer.customer_name }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {{ customer.customer_code }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span 
+                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                        :class="{
+                          'bg-green-100 text-green-800': customer.status === 'Active',
+                          'bg-red-100 text-red-800': customer.status === 'Obsolete' || customer.status === 'Inactive'
+                        }"
+                      >
+                        {{ customer.status }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="lg:col-span-1">
+          <!-- Addresses Panel -->
+          <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
+            <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+              <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                <i class="fas fa-map-marker-alt text-white"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Alternate Addresses</h3>
+            </div>
+
+            <div v-if="!selectedCustomer" class="p-4 bg-gray-50 rounded-lg text-center">
+              <p class="text-gray-500">Please select a customer to view addresses</p>
+            </div>
+            
+            <div v-else-if="loadingAddresses" class="p-4 bg-gray-50 rounded-lg text-center">
+              <div class="flex justify-center">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-700"></div>
+              </div>
+              <p class="mt-2 text-gray-500">Loading addresses...</p>
+            </div>
+            
+            <div v-else-if="addresses.length === 0" class="p-4 bg-gray-50 rounded-lg">
+              <p class="text-gray-500 text-center">No alternate addresses found</p>
+              <div class="mt-4 flex justify-center">
+                <button 
+                  @click="openAddModal" 
+                  class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  <i class="fas fa-plus mr-1"></i> Add Address
+                </button>
+              </div>
+            </div>
+            
+            <div v-else class="space-y-3">
+              <div v-for="address in addresses" :key="address.id" class="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-teal-300 hover:shadow-sm transition-all">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="font-medium text-gray-900">{{ address.address }}</p>
+                    <p class="text-sm text-gray-600">{{ address.city }}, {{ address.postal_code }}</p>
+                    <p class="text-xs text-gray-500">{{ address.phone }}</p>
+                    <p class="text-xs text-teal-600">{{ address.email }}</p>
+                  </div>
+                  <div class="flex space-x-1">
+                    <button @click.stop="openEditModal(address)" class="p-1 text-blue-600 hover:bg-blue-50 rounded">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button @click.stop="confirmDelete(address)" class="p-1 text-red-600 hover:bg-red-50 rounded">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-4 flex justify-center">
+                <button 
+                  @click="openAddModal" 
+                  class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  <i class="fas fa-plus mr-1"></i> Add Address
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Options Panel (when showOptions is true) -->
+          <div v-if="showOptions" class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+            <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-200">
+              <div class="flex items-center">
+                <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                  <i class="fas fa-cog text-white"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800">Options</h3>
+              </div>
+              <button @click="showOptions = false" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div class="space-y-4">
+              <!-- Sort Options -->
               <div>
-                <h1 class="text-2xl font-bold text-gray-800">Customer Alternate Address</h1>
-                <p class="text-gray-600">Manage customer alternate addresses</p>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Sort by:</label>
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input type="radio" v-model="sortBy" value="customer_name" class="mr-2">
+                    <span>Customer Name</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" v-model="sortBy" value="customer_code" class="mr-2">
+                    <span>Customer Code</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" v-model="sortBy" value="status" class="mr-2">
+                    <span>Status</span>
+                  </label>
+                </div>
               </div>
-            </div>
-            <div class="flex space-x-2">
-              <button 
-                @click="openAddModal"
-                class="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg"
-              >
-                <!-- Plus Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>Add Address</span>
-              </button>
-              <button 
-                @click="showOptions = !showOptions"
-                class="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
-              >
-                <!-- Filter Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                <span>Options</span>
-              </button>
+              
+              <!-- Sort Direction -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Direction:</label>
+                <label class="flex items-center">
+                  <input type="checkbox" v-model="sortAsc" class="mr-2">
+                  <span>Ascending Order</span>
+                </label>
+              </div>
+              
+              <!-- Status Filter -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Status Filter:</label>
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input type="radio" v-model="recordStatus" value="All" class="mr-2">
+                    <span>All</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" v-model="recordStatus" value="Active" class="mr-2">
+                    <span>Active Only</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" v-model="recordStatus" value="Obsolete" class="mr-2">
+                    <span>Obsolete Only</span>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Search Bar -->
-          <div class="relative">
-            <!-- Search Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input
-              type="text"
-              placeholder="Search customers or addresses..."
-              v-model="searchTerm"
-              class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-            />
+          <!-- Info Panel -->
+          <div v-else class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+            <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
+              <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                <i class="fas fa-info-circle text-white"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Information</h3>
+            </div>
+
+            <div class="space-y-4">
+              <div class="p-4 bg-purple-50 rounded-lg">
+                <h4 class="text-sm font-semibold text-purple-800 uppercase tracking-wider mb-2">Instructions</h4>
+                <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                  <li>Select a customer first</li>
+                  <li>View and manage alternate addresses</li>
+                  <li>You can add multiple addresses for each customer</li>
+                  <li>All addresses must have valid email format</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <!-- Customer List -->
-          <div class="lg:col-span-2">
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div class="p-6 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-800">Customers</h2>
-                <p class="text-sm text-gray-600 mt-1">Select a customer to view alternate addresses</p>
-              </div>
-              
-              <div v-if="loadingCustomers" class="p-8 flex justify-center">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-              </div>
-              
-              <div v-else class="overflow-x-auto max-h-96 overflow-y-auto">
-                <table class="w-full">
-                  <thead class="bg-blue-600 text-white sticky top-0">
-                    <tr>
-                      <th @click="sortCustomers('customer_name')" class="px-4 py-2 text-left text-xs font-semibold cursor-pointer hover:bg-blue-700">
-                        Customer Name
-                        <i class="fas fa-sort ml-1" :class="{
-                          'fa-sort-up': sortBy === 'customer_name' && sortAsc,
-                          'fa-sort-down': sortBy === 'customer_name' && !sortAsc
-                        }"></i>
-                      </th>
-                      <th @click="sortCustomers('customer_code')" class="px-4 py-2 text-left text-xs font-semibold cursor-pointer hover:bg-blue-700">
-                        Customer Code
-                        <i class="fas fa-sort ml-1" :class="{
-                          'fa-sort-up': sortBy === 'customer_code' && sortAsc,
-                          'fa-sort-down': sortBy === 'customer_code' && !sortAsc
-                        }"></i>
-                      </th>
-                      <th @click="sortCustomers('status')" class="px-4 py-2 text-left text-xs font-semibold cursor-pointer hover:bg-blue-700">
-                        Status
-                        <i class="fas fa-sort ml-1" :class="{
-                          'fa-sort-up': sortBy === 'status' && sortAsc,
-                          'fa-sort-down': sortBy === 'status' && !sortAsc
-                        }"></i>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-200">
-                    <tr v-if="filteredCustomers.length === 0" class="text-center">
-                      <td colspan="3" class="px-4 py-4 text-gray-500 text-sm">No customers found</td>
-                    </tr>
-                    <tr 
-                      v-for="customer in filteredCustomers"
-                      :key="customer.id"
-                      class="hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
-                      :class="{ 'bg-blue-50 border-l-4 border-blue-500': selectedCustomer && selectedCustomer.customer_code === customer.customer_code }"
-                      @click="selectCustomer(customer)"
-                    >
-                      <td class="px-4 py-2 text-xs font-medium text-gray-900">{{ customer.customer_name }}</td>
-                      <td class="px-4 py-2 text-xs text-gray-700">{{ customer.customer_code }}</td>
-                      <td class="px-4 py-2">
-                        <span 
-                          class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full"
-                          :class="{
-                            'bg-green-100 text-green-800': customer.status === 'Active', 
-                            'bg-red-100 text-red-800': customer.status === 'Obsolete'
-                          }">
-                          {{ customer.status }}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+      </div>
+    </div>
+    
+    <!-- Customer Selection Modal -->
+    <div v-if="showCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl mx-auto">
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+          <div class="flex items-center">
+            <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+              <i class="fas fa-users"></i>
+            </div>
+            <h3 class="text-xl font-semibold">Select Customer</h3>
+          </div>
+          <button type="button" @click="showCustomerModal = false" class="text-white hover:text-gray-200">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <div class="p-6">
+          <div class="mb-4">
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                <i class="fas fa-search"></i>
+              </span>
+              <input 
+                type="text" 
+                v-model="modalSearchTerm" 
+                placeholder="Search customers..." 
+                class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+              >
             </div>
           </div>
-
-          <!-- Alternate Addresses -->
-          <div class="lg:col-span-2">
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                <div>
-                  <h2 class="text-lg font-semibold text-gray-800">Alternate Addresses</h2>
-                  <p class="text-sm text-gray-600 mt-1" v-if="selectedCustomer">
-                    Showing addresses for {{ selectedCustomer.customer_name }}
-                  </p>
-                  <p class="text-sm text-gray-600 mt-1" v-else>
-                    Select a customer to view addresses
-                  </p>
-                </div>
-                <button 
-                  v-if="selectedCustomer"
-                  @click="openAddModal"
-                  class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs flex items-center"
+          
+          <div class="overflow-x-auto max-h-96 rounded-lg border border-gray-200">
+            <table class="w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Name</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Code</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-if="filteredModalCustomers.length === 0">
+                  <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                    No customers found matching your search criteria.
+                  </td>
+                </tr>
+                <tr 
+                  v-for="customer in filteredModalCustomers" 
+                  :key="customer.id"
+                  @click="selectCustomerFromModal(customer)"
+                  class="hover:bg-blue-50 cursor-pointer transition-colors"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 mr-1"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                  Add
-                </button>
-              </div>
-              
-              <div v-if="loadingAddresses" class="p-8 flex justify-center">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-              </div>
-              
-              <div v-else-if="!selectedCustomer" class="p-8 text-center text-gray-500">
-                Please select a customer to view their alternate addresses
-              </div>
-              
-              <div v-else-if="addresses.length === 0" class="p-8 text-center text-gray-500">
-                No alternate addresses found for this customer
-              </div>
-              
-              <div v-else class="overflow-x-auto max-h-96 overflow-y-auto">
-                <table class="w-full">
-                  <thead class="bg-blue-600 text-white sticky top-0">
-                    <tr>
-                      <th class="px-4 py-2 text-left text-xs font-semibold">Address</th>
-                      <th class="px-4 py-2 text-left text-xs font-semibold">City</th>
-                      <th class="px-4 py-2 text-left text-xs font-semibold">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-200">
-                    <tr 
-                      v-for="address in addresses"
-                      :key="address.id"
-                      class="hover:bg-blue-50 transition-colors duration-150"
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {{ customer.customer_name }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ customer.customer_code }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span 
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      :class="{
+                        'bg-green-100 text-green-800': customer.status === 'Active',
+                        'bg-red-100 text-red-800': customer.status === 'Obsolete' || customer.status === 'Inactive'
+                      }"
                     >
-                      <td class="px-4 py-2 text-xs font-medium text-gray-900">{{ address.address }}</td>
-                      <td class="px-4 py-2 text-xs text-gray-700">{{ address.city }}</td>
-                      <td class="px-4 py-2">
-                        <div class="flex space-x-2">
-                          <button class="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors duration-150" @click="openEditModal(address)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                          </button>
-                          <button class="p-1 text-red-600 hover:bg-red-50 rounded transition-colors duration-150" @click="confirmDelete(address)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                      {{ customer.status }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-
-          <!-- Options Panel -->
-          <div v-if="showOptions" class="lg:col-span-4 mt-4">
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                <div>
-                  <h2 class="text-lg font-semibold text-gray-800">Options</h2>
-                  <p class="text-sm text-gray-600 mt-1">Sorting and filtering options</p>
-                </div>
-                <button 
-                  @click="showOptions = false"
-                  class="text-gray-400 hover:text-gray-600"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-              </div>
-              
-              <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Sort By Section -->
-                <div>
-                  <h3 class="text-sm font-medium text-gray-700 mb-3">Sort by:</h3>
-                  <div class="space-y-3">
-                    <label class="flex items-center">
-                      <input
-                        type="radio"
-                        name="sortBy"
-                        value="customer_code"
-                        v-model="sortBy"
-                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                      />
-                      <span class="ml-3 text-sm text-gray-700">Customer Code</span>
-                    </label>
-                    <label class="flex items-center">
-                      <input
-                        type="radio"
-                        name="sortBy"
-                        value="customer_name"
-                        v-model="sortBy"
-                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                      />
-                      <span class="ml-3 text-sm text-gray-700">Customer Name</span>
-                    </label>
-                    <label class="flex items-center">
-                      <input
-                        type="radio"
-                        name="sortBy"
-                        value="status"
-                        v-model="sortBy"
-                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                      />
-                      <span class="ml-3 text-sm text-gray-700">Status</span>
-                    </label>
-                    
-                    <div class="mt-4">
-                      <label class="flex items-center">
-                        <input
-                          type="checkbox"
-                          v-model="sortAsc"
-                          class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                        />
-                        <span class="ml-3 text-sm text-gray-700">Ascending Order</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Record Status Section -->
-                <div>
-                  <h3 class="text-sm font-medium text-gray-700 mb-3">Record Status:</h3>
-                  <div class="space-y-3">
-                    <label class="flex items-center">
-                      <input
-                        type="radio"
-                        name="recordStatus"
-                        value="All"
-                        v-model="recordStatus"
-                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                      />
-                      <span class="ml-3 text-sm text-gray-700">All</span>
-                    </label>
-                    <label class="flex items-center">
-                      <input
-                        type="radio"
-                        name="recordStatus"
-                        value="Active"
-                        v-model="recordStatus"
-                        class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
-                      />
-                      <span class="ml-3 text-sm text-gray-700">Active</span>
-                    </label>
-                    <label class="flex items-center">
-                      <input
-                        type="radio"
-                        name="recordStatus"
-                        value="Obsolete"
-                        v-model="recordStatus"
-                        class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
-                      />
-                      <span class="ml-3 text-sm text-gray-700">Obsolete</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
+          
+          <div class="mt-4 flex justify-end">
+            <button 
+              type="button" 
+              @click="showCustomerModal = false" 
+              class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>
@@ -327,117 +418,138 @@
     
     <!-- Address Form Modal -->
     <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-800">
-            {{ isEditing ? 'Edit Address' : 'Add New Address' }}
-          </h3>
-          <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-lg mx-auto">
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-t-lg">
+          <div class="flex items-center">
+            <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h3 class="text-xl font-semibold">{{ isEditing ? 'Edit Address' : 'Add New Address' }}</h3>
+          </div>
+          <button @click="closeModal" class="text-white hover:text-gray-200">
+            <i class="fas fa-times text-xl"></i>
           </button>
         </div>
         
-        <form @submit.prevent="saveAddress">
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-              <input 
-                type="text" 
-                v-model="addressForm.address" 
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
+        <div class="p-6">
+          <form @submit.prevent="saveAddress">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <input 
+                  type="text" 
+                  v-model="addressForm.address" 
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                <input 
+                  type="text" 
+                  v-model="addressForm.city" 
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+                <input 
+                  type="text" 
+                  v-model="addressForm.postal_code" 
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <input 
+                  type="text" 
+                  v-model="addressForm.phone" 
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input 
+                  type="email" 
+                  v-model="addressForm.email" 
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  required
+                />
+              </div>
             </div>
             
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-              <input 
-                type="text" 
-                v-model="addressForm.city" 
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
+            <div class="mt-6 flex justify-end space-x-3">
+              <button 
+                type="button"
+                @click="closeModal"
+                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              
+              <button 
+                type="submit"
+                class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700"
+                :disabled="saving"
+              >
+                <span v-if="saving">Saving...</span>
+                <span v-else>Save</span>
+              </button>
             </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
-              <input 
-                type="text" 
-                v-model="addressForm.postal_code" 
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-md mx-auto">
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-t-lg">
+          <div class="flex items-center">
+            <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+              <i class="fas fa-exclamation-triangle"></i>
             </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-              <input 
-                type="text" 
-                v-model="addressForm.phone" 
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input 
-                type="email" 
-                v-model="addressForm.email" 
-                class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
+            <h3 class="text-xl font-semibold">Confirm Deletion</h3>
           </div>
+          <button @click="showDeleteModal = false" class="text-white hover:text-gray-200">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <div class="p-6">
+          <p class="mb-6 text-gray-700">Are you sure you want to delete this address? This action cannot be undone.</p>
           
-          <div class="mt-6 flex justify-end space-x-3">
+          <div class="flex justify-end space-x-3">
             <button 
-              type="button"
-              @click="closeModal"
+              @click="showDeleteModal = false"
               class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
             >
               Cancel
             </button>
             
             <button 
-              type="submit"
-              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              :disabled="saving"
+              @click="deleteAddress"
+              class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              :disabled="deleting"
             >
-              <span v-if="saving">Saving...</span>
-              <span v-else>Save</span>
+              <span v-if="deleting">Deleting...</span>
+              <span v-else>Delete</span>
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
     
-    <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-        <div class="mb-4">
-          <h3 class="text-lg font-semibold text-gray-800 mb-2">Confirm Deletion</h3>
-          <p class="text-sm text-gray-600">Are you sure you want to delete this address? This action cannot be undone.</p>
-        </div>
-        
-        <div class="mt-6 flex justify-end space-x-3">
-          <button 
-            @click="showDeleteModal = false"
-            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-          >
-            Cancel
-          </button>
-          
-          <button 
-            @click="deleteAddress"
-            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-            :disabled="deleting"
-          >
-            <span v-if="deleting">Deleting...</span>
-            <span v-else>Delete</span>
-          </button>
-        </div>
-      </div>
+    <!-- Loading Overlay -->
+    <div v-if="saving || deleting" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
+      <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
   </AppLayout>
 </template>

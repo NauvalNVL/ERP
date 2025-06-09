@@ -31,7 +31,11 @@ class DatabaseSeeder extends Seeder
             IndustrySeeder::class,
             CustomerGroupSeeder::class,
             UpdateCustomerAccountSeeder::class,
+<<<<<<< HEAD
             CustomerAlternateAddressSeeder::class,
+=======
+            ApproveMCSeeder::class,
+>>>>>>> 14d5685af6c98389a9e59b24a998b9a23482f8c9
         ]);
     }
 }
