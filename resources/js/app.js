@@ -31,8 +31,8 @@ createInertiaApp({
                 
             // If still undefined, check subdirectory components
             if (typeof page === 'undefined') {
-                const parts = name.split('/');
-                const componentName = parts.pop();
+             const parts = name.split('/');
+             const componentName = parts.pop();
                 const directory = parts.join('/');
                 
                 // Try exact match with directory

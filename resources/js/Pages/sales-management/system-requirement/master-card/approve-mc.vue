@@ -600,75 +600,112 @@ const handleEdit = (mc) => {
 };
 
 const handleAddNew = () => {
+    console.log('Opening add new master card modal');
+    // Reset editing master card to a new empty record with good defaults
     editingMasterCard.value = {
-        mc_seq: '',
+        mc_seq: generateUniqueMcSeq(),
         mc_model: '',
         customer_code: '',
         customer_name: '',
         status: 'pending'
     };
+    // Set mode to add
     modalMode.value = 'add';
+    // Show the modal
     showEditModal.value = true;
+    
+    console.log('New master card initialized with:', editingMasterCard.value);
+};
+
+// Helper function to generate a unique MC sequence (example format: MC-2023-001)
+const generateUniqueMcSeq = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const existingSeqs = masterCards.value
+        .map(mc => mc.mc_seq)
+        .filter(seq => seq.includes(`MC-${year}`));
+    
+    let nextNumber = 1;
+    if (existingSeqs.length > 0) {
+        // Extract the numeric parts and find the highest
+        const numbers = existingSeqs
+            .map(seq => {
+                const match = seq.match(/MC-\d+-(\d+)/);
+                return match ? parseInt(match[1], 10) : 0;
+            })
+            .filter(num => !isNaN(num));
+        
+        if (numbers.length > 0) {
+            nextNumber = Math.max(...numbers) + 1;
+        }
+    }
+    
+    // Format with leading zeros (e.g., 001, 012, etc.)
+    const paddedNumber = nextNumber.toString().padStart(3, '0');
+    return `MC-${year}-${paddedNumber}`;
 };
 
 const closeEditModal = () => {
+    console.log('Closing edit modal');
     showEditModal.value = false;
     editingMasterCard.value = null;
 };
 
-const handleUpdateMasterCard = async (updatedMasterCard) => {
-    try {
-        let response;
-        let url = '/api/approve-mc';
-        let method = 'POST';
-        
-        // If editing an existing record
-        if (updatedMasterCard.id) {
-            url = `/api/approve-mc/${updatedMasterCard.id}`;
-            method = 'PUT';
-        }
-        
-        response = await fetch(url, {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(updatedMasterCard)
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            // If new record was added
-            if (!updatedMasterCard.id) {
-                masterCards.value.push(result.data);
-            } else {
-                // If existing record was updated
-                const index = masterCards.value.findIndex(mc => mc.id === updatedMasterCard.id);
-                if (index !== -1) {
-                    // Update all fields from the response
-                    masterCards.value[index] = {
-                        ...masterCards.value[index],
-                        ...result.data,
-                        // Make sure status is updated
-                        status: result.data.status
-                    };
-                    console.log('Updated master card:', masterCards.value[index]);
-                }
-            }
-            
-            alert(updatedMasterCard.id ? 'Master Card updated successfully!' : 'Master Card added successfully!');
-        } else {
-            alert('Error: ' + (result.message || 'Unknown error'));
-        }
-    } catch (error) {
-        console.error('Error updating/adding master card:', error);
-        alert('An error occurred while saving the master card');
+const handleUpdateMasterCard = async (updatedMasterCardData) => {
+    console.log('==== Master Card Update/Add Handler ====');
+    console.log('Received response from modal:', updatedMasterCardData);
+
+    // Check if we received valid data from the modal
+    if (!updatedMasterCardData) {
+        console.error('No master card data received from modal');
+        return;
     }
-    
-    closeEditModal();
+
+    try {
+        // Check if this is a new record (no ID) or an existing one
+        if (!updatedMasterCardData.id) {
+            console.log('Adding new master card to local state:', updatedMasterCardData);
+            
+            // Add the new record to the master cards array at the beginning for visibility
+            masterCards.value = [updatedMasterCardData, ...masterCards.value];
+            
+            // Set the new card as selected
+            selectedMasterCard.value = updatedMasterCardData;
+            
+            // Show confirmation to the user
+            alert('Master Card added successfully!');
+        } else {
+            console.log('Updating existing master card in local state');
+            
+            // Find the index of the existing record
+            const index = masterCards.value.findIndex(mc => mc.id === updatedMasterCardData.id);
+            
+            if (index !== -1) {
+                console.log(`Found existing record at index ${index}, updating`);
+                
+                // Update the record in the array
+                masterCards.value.splice(index, 1, updatedMasterCardData);
+                
+                // If this was the selected record, update the selection
+                if (selectedMasterCard.value?.id === updatedMasterCardData.id) {
+                    selectedMasterCard.value = updatedMasterCardData;
+                }
+                
+                // Show confirmation to the user
+                alert('Master Card updated successfully!');
+            } else {
+                console.warn('Could not find master card with ID', updatedMasterCardData.id);
+                
+                // Add it anyway in case it's a valid record
+                masterCards.value.push(updatedMasterCardData);
+            }
+        }
+
+        // Always close the modal after handling the response
+        closeEditModal();
+    } catch (error) {
+        console.error('Error processing master card data:', error);
+    }
 };
 </script>
 

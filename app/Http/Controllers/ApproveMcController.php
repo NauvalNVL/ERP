@@ -64,24 +64,70 @@ class ApproveMcController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'mc_seq' => 'required|unique:approve_mcs,mc_seq',
-            'mc_model' => 'required',
-            'customer_code' => 'required',
-            'customer_name' => 'required',
-            'status' => 'required|in:pending,active,obsolete'
+        Log::info('Creating new master card - debug details', [
+            'raw_data' => $request->getContent(),
+            'all_data' => $request->all(),
+            'request_status' => $request->status,
+            'headers' => collect($request->headers->all())->map(fn($item) => $item[0])->toArray(),
+            'has_csrf' => $request->header('X-CSRF-TOKEN') ? 'yes' : 'no',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
+        
         try {
-            $approveMc = ApproveMC::create($request->all());
+            // Enhanced validation with better error messages
+            $validator = Validator::make($request->all(), [
+                'mc_seq' => 'required|unique:approve_mcs,mc_seq',
+                'mc_model' => 'required',
+                'customer_code' => 'required',
+                'customer_name' => 'required',
+                'status' => 'required|in:pending,active,obsolete'
+            ], [
+                'mc_seq.required' => 'The MC Sequence field is required.',
+                'mc_seq.unique' => 'This MC Sequence already exists.',
+                'mc_model.required' => 'The MC Model field is required.',
+                'customer_code.required' => 'The Customer Code field is required.',
+                'customer_name.required' => 'The Customer Name field is required.',
+                'status.required' => 'The Status field is required.',
+                'status.in' => 'The selected Status is invalid. Choose from: pending, active, or obsolete.'
+            ]);
+
+            if ($validator->fails()) {
+                Log::warning('Validation failed for new master card', ['errors' => $validator->errors()->toArray()]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Create new master card with request data
+            $approveMc = new ApproveMC;
+            $approveMc->mc_seq = $request->mc_seq;
+            $approveMc->mc_model = $request->mc_model;
+            $approveMc->customer_code = $request->customer_code;
+            $approveMc->customer_name = $request->customer_name;
+            $approveMc->status = $request->status;
+            
+            // Set additional fields based on status
+            if ($request->status === 'active') {
+                $approveMc->approved_by = Auth::user() ? Auth::user()->user_id : 'SYSTEM';
+                $approveMc->approved_date = now();
+            } elseif ($request->status === 'obsolete') {
+                $approveMc->rejected_by = Auth::user() ? Auth::user()->user_id : 'SYSTEM';
+                $approveMc->rejected_date = now();
+                $approveMc->rejection_reason = $request->rejection_reason ?? 'Marked obsolete during creation';
+            }
+            
+            $approveMc->save();
+            
+            // Make sure we have the full record with ID
+            $approveMc = ApproveMC::find($approveMc->id);
+            
+            Log::info('Master card created successfully', [
+                'id' => $approveMc->id, 
+                'status' => $approveMc->status,
+                'mc_seq' => $approveMc->mc_seq,
+                'customer' => $approveMc->customer_name
+            ]);
             
             return response()->json([
                 'success' => true,
@@ -89,6 +135,12 @@ class ApproveMcController extends Controller
                 'data' => $approveMc
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to create master card', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create master card: ' . $e->getMessage()
@@ -117,9 +169,18 @@ class ApproveMcController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Log::info('Updating master card', ['id' => $id, 'data' => $request->all()]);
+        Log::info('Updating master card', [
+            'id' => $id, 
+            'data' => $request->all(),
+            'request_status' => $request->status
+        ]);
         
         $approveMc = ApproveMC::findOrFail($id);
+        
+        Log::info('Current master card status', [
+            'id' => $id,
+            'current_status' => $approveMc->status
+        ]);
         
         $validator = Validator::make($request->all(), [
             'mc_seq' => 'required|unique:approve_mcs,mc_seq,' . $id,
@@ -140,19 +201,28 @@ class ApproveMcController extends Controller
 
         try {
             // Handle the status change separately if needed
-            $statusChanged = $request->status !== $approveMc->status;
-            Log::info('Status change detected', [
-                'previous' => $approveMc->status,
-                'new' => $request->status,
+            $oldStatus = $approveMc->status;
+            $newStatus = $request->status;
+            $statusChanged = $newStatus !== $oldStatus;
+            
+            Log::info('Status change analysis', [
+                'previous' => $oldStatus,
+                'new' => $newStatus,
                 'changed' => $statusChanged
             ]);
             
-            // Update the model with request data
-            $approveMc->fill($request->all());
+            // Update basic fields first
+            $approveMc->mc_seq = $request->mc_seq;
+            $approveMc->mc_model = $request->mc_model;
+            $approveMc->customer_code = $request->customer_code;
+            $approveMc->customer_name = $request->customer_name;
+            
+            // Handle status specifically
+            $approveMc->status = $newStatus;
             
             // If status is changing, update relevant fields
             if ($statusChanged) {
-                if ($request->status === 'active') {
+                if ($newStatus === 'active') {
                     $approveMc->approved_by = Auth::user() ? Auth::user()->user_id : 'SYSTEM';
                     $approveMc->approved_date = now();
                     // Clear rejection fields if previously rejected
@@ -162,7 +232,7 @@ class ApproveMcController extends Controller
                     
                     Log::info('Master card activated', ['id' => $id, 'by' => $approveMc->approved_by]);
                 } 
-                elseif ($request->status === 'obsolete') {
+                elseif ($newStatus === 'obsolete') {
                     // In case of direct obsolete status change without going through reject API
                     if (!$request->has('rejection_reason')) {
                         $approveMc->rejection_reason = 'Set to obsolete during edit';
@@ -175,7 +245,7 @@ class ApproveMcController extends Controller
                     
                     Log::info('Master card marked obsolete', ['id' => $id, 'by' => $approveMc->rejected_by]);
                 }
-                elseif ($request->status === 'pending') {
+                elseif ($newStatus === 'pending') {
                     // Reset both approval and rejection fields
                     $approveMc->approved_by = null;
                     $approveMc->approved_date = null; 
@@ -189,7 +259,10 @@ class ApproveMcController extends Controller
             
             $approveMc->save();
             
-            Log::info('Master card updated successfully', ['id' => $id]);
+            Log::info('Master card updated successfully', [
+                'id' => $id,
+                'new_status' => $approveMc->status
+            ]);
             
             return response()->json([
                 'success' => true,

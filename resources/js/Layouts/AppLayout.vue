@@ -86,13 +86,13 @@ onMounted(() => {
     sidebarStore.toggle('sales-management');
     
     if (currentRouteUrl.includes('/system-requirement')) {
-      // Ensure System Requirement submenu is open
-      sidebarStore.toggle('system-requirement');
-      
+    // Ensure System Requirement submenu is open
+    sidebarStore.toggle('system-requirement');
+    
       // Check specific submenus
       if (currentRouteUrl.includes('/master-card')) {
-        // Ensure Master Card submenu is open
-        sidebarStore.toggle('master-card');
+    // Ensure Master Card submenu is open
+    sidebarStore.toggle('master-card');
       } else if (currentRouteUrl.includes('/customer-account')) {
         sidebarStore.toggle('customer-account');
       }

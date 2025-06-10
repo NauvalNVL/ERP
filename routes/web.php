@@ -32,6 +32,7 @@ use App\Http\Controllers\ISOCurrencyController;
 use App\Http\Controllers\CustomerAlternateAddressController;
 use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\ApproveMcController;
+use App\Http\Controllers\RealeseApproveMcController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -195,6 +196,9 @@ Route::middleware('auth')->group(function () {
                  'customers' => $customers
              ]);
          })->name('vue.master-card.approve-mc');
+         
+         // Add route for realese-approve-mc
+         Route::get('/sales-management/system-requirement/master-card/realese-approve-mc', [RealeseApproveMcController::class, 'index'])->name('vue.master-card.realese-approve-mc');
 
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -362,4 +366,11 @@ Route::prefix('api')->group(function () {
     Route::post('/approve-mc/approve/{id}', [ApproveMcController::class, 'approve']);
     Route::post('/approve-mc/reject/{id}', [ApproveMcController::class, 'reject']);
     Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);
+    
+    // RealeseApproveMC API routes
+    Route::get('/realese-approve-mc', [RealeseApproveMcController::class, 'apiIndex']);
+    Route::post('/realese-approve-mc', [RealeseApproveMcController::class, 'store']);
+    Route::post('/realese-approve-mc/release/{id}', [RealeseApproveMcController::class, 'release']);
+    Route::post('/realese-approve-mc/unreleased/{id}', [RealeseApproveMcController::class, 'unreleased']);
+    Route::get('/realese-approve-mc/by-customer/{customerId}', [RealeseApproveMcController::class, 'getByCustomer']);
 });

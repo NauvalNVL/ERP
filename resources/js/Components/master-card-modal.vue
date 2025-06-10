@@ -51,22 +51,12 @@
               <!-- Customer Code -->
               <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1" for="customer_code">Customer Code:</label>
-                <div class="flex">
-                  <input 
-                    type="text" 
-                    id="customer_code" 
-                    v-model="formData.customer_code" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    readonly
-                  >
-                  <button 
-                    type="button" 
-                    class="bg-gray-200 px-3 py-2 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-300"
-                    @click="openCustomerModal"
-                  >
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
+                <input 
+                  type="text" 
+                  id="customer_code" 
+                  v-model="formData.customer_code" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
               </div>
               
               <!-- Customer Name -->
@@ -77,7 +67,6 @@
                   id="customer_name" 
                   v-model="formData.customer_name" 
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  readonly
                 >
               </div>
               
@@ -147,25 +136,11 @@
         </div>
       </div>
     </div>
-
-    <!-- Customer Account Modal -->
-    <customer-account-modal
-      v-if="showCustomerModal"
-      :show="showCustomerModal"
-      @close="showCustomerModal = false"
-      @select="selectCustomer"
-    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import axios from 'axios';
-import CustomerAccountModal from './customer-account-modal.vue';
-
-// Setup CSRF token for all axios requests
-axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-axios.defaults.headers.common['Accept'] = 'application/json';
+import { ref, watch } from 'vue';
 
 const props = defineProps({
   show: {
@@ -180,14 +155,17 @@ const props = defineProps({
     type: String,
     default: 'edit',
     validator: (value) => ['add', 'edit'].includes(value)
+  },
+  apiEndpoint: {
+    type: String,
+    default: '/api/approve-mc'
   }
 });
 
-const emit = defineEmits(['close', 'update']);
+const emit = defineEmits(['close', 'update', 'master-card-added']);
 
 const loading = ref(false);
 const error = ref(null);
-const showCustomerModal = ref(false);
 const formData = ref({
   mc_seq: '',
   mc_model: '',
@@ -207,27 +185,23 @@ watch(() => props.masterCard, (newVal) => {
     console.log('Form data initialized:', formData.value);
   } else {
     // Reset form if no master card is provided
-    formData.value = {
-      mc_seq: '',
-      mc_model: '',
-      customer_code: '',
-      customer_name: '',
-      status: 'pending'
-    };
+    resetForm();
   }
 }, { immediate: true });
 
-const openCustomerModal = () => {
-  showCustomerModal.value = true;
+// Reset form data to defaults
+const resetForm = () => {
+  formData.value = {
+    mc_seq: '',
+    mc_model: '',
+    customer_code: '',
+    customer_name: '',
+    status: 'pending'
+  };
+  console.log('Form data reset to defaults');
 };
 
-const selectCustomer = (customer) => {
-  formData.value.customer_code = customer.customer_code;
-  formData.value.customer_name = customer.customer_name;
-  showCustomerModal.value = false;
-};
-
-// This code snippet adds a debugging method and event handling to the script
+// Debug helper
 const debug = (message, data) => {
   console.log(`[MasterCardModal] ${message}:`, data);
 };
@@ -239,40 +213,137 @@ watch(() => formData.value.status, (newVal, oldVal) => {
   }
 });
 
-// Enhanced handle submit with better error handling
+// Form validation 
+const validateForm = () => {
+  const errors = [];
+  
+  if (!formData.value.mc_seq) {
+    errors.push('MC Sequence is required');
+  }
+  
+  if (!formData.value.mc_model) {
+    errors.push('MC Model is required');
+  }
+  
+  if (!formData.value.customer_code) {
+    errors.push('Customer Code is required');
+  }
+  
+  if (!formData.value.customer_name) {
+    errors.push('Customer Name is required');
+  }
+  
+  if (!formData.value.status) {
+    errors.push('Status is required');
+  }
+  
+  return errors;
+};
+
+// Completely revamped form submission handler
 const handleSubmit = async () => {
+  debug('Handling form submission', { mode: props.mode });
+  
   loading.value = true;
   error.value = null;
   
-  debug('Submitting form data', formData.value);
-  
   try {
-    let response;
-    if (props.mode === 'edit' && props.masterCard?.id) {
-      // Update existing master card
-      debug('Updating master card', props.masterCard.id);
-      response = await axios.put(`/api/approve-mc/${props.masterCard.id}`, formData.value);
-    } else {
-      // Create new master card
-      debug('Creating new master card');
-      response = await axios.post('/api/approve-mc', formData.value);
+    // 1. Form validation
+    const validationErrors = validateForm();
+    if (validationErrors.length > 0) {
+      error.value = validationErrors.join(', ');
+      debug('Validation failed', validationErrors);
+      return;
     }
     
-    debug('API response', response.data);
+    // 2. Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+      error.value = 'CSRF token not found. Please refresh the page.';
+      debug('CSRF token missing');
+      return;
+    }
     
-    // Check for success property in response data
-    if (response.data.success) {
-      // Pass the actual data to the parent component
-      emit('update', response.data.data || response.data);
+    // 3. Prepare request data
+    const payload = {
+      mc_seq: formData.value.mc_seq.trim(),
+      mc_model: formData.value.mc_model.trim(),
+      customer_code: formData.value.customer_code.trim(),
+      customer_name: formData.value.customer_name.trim(),
+      status: formData.value.status
+    };
+    
+    debug('Prepared payload', payload);
+    
+    // 4. Determine API endpoint and method
+    let url = props.apiEndpoint;
+    let method = 'POST';
+    
+    if (props.mode === 'edit' && props.masterCard?.id) {
+      url = `${props.apiEndpoint}/${props.masterCard.id}`;
+      method = 'PUT';
+      debug('Using update endpoint', { url, method });
+    } else {
+      debug('Using create endpoint', { url, method });
+    }
+    
+    // 5. Make the API request
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    // 6. Parse the response
+    let responseData;
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      responseData = await response.json();
+      debug('Received JSON response', responseData);
+    } else {
+      const text = await response.text();
+      debug('Received non-JSON response', text);
+      throw new Error('Unexpected response format');
+    }
+    
+    // 7. Handle the response
+    if (!response.ok) {
+      debug('API request failed', { status: response.status, statusText: response.statusText });
+      
+      if (responseData.errors) {
+        const errorMessages = Object.values(responseData.errors).flat();
+        error.value = errorMessages.join(', ');
+      } else {
+        error.value = responseData.message || `Server error: ${response.status} ${response.statusText}`;
+      }
+      return;
+    }
+    
+    // 8. Success handling
+    if (responseData.success) {
+      debug('Operation successful', responseData.data);
+      // Pass the data back to parent component
+      if (props.mode === 'add') {
+        emit('master-card-added', responseData.data);
+      } else {
+        emit('update', responseData.data);
+      }
       emit('close');
     } else {
-      // Handle API error case
-      error.value = response.data.message || 'Failed to save master card data.';
+      // Success false but HTTP 200
+      error.value = responseData.message || 'Unknown error occurred';
+      debug('API returned success:false', responseData);
     }
+    
   } catch (err) {
-    console.error('Error saving master card:', err);
-    debug('API error', err.response?.data || err);
-    error.value = err.response?.data?.message || 'Failed to save master card data.';
+    console.error('Error in form submission:', err);
+    debug('Exception thrown', err);
+    error.value = 'An unexpected error occurred. Please try again.';
   } finally {
     loading.value = false;
   }
