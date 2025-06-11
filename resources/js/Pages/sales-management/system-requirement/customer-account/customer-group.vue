@@ -27,36 +27,6 @@
               <h3 class="text-xl font-semibold text-gray-800">Customer Group Management</h3>
             </div>
 
-<<<<<<< HEAD
-            
-            <!-- Form Section -->
-            <form @submit.prevent="handleSubmit" class="space-y-6">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label for="group_code" class="block text-sm font-medium text-gray-700 mb-1">Grouping Code</label>
-                  <div class="relative flex">
-                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                      <i class="fas fa-users"></i>
-                    </span>
-                    <input type="text" v-model="form.group_code" id="group_code" required maxlength="20"
-                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                    <button type="button" @click="openModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
-                      <i class="fas fa-table"></i>
-                    </button>
-                  </div>
-                  <p v-if="errors.group_code" class="mt-1 text-sm text-red-600">{{ errors.group_code }}</p>
-                </div>
-                <div>
-                  <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                  <input type="text" v-model="form.description" id="description" required maxlength="100"
-                    class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                  <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</p>
-                </div>
-              </div>
-              <div class="flex justify-end">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                  Save
-=======
           <!-- Search Section -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
             <div class="col-span-2">
@@ -67,18 +37,10 @@
                     </span>
                 <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                 <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md">
-<<<<<<< HEAD
                       <i class="fas fa-table"></i>
                     </button>
                   </div>
                 </div>
-=======
-                  <i class="fas fa-table"></i>
->>>>>>> a0b861e5d074eba957df2cf6333ab1cb041b53ca
-                </button>
-              </div>
-            </div>
->>>>>>> 14d5685af6c98389a9e59b24a998b9a23482f8c9
             <div class="col-span-1">
               <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
               <button type="button" @click="createNewCustomerGroup" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">

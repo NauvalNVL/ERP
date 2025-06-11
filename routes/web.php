@@ -31,7 +31,6 @@ use App\Http\Controllers\UpdateCustomerAccountController;
 use App\Http\Controllers\ISOCurrencyController;
 use App\Http\Controllers\CustomerAlternateAddressController;
 use App\Http\Controllers\UpdateMcController;
-use App\Http\Controllers\ApproveMcController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -166,10 +165,6 @@ Route::middleware('auth')->group(function () {
              return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
          })->name('vue.update-customer-account.index');
          
-         Route::get('/obsolete-reactive-customer-account', function () {
-             return Inertia::render('sales-management/system-requirement/customer-account/obsolete-reactive-customer-ac');
-         })->name('vue.obsolete-reactive-customer-account.index');
-         
          Route::get('/customer-alternate-address', [CustomerAlternateAddressController::class, 'index'])->name('vue.customer-alternate-address.index');
          Route::get('/customer-alternate-address/view-print', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-alternate-address');
@@ -179,9 +174,6 @@ Route::middleware('auth')->group(function () {
          Route::get('/sales-management/system-requirement/master-card/update-mc', [UpdateMcController::class, 'index'])->name('vue.master-card.update-mc');
          Route::post('/api/update-mc/search-ac', [UpdateMcController::class, 'searchAc']);
          Route::post('/api/update-mc/search-mcs', [UpdateMcController::class, 'searchMcs']);
-         
-         // Add route for approve-mc
-         Route::get('/sales-management/system-requirement/master-card/approve-mc', [ApproveMcController::class, 'index'])->name('vue.master-card.approve-mc');
 
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -315,7 +307,6 @@ Route::prefix('api')->group(function () {
     Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
     Route::post('/customer-accounts', [UpdateCustomerAccountController::class, 'apiStore']);
     Route::put('/customer-accounts/{id}', [UpdateCustomerAccountController::class, 'apiUpdate']);
-    Route::put('/customer-accounts/{customer_code}/status', [UpdateCustomerAccountController::class, 'updateStatus']);
     
     // Customer Alternate Address API routes
     Route::get('/customer-alternate-addresses', [CustomerAlternateAddressController::class, 'apiIndex']);
@@ -323,6 +314,7 @@ Route::prefix('api')->group(function () {
     Route::post('/customer-alternate-addresses', [CustomerAlternateAddressController::class, 'apiStore']);
     Route::put('/customer-alternate-addresses/{id}', [CustomerAlternateAddressController::class, 'apiUpdate']);
     Route::delete('/customer-alternate-addresses/{id}', [CustomerAlternateAddressController::class, 'apiDestroy']);
+    Route::post('/seed-customer-alternate-addresses', [CustomerAlternateAddressController::class, 'seed']);
     
     // Foreign Currency API endpoints
     Route::get('/foreign-currencies', [ForeignCurrencyController::class, 'apiIndex']);
@@ -341,12 +333,4 @@ Route::prefix('api')->group(function () {
     Route::put('/finishings/{code}', [FinishingController::class, 'update']);
     Route::delete('/finishings/{code}', [FinishingController::class, 'destroy']);
     Route::post('/finishings/seed', [FinishingController::class, 'seed']);
-
-    // ApproveMC API routes
-    Route::get('/approve-mc', [ApproveMcController::class, 'apiIndex']);
-    Route::post('/approve-mc', [ApproveMcController::class, 'store']);
-    Route::put('/approve-mc/{id}', [ApproveMcController::class, 'update']);
-    Route::post('/approve-mc/approve/{id}', [ApproveMcController::class, 'approve']);
-    Route::post('/approve-mc/reject/{id}', [ApproveMcController::class, 'reject']);
-    Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);
 });

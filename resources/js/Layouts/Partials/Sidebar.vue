@@ -260,10 +260,9 @@ const salesManagementItems = [
       }
     ]
   },
-  { title: 'Standard Costing', icon: 'fas fa-calculator', route: null },
+
   { title: 'Standard Formula', icon: 'fas fa-flask', route: null },
   { title: 'Sales Order', icon: 'fas fa-shopping-cart', route: null },
-  { title: 'Sales Analysis', icon: 'fas fa-chart-bar', route: null },
   { title: 'Customer Service', icon: 'fas fa-headset', route: null }
 ];
 

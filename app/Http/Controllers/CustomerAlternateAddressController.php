@@ -28,8 +28,9 @@ class CustomerAlternateAddressController extends Controller
     private function getInitialData()
     {
         return [
-            'customers' => UpdateCustomerAccount::select('id', 'customer_code', 'customer_name', 'status', 'currency', 'currency_code', 'salesperson_code')
+            'customers' => UpdateCustomerAccount::select('customer_code', 'customer_name', 'status')
                 ->orderBy('customer_name')
+                ->limit(20)
                 ->get(),
         ];
     }
@@ -37,9 +38,7 @@ class CustomerAlternateAddressController extends Controller
     public function apiIndex()
     {
         try {
-            $customers = UpdateCustomerAccount::select('id', 'customer_code', 'customer_name', 'status', 'currency', 'currency_code', 'salesperson_code')
-                ->orderBy('customer_name')
-                ->get();
+            $customers = UpdateCustomerAccount::orderBy('customer_name')->get();
             Log::info('Fetched customer data for API');
             return response()->json($customers);
         } catch (\Exception $e) {
@@ -169,6 +168,36 @@ class CustomerAlternateAddressController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete alternate address: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Run the CustomerAlternateAddressSeeder
+     */
+    public function seed()
+    {
+        try {
+            // Clear existing records
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            CustomerAlternateAddress::truncate();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+            
+            // Run the seeder
+            $seeder = new \Database\Seeders\CustomerAlternateAddressSeeder();
+            $seeder->run();
+            
+            Log::info('Customer alternate address data seeded successfully');
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Customer alternate address data seeded successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error seeding customer alternate address data: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to seed customer alternate address data: ' . $e->getMessage()
             ], 500);
         }
     }
