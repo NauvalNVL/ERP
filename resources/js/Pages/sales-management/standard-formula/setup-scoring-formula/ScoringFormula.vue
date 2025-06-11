@@ -79,6 +79,7 @@
                             </button>
                             
                             <button 
+                              @click="saveFormula"
                               class="w-full mt-4 flex items-center justify-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
                             >
                                 <i class="fas fa-save mr-2"></i> Save Formula
@@ -234,6 +235,15 @@
       @close="showPaperFluteModal = false"
     />
 
+    <!-- Product Design Modal -->
+    <ProductDesignModal
+      :show="showProductDesignModal"
+      :designs="productDesigns"
+      :products="[]"
+      @select="onProductDesignSelected"
+      @close="showProductDesignModal = false"
+    />
+
     <!-- Loading Overlay -->
     <div v-if="loading" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
       <div class="bg-white p-5 rounded-lg shadow-lg flex items-center">
@@ -275,6 +285,7 @@ import { ref, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PapeFluteSelector from '@/Components/paper-flute-selector-modal.vue';
+import ProductDesignModal from '@/Components/product-design-modal.vue';
 
 // Form data
 const form = ref({
@@ -363,6 +374,7 @@ const onFluteSelected = (flute) => {
 
 // Add function to fetch product designs
 const fetchProductDesigns = async () => {
+  loading.value = true;
   try {
     const res = await fetch('/api/product-designs', { 
       headers: { 
@@ -388,15 +400,17 @@ const fetchProductDesigns = async () => {
     console.error('Error fetching product designs:', e);
     productDesigns.value = [];
     showNotification('Error loading product designs: ' + e.message, 'error');
+  } finally {
+    loading.value = false;
   }
 };
 
 // Add function to handle product design selection
 const onProductDesignSelected = (design) => {
-  form.value.productDesign = design.code;
+  form.value.productDesign = design.pd_code;
   form.value.product_design_id = design.id;
   showProductDesignModal.value = false;
-  showNotification(`Selected product design: ${design.code}`, 'success');
+  showNotification(`Selected product design: ${design.pd_code}`, 'success');
 };
 
 // Open product design modal
