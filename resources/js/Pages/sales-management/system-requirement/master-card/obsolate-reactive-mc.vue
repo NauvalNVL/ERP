@@ -21,7 +21,7 @@
                         </div>
                         <div class="flex space-x-3">
                             <button 
-                                @click="showOptions = !showOptions"
+                                @click="showOptionModal = true"
                                 class="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
                             >
                                 <!-- Filter Icon -->
@@ -44,9 +44,9 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 gap-6">
                     <!-- Master Card List -->
-                    <div class="lg:col-span-3">
+                    <div class="col-span-1">
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                             <div class="p-6 border-b border-gray-200">
                                 <h2 class="text-lg font-semibold text-gray-800">Master Card Table</h2>
@@ -122,338 +122,356 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Options Panel -->
-                    <div class="lg:col-span-1">
-                        <div 
-                            :class="[
-                                'bg-white rounded-xl shadow-lg transition-all duration-300',
-                                showOptions ? 'opacity-100 transform translate-y-0' : 'opacity-50 transform translate-y-2 pointer-events-none'
-                            ]"
-                        >
-                            <div class="p-6">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h3 class="text-lg font-semibold text-gray-800">Options</h3>
-                                    <!-- X Icon -->
-                                    <svg 
-                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
-                                        class="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" 
-                                        @click="showOptions = false">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </div>
-
-                                <!-- Sort By Section -->
-                                <div class="mb-6">
-                                    <label class="block text-sm font-medium text-gray-700 mb-3">Sort by:</label>
-                                    <div class="space-y-3">
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="sortBy"
-                                                value="seq"
-                                                v-model="sortBy"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">MC Sequence</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="sortBy"
-                                                value="model"
-                                                v-model="sortBy"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">MC Model</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="sortBy"
-                                                value="customer"
-                                                v-model="sortBy"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">Customer</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- Record Status Section -->
-                                <div class="mb-6">
-                                    <label class="block text-sm font-medium text-gray-700 mb-3">Record Status:</label>
-                                    <div class="space-y-3">
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="recordStatus"
-                                                value="active"
-                                                v-model="recordStatus"
-                                                class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">Active</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="recordStatus"
-                                                value="obsolete"
-                                                v-model="recordStatus"
-                                                class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">Obsolete</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="recordStatus"
-                                                value="all"
-                                                v-model="recordStatus"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">All</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- Select by option -->
-                                <div class="mb-6">
-                                    <label class="block text-sm font-medium text-gray-700 mb-3">Select by:</label>
-                                    <div class="space-y-3">
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="selectBy"
-                                                value="customer"
-                                                v-model="selectBy"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">Customer</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="selectBy"
-                                                value="mastercard"
-                                                v-model="selectBy"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">Master Card</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Selected Customer -->
-                        <div v-if="selectBy === 'customer' && showOptions" class="bg-white rounded-xl shadow-lg mt-6 p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Select Customer</h3>
-                            <div class="relative">
-                                <select 
-                                    v-model="selectedCustomerId"
-                                    class="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                >
-                                    <option value="">All Customers</option>
-                                    <option 
-                                        v-for="customer in customers" 
-                                        :key="customer.id" 
-                                        :value="customer.id"
-                                    >
-                                        {{ customer.customer_name }}
-                                    </option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Options Modal -->
+        <TransitionRoot appear :show="showOptionModal" as="template">
+            <Dialog as="div" class="fixed z-10 inset-0 overflow-y-auto" @close="showOptionModal = false">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <TransitionChild
+                        as="template"
+                        enter="ease-out duration-300"
+                        enter-from="opacity-0"
+                        enter-to="opacity-100"
+                        leave="ease-in duration-200"
+                        leave-from="opacity-100"
+                        leave-to="opacity-0"
+                    >
+                        <DialogOverlay class="fixed inset-0 bg-black bg-opacity-30 transition-opacity" />
+                    </TransitionChild>
+
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                    <TransitionChild
+                        as="template"
+                        enter="ease-out duration-300"
+                        enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        enter-to="opacity-100 translate-y-0 sm:scale-100"
+                        leave="ease-in duration-200"
+                        leave-from="opacity-100 translate-y-0 sm:scale-100"
+                        leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    >
+                        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
+                            <!-- Header with blue background -->
+                            <div class="bg-gradient-to-r from-blue-600 to-blue-800 px-4 py-3 flex justify-between items-center">
+                                <h3 class="text-lg font-medium text-white flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Options
+                                </h3>
+                                <button @click="showOptionModal = false" class="text-white hover:text-gray-200 transition-colors duration-150 focus:outline-none">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div class="bg-white px-6 pt-5 pb-6">
+                                <!-- Sort by section -->
+                                <div class="mb-6">
+                                    <div class="flex items-center mb-3 border-l-4 border-blue-500 pl-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                        </svg>
+                                        <span class="text-sm font-medium text-gray-700">Sort by:</span>
+                                    </div>
+                                    <div class="space-y-3 ml-7">
+                                        <label class="flex items-center transition-colors duration-150 p-2 rounded-md hover:bg-blue-50">
+                                            <input 
+                                                type="radio" 
+                                                name="sortBy" 
+                                                value="customerCode" 
+                                                v-model="sortBy"
+                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                            />
+                                            <span class="ml-3 text-sm text-gray-700">Customer Code</span>
+                                        </label>
+                                        <label class="flex items-center transition-colors duration-150 p-2 rounded-md hover:bg-blue-50">
+                                            <input 
+                                                type="radio" 
+                                                name="sortBy" 
+                                                value="customerName" 
+                                                v-model="sortBy"
+                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                            />
+                                            <span class="ml-3 text-sm text-gray-700">Customer Name</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Record Status section -->
+                                <div class="mb-6">
+                                    <div class="flex items-center mb-3 border-l-4 border-blue-500 pl-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                        </svg>
+                                        <span class="text-sm font-medium text-gray-700">Record Status:</span>
+                                    </div>
+                                    <div class="space-y-3 ml-7">
+                                        <label class="flex items-center transition-colors duration-150 p-2 rounded-md hover:bg-blue-50">
+                                            <input 
+                                                type="checkbox" 
+                                                v-model="isActiveSelected"
+                                                class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <span class="ml-3 text-sm text-gray-700 flex items-center">
+                                                <span class="inline-block w-3 h-3 rounded-full bg-green-500 mr-2"></span>
+                                                Active
+                                            </span>
+                                        </label>
+                                        <label class="flex items-center transition-colors duration-150 p-2 rounded-md hover:bg-blue-50">
+                                            <input 
+                                                type="checkbox" 
+                                                v-model="isObsoleteSelected"
+                                                class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <span class="ml-3 text-sm text-gray-700 flex items-center">
+                                                <span class="inline-block w-3 h-3 rounded-full bg-red-500 mr-2"></span>
+                                                Obsolete
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-4 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button 
+                                    type="button"
+                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-700 text-base font-medium text-white hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all duration-150 hover:scale-105 sm:ml-3 sm:w-auto sm:text-sm"
+                                    @click="applyOptions"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    OK
+                                </button>
+                                <button 
+                                    type="button"
+                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all duration-150 hover:scale-105 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                    @click="showOptionModal = false"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Exit
+                                </button>
+                            </div>
+                        </div>
+                    </TransitionChild>
+                </div>
+            </Dialog>
+        </TransitionRoot>
 
         <!-- Obsolate Modal -->
-        <div v-if="showObsolateModal" class="fixed inset-0 z-10 overflow-y-auto">
-            <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-black bg-opacity-30 transition-opacity" @click="showObsolateModal = false"></div>
+        <TransitionRoot appear :show="showObsolateModal" as="template">
+            <Dialog as="div" class="fixed z-10 inset-0 overflow-y-auto" @close="showObsolateModal = false">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <TransitionChild
+                        as="template"
+                        enter="ease-out duration-300"
+                        enter-from="opacity-0"
+                        enter-to="opacity-100"
+                        leave="ease-in duration-200"
+                        leave-from="opacity-100"
+                        leave-to="opacity-0"
+                    >
+                        <DialogOverlay class="fixed inset-0 bg-black bg-opacity-30 transition-opacity" />
+                    </TransitionChild>
 
-                <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                    <div>
-                        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-red-600"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-5">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                Obsolate Master Card
-                            </h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500">
-                                    Are you sure you want to obsolate the master card? This will mark it as no longer in use.
-                                </p>
+                    <TransitionChild
+                        as="template"
+                        enter="ease-out duration-300"
+                        enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        enter-to="opacity-100 translate-y-0 sm:scale-100"
+                        leave="ease-in duration-200"
+                        leave-from="opacity-100 translate-y-0 sm:scale-100"
+                        leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    >
+                        <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-0">
+                            <!-- Header with red gradient background -->
+                            <div class="bg-gradient-to-r from-red-600 to-red-800 px-4 py-3 flex justify-between items-center rounded-t-lg">
+                                <h3 class="text-lg font-medium text-white flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    Obsolate Master Card
+                                </h3>
+                                <button @click="showObsolateModal = false" class="text-white hover:text-gray-200 transition-colors duration-150 focus:outline-none">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
                             </div>
-                            <div class="mt-4">
-                                <label for="obsolate-reason" class="block text-sm font-medium text-gray-700 text-left">
-                                    Reason for Obsolating:
-                                </label>
-                                <textarea
-                                    id="obsolate-reason"
-                                    v-model="obsolateReason"
-                                    rows="3"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    placeholder="Please provide a reason..."
-                                ></textarea>
+                            
+                            <div class="px-6 pt-5 pb-6 bg-white">
+                                <div class="sm:flex sm:items-start">
+                                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10 pulse-animation">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-red-600"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                        <div class="mt-2">
+                                            <p class="text-sm text-gray-600 border-l-4 border-red-500 pl-3 py-2 bg-red-50 rounded-r-md">
+                                                Are you sure you want to obsolate the master card? This will mark it as no longer in use.
+                                            </p>
+                                        </div>
+                                        <div class="mt-4">
+                                            <label for="obsolate-reason" class="block text-sm font-medium text-gray-700">
+                                                Reason for Obsolating:
+                                            </label>
+                                            <textarea
+                                                id="obsolate-reason"
+                                                v-model="obsolateReason"
+                                                rows="3"
+                                                class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 transition-all duration-200"
+                                                placeholder="Please provide a reason..."
+                                            ></textarea>
+                                            <p class="mt-1 text-xs text-gray-500">Please provide a detailed reason why this master card should be obsolated.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-4 rounded-b-lg sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button
+                                    type="button"
+                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-red-500 to-red-700 text-base font-medium text-white hover:from-red-600 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transform hover:scale-105 transition-all duration-150 sm:ml-3 sm:w-auto sm:text-sm"
+                                    @click="confirmObsolate"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Obsolate
+                                </button>
+                                <button
+                                    type="button"
+                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transform hover:scale-105 transition-all duration-150 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                    @click="showObsolateModal = false"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Cancel
+                                </button>
                             </div>
                         </div>
-                    </div>
-                    <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                        <button
-                            type="button"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:col-start-2 sm:text-sm"
-                            @click="confirmObsolate"
-                        >
-                            Obsolate
-                        </button>
-                        <button
-                            type="button"
-                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:col-start-1 sm:text-sm"
-                            @click="showObsolateModal = false"
-                        >
-                            Cancel
-                        </button>
-                    </div>
+                    </TransitionChild>
                 </div>
-            </div>
-        </div>
+            </Dialog>
+        </TransitionRoot>
 
         <!-- Reactive Modal -->
-        <div v-if="showReactiveModal" class="fixed inset-0 z-10 overflow-y-auto">
-            <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-black bg-opacity-30 transition-opacity" @click="showReactiveModal = false"></div>
+        <TransitionRoot appear :show="showReactiveModal" as="template">
+            <Dialog as="div" class="fixed z-10 inset-0 overflow-y-auto" @close="showReactiveModal = false">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <TransitionChild
+                        as="template"
+                        enter="ease-out duration-300"
+                        enter-from="opacity-0"
+                        enter-to="opacity-100"
+                        leave="ease-in duration-200"
+                        leave-from="opacity-100"
+                        leave-to="opacity-0"
+                    >
+                        <DialogOverlay class="fixed inset-0 bg-black bg-opacity-30 transition-opacity" />
+                    </TransitionChild>
 
-                <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                    <div>
-                        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-green-600"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-5">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                Reactive Master Card
-                            </h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500">
-                                    Are you sure you want to reactive this master card? This will make it active again.
-                                </p>
+                    <TransitionChild
+                        as="template"
+                        enter="ease-out duration-300"
+                        enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        enter-to="opacity-100 translate-y-0 sm:scale-100"
+                        leave="ease-in duration-200"
+                        leave-from="opacity-100 translate-y-0 sm:scale-100"
+                        leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    >
+                        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-0">
+                            <!-- Header with green gradient background -->
+                            <div class="bg-gradient-to-r from-green-600 to-green-800 px-4 py-3 flex justify-between items-center rounded-t-lg">
+                                <h3 class="text-lg font-medium text-white flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    Reactive Master Card
+                                </h3>
+                                <button @click="showReactiveModal = false" class="text-white hover:text-gray-200 transition-colors duration-150 focus:outline-none">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
                             </div>
-                            <div class="mt-4">
-                                <label for="reactive-reason" class="block text-sm font-medium text-gray-700 text-left">
-                                    Reason for Reactivating:
-                                </label>
-                                <textarea
-                                    id="reactive-reason"
-                                    v-model="reactiveReason"
-                                    rows="3"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    placeholder="Please provide a reason..."
-                                ></textarea>
+                            
+                            <div class="px-6 pt-5 pb-6 bg-white">
+                                <div class="sm:flex sm:items-start">
+                                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-green-600"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                        <div class="mt-2">
+                                            <p class="text-sm text-gray-600 border-l-4 border-green-500 pl-3 py-2 bg-green-50 rounded-r-md">
+                                                Are you sure you want to reactive this master card? This will make it active again.
+                                            </p>
+                                        </div>
+                                        <div class="mt-4">
+                                            <label for="reactive-reason" class="block text-sm font-medium text-gray-700">
+                                                Reason for Reactivating:
+                                            </label>
+                                            <textarea
+                                                id="reactive-reason"
+                                                v-model="reactiveReason"
+                                                rows="3"
+                                                class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 transition-all duration-200"
+                                                placeholder="Please provide a reason..."
+                                            ></textarea>
+                                            <p class="mt-1 text-xs text-gray-500">Please provide a detailed reason why this master card should be reactivated.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gradient-to-b from-gray-50 to-gray-100 px-6 py-4 rounded-b-lg sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button
+                                    type="button"
+                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-green-500 to-green-700 text-base font-medium text-white hover:from-green-600 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transform hover:scale-105 transition-all duration-150 sm:ml-3 sm:w-auto sm:text-sm"
+                                    @click="confirmReactive"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Reactivate
+                                </button>
+                                <button
+                                    type="button"
+                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transform hover:scale-105 transition-all duration-150 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                    @click="showReactiveModal = false"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Cancel
+                                </button>
                             </div>
                         </div>
-                    </div>
-                    <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                        <button
-                            type="button"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:col-start-2 sm:text-sm"
-                            @click="confirmReactive"
-                        >
-                            Reactivate
-                        </button>
-                        <button
-                            type="button"
-                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:col-start-1 sm:text-sm"
-                            @click="showReactiveModal = false"
-                        >
-                            Cancel
-                        </button>
-                    </div>
+                    </TransitionChild>
                 </div>
-            </div>
-        </div>
+            </Dialog>
+        </TransitionRoot>
     </AppLayout>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue';
+import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { useToast } from '@/Composables/useToast';
 import axios from 'axios';
-
-// Custom toast function
-const useToast = () => {
-    const showToast = (message, type = 'info', duration = 3000) => {
-        // Create toast container if it doesn't exist
-        let toastContainer = document.getElementById('toast-container');
-        
-        if (!toastContainer) {
-            toastContainer = document.createElement('div');
-            toastContainer.id = 'toast-container';
-            toastContainer.className = 'fixed top-4 right-4 z-50 flex flex-col gap-2';
-            document.body.appendChild(toastContainer);
-        }
-        
-        // Create toast element
-        const toast = document.createElement('div');
-        toast.className = 'px-4 py-2 rounded-md shadow-lg transform transition-all duration-300 ease-in-out';
-        
-        // Add appropriate styling based on type
-        switch(type) {
-            case 'success':
-                toast.classList.add('bg-green-500', 'text-white');
-                break;
-            case 'error':
-                toast.classList.add('bg-red-500', 'text-white');
-                break;
-            case 'warning':
-                toast.classList.add('bg-yellow-500', 'text-white');
-                break;
-            default:
-                toast.classList.add('bg-blue-500', 'text-white');
-        }
-        
-        // Add message content
-        toast.textContent = message;
-        
-        // Add to container
-        toastContainer.appendChild(toast);
-        
-        // Animation: slide in from right
-        setTimeout(() => {
-            toast.classList.add('translate-x-0');
-            toast.classList.remove('translate-x-full');
-        }, 10);
-        
-        // Remove after duration
-        setTimeout(() => {
-            toast.classList.add('opacity-0');
-            setTimeout(() => {
-                toastContainer.removeChild(toast);
-                
-                // Remove container if empty
-                if (toastContainer.childNodes.length === 0) {
-                    document.body.removeChild(toastContainer);
-                }
-            }, 300);
-        }, duration);
-    };
-    
-    return {
-        showToast
-    };
-};
 
 // Props
 const props = defineProps({
@@ -468,6 +486,7 @@ const recordStatus = ref('all');
 const selectBy = ref('mastercard');
 const selectedCustomerId = ref('');
 const showOptions = ref(true);
+const showOptionModal = ref(false);
 const showObsolateModal = ref(false);
 const showReactiveModal = ref(false);
 const showDetailsModal = ref(false);
@@ -475,9 +494,35 @@ const obsolateReason = ref('');
 const reactiveReason = ref('');
 const selectedMasterCard = ref(null);
 const masterCardsList = ref(props.masterCards || []);
+const isActiveSelected = ref(true);
+const isObsoleteSelected = ref(false);
 
 // Toast
 const { showToast } = useToast();
+
+// Apply options from modal
+const applyOptions = () => {
+    // Update recordStatus based on checkboxes
+    if (isActiveSelected.value && isObsoleteSelected.value) {
+        recordStatus.value = 'all';
+    } else if (isActiveSelected.value) {
+        recordStatus.value = 'active';
+    } else if (isObsoleteSelected.value) {
+        recordStatus.value = 'obsolete';
+    } else {
+        recordStatus.value = 'all'; // Default to all if none selected
+    }
+    
+    // Update sort
+    if (sortBy.value === 'customerCode') {
+        sortBy.value = 'seq';
+    } else if (sortBy.value === 'customerName') {
+        sortBy.value = 'customer';
+    }
+    
+    showOptionModal.value = false;
+    showToast('Options applied', 'success');
+};
 
 // Filtered master cards based on search, status and sorting
 const filteredMasterCards = computed(() => {
@@ -622,5 +667,41 @@ const confirmReactive = async () => {
         transform: scale(0.95);
         box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
     }
+}
+
+.pulse-animation {
+    animation: pulse-light 2s infinite;
+}
+
+@keyframes pulse-light {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    }
+    
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+/* Button hover effects */
+button.transform:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal transition effects */
+.modal-enter-active, .modal-leave-active {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.modal-enter-from, .modal-leave-to {
+    opacity: 0;
+    transform: translateY(-20px);
 }
 </style>
