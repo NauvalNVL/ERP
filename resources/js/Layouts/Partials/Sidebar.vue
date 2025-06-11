@@ -333,9 +333,9 @@ const salesManagementItems = [
         children: [
           { title: 'Define SO Config', icon: 'fas fa-cogs', route: '/sales-order/setup/define-so-config' },
           { title: 'Define SO Period', icon: 'fas fa-calendar-alt', route: null },
-          { title: 'Define SO Rough Cut', icon: 'fas fa-cut', route: null },
-          { title: 'Define AC# Auto WO', icon: 'fas fa-robot', route: null },
-          { title: 'Define MC Auto WO', icon: 'fas fa-robot', route: null },
+          { title: 'Define SO Rough Cut', icon: 'fas fa-cut', route: '/sales-order/setup/define-so-rough-cut' },
+          { title: 'Define AC# Auto WO', icon: 'fas fa-robot', route: '/sales-order/setup/define-ac-auto-wo' },
+          { title: 'Define MC Auto WO', icon: 'fas fa-robot', route: '/sales-order/setup/define-mc-auto-wo' },
           { title: 'Print SO Period', icon: 'fas fa-print', route: null },
           { title: 'Print SO Rough Cut', icon: 'fas fa-print', route: null },
           { title: 'Print AC# Auto WO', icon: 'fas fa-print', route: null },
