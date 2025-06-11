@@ -12,8 +12,16 @@ class ProductDesign extends Model
     protected $fillable = [
         'pd_code',
         'pd_name',
-        'product_code',
-        'dimension',
-        'idc'
+        'pd_design_type',
+        'idc',
+        'product',
+        'joint',
+        'joint_to_print',
+        'pcs_to_joint',
+        'score',
+        'slot',
+        'flute_style',
+        'print_flute',
+        'input_weight'
     ];
 } 

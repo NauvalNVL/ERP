@@ -12,9 +12,17 @@ return new class extends Migration
             $table->id();
             $table->string('pd_code')->unique();
             $table->string('pd_name');
-            $table->string('product_code');
-            $table->string('dimension');
+            $table->string('pd_design_type');
             $table->string('idc');
+            $table->string('product');
+            $table->string('joint')->default('No');
+            $table->string('joint_to_print')->default('No');
+            $table->string('pcs_to_joint')->default('No');
+            $table->string('score')->default('No');
+            $table->string('slot')->default('No');
+            $table->string('flute_style');
+            $table->string('print_flute');
+            $table->string('input_weight');
             $table->timestamps();
         });
     }

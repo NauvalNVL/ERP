@@ -57,11 +57,19 @@ class ProductDesignController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'design_code' => 'required|string|max:10|unique:product_designs,design_code',
-            'design_name' => 'required|string|max:255',
-            'product_code' => 'required|string|exists:products,product_code',
-            'dimension' => 'required|string|max:100',
+            'pd_code' => 'required|string|max:10|unique:product_designs,pd_code',
+            'pd_name' => 'required|string|max:255',
+            'pd_design_type' => 'required|string|max:255',
+            'product' => 'required|string|max:255',
             'idc' => 'nullable|string|max:100',
+            'joint' => 'nullable|string|max:100',
+            'joint_to_print' => 'nullable|string|max:100',
+            'pcs_to_joint' => 'nullable|string|max:100',
+            'score' => 'nullable|string|max:100',
+            'slot' => 'nullable|string|max:100',
+            'flute_style' => 'nullable|string|max:100',
+            'print_flute' => 'nullable|string|max:100',
+            'input_weight' => 'nullable|string|max:100',
         ]);
 
         if ($validator->fails()) {
@@ -73,11 +81,19 @@ class ProductDesignController extends Controller
 
         try {
             ProductDesign::create([
-                'design_code' => strtoupper($request->design_code),
-                'design_name' => $request->design_name,
-                'product_code' => strtoupper($request->product_code),
-                'dimension' => $request->dimension,
+                'pd_code' => strtoupper($request->pd_code),
+                'pd_name' => $request->pd_name,
+                'pd_design_type' => $request->pd_design_type,
                 'idc' => $request->idc,
+                'product' => $request->product,
+                'joint' => $request->joint,
+                'joint_to_print' => $request->joint_to_print,
+                'pcs_to_joint' => $request->pcs_to_joint,
+                'score' => $request->score,
+                'slot' => $request->slot,
+                'flute_style' => $request->flute_style,
+                'print_flute' => $request->print_flute,
+                'input_weight' => $request->input_weight,
             ]);
 
             return redirect()
@@ -111,7 +127,7 @@ class ProductDesignController extends Controller
     public function edit($id)
     {
         try {
-            $productDesign = ProductDesign::where('design_code', $id)->firstOrFail();
+            $productDesign = ProductDesign::where('pd_code', $id)->firstOrFail();
             return view('sales-management.system-requirement.system-requirement.standard-requirement.edit-productdesign', compact('productDesign'));
         } catch (\Exception $e) {
             Log::error('Error in ProductDesignController@edit: ' . $e->getMessage());
@@ -129,10 +145,18 @@ class ProductDesignController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'design_name' => 'required|string|max:255',
-            'product_code' => 'required|string|exists:products,product_code',
-            'dimension' => 'required|string|max:100',
+            'pd_name' => 'required|string|max:255',
+            'pd_design_type' => 'required|string|max:255',
+            'product' => 'required|string|max:255',
             'idc' => 'nullable|string|max:100',
+            'joint' => 'nullable|string|max:100',
+            'joint_to_print' => 'nullable|string|max:100',
+            'pcs_to_joint' => 'nullable|string|max:100',
+            'score' => 'nullable|string|max:100',
+            'slot' => 'nullable|string|max:100',
+            'flute_style' => 'nullable|string|max:100',
+            'print_flute' => 'nullable|string|max:100',
+            'input_weight' => 'nullable|string|max:100',
         ]);
 
         if ($validator->fails()) {
@@ -143,13 +167,21 @@ class ProductDesignController extends Controller
         }
 
         try {
-            $productDesign = ProductDesign::where('design_code', $id)->firstOrFail();
+            $productDesign = ProductDesign::where('pd_code', $id)->firstOrFail();
             
             $productDesign->update([
-                'design_name' => $request->design_name,
-                'product_code' => strtoupper($request->product_code),
-                'dimension' => $request->dimension,
+                'pd_name' => $request->pd_name,
+                'pd_design_type' => $request->pd_design_type,
                 'idc' => $request->idc,
+                'product' => $request->product,
+                'joint' => $request->joint,
+                'joint_to_print' => $request->joint_to_print,
+                'pcs_to_joint' => $request->pcs_to_joint,
+                'score' => $request->score,
+                'slot' => $request->slot,
+                'flute_style' => $request->flute_style,
+                'print_flute' => $request->print_flute,
+                'input_weight' => $request->input_weight,
             ]);
 
             return redirect()
@@ -172,7 +204,7 @@ class ProductDesignController extends Controller
     public function destroy($id)
     {
         try {
-            $productDesign = ProductDesign::where('design_code', $id)->firstOrFail();
+            $productDesign = ProductDesign::where('pd_code', $id)->firstOrFail();
             $productDesign->delete();
 
             return redirect()
@@ -193,7 +225,7 @@ class ProductDesignController extends Controller
      */
     public function viewAndPrint()
     {
-        $productDesigns = ProductDesign::orderBy('design_code')->get();
+        $productDesigns = ProductDesign::orderBy('pd_code')->get();
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintproductdesign', compact('productDesigns')); 
     }
 
@@ -238,11 +270,19 @@ class ProductDesignController extends Controller
     {
         try {
             $designs = ProductDesign::select(
-                    'pd_code as design_code', 
-                    'pd_name as design_name', 
-                    'product_code', 
-                    'dimension', 
-                    'idc'
+                    'pd_code', 
+                    'pd_name', 
+                    'pd_design_type',
+                    'idc',
+                    'product',
+                    'joint',
+                    'joint_to_print',
+                    'pcs_to_joint',
+                    'score',
+                    'slot',
+                    'flute_style',
+                    'print_flute',
+                    'input_weight'
                 )
                 ->orderBy('pd_code')
                 ->get();
@@ -264,11 +304,19 @@ class ProductDesignController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'design_code' => 'required|string|max:10|unique:product_designs,pd_code',
-                'design_name' => 'required|string|max:255',
-                'product_code' => 'required|string|exists:products,product_code',
-                'dimension' => 'required|string|max:100',
+                'pd_code' => 'required|string|max:10|unique:product_designs,pd_code',
+                'pd_name' => 'required|string|max:255',
+                'pd_design_type' => 'required|string|max:255',
+                'product' => 'required|string|max:255',
                 'idc' => 'nullable|string|max:100',
+                'joint' => 'nullable|string|max:100',
+                'joint_to_print' => 'nullable|string|max:100',
+                'pcs_to_joint' => 'nullable|string|max:100',
+                'score' => 'nullable|string|max:100',
+                'slot' => 'nullable|string|max:100',
+                'flute_style' => 'nullable|string|max:100',
+                'print_flute' => 'nullable|string|max:100',
+                'input_weight' => 'nullable|string|max:100',
             ]);
 
             if ($validator->fails()) {
@@ -279,26 +327,25 @@ class ProductDesignController extends Controller
             }
 
             $productDesign = ProductDesign::create([
-                'pd_code' => strtoupper($request->design_code),
-                'pd_name' => $request->design_name,
-                'product_code' => strtoupper($request->product_code),
-                'dimension' => $request->dimension,
+                'pd_code' => strtoupper($request->pd_code),
+                'pd_name' => $request->pd_name,
+                'pd_design_type' => $request->pd_design_type,
                 'idc' => $request->idc,
+                'product' => $request->product,
+                'joint' => $request->joint,
+                'joint_to_print' => $request->joint_to_print,
+                'pcs_to_joint' => $request->pcs_to_joint,
+                'score' => $request->score,
+                'slot' => $request->slot,
+                'flute_style' => $request->flute_style,
+                'print_flute' => $request->print_flute,
+                'input_weight' => $request->input_weight,
             ]);
-
-            // Transform the newly created record to match the expected format
-            $responseData = [
-                'design_code' => $productDesign->pd_code,
-                'design_name' => $productDesign->pd_name,
-                'product_code' => $productDesign->product_code,
-                'dimension' => $productDesign->dimension,
-                'idc' => $productDesign->idc
-            ];
 
             return response()->json([
                 'success' => true,
                 'message' => 'Product design created successfully',
-                'data' => $responseData
+                'data' => $productDesign
             ], 201);
         } catch (\Exception $e) {
             Log::error('Error creating product design: ' . $e->getMessage());
@@ -329,10 +376,18 @@ class ProductDesignController extends Controller
             }
             
             $validator = Validator::make($request->all(), [
-                'design_name' => 'required|string|max:255',
-                'product_code' => 'required|string|exists:products,product_code',
-                'dimension' => 'required|string|max:100',
+                'pd_name' => 'required|string|max:255',
+                'pd_design_type' => 'required|string|max:255',
+                'product' => 'required|string|max:255',
                 'idc' => 'nullable|string|max:100',
+                'joint' => 'nullable|string|max:100',
+                'joint_to_print' => 'nullable|string|max:100',
+                'pcs_to_joint' => 'nullable|string|max:100',
+                'score' => 'nullable|string|max:100',
+                'slot' => 'nullable|string|max:100',
+                'flute_style' => 'nullable|string|max:100',
+                'print_flute' => 'nullable|string|max:100',
+                'input_weight' => 'nullable|string|max:100',
             ]);
 
             if ($validator->fails()) {
@@ -343,25 +398,24 @@ class ProductDesignController extends Controller
             }
 
             $productDesign->update([
-                'pd_name' => $request->design_name,
-                'product_code' => strtoupper($request->product_code),
-                'dimension' => $request->dimension,
+                'pd_name' => $request->pd_name,
+                'pd_design_type' => $request->pd_design_type,
                 'idc' => $request->idc,
+                'product' => $request->product,
+                'joint' => $request->joint,
+                'joint_to_print' => $request->joint_to_print,
+                'pcs_to_joint' => $request->pcs_to_joint,
+                'score' => $request->score,
+                'slot' => $request->slot,
+                'flute_style' => $request->flute_style,
+                'print_flute' => $request->print_flute,
+                'input_weight' => $request->input_weight,
             ]);
-
-            // Transform the updated record to match the expected format
-            $responseData = [
-                'design_code' => $productDesign->pd_code,
-                'design_name' => $productDesign->pd_name,
-                'product_code' => $productDesign->product_code,
-                'dimension' => $productDesign->dimension,
-                'idc' => $productDesign->idc
-            ];
 
             return response()->json([
                 'success' => true,
                 'message' => 'Product design updated successfully',
-                'data' => $responseData
+                'data' => $productDesign
             ]);
         } catch (\Exception $e) {
             Log::error('Error updating product design: ' . $e->getMessage());

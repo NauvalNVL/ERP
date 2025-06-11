@@ -30,17 +30,22 @@
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-drafting-compass"></i>
                                 </span>
-                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <input type="text" v-model="searchQuery" @dblclick="showModal = true" placeholder="Double-click to browse designs..." class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                                 <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
-                            <button type="button" @click="createNewDesign" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
-                                <i class="fas fa-plus-circle mr-2"></i> Add New
-                            </button>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Actions:</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" @click="createNewDesign" class="flex items-center justify-center px-3 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
+                                    <i class="fas fa-plus-circle mr-1"></i> Add
+                                </button>
+                                <button type="button" @click="editSelectedRow" class="flex items-center justify-center px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded" :disabled="!selectedRow" :class="{'opacity-50 cursor-not-allowed': !selectedRow}">
+                                    <i class="fas fa-edit mr-1"></i> Edit
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <!-- Data Status Information -->
@@ -61,8 +66,9 @@
                     </div>
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
                         <p class="text-sm font-medium text-green-800">Data available: {{ designs.length }} designs found.</p>
-                        <p v-if="selectedRow" class="text-xs text-green-700 mt-1">
-                            Selected: <span class="font-semibold">{{ selectedRow.design_code }}</span> - {{ selectedRow.design_name }}
+                        <p v-if="selectedRow" @click="editSelectedRow" class="text-xs text-green-700 mt-1 cursor-pointer hover:text-green-900 hover:underline flex items-center">
+                            Selected: <span class="font-semibold">{{ selectedRow.pd_code }}</span> - {{ selectedRow.pd_name }}
+                            <i class="fas fa-edit ml-2"></i>
                         </p>
                     </div>
                 </div>
@@ -89,22 +95,31 @@
                             </ul>
                         </div>
 
-                        <div class="p-4 bg-blue-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Design Information</h4>
+                        <div class="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors" :class="{'cursor-pointer': selectedRow}" @click="selectedRow && editSelectedRow()">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider">Design Information</h4>
+                                <button v-if="selectedRow" @click.stop="editSelectedRow" class="text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-200">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
                             <div class="space-y-2 text-sm">
                                 <div v-if="selectedRow" class="grid grid-cols-2 gap-2">
                                     <div class="font-medium text-gray-700">Code:</div>
-                                    <div>{{ selectedRow.design_code }}</div>
+                                    <div>{{ selectedRow.pd_code }}</div>
                                     <div class="font-medium text-gray-700">Name:</div>
-                                    <div>{{ selectedRow.design_name }}</div>
+                                    <div>{{ selectedRow.pd_name }}</div>
                                     <div class="font-medium text-gray-700">Product:</div>
-                                    <div>{{ selectedRow.product_code }}</div>
-                                    <div class="font-medium text-gray-700">Dimension:</div>
-                                    <div>{{ selectedRow.dimension }}</div>
+                                    <div>{{ selectedRow.product }}</div>
+                                    <div class="font-medium text-gray-700">IDC:</div>
+                                    <div>{{ selectedRow.idc }}</div>
                                 </div>
                                 <div v-else class="text-gray-500 italic">
                                     Select a design to view details
                                 </div>
+                            </div>
+                            <div v-if="selectedRow" class="mt-3 text-xs text-blue-600 flex items-center">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Click to edit this design
                             </div>
                         </div>
                     </div>
@@ -166,58 +181,290 @@
 
     <!-- Edit Modal -->
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-3/4 max-w-4xl mx-auto relative">
+            <div class="flex items-center justify-between p-3 bg-blue-600 text-white rounded-t-lg">
                 <div class="flex items-center">
-                    <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
-                        <i class="fas fa-drafting-compass"></i>
+                    <div class="p-2 bg-white bg-opacity-20 rounded-lg mr-3">
+                        <i class="fas fa-drafting-compass text-white"></i>
                     </div>
-                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Product Design' : 'Edit Product Design' }}</h3>
+                    <h3 class="text-xl font-semibold">Define Product Design</h3>
                 </div>
-                <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+                <div class="flex space-x-2">
+                    <button type="button" class="px-4 py-1 bg-white text-blue-800 rounded-md flex items-center shadow-sm">
+                        <i class="fas fa-search mr-1"></i> Record
+                    </button>
+                    <button type="button" class="px-4 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md flex items-center shadow-sm">
+                        <i class="fas fa-sync-alt mr-1"></i> Review
+                    </button>
+                    <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200 p-1 ml-2">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
             </div>
-            <div class="p-6">
-                <form @submit.prevent="saveDesignChanges" class="space-y-4">
-                    <div class="grid grid-cols-1 gap-4">
+            <div class="p-5 bg-gray-50 overflow-y-auto" style="max-height: calc(100vh - 130px);">
+                <form @submit.prevent="saveDesignChanges">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Left Column -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Design Code:</label>
-                            <input v-model="editForm.design_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Design Name:</label>
-                            <input v-model="editForm.design_name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Product:</label>
-                            <div class="relative">
-                                <select v-model="editForm.product_code" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                                    <option value="">Select a product</option>
-                                    <option v-for="product in products" :key="product.product_code" :value="product.product_code">
-                                        {{ product.product_code }} - {{ product.description }}
-                                    </option>
-                                </select>
+                            <!-- Design Code -->
+                            <div class="mb-3">
+                                <div class="flex items-center">
+                                    <div class="w-1/3">
+                                        <label class="text-sm font-medium text-gray-700">P/Design Code:</label>
+                                    </div>
+                                    <div class="w-2/3">
+                                        <input v-model="editForm.pd_code" type="text" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Design Name -->
+                            <div class="mb-3">
+                                <div class="flex items-center">
+                                    <div class="w-1/3">
+                                        <label class="text-sm font-medium text-gray-700">P/Design Name:</label>
+                                    </div>
+                                    <div class="w-2/3">
+                                        <input v-model="editForm.pd_name" type="text" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Design Alt Name -->
+                            <div class="mb-3">
+                                <div class="flex items-center">
+                                    <div class="w-1/3">
+                                        <label class="text-sm font-medium text-gray-700">P/Design Alt Name:</label>
+                                    </div>
+                                    <div class="w-2/3">
+                                        <input v-model="editForm.pd_alt_name" type="text" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Product -->
+                            <div class="mb-3">
+                                <div class="flex items-center">
+                                    <div class="w-1/3">
+                                        <label class="text-sm font-medium text-gray-700">Product:</label>
+                                    </div>
+                                    <div class="w-2/3 flex">
+                                        <input v-model="editForm.product" type="text" class="w-full border-gray-300 rounded-l-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                        <button type="button" class="px-3 py-2 bg-blue-500 text-white rounded-r-md border border-blue-600" @click="showProductModal = true">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Design Type -->
+                            <div class="mb-3">
+                                <div class="flex items-center">
+                                    <div class="w-1/3">
+                                        <label class="text-sm font-medium text-gray-700">P/Design Type:</label>
+                                    </div>
+                                    <div class="w-2/3">
+                                        <select v-model="editForm.pd_design_type" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                            <option value="T-Trading">T-Trading</option>
+                                            <option value="M-Manufacture">M-Manufacture</option>
+                                            <option value="N/A">N/A</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Carton Product Section -->
+                            <div class="mt-5 pt-3 border-t border-gray-200">
+                                <h4 class="font-medium text-gray-700 mb-3">Carton Product</h4>
+                                <div class="flex items-center">
+                                    <div class="w-1/3">
+                                        <label class="text-sm font-medium text-gray-700">IDC:</label>
+                                    </div>
+                                    <div class="w-2/3 flex">
+                                        <input v-model="editForm.idc" type="text" class="w-full border-gray-300 rounded-l-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                        <button type="button" class="px-3 py-2 bg-blue-500 text-white rounded-r-md border border-blue-600">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center mt-1">
+                                    <div class="w-1/3"></div>
+                                    <div class="w-2/3">
+                                        <span class="text-xs text-blue-600">Use by Master Card & Work Order</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        
+                        <!-- Right Column -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Dimension (mm):</label>
-                            <input v-model="editForm.dimension" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">IDC:</label>
-                            <input v-model="editForm.idc" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
+                            <!-- Joint -->
+                            <div class="bg-white p-4 rounded-md border border-gray-200 mb-5">
+                                <h4 class="font-medium text-blue-700 mb-3 pb-2 border-b border-gray-200">Joint</h4>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Joint:</label>
+                                        <div class="flex space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="editForm.joint" value="Yes" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                                <span class="ml-2 text-sm text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="editForm.joint" value="No" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                                <span class="ml-2 text-sm text-gray-700">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Joint to Print:</label>
+                                        <div class="flex space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="editForm.joint_to_print" value="Yes" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                                <span class="ml-2 text-sm text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="editForm.joint_to_print" value="No" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                                <span class="ml-2 text-sm text-gray-700">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Pieces to Joint:</label>
+                                    <select v-model="editForm.pcs_to_joint" class="w-20 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                    </select>
+                                    <span class="ml-2 text-xs text-gray-500">Number of pieces to be joined. Eg. HSC 2+1</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Score & Slot -->
+                            <div class="bg-white p-4 rounded-md border border-gray-200 mb-5">
+                                <h4 class="font-medium text-blue-700 mb-3 pb-2 border-b border-gray-200">Score & Slot</h4>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Score:</label>
+                                        <div class="flex space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="editForm.score" value="Yes" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                                <span class="ml-2 text-sm text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="editForm.score" value="No" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                                <span class="ml-2 text-sm text-gray-700">N-No</span>
+                                            </label>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">Y Print Scoring on CDRi SCH + SB PD</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Slot:</label>
+                                        <div class="flex space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="editForm.slot" value="Yes" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                                <span class="ml-2 text-sm text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="editForm.slot" value="No" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                                <span class="ml-2 text-sm text-gray-700">N-No</span>
+                                            </label>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">N Print Total Scoring on CDRi SCH + SB PD</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Flute Configuration -->
+                            <div class="bg-white p-4 rounded-md border border-gray-200 mb-5">
+                                <h4 class="font-medium text-blue-700 mb-3 pb-2 border-b border-gray-200">Flute Configuration</h4>
+                                
+                                <div class="mb-4">
+                                    <div class="flex items-center">
+                                        <div class="w-1/3">
+                                            <label class="text-sm font-medium text-gray-700">Flute Style:</label>
+                                        </div>
+                                        <div class="w-2/3 flex items-center">
+                                            <select v-model="editForm.flute_style" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                                <option value="Blank N/A">Blank N/A</option>
+                                                <option value="A">A</option>
+                                                <option value="B">B</option>
+                                                <option value="C">C</option>
+                                                <option value="E">E</option>
+                                                <option value="F">F</option>
+                                                <option value="BC">BC</option>
+                                                <option value="BE">BE</option>
+                                            </select>
+                                            <button type="button" class="ml-2 px-3 py-2 bg-blue-500 text-white rounded-md border border-blue-600 text-sm">
+                                                View Flute Style
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Print Flute:</label>
+                                    <div class="flex space-x-4">
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" v-model="editForm.print_flute" value="Yes" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                            <span class="ml-2 text-sm text-gray-700">Y-Yes</span>
+                                        </label>
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" v-model="editForm.print_flute" value="No" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                            <span class="ml-2 text-sm text-gray-700">N-No</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Others Section -->
+                            <div class="bg-white p-4 rounded-md border border-gray-200 mb-5">
+                                <h4 class="font-medium text-blue-700 mb-3 pb-2 border-b border-gray-200">Others</h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input Weight:</label>
+                                    <div class="ml-4 mb-2">
+                                        <div class="flex space-x-6">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="editForm.input_weight" value="Yes" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                                <span class="ml-2 text-sm text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="editForm.input_weight" value="No" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                                <span class="ml-2 text-sm text-gray-700">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <span class="text-xs text-gray-500">To input manual KG and M2 in M/Card.</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteDesign(editForm.design_code)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                    
+                    <!-- Action Buttons -->
+                    <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex justify-end space-x-4 shadow-md" style="border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
+                        <button type="button" @click="closeEditModal" class="px-5 py-2 bg-gray-100 text-gray-800 rounded border border-gray-300 hover:bg-gray-200 flex items-center font-medium">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </button>
+                        <button type="submit" class="px-5 py-2 bg-blue-500 text-white rounded border border-blue-600 hover:bg-blue-600 flex items-center font-medium">
+                            <i class="fas fa-save mr-2"></i>Save
+                        </button>
+                        <button v-if="!isCreating" type="button" @click="deleteDesign(editForm.pd_code)" class="px-5 py-2 bg-red-500 text-white rounded border border-red-600 hover:bg-red-600 flex items-center font-medium">
                             <i class="fas fa-trash-alt mr-2"></i>Delete
                         </button>
-                        <div v-else class="w-24"></div>
-                        <div class="flex space-x-3">
-                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
-                        </div>
                     </div>
                 </form>
             </div>
@@ -251,6 +498,16 @@
             </div>
         </div>
     </div>
+
+    <!-- Product Modal for Edit Form -->
+    <ProductModal
+        :show="showProductModal"
+        :products="products"
+        :categories="[]"
+        :loading="loading"
+        @close="showProductModal = false"
+        @select="onProductSelected"
+    />
     </AppLayout>
 </template>
 
@@ -258,6 +515,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import ProductDesignModal from '@/Components/product-design-modal.vue';
+import ProductModal from '@/Components/product-modal.vue';
 
 // Get the header from props
 const props = defineProps({
@@ -273,14 +531,24 @@ const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
+const showProductModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref('');
 const editForm = ref({ 
-    design_code: '', 
-    design_name: '', 
-    product_code: '',
-    dimension: '',
-    idc: ''
+    pd_code: '', 
+    pd_name: '', 
+    pd_alt_name: '',
+    pd_design_type: 'T-Trading',
+    idc: 'NA',
+    product: '',
+    joint: 'No',
+    joint_to_print: 'No',
+    pcs_to_joint: '1',
+    score: 'Yes',
+    slot: 'No',
+    flute_style: 'Blank N/A',
+    print_flute: 'No',
+    input_weight: 'Yes'
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
@@ -351,8 +619,8 @@ onMounted(() => {
 watch(searchQuery, (newQuery) => {
     if (newQuery && designs.value.length > 0) {
         const foundDesign = designs.value.find(design => 
-            design.design_code.toLowerCase().includes(newQuery.toLowerCase()) ||
-            design.design_name.toLowerCase().includes(newQuery.toLowerCase())
+            design.pd_code.toLowerCase().includes(newQuery.toLowerCase()) ||
+            design.pd_name.toLowerCase().includes(newQuery.toLowerCase())
         );
         
         if (foundDesign) {
@@ -363,12 +631,28 @@ watch(searchQuery, (newQuery) => {
 
 const onDesignSelected = (design) => {
     selectedRow.value = design;
-    searchQuery.value = design.design_code;
-    showModal.value = false;
+    searchQuery.value = design.pd_code;
     
-    // Automatically open the edit modal for the selected row
+    // Populate the edit form with the selected design data
+    editForm.value = {
+        pd_code: design.pd_code,
+        pd_name: design.pd_name,
+        pd_alt_name: design.pd_alt_name || '',
+        pd_design_type: design.pd_design_type,
+        idc: design.idc || '',
+        product: design.product || '',
+        joint: design.joint || 'No',
+        joint_to_print: design.joint_to_print || 'No',
+        pcs_to_joint: design.pcs_to_joint || '1',
+        score: design.score || 'Yes',
+        slot: design.slot || 'No',
+        flute_style: design.flute_style || 'Blank N/A',
+        print_flute: design.print_flute || 'No',
+        input_weight: design.input_weight || 'Yes'
+    };
     isCreating.value = false;
-    editForm.value = { ...design };
+    
+    // Automatically open the edit modal when a design is selected
     showEditModal.value = true;
 };
 
@@ -383,80 +667,147 @@ const editSelectedRow = () => {
 };
 
 const createNewDesign = () => {
-    isCreating.value = true;
+    // Reset the form for a new design
     editForm.value = { 
-        design_code: '', 
-        design_name: '', 
-        product_code: '',
-        dimension: '',
-        idc: '' 
+        pd_code: '',
+        pd_name: '',
+        pd_alt_name: '',
+        pd_design_type: 'T-Trading',
+        idc: 'NA',
+        product: '',
+        joint: 'No',
+        joint_to_print: 'No',
+        pcs_to_joint: '1',
+        score: 'Yes',
+        slot: 'No',
+        flute_style: 'Blank N/A',
+        print_flute: 'No',
+        input_weight: 'Yes'
     };
+    isCreating.value = true;
     showEditModal.value = true;
 };
 
 const closeEditModal = () => {
     showEditModal.value = false;
     editForm.value = { 
-        design_code: '', 
-        design_name: '', 
-        product_code: '',
-        dimension: '',
-        idc: '' 
+        pd_code: '', 
+        pd_name: '', 
+        pd_alt_name: '',
+        pd_design_type: 'T-Trading',
+        idc: 'NA',
+        product: '',
+        joint: 'No',
+        joint_to_print: 'No',
+        pcs_to_joint: '1',
+        score: 'Yes',
+        slot: 'No',
+        flute_style: 'Blank N/A',
+        print_flute: 'No',
+        input_weight: 'Yes'
     };
     isCreating.value = false;
 };
 
 const saveDesignChanges = async () => {
     saving.value = true;
+    
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const endpoint = isCreating.value 
+            ? '/api/product-designs' 
+            : `/api/product-designs/${editForm.value.pd_code}`;
         
-        // Different API call for create vs update
-        let url = isCreating.value ? '/api/product-designs' : `/api/product-designs/${editForm.value.design_code}`;
-        let method = isCreating.value ? 'POST' : 'PUT';
+        const method = isCreating.value ? 'POST' : 'PUT';
         
-        const response = await fetch(url, {
-            method: method,
+        const res = await fetch(endpoint, {
+            method,
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
-            body: JSON.stringify(editForm.value)
+            body: JSON.stringify({
+                pd_code: editForm.value.pd_code,
+                pd_name: editForm.value.pd_name,
+                pd_alt_name: editForm.value.pd_alt_name,
+                pd_design_type: editForm.value.pd_design_type,
+                idc: editForm.value.idc,
+                product: editForm.value.product,
+                joint: editForm.value.joint,
+                joint_to_print: editForm.value.joint_to_print,
+                pcs_to_joint: editForm.value.pcs_to_joint,
+                score: editForm.value.score,
+                slot: editForm.value.slot,
+                flute_style: editForm.value.flute_style,
+                print_flute: editForm.value.print_flute,
+                input_weight: editForm.value.input_weight
+            })
         });
         
-        const result = await response.json();
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to save product design');
+        }
         
-        if (response.ok) {
-            // Update the local data with the changes or add new item
+        const data = await res.json();
+        
             if (isCreating.value) {
+            // Add the new design to the list
+            designs.value.push(data.data);
                 showNotification('Product design created successfully', 'success');
             } else {
-                if (selectedRow.value) {
-                    selectedRow.value.design_name = editForm.value.design_name;
-                    selectedRow.value.product_code = editForm.value.product_code;
-                    selectedRow.value.dimension = editForm.value.dimension;
+            // Update the existing design in the list
+            const index = designs.value.findIndex(d => d.pd_code === editForm.value.pd_code);
+            if (index !== -1) {
+                designs.value[index] = {
+                    ...designs.value[index],
+                    pd_name: editForm.value.pd_name,
+                    pd_alt_name: editForm.value.pd_alt_name,
+                    pd_design_type: editForm.value.pd_design_type,
+                    idc: editForm.value.idc,
+                    product: editForm.value.product,
+                    joint: editForm.value.joint,
+                    joint_to_print: editForm.value.joint_to_print,
+                    pcs_to_joint: editForm.value.pcs_to_joint,
+                    score: editForm.value.score,
+                    slot: editForm.value.slot,
+                    flute_style: editForm.value.flute_style,
+                    print_flute: editForm.value.print_flute,
+                    input_weight: editForm.value.input_weight
+                };
+                
+                // Update the selected row if it's the same design
+                if (selectedRow.value && selectedRow.value.pd_code === editForm.value.pd_code) {
+                    selectedRow.value.pd_name = editForm.value.pd_name;
+                    selectedRow.value.pd_alt_name = editForm.value.pd_alt_name;
+                    selectedRow.value.pd_design_type = editForm.value.pd_design_type;
                     selectedRow.value.idc = editForm.value.idc;
+                    selectedRow.value.product = editForm.value.product;
+                    selectedRow.value.joint = editForm.value.joint;
+                    selectedRow.value.joint_to_print = editForm.value.joint_to_print;
+                    selectedRow.value.pcs_to_joint = editForm.value.pcs_to_joint;
+                    selectedRow.value.score = editForm.value.score;
+                    selectedRow.value.slot = editForm.value.slot;
+                    selectedRow.value.flute_style = editForm.value.flute_style;
+                    selectedRow.value.print_flute = editForm.value.print_flute;
+                    selectedRow.value.input_weight = editForm.value.input_weight;
                 }
                 showNotification('Product design updated successfully', 'success');
             }
-            
-            // Refresh the full data list to ensure we're in sync with the database
-            await fetchDesigns();
-            closeEditModal();
-        } else {
-            showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
         }
+        
+        closeEditModal();
     } catch (e) {
-        console.error('Error saving product design changes:', e);
-        showNotification('Error saving product design. Please try again.', 'error');
+        console.error('Error saving product design:', e);
+        showNotification(e.message || 'Failed to save product design', 'error');
     } finally {
         saving.value = false;
     }
 };
 
-const deleteDesign = async (designCode) => {
-    if (!confirm(`Are you sure you want to delete product design "${designCode}"?`)) {
+const deleteDesign = async (pdCode) => {
+    if (!confirm(`Are you sure you want to delete product design "${pdCode}"?`)) {
         return;
     }
     
@@ -464,7 +815,7 @@ const deleteDesign = async (designCode) => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         
-        const response = await fetch(`/api/product-designs/${designCode}`, {
+        const response = await fetch(`/api/product-designs/${pdCode}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -476,9 +827,9 @@ const deleteDesign = async (designCode) => {
         
         if (response.ok) {
             // Remove the item from the local array
-            designs.value = designs.value.filter(design => design.design_code !== designCode);
+            designs.value = designs.value.filter(design => design.pd_code !== pdCode);
             
-            if (selectedRow.value && selectedRow.value.design_code === designCode) {
+            if (selectedRow.value && selectedRow.value.pd_code === pdCode) {
                 selectedRow.value = null;
                 searchQuery.value = '';
             }
@@ -507,4 +858,117 @@ const showNotification = (message, type = 'success') => {
         notification.value.show = false;
     }, 3000);
 };
+
+const onProductSelected = (product) => {
+    editForm.value.product = product.product_code;
+    showProductModal.value = false;
+};
 </script>
+
+<style scoped>
+/* Custom styling for the edit modal */
+.fixed.inset-0.z-50 .bg-white {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Toolbar button styles */
+.px-3.py-1.bg-green-500,
+.px-3.py-1.bg-yellow-500 {
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.px-3.py-1.bg-green-500:hover,
+.px-3.py-1.bg-yellow-500:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form section styling */
+.border.border-gray-200.rounded-lg {
+  transition: all 0.3s;
+}
+
+.border.border-gray-200.rounded-lg:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Form heading styles */
+.font-medium.text-gray-700.mb-4.pb-2.border-b {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* Radio button styling */
+.inline-flex.items-center input[type="radio"] {
+  cursor: pointer;
+}
+
+.inline-flex.items-center input[type="radio"]:checked {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+/* Input focus effects */
+input:focus, select:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  transition: all 0.2s;
+}
+
+/* Button hover animations */
+.px-4.py-2.bg-blue-500,
+.px-4.py-2.bg-red-500,
+.px-4.py-2.bg-gray-200 {
+  transition: all 0.2s;
+}
+
+.px-4.py-2.bg-blue-500:hover,
+.px-4.py-2.bg-red-500:hover,
+.px-4.py-2.bg-gray-200:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom scrollbar for the modal */
+.bg-gray-50 {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.bg-gray-50::-webkit-scrollbar {
+  width: 8px;
+}
+
+.bg-gray-50::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.bg-gray-50::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
+}
+
+/* Label styling */
+.text-sm.font-medium.text-gray-700 {
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Help text styling */
+.text-sm.text-gray-500, .text-xs.text-gray-500 {
+  font-style: italic;
+}
+
+/* Input Weight explanation text */
+.input-weight-explanation {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: #4B5563 !important;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  font-style: normal !important;
+  position: relative;
+  z-index: 50;
+}
+</style>
