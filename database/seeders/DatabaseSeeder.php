@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             CustomerAlternateAddressSeeder::class,
             ApproveMCSeeder::class,
             StandardFormulaSeeder::class,
+            ScoringFormulaSeeder::class,
         ]);
     }
 }
