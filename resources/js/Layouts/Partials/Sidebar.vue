@@ -261,7 +261,68 @@ const salesManagementItems = [
     ]
   },
 
-  { title: 'Standard Formula', icon: 'fas fa-flask', route: null },
+  { 
+    title: 'Standard Formula', 
+    icon: 'fas fa-flask', 
+    children: [
+      { title: 'Setup Standard Formula Configuration', icon: 'fas fa-cogs', route: '/standard-formula/configuration' },
+      { 
+        title: 'Setup Scoring Formula', 
+        icon: 'fas fa-cut', 
+        children: [
+          { title: 'Define Scoring Formula', icon: 'fas fa-pen-fancy', route: '/standard-formula/scoring-formula' },
+          { title: 'View & Print Scoring Formula', icon: 'fas fa-print', route: '/standard-formula/scoring-formula/view-print' }
+        ]
+      },
+      {
+        title: 'Setup Corrugator Run Size Formula',
+        icon: 'fas fa-box',
+        children: [
+          { title: 'Define Product Design', icon: 'fas fa-drafting-compass', route: '/standard-formula/corrugator-run-size/product-design' },
+          { title: 'Define Corrugator', icon: 'fas fa-cog', route: '/standard-formula/corrugator-run-size/corrugator' },
+          { title: 'Define Corrugator Spesification by Product', icon: 'fas fa-cogs', route: '/standard-formula/corrugator-run-size/corrugator-spec-by-product' },
+          { title: 'Define Roll Trim by Corrugator', icon: 'fas fa-cut', route: '/standard-formula/corrugator-run-size/roll-trim-by-corrugator' },
+          { title: 'Define Roll Trim by Product Design', icon: 'fas fa-ruler-combined', route: '/standard-formula/corrugator-run-size/roll-trim-by-product-design' },
+          { title: 'Define Roll Size', icon: 'fas fa-scroll', route: '/standard-formula/corrugator-run-size/roll-size' },
+          { title: 'Define Side Trim by Flute', icon: 'fas fa-layer-group', route: '/standard-formula/corrugator-run-size/side-trim-by-flute' },
+          { title: 'Define Side Trim by Product Design', icon: 'fas fa-ruler', route: '/standard-formula/corrugator-run-size/side-trim-by-product-design' },
+          { title: 'View & Print Product Design', icon: 'fas fa-print', route: '/standard-formula/corrugator-run-size/view-print-product-design' },
+          { title: 'View & Print Corr. Spesification by Product', icon: 'fas fa-print', route: '/standard-formula/corrugator-run-size/view-print-corrugator-spec' },
+          { title: 'View & Print Roll Trim by Corrugator', icon: 'fas fa-print', route: '/standard-formula/corrugator-run-size/view-print-roll-trim-by-corrugator' },
+          { title: 'View & Print Roll Trim by Product Design', icon: 'fas fa-print', route: '/standard-formula/corrugator-run-size/view-print-roll-trim-by-product-design' },
+          { title: 'View & Print Roll Size', icon: 'fas fa-print', route: '/standard-formula/corrugator-run-size/view-print-roll-size' },
+          { title: 'View & Print Side Trim by Flute', icon: 'fas fa-print', route: '/standard-formula/corrugator-run-size/view-print-side-trim-by-flute' },
+          { title: 'View & Print Side Trim by Product Design', icon: 'fas fa-print', route: '/standard-formula/corrugator-run-size/view-print-side-trim-by-product-design' }
+        ]
+      },
+      {
+        title: 'Define Stitching Computation Method',
+        icon: 'fas fa-paperclip',
+        children: [
+          { title: 'Define Computation Method', icon: 'fas fa-calculator', route: '/standard-formula/stitching-computation/method' },
+          { title: 'Define Finishing', icon: 'fas fa-paint-roller', route: '/standard-formula/stitching-computation/finishing' },
+          { title: 'View & Print Finishing', icon: 'fas fa-print', route: '/standard-formula/stitching-computation/view-print-finishing' }
+        ]
+      },
+      {
+        title: 'Define Bundling Computation Method',
+        icon: 'fas fa-cubes',
+        children: [
+          { title: 'Define Computation Method', icon: 'fas fa-calculator', route: '/standard-formula/bundling-computation/method' },
+          { title: 'View & Print Computation Method', icon: 'fas fa-print', route: '/standard-formula/bundling-computation/view-print-method' }
+        ]
+      },
+      {
+        title: 'Define Diecut Computation Method',
+        icon: 'fas fa-cut',
+        children: [
+          { title: 'Define Computation Formula', icon: 'fas fa-calculator', route: '/standard-formula/diecut-computation/formula' },
+          { title: 'Define Product Design', icon: 'fas fa-drafting-compass', route: '/standard-formula/diecut-computation/product-design' },
+          { title: 'View & Print Product Design', icon: 'fas fa-print', route: '/standard-formula/diecut-computation/view-print-product-design' }
+        ]
+      }
+    ]
+  },
   { title: 'Sales Order', icon: 'fas fa-shopping-cart', route: null },
   { title: 'Customer Service', icon: 'fas fa-headset', route: null }
 ];
