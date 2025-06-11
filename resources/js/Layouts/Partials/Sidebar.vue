@@ -270,8 +270,8 @@ const salesManagementItems = [
         title: 'Setup Scoring Formula', 
         icon: 'fas fa-cut', 
         children: [
-          { title: 'Define Scoring Formula', icon: 'fas fa-pen-fancy', route: '/standard-formula/scoring-formula' },
-          { title: 'View & Print Scoring Formula', icon: 'fas fa-print', route: '/standard-formula/scoring-formula/view-print' }
+          { title: 'Define Scoring Formula', icon: 'fas fa-pen-fancy', route: '/scoring-formula' },
+          { title: 'View & Print Scoring Formula', icon: 'fas fa-print', route: '/scoring-formula/view-print' }
         ]
       },
       {

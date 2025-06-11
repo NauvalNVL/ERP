@@ -16,6 +16,11 @@ class StandardFormulaController extends Controller
         ]);
     }
 
+    public function scoringFormula()
+    {
+        return Inertia::render('sales-management/standard-formula/setup-scoring-formula/ScoringFormula');
+    }
+
     // API method to get configuration
     public function apiIndex()
     {

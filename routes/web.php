@@ -35,6 +35,7 @@ use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\RealeseApproveMcController;
 use App\Http\Controllers\StandardFormulaController;
 use App\Http\Controllers\SOConfigController;
+use App\Http\Controllers\ScoringFormulaController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -156,6 +157,8 @@ Route::middleware('auth')->group(function () {
          Route::get('/sales-order/setup/print-mc-auto-wo', function () {
              return Inertia::render('sales-management/sales-order/setup/print-mc-auto-wo');
          })->name('vue.sales-order.setup.print-mc-auto-wo');
+         Route::get('/scoring-formula', [ScoringFormulaController::class, 'index'])->name('vue.scoring-formula.index');
+         Route::get('/scoring-formula/view-print', [ScoringFormulaController::class, 'viewAndPrint'])->name('vue.scoring-formula.view-print');
          
          // Standard Requirement Routes
          Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team.index');
@@ -428,4 +431,14 @@ Route::prefix('api')->group(function () {
     Route::get('/standard-formula', [StandardFormulaController::class, 'apiIndex']);
     Route::post('/standard-formula', [StandardFormulaController::class, 'apiStore']);
     Route::post('/standard-formula/seed', [StandardFormulaController::class, 'apiSeed']);
+
+    // Scoring Formula API routes
+    Route::get('/scoring-formulas', [ScoringFormulaController::class, 'apiIndex']);
+    Route::get('/scoring-formulas/{id}', [ScoringFormulaController::class, 'apiShow']);
+    Route::post('/scoring-formulas', [ScoringFormulaController::class, 'apiStore']);
+    Route::put('/scoring-formulas/{id}', [ScoringFormulaController::class, 'apiUpdate']);
+    Route::delete('/scoring-formulas/{id}', [ScoringFormulaController::class, 'apiDestroy']);
+    Route::get('/scoring-formulas/product-design/{productDesignId}', [ScoringFormulaController::class, 'getByProductDesign']);
+    Route::get('/scoring-formulas/paper-flute/{paperFluteId}', [ScoringFormulaController::class, 'getByPaperFlute']);
+    Route::post('/scoring-formulas/seed', [ScoringFormulaController::class, 'apiSeed']);
 });
