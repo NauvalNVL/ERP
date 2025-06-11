@@ -34,6 +34,7 @@ use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\RealeseApproveMcController;
 use App\Http\Controllers\StandardFormulaController;
+use App\Http\Controllers\SOConfigController;
 use App\Http\Controllers\ScoringFormulaController;
 
 // Test Routes
@@ -113,6 +114,49 @@ Route::middleware('auth')->group(function () {
          
          // Standard Formula Configuration
          Route::get('/standard-formula-configuration', [StandardFormulaController::class, 'index'])->name('vue.standard-formula.index');
+         
+         // Sales Order Setup - Define SO Config
+         Route::get('/sales-order/setup/define-so-config', [SOConfigController::class, 'index'])->name('vue.sales-order.setup.define-so-config');
+         
+         // Sales Order Setup - Define SO Period
+         Route::get('/sales-order/setup/define-so-period', function () {
+             return Inertia::render('sales-management/sales-order/setup/define-so-period');
+         })->name('vue.sales-order.setup.define-so-period');
+         
+         // Sales Order Setup - Define SO Rough Cut
+         Route::get('/sales-order/setup/define-so-rough-cut', function () {
+             return Inertia::render('sales-management/sales-order/setup/define-so-rough-cut');
+         })->name('vue.sales-order.setup.define-so-rough-cut');
+         
+         // Sales Order Setup - Define AC# Auto WO
+         Route::get('/sales-order/setup/define-ac-auto-wo', function () {
+             return Inertia::render('sales-management/sales-order/setup/define-ac-auto-wo');
+         })->name('vue.sales-order.setup.define-ac-auto-wo');
+         
+         // Sales Order Setup - Define MC Auto WO
+         Route::get('/sales-order/setup/define-mc-auto-wo', function () {
+             return Inertia::render('sales-management/sales-order/setup/define-mc-auto-wo');
+         })->name('vue.sales-order.setup.define-mc-auto-wo');
+         
+         // Sales Order Setup - Print SO Period
+         Route::get('/sales-order/setup/print-so-period', function () {
+             return Inertia::render('sales-management/sales-order/setup/print-so-period');
+         })->name('vue.sales-order.setup.print-so-period');
+         
+         // Sales Order Setup - Print SO Rough Cut
+         Route::get('/sales-order/setup/print-so-rough-cut', function () {
+             return Inertia::render('sales-management/sales-order/setup/print-so-rough-cut');
+         })->name('vue.sales-order.setup.print-so-rough-cut');
+         
+         // Sales Order Setup - Print AC# Auto WO
+         Route::get('/sales-order/setup/print-ac-auto-wo', function () {
+             return Inertia::render('sales-management/sales-order/setup/print-ac-auto-wo');
+         })->name('vue.sales-order.setup.print-ac-auto-wo');
+         
+         // Sales Order Setup - Print MC Auto WO
+         Route::get('/sales-order/setup/print-mc-auto-wo', function () {
+             return Inertia::render('sales-management/sales-order/setup/print-mc-auto-wo');
+         })->name('vue.sales-order.setup.print-mc-auto-wo');
          Route::get('/scoring-formula', [ScoringFormulaController::class, 'index'])->name('vue.scoring-formula.index');
          Route::get('/scoring-formula/view-print', [ScoringFormulaController::class, 'viewAndPrint'])->name('vue.scoring-formula.view-print');
          
