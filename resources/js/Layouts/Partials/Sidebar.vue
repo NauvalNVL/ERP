@@ -265,7 +265,7 @@ const salesManagementItems = [
     title: 'Standard Formula', 
     icon: 'fas fa-flask', 
     children: [
-      { title: 'Setup Standard Formula Configuration', icon: 'fas fa-cogs', route: '/standard-formula/configuration' },
+      { title: 'Setup Standard Formula Configuration', icon: 'fas fa-cogs', route: '/standard-formula-configuration' },
       { 
         title: 'Setup Scoring Formula', 
         icon: 'fas fa-cut', 

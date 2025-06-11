@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             UpdateCustomerAccountSeeder::class,
             CustomerAlternateAddressSeeder::class,
             ApproveMCSeeder::class,
+            StandardFormulaSeeder::class,
         ]);
     }
 }

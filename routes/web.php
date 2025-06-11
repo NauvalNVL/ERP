@@ -33,6 +33,7 @@ use App\Http\Controllers\CustomerAlternateAddressController;
 use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\RealeseApproveMcController;
+use App\Http\Controllers\StandardFormulaController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -108,6 +109,9 @@ Route::middleware('auth')->group(function () {
          // Sales Management Routes
          // Sales Configuration
          Route::get('/sales-configuration', [SalesConfigurationController::class, 'vueIndex'])->name('vue.sales-configuration.index');
+         
+         // Standard Formula Configuration
+         Route::get('/standard-formula-configuration', [StandardFormulaController::class, 'index'])->name('vue.standard-formula.index');
          
          // Standard Requirement Routes
          Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team.index');
@@ -375,4 +379,9 @@ Route::prefix('api')->group(function () {
     Route::post('/realese-approve-mc/release/{id}', [RealeseApproveMcController::class, 'release']);
     Route::post('/realese-approve-mc/unreleased/{id}', [RealeseApproveMcController::class, 'unreleased']);
     Route::get('/realese-approve-mc/by-customer/{customerId}', [RealeseApproveMcController::class, 'getByCustomer']);
+
+    // Standard Formula API routes
+    Route::get('/standard-formula', [StandardFormulaController::class, 'apiIndex']);
+    Route::post('/standard-formula', [StandardFormulaController::class, 'apiStore']);
+    Route::post('/standard-formula/seed', [StandardFormulaController::class, 'apiSeed']);
 });
