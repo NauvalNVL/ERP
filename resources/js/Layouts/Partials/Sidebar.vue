@@ -245,7 +245,7 @@ const salesManagementItems = [
           { title: 'Update MC', icon: 'fas fa-edit', route: '/sales-management/system-requirement/master-card/update-mc' },
           { title: 'Approve MC', icon: 'fas fa-check', route: '/sales-management/system-requirement/master-card/approve-mc' },
           { title: 'Release Approved MC', icon: 'fas fa-unlock', route: '/sales-management/system-requirement/master-card/realese-approve-mc' },
-          { title: 'Obsolate & Reactive MC', icon: 'fas fa-ban', route: null },
+          { title: 'Obsolate & Reactive MC', icon: 'fas fa-ban', route: '/sales-management/system-requirement/master-card/obsolate-reactive-mc' },
           { title: 'View & Print MC', icon: 'fas fa-print', route: null },
           { title: 'View & Print MC Maintenance Log', icon: 'fas fa-file-alt', route: null },
           { title: 'View & Print MC Approval Log', icon: 'fas fa-file-alt', route: null },
