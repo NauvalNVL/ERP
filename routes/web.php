@@ -36,6 +36,7 @@ use App\Http\Controllers\RealeseApproveMcController;
 use App\Http\Controllers\StandardFormulaController;
 use App\Http\Controllers\SOConfigController;
 use App\Http\Controllers\ScoringFormulaController;
+use App\Http\Controllers\ObsolateReactiveMcController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -253,6 +254,9 @@ Route::middleware('auth')->group(function () {
          // Add route for realese-approve-mc
          Route::get('/sales-management/system-requirement/master-card/realese-approve-mc', [RealeseApproveMcController::class, 'index'])->name('vue.master-card.realese-approve-mc');
 
+         // Add route for obsolate-reactive-mc
+         Route::get('/sales-management/system-requirement/master-card/obsolate-reactive-mc', [ObsolateReactiveMcController::class, 'index'])->name('vue.master-card.obsolate-reactive-mc');
+
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
@@ -441,4 +445,11 @@ Route::prefix('api')->group(function () {
     Route::get('/scoring-formulas/product-design/{productDesignId}', [ScoringFormulaController::class, 'getByProductDesign']);
     Route::get('/scoring-formulas/paper-flute/{paperFluteId}', [ScoringFormulaController::class, 'getByPaperFlute']);
     Route::post('/scoring-formulas/seed', [ScoringFormulaController::class, 'apiSeed']);
+
+    // ObsolateReactiveMC API routes
+    Route::get('/obsolate-reactive-mc', [ObsolateReactiveMcController::class, 'apiIndex']);
+    Route::post('/obsolate-reactive-mc', [ObsolateReactiveMcController::class, 'store']);
+    Route::post('/obsolate-reactive-mc/obsolate/{id}', [ObsolateReactiveMcController::class, 'obsolate']);
+    Route::post('/obsolate-reactive-mc/reactive/{id}', [ObsolateReactiveMcController::class, 'reactive']);
+    Route::get('/obsolate-reactive-mc/by-customer/{customerId}', [ObsolateReactiveMcController::class, 'getByCustomer']);
 });
