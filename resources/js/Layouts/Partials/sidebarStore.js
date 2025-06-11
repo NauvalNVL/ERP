@@ -12,7 +12,16 @@ const loadSavedState = () => {
 };
 
 export const useSidebarStore = () => {
-  const state = reactive(loadSavedState());
+  // Initialize with saved state or empty object
+  const state = reactive({
+    ...loadSavedState(),
+    // Ensure that important menus are always opened by default
+    'sales-management': true,
+    'system-requirement': true,
+    'master-card': true
+  });
+  
+  // Mobile sidebar state should always start as false
   const mobileOpen = ref(false);
 
   const isOpen = (id) => {

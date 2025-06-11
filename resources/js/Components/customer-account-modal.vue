@@ -136,7 +136,8 @@ export default {
         const response = await fetch('/api/customer-accounts', {
           headers: { 
             'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
           },
           credentials: 'same-origin'
         })
@@ -163,6 +164,12 @@ export default {
         } else {
           console.error('Unexpected data format:', rawData)
           throw new Error('Invalid data format returned from server')
+        }
+        
+        // If we have accounts but none are selected, select the first one by default
+        if (allAccounts.value.length > 0 && !selectedAccount.value) {
+          console.log('Auto-selecting first account')
+          selectedAccount.value = allAccounts.value[0]
         }
       } catch (err) {
         console.error('Error details:', err)
@@ -200,7 +207,12 @@ export default {
 
     const handleSelect = () => {
       if (selectedAccount.value) {
+        console.log('Selected customer:', selectedAccount.value)
         emit('select', selectedAccount.value)
+        emit('close')
+      } else {
+        console.warn('No customer account selected')
+        error.value = 'Please select a customer account'
       }
     }
     

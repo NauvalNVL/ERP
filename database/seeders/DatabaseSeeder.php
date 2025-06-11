@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             CustomerGroupSeeder::class,
             UpdateCustomerAccountSeeder::class,
             CustomerAlternateAddressSeeder::class,
+            ApproveMCSeeder::class,
         ]);
     }
 }

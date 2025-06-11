@@ -78,19 +78,25 @@ onMounted(() => {
   }
   
   // Auto-open parent menus based on current route
-  const currentRouteUrl = window.location.pathname;
+  const currentRouteUrl = window.location.pathname.toLowerCase();
   
-  // Get the menu structure from sidebar components
-  // For now, we'll handle common paths that might need parent menus opened
-  if (currentRouteUrl.includes('/sales-management/system-requirement/master-card')) {
+  // Handle common deep nested paths
+  if (currentRouteUrl.includes('/sales-management')) {
     // Ensure Sales Management menu is open
     sidebarStore.toggle('sales-management');
     
+    if (currentRouteUrl.includes('/system-requirement')) {
     // Ensure System Requirement submenu is open
     sidebarStore.toggle('system-requirement');
     
+      // Check specific submenus
+      if (currentRouteUrl.includes('/master-card')) {
     // Ensure Master Card submenu is open
     sidebarStore.toggle('master-card');
+      } else if (currentRouteUrl.includes('/customer-account')) {
+        sidebarStore.toggle('customer-account');
+      }
+    }
   }
 });
 

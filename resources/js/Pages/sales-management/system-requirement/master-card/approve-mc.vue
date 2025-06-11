@@ -1,3 +1,7 @@
+<!-- 
+  Approve Master Card Component
+  This component handles the approval of master cards in the system
+-->
 <template>
     <AppLayout :header="'Approve MC'">
         <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
@@ -426,8 +430,14 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { usePage, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import MasterCardModal from '@/components/master-card-modal.vue';
+
+const props = defineProps({
+    masterCards: Array,
+    customers: Array,
+});
 
 // Define reactive state variables
 const sortBy = ref('seq');
@@ -444,13 +454,9 @@ const showEditModal = ref(false);
 const editingMasterCard = ref(null);
 const modalMode = ref('edit');
 
-// Sample master card data - replace with data fetched from your backend
-const masterCards = ref([
-    { id: 1, mc_seq: 'MC001', mc_model: 'Box-Standard', customer_name: 'PT. Indah Karya', status: 'pending' },
-    { id: 2, mc_seq: 'MC002', mc_model: 'Box-Premium', customer_name: 'PT. Maju Bersama', status: 'active' },
-    { id: 3, mc_seq: 'MC003', mc_model: 'Container-Small', customer_name: 'CV. Berkah Jaya', status: 'obsolete' },
-    { id: 4, mc_seq: 'MC004', mc_model: 'Container-Medium', customer_name: 'UD. Sukses Mandiri', status: 'active' },
-]);
+// Replace the hardcoded masterCards with props data
+const masterCards = ref(props.masterCards || []);
+const customers = ref(props.customers || []);
 
 const selectedMasterCard = ref(null);
 const searchTerm = ref('');
@@ -496,25 +502,81 @@ const handleApprove = (mc) => {
 
 const handleReject = (mc) => {
     masterCardToAction.value = mc;
-    showRejectionModal.value = true;
     rejectionReason.value = ''; // Clear previous rejection reason
+    showRejectionModal.value = true;
 };
 
-const confirmApproval = () => {
-    // Implement your approval logic here
-    console.log('Approved:', masterCardToAction.value);
-    if (masterCardToAction.value) {
-        masterCardToAction.value.status = 'active';
+const confirmApproval = async () => {
+    try {
+        const response = await fetch(`/api/approve-mc/approve/${masterCardToAction.value.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Update the status locally
+            const index = masterCards.value.findIndex(mc => mc.id === masterCardToAction.value.id);
+            if (index !== -1) {
+                masterCards.value[index].status = 'active';
+                masterCards.value[index].approved_by = result.approved_by;
+                masterCards.value[index].approved_date = result.approved_date;
+            }
+            
+            // Show success message
+            alert('Master Card approved successfully!');
+        } else {
+            alert('Error approving Master Card: ' + (result.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error approving master card:', error);
+        alert('An error occurred during approval');
     }
+    
     showApprovalModal.value = false;
 };
 
-const confirmRejection = () => {
-    // Implement your rejection logic here
-    console.log('Rejected:', masterCardToAction.value, 'Reason:', rejectionReason.value);
-    if (masterCardToAction.value) {
-        masterCardToAction.value.status = 'obsolete';
+const confirmRejection = async () => {
+    try {
+        const response = await fetch(`/api/approve-mc/reject/${masterCardToAction.value.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ 
+                rejection_reason: rejectionReason.value 
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Update the status locally
+            const index = masterCards.value.findIndex(mc => mc.id === masterCardToAction.value.id);
+            if (index !== -1) {
+                masterCards.value[index].status = 'obsolete';
+                masterCards.value[index].rejected_by = result.rejected_by;
+                masterCards.value[index].rejected_date = result.rejected_date;
+                masterCards.value[index].rejection_reason = rejectionReason.value;
+            }
+            
+            // Show success message
+            alert('Master Card rejected successfully!');
+        } else {
+            alert('Error rejecting Master Card: ' + (result.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error rejecting master card:', error);
+        alert('An error occurred during rejection');
     }
+    
     showRejectionModal.value = false;
 };
 
@@ -538,33 +600,112 @@ const handleEdit = (mc) => {
 };
 
 const handleAddNew = () => {
+    console.log('Opening add new master card modal');
+    // Reset editing master card to a new empty record with good defaults
     editingMasterCard.value = {
-        mc_seq: '',
+        mc_seq: generateUniqueMcSeq(),
         mc_model: '',
         customer_code: '',
         customer_name: '',
         status: 'pending'
     };
+    // Set mode to add
     modalMode.value = 'add';
+    // Show the modal
     showEditModal.value = true;
+    
+    console.log('New master card initialized with:', editingMasterCard.value);
+};
+
+// Helper function to generate a unique MC sequence (example format: MC-2023-001)
+const generateUniqueMcSeq = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const existingSeqs = masterCards.value
+        .map(mc => mc.mc_seq)
+        .filter(seq => seq.includes(`MC-${year}`));
+    
+    let nextNumber = 1;
+    if (existingSeqs.length > 0) {
+        // Extract the numeric parts and find the highest
+        const numbers = existingSeqs
+            .map(seq => {
+                const match = seq.match(/MC-\d+-(\d+)/);
+                return match ? parseInt(match[1], 10) : 0;
+            })
+            .filter(num => !isNaN(num));
+        
+        if (numbers.length > 0) {
+            nextNumber = Math.max(...numbers) + 1;
+        }
+    }
+    
+    // Format with leading zeros (e.g., 001, 012, etc.)
+    const paddedNumber = nextNumber.toString().padStart(3, '0');
+    return `MC-${year}-${paddedNumber}`;
 };
 
 const closeEditModal = () => {
+    console.log('Closing edit modal');
     showEditModal.value = false;
     editingMasterCard.value = null;
 };
 
-const handleUpdateMasterCard = (updatedMasterCard) => {
-    // Find and update the master card in the list
-    const index = masterCards.value.findIndex(mc => mc.id === updatedMasterCard.id);
-    if (index !== -1) {
-        masterCards.value[index] = updatedMasterCard;
-    } else {
-        // If not found (new card), add it to the list
-        masterCards.value.push(updatedMasterCard);
+const handleUpdateMasterCard = async (updatedMasterCardData) => {
+    console.log('==== Master Card Update/Add Handler ====');
+    console.log('Received response from modal:', updatedMasterCardData);
+
+    // Check if we received valid data from the modal
+    if (!updatedMasterCardData) {
+        console.error('No master card data received from modal');
+        return;
     }
-    
-    closeEditModal();
+
+    try {
+        // Check if this is a new record (no ID) or an existing one
+        if (!updatedMasterCardData.id) {
+            console.log('Adding new master card to local state:', updatedMasterCardData);
+            
+            // Add the new record to the master cards array at the beginning for visibility
+            masterCards.value = [updatedMasterCardData, ...masterCards.value];
+            
+            // Set the new card as selected
+            selectedMasterCard.value = updatedMasterCardData;
+            
+            // Show confirmation to the user
+            alert('Master Card added successfully!');
+        } else {
+            console.log('Updating existing master card in local state');
+            
+            // Find the index of the existing record
+            const index = masterCards.value.findIndex(mc => mc.id === updatedMasterCardData.id);
+            
+            if (index !== -1) {
+                console.log(`Found existing record at index ${index}, updating`);
+                
+                // Update the record in the array
+                masterCards.value.splice(index, 1, updatedMasterCardData);
+                
+                // If this was the selected record, update the selection
+                if (selectedMasterCard.value?.id === updatedMasterCardData.id) {
+                    selectedMasterCard.value = updatedMasterCardData;
+                }
+                
+                // Show confirmation to the user
+                alert('Master Card updated successfully!');
+            } else {
+                console.warn('Could not find master card with ID', updatedMasterCardData.id);
+                
+                // Add it anyway in case it's a valid record
+                masterCards.value.push(updatedMasterCardData);
+            }
+        }
+
+        // Always close the modal after handling the response
+        closeEditModal();
+    } catch (error) {
+        console.error('Error processing master card data:', error);
+    }
 };
 </script>
 
