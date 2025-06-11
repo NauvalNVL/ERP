@@ -184,6 +184,9 @@ Route::middleware('auth')->group(function () {
          Route::get('/product/view-print', [ProductController::class, 'vueViewAndPrint'])->name('vue.product.view-print');
          
          Route::get('/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design.index');
+         Route::get('/product-design/standard-formula', function() {
+             return Inertia::render('sales-management/standard-formula/setup-corrugator-run-size-formula/ProductDesign');
+         })->name('vue.product-design.standard-formula');
          Route::get('/product-design/view-print', [ProductDesignController::class, 'vueViewAndPrint'])->name('vue.product-design.view-print');
          
          Route::get('/scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.scoring-tool.index');

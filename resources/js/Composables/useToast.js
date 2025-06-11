@@ -2,69 +2,73 @@
  * Simple toast notification composable
  */
 export function useToast() {
+    const success = (message) => {
+        showToast(message, 'success');
+    };
+
+    const error = (message) => {
+        showToast(message, 'error');
+    };
+
+    const warning = (message) => {
+        showToast(message, 'warning');
+    };
+
+    const info = (message) => {
+        showToast(message, 'info');
+    };
+
     /**
      * Show a toast notification
      * @param {string} message - The message to display
      * @param {string} type - The type of toast: 'success', 'error', 'warning', 'info'
-     * @param {number} duration - Duration in milliseconds
      */
-    const showToast = (message, type = 'info', duration = 3000) => {
-        // Create toast container if it doesn't exist
-        let toastContainer = document.getElementById('toast-container');
-        
-        if (!toastContainer) {
-            toastContainer = document.createElement('div');
-            toastContainer.id = 'toast-container';
-            toastContainer.className = 'fixed top-4 right-4 z-50 flex flex-col gap-2';
-            document.body.appendChild(toastContainer);
-        }
-        
+    const showToast = (message, type) => {
         // Create toast element
         const toast = document.createElement('div');
-        toast.className = 'px-4 py-2 rounded-md shadow-lg transform transition-all duration-300 ease-in-out';
+        toast.className = `fixed z-50 top-4 right-4 px-4 py-2 rounded-lg shadow-lg transform transition-all duration-500 ease-in-out max-w-xs`;
         
-        // Add appropriate styling based on type
-        switch(type) {
+        // Set style based on type
+        switch (type) {
             case 'success':
-                toast.classList.add('bg-green-500', 'text-white');
+                toast.className += ' bg-green-500 text-white';
+                toast.innerHTML = `<div class="flex items-center"><i class="fas fa-check-circle mr-2"></i>${message}</div>`;
                 break;
             case 'error':
-                toast.classList.add('bg-red-500', 'text-white');
+                toast.className += ' bg-red-500 text-white';
+                toast.innerHTML = `<div class="flex items-center"><i class="fas fa-exclamation-circle mr-2"></i>${message}</div>`;
                 break;
             case 'warning':
-                toast.classList.add('bg-yellow-500', 'text-white');
+                toast.className += ' bg-yellow-500 text-white';
+                toast.innerHTML = `<div class="flex items-center"><i class="fas fa-exclamation-triangle mr-2"></i>${message}</div>`;
                 break;
             default:
-                toast.classList.add('bg-blue-500', 'text-white');
+                toast.className += ' bg-blue-500 text-white';
+                toast.innerHTML = `<div class="flex items-center"><i class="fas fa-info-circle mr-2"></i>${message}</div>`;
         }
         
-        // Add message content
-        toast.textContent = message;
+        // Add toast to DOM
+        document.body.appendChild(toast);
         
-        // Add to container
-        toastContainer.appendChild(toast);
-        
-        // Animation: slide in from right
+        // Animate in
         setTimeout(() => {
-            toast.classList.add('translate-x-0');
-            toast.classList.remove('translate-x-full');
+            toast.style.transform = 'translateY(10px)';
         }, 10);
         
-        // Remove after duration
+        // Auto remove after 3 seconds
         setTimeout(() => {
-            toast.classList.add('opacity-0');
+            toast.style.transform = 'translateY(-10px)';
+            toast.style.opacity = '0';
             setTimeout(() => {
-                toastContainer.removeChild(toast);
-                
-                // Remove container if empty
-                if (toastContainer.childNodes.length === 0) {
-                    document.body.removeChild(toastContainer);
-                }
+                document.body.removeChild(toast);
             }, 300);
-        }, duration);
+        }, 3000);
     };
-    
+
     return {
-        showToast
+        success,
+        error,
+        warning,
+        info
     };
 } 

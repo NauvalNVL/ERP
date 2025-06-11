@@ -223,6 +223,14 @@ const salesManagementItems = [
         ]
       },
       {
+        title: 'Standard Formula',
+        icon: 'fas fa-calculator',
+        children: [
+          { title: 'Define Product Design', icon: 'fas fa-drafting-compass', route: '/product-design/standard-formula' },
+          // Add other standard formula items here
+        ]
+      },
+      {
         title: 'Customer Account',
         icon: 'fas fa-user-circle',
         children: [
@@ -278,7 +286,7 @@ const salesManagementItems = [
         title: 'Setup Corrugator Run Size Formula',
         icon: 'fas fa-box',
         children: [
-          { title: 'Define Product Design', icon: 'fas fa-drafting-compass', route: '/standard-formula/corrugator-run-size/product-design' },
+          { title: 'Define Product Design', icon: 'fas fa-drafting-compass', route: '/product-design/standard-formula' },
           { title: 'Define Corrugator', icon: 'fas fa-cog', route: '/standard-formula/corrugator-run-size/corrugator' },
           { title: 'Define Corrugator Spesification by Product', icon: 'fas fa-cogs', route: '/standard-formula/corrugator-run-size/corrugator-spec-by-product' },
           { title: 'Define Roll Trim by Corrugator', icon: 'fas fa-cut', route: '/standard-formula/corrugator-run-size/roll-trim-by-corrugator' },
