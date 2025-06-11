@@ -478,8 +478,15 @@ const deleteSalesTeam = async (code) => {
         
         console.log('Deleting sales team with code:', code);
         
-        // Use code as the identifier instead of id
-        const response = await fetch(`/api/sales-teams/${code}`, {
+        // Find the team in the array to get the ID
+        const teamToDelete = salesTeams.value.find(team => team.code === code);
+        
+        if (!teamToDelete || !teamToDelete.id) {
+            throw new Error('Team not found or missing ID');
+        }
+        
+        // Use the team ID for deletion
+        const response = await fetch(`/api/sales-teams/${teamToDelete.id}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,

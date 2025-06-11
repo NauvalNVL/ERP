@@ -19,6 +19,42 @@ class UpdateCustomerAccountController extends Controller
         return view('sales-management.system-requirement.system-requirement.customer account.updatecustomeraccount', compact('accounts', 'industries', 'geoData'));
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'customer_code' => 'required|string|max:20',
+            'customer_name' => 'required|string|max:100',
+            'short_name' => 'nullable|string|max:50',
+            'address' => 'nullable|string',
+            'contact_person' => 'nullable|string|max:100',
+            'telephone_no' => 'nullable|string|max:30',
+            'fax_no' => 'nullable|string|max:30',
+            'co_email' => 'nullable|email|max:100',
+            'credit_limit' => 'nullable|numeric',
+            'credit_terms' => 'nullable|integer',
+            'ac_type' => 'required|string|in:Y-Foreign,N-Local',
+            'currency_code' => 'nullable|string|max:10',
+            'salesperson_code' => 'nullable|string|max:20',
+            'industrial_code' => 'nullable|string|max:20',
+            'geographical' => 'nullable|string|max:20',
+            'grouping_code' => 'nullable|string|max:20',
+            'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
+        ]);
+
+        // Check if customer with this code already exists
+        $existingAccount = UpdateCustomerAccount::where('customer_code', $validated['customer_code'])->first();
+        
+        if ($existingAccount) {
+            // Update existing account
+            $existingAccount->update($validated);
+            return to_route('vue.update-customer-account.index')->with('message', 'Customer account updated successfully');
+        } else {
+            // Create new account
+            UpdateCustomerAccount::create($validated);
+            return to_route('vue.update-customer-account.index')->with('message', 'Customer account created successfully');
+        }
+    }
+
     public function apiIndex()
     {
         try {

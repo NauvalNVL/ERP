@@ -167,6 +167,8 @@ Route::middleware('auth')->group(function () {
              return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
          })->name('vue.update-customer-account.index');
          
+         Route::post('/update-customer-account', [UpdateCustomerAccountController::class, 'store'])->name('update-customer-account.store');
+         
          Route::get('/update-customer-account/view-print', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-account');
          })->name('vue.update-customer-account.view-print');

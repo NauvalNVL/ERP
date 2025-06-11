@@ -9,6 +9,14 @@
             <p class="text-cyan-100">Perbarui data akun customer di sistem</p>
         </div>
 
+        <!-- Success Message -->
+        <div v-if="$page.props.flash.message" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4 mb-4">
+            <span class="block sm:inline">{{ $page.props.flash.message }}</span>
+            <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                <i class="fas fa-check"></i>
+            </span>
+        </div>
+
         <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Left Column - Main Content -->
@@ -304,7 +312,7 @@
 
 <script>
 import { ref, reactive } from 'vue'
-import { router, Link } from '@inertiajs/vue3'
+import { router, Link, usePage } from '@inertiajs/vue3'
 import CustomerAccountModal from '@/Components/customer-account-modal.vue'
 import SalespersonModal from '@/Components/salesperson-modal.vue'
 import IndustryModal from '@/Components/industry-modal.vue'
@@ -323,6 +331,7 @@ export default {
         AppLayout
     },
     setup() {
+        const page = usePage()
         const showAdditionalFields = ref(false)
         const showCustomerAccountModal = ref(false)
         const showSalespersonModal = ref(false)
