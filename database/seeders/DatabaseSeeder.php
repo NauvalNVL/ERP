@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             ObsolateReactiveMCSeeder::class,
             StandardFormulaSeeder::class,
             ScoringFormulaSeeder::class,
+            CustomerSalesTypeSeeder::class,
         ]);
     }
 }
