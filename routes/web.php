@@ -37,6 +37,7 @@ use App\Http\Controllers\StandardFormulaController;
 use App\Http\Controllers\SOConfigController;
 use App\Http\Controllers\ScoringFormulaController;
 use App\Http\Controllers\ObsolateReactiveMcController;
+use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\CorrugatorConfigController;
 use App\Http\Controllers\CorrugatorSpecByProductController;
 use App\Http\Controllers\RollTrimByCorrugatorController;
@@ -255,6 +256,9 @@ Route::middleware('auth')->group(function () {
          Route::get('/customer-alternate-address/view-print', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-alternate-address');
          })->name('vue.customer-alternate-address.view-print');
+         
+         Route::get('/customer-sales-type', [CustomerSalesTypeController::class, 'index'])->name('vue.customer-sales-type.index');
+         Route::get('/customer-sales-type/view-print', [CustomerSalesTypeController::class, 'viewAndPrint'])->name('vue.customer-sales-type.view-print');
 
          // Master Card Routes
          Route::get('/sales-management/system-requirement/master-card/update-mc', [UpdateMcController::class, 'index'])->name('vue.master-card.update-mc');
@@ -423,6 +427,12 @@ Route::prefix('api')->group(function () {
     // Foreign Currency API endpoints
     Route::get('/foreign-currencies', [ForeignCurrencyController::class, 'apiIndex']);
     Route::get('/foreign-currencies/{id}', [ForeignCurrencyController::class, 'apiShow']);
+    
+    // Customer Sales Type API routes
+    Route::get('/customer-sales-types', [CustomerSalesTypeController::class, 'apiIndex']);
+    Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'apiStore']);
+    Route::put('/customer-sales-types/{id}', [CustomerSalesTypeController::class, 'apiUpdate']);
+    Route::delete('/customer-sales-types/{id}', [CustomerSalesTypeController::class, 'apiDestroy']);
 
     // Color Group API routes
     Route::get('/color-groups', [ColorGroupController::class, 'index']);
