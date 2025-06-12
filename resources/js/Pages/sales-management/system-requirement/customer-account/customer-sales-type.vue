@@ -9,7 +9,7 @@
                             <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
                                 <i class="fas fa-tags text-white text-xl"></i>
                             </div>
-                            <div>
+    <div>
                                 <h1 class="text-2xl font-bold text-gray-800">Define Customer Sales Type</h1>
                                 <p class="text-gray-600">Manage customer sales type settings</p>
                             </div>
@@ -124,7 +124,7 @@
                     </button>
                 </div>
             </div>
-        </div>
+    </div>
     </AppLayout>
 </template>
 
