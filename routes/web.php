@@ -37,6 +37,7 @@ use App\Http\Controllers\StandardFormulaController;
 use App\Http\Controllers\SOConfigController;
 use App\Http\Controllers\ScoringFormulaController;
 use App\Http\Controllers\ObsolateReactiveMcController;
+use App\Http\Controllers\CorrugatorConfigController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -115,6 +116,9 @@ Route::middleware('auth')->group(function () {
          
          // Standard Formula Configuration
          Route::get('/standard-formula-configuration', [StandardFormulaController::class, 'index'])->name('vue.standard-formula.index');
+         
+         // Corrugator Configuration Route
+         Route::get('/standard-formula/setup-corrugator', [CorrugatorConfigController::class, 'index'])->name('vue.standard-formula.setup-corrugator');
          
          // Sales Order Setup - Define SO Config
          Route::get('/sales-order/setup/define-so-config', [SOConfigController::class, 'index'])->name('vue.sales-order.setup.define-so-config');
@@ -455,4 +459,12 @@ Route::prefix('api')->group(function () {
     Route::post('/obsolate-reactive-mc/obsolate/{id}', [ObsolateReactiveMcController::class, 'obsolate']);
     Route::post('/obsolate-reactive-mc/reactive/{id}', [ObsolateReactiveMcController::class, 'reactive']);
     Route::get('/obsolate-reactive-mc/by-customer/{customerId}', [ObsolateReactiveMcController::class, 'getByCustomer']);
+    
+    // Corrugator Configuration API routes
+    Route::get('/corrugator-configs', [CorrugatorConfigController::class, 'apiIndex']);
+    Route::get('/corrugator-configs/{id}', [CorrugatorConfigController::class, 'apiShow']);
+    Route::post('/corrugator-configs', [CorrugatorConfigController::class, 'apiStore']);
+    Route::put('/corrugator-configs/{id}', [CorrugatorConfigController::class, 'apiUpdate']);
+    Route::delete('/corrugator-configs/{id}', [CorrugatorConfigController::class, 'apiDestroy']);
+    Route::post('/corrugator-configs/seed', [CorrugatorConfigController::class, 'apiSeed']);
 });

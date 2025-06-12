@@ -287,7 +287,7 @@ const salesManagementItems = [
         icon: 'fas fa-box',
         children: [
           { title: 'Define Product Design', icon: 'fas fa-drafting-compass', route: '/product-design/standard-formula' },
-          { title: 'Define Corrugator', icon: 'fas fa-cog', route: '/standard-formula/corrugator-run-size/corrugator' },
+          { title: 'Define Corrugator', icon: 'fas fa-cog', route: '/standard-formula/setup-corrugator' },
           { title: 'Define Corrugator Spesification by Product', icon: 'fas fa-cogs', route: '/standard-formula/corrugator-run-size/corrugator-spec-by-product' },
           { title: 'Define Roll Trim by Corrugator', icon: 'fas fa-cut', route: '/standard-formula/corrugator-run-size/roll-trim-by-corrugator' },
           { title: 'Define Roll Trim by Product Design', icon: 'fas fa-ruler-combined', route: '/standard-formula/corrugator-run-size/roll-trim-by-product-design' },
