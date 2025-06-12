@@ -6,256 +6,161 @@
       </h2>
     </template>
 
-    <div class="py-8">
-      <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6">
+      <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
         <!-- Main Card -->
-        <div class="bg-white overflow-hidden shadow-lg sm:rounded-xl border border-gray-100">
-          <!-- Header with gradient -->
-          <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+        <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg border border-gray-200">
+          <!-- Header with buttons -->
+          <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-white">Define Corrugator</h2>
+            <div class="flex space-x-2">
+              <button @click="resetForm" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                New
+              </button>
+              <button @click="saveSettings" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-sm flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
-                </div>
-                <div>
-                  <h2 class="text-xl font-bold text-white">Corrugator Configuration</h2>
-                  <p class="text-blue-100 text-sm">Define the parameters for corrugator run size</p>
-                </div>
-              </div>
-              
-              <!-- Action buttons -->
-              <div class="flex gap-2">
+                Save
+              </button>
                 <button 
                   @click="deleteConfig" 
-                  class="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all duration-200 text-white"
-                  :class="{'opacity-50 cursor-not-allowed': !formData.id, 'hover:scale-105': formData.id}"
                   :disabled="!formData.id"
-                  title="Delete configuration"
+                :class="{'opacity-50 cursor-not-allowed': !formData.id}"
+                class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-sm flex items-center"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                   </svg>
+                Delete
                 </button>
-                <button 
-                  @click="resetForm" 
-                  class="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all duration-200 text-white hover:scale-105"
-                  title="Add new configuration"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                  </svg>
-                </button>
-                <button 
-                  @click="editConfig" 
-                  class="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all duration-200 text-white"
-                  :class="{'opacity-50 cursor-not-allowed': !formData.id, 'hover:scale-105': formData.id}"
-                  :disabled="!formData.id"
-                  title="Edit configuration"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                  </svg>
-                </button>
-              </div>
             </div>
           </div>
 
-          <!-- Form content -->
+          <!-- Main content -->
           <div class="p-6">
-            <!-- Corrugator selection card -->
-            <div class="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-100 mb-8">
-              <div class="flex items-center justify-between mb-4">
+            <!-- Loading Spinner -->
+            <div v-if="loading" class="flex justify-center items-center py-8">
+              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <span class="ml-3 text-gray-600">Loading...</span>
+            </div>
+
+            <div v-else>
+              <!-- Corrugator Selection -->
+              <div class="mb-6 flex items-center justify-between bg-gray-100 p-4 rounded-lg">
                 <div class="flex items-center">
-                  <div class="bg-blue-500 p-2 rounded-md mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
-                    </svg>
-                  </div>
-                  <h3 class="text-lg font-semibold text-gray-700">Corrugator Selection</h3>
+                  <span class="font-medium text-gray-700 mr-4">Min/Max Corrugator Out:</span>
                 </div>
-                <div class="relative z-0 w-32">
+                <div class="flex items-center space-x-2">
                   <select 
                     v-model="formData.corrugator_id" 
                     @change="loadConfigById"
-                    class="block w-full py-2.5 px-4 text-sm text-gray-900 bg-transparent rounded-lg border-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                    class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                   >
-                    <option value="1">Corrugator 1</option>
-                    <option value="2">Corrugator 2</option>
-                    <option value="3">Corrugator 3</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
                   </select>
-                  <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                  </div>
-                </div>
+                  <span class="text-gray-500">to</span>
+                  <select 
+                    class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                  >
+                    <option value="9">9</option>
+                  </select>
               </div>
             </div>
 
-            <!-- Dimensions settings -->
-            <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden mb-8">
-              <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-5 py-3 border-b border-gray-200">
-                <h3 class="font-medium text-gray-700">Dimensions Settings</h3>
+              <!-- Sheet Length Settings -->
+              <div class="mb-6 flex items-center justify-between bg-gray-100 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <span class="font-medium text-gray-700 mr-4">Min/Max Sheet Length:</span>
               </div>
-              <div class="p-5 space-y-6">
-                <!-- Sheet Length Settings -->
-                <div class="group">
-                  <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                    </svg>
-                    Min/Max Sheet Length
-                  </label>
-                  <div class="flex items-center space-x-3">
-                    <div class="relative">
+                <div class="flex items-center space-x-2">
                       <input 
                         type="number" 
                         v-model="formData.min_sheet_length" 
-                        class="block w-full p-2.5 text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-300"
-                      />
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span class="text-gray-400 text-xs">Min</span>
-                      </div>
-                    </div>
-                    
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                    
-                    <div class="relative">
+                    class="border border-gray-300 rounded w-20 px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <span class="text-gray-500">to</span>
                       <input 
                         type="number" 
                         v-model="formData.max_sheet_length" 
-                        class="block w-full p-2.5 text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-300"
+                    class="border border-gray-300 rounded w-20 px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span class="text-gray-400 text-xs">Max</span>
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                <!-- Sheet Width Settings -->
-                <div class="group">
-                  <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
-                    Min/Max Sheet Width
-                  </label>
-                  <div class="flex items-center space-x-3">
-                    <div class="relative">
+              <!-- Sheet Width Settings -->
+              <div class="mb-6 flex items-center justify-between bg-gray-100 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <span class="font-medium text-gray-700 mr-4">Min/Max Sheet Width:</span>
+                </div>
+                <div class="flex items-center space-x-2">
                       <input 
                         type="number" 
                         v-model="formData.min_sheet_width" 
-                        class="block w-full p-2.5 text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-300"
-                      />
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span class="text-gray-400 text-xs">Min</span>
-                      </div>
-                    </div>
-                    
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                    
-                    <div class="relative">
+                    class="border border-gray-300 rounded w-20 px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <span class="text-gray-500">to</span>
                       <input 
                         type="number" 
                         v-model="formData.max_sheet_width" 
-                        class="block w-full p-2.5 text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-300"
+                    class="border border-gray-300 rounded w-20 px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+              </div>
+            </div>
+
+              <!-- Sheet Length Multiplication Settings -->
+              <div class="mb-6 bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                <div class="bg-gray-100 px-4 py-2 border-b border-gray-200">
+                  <h3 class="font-medium text-gray-700">Increase SL as Sheet Length to meet Min Sheet Length</h3>
+              </div>
+                <div class="p-4">
+                  <div class="flex items-center">
+                    <label class="inline-flex items-center mr-4">
+                      <input 
+                        type="checkbox" 
+                        v-model="formData.is_sheet_length_multiplied" 
+                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-offset-0 focus:ring-blue-200 focus:ring-opacity-50"
                       />
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span class="text-gray-400 text-xs">Max</span>
-                      </div>
+                      <span class="ml-2 text-gray-700">SL will be multiplied to meet min Board Length.</span>
+                    </label>
+                    <span class="text-gray-700">Then add</span>
+                      <input 
+                      type="number" 
+                      v-model="slitterTrim"
+                      class="mx-2 border border-gray-300 rounded w-16 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <span class="text-gray-700">mm Slitter Trim when Scoring Length has been multiplied.</span>
+                  </div>
+                  </div>
+                </div>
+
+              <!-- Sheet Width Validation Settings -->
+              <div class="mb-6 bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                <div class="bg-gray-100 px-4 py-2 border-b border-gray-200">
+                  <h3 class="font-medium text-gray-700">Increase SW as Sheet Width</h3>
+                </div>
+                <div class="p-4">
+                  <div class="flex items-center">
+                    <div class="flex items-center text-sm text-gray-600 italic bg-blue-50 p-2 rounded-md border-l-4 border-blue-400 w-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                      <span>Validate Sheet Width to meet Min/Max Sheet Width.</span>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Advanced settings -->
-            <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden mb-8">
-              <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-5 py-3 border-b border-gray-200">
-                <h3 class="font-medium text-gray-700">Advanced Settings</h3>
-              </div>
-              <div class="p-5 space-y-6">
-                <!-- Sheet Length Multiplication -->
-                <div class="group">
-                  <h4 class="flex items-center text-sm font-medium text-gray-700 mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    Sheet Length Multiplication
-                  </h4>
-                  <div class="ml-7 space-y-3 bg-gray-50 p-4 rounded-lg">
-                    <label class="inline-flex items-center relative">
-                      <input 
-                        type="checkbox" 
-                        id="sl-option1" 
-                        v-model="formData.is_sheet_length_multiplied" 
-                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-offset-0 focus:ring-blue-200 focus:ring-opacity-50"
-                      />
-                      <span class="ml-2 text-sm text-gray-700">SL will be multiplied to meet min Board Length</span>
-                    </label>
-                    
-                    <label class="inline-flex items-center relative">
-                      <input 
-                        type="checkbox" 
-                        id="min-raw" 
-                        v-model="formData.is_min_raw_multiplied" 
-                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-offset-0 focus:ring-blue-200 focus:ring-opacity-50"
-                      />
-                      <span class="ml-2 text-sm text-gray-700">Min SL(in) / raw where Scoring Length has been multiplied</span>
-                    </label>
-                  </div>
-                </div>
-
-                <!-- Sheet Width Validation -->
-                <div class="group">
-                  <h4 class="flex items-center text-sm font-medium text-gray-700 mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Sheet Width Validation
-                  </h4>
-                  <div class="ml-7 space-y-3 bg-gray-50 p-4 rounded-lg">
-                    <label class="inline-flex items-center relative">
-                      <input 
-                        type="checkbox" 
-                        id="validate-width" 
-                        v-model="formData.validate_sheet_width" 
-                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-offset-0 focus:ring-blue-200 focus:ring-opacity-50"
-                      />
-                      <span class="ml-2 text-sm text-gray-700">Validate Sheet Width to meet Min/Max Sheet Width</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex justify-end space-x-3">
-              <button 
-                @click="resetForm" 
-                class="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Cancel
-              </button>
-              <button 
-                @click="saveSettings" 
-                class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                Save
-              </button>
             </div>
             
             <!-- Notification -->
@@ -269,7 +174,7 @@
             >
               <div 
                 v-if="notification.show" 
-                class="mt-6 sm:fixed sm:top-4 sm:right-4 w-full sm:w-80 p-4 rounded-lg shadow-lg border border-l-4"
+                class="fixed bottom-4 right-4 w-80 p-4 rounded-lg shadow-lg border border-l-4"
                 :class="notification.type === 'success' ? 'bg-green-50 border-green-500 text-green-800' : 'bg-red-50 border-red-500 text-red-800'"
               >
                 <div class="flex items-center">
@@ -308,13 +213,25 @@ export default defineComponent({
       id: null,
       corrugator_id: '1',
       min_sheet_length: 1,
-      max_sheet_length: 99999,
+      max_sheet_length: 9999,
       min_sheet_width: 1,
-      max_sheet_width: 99999,
+      max_sheet_width: 9999,
       is_sheet_length_multiplied: true,
       is_min_raw_multiplied: false,
       validate_sheet_width: false,
     });
+    
+    const defaultFormData = {
+      id: null,
+      corrugator_id: '1',
+      min_sheet_length: 1,
+      max_sheet_length: 9999,
+      min_sheet_width: 1,
+      max_sheet_width: 9999,
+      is_sheet_length_multiplied: true,
+      is_min_raw_multiplied: false,
+      validate_sheet_width: false,
+    };
     
     const notification = ref({
       show: false,
@@ -323,6 +240,8 @@ export default defineComponent({
     });
     
     const allConfigs = ref([]);
+    const loading = ref(false);
+    const slitterTrim = ref(0);
     
     const showNotification = (message, type = 'success') => {
       notification.value = {
@@ -338,19 +257,52 @@ export default defineComponent({
     
     const loadConfigs = async () => {
       try {
+        loading.value = true;
         const response = await axios.get('/api/corrugator-configs');
         allConfigs.value = response.data;
         
         // If we have data, load the first corrugator by default
         if (allConfigs.value.length > 0) {
-          formData.value = { ...allConfigs.value.find(c => c.corrugator_id === formData.value.corrugator_id) };
+          const config = allConfigs.value.find(c => c.corrugator_id === formData.value.corrugator_id);
+          if (config) {
+            formData.value = { ...config };
+          } else {
+            // If no config found for the current corrugator_id, load the first one
+            formData.value = { ...allConfigs.value[0] };
+          }
         } else {
           // If no data, initialize the form with default data
           resetForm();
+          // Try to seed default data if no configurations exist
+          await seedDefaultData();
         }
       } catch (error) {
         console.error('Error loading corrugator configs:', error);
-        showNotification('Failed to load corrugator configurations', 'error');
+        
+        // More detailed error handling
+        let errorMessage = 'Failed to load corrugator configurations';
+        
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          errorMessage += ` (Status: ${error.response.status})`;
+          if (error.response.data && error.response.data.message) {
+            errorMessage += `: ${error.response.data.message}`;
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          errorMessage += ': No response received from server';
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          errorMessage += `: ${error.message}`;
+        }
+        
+        showNotification(errorMessage, 'error');
+        
+        // Even if loading fails, try to initialize with default form data
+        resetForm();
+      } finally {
+        loading.value = false;
       }
     };
     
@@ -366,8 +318,38 @@ export default defineComponent({
       }
     };
     
+    const validateForm = () => {
+      // Basic validation
+      if (formData.value.min_sheet_length <= 0) {
+        showNotification('Minimum sheet length must be greater than 0', 'error');
+        return false;
+      }
+      
+      if (formData.value.max_sheet_length <= formData.value.min_sheet_length) {
+        showNotification('Maximum sheet length must be greater than minimum sheet length', 'error');
+        return false;
+      }
+      
+      if (formData.value.min_sheet_width <= 0) {
+        showNotification('Minimum sheet width must be greater than 0', 'error');
+        return false;
+      }
+      
+      if (formData.value.max_sheet_width <= formData.value.min_sheet_width) {
+        showNotification('Maximum sheet width must be greater than minimum sheet width', 'error');
+        return false;
+      }
+      
+      return true;
+    };
+    
     const saveSettings = async () => {
+      if (!validateForm()) {
+        return;
+      }
+      
       try {
+        loading.value = true;
         let response;
         
         if (formData.value.id) {
@@ -385,16 +367,28 @@ export default defineComponent({
         formData.value = { ...response.data };
       } catch (error) {
         console.error('Error saving corrugator config:', error);
+        if (error.response && error.response.data && error.response.data.errors) {
+          // Show validation errors
+          const errorMessages = Object.values(error.response.data.errors).flat();
+          showNotification(errorMessages.join(', '), 'error');
+        } else {
         showNotification('Failed to save corrugator configuration', 'error');
+        }
+      } finally {
+        loading.value = false;
       }
     };
     
     const deleteConfig = async () => {
-      if (!formData.value.id) return;
+      if (!formData.value.id) {
+        showNotification('No configuration selected to delete', 'error');
+        return;
+      }
       
       if (!confirm('Are you sure you want to delete this configuration?')) return;
       
       try {
+        loading.value = true;
         await axios.delete(`/api/corrugator-configs/${formData.value.id}`);
         showNotification('Corrugator configuration deleted successfully');
         
@@ -404,56 +398,131 @@ export default defineComponent({
       } catch (error) {
         console.error('Error deleting corrugator config:', error);
         showNotification('Failed to delete corrugator configuration', 'error');
+      } finally {
+        loading.value = false;
       }
     };
     
-    const editConfig = () => {
-      // Just a placeholder for edit functionality
-      // The form is already populated with the selected config
-      showNotification('Editing current configuration. Make changes and click Save.');
-    };
-    
     const resetForm = () => {
-      formData.value = {
-        id: null,
-        corrugator_id: '1',
-        min_sheet_length: 1,
-        max_sheet_length: 99999,
-        min_sheet_width: 1,
-        max_sheet_width: 99999,
-        is_sheet_length_multiplied: true,
-        is_min_raw_multiplied: false,
-        validate_sheet_width: false,
-      };
+      formData.value = { ...defaultFormData };
+      slitterTrim.value = 0;
     };
     
     const seedDefaultData = async () => {
+      loading.value = true;
+      let errors = [];
+      let successCount = 0;
+      
       try {
-        await axios.post('/api/corrugator-configs/seed');
-        showNotification('Default corrugator configurations loaded successfully');
+        // Create configurations directly without trying the seeder API
+        const defaultConfigs = [
+          {
+            corrugator_id: '1',
+            min_sheet_length: 1,
+            max_sheet_length: 9999,
+            min_sheet_width: 1,
+            max_sheet_width: 9999,
+            is_sheet_length_multiplied: true,
+            is_min_raw_multiplied: false,
+            validate_sheet_width: false
+          },
+          {
+            corrugator_id: '2',
+            min_sheet_length: 1,
+            max_sheet_length: 9999,
+            min_sheet_width: 1,
+            max_sheet_width: 9999,
+            is_sheet_length_multiplied: true,
+            is_min_raw_multiplied: false,
+            validate_sheet_width: false
+          },
+          {
+            corrugator_id: '3',
+            min_sheet_length: 1,
+            max_sheet_length: 9999,
+            min_sheet_width: 1,
+            max_sheet_width: 9999,
+            is_sheet_length_multiplied: true,
+            is_min_raw_multiplied: false,
+            validate_sheet_width: false
+          }
+        ];
+        
+        // Try to create each configuration
+        for (const config of defaultConfigs) {
+          try {
+            const response = await axios.post('/api/corrugator-configs', config);
+            // Check response status and data
+            if (response && (response.status === 200 || response.status === 201)) {
+              successCount++;
+              console.log(`Successfully created/loaded config for corrugator ${config.corrugator_id}`);
+            } else {
+              // Unexpected response status
+              const errorMsg = `Unexpected response for corrugator ${config.corrugator_id}: Status ${response?.status || 'unknown'}`;
+              console.error(errorMsg);
+              errors.push(errorMsg);
+            }
+          } catch (configError) {
+            console.error(`Error creating config for corrugator ${config.corrugator_id}:`, configError);
+            
+            let errorMessage = `Failed to create config for corrugator ${config.corrugator_id}`;
+            if (configError.response) {
+              // Server responded with error
+              errorMessage += ` (Status: ${configError.response.status})`;
+              if (configError.response.data) {
+                if (configError.response.data.message) {
+                  errorMessage += `: ${configError.response.data.message}`;
+                } else if (configError.response.data.errors) {
+                  const firstError = Object.values(configError.response.data.errors)[0];
+                  errorMessage += `: ${Array.isArray(firstError) ? firstError[0] : firstError}`;
+                }
+              }
+            } else if (configError.request) {
+              // Request made but no response received
+              errorMessage += ': No response received from server';
+            } else {
+              // Error in request setup
+              errorMessage += `: ${configError.message}`;
+            }
+            
+            errors.push(errorMessage);
+          }
+        }
+        
+        // Handle results
+        if (successCount > 0) {
+          showNotification(`Created or loaded ${successCount} default configurations successfully`);
         await loadConfigs();
+          return true;
+        } else if (errors.length > 0) {
+          // Show the first error
+          showNotification(`Failed to create configurations: ${errors[0]}`, 'error');
+          throw new Error('Failed to create any configurations');
+        } else {
+          showNotification('No configurations were created', 'error');
+          throw new Error('Failed to create any configurations');
+        }
       } catch (error) {
-        console.error('Error seeding default data:', error);
-        showNotification('Failed to load default configurations', 'error');
+        console.error('Error in seedDefaultData:', error);
+        showNotification('Failed to create default configurations. Please try again.', 'error');
+        return false;
+      } finally {
+        loading.value = false;
       }
     };
     
     onMounted(async () => {
       await loadConfigs();
-      
-      // If no configurations are found, seed the default data
-      if (allConfigs.value.length === 0) {
-        await seedDefaultData();
-      }
     });
 
     return {
       formData,
       notification,
+      loading,
+      slitterTrim,
       saveSettings,
       resetForm,
       deleteConfig,
-      editConfig,
       loadConfigById,
     };
   },

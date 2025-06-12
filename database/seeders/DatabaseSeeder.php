@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             ScoringFormulaSeeder::class,
             CustomerSalesTypeSeeder::class,
             CorrugatorConfigSeeder::class,
+            CorrugatorSpecByProductSeeder::class,
         ]);
     }
 }

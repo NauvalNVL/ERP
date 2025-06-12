@@ -39,6 +39,9 @@ use App\Http\Controllers\ScoringFormulaController;
 use App\Http\Controllers\ObsolateReactiveMcController;
 use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\CorrugatorConfigController;
+use App\Http\Controllers\CorrugatorSpecByProductController;
+use App\Http\Controllers\RollTrimByCorrugatorController;
+use App\Http\Controllers\RollTrimByProductDesignController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -120,6 +123,18 @@ Route::middleware('auth')->group(function () {
          
          // Corrugator Configuration Route
          Route::get('/standard-formula/setup-corrugator', [CorrugatorConfigController::class, 'index'])->name('vue.standard-formula.setup-corrugator');
+         
+         // Corrugator Specification by Product Route
+         Route::get('/standard-formula/setup-corrugator-specification-by-product', [CorrugatorSpecByProductController::class, 'index'])->name('vue.standard-formula.setup-corrugator-specification-by-product');
+         Route::get('/standard-formula/setup-corrugator-specification-by-product/view-print', [CorrugatorSpecByProductController::class, 'viewPrint'])->name('vue.standard-formula.setup-corrugator-specification-by-product.view-print');
+         
+         // Roll Trim By Corrugator Route
+         Route::get('/standard-formula/setup-roll-trim-by-corrugator', [RollTrimByCorrugatorController::class, 'index'])->name('vue.standard-formula.setup-roll-trim-by-corrugator');
+         Route::get('/standard-formula/setup-roll-trim-by-corrugator/view-print', [RollTrimByCorrugatorController::class, 'viewPrint'])->name('vue.standard-formula.setup-roll-trim-by-corrugator.view-print');
+         
+         // Roll Trim By Product Design Route
+         Route::get('/standard-formula/setup-roll-trim-by-product-design', [RollTrimByProductDesignController::class, 'index'])->name('vue.standard-formula.setup-roll-trim-by-product-design');
+         Route::get('/standard-formula/setup-roll-trim-by-product-design/view-print', [RollTrimByProductDesignController::class, 'viewPrint'])->name('vue.standard-formula.setup-roll-trim-by-product-design.view-print');
          
          // Sales Order Setup - Define SO Config
          Route::get('/sales-order/setup/define-so-config', [SOConfigController::class, 'index'])->name('vue.sales-order.setup.define-so-config');
