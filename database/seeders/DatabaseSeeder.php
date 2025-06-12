@@ -37,6 +37,7 @@ class DatabaseSeeder extends Seeder
             StandardFormulaSeeder::class,
             ScoringFormulaSeeder::class,
             CustomerSalesTypeSeeder::class,
+            CorrugatorConfigSeeder::class,
         ]);
     }
 }
