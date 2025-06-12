@@ -23,4 +23,12 @@ class Product extends Model
     {
         return $this->belongsTo(ProductGroup::class, 'product_group_id', 'product_group_id');
     }
+    
+    /**
+     * Get the corrugator specification for this product.
+     */
+    public function corrugatorSpec()
+    {
+        return $this->hasOne(CorrugatorSpecByProduct::class);
+    }
 }

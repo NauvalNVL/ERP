@@ -6,6 +6,7 @@ use App\Models\CorrugatorConfig;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class CorrugatorConfigController extends Controller
 {
@@ -55,6 +56,13 @@ class CorrugatorConfigController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        // Check if corrugator_id already exists
+        $existingConfig = CorrugatorConfig::where('corrugator_id', $request->corrugator_id)->first();
+        if ($existingConfig) {
+            // Return the existing config instead of an error
+            return response()->json($existingConfig, 200);
+        }
+
         $config = CorrugatorConfig::create($request->all());
         return response()->json($config, 201);
     }
@@ -101,9 +109,14 @@ class CorrugatorConfigController extends Controller
      */
     public function apiSeed()
     {
-        $seeder = new \Database\Seeders\CorrugatorConfigSeeder();
-        $seeder->run();
-        
-        return response()->json(['message' => 'Corrugator configurations seeded successfully']);
+        try {
+            $seeder = new \Database\Seeders\CorrugatorConfigSeeder();
+            $seeder->run();
+            
+            return response()->json(['message' => 'Corrugator configurations seeded successfully']);
+        } catch (\Exception $e) {
+            Log::error('Error seeding corrugator configs: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to seed corrugator configurations'], 500);
+        }
     }
 } 
