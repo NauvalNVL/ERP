@@ -42,6 +42,9 @@ use App\Http\Controllers\CorrugatorConfigController;
 use App\Http\Controllers\CorrugatorSpecByProductController;
 use App\Http\Controllers\RollTrimByCorrugatorController;
 use App\Http\Controllers\RollTrimByProductDesignController;
+use App\Http\Controllers\RollSizeController;
+use App\Http\Controllers\SideTrimByFluteController;
+use App\Http\Controllers\SideTrimByProductDesignController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -493,3 +496,33 @@ Route::prefix('api')->group(function () {
     Route::delete('/corrugator-configs/{id}', [CorrugatorConfigController::class, 'apiDestroy']);
     Route::post('/corrugator-configs/seed', [CorrugatorConfigController::class, 'apiSeed']);
 });
+
+// Roll Size Route
+Route::get('/standard-formula/setup-roll-size', [RollSizeController::class, 'index'])->name('vue.standard-formula.setup-roll-size');
+Route::get('/standard-formula/setup-roll-size/view-print', [RollSizeController::class, 'viewPrint'])->name('vue.standard-formula.setup-roll-size.view-print');
+
+// Side Trim By Flute Route
+Route::get('/standard-formula/setup-side-trim-by-flute', [SideTrimByFluteController::class, 'index'])->name('vue.standard-formula.setup-side-trim-by-flute');
+Route::get('/standard-formula/setup-side-trim-by-flute/view-print', [SideTrimByFluteController::class, 'viewPrint'])->name('vue.standard-formula.setup-side-trim-by-flute.view-print');
+
+// Side Trim By Product Design Route
+Route::get('/standard-formula/setup-side-trim-by-product-design', [SideTrimByProductDesignController::class, 'index'])->name('vue.standard-formula.setup-side-trim-by-product-design');
+Route::get('/standard-formula/setup-side-trim-by-product-design/view-print', [SideTrimByProductDesignController::class, 'viewPrint'])->name('vue.standard-formula.setup-side-trim-by-product-design.view-print');
+
+// Define routes for the Roll Size feature
+Route::get('/standard-formula/setup-roll-size', function () {
+    return Inertia::render('sales-management/standard-formula/setup-corrugator-run-size-formula/RollSize');
+})->name('setup.roll.size');
+
+Route::get('/standard-formula/setup-roll-size/view-print', function () {
+    return Inertia::render('sales-management/standard-formula/setup-corrugator-run-size-formula/ViewPrintRollSize');
+})->name('setup.roll.size.view-print');
+
+// Define routes for the Product Design feature
+Route::get('/standard-formula/setup-corrugator-run-size-formula/product-design', function () {
+    return Inertia::render('sales-management/standard-formula/setup-corrugator-run-size-formula/ProductDesign');
+})->name('setup.product.design');
+
+Route::get('/standard-formula/setup-corrugator-run-size-formula/product-design/view-print', function () {
+    return Inertia::render('sales-management/standard-formula/setup-corrugator-run-size-formula/ViewPrintProductDesign');
+})->name('setup.product.design.view-print');

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ProductDesignController extends Controller
 {
@@ -455,6 +457,76 @@ class ProductDesignController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete product design: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Export product designs to CSV
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function apiExport()
+    {
+        try {
+            $designs = ProductDesign::orderBy('pd_code')->get();
+            
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="product_designs_' . date('Y-m-d') . '.csv"',
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0'
+            ];
+            
+            $columns = [
+                'Design Code', 
+                'Design Name', 
+                'Design Type', 
+                'IDC', 
+                'Product', 
+                'Joint', 
+                'Joint to Print', 
+                'PCS to Joint',
+                'Score',
+                'Slot',
+                'Flute Style',
+                'Print Flute',
+                'Input Weight'
+            ];
+            
+            $callback = function() use ($designs, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+                
+                foreach ($designs as $design) {
+                    fputcsv($file, [
+                        $design->pd_code,
+                        $design->pd_name,
+                        $design->pd_design_type,
+                        $design->idc,
+                        $design->product,
+                        $design->joint,
+                        $design->joint_to_print,
+                        $design->pcs_to_joint,
+                        $design->score,
+                        $design->slot,
+                        $design->flute_style,
+                        $design->print_flute,
+                        $design->input_weight
+                    ]);
+                }
+                
+                fclose($file);
+            };
+            
+            return response()->stream($callback, 200, $headers);
+            
+        } catch (\Exception $e) {
+            Log::error('Error exporting product designs: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to export product designs: ' . $e->getMessage()
             ], 500);
         }
     }

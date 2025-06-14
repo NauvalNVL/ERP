@@ -163,26 +163,41 @@ class RollTrimByProductDesignController extends Controller
         try {
             $rollTrims = RollTrimByProductDesign::with(['product', 'productDesign', 'paperFlute'])->get();
             
-            // Transform data for export
-            $exportData = $rollTrims->map(function ($trim) {
-                return [
-                    'Product Design' => $trim->productDesign ? $trim->productDesign->pd_name : 'N/A',
-                    'Product Code' => $trim->product ? $trim->product->product_code : 'N/A',
-                    'Product Name' => $trim->product ? $trim->product->description : 'N/A',
-                    'Flute Code' => $trim->paperFlute ? $trim->paperFlute->code : 'N/A',
-                    'Composite' => $trim->is_composite ? 'Yes' : 'No',
-                    'Min Trim (mm)' => $trim->min_trim,
-                    'Max Trim (mm)' => $trim->max_trim,
-                    'Created At' => $trim->created_at->format('Y-m-d H:i:s'),
-                    'Updated At' => $trim->updated_at->format('Y-m-d H:i:s'),
-                ];
-            });
+            // Create CSV content
+            $headers = [
+                'Product Design',
+                'Flute Code',
+                'To Computer',
+                'Min Trim (mm)',
+                'Max Trim (mm)',
+                'Created At',
+                'Updated At'
+            ];
             
-            // Return JSON data for now
-            return response()->json([
-                'status' => 'success',
-                'data' => $exportData,
-                'filename' => 'roll_trim_by_product_design_' . date('Y-m-d') . '.xlsx'
+            $callback = function() use ($rollTrims, $headers) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $headers);
+                
+                foreach ($rollTrims as $trim) {
+                    fputcsv($file, [
+                        $trim->productDesign ? $trim->productDesign->pd_name : 'N/A',
+                        $trim->paperFlute ? $trim->paperFlute->code : 'N/A',
+                        $trim->is_composite ? 'Yes' : 'No',
+                        $trim->min_trim,
+                        $trim->max_trim,
+                        $trim->created_at->format('Y-m-d H:i:s'),
+                        $trim->updated_at->format('Y-m-d H:i:s')
+                    ]);
+                }
+                
+                fclose($file);
+            };
+            
+            $filename = 'roll_trim_by_product_design_' . date('Y-m-d') . '.csv';
+            
+            return response()->stream($callback, 200, [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             ]);
         } catch (\Exception $e) {
             Log::error('Error exporting roll trim by product design data: ' . $e->getMessage());

@@ -1,8 +1,8 @@
 <template>
-  <AppLayout title="View & Print Roll Trim by Product Design">
+  <AppLayout title="View & Print Side Trim By Product Design">
     <template #header>
       <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        View & Print Roll Trim by Product Design
+        View & Print Side Trim By Product Design
       </h2>
     </template>
 
@@ -11,7 +11,7 @@
         <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
           <!-- Header with buttons -->
           <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 flex items-center justify-between">
-            <h2 class="text-lg font-bold text-white">View & Print Roll Trim by Product Design</h2>
+            <h2 class="text-lg font-bold text-white">View & Print Side Trim By Product Design</h2>
             <div class="flex space-x-2">
               <button @click="exportData" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-sm flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -25,11 +25,11 @@
                 </svg>
                 Print
               </button>
-              <Link :href="setupRollTrimByProductDesignRoute" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded text-sm flex items-center">
+              <Link :href="backToDefineRoute" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded text-sm flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L4.414 9H17a1 1 0 110 2H4.414l5.293 5.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                 </svg>
-                Back to Edit
+                Back to Define
               </Link>
             </div>
           </div>
@@ -43,49 +43,46 @@
             </div>
 
             <div v-else>
-              <!-- Search and filter section -->
+              <!-- Filters -->
               <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200 print:hidden">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <!-- Product Design Filter -->
                   <div>
                     <label for="product-design-filter" class="block text-sm font-medium text-gray-700 mb-1">Product Design</label>
                     <select
                       id="product-design-filter"
-                      v-model="filters.productDesign"
+                      v-model="filters.productDesignId"
                       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      @change="filterItems"
+                      @change="filterData"
                     >
                       <option value="">All Product Designs</option>
                       <option v-for="design in productDesigns" :key="design.id" :value="design.id">
-                        {{ design.pd_name }}
+                        {{ design.pd_name || design.code }}
                       </option>
                     </select>
                   </div>
                   
-                  <!-- Product Filter -->
                   <div>
                     <label for="product-filter" class="block text-sm font-medium text-gray-700 mb-1">Product</label>
                     <select
                       id="product-filter"
-                      v-model="filters.product"
+                      v-model="filters.productId"
                       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      @change="filterItems"
+                      @change="filterData"
                     >
                       <option value="">All Products</option>
                       <option v-for="product in products" :key="product.id" :value="product.id">
-                        {{ product.product_code }}
+                        {{ product.product_code || product.code }}
                       </option>
                     </select>
                   </div>
                   
-                  <!-- Flute Filter -->
                   <div>
                     <label for="flute-filter" class="block text-sm font-medium text-gray-700 mb-1">Flute</label>
                     <select
                       id="flute-filter"
-                      v-model="filters.flute"
+                      v-model="filters.fluteId"
                       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      @change="filterItems"
+                      @change="filterData"
                     >
                       <option value="">All Flutes</option>
                       <option v-for="flute in flutes" :key="flute.id" :value="flute.id">
@@ -112,7 +109,7 @@
               <!-- Report header for print -->
               <div class="hidden print:block mb-6">
                 <div class="text-center">
-                  <h1 class="text-xl font-bold">Roll Trim By Product Design Report</h1>
+                  <h1 class="text-xl font-bold">Side Trim By Product Design Report</h1>
                   <p class="text-gray-600">Generated on {{ formattedDate }}</p>
                 </div>
               </div>
@@ -120,79 +117,61 @@
               <!-- Table section -->
               <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 border">
-                  <thead class="bg-gray-100">
+                  <thead class="bg-blue-700">
                     <tr>
-                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
-                        Product Design
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r">
+                        P/Design
                       </th>
-                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r">
+                        Product
+                      </th>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r">
                         Flute
                       </th>
-                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
-                        To Computer
+                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wider border-r">
+                        Composite
                       </th>
-                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
-                        Min Trim (mm)
+                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wider border-r">
+                        Length Less (mm)
                       </th>
-                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Max Trim (mm)
+                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
+                        Length Add (mm)
                       </th>
                     </tr>
                   </thead>
                   <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-if="filteredItems.length === 0" class="hover:bg-gray-50">
-                      <td colspan="5" class="px-4 py-4 text-center text-sm text-gray-500">
-                        No roll trim data found. Please try different filters or add new data.
+                    <tr v-if="filteredSideTrims.length === 0" class="hover:bg-gray-50">
+                      <td colspan="6" class="px-4 py-4 text-center text-sm text-gray-500">
+                        No side trim data found. Please try different filters or add new data.
                       </td>
                     </tr>
-                    <tr v-for="item in filteredItems" :key="item.id" class="hover:bg-gray-50">
+                    <tr v-for="(trim, index) in filteredSideTrims" :key="trim.id || index" 
+                        :class="{ 'bg-yellow-100': index === 6 }"
+                        class="hover:bg-gray-50">
                       <td class="px-4 py-2 text-sm font-medium text-gray-900 border-r">
-                        {{ item.product_design_name }}
+                        {{ trim.product_design_name || trim.product_design_code || '—' }}
                       </td>
                       <td class="px-4 py-2 text-sm text-gray-900 border-r">
-                        {{ item.flute_code }}
+                        {{ trim.product_code || '—' }}
+                      </td>
+                      <td class="px-4 py-2 text-sm text-gray-900 border-r">
+                        {{ trim.flute_code || '—' }}
                       </td>
                       <td class="px-4 py-2 text-center border-r">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
-                          :class="item.is_composite ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'">
-                          {{ item.is_composite ? 'Yes' : 'No' }}
+                          :class="trim.is_composite ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                          {{ trim.is_composite ? 'Yes' : 'No' }}
                         </span>
                       </td>
-                      <td class="px-4 py-2 text-center border-r">
-                        {{ item.min_trim }}
+                      <td class="px-4 py-2 text-center text-sm text-gray-900 border-r">
+                        {{ trim.length_less }}
                       </td>
-                      <td class="px-4 py-2 text-center">
-                        {{ item.max_trim }}
+                      <td class="px-4 py-2 text-center text-sm text-gray-900">
+                        {{ trim.length_add }}
                       </td>
                     </tr>
                   </tbody>
                 </table>
-              </div>
-
-              <!-- Product Design and Product Selection Fields -->
-              <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 print:block">
-                <div class="border rounded-md p-4 bg-gray-50">
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Product:</label>
-                      <input 
-                        type="text" 
-                        v-model="productInput"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="BOX"
-                      />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">PD/Design Name:</label>
-                      <input 
-                        type="text" 
-                        v-model="pdNameInput"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="PUNCH"
-                      />
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -245,15 +224,15 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(true);
-    const items = ref([]);
-    const filteredItems = ref([]);
+    const sideTrims = ref([]);
+    const filteredSideTrims = ref([]);
     const productDesigns = ref([]);
     const products = ref([]);
     const flutes = ref([]);
     const filters = ref({
-      productDesign: '',
-      product: '',
-      flute: ''
+      productDesignId: '',
+      productId: '',
+      fluteId: ''
     });
     const notification = ref({
       show: false,
@@ -261,12 +240,8 @@ export default defineComponent({
       type: 'success'
     });
     
-    // Input fields for the product and PD name
-    const productInput = ref('BOX');
-    const pdNameInput = ref('PUNCH');
-    
     // Define route for back button
-    const setupRollTrimByProductDesignRoute = '/standard-formula/setup-roll-trim-by-product-design';
+    const backToDefineRoute = '/standard-formula/setup-side-trim-by-product-design';
 
     // Formatted current date
     const formattedDate = computed(() => {
@@ -308,51 +283,52 @@ export default defineComponent({
         const flutesResponse = await axios.get('/api/paper-flutes');
         flutes.value = flutesResponse.data;
         
-        // Load roll trim by product design data
-        const trimResponse = await axios.get('/api/roll-trim-by-product-design');
+        // Load side trim by product design data
+        const trimResponse = await axios.get('/api/side-trims-by-product-design');
         
-        if (trimResponse.data && trimResponse.data.status === 'success' && trimResponse.data.data.length > 0) {
+        if (trimResponse.data && trimResponse.data.status === 'success') {
           // Process the data from the API response
-          const processedData = [];
-          const groupedData = {};
-          
-          // Group by product design and flute
-          trimResponse.data.data.forEach(trim => {
-            // Get related objects
-            const product = trim.product || {};
-            const design = trim.product_design || {};
-            const flute = trim.paper_flute || {};
+          sideTrims.value = trimResponse.data.data.map(trim => {
+            // Get product design, product, and flute information
+            const productDesign = productDesigns.value.find(d => d.id === trim.product_design_id);
+            const product = products.value.find(p => p.id === trim.product_id);
+            const flute = flutes.value.find(f => f.id === trim.flute_id);
             
-            if (design && flute) {
-              const key = `${design.id}_${flute.id}`;
-              
-              if (!groupedData[key]) {
-                groupedData[key] = {
-                  id: trim.id,
-                  product_design_id: design.id,
-                  product_design_name: design.pd_name || design.pd_alt_name || 'N/A',
-                  flute_id: flute.id,
-                  flute_code: flute.code || 'N/A',
-                  is_composite: trim.is_composite,
-                  min_trim: trim.min_trim,
-                  max_trim: trim.max_trim
-                };
-              }
-            }
+            return {
+              id: trim.id,
+              product_design_id: trim.product_design_id,
+              product_id: trim.product_id,
+              flute_id: trim.flute_id,
+              product_design_name: productDesign?.pd_name || productDesign?.code || 'APSI',
+              product_code: product?.product_code || product?.code || '905',
+              flute_code: flute?.code || '9589',
+              is_composite: trim.is_composite,
+              length_less: trim.length_less || 0,
+              length_add: trim.length_add || 0
+            };
           });
           
-          items.value = Object.values(groupedData);
+          // Sort by product design, product, and flute
+          sideTrims.value.sort((a, b) => {
+            if (a.product_design_name !== b.product_design_name) {
+              return a.product_design_name.localeCompare(b.product_design_name);
+            }
+            if (a.product_code !== b.product_code) {
+              return a.product_code.localeCompare(b.product_code);
+            }
+            return a.flute_code.localeCompare(b.flute_code);
+          });
         } else {
-          // If no data or error, initialize with sample data
-          items.value = getSampleData();
+          // If no data from API, use sample data
+          sideTrims.value = getSampleData();
         }
         
-        filteredItems.value = [...items.value];
+        filteredSideTrims.value = [...sideTrims.value];
       } catch (error) {
         console.error('Error loading data:', error);
         
         // More detailed error handling
-        let errorMessage = 'Failed to load roll trim by product design data';
+        let errorMessage = 'Failed to load side trim by product design data';
         
         if (error.response) {
           errorMessage += ` (Status: ${error.response.status})`;
@@ -368,29 +344,30 @@ export default defineComponent({
         showNotification(errorMessage, 'error');
         
         // Initialize with sample data for development
-        items.value = getSampleData();
-        filteredItems.value = [...items.value];
+        sideTrims.value = getSampleData();
+        filteredSideTrims.value = [...sideTrims.value];
       } finally {
         loading.value = false;
       }
     };
 
-    const filterItems = () => {
-      filteredItems.value = items.value.filter(item => {
-        const matchesProductDesign = !filters.value.productDesign || item.product_design_id === filters.value.productDesign;
-        const matchesFlute = !filters.value.flute || item.flute_id === filters.value.flute;
+    const filterData = () => {
+      filteredSideTrims.value = sideTrims.value.filter(trim => {
+        const matchesProductDesign = !filters.value.productDesignId || trim.product_design_id === filters.value.productDesignId;
+        const matchesProduct = !filters.value.productId || trim.product_id === filters.value.productId;
+        const matchesFlute = !filters.value.fluteId || trim.flute_id === filters.value.fluteId;
         
-        return matchesProductDesign && matchesFlute;
+        return matchesProductDesign && matchesProduct && matchesFlute;
       });
     };
 
     const resetFilters = () => {
       filters.value = {
-        productDesign: '',
-        product: '',
-        flute: ''
+        productDesignId: '',
+        productId: '',
+        fluteId: ''
       };
-      filteredItems.value = [...items.value];
+      filteredSideTrims.value = [...sideTrims.value];
     };
 
     const exportData = () => {
@@ -398,14 +375,14 @@ export default defineComponent({
       
       // Call the export API endpoint
       axios({
-        url: '/api/roll-trim-by-product-design/export',
+        url: '/api/side-trims-by-product-design/export',
         method: 'GET',
         responseType: 'blob'
       }).then((response) => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `roll_trim_by_product_design_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute('download', `side_trim_by_product_design_${new Date().toISOString().split('T')[0]}.csv`);
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -422,22 +399,16 @@ export default defineComponent({
 
     // Sample data for development/fallback
     const getSampleData = () => [
-      { id: 1, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 1, flute_code: 'AC', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 2, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 2, flute_code: 'AF', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 3, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 3, flute_code: 'BC', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 4, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 4, flute_code: 'BF', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 5, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 5, flute_code: 'CF', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 6, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 6, flute_code: 'EB', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 7, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 7, flute_code: 'EF', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 8, product_design_id: 2, product_design_name: 'HDC-FB', flute_id: 1, flute_code: 'AC', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 9, product_design_id: 2, product_design_name: 'HDC-FB', flute_id: 2, flute_code: 'AF', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 10, product_design_id: 2, product_design_name: 'HDC-FB', flute_id: 3, flute_code: 'BC', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 11, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 1, flute_code: 'AC', is_composite: false, min_trim: 20, max_trim: 65 },
-      { id: 12, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 2, flute_code: 'AF', is_composite: false, min_trim: 20, max_trim: 65 },
-      { id: 13, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 3, flute_code: 'BC', is_composite: false, min_trim: 20, max_trim: 65 },
-      { id: 14, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 4, flute_code: 'BF', is_composite: false, min_trim: 20, max_trim: 65 },
-      { id: 15, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 5, flute_code: 'CF', is_composite: false, min_trim: 20, max_trim: 65 },
-      { id: 16, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 6, flute_code: 'EB', is_composite: false, min_trim: 20, max_trim: 65 },
+      { id: 1, product_design_id: 1, product_design_name: 'APSI', product_id: 1, product_code: '905', flute_id: 1, flute_code: '9589', is_composite: false, length_less: 15, length_add: 29 },
+      { id: 2, product_design_id: 1, product_design_name: 'APSI', product_id: 1, product_code: '905', flute_id: 2, flute_code: '9589', is_composite: false, length_less: 5, length_add: 27 },
+      { id: 3, product_design_id: 1, product_design_name: 'APSI', product_id: 1, product_code: '905', flute_id: 3, flute_code: '9589', is_composite: true, length_less: 11, length_add: 35 },
+      { id: 4, product_design_id: 1, product_design_name: 'APSI', product_id: 1, product_code: '905', flute_id: 4, flute_code: '9589', is_composite: true, length_less: 18, length_add: 21 },
+      { id: 5, product_design_id: 1, product_design_name: 'APSI', product_id: 1, product_code: '905', flute_id: 5, flute_code: '9589', is_composite: false, length_less: 8, length_add: 10 },
+      { id: 6, product_design_id: 1, product_design_name: 'APSI', product_id: 1, product_code: '905', flute_id: 6, flute_code: '9589', is_composite: false, length_less: 7, length_add: 28 },
+      { id: 7, product_design_id: 1, product_design_name: 'APSI', product_id: 1, product_code: '905', flute_id: 7, flute_code: '9589', is_composite: false, length_less: 19, length_add: 28 },
+      { id: 8, product_design_id: 1, product_design_name: 'APSI', product_id: 1, product_code: '905', flute_id: 8, flute_code: '9589', is_composite: false, length_less: 5, length_add: 19 },
+      { id: 9, product_design_id: 1, product_design_name: 'APSI', product_id: 1, product_code: '905', flute_id: 9, flute_code: '9589', is_composite: true, length_less: 25, length_add: 36 },
+      { id: 10, product_design_id: 1, product_design_name: 'APSI', product_id: 1, product_code: '905', flute_id: 10, flute_code: '9589', is_composite: false, length_less: 9, length_add: 24 },
     ];
 
     onMounted(() => {
@@ -446,18 +417,16 @@ export default defineComponent({
 
     return {
       loading,
-      items,
-      filteredItems,
+      sideTrims,
+      filteredSideTrims,
       productDesigns,
       products,
       flutes,
       filters,
       notification,
-      productInput,
-      pdNameInput,
-      setupRollTrimByProductDesignRoute,
+      backToDefineRoute,
       formattedDate,
-      filterItems,
+      filterData,
       resetFilters,
       exportData,
       printData,
@@ -495,26 +464,27 @@ export default defineComponent({
     display: block !important;
   }
   
-  /* Remove background colors for better printing */
-  .bg-gray-100 {
-    background-color: #f9fafb !important;
+  /* Keep background colors for better printing */
+  .bg-blue-700 {
+    background-color: #1d4ed8 !important;
     -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .bg-yellow-100 {
+    background-color: #fef3c7 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
   
   /* Ensure text is visible */
-  .text-gray-500, .text-gray-900 {
-    color: #000 !important;
+  .text-white {
+    color: #fff !important;
   }
   
   /* Make borders more visible */
   .border, .border-r {
     border-color: #000 !important;
-  }
-  
-  /* Show the input fields in print */
-  .print\:block {
-    display: block !important;
-    margin-top: 2cm;
   }
 }
 </style> 

@@ -10,6 +10,10 @@ use App\Http\Controllers\CorrugatorConfigController;
 use App\Http\Controllers\CorrugatorSpecByProductController;
 use App\Http\Controllers\RollTrimByCorrugatorController;
 use App\Http\Controllers\RollTrimByProductDesignController;
+use App\Http\Controllers\RollSizeController;
+use App\Http\Controllers\SideTrimByFluteController;
+use App\Http\Controllers\SideTrimByProductDesignController;
+use App\Http\Controllers\ProductDesignController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,3 +82,34 @@ Route::put('/roll-trim-by-product-design/{id}', [RollTrimByProductDesignControll
 Route::delete('/roll-trim-by-product-design/{id}', [RollTrimByProductDesignController::class, 'apiDestroy']);
 Route::get('/roll-trim-by-product-design/export', [RollTrimByProductDesignController::class, 'apiExport']);
 Route::post('/roll-trim-by-product-design/seed', [RollTrimByProductDesignController::class, 'apiSeed']); 
+
+// Roll Size API routes
+Route::get('/roll-sizes', [RollSizeController::class, 'apiIndex']);
+Route::post('/roll-sizes', [RollSizeController::class, 'apiStore']);
+Route::put('/roll-sizes/{id}', [RollSizeController::class, 'apiUpdate']);
+Route::delete('/roll-sizes/{id}', [RollSizeController::class, 'apiDestroy']);
+Route::get('/roll-sizes/export', [RollSizeController::class, 'apiExport']);
+Route::post('/roll-sizes/seed', [RollSizeController::class, 'apiSeed']); 
+
+// Side Trim By Flute API routes
+Route::get('/side-trims-by-flute', [SideTrimByFluteController::class, 'apiIndex']);
+Route::post('/side-trims-by-flute', [SideTrimByFluteController::class, 'apiStore']);
+Route::put('/side-trims-by-flute/{id}', [SideTrimByFluteController::class, 'apiUpdate']);
+Route::delete('/side-trims-by-flute/{id}', [SideTrimByFluteController::class, 'apiDestroy']);
+Route::get('/side-trims-by-flute/export', [SideTrimByFluteController::class, 'apiExport']);
+Route::post('/side-trims-by-flute/seed', [SideTrimByFluteController::class, 'apiSeed']);
+
+// Side Trim By Product Design API routes
+Route::get('/side-trims-by-product-design', [SideTrimByProductDesignController::class, 'apiIndex']);
+Route::post('/side-trims-by-product-design', [SideTrimByProductDesignController::class, 'apiStore']);
+Route::put('/side-trims-by-product-design/{id}', [SideTrimByProductDesignController::class, 'apiUpdate']);
+Route::delete('/side-trims-by-product-design/{id}', [SideTrimByProductDesignController::class, 'apiDestroy']);
+Route::get('/side-trims-by-product-design/export', [SideTrimByProductDesignController::class, 'apiExport']);
+Route::post('/side-trims-by-product-design/seed', [SideTrimByProductDesignController::class, 'apiSeed']); 
+
+// Product Design API routes
+Route::get('/product-designs', [ProductDesignController::class, 'getDesignsJson']);
+Route::post('/product-designs', [ProductDesignController::class, 'apiStore']);
+Route::put('/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
+Route::delete('/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
+Route::get('/product-designs/export', [ProductDesignController::class, 'apiExport']); 
