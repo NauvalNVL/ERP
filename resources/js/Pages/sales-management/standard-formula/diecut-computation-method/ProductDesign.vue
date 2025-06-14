@@ -73,6 +73,11 @@
 
               <!-- Form Section -->
               <div class="mt-4 border border-gray-300 p-3 bg-gray-100">
+                <!-- Form Header -->
+                <div class="mb-3 font-medium text-gray-700">
+                  {{ editMode ? 'Edit Product Design: ' + form.pd_code : 'Create New Product Design' }}
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <!-- Product Design Code -->
                   <div class="flex items-center">
@@ -83,6 +88,7 @@
                       v-model="form.pd_code"
                       :disabled="editMode"
                       class="block w-full border-gray-300 rounded shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      :class="{'bg-gray-100': editMode}"
                     />
                   </div>
 
@@ -127,8 +133,11 @@
                   <button @click="resetForm" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-1 rounded text-sm">
                     Reset
                   </button>
-                  <button @click="saveProductDesign" :disabled="loading" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded text-sm">
-                    {{ editMode ? 'Update' : 'Save' }}
+                  <button v-if="!editMode" @click="createProductDesign" :disabled="loading" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded text-sm">
+                    Save
+                  </button>
+                  <button v-else @click="updateProductDesign" :disabled="loading" class="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded text-sm">
+                    Update
                   </button>
                 </div>
               </div>
@@ -206,6 +215,9 @@ const form = reactive({
   input_weight: ''
 });
 
+// Original form data for comparison when updating
+const originalForm = ref({});
+
 // Fetch data on component mount
 onMounted(async () => {
   await fetchProductDesigns();
@@ -255,6 +267,7 @@ const resetForm = () => {
   });
   editMode.value = false;
   selectedDesign.value = null;
+  originalForm.value = {};
   errors.value = {};
 };
 
@@ -289,6 +302,9 @@ const selectDesign = (design) => {
     input_weight: design.input_weight || ''
   });
   
+  // Save original form data for comparison
+  originalForm.value = { ...form };
+  
   // Clear any previous errors
   errors.value = {};
 };
@@ -314,45 +330,24 @@ const editSelected = () => {
     input_weight: selectedDesign.value.input_weight || ''
   });
   
+  // Save original form data for comparison
+  originalForm.value = { ...form };
+  
   // Set edit mode
   editMode.value = true;
 };
 
-// Save or update a product design
-const saveProductDesign = async () => {
+// Create a new product design
+const createProductDesign = async () => {
   try {
     loading.value = true;
     errors.value = {};
     
-    if (editMode.value && selectedDesign.value) {
-      // Update existing design - create a new object with only the fields we want to update
-      const updateData = {
-        pd_name: form.pd_name,
-        pd_design_type: form.pd_design_type,
-        idc: form.idc,
-        product: form.product,
-        joint: form.joint,
-        joint_to_print: form.joint_to_print,
-        pcs_to_joint: form.pcs_to_joint,
-        score: form.score,
-        slot: form.slot,
-        flute_style: form.flute_style,
-        print_flute: form.print_flute,
-        input_weight: form.input_weight
-      };
-      
-      // Explicitly exclude pd_code from update data
-      await axios.put(`/api/product-designs/${selectedDesign.value.pd_code}`, updateData);
-      
-      // Show success message
-      alert('Product design updated successfully');
-    } else {
-      // Create new design
-      await axios.post('/api/product-designs', form);
-      
-      // Show success message
-      alert('Product design created successfully');
-    }
+    // Create new design
+    await axios.post('/api/product-designs', form);
+    
+    // Show success message
+    alert('Product design created successfully');
     
     // Refresh the data
     await fetchProductDesigns();
@@ -361,21 +356,83 @@ const saveProductDesign = async () => {
     resetForm();
     
   } catch (error) {
-    console.error('Error saving product design:', error);
-    if (error.response && error.response.data && error.response.data.message) {
-      alert(error.response.data.message);
-    } else if (error.response && error.response.data && error.response.data.errors) {
-      const errorMessages = [];
-      for (const field in error.response.data.errors) {
-        errorMessages.push(error.response.data.errors[field][0]);
-      }
-      alert('Validation error: ' + errorMessages.join(', '));
-      errors.value = error.response.data.errors;
-    } else {
-      alert('An error occurred while saving the product design');
-    }
+    console.error('Error creating product design:', error);
+    handleApiError(error);
   } finally {
     loading.value = false;
+  }
+};
+
+// Update an existing product design
+const updateProductDesign = async () => {
+  try {
+    if (!selectedDesign.value) return;
+    
+    loading.value = true;
+    errors.value = {};
+    
+    // Create an object with only the fields that have changed
+    const updateData = {};
+    
+    // Only include fields that have changed
+    if (form.pd_name !== originalForm.value.pd_name) updateData.pd_name = form.pd_name;
+    if (form.pd_design_type !== originalForm.value.pd_design_type) updateData.pd_design_type = form.pd_design_type;
+    if (form.idc !== originalForm.value.idc) updateData.idc = form.idc;
+    if (form.product !== originalForm.value.product) updateData.product = form.product;
+    if (form.joint !== originalForm.value.joint) updateData.joint = form.joint;
+    if (form.joint_to_print !== originalForm.value.joint_to_print) updateData.joint_to_print = form.joint_to_print;
+    if (form.pcs_to_joint !== originalForm.value.pcs_to_joint) updateData.pcs_to_joint = form.pcs_to_joint;
+    if (form.score !== originalForm.value.score) updateData.score = form.score;
+    if (form.slot !== originalForm.value.slot) updateData.slot = form.slot;
+    if (form.flute_style !== originalForm.value.flute_style) updateData.flute_style = form.flute_style;
+    if (form.print_flute !== originalForm.value.print_flute) updateData.print_flute = form.print_flute;
+    if (form.input_weight !== originalForm.value.input_weight) updateData.input_weight = form.input_weight;
+    
+    // If nothing has changed, show a message and return
+    if (Object.keys(updateData).length === 0) {
+      alert('No changes detected');
+      loading.value = false;
+      return;
+    }
+    
+    // Add required fields if they're not included (API validation requires them)
+    if (!updateData.pd_name) updateData.pd_name = form.pd_name;
+    if (!updateData.pd_design_type) updateData.pd_design_type = form.pd_design_type;
+    if (!updateData.product) updateData.product = form.product;
+    
+    // Update the product design
+    await axios.put(`/api/product-designs/${selectedDesign.value.pd_code}`, updateData);
+    
+    // Show success message
+    alert('Product design updated successfully');
+    
+    // Refresh the data
+    await fetchProductDesigns();
+    
+    // Reset the form
+    resetForm();
+    
+  } catch (error) {
+    console.error('Error updating product design:', error);
+    handleApiError(error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Handle API errors
+const handleApiError = (error) => {
+  if (error.response && error.response.data && error.response.data.message) {
+    alert(error.response.data.message);
+  } else if (error.response && error.response.data && error.response.data.errors) {
+    const errorMessages = [];
+    for (const field in error.response.data.errors) {
+      errorMessages.push(error.response.data.errors[field][0]);
+    }
+    alert('Validation error: ' + errorMessages.join(', '));
+    errors.value = error.response.data.errors;
+  } else {
+    alert('An error occurred while saving the product design');
   }
 };
 

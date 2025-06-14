@@ -617,7 +617,6 @@ Route::get('/standard-formula/bundling-computation/view-print-method', [Bundling
 
 // Define routes for the Diecut Computation Method feature
 Route::get('/standard-formula/diecut-computation/formula', [ComputationFormulaController::class, 'index'])->name('vue.standard-formula.diecut-computation.formula');
-Route::get('/standard-formula/diecut-computation/view-print-formula', [ComputationFormulaController::class, 'viewPrint'])->name('vue.standard-formula.diecut-computation.view-print-formula');
 Route::get('/standard-formula/diecut-computation/product-design', function() {
     return Inertia::render('sales-management/standard-formula/diecut-computation-method/ProductDesign');
 })->name('vue.standard-formula.diecut-computation.product-design');

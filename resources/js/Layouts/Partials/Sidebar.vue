@@ -326,7 +326,6 @@ const salesManagementItems = [
         children: [
           { title: 'Define Computation Formula', icon: 'fas fa-calculator', route: '/standard-formula/diecut-computation/formula' },
           { title: 'Define Product Design', icon: 'fas fa-drafting-compass', route: '/standard-formula/diecut-computation/product-design' },
-          { title: 'View & Print Computation Formula', icon: 'fas fa-print', route: '/standard-formula/diecut-computation/view-print-formula' },
           { title: 'View & Print Product Design', icon: 'fas fa-print', route: '/standard-formula/diecut-computation/view-print-product-design' }
         ]
       }

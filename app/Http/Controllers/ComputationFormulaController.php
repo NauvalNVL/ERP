@@ -9,23 +9,13 @@ use Inertia\Inertia;
 class ComputationFormulaController extends Controller
 {
     /**
-     * Display the computation formula page.
+     * Display the index view for the computation formula.
      *
      * @return \Inertia\Response
      */
     public function index()
     {
         return Inertia::render('sales-management/standard-formula/diecut-computation-method/ComputationFormula');
-    }
-
-    /**
-     * Display the view & print page.
-     *
-     * @return \Inertia\Response
-     */
-    public function viewPrint()
-    {
-        return Inertia::render('sales-management/standard-formula/diecut-computation-method/ViewPrintComputationFormula');
     }
 
     /**
