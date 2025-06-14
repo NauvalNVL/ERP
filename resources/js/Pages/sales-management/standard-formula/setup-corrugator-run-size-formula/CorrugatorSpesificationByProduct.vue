@@ -223,7 +223,7 @@ export default defineComponent({
       try {
         loading.value = true;
         // First, get all products
-        const productsResponse = await axios.get('/products');
+        const productsResponse = await axios.get('/api/products');
         const productsList = productsResponse.data;
         
         // Then, get corrugator specifications by product if they exist

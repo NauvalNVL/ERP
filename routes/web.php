@@ -532,6 +532,15 @@ Route::prefix('api')->group(function () {
     Route::delete('/corrugator-configs/{id}', [CorrugatorConfigController::class, 'apiDestroy']);
     Route::post('/corrugator-configs/seed', [CorrugatorConfigController::class, 'apiSeed']);
 
+    // Corrugator Specs By Product API routes
+    Route::get('/corrugator-specs-by-product', [CorrugatorSpecByProductController::class, 'apiIndex']);
+    Route::get('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiShow']);
+    Route::post('/corrugator-specs-by-product', [CorrugatorSpecByProductController::class, 'apiStore']);
+    Route::put('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiUpdate']);
+    Route::delete('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiDestroy']);
+    Route::post('/corrugator-specs-by-product/batch', [CorrugatorSpecByProductController::class, 'apiBatchUpdate']);
+    Route::get('/corrugator-specs-by-product/export', [CorrugatorSpecByProductController::class, 'apiExport']);
+
     // Bundling Computation Method API routes
     Route::get('/bundling-computation-methods', [BundlingComputationMethodController::class, 'apiIndex']);
     Route::get('/bundling-computation-methods/{id}', [BundlingComputationMethodController::class, 'apiShow']);

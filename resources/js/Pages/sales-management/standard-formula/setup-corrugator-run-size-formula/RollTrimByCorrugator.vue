@@ -256,16 +256,17 @@ export default defineComponent({
         loading.value = true;
         
         // Prepare data for saving
-        const dataToSave = items.value.map(item => ({
-          corrugator_name: 'BHS', // Default corrugator name
-          flute_code: item.flute_code,
-          trim_value: item.min_trim,
-        }));
-        
-        // Send data to the API - save each item
-        const promises = dataToSave.map(item => 
-          axios.post('/api/roll-trim-by-corrugator', item)
-        );
+        const promises = items.value.map(item => {
+          // Create payload according to the API's expected format
+          const payload = {
+            corrugator_name: 'BHS', // Default corrugator name
+            flute_code: item.flute_code,
+            trim_value: parseInt(item.min_trim, 10), // Ensure it's an integer
+          };
+          
+          // Send data to the API
+          return axios.post('/api/roll-trim-by-corrugator', payload);
+        });
         
         await Promise.all(promises);
         showNotification('Roll trim specifications saved successfully');

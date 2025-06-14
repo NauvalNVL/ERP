@@ -40,8 +40,8 @@
                   class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm appearance-none"
                 >
                   <option value="">All Products</option>
-                  <option v-for="product in products" :key="product.id" :value="product.id">
-                    {{ product.product_code }}
+                  <option v-for="product in uniqueProducts" :key="product" :value="product">
+                    {{ product }}
                   </option>
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
@@ -50,8 +50,14 @@
               </div>
             </div>
 
+            <!-- Loading indicator -->
+            <div v-if="loading" class="flex justify-center items-center py-8">
+              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <span class="ml-3 text-gray-600">Loading...</span>
+            </div>
+
             <!-- Table Section -->
-            <div class="overflow-x-auto" ref="printSection">
+            <div v-else class="overflow-x-auto" ref="printSection">
               <table class="min-w-full divide-y divide-gray-200 border">
                 <thead class="bg-gray-50">
                   <tr>
@@ -73,24 +79,24 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="design in filteredDesigns" :key="design.id" class="hover:bg-gray-50">
+                  <tr v-for="design in filteredDesigns" :key="design.pd_code" class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r">
-                      {{ design.code }}
+                      {{ design.pd_code }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r">
-                      {{ design.name }}
+                      {{ design.pd_name }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r">
-                      {{ getProductName(design.product_id) }}
+                      {{ design.product }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r">
                       <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                            :class="design.compute ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'">
-                        {{ design.compute ? 'Yes' : 'No' }}
+                            :class="design.score === 'Yes' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'">
+                        {{ design.score === 'Yes' ? 'Yes' : 'No' }}
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {{ design.alt_name || '-' }}
+                      {{ design.pd_alt_name || '-' }}
                     </td>
                   </tr>
                   <tr v-if="filteredDesigns.length === 0">
@@ -122,47 +128,50 @@ import axios from 'axios';
 
 // State
 const productDesigns = ref([]);
-const products = ref([]);
 const searchQuery = ref('');
 const productFilter = ref('');
 const loading = ref(false);
 
 // Fetch data on component mount
 onMounted(async () => {
-  await Promise.all([
-    fetchProductDesigns(),
-    fetchProducts()
-  ]);
+  await fetchProductDesigns();
 });
 
 // Fetch product designs from API
 const fetchProductDesigns = async () => {
   try {
     loading.value = true;
+    console.log('Fetching product designs...');
+    
     const response = await axios.get('/api/product-designs');
-    productDesigns.value = response.data.data;
+    
+    // Log the response to check the data structure
+    console.log('API Response:', response.data);
+    
+    if (Array.isArray(response.data)) {
+      productDesigns.value = response.data;
+    } else {
+      console.error('Unexpected data format:', response.data);
+      productDesigns.value = [];
+    }
   } catch (error) {
     console.error('Error fetching product designs:', error);
+    productDesigns.value = [];
   } finally {
     loading.value = false;
   }
 };
 
-// Fetch products from API
-const fetchProducts = async () => {
-  try {
-    const response = await axios.get('/api/products');
-    products.value = response.data;
-  } catch (error) {
-    console.error('Error fetching products:', error);
-  }
-};
-
-// Get product name by ID
-const getProductName = (productId) => {
-  const product = products.value.find(p => p.id === productId);
-  return product ? product.product_code : '';
-};
+// Get unique products for filtering
+const uniqueProducts = computed(() => {
+  const products = new Set();
+  productDesigns.value.forEach(design => {
+    if (design.product) {
+      products.add(design.product);
+    }
+  });
+  return Array.from(products).sort();
+});
 
 // Filter designs based on search query and product filter
 const filteredDesigns = computed(() => {
@@ -172,15 +181,15 @@ const filteredDesigns = computed(() => {
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     filtered = filtered.filter(design => {
-      return design.code.toLowerCase().includes(query) || 
-             design.name.toLowerCase().includes(query) ||
-             (design.alt_name && design.alt_name.toLowerCase().includes(query));
+      return (design.pd_code && design.pd_code.toLowerCase().includes(query)) || 
+             (design.pd_name && design.pd_name.toLowerCase().includes(query)) ||
+             (design.product && design.product.toLowerCase().includes(query));
     });
   }
   
   // Apply product filter
   if (productFilter.value) {
-    filtered = filtered.filter(design => design.product_id === productFilter.value);
+    filtered = filtered.filter(design => design.product === productFilter.value);
   }
   
   return filtered;

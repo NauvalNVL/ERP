@@ -175,35 +175,154 @@ export default defineComponent({
     const loadData = async () => {
       try {
         loading.value = true;
+        console.log('Loading side trim data...');
+        
+        // Load product designs, products, flutes, and side trims
         const [designsRes, productsRes, flutesRes, trimsRes] = await Promise.all([
           axios.get('/api/product-designs'),
           axios.get('/api/products'),
           axios.get('/api/paper-flutes'),
           axios.get('/api/side-trims-by-product-design')
         ]);
+        
         productDesigns.value = designsRes.data;
         products.value = productsRes.data;
         flutes.value = flutesRes.data;
-        if (trimsRes.data && trimsRes.data.status === 'success') {
+        
+        console.log('API response:', trimsRes.data);
+        
+        // Check if we have valid data from the API
+        if (trimsRes.data && trimsRes.data.status === 'success' && Array.isArray(trimsRes.data.data) && trimsRes.data.data.length > 0) {
+          console.log('Processing side trim data...');
+          
+          // Create a map of product designs by ID for faster lookups
+          const designsMap = new Map(productDesigns.value.map(design => [design.id, design]));
+          
+          // Create a map of products by ID for faster lookups
+          const productsMap = new Map(products.value.map(product => [product.id, product]));
+          
+          // Process the side trims data
           sideTrims.value = trimsRes.data.data.map(trim => {
+            // Find the corresponding design and product using the maps
+            const design = designsMap.get(trim.product_design_id);
+            const product = productsMap.get(trim.product_id);
+            
             return {
               id: trim.id,
               product_design_id: trim.product_design_id,
               product_id: trim.product_id,
               flute_id: trim.flute_id,
-              product_design_code: trim.product_design?.code || 'APSI',
-              product_code: trim.product?.code || '905',
-              flute_code: trim.paper_flute?.code || '',
-              is_composite: trim.is_composite,
+              product_design_code: design ? design.code : 'N/A',
+              product_code: product ? product.code : 'N/A',
+              flute_code: trim.paper_flute?.code || 'N/A',
+              is_composite: trim.is_composite === 1 || trim.is_composite === true,
               length_less: trim.length_less,
               length_add: trim.length_add
             };
           });
+          
+          // Sort the side trims by product design code, product code, and flute code
+          sideTrims.value.sort((a, b) => {
+            if (a.product_design_code === b.product_design_code) {
+              if (a.product_code === b.product_code) {
+                if (a.flute_code === b.flute_code) {
+                  return a.is_composite === b.is_composite ? 0 : a.is_composite ? 1 : -1;
+                }
+                return a.flute_code.localeCompare(b.flute_code);
+              }
+              return a.product_code.localeCompare(b.product_code);
+            }
+            return a.product_design_code.localeCompare(b.product_design_code);
+          });
+          
+          console.log('Processed side trims:', sideTrims.value);
         } else {
-          sideTrims.value = [];
+          console.log('No side trim data found. Attempting to seed...');
+          
+          // If no data, try to seed the database
+          try {
+            showNotification('No side trim data found. Seeding initial data...', 'info');
+            const seedResponse = await axios.post('/api/side-trims-by-product-design/seed');
+            
+            if (seedResponse.data && seedResponse.data.success) {
+              showNotification(seedResponse.data.message, 'success');
+              
+              // Fetch the data again after seeding
+              const newTrimsResponse = await axios.get('/api/side-trims-by-product-design');
+              
+              if (newTrimsResponse.data && newTrimsResponse.data.status === 'success' && 
+                  Array.isArray(newTrimsResponse.data.data) && newTrimsResponse.data.data.length > 0) {
+                
+                // Create a map of product designs by ID for faster lookups
+                const designsMap = new Map(productDesigns.value.map(design => [design.id, design]));
+                
+                // Create a map of products by ID for faster lookups
+                const productsMap = new Map(products.value.map(product => [product.id, product]));
+                
+                // Process the side trims data after seeding
+                sideTrims.value = newTrimsResponse.data.data.map(trim => {
+                  // Find the corresponding design and product using the maps
+                  const design = designsMap.get(trim.product_design_id);
+                  const product = productsMap.get(trim.product_id);
+                  
+                  return {
+                    id: trim.id,
+                    product_design_id: trim.product_design_id,
+                    product_id: trim.product_id,
+                    flute_id: trim.flute_id,
+                    product_design_code: design ? design.code : 'N/A',
+                    product_code: product ? product.code : 'N/A',
+                    flute_code: trim.paper_flute?.code || 'N/A',
+                    is_composite: trim.is_composite === 1 || trim.is_composite === true,
+                    length_less: trim.length_less,
+                    length_add: trim.length_add
+                  };
+                });
+                
+                // Sort the side trims
+                sideTrims.value.sort((a, b) => {
+                  if (a.product_design_code === b.product_design_code) {
+                    if (a.product_code === b.product_code) {
+                      if (a.flute_code === b.flute_code) {
+                        return a.is_composite === b.is_composite ? 0 : a.is_composite ? 1 : -1;
+                      }
+                      return a.flute_code.localeCompare(b.flute_code);
+                    }
+                    return a.product_code.localeCompare(b.product_code);
+                  }
+                  return a.product_design_code.localeCompare(b.product_design_code);
+                });
+              } else {
+                sideTrims.value = [];
+                showNotification('Failed to load side trim data after seeding', 'error');
+              }
+            } else {
+              sideTrims.value = [];
+              showNotification('Failed to seed side trim data', 'error');
+            }
+          } catch (seedError) {
+            console.error('Error seeding data:', seedError);
+            sideTrims.value = [];
+            showNotification('Failed to seed side trim data', 'error');
+          }
         }
       } catch (error) {
-        showNotification('Failed to load data', 'error');
+        console.error('Error loading data:', error);
+        
+        let errorMessage = 'Failed to load data';
+        
+        if (error.response) {
+          errorMessage += ` (Status: ${error.response.status})`;
+          if (error.response.data && error.response.data.message) {
+            errorMessage += `: ${error.response.data.message}`;
+          }
+        } else if (error.request) {
+          errorMessage += ': No response received from server';
+        } else {
+          errorMessage += `: ${error.message}`;
+        }
+        
+        showNotification(errorMessage, 'error');
         sideTrims.value = [];
       } finally {
         loading.value = false;

@@ -273,7 +273,9 @@ export default defineComponent({
         // Load side trims
         const trimsResponse = await axios.get('/api/side-trims-by-flute');
         
-        if (trimsResponse.data && trimsResponse.data.status === 'success') {
+        if (trimsResponse.data && trimsResponse.data.status === 'success' && Array.isArray(trimsResponse.data.data) && trimsResponse.data.data.length > 0) {
+          console.log('Received data from API:', trimsResponse.data.data);
+          // Process the data from the API response
           sideTrims.value = trimsResponse.data.data.map(trim => {
             const flute = trim.paper_flute || {};
             
@@ -284,7 +286,7 @@ export default defineComponent({
               flute_name: flute.name || 'N/A',
               length_add: trim.length_add,
               length_less: trim.length_less,
-              is_composite: trim.is_composite
+              is_composite: trim.is_composite === 1 || trim.is_composite === true
             };
           });
           
@@ -295,9 +297,49 @@ export default defineComponent({
             }
             return a.flute_code.localeCompare(b.flute_code);
           });
+          
+          console.log('Processed side trims:', sideTrims.value);
         } else {
-          sideTrims.value = [];
-          showNotification('No side trim data found. Please add new data.', 'info');
+          console.log('No data found or invalid response format:', trimsResponse.data);
+          // If no data from API, seed the database first
+          try {
+            showNotification('No side trim data found. Seeding initial data...', 'info');
+            await axios.post('/api/side-trims-by-flute/seed');
+            showNotification('Initial data has been seeded. Loading data...', 'success');
+            
+            // Try to fetch the data again after seeding
+            const newTrimsResponse = await axios.get('/api/side-trims-by-flute');
+            if (newTrimsResponse.data && newTrimsResponse.data.status === 'success' && Array.isArray(newTrimsResponse.data.data) && newTrimsResponse.data.data.length > 0) {
+              sideTrims.value = newTrimsResponse.data.data.map(trim => {
+                const flute = trim.paper_flute || {};
+                
+                return {
+                  id: trim.id,
+                  flute_id: trim.flute_id,
+                  flute_code: flute.code || 'N/A',
+                  flute_name: flute.name || 'N/A',
+                  length_add: trim.length_add,
+                  length_less: trim.length_less,
+                  is_composite: trim.is_composite === 1 || trim.is_composite === true
+                };
+              });
+              
+              // Sort by flute code and then by composite status
+              sideTrims.value.sort((a, b) => {
+                if (a.flute_code === b.flute_code) {
+                  return a.is_composite === b.is_composite ? 0 : a.is_composite ? 1 : -1;
+                }
+                return a.flute_code.localeCompare(b.flute_code);
+              });
+            } else {
+              sideTrims.value = [];
+              showNotification('Failed to load side trim data after seeding', 'error');
+            }
+          } catch (seedError) {
+            console.error('Error seeding data:', seedError);
+            sideTrims.value = [];
+            showNotification('Failed to seed side trim data', 'error');
+          }
         }
       } catch (error) {
         console.error('Error loading data:', error);

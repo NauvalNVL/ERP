@@ -245,7 +245,9 @@ export default defineComponent({
         // Load roll sizes
         const sizesResponse = await axios.get('/api/roll-sizes');
         
-        if (sizesResponse.data && sizesResponse.data.status === 'success') {
+        if (sizesResponse.data && sizesResponse.data.status === 'success' && Array.isArray(sizesResponse.data.data) && sizesResponse.data.data.length > 0) {
+          console.log('Received data from API:', sizesResponse.data.data);
+          // Process the data from the API response
           rollSizes.value = sizesResponse.data.data.map(size => {
             const flute = size.paper_flute || {};
             
@@ -254,7 +256,7 @@ export default defineComponent({
               flute_id: size.flute_id,
               flute_code: flute.code || 'N/A',
               roll_length: size.roll_length,
-              is_composite: size.is_composite
+              is_composite: size.is_composite === 1 || size.is_composite === true
             };
           });
           
@@ -265,9 +267,47 @@ export default defineComponent({
             }
             return a.flute_code.localeCompare(b.flute_code);
           });
+          
+          console.log('Processed roll sizes:', rollSizes.value);
         } else {
-          rollSizes.value = [];
-          showNotification('No roll size data found. Please add new data.', 'info');
+          console.log('No data found or invalid response format:', sizesResponse.data);
+          // If no data from API, seed the database first
+          try {
+            showNotification('No roll size data found. Seeding initial data...', 'info');
+            await axios.post('/api/roll-sizes/seed');
+            showNotification('Initial data has been seeded. Loading data...', 'success');
+            
+            // Try to fetch the data again after seeding
+            const newSizesResponse = await axios.get('/api/roll-sizes');
+            if (newSizesResponse.data && newSizesResponse.data.status === 'success' && Array.isArray(newSizesResponse.data.data) && newSizesResponse.data.data.length > 0) {
+              rollSizes.value = newSizesResponse.data.data.map(size => {
+                const flute = size.paper_flute || {};
+                
+                return {
+                  id: size.id,
+                  flute_id: size.flute_id,
+                  flute_code: flute.code || 'N/A',
+                  roll_length: size.roll_length,
+                  is_composite: size.is_composite === 1 || size.is_composite === true
+                };
+              });
+              
+              // Sort by flute code and then by roll length
+              rollSizes.value.sort((a, b) => {
+                if (a.flute_code === b.flute_code) {
+                  return a.roll_length - b.roll_length;
+                }
+                return a.flute_code.localeCompare(b.flute_code);
+              });
+            } else {
+              rollSizes.value = [];
+              showNotification('Failed to load roll size data after seeding', 'error');
+            }
+          } catch (seedError) {
+            console.error('Error seeding data:', seedError);
+            rollSizes.value = [];
+            showNotification('Failed to seed roll size data', 'error');
+          }
         }
       } catch (error) {
         console.error('Error loading data:', error);

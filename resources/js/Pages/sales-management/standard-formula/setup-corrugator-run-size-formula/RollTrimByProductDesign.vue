@@ -300,7 +300,8 @@ export default defineComponent({
         // Load roll trim by product design data
         const trimResponse = await axios.get('/api/roll-trim-by-product-design');
         
-        if (trimResponse.data && trimResponse.data.status === 'success' && trimResponse.data.data.length > 0) {
+        if (trimResponse.data && trimResponse.data.status === 'success' && Array.isArray(trimResponse.data.data) && trimResponse.data.data.length > 0) {
+          console.log('Received data from API:', trimResponse.data.data);
           // Process the data from the API response
           items.value = trimResponse.data.data.map(trim => {
             // Get related objects using the relationships from the API
@@ -316,17 +317,51 @@ export default defineComponent({
               product_design_name: design.pd_name || design.pd_alt_name || 'N/A',
               flute_id: trim.flute_id,
               flute_code: flute.code || 'N/A',
-              is_composite: trim.is_composite,
+              is_composite: trim.is_composite === 1 || trim.is_composite === true,
               min_trim: trim.min_trim,
               max_trim: trim.max_trim
             };
           });
-        } else {
-          // If no data from API, generate combinations of existing products, designs and flutes
-          items.value = generateCombinations();
           
-          // Show notification that we're using generated data
-          showNotification('No roll trim data found. Using generated combinations for editing.', 'info');
+          console.log('Processed items:', items.value);
+        } else {
+          console.log('No data found or invalid response format:', trimResponse.data);
+          // If no data from API, seed the database first
+          try {
+            await axios.post('/api/roll-trim-by-product-design/seed');
+            showNotification('Initial data has been seeded. Loading data...', 'success');
+            
+            // Try to fetch the data again after seeding
+            const newTrimResponse = await axios.get('/api/roll-trim-by-product-design');
+            if (newTrimResponse.data && newTrimResponse.data.status === 'success' && Array.isArray(newTrimResponse.data.data) && newTrimResponse.data.data.length > 0) {
+              items.value = newTrimResponse.data.data.map(trim => {
+                const product = trim.product || {};
+                const design = trim.product_design || {};
+                const flute = trim.paper_flute || {};
+                
+                return {
+                  id: trim.id,
+                  product_id: trim.product_id,
+                  product_code: product.product_code || 'N/A',
+                  product_design_id: trim.product_design_id,
+                  product_design_name: design.pd_name || design.pd_alt_name || 'N/A',
+                  flute_id: trim.flute_id,
+                  flute_code: flute.code || 'N/A',
+                  is_composite: trim.is_composite === 1 || trim.is_composite === true,
+                  min_trim: trim.min_trim,
+                  max_trim: trim.max_trim
+                };
+              });
+            } else {
+              // If still no data, generate combinations
+              items.value = generateCombinations();
+              showNotification('No roll trim data found. Using generated combinations for editing.', 'info');
+            }
+          } catch (seedError) {
+            console.error('Error seeding data:', seedError);
+            items.value = generateCombinations();
+            showNotification('No roll trim data found. Using generated combinations for editing.', 'info');
+          }
         }
         
         filteredItems.value = [...items.value];
