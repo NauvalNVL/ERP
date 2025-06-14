@@ -11,19 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('corrugator_spec_by_products', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->boolean('composite')->default(false);
-            $table->integer('min_sheet_length')->default(1);
-            $table->integer('max_sheet_length')->default(99999);
-            $table->integer('min_sheet_width')->default(1);
-            $table->integer('max_sheet_width')->default(99999);
-            $table->timestamps();
-            
-            // Add unique constraint to ensure one spec per product
-            $table->unique('product_id');
-        });
+        if (!Schema::hasTable('corrugator_spec_by_products')) {
+            Schema::create('corrugator_spec_by_products', function (Blueprint $table) {
+                $table->id();
+                $table->string('product_code', 50);
+                $table->boolean('composite')->default(false);
+                $table->integer('min_sheet_length')->default(1);
+                $table->integer('max_sheet_length')->default(99999);
+                $table->integer('min_sheet_width')->default(1);
+                $table->integer('max_sheet_width')->default(99999);
+                $table->timestamps();
+                
+                // Add unique constraint to ensure one spec per product
+                $table->unique('product_code');
+                
+                // Add foreign key if products table exists
+                if (Schema::hasTable('products')) {
+                    $table->foreign('product_code')
+                        ->references('product_code')
+                        ->on('products')
+                        ->onDelete('cascade');
+                }
+            });
+        }
     }
 
     /**
@@ -31,6 +41,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('corrugator_spec_by_products');
+        // Don't drop the table here as it might be used by other migrations
+        // Schema::dropIfExists('corrugator_spec_by_products');
     }
 }; 

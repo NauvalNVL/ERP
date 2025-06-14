@@ -14,6 +14,8 @@ use App\Http\Controllers\RollSizeController;
 use App\Http\Controllers\SideTrimByFluteController;
 use App\Http\Controllers\SideTrimByProductDesignController;
 use App\Http\Controllers\ProductDesignController;
+use App\Http\Controllers\ComputationMethodController;
+use App\Http\Controllers\FinishingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -113,3 +115,19 @@ Route::post('/product-designs', [ProductDesignController::class, 'apiStore']);
 Route::put('/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
 Route::delete('/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
 Route::get('/product-designs/export', [ProductDesignController::class, 'apiExport']); 
+
+// Computation Method API routes
+Route::get('/computation-methods', [ComputationMethodController::class, 'apiIndex']);
+Route::get('/computation-methods/{id}', [ComputationMethodController::class, 'apiShow']);
+Route::post('/computation-methods', [ComputationMethodController::class, 'apiStore']);
+Route::put('/computation-methods/{id}', [ComputationMethodController::class, 'apiUpdate']);
+Route::delete('/computation-methods/{id}', [ComputationMethodController::class, 'apiDestroy']);
+Route::get('/computation-methods/export', [ComputationMethodController::class, 'apiExport']);
+Route::post('/computation-methods/seed', [ComputationMethodController::class, 'apiSeed']); 
+
+// Finishing API routes
+Route::get('/finishings', [FinishingController::class, 'apiIndex']);
+Route::post('/finishings', [FinishingController::class, 'store']);
+Route::put('/finishings/{code}', [FinishingController::class, 'update']);
+Route::delete('/finishings/{code}', [FinishingController::class, 'destroy']);
+Route::post('/finishings/seed', [FinishingController::class, 'seed']); 

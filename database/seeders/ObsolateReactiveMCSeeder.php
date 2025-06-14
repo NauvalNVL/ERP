@@ -23,13 +23,15 @@ class ObsolateReactiveMCSeeder extends Seeder
         
         if ($customers->isEmpty()) {
             // If no customers exist, create a default one
-            $customer = UpdateCustomerAccount::create([
-                'customer_code' => 'CUST001',
-                'customer_name' => 'Default Customer',
-                'address' => 'Default Address',
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
-            ]);
+            $customer = UpdateCustomerAccount::updateOrCreate(
+                ['customer_code' => 'CUST001'],
+                [
+                    'customer_name' => 'Default Customer',
+                    'address' => 'Default Address',
+                    'created_by' => $user->id,
+                    'updated_by' => $user->id,
+                ]
+            );
             $customers = collect([$customer]);
         }
         
@@ -73,22 +75,24 @@ class ObsolateReactiveMCSeeder extends Seeder
         foreach ($masterCards as $masterCard) {
             $customer = $customers->random();
             
-            ObsolateReactiveMC::create([
-                'mc_seq' => $masterCard['mc_seq'],
-                'mc_model' => $masterCard['mc_model'],
-                'customer_id' => $customer->id,
-                'customer_name' => $customer->customer_name,
-                'description' => $masterCard['description'],
-                'status' => $masterCard['status'],
-                'obsolate_date' => $masterCard['obsolate_date'] ?? null,
-                'obsolate_by' => $masterCard['obsolate_by'] ?? null,
-                'obsolate_reason' => $masterCard['obsolate_reason'] ?? null,
-                'reactive_date' => $masterCard['reactive_date'] ?? null,
-                'reactive_by' => $masterCard['reactive_by'] ?? null,
-                'reactive_reason' => $masterCard['reactive_reason'] ?? null,
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
-            ]);
+            ObsolateReactiveMC::updateOrCreate(
+                ['mc_seq' => $masterCard['mc_seq']],
+                [
+                    'mc_model' => $masterCard['mc_model'],
+                    'customer_id' => $customer->id,
+                    'customer_name' => $customer->customer_name,
+                    'description' => $masterCard['description'],
+                    'status' => $masterCard['status'],
+                    'obsolate_date' => $masterCard['obsolate_date'] ?? null,
+                    'obsolate_by' => $masterCard['obsolate_by'] ?? null,
+                    'obsolate_reason' => $masterCard['obsolate_reason'] ?? null,
+                    'reactive_date' => $masterCard['reactive_date'] ?? null,
+                    'reactive_by' => $masterCard['reactive_by'] ?? null,
+                    'reactive_reason' => $masterCard['reactive_reason'] ?? null,
+                    'created_by' => $user->id,
+                    'updated_by' => $user->id,
+                ]
+            );
         }
     }
 }

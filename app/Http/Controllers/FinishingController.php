@@ -6,6 +6,7 @@ use App\Models\Finishing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Inertia\Inertia;
 
 class FinishingController extends Controller
 {
@@ -44,9 +45,10 @@ class FinishingController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-            'code' => 'required|unique:finishings,code',
+                'code' => 'required|unique:finishings,code',
                 'description' => 'required|string|max:255',
-        ]);
+                'is_compute' => 'boolean',
+            ]);
 
             if ($validator->fails()) {
                 return response()->json([
@@ -58,6 +60,7 @@ class FinishingController extends Controller
             $finishing = Finishing::create([
                 'code' => $request->code,
                 'description' => $request->description,
+                'is_compute' => $request->is_compute ?? false,
             ]);
 
             return response()->json([
@@ -87,7 +90,8 @@ class FinishingController extends Controller
             $validator = Validator::make($request->all(), [
                 'code' => 'required|string|max:10|unique:finishings,code,' . $finishing->id,
                 'description' => 'required|string|max:255',
-        ]);
+                'is_compute' => 'boolean',
+            ]);
 
             if ($validator->fails()) {
                 return response()->json([
@@ -100,6 +104,7 @@ class FinishingController extends Controller
             $finishing->update([
                 'code' => $request->code,
                 'description' => $request->description,
+                'is_compute' => $request->is_compute ?? $finishing->is_compute,
                 'updated_at' => now()
             ]);
 
@@ -180,37 +185,23 @@ class FinishingController extends Controller
     }
     
     /**
-     * Display the Vue index page for finishing management
+     * Display the Vue component for Finishing
      *
      * @return \Inertia\Response
      */
     public function vueIndex()
     {
-        try {
-            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/finishing', [
-                'header' => 'Finishing Management'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in FinishingController@vueIndex: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to load finishing data'], 500);
-        }
+        return Inertia::render('sales-management/standard-formula/stitching-computation-method/Finishing');
     }
     
     /**
-     * Display the Vue view and print page for finishing
+     * Display the Vue component for View & Print Finishing
      *
      * @return \Inertia\Response
      */
     public function vueViewAndPrint()
     {
-        try {
-            return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-finishing', [
-                'header' => 'View & Print Finishings'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in FinishingController@vueViewAndPrint: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to load finishing data for printing'], 500);
-        }
+        return Inertia::render('sales-management/standard-formula/stitching-computation-method/ViewPrintFinishing');
     }
 
     /**
@@ -239,11 +230,11 @@ class FinishingController extends Controller
         try {
             // Default finishings
             $defaultFinishings = [
-                ['code' => 'G', 'description' => 'Glue Application'],
-                ['code' => 'S', 'description' => 'Stitching'],
-                ['code' => 'A', 'description' => 'Assembly'],
-                ['code' => 'H', 'description' => 'Heat Treatment'],
-                ['code' => 'W', 'description' => 'Wrapping']
+                ['code' => 'G', 'description' => 'Glue Application', 'is_compute' => false],
+                ['code' => 'S', 'description' => 'Stitching', 'is_compute' => false],
+                ['code' => 'A', 'description' => 'Assembly', 'is_compute' => false],
+                ['code' => 'H', 'description' => 'Heat Treatment', 'is_compute' => false],
+                ['code' => 'W', 'description' => 'Wrapping', 'is_compute' => false]
             ];
 
             $created = [];
@@ -253,7 +244,8 @@ class FinishingController extends Controller
                 if (!$exists) {
                     $created[] = Finishing::create([
                         'code' => $finishing['code'],
-                        'description' => $finishing['description']
+                        'description' => $finishing['description'],
+                        'is_compute' => $finishing['is_compute']
                     ]);
                 }
             }

@@ -45,10 +45,44 @@ use App\Http\Controllers\RollTrimByProductDesignController;
 use App\Http\Controllers\RollSizeController;
 use App\Http\Controllers\SideTrimByFluteController;
 use App\Http\Controllers\SideTrimByProductDesignController;
+use App\Http\Controllers\ComputationMethodController;
+use App\Http\Controllers\BundlingComputationMethodController;
+use App\Http\Controllers\ComputationFormulaController;
 
 // Test Routes
 Route::get('/test-vue', function () {
     return Inertia::render('Dashboard');
+});
+
+Route::get('/test-finishings', function () {
+    try {
+        $finishings = [
+            ['code' => 'G', 'description' => 'Glue Application', 'is_compute' => false],
+            ['code' => 'S', 'description' => 'Stitching', 'is_compute' => false],
+            ['code' => 'A', 'description' => 'Assembly', 'is_compute' => false],
+            ['code' => 'H', 'description' => 'Heat Treatment', 'is_compute' => false],
+            ['code' => 'W', 'description' => 'Wrapping', 'is_compute' => false]
+        ];
+
+        $created = [];
+        foreach ($finishings as $finishing) {
+            $created[] = \App\Models\Finishing::updateOrCreate(
+                ['code' => $finishing['code']],
+                $finishing
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Test finishings created successfully',
+            'data' => $created
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error creating test finishings: ' . $e->getMessage()
+        ], 500);
+    }
 });
 
 Route::get('/', function () {
@@ -495,6 +529,22 @@ Route::prefix('api')->group(function () {
     Route::put('/corrugator-configs/{id}', [CorrugatorConfigController::class, 'apiUpdate']);
     Route::delete('/corrugator-configs/{id}', [CorrugatorConfigController::class, 'apiDestroy']);
     Route::post('/corrugator-configs/seed', [CorrugatorConfigController::class, 'apiSeed']);
+
+    // Bundling Computation Method API routes
+    Route::get('/bundling-computation-methods', [BundlingComputationMethodController::class, 'apiIndex']);
+    Route::get('/bundling-computation-methods/{id}', [BundlingComputationMethodController::class, 'apiShow']);
+    Route::post('/bundling-computation-methods', [BundlingComputationMethodController::class, 'apiStore']);
+    Route::put('/bundling-computation-methods/{id}', [BundlingComputationMethodController::class, 'apiUpdate']);
+    Route::delete('/bundling-computation-methods/{id}', [BundlingComputationMethodController::class, 'apiDestroy']);
+    Route::post('/bundling-computation-methods/seed', [BundlingComputationMethodController::class, 'apiSeed']);
+
+    // Diecut Computation Formula API routes
+    Route::get('/diecut-computation-formulas', [ComputationFormulaController::class, 'apiIndex']);
+    Route::get('/diecut-computation-formulas/{id}', [ComputationFormulaController::class, 'apiShow']);
+    Route::post('/diecut-computation-formulas', [ComputationFormulaController::class, 'apiStore']);
+    Route::put('/diecut-computation-formulas/{id}', [ComputationFormulaController::class, 'apiUpdate']);
+    Route::delete('/diecut-computation-formulas/{id}', [ComputationFormulaController::class, 'apiDestroy']);
+    Route::post('/diecut-computation-formulas/seed', [ComputationFormulaController::class, 'apiSeed']);
 });
 
 // Roll Size Route
@@ -526,3 +576,51 @@ Route::get('/standard-formula/setup-corrugator-run-size-formula/product-design',
 Route::get('/standard-formula/setup-corrugator-run-size-formula/product-design/view-print', function () {
     return Inertia::render('sales-management/standard-formula/setup-corrugator-run-size-formula/ViewPrintProductDesign');
 })->name('setup.product.design.view-print');
+
+// Computation Method Route
+Route::get('/standard-formula/stitching-computation-method', [ComputationMethodController::class, 'index'])->name('vue.standard-formula.stitching-computation-method');
+
+// Finishing Routes
+Route::get('/standard-formula/stitching-computation/finishing', [App\Http\Controllers\FinishingController::class, 'vueIndex'])->name('finishing.index');
+Route::get('/standard-formula/stitching-computation/finishing/view-print', [App\Http\Controllers\FinishingController::class, 'vueViewAndPrint'])->name('finishing.view-print');
+
+Route::get('/finishings/test-data', function () {
+    try {
+        $finishings = [
+            ['code' => 'G', 'description' => 'Glue Application', 'is_compute' => false],
+            ['code' => 'S', 'description' => 'Stitching', 'is_compute' => false],
+            ['code' => 'A', 'description' => 'Assembly', 'is_compute' => false],
+            ['code' => 'H', 'description' => 'Heat Treatment', 'is_compute' => false],
+            ['code' => 'W', 'description' => 'Wrapping', 'is_compute' => false]
+        ];
+
+        $created = [];
+        foreach ($finishings as $finishing) {
+            $created[] = \App\Models\Finishing::updateOrCreate(
+                ['code' => $finishing['code']],
+                $finishing
+            );
+        }
+
+        return response()->json($created);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error creating test finishings: ' . $e->getMessage()
+        ], 500);
+    }
+});
+
+// Define routes for the Bundling Computation Method feature
+Route::get('/standard-formula/bundling-computation/method', [BundlingComputationMethodController::class, 'index'])->name('vue.standard-formula.bundling-computation.method');
+Route::get('/standard-formula/bundling-computation/view-print-method', [BundlingComputationMethodController::class, 'viewPrint'])->name('vue.standard-formula.bundling-computation.view-print-method');
+
+// Define routes for the Diecut Computation Method feature
+Route::get('/standard-formula/diecut-computation/formula', [ComputationFormulaController::class, 'index'])->name('vue.standard-formula.diecut-computation.formula');
+Route::get('/standard-formula/diecut-computation/view-print-formula', [ComputationFormulaController::class, 'viewPrint'])->name('vue.standard-formula.diecut-computation.view-print-formula');
+Route::get('/standard-formula/diecut-computation/product-design', function() {
+    return Inertia::render('sales-management/standard-formula/diecut-computation-method/ProductDesign');
+})->name('vue.standard-formula.diecut-computation.product-design');
+Route::get('/standard-formula/diecut-computation/view-print-product-design', function() {
+    return Inertia::render('sales-management/standard-formula/diecut-computation-method/ViewPrintProductDesign');
+})->name('vue.standard-formula.diecut-computation.view-print-product-design');

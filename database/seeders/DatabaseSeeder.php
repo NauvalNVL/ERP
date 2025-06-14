@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             CustomerSalesTypeSeeder::class,
             CorrugatorConfigSeeder::class,
             CorrugatorSpecByProductSeeder::class,
+            BundlingComputationMethodSeeder::class,
         ]);
     }
 }

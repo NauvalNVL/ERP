@@ -307,9 +307,9 @@ const salesManagementItems = [
         title: 'Define Stitching Computation Method',
         icon: 'fas fa-paperclip',
         children: [
-          { title: 'Define Computation Method', icon: 'fas fa-calculator', route: '/standard-formula/stitching-computation/method' },
+          { title: 'Define Computation Method', icon: 'fas fa-calculator', route: '/standard-formula/stitching-computation-method' },
           { title: 'Define Finishing', icon: 'fas fa-paint-roller', route: '/standard-formula/stitching-computation/finishing' },
-          { title: 'View & Print Finishing', icon: 'fas fa-print', route: '/standard-formula/stitching-computation/view-print-finishing' }
+          { title: 'View & Print Finishing', icon: 'fas fa-print', route: '/standard-formula/stitching-computation/finishing/view-print' }
         ]
       },
       {
@@ -326,6 +326,7 @@ const salesManagementItems = [
         children: [
           { title: 'Define Computation Formula', icon: 'fas fa-calculator', route: '/standard-formula/diecut-computation/formula' },
           { title: 'Define Product Design', icon: 'fas fa-drafting-compass', route: '/standard-formula/diecut-computation/product-design' },
+          { title: 'View & Print Computation Formula', icon: 'fas fa-print', route: '/standard-formula/diecut-computation/view-print-formula' },
           { title: 'View & Print Product Design', icon: 'fas fa-print', route: '/standard-formula/diecut-computation/view-print-product-design' }
         ]
       }

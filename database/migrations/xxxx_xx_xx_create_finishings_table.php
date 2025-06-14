@@ -6,18 +6,29 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        Schema::create('finishings', function (Blueprint $table) {
-            $table->id();
-            $table->string('code', 10)->unique();
-            $table->string('description');
-            $table->timestamps();
-        });
+        // Skip creating the table if it already exists
+        if (!Schema::hasTable('finishings')) {
+            Schema::create('finishings', function (Blueprint $table) {
+                $table->id();
+                $table->string('code', 10)->unique();
+                $table->string('description');
+                $table->boolean('compute')->default(false);
+                $table->timestamps();
+            });
+        }
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
-        Schema::dropIfExists('finishings');
+        // Don't drop the table here as it might be used by other migrations
+        // Schema::dropIfExists('finishings');
     }
 }; 

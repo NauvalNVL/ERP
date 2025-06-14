@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roll_trims_by_corrugator', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('flute_id');
-            $table->integer('min_trim')->default(0);
-            $table->integer('max_trim')->default(100);
-            $table->timestamps();
-
-            $table->foreign('flute_id')->references('id')->on('paper_flutes')->onDelete('cascade');
-            $table->unique('flute_id');
-        });
+        // Skip creating the table if it already exists
+        if (!Schema::hasTable('roll_trims_by_corrugator')) {
+            Schema::create('roll_trims_by_corrugator', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('flute_id')->constrained('paper_flutes');
+                $table->integer('min_trim')->default(0);
+                $table->integer('max_trim')->default(100);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -28,6 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roll_trims_by_corrugator');
+        // Don't drop the table here as it might be used by other migrations
+        // Schema::dropIfExists('roll_trims_by_corrugator');
     }
 };

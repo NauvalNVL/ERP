@@ -49,7 +49,7 @@ class CorrugatorSpecByProductSeeder extends Seeder
             // If product exists, create the specification
             if ($product) {
                 CorrugatorSpecByProduct::create([
-                    'product_id' => $product->id,
+                    'product_code' => $spec['code'],
                     'composite' => $spec['composite'],
                     'min_sheet_length' => $spec['min_length'],
                     'max_sheet_length' => $spec['max_length'],

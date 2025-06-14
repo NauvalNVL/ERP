@@ -12,7 +12,7 @@ class CorrugatorSpecByProduct extends Model
     protected $table = 'corrugator_spec_by_products';
 
     protected $fillable = [
-        'product_id',
+        'product_code',
         'composite',
         'min_sheet_length',
         'max_sheet_length',
@@ -33,6 +33,6 @@ class CorrugatorSpecByProduct extends Model
      */
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class, 'product_code', 'product_code');
     }
 } 

@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Skip if table already exists
         if (!Schema::hasTable('product_groups')) {
             Schema::create('product_groups', function (Blueprint $table) {
                 $table->id();
-                $table->string('product_group_id', 10)->unique();
-                $table->string('product_group_name', 100);
+                $table->string('product_group_id', 50)->unique();
+                $table->string('product_group_name');
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();
             });
@@ -28,7 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Don't drop the table here as it might be used by other migrations
         // Schema::dropIfExists('product_groups');
     }
-}; 
+};
