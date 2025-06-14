@@ -227,14 +227,6 @@
         </div>
     </div>
 
-    <!-- Paper Flute Modal -->
-    <PapeFluteSelector
-      :show="showPaperFluteModal"
-      :flutes="paperFlutes"
-      @select="onFluteSelected"
-      @close="showPaperFluteModal = false"
-    />
-
     <!-- Product Design Modal -->
     <ProductDesignModal
       :show="showProductDesignModal"
@@ -364,7 +356,6 @@
 import { ref, onMounted, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import PapeFluteSelector from '@/Components/paper-flute-selector-modal.vue';
 import ProductDesignModal from '@/Components/product-design-modal.vue';
 
 // Form data
@@ -457,8 +448,50 @@ const fetchPaperFlutes = async () => {
 
 // Handle flute selection from modal
 const onFluteSelected = (flute) => {
+  console.log("Selected flute:", flute);
+  if (!flute || !flute.code) {
+    console.error("Invalid flute object:", flute);
+    showNotification("Error selecting flute: Invalid data", 'error');
+    return;
+  }
+
+  // Set the display value
   form.value.paperFlute = flute.code;
-  form.value.paper_flute_id = flute.id;
+  
+  // Try to get a valid numeric ID
+  let validId = null;
+  
+  // First try from the selected flute
+  if (flute.id !== undefined && flute.id !== null) {
+    const parsedId = parseInt(flute.id, 10);
+    if (!isNaN(parsedId)) {
+      validId = parsedId;
+      console.log("Using ID directly from selected flute:", validId);
+    }
+  }
+  
+  // If that didn't work, try to find the flute in our cached list
+  if (validId === null) {
+    const matchedFlute = paperFlutes.value.find(f => f.code === flute.code);
+    if (matchedFlute && matchedFlute.id !== undefined && matchedFlute.id !== null) {
+      const parsedId = parseInt(matchedFlute.id, 10);
+      if (!isNaN(parsedId)) {
+        validId = parsedId;
+        console.log("Found ID from cached flutes list:", validId);
+      }
+    }
+  }
+  
+  // Set the ID or show warning if not found
+  if (validId !== null) {
+    form.value.paper_flute_id = validId;
+    console.log("Set paper_flute_id to:", validId);
+  } else {
+    form.value.paper_flute_id = null;
+    console.error("Could not find a valid numeric ID for flute:", flute.code);
+    showNotification("Warning: Could not find a valid ID for the selected flute. Please try selecting again.", 'warning');
+  }
+  
   showPaperFluteModal.value = false;
   showNotification(`Selected paper flute: ${flute.code}`, 'success');
 };
@@ -498,10 +531,98 @@ const fetchProductDesigns = async () => {
 
 // Add function to handle product design selection
 const onProductDesignSelected = (design) => {
+  console.log("Selected product design:", design);
+  if (!design || !design.pd_code) {
+    console.error("Invalid product design object:", design);
+    showNotification("Error selecting product design: Invalid data", 'error');
+    return;
+  }
+
+  // Set the display value
   form.value.productDesign = design.pd_code;
-  form.value.product_design_id = design.id;
+  
+  // IMPORTANT FIX: For product designs with codes like "APP" or "LAYER", we need to use the actual ID
+  // First, log the full design object to see what's available
+  console.log("Full design object:", design);
+  
+  // Try to get a valid numeric ID
+  let validId = null;
+  
+  // First try from the selected design
+  if (design.id !== undefined && design.id !== null) {
+    const parsedId = parseInt(design.id, 10);
+    if (!isNaN(parsedId)) {
+      validId = parsedId;
+      console.log("Using ID directly from selected design:", validId);
+    }
+  }
+  
+  // If that didn't work, try to find the design in our cached list
+  if (validId === null) {
+    // Log the product designs list to debug
+    console.log("Available product designs:", productDesigns.value);
+    
+    const matchedDesign = productDesigns.value.find(d => d.pd_code === design.pd_code);
+    console.log("Matched design from cache:", matchedDesign);
+    
+    if (matchedDesign && matchedDesign.id !== undefined && matchedDesign.id !== null) {
+      const parsedId = parseInt(matchedDesign.id, 10);
+      if (!isNaN(parsedId)) {
+        validId = parsedId;
+        console.log("Found ID from cached designs list:", validId);
+      }
+    }
+  }
+  
+  // FALLBACK: If we still don't have an ID, make a direct API call to get the design by code
+  if (validId === null) {
+    console.log("Attempting to fetch product design by code:", design.pd_code);
+    fetchProductDesignByCode(design.pd_code);
+  } else {
+    // Set the ID if we found it
+    form.value.product_design_id = validId;
+    console.log("Set product_design_id to:", validId);
+  }
+  
   showProductDesignModal.value = false;
   showNotification(`Selected product design: ${design.pd_code}`, 'success');
+};
+
+// Add new function to fetch product design by code
+const fetchProductDesignByCode = async (code) => {
+  loading.value = true;
+  try {
+    console.log("Fetching product design by code:", code);
+    
+    const response = await fetch(`/api/product-designs/by-code/${encodeURIComponent(code)}`, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch product design by code: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("API response for product design by code:", data);
+    
+    if (data && data.id) {
+      form.value.product_design_id = parseInt(data.id, 10);
+      console.log("Set product_design_id from API lookup:", form.value.product_design_id);
+    } else {
+      console.error("API returned data but no valid ID for code:", code);
+      form.value.product_design_id = null;
+      showNotification(`Could not find a valid ID for product design: ${code}. Please try selecting again or contact support.`, 'warning');
+    }
+  } catch (error) {
+    console.error("Error fetching product design by code:", error);
+    form.value.product_design_id = null;
+    showNotification(`Error looking up product design: ${error.message}`, 'error');
+  } finally {
+    loading.value = false;
+  }
 };
 
 // Open product design modal
@@ -530,8 +651,34 @@ const showNotification = (message, type = 'success') => {
 
 // Add function to save the formula
 const saveFormula = async () => {
+  // Add more detailed debugging
+  console.log("=== SAVE FORMULA DEBUG INFO ===");
+  console.log("Form object:", form.value);
+  console.log("product_design_id (raw):", form.value.product_design_id);
+  console.log("product_design_id (type):", typeof form.value.product_design_id);
+  console.log("paper_flute_id (raw):", form.value.paper_flute_id);
+  console.log("paper_flute_id (type):", typeof form.value.paper_flute_id);
+  
+  // Check if both values are present
   if (!form.value.product_design_id || !form.value.paper_flute_id) {
+    console.log("VALIDATION FAILED: Missing IDs");
+    console.log("product_design_id exists:", !!form.value.product_design_id);
+    console.log("paper_flute_id exists:", !!form.value.paper_flute_id);
     showNotification('Please select both Product Design and Paper Flute', 'warning');
+    return;
+  }
+  
+  // Convert IDs to numbers and check if they're valid
+  const productDesignId = Number(form.value.product_design_id);
+  const paperFluteId = Number(form.value.paper_flute_id);
+  
+  console.log("Converted IDs:");
+  console.log("productDesignId:", productDesignId, "isNaN:", isNaN(productDesignId));
+  console.log("paperFluteId:", paperFluteId, "isNaN:", isNaN(paperFluteId));
+  
+  if (isNaN(productDesignId) || isNaN(paperFluteId)) {
+    console.log("VALIDATION FAILED: Invalid numeric IDs");
+    showNotification('Invalid ID values. Please reselect Product Design and Paper Flute', 'warning');
     return;
   }
   
@@ -540,6 +687,21 @@ const saveFormula = async () => {
   try {
     // Get fresh CSRF token
     const csrfToken = getCsrfToken();
+    console.log("Got CSRF token:", csrfToken ? "Yes" : "No");
+    
+    const requestBody = {
+      product_design_id: productDesignId,
+      paper_flute_id: paperFluteId,
+      scoring_length_formula: form.value.scoring_length_formula,
+      scoring_width_formula: form.value.scoring_width_formula,
+      length_conversion: parseFloat(form.value.length_conversion),
+      width_conversion: parseFloat(form.value.width_conversion),
+      height_conversion: parseFloat(form.value.height_conversion),
+      is_active: form.value.is_active,
+      notes: form.value.notes
+    };
+    
+    console.log("Request body:", requestBody);
     
     const response = await fetch('/api/scoring-formulas', {
       method: 'POST',
@@ -549,21 +711,12 @@ const saveFormula = async () => {
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest'
       },
-      body: JSON.stringify({
-        product_design_id: form.value.product_design_id,
-        paper_flute_id: form.value.paper_flute_id,
-        scoring_length_formula: form.value.scoring_length_formula,
-        scoring_width_formula: form.value.scoring_width_formula,
-        length_conversion: form.value.length_conversion,
-        width_conversion: form.value.width_conversion,
-        height_conversion: form.value.height_conversion,
-        is_active: form.value.is_active,
-        notes: form.value.notes
-      }),
+      body: JSON.stringify(requestBody),
       credentials: 'same-origin'
     });
     
     const result = await response.json();
+    console.log("API response:", result);
     
     if (response.ok && result.success) {
       showNotification('Scoring formula saved successfully', 'success');

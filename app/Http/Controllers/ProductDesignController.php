@@ -530,4 +530,28 @@ class ProductDesignController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get a product design by its code
+     */
+    public function getByCode($code)
+    {
+        try {
+            $design = ProductDesign::where('pd_code', $code)->first();
+            
+            if (!$design) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product design not found'
+                ], 404);
+            }
+            
+            return response()->json($design);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving product design: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

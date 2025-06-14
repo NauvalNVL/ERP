@@ -361,7 +361,9 @@ Route::prefix('api')->group(function () {
     Route::put('/products/{id}', [ProductController::class, 'apiUpdate']);
     Route::delete('/products/{id}', [ProductController::class, 'apiDestroy']);
     
+    // Product Designs API routes - Fixed duplicate /api prefix
     Route::get('/product-designs', [ProductDesignController::class, 'getDesignsJson']);
+    Route::get('/product-designs/by-code/{code}', [ProductDesignController::class, 'getByCode']);
     Route::post('/product-designs', [ProductDesignController::class, 'apiStore']);
     Route::put('/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
     Route::delete('/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
