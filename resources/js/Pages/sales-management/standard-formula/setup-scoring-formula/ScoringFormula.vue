@@ -244,6 +244,86 @@
       @close="showProductDesignModal = false"
     />
 
+    <!-- Paper Flute Table Modal -->
+    <div v-if="showPaperFluteModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-4 py-3 sm:px-6 flex justify-between items-center">
+            <h3 class="text-lg leading-6 font-medium text-white flex items-center">
+              <i class="fas fa-layer-group mr-2"></i>
+              Paper Flute Table
+            </h3>
+            <button @click="showPaperFluteModal = false" class="text-white hover:text-gray-200 focus:outline-none">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <div class="bg-gray-50 px-4 py-3">
+            <div class="relative rounded-md shadow-sm">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
+              <input type="text" v-model="fluteSearch" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Search flutes...">
+            </div>
+          </div>
+
+          <div class="max-h-96 overflow-y-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-100 sticky top-0">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider bg-blue-50 border-b-2 border-blue-200">
+                    Paper Flute
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider bg-blue-50 border-b-2 border-blue-200">
+                    Description
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="flute in filteredFlutes" :key="flute.code" 
+                    @click="onFluteSelected(flute)" 
+                    class="hover:bg-blue-50 cursor-pointer transition-colors duration-150">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                        <span class="text-blue-700 font-semibold">{{ flute.code.charAt(0) }}</span>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ flute.code }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ flute.description || 'No description' }}</div>
+                  </td>
+                </tr>
+                <tr v-if="filteredFlutes.length === 0">
+                  <td colspan="2" class="px-6 py-4 text-center text-sm text-gray-500">
+                    <div class="flex flex-col items-center py-6">
+                      <i class="fas fa-search text-gray-400 text-3xl mb-2"></i>
+                      <p>No flutes found matching your search</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button @click="showPaperFluteModal = false" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Loading Overlay -->
     <div v-if="loading" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
       <div class="bg-white p-5 rounded-lg shadow-lg flex items-center">
@@ -281,7 +361,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PapeFluteSelector from '@/Components/paper-flute-selector-modal.vue';
@@ -307,6 +387,17 @@ const paperFlutes = ref([]);
 const showPaperFluteModal = ref(false);
 const loading = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
+const fluteSearch = ref('');
+
+// Computed property for filtered flutes
+const filteredFlutes = computed(() => {
+  if (!fluteSearch.value) return paperFlutes.value;
+  const searchTerm = fluteSearch.value.toLowerCase();
+  return paperFlutes.value.filter(flute => 
+    flute.code.toLowerCase().includes(searchTerm) || 
+    (flute.description && flute.description.toLowerCase().includes(searchTerm))
+  );
+});
 
 // Reference to the CSRF form
 const csrfForm = ref(null);

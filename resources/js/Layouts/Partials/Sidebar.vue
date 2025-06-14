@@ -223,14 +223,6 @@ const salesManagementItems = [
         ]
       },
       {
-        title: 'Standard Formula',
-        icon: 'fas fa-calculator',
-        children: [
-          { title: 'Define Product Design', icon: 'fas fa-drafting-compass', route: '/product-design/standard-formula' },
-          // Add other standard formula items here
-        ]
-      },
-      {
         title: 'Customer Account',
         icon: 'fas fa-user-circle',
         children: [
