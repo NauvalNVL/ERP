@@ -17,6 +17,7 @@ use App\Http\Controllers\ProductDesignController;
 use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\ApproveMcController;
+use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -138,4 +139,8 @@ Route::post('/finishings/seed', [FinishingController::class, 'seed']);
 
 // Approve MC API routes
 Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);
-Route::get('/mc-auto-wo-not-releasing', [ApproveMcController::class, 'apiIndexMcAutoWoNotReleasing']); 
+Route::get('/mc-auto-wo-not-releasing', [ApproveMcController::class, 'apiIndexMcAutoWoNotReleasing']);
+
+// Sales Order Report API routes
+Route::get('/report-formats', [SalesOrderReportController::class, 'apiIndexReportFormats']);
+Route::post('/so-report', [SalesOrderReportController::class, 'apiGenerateSoReport']); 

@@ -215,6 +215,27 @@ Route::middleware('auth')->group(function () {
          Route::get('/sales-order/setup/print-mc-auto-wo', function () {
              return Inertia::render('sales-management/sales-order/setup/print-mc-auto-wo');
          })->name('vue.sales-order.setup.print-mc-auto-wo');
+
+         // Sales Order Report - Rough Cut Report - Define Report Format
+         Route::get('/sales-order/report/rough-cut-report/define-report-format', function () {
+             return Inertia::render('sales-management/sales-order/report/rough-cut-report/define-report-format');
+         })->name('vue.sales-order.report.rough-cut-report.define-report-format');
+
+         // Sales Order Report - Rough Cut Report - Print Rough Cut Report
+         Route::get('/sales-order/report/rough-cut-report/print-rough-cut-report', function () {
+             return Inertia::render('sales-management/sales-order/report/rough-cut-report/print-rough-cut-report');
+         })->name('vue.sales-order.report.rough-cut-report.print-rough-cut-report');
+
+         // Sales Order Report - Print SO Cancel Report
+         Route::get('/sales-order/report/print-so-cancel-report', function () {
+             return Inertia::render('sales-management/sales-order/report/print-so-cancel-report');
+         })->name('vue.sales-order.report.print-so-cancel-report');
+
+         // Sales Order Report - Print SO Report
+         Route::get('/sales-order/report/print-so-report', function () {
+             return Inertia::render('sales-management/sales-order/report/print-so-report');
+         })->name('vue.sales-order.report.print-so-report');
+
          Route::get('/scoring-formula', [ScoringFormulaController::class, 'index'])->name('vue.scoring-formula.index');
          Route::get('/scoring-formula/view-print', [ScoringFormulaController::class, 'viewAndPrint'])->name('vue.scoring-formula.view-print');
          

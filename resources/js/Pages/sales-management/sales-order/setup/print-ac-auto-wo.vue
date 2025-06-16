@@ -115,9 +115,9 @@
                 <li>You can search or sort data before printing</li>
                 <li>Only the table will be included in the print output</li>
             </ul>
-        </div>
+      </div>
     </div>
-    </AppLayout>
+  </AppLayout>
 </template>
 
 <script setup>
@@ -244,7 +244,7 @@ const printTable = () => {
 onMounted(() => {
     fetchCustomers();
 });
-</script>
+</script> 
 
 <style scoped>
 /* Add any specific styles here if needed */
