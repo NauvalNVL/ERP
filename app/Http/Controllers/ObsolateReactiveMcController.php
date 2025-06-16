@@ -141,4 +141,20 @@ class ObsolateReactiveMcController extends Controller
         $masterCards = ObsolateReactiveMC::where('customer_id', $customerId)->get();
         return response()->json($masterCards);
     }
+    
+    /**
+     * Display the View and Print Master Cards page
+     */
+    public function viewAndPrint()
+    {
+        return Inertia::render('sales-management/system-requirement/master-card/view-and-print-MC');
+    }
+    
+    /**
+     * Display the View and Print MC Maintenance Log page
+     */
+    public function viewAndPrintMcMaintenanceLog()
+    {
+        return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log');
+    }
 }

@@ -317,8 +317,14 @@ Route::middleware('auth')->group(function () {
          // Add route for realese-approve-mc
          Route::get('/sales-management/system-requirement/master-card/realese-approve-mc', [RealeseApproveMcController::class, 'index'])->name('vue.master-card.realese-approve-mc');
 
-         // Add route for obsolate-reactive-mc
-         Route::get('/sales-management/system-requirement/master-card/obsolate-reactive-mc', [ObsolateReactiveMcController::class, 'index'])->name('vue.master-card.obsolate-reactive-mc');
+                  // Add route for obsolate-reactive-mc
+        Route::get('/sales-management/system-requirement/master-card/obsolate-reactive-mc', [ObsolateReactiveMcController::class, 'index'])->name('vue.master-card.obsolate-reactive-mc');
+
+        // Add route for view-and-print-MC
+        Route::get('/sales-management/system-requirement/master-card/view-and-print-MC', [ObsolateReactiveMcController::class, 'viewAndPrint'])->name('vue.master-card.view-and-print-mc');
+
+        // Add route for view-and-print-mc-maintenance-log
+        Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log', [ObsolateReactiveMcController::class, 'viewAndPrintMcMaintenanceLog'])->name('vue.master-card.view-and-print-mc-maintenance-log');
 
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
