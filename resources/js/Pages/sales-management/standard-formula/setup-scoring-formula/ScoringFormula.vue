@@ -357,6 +357,7 @@ import { ref, onMounted, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ProductDesignModal from '@/Components/product-design-modal.vue';
+import axios from 'axios';
 
 // Form data
 const form = ref({
@@ -685,9 +686,16 @@ const saveFormula = async () => {
   loading.value = true;
   
   try {
-    // Get fresh CSRF token
-    const csrfToken = getCsrfToken();
-    console.log("Got CSRF token:", csrfToken ? "Yes" : "No");
+    // Get CSRF token from meta tag
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    console.log("CSRF token from meta tag:", csrfToken ? "Found" : "Not found");
+    
+    if (!csrfToken) {
+      console.error("CSRF token not found in meta tag");
+      showNotification('CSRF token not found. Please refresh the page and try again.', 'error');
+      loading.value = false;
+      return;
+    }
     
     const requestBody = {
       product_design_id: productDesignId,
@@ -703,30 +711,31 @@ const saveFormula = async () => {
     
     console.log("Request body:", requestBody);
     
-    const response = await fetch('/api/scoring-formulas', {
-      method: 'POST',
+    // Use axios instead of fetch for better handling of CSRF
+    const response = await axios.post('/api/scoring-formulas', requestBody, {
       headers: {
-        'Content-Type': 'application/json',
         'X-CSRF-TOKEN': csrfToken,
+        'Content-Type': 'application/json',
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest'
-      },
-      body: JSON.stringify(requestBody),
-      credentials: 'same-origin'
+      }
     });
     
-    const result = await response.json();
-    console.log("API response:", result);
+    console.log("API response:", response.data);
     
-    if (response.ok && result.success) {
+    if (response.data && response.data.success) {
       showNotification('Scoring formula saved successfully', 'success');
       // Optionally reset form or redirect
     } else {
-      showNotification(result.message || 'Error saving formula', 'error');
+      showNotification(response.data?.message || 'Error saving formula', 'error');
     }
   } catch (e) {
     console.error('Error saving formula:', e);
-    showNotification('Error saving formula: ' + e.message, 'error');
+    if (e.response && e.response.status === 419) {
+      showNotification('CSRF token mismatch. Please refresh the page and try again.', 'error');
+    } else {
+      showNotification('Error saving formula: ' + (e.response?.data?.message || e.message), 'error');
+    }
   } finally {
     loading.value = false;
   }
