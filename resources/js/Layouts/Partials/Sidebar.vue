@@ -250,7 +250,7 @@ const salesManagementItems = [
           { title: 'View & Print MC Maintenance Log', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log' },
           { title: 'View & Print MC Approval Log', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/view-and-print-mc-approval-log' },
           { title: 'View & Print Non-Active MC', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/view-and-print-non-active-mc' },
-          { title: 'Initialized MC Maintenance Log', icon: 'fas fa-file-alt', route: null },
+          { title: 'Initialized MC Maintenance Log', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/initialized-mc-maintenance-log' },
           { title: 'View & Print MC Print/DC Block Listing', icon: 'fas fa-file-alt', route: null },
           { title: 'View & Print MC DC Block Matching', icon: 'fas fa-file-alt', route: null },
           { title: 'View & Print MC by Color', icon: 'fas fa-file-alt', route: null },

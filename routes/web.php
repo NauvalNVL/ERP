@@ -336,6 +336,11 @@ Route::middleware('auth')->group(function () {
             return Inertia::render('sales-management/system-requirement/master-card/view-and-print-non-active-mc');
         })->name('vue.master-card.view-and-print-non-active-mc');
 
+        // Add route for initialized-mc-maintenance-log
+        Route::get('/sales-management/system-requirement/master-card/initialized-mc-maintenance-log', function() {
+            return Inertia::render('sales-management/system-requirement/master-card/initialized-mc-maintenance-log');
+        })->name('vue.master-card.initialized-mc-maintenance-log');
+
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
