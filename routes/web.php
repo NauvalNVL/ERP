@@ -331,6 +331,11 @@ Route::middleware('auth')->group(function () {
             return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-approval-log');
         })->name('vue.master-card.view-and-print-mc-approval-log');
 
+        // Add route for view-and-print-non-active-mc
+        Route::get('/sales-management/system-requirement/master-card/view-and-print-non-active-mc', function() {
+            return Inertia::render('sales-management/system-requirement/master-card/view-and-print-non-active-mc');
+        })->name('vue.master-card.view-and-print-non-active-mc');
+
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
