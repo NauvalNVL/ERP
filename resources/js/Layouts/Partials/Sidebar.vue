@@ -357,7 +357,7 @@ const salesManagementItems = [
     title: 'Customer Service',
     icon: 'fas fa-headset',
     children: [
-      { title: 'Customer Service Dashboard', icon: 'fas fa-chart-line', route: '/sales-management/customer-service/customer-service-dashboard' },
+      { title: 'Customer Service Dashboard', icon: 'fas fa-chart-line', route: '/customer-service/dashboard' },
       { title: 'Customer Account Credit', icon: 'fas fa-credit-card', route: '/sales-management/customer-service/customer-account-credit' },
       { title: 'Sales Order Delivery Schedule', icon: 'fas fa-calendar-alt', route: '/sales-management/customer-service/sales-order-delivery-schedule' },
       { title: 'Customer Finished Goods', icon: 'fas fa-box-open', route: '/sales-management/customer-service/customer-finished-goods' },

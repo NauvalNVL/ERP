@@ -259,7 +259,7 @@ Route::middleware('auth')->group(function () {
          Route::get('/customer-service/production-monitoring-board', function () {
              return Inertia::render('sales-management/customer-service/production-monitoring-board');
          })->name('vue.customer-service.production-monitoring-board');
-
+         
          // Standard Requirement Routes
          Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team.index');
          Route::get('/sales-team/view-print', [SalesTeamController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');
