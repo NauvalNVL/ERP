@@ -53,7 +53,7 @@
                     <div class="text-teal-600 mr-3 mt-1">
                         <i class="fas fa-info-circle text-xl"></i>
                     </div>
-                    <div>
+    <div>
                         <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
                         <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
                             <li>Use the search box to filter by customer name or code</li>
@@ -125,7 +125,7 @@
                     Showing {{ filteredSalesTypes.length }} of {{ salesTypesList.length }} entries
                 </div>
             </div>
-        </div>
+    </div>
     </AppLayout>
 </template>
 
