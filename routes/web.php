@@ -239,6 +239,27 @@ Route::middleware('auth')->group(function () {
          Route::get('/scoring-formula', [ScoringFormulaController::class, 'index'])->name('vue.scoring-formula.index');
          Route::get('/scoring-formula/view-print', [ScoringFormulaController::class, 'viewAndPrint'])->name('vue.scoring-formula.view-print');
          
+         // Customer Service Routes
+         Route::get('/customer-service/dashboard', function () {
+             return Inertia::render('sales-management/customer-service/customer-service-dashboard');
+         })->name('vue.customer-service.dashboard');
+
+         Route::get('/customer-service/account-credit', function () {
+             return Inertia::render('sales-management/customer-service/customer-account-credit');
+         })->name('vue.customer-service.account-credit');
+
+         Route::get('/customer-service/delivery-schedule', function () {
+             return Inertia::render('sales-management/customer-service/sales-order-delivery-schedule');
+         })->name('vue.customer-service.delivery-schedule');
+
+         Route::get('/customer-service/finished-goods', function () {
+             return Inertia::render('sales-management/customer-service/customer-finished-goods');
+         })->name('vue.customer-service.finished-goods');
+
+         Route::get('/customer-service/production-monitoring-board', function () {
+             return Inertia::render('sales-management/customer-service/production-monitoring-board');
+         })->name('vue.customer-service.production-monitoring-board');
+
          // Standard Requirement Routes
          Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team.index');
          Route::get('/sales-team/view-print', [SalesTeamController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');

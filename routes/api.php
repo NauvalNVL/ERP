@@ -18,6 +18,7 @@ use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController;
+use App\Http\Controllers\SalesManagement\CustomerService\CustomerServiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -143,4 +144,11 @@ Route::get('/mc-auto-wo-not-releasing', [ApproveMcController::class, 'apiIndexMc
 
 // Sales Order Report API routes
 Route::get('/report-formats', [SalesOrderReportController::class, 'apiIndexReportFormats']);
-Route::post('/so-report', [SalesOrderReportController::class, 'apiGenerateSoReport']); 
+Route::post('/so-report', [SalesOrderReportController::class, 'apiGenerateSoReport']);
+
+// Customer Service API routes
+Route::get('/customer-service/dashboard-data', [CustomerServiceController::class, 'apiDashboardData']);
+Route::get('/customer-service/account-credit-data', [CustomerServiceController::class, 'apiAccountCreditData']);
+Route::get('/customer-service/delivery-schedule-data', [CustomerServiceController::class, 'apiDeliveryScheduleData']);
+Route::get('/customer-service/finished-goods-data', [CustomerServiceController::class, 'apiFinishedGoodsData']);
+Route::get('/customer-service/production-monitoring-data', [CustomerServiceController::class, 'apiProductionMonitoringData']); 
