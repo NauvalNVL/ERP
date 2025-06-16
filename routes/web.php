@@ -325,6 +325,11 @@ Route::middleware('auth')->group(function () {
 
         // Add route for view-and-print-mc-maintenance-log
         Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log', [ObsolateReactiveMcController::class, 'viewAndPrintMcMaintenanceLog'])->name('vue.master-card.view-and-print-mc-maintenance-log');
+        
+        // Add route for view-and-print-mc-approval-log
+        Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-approval-log', function() {
+            return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-approval-log');
+        })->name('vue.master-card.view-and-print-mc-approval-log');
 
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
