@@ -148,6 +148,20 @@ class UpdateCustomerAccountController extends Controller
         return response()->json($account);
     }
 
+    public function apiIndexAcAutoWoCustomers()
+    {
+        // For demonstration, returning dummy data
+        $dummyCustomers = [
+            ['customer_code' => 'CUST001', 'customer_name' => 'Customer A Ltd.', 'status' => 'Active'],
+            ['customer_code' => 'CUST002', 'customer_name' => 'Customer B Corp.', 'status' => 'Inactive'],
+            ['customer_code' => 'CUST003', 'customer_name' => 'Customer C Inc.', 'status' => 'Active'],
+            ['customer_code' => 'CUST004', 'customer_name' => 'Customer D LLC', 'status' => 'Active'],
+            ['customer_code' => 'CUST005', 'customer_name' => 'Customer E Group', 'status' => 'Inactive'],
+        ];
+
+        return response()->json($dummyCustomers);
+    }
+
     public function updateStatus(Request $request, $customer_code)
     {
         try {
