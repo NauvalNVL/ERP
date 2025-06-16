@@ -385,4 +385,18 @@ class ApproveMcController extends Controller
             ], 500);
         }
     }
+
+    public function apiIndexMcAutoWoNotReleasing()
+    {
+        // For demonstration, returning dummy data for M/Card for Not Auto Releasing W/Order
+        $dummyMcs = [
+            ['id' => 1, 'customer_code' => 'CUST001', 'mc_seq' => 'MC001', 'model' => 'Model X', 'status' => 'Active', 'ignore' => false],
+            ['id' => 2, 'customer_code' => 'CUST002', 'mc_seq' => 'MC002', 'model' => 'Model Y', 'status' => 'Inactive', 'ignore' => true],
+            ['id' => 3, 'customer_code' => 'CUST001', 'mc_seq' => 'MC003', 'model' => 'Model Z', 'status' => 'Active', 'ignore' => false],
+            ['id' => 4, 'customer_code' => 'CUST003', 'mc_seq' => 'MC004', 'model' => 'Model A', 'status' => 'Active', 'ignore' => false],
+            ['id' => 5, 'customer_code' => 'CUST002', 'mc_seq' => 'MC005', 'model' => 'Model B', 'status' => 'Inactive', 'ignore' => false],
+        ];
+
+        return response()->json($dummyMcs);
+    }
 }

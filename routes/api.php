@@ -16,6 +16,7 @@ use App\Http\Controllers\SideTrimByProductDesignController;
 use App\Http\Controllers\ProductDesignController;
 use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\FinishingController;
+use App\Http\Controllers\ApproveMcController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,12 +43,15 @@ Route::post('/standard-formula/seed', [StandardFormulaController::class, 'apiSee
 
 // SO Config API routes
 Route::post('/so-config', [SOConfigController::class, 'apiStore']); 
+Route::get('/so-periods', [SOConfigController::class, 'apiIndexPeriods']);
+Route::get('/so-rough-cut-capacity', [SOConfigController::class, 'apiIndexRoughCutCapacity']);
 
 // Customer Accounts API routes
 Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
 Route::post('/customer-accounts', [UpdateCustomerAccountController::class, 'apiStore']);
 Route::put('/customer-accounts/{id}', [UpdateCustomerAccountController::class, 'apiUpdate']);
 Route::get('/customers-with-status', [UpdateCustomerAccountController::class, 'apiIndex']);
+Route::get('/ac-auto-wo-customers', [UpdateCustomerAccountController::class, 'apiIndexAcAutoWoCustomers']);
 
 // Customer Alternate Address API routes
 Route::get('/customer-alternate-addresses', [CustomerAlternateAddressController::class, 'apiIndex']);
@@ -131,3 +135,7 @@ Route::post('/finishings', [FinishingController::class, 'store']);
 Route::put('/finishings/{code}', [FinishingController::class, 'update']);
 Route::delete('/finishings/{code}', [FinishingController::class, 'destroy']);
 Route::post('/finishings/seed', [FinishingController::class, 'seed']); 
+
+// Approve MC API routes
+Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);
+Route::get('/mc-auto-wo-not-releasing', [ApproveMcController::class, 'apiIndexMcAutoWoNotReleasing']); 

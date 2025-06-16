@@ -329,21 +329,19 @@ const salesManagementItems = [
     children: [
       {
         title: 'Setup',
-        icon: 'fas fa-cog',
+        icon: 'fas fa-cogs',
         children: [
-          { title: 'Define SO Config', icon: 'fas fa-cogs', route: '/sales-order/setup/define-so-config' },
-          { title: 'Define SO Period', icon: 'fas fa-calendar-alt', route: null },
+          { title: 'Define SO Config', icon: 'fas fa-cog', route: '/sales-order/setup/define-so-config' },
+          { title: 'Define SO Period', icon: 'fas fa-calendar-alt', route: '/sales-order/setup/define-so-period' },
           { title: 'Define SO Rough Cut', icon: 'fas fa-cut', route: '/sales-order/setup/define-so-rough-cut' },
-          { title: 'Define AC# Auto WO', icon: 'fas fa-robot', route: '/sales-order/setup/define-ac-auto-wo' },
-          { title: 'Define MC Auto WO', icon: 'fas fa-robot', route: '/sales-order/setup/define-mc-auto-wo' },
-          { title: 'Print SO Period', icon: 'fas fa-print', route: null },
-          { title: 'Print SO Rough Cut', icon: 'fas fa-print', route: null },
-          { title: 'Print AC# Auto WO', icon: 'fas fa-print', route: null },
-          { title: 'Print MC Auto WO', icon: 'fas fa-print', route: null }
+          { title: 'Define AC# Auto WO', icon: 'fas fa-file-invoice', route: '/sales-order/setup/define-ac-auto-wo' },
+          { title: 'Define MC Auto WO', icon: 'fas fa-file-invoice', route: '/sales-order/setup/define-mc-auto-wo' },
+          { title: 'View & Print SO Period', icon: 'fas fa-print', route: '/sales-order/setup/print-so-period' },
+          { title: 'View & Print Rough Cut Target Capacity', icon: 'fas fa-print', route: '/sales-order/setup/print-so-rough-cut' },
+          { title: 'View & Print Customer for Auto Releasing W/Order', icon: 'fas fa-print', route: '/sales-order/setup/print-ac-auto-wo' },
+          { title: 'View & Print M/Card for Not Auto Releasing W/Order', icon: 'fas fa-print', route: '/sales-order/setup/print-mc-auto-wo' },
         ]
       },
-      { title: 'Transaction', icon: 'fas fa-exchange-alt', route: null },
-      { title: 'Report', icon: 'fas fa-chart-bar', route: null }
     ]
   },
   { title: 'Customer Service', icon: 'fas fa-headset', route: null }
