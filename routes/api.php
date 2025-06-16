@@ -152,3 +152,20 @@ Route::get('/customer-service/account-credit-data', [CustomerServiceController::
 Route::get('/customer-service/delivery-schedule-data', [CustomerServiceController::class, 'apiDeliveryScheduleData']);
 Route::get('/customer-service/finished-goods-data', [CustomerServiceController::class, 'apiFinishedGoodsData']);
 Route::get('/customer-service/production-monitoring-data', [CustomerServiceController::class, 'apiProductionMonitoringData']); 
+
+// New: Placeholder API routes for Sales Order Delivery Schedule Modals
+Route::get('/po-refs', function() {
+    return response()->json([
+        ['po_ref' => 'PO-ALPHA-001', 'customer_code' => 'CUST001', 'so_number' => 'SO-2023-001', 'status' => 'Active'],
+        ['po_ref' => 'PO-BETA-002', 'customer_code' => 'CUST002', 'so_number' => 'SO-2023-002', 'status' => 'Closed'],
+        ['po_ref' => 'PO-GAMMA-003', 'customer_code' => 'CUST003', 'so_number' => 'SO-2023-003', 'status' => 'Active'],
+    ]);
+});
+
+Route::get('/area-groups', function() {
+    return response()->json([
+        ['code' => 'AG01', 'name' => 'Central Region'],
+        ['code' => 'AG02', 'name' => 'East Region'],
+        ['code' => 'AG03', 'name' => 'West Region'],
+    ]);
+}); 

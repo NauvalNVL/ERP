@@ -235,7 +235,8 @@ const salesManagementItems = [
           { title: 'View & Print Customer Account', icon: 'fas fa-list', route: '/update-customer-account/view-print' },
           { title: 'View & Print Customer Alternate Address', icon: 'fas fa-list', route: '/customer-alternate-address/view-print' },
           { title: 'View & Print Customer Sales Type', icon: 'fas fa-list', route: '/customer-sales-type/view-print' },
-          { title: 'View & Print Non-Active Customer', icon: 'fas fa-list', route: '/obsolete-reactive-customer-account/view-print' }
+          { title: 'View & Print Non-Active Customer', icon: 'fas fa-list', route: '/obsolete-reactive-customer-account/view-print' },
+
         ]
       },
       {
@@ -357,11 +358,11 @@ const salesManagementItems = [
     title: 'Customer Service',
     icon: 'fas fa-headset',
     children: [
-      { title: 'Customer Service Dashboard', icon: 'fas fa-chart-line', route: '/customer-service/dashboard' },
-      { title: 'Customer Account Credit', icon: 'fas fa-credit-card', route: '/sales-management/customer-service/customer-account-credit' },
-      { title: 'Sales Order Delivery Schedule', icon: 'fas fa-calendar-alt', route: '/sales-management/customer-service/sales-order-delivery-schedule' },
-      { title: 'Customer Finished Goods', icon: 'fas fa-box-open', route: '/sales-management/customer-service/customer-finished-goods' },
-      { title: 'Production Monitoring Board [PMB3]', icon: 'fas fa-tv', route: '/sales-management/customer-service/production-monitoring-board' },
+      { title: 'Customer Service Dashboard', icon: 'fas fa-tachometer-alt', route: '/customer-service/dashboard' },
+      { title: 'Customer Account Credit', icon: 'fas fa-credit-card', route: '/customer-service/account-credit' },
+      { title: 'Sales Order Delivery Schedule', icon: 'fas fa-truck-loading', route: '/customer-service/delivery-schedule' },
+      { title: 'Customer Finished Goods', icon: 'fas fa-boxes', route: '/customer-service/finished-goods' },
+      { title: 'Production Monitoring Board', icon: 'fas fa-chart-bar', route: '/customer-service/production-monitoring-board' },
     ]
   },
 ];

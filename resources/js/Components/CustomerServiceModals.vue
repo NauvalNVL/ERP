@@ -1730,9 +1730,11 @@ const confirmCustomerSelection = () => {
             customerCodePurchaseOrderRef.value = selectedCustomerAccount.value.customer_code;
         } else if (currentCustomerCodeTarget.value === 'boardPurchase') {
             customerCodeBoardPurchase.value = selectedCustomerAccount.value.customer_code;
+        } else if (currentCustomerCodeTarget.value === 'customerCodeFrom' || currentCustomerCodeTarget.value === 'customerCodeTo') {
+            emit('customerSelected', { customer: selectedCustomerAccount.value, target: currentCustomerCodeTarget.value });
         }
         closeAllModals(); // Close the customer account modal
-        // Re-open the parent modal (Master Card or P/Order Ref)
+        // Re-open the parent modal based on the specific scenario, if needed
         if (currentCustomerCodeTarget.value === 'masterCard') {
             showMasterCardSearchModal.value = true;
         } else if (currentCustomerCodeTarget.value === 'purchaseOrderRef') {
@@ -1854,6 +1856,8 @@ const handleOptionSelection = () => {
     }
 };
 
+const emit = defineEmits(['customerSelected']);
+
 defineExpose({
     openInitialSalesOrderModal,
     closeAllModals,
@@ -1865,6 +1869,7 @@ defineExpose({
     openInitialWorkOrderModal, // New: Expose Work Order functions
     openInitialDeliveryOrderModal, // New: Expose Delivery Order functions
     openInitialInvoiceModal, // New: Expose Invoice functions
+    openCustomerAccountSearchModal, // Expose this for other components to use
 });
 </script>
 
