@@ -382,6 +382,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/sales-management/system-requirement/master-card/initialized-mc-maintenance-log', function() {
             return Inertia::render('sales-management/system-requirement/master-card/initialized-mc-maintenance-log');
         })->name('vue.master-card.initialized-mc-maintenance-log');
+        
+        // Add route for view-and-print-mc-print-dc-block-listing
+        Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-print-dc-block-listing', function() {
+            return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-print-dc-block-listing');
+        })->name('vue.master-card.view-and-print-mc-print-dc-block-listing');
 
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
