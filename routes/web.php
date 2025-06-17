@@ -392,6 +392,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-print-dc-block-matching', function() {
             return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-print-dc-block-matching');
         })->name('vue.master-card.view-and-print-mc-print-dc-block-matching');
+        
+        // Add route for view-and-print-mc-by-color
+        Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-by-color', function() {
+            return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-by-color');
+        })->name('vue.master-card.view-and-print-mc-by-color');
 
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
