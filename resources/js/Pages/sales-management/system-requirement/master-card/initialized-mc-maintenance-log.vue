@@ -1,10 +1,6 @@
 <template>
-  <AppLayout title="Initialize MC Maintenance Log">
-    <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        Initialize MC Maintenance Log
-      </h2>
-    </template>
+  <AppLayout :header="'Initialize MC Maintenance Log'">
+    <Head title="Initialize MC Maintenance Log" />
 
     <!-- Main Container with vibrant gradient background -->
     <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 md:p-6">
@@ -20,8 +16,10 @@
             <div class="p-6 md:p-8 relative z-10">
               <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="flex items-start md:items-center space-x-4 mb-4 md:mb-0">
-                  <div class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner flex items-center justify-center">
-                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                  <div class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-300 opacity-30 rounded-full animate-ping-slow"></div>
+                    <div class="absolute -bottom-1 -left-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full animate-ping-slow animation-delay-500"></div>
+                    <i class="fas fa-history text-white text-2xl z-10 animate-pulse"></i>
                   </div>
                   <div>
                     <h1 class="text-2xl md:text-3xl font-bold text-white text-shadow">Initialize MC Maintenance Log</h1>
@@ -29,12 +27,24 @@
                   </div>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                  <button @click="initializeAction" class="bg-gradient-to-r from-green-500 to-teal-400 text-white hover:from-green-600 hover:to-teal-500 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md">
-                    <i class="fas fa-sync-alt mr-2"></i> Initialize
+                  <button @click="initializeAction" class="bg-gradient-to-r from-green-500 to-teal-400 text-white hover:from-green-600 hover:to-teal-500 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md relative overflow-hidden group">
+                    <span class="absolute inset-0 bg-white opacity-20 transform scale-x-0 origin-left transition-transform group-hover:scale-x-100"></span>
+                    <div class="relative z-10 flex items-center">
+                      <div class="bg-white bg-opacity-30 rounded-full p-1 mr-2">
+                        <i class="fas fa-sync-alt text-white"></i>
+                      </div>
+                      <span>Initialize</span>
+                    </div>
                   </button>
-                  <button @click="$router.go(-1)" class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center transition-all duration-300">
-                    <i class="fas fa-arrow-left mr-2"></i> Back
-                  </button>
+                  <Link href="/sales-management/system-requirement/master-card/view-and-print-MC" class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center transition-all duration-300 relative overflow-hidden">
+                    <span class="absolute inset-0 bg-white opacity-10 transform scale-x-0 origin-left transition-transform hover:scale-x-100"></span>
+                    <div class="relative z-10 flex items-center">
+                      <div class="bg-white bg-opacity-30 rounded-full p-1.5 mr-2 transition-transform transform group-hover:rotate-12 shadow-inner">
+                        <i class="fas fa-arrow-left text-white"></i>
+                      </div>
+                      <span>Back</span>
+                    </div>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -43,106 +53,193 @@
 
         <!-- Log Information Form -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6">
+            <div class="flex items-center">
+              <div class="mr-3 bg-white bg-opacity-20 p-2 rounded-full shadow-inner relative overflow-hidden">
+                <div class="absolute -top-1 -right-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full"></div>
+                <div class="absolute -bottom-1 -left-1 w-3 h-3 bg-yellow-300 opacity-30 rounded-full"></div>
+                <i class="fas fa-database text-xl relative z-10"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold">Log Records</h2>
+                <p class="text-xs text-blue-100 opacity-80">View and manage maintenance log records</p>
+              </div>
+            </div>
+          </div>
           <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- M/C Audit Log Records -->
-              <div class="space-y-4">
-                <h3 class="font-semibold text-lg text-indigo-700 border-b border-indigo-100 pb-2">M/C Audit Log Records</h3>
+              <div class="space-y-4 bg-gradient-to-br from-indigo-50 to-white p-4 rounded-lg border border-indigo-100">
+                <h3 class="font-semibold text-lg text-indigo-700 border-b border-indigo-100 pb-2 flex items-center">
+                  <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                    <i class="fas fa-clipboard-check text-white text-sm"></i>
+                  </div>
+                  M/C Audit Log Records
+                </h3>
                 
                 <div class="grid grid-cols-[150px_1fr] items-center gap-4">
-                  <label class="font-medium text-gray-700">First Record:</label>
+                  <label class="font-medium text-gray-700 flex items-center">
+                    <i class="fas fa-hourglass-start text-indigo-500 mr-2"></i>
+                    First Record:
+                  </label>
                   <div class="flex space-x-2">
-                    <input 
-                      type="text" 
-                      v-model="auditFirstDate" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                      readonly 
-                    />
-                    <input 
-                      type="text" 
-                      v-model="auditFirstTime" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                      readonly 
-                    />
+                    <div class="relative flex-1">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-calendar-alt text-gray-400"></i>
+                      </div>
+                      <input 
+                        type="text" 
+                        v-model="auditFirstDate" 
+                        class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        readonly 
+                      />
+                    </div>
+                    <div class="relative flex-1">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-clock text-gray-400"></i>
+                      </div>
+                      <input 
+                        type="text" 
+                        v-model="auditFirstTime" 
+                        class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        readonly 
+                      />
+                    </div>
                   </div>
                 </div>
                 
                 <div class="grid grid-cols-[150px_1fr] items-center gap-4">
-                  <label class="font-medium text-gray-700">Last Record:</label>
+                  <label class="font-medium text-gray-700 flex items-center">
+                    <i class="fas fa-hourglass-end text-indigo-500 mr-2"></i>
+                    Last Record:
+                  </label>
                   <div class="flex space-x-2">
-                    <input 
-                      type="text" 
-                      v-model="auditLastDate" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                      readonly 
-                    />
-                    <input 
-                      type="text" 
-                      v-model="auditLastTime" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                      readonly 
-                    />
+                    <div class="relative flex-1">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-calendar-alt text-gray-400"></i>
+                      </div>
+                      <input 
+                        type="text" 
+                        v-model="auditLastDate" 
+                        class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        readonly 
+                      />
+                    </div>
+                    <div class="relative flex-1">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-clock text-gray-400"></i>
+                      </div>
+                      <input 
+                        type="text" 
+                        v-model="auditLastTime" 
+                        class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        readonly 
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
               
               <!-- M/C Verify Log Records -->
-              <div class="space-y-4">
-                <h3 class="font-semibold text-lg text-indigo-700 border-b border-indigo-100 pb-2">M/C Verify Log Records</h3>
+              <div class="space-y-4 bg-gradient-to-br from-purple-50 to-white p-4 rounded-lg border border-purple-100">
+                <h3 class="font-semibold text-lg text-indigo-700 border-b border-indigo-100 pb-2 flex items-center">
+                  <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                    <i class="fas fa-clipboard-list text-white text-sm"></i>
+                  </div>
+                  M/C Verify Log Records
+                </h3>
                 
                 <div class="grid grid-cols-[150px_1fr] items-center gap-4">
-                  <label class="font-medium text-gray-700">First Record:</label>
+                  <label class="font-medium text-gray-700 flex items-center">
+                    <i class="fas fa-hourglass-start text-purple-500 mr-2"></i>
+                    First Record:
+                  </label>
                   <div class="flex space-x-2">
-                    <input 
-                      type="text" 
-                      v-model="verifyFirstDate" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                      readonly 
-                    />
-                    <input 
-                      type="text" 
-                      v-model="verifyFirstTime" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                      readonly 
-                    />
+                    <div class="relative flex-1">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-calendar-alt text-gray-400"></i>
+                      </div>
+                      <input 
+                        type="text" 
+                        v-model="verifyFirstDate" 
+                        class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        readonly 
+                      />
+                    </div>
+                    <div class="relative flex-1">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-clock text-gray-400"></i>
+                      </div>
+                      <input 
+                        type="text" 
+                        v-model="verifyFirstTime" 
+                        class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        readonly 
+                      />
+                    </div>
                   </div>
                 </div>
                 
                 <div class="grid grid-cols-[150px_1fr] items-center gap-4">
-                  <label class="font-medium text-gray-700">Last Record:</label>
+                  <label class="font-medium text-gray-700 flex items-center">
+                    <i class="fas fa-hourglass-end text-purple-500 mr-2"></i>
+                    Last Record:
+                  </label>
                   <div class="flex space-x-2">
-                    <input 
-                      type="text" 
-                      v-model="verifyLastDate" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                      readonly 
-                    />
-                    <input 
-                      type="text" 
-                      v-model="verifyLastTime" 
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                      readonly 
-                    />
+                    <div class="relative flex-1">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-calendar-alt text-gray-400"></i>
+                      </div>
+                      <input 
+                        type="text" 
+                        v-model="verifyLastDate" 
+                        class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        readonly 
+                      />
+                    </div>
+                    <div class="relative flex-1">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-clock text-gray-400"></i>
+                      </div>
+                      <input 
+                        type="text" 
+                        v-model="verifyLastTime" 
+                        class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        readonly 
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
             
             <!-- Initialize from first record to -->
-            <div class="mt-6">
-              <div class="grid grid-cols-[200px_1fr] items-center gap-4">
-                <label class="font-medium text-gray-700">Initialize from first record to:</label>
+            <div class="mt-8 p-4 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-lg border border-indigo-100">
+              <div class="grid grid-cols-1 md:grid-cols-[200px_1fr] items-center gap-4">
+                <label class="font-medium text-gray-700 flex items-center">
+                  <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                    <i class="fas fa-calendar-day text-white text-sm"></i>
+                  </div>
+                  Initialize from first record to:
+                </label>
                 <div class="flex items-center space-x-2">
                   <div class="relative flex-grow-0">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i class="fas fa-calendar-alt text-gray-400"></i>
+                    </div>
                     <input 
                       type="text" 
                       v-model="initializeFrom" 
-                      class="w-36 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" 
+                      class="w-48 pl-10 px-3 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" 
                     />
                     <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800">
                       <i class="fas fa-search"></i>
                     </button>
                   </div>
+                  <button class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg shadow-md hover:from-indigo-700 hover:to-purple-700 transition-colors">
+                    <i class="fas fa-calendar-check mr-2"></i>
+                    Set Date
+                  </button>
                 </div>
               </div>
             </div>
@@ -151,77 +248,95 @@
 
         <!-- System Note -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-yellow-500 to-amber-500 text-white py-3 px-6">
+            <div class="flex items-center">
+              <div class="mr-3 bg-white bg-opacity-20 p-2 rounded-full shadow-inner">
+                <i class="fas fa-exclamation-triangle text-xl"></i>
+              </div>
+              <h2 class="text-xl font-bold">Important Note</h2>
+            </div>
+          </div>
           <div class="p-6">
-            <h3 class="font-semibold text-lg text-indigo-700 mb-4">Note</h3>
-            <div class="p-4 bg-gray-50 border border-gray-200 rounded-md">
+            <div class="p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-md flex items-start">
+              <i class="fas fa-info-circle text-amber-500 text-xl mr-3 mt-1"></i>
               <p class="text-gray-700 font-medium">System will retain at least 1 year of audit log records!</p>
             </div>
           </div>
         </div>
 
         <!-- Instructions and Tips -->
-        <div class="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-100 shadow-sm">
-          <h3 class="font-semibold text-indigo-800 mb-2 flex items-center">
-            <i class="fas fa-info-circle mr-2 text-purple-500"></i> Usage Instructions
-          </h3>
-          <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-            <li>The audit log records track all changes made to master cards</li>
-            <li>The verification log records track when master cards were verified</li>
-            <li>Enter a record ID in the initialize field to remove logs before that record</li>
-            <li>Click "Initialize" to perform the maintenance log cleanup</li>
-            <li>The system will always retain at least 1 year of log history</li>
-          </ul>
+        <div class="bg-gradient-to-br from-white to-purple-50 rounded-xl shadow-lg overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-6">
+            <div class="flex items-center">
+              <div class="mr-3 bg-white bg-opacity-20 p-2 rounded-full shadow-inner">
+                <i class="fas fa-lightbulb text-xl"></i>
+              </div>
+              <h2 class="text-xl font-bold">Usage Instructions</h2>
+            </div>
+          </div>
+          <div class="p-6">
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <div class="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <span class="text-gray-700">The audit log records track all changes made to master cards</span>
+              </li>
+              <li class="flex items-start">
+                <div class="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <span class="text-gray-700">The verification log records track when master cards were verified</span>
+              </li>
+              <li class="flex items-start">
+                <div class="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <span class="text-gray-700">Enter a record ID in the initialize field to remove logs before that record</span>
+              </li>
+              <li class="flex items-start">
+                <div class="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <span class="text-gray-700">Click "Initialize" to perform the maintenance log cleanup</span>
+              </li>
+              <li class="flex items-start">
+                <div class="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <span class="text-gray-700">The system will always retain at least 1 year of log history</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
   </AppLayout>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
-export default {
-  components: {
-    AppLayout,
-    Head,
-    Link
-  },
-  setup() {
-    // Form state variables
-    const auditFirstDate = ref('03/05/2014');
-    const auditFirstTime = ref('09:52:04');
-    const auditLastDate = ref('14/06/2025');
-    const auditLastTime = ref('16:27:33');
-    
-    const verifyFirstDate = ref('03/05/2014');
-    const verifyFirstTime = ref('09:52:22');
-    const verifyLastDate = ref('25/11/2015');
-    const verifyLastTime = ref('09:54:22');
-    
-    const initializeFrom = ref('00/00/0000');
+// Form state variables
+const auditFirstDate = ref('03/05/2014');
+const auditFirstTime = ref('09:52:04');
+const auditLastDate = ref('14/06/2025');
+const auditLastTime = ref('16:27:33');
 
-    // Action handlers
-    const initializeAction = () => {
-      // In a real implementation, this would send a request to initialize logs
-      if (confirm('Are you sure you want to initialize the maintenance log records?')) {
-        alert('Maintenance log initialization started');
-      }
-    };
+const verifyFirstDate = ref('03/05/2014');
+const verifyFirstTime = ref('09:52:22');
+const verifyLastDate = ref('25/11/2015');
+const verifyLastTime = ref('09:54:22');
 
-    return {
-      auditFirstDate,
-      auditFirstTime,
-      auditLastDate,
-      auditLastTime,
-      verifyFirstDate,
-      verifyFirstTime,
-      verifyLastDate,
-      verifyLastTime,
-      initializeFrom,
-      initializeAction
-    };
+const initializeFrom = ref('00/00/0000');
+
+// Action handlers
+const initializeAction = () => {
+  // In a real implementation, this would send a request to initialize logs
+  if (confirm('Are you sure you want to initialize the maintenance log records?')) {
+    alert('Maintenance log initialization started');
   }
 };
 </script>
@@ -260,6 +375,30 @@ button:hover {
 
 button:active {
   transform: translateY(0);
+}
+
+/* Custom animation for slow ping effect */
+@keyframes ping-slow {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.8);
+    opacity: 0.15;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+}
+
+.animate-ping-slow {
+  animation: ping-slow 3s ease-in-out infinite;
+}
+
+.animation-delay-500 {
+  animation-delay: 1.5s;
 }
 
 /* Print styling */

@@ -1,10 +1,6 @@
 <template>
-  <AppLayout title="View & Print Non-Active MC">
-    <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        View & Print Non-Active MC
-      </h2>
-    </template>
+  <AppLayout :header="'View & Print Non-Active MC'">
+    <Head title="View & Print Non-Active MC" />
 
     <!-- Main Container with vibrant gradient background -->
     <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 md:p-6">
@@ -20,8 +16,10 @@
             <div class="p-6 md:p-8 relative z-10">
               <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="flex items-start md:items-center space-x-4 mb-4 md:mb-0">
-                  <div class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner flex items-center justify-center">
-                    <i class="fas fa-print text-white text-2xl"></i>
+                  <div class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-300 opacity-30 rounded-full animate-ping-slow"></div>
+                    <div class="absolute -bottom-1 -left-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full animate-ping-slow animation-delay-500"></div>
+                    <i class="fas fa-print text-white text-2xl z-10"></i>
                   </div>
                   <div>
                     <h1 class="text-2xl md:text-3xl font-bold text-white text-shadow">View & Print Non-Active MC</h1>
@@ -29,12 +27,24 @@
                   </div>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                  <button @click="proceedAction" class="bg-gradient-to-r from-green-500 to-teal-400 text-white hover:from-green-600 hover:to-teal-500 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md">
-                    <i class="fas fa-check mr-2"></i> Proceed
+                  <button @click="proceedAction" class="bg-gradient-to-r from-green-500 to-teal-400 text-white hover:from-green-600 hover:to-teal-500 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md relative overflow-hidden group">
+                    <span class="absolute inset-0 bg-white opacity-20 transform scale-x-0 origin-left transition-transform group-hover:scale-x-100"></span>
+                    <div class="relative z-10 flex items-center">
+                      <div class="bg-white bg-opacity-30 rounded-full p-1 mr-2">
+                        <i class="fas fa-check text-white"></i>
+                      </div>
+                      <span>Proceed</span>
+                    </div>
                   </button>
-                  <button @click="$router.go(-1)" class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center transition-all duration-300">
-                    <i class="fas fa-arrow-left mr-2"></i> Back
-                  </button>
+                  <Link href="/sales-management/system-requirement/master-card/view-and-print-MC" class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center transition-all duration-300 relative overflow-hidden">
+                    <span class="absolute inset-0 bg-white opacity-10 transform scale-x-0 origin-left transition-transform hover:scale-x-100"></span>
+                    <div class="relative z-10 flex items-center">
+                      <div class="bg-white bg-opacity-30 rounded-full p-1.5 mr-2 transition-transform transform group-hover:rotate-12 shadow-inner">
+                        <i class="fas fa-arrow-left text-white"></i>
+                      </div>
+                      <span>Back</span>
+                    </div>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -43,19 +53,37 @@
 
         <!-- Search Form -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6">
+            <div class="flex items-center">
+              <div class="mr-3 bg-white bg-opacity-20 p-2 rounded-full shadow-inner relative overflow-hidden">
+                <div class="absolute -top-1 -right-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full"></div>
+                <div class="absolute -bottom-1 -left-1 w-3 h-3 bg-yellow-300 opacity-30 rounded-full"></div>
+                <i class="fas fa-filter text-xl relative z-10"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold">Search Parameters</h2>
+                <p class="text-xs text-blue-100 opacity-80">Filter non-active master cards by various criteria</p>
+              </div>
+            </div>
+          </div>
           <div class="p-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <!-- Left Column - Filter Fields -->
               <div class="space-y-6">
                 <!-- Current Sales Period -->
                 <div>
-                  <label class="block text-sm font-medium text-indigo-700 mb-2">Current Sales Period:</label>
-                  <div class="flex space-x-2">
+                  <label class="block text-sm font-medium text-indigo-700 mb-2 flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                      <i class="fas fa-calendar-alt text-white text-sm"></i>
+                    </div>
+                    Current Sales Period:
+                  </label>
+                  <div class="flex space-x-2 ml-10">
                     <div class="relative w-20">
-                      <input type="text" value="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" readonly />
+                      <input type="text" value="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" readonly />
                     </div>
                     <div class="relative w-24">
-                      <input type="text" value="2025" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" readonly />
+                      <input type="text" value="2025" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" readonly />
                     </div>
                     <div class="flex items-center text-gray-500 text-sm">
                       mm/yyyy
@@ -65,11 +93,16 @@
 
                 <!-- Salesperson Code -->
                 <div>
-                  <label class="block text-sm font-medium text-indigo-700 mb-2">Salesperson Code:</label>
-                  <div class="flex space-x-2">
+                  <label class="block text-sm font-medium text-indigo-700 mb-2 flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                      <i class="fas fa-user-tie text-white text-sm"></i>
+                    </div>
+                    Salesperson Code:
+                  </label>
+                  <div class="flex space-x-2 ml-10">
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800">
+                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -77,8 +110,8 @@
                       to
                     </div>
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800">
+                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -87,11 +120,16 @@
 
                 <!-- AC# -->
                 <div>
-                  <label class="block text-sm font-medium text-indigo-700 mb-2">AC#:</label>
-                  <div class="flex space-x-2">
+                  <label class="block text-sm font-medium text-indigo-700 mb-2 flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                      <i class="fas fa-building text-white text-sm"></i>
+                    </div>
+                    AC#:
+                  </label>
+                  <div class="flex space-x-2 ml-10">
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800">
+                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -99,8 +137,8 @@
                       to
                     </div>
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800">
+                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -109,11 +147,16 @@
 
                 <!-- MCS# -->
                 <div>
-                  <label class="block text-sm font-medium text-indigo-700 mb-2">MCS#:</label>
-                  <div class="flex space-x-2">
+                  <label class="block text-sm font-medium text-indigo-700 mb-2 flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                      <i class="fas fa-file-alt text-white text-sm"></i>
+                    </div>
+                    MCS#:
+                  </label>
+                  <div class="flex space-x-2 ml-10">
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800">
+                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -121,8 +164,8 @@
                       to
                     </div>
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800">
+                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -134,50 +177,91 @@
               <div class="space-y-6">
                 <!-- Master Card Status -->
                 <div>
-                  <label class="block text-sm font-medium text-indigo-700 mb-2">Master Card Status:</label>
-                  <div class="flex space-x-4">
+                  <label class="block text-sm font-medium text-indigo-700 mb-2 flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                      <i class="fas fa-tag text-white text-sm"></i>
+                    </div>
+                    Master Card Status:
+                  </label>
+                  <div class="flex space-x-6 ml-10 mt-1">
                     <div class="flex items-center">
                       <input type="checkbox" id="active" checked class="form-checkbox h-5 w-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500" />
-                      <label for="active" class="ml-2 text-gray-700">A-Active</label>
+                      <label for="active" class="ml-2 text-gray-700 flex items-center">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <i class="fas fa-check-circle mr-1"></i> Active
+                        </span>
+                      </label>
                     </div>
                     <div class="flex items-center">
                       <input type="checkbox" id="obsolete" checked class="form-checkbox h-5 w-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500" />
-                      <label for="obsolete" class="ml-2 text-gray-700">O-Obsolete</label>
+                      <label for="obsolete" class="ml-2 text-gray-700 flex items-center">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          <i class="fas fa-ban mr-1"></i> Obsolete
+                        </span>
+                      </label>
                     </div>
                   </div>
                 </div>
 
                 <!-- M/Card with no S/Order -->
                 <div>
-                  <label class="block text-sm font-medium text-indigo-700 mb-2">M/Card with no S/Order:</label>
-                  <div class="flex space-x-4">
+                  <label class="block text-sm font-medium text-indigo-700 mb-2 flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                      <i class="fas fa-file-invoice text-white text-sm"></i>
+                    </div>
+                    M/Card with no S/Order:
+                  </label>
+                  <div class="flex space-x-6 ml-10 mt-1">
                     <div class="flex items-center">
                       <input type="radio" id="yes" name="so_status" class="form-radio h-5 w-5 text-indigo-600 border-gray-300 focus:ring-indigo-500" />
-                      <label for="yes" class="ml-2 text-gray-700">Y-Yes</label>
+                      <label for="yes" class="ml-2 text-gray-700 flex items-center">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <i class="fas fa-check mr-1"></i> Yes
+                        </span>
+                      </label>
                     </div>
                     <div class="flex items-center">
                       <input type="radio" id="no" name="so_status" checked class="form-radio h-5 w-5 text-indigo-600 border-gray-300 focus:ring-indigo-500" />
-                      <label for="no" class="ml-2 text-gray-700">N-No</label>
+                      <label for="no" class="ml-2 text-gray-700 flex items-center">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          <i class="fas fa-times mr-1"></i> No
+                        </span>
+                      </label>
                     </div>
                   </div>
                 </div>
 
                 <!-- Non-Active for -->
                 <div>
-                  <label class="block text-sm font-medium text-indigo-700 mb-2">Non-Active for:</label>
-                  <div class="flex items-center">
-                    <input type="text" value="0" class="w-20 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-center" />
-                    <span class="ml-2 text-gray-700">Months and above without any new orders</span>
+                  <label class="block text-sm font-medium text-indigo-700 mb-2 flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                      <i class="fas fa-hourglass-half text-white text-sm"></i>
+                    </div>
+                    Non-Active for:
+                  </label>
+                  <div class="flex items-center ml-10">
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-clock text-gray-400"></i>
+                      </div>
+                      <input type="text" value="0" class="w-20 pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-center shadow-sm" />
+                    </div>
+                    <span class="ml-3 text-gray-700">Months and above without any new orders</span>
                   </div>
                 </div>
 
                 <!-- Product# -->
                 <div>
-                  <label class="block text-sm font-medium text-indigo-700 mb-2">Product#:</label>
-                  <div class="flex space-x-2">
+                  <label class="block text-sm font-medium text-indigo-700 mb-2 flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                      <i class="fas fa-box text-white text-sm"></i>
+                    </div>
+                    Product#:
+                  </label>
+                  <div class="flex space-x-2 ml-10">
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800">
+                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -185,8 +269,8 @@
                       to
                     </div>
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800">
+                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -194,80 +278,97 @@
                 </div>
               </div>
             </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-8 flex justify-end space-x-4">
+              <button class="px-6 py-2.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 text-gray-700 transition-all duration-300 shadow-sm flex items-center">
+                <i class="fas fa-undo mr-2 text-gray-500"></i>
+                Reset Filters
+              </button>
+              <button @click="proceedAction" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white rounded-lg transition-all duration-300 shadow-md flex items-center">
+                <i class="fas fa-check mr-2"></i>
+                Proceed
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Instructions and Tips -->
-        <div class="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-100 shadow-sm">
-          <h3 class="font-semibold text-indigo-800 mb-2 flex items-center">
-            <i class="fas fa-info-circle mr-2 text-purple-500"></i> Usage Instructions
-          </h3>
-          <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-            <li>Set your filter criteria above to narrow down the list of non-active master cards</li>
-            <li>Check "A-Active" and/or "O-Obsolete" to include those statuses in your results</li>
-            <li>Set the number of months to filter by age of inactive master cards</li>
-            <li>Click "Proceed" to view the filtered list of non-active master cards</li>
-            <li>All fields are optional - leave blank to include all values</li>
-          </ul>
+        <div class="bg-gradient-to-br from-white to-purple-50 rounded-xl shadow-lg overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-6">
+            <div class="flex items-center">
+              <div class="mr-3 bg-white bg-opacity-20 p-2 rounded-full shadow-inner">
+                <i class="fas fa-lightbulb text-xl"></i>
+              </div>
+              <h2 class="text-xl font-bold">Usage Instructions</h2>
+            </div>
+          </div>
+          <div class="p-6">
+            <ul class="space-y-3">
+              <li class="flex items-start">
+                <div class="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <span class="text-gray-700">Set your filter criteria above to narrow down the list of non-active master cards</span>
+              </li>
+              <li class="flex items-start">
+                <div class="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <span class="text-gray-700">Check "A-Active" and/or "O-Obsolete" to include those statuses in your results</span>
+              </li>
+              <li class="flex items-start">
+                <div class="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <span class="text-gray-700">Set the number of months to filter by age of inactive master cards</span>
+              </li>
+              <li class="flex items-start">
+                <div class="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <span class="text-gray-700">Click "Proceed" to view the filtered list of non-active master cards</span>
+              </li>
+              <li class="flex items-start">
+                <div class="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <span class="text-gray-700">All fields are optional - leave blank to include all values</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
   </AppLayout>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
-export default {
-  components: {
-    AppLayout,
-    Head,
-    Link
-  },
-  setup() {
-    // Form state variables
-    const salesPeriodMonth = ref(6);
-    const salesPeriodYear = ref(2025);
-    const salespersonFrom = ref('');
-    const salespersonTo = ref('');
-    const acFrom = ref('');
-    const acTo = ref('');
-    const mcsFrom = ref('');
-    const mcsTo = ref('');
-    const showActive = ref(true);
-    const showObsolete = ref(true);
-    const withNoSalesOrder = ref(false);
-    const inactiveMonths = ref(0);
-    const productFrom = ref('');
-    const productTo = ref('');
+// Form state variables
+const salesPeriodMonth = ref(6);
+const salesPeriodYear = ref(2025);
+const salespersonFrom = ref('');
+const salespersonTo = ref('');
+const acFrom = ref('');
+const acTo = ref('');
+const mcsFrom = ref('');
+const mcsTo = ref('');
+const showActive = ref(true);
+const showObsolete = ref(true);
+const withNoSalesOrder = ref(false);
+const inactiveMonths = ref(0);
+const productFrom = ref('');
+const productTo = ref('');
 
-    // Action handlers
-    const proceedAction = () => {
-      // In a real implementation, this would navigate to a results page
-      // or perform a search with the specified criteria
-      alert('Searching for non-active master cards with the specified criteria');
-    };
-
-    return {
-      salesPeriodMonth,
-      salesPeriodYear,
-      salespersonFrom,
-      salespersonTo,
-      acFrom,
-      acTo,
-      mcsFrom,
-      mcsTo,
-      showActive,
-      showObsolete,
-      withNoSalesOrder,
-      inactiveMonths,
-      productFrom,
-      productTo,
-      proceedAction
-    };
-  }
+// Action handlers
+const proceedAction = () => {
+  // In a real implementation, this would navigate to a results page
+  // or perform a search with the specified criteria
+  alert('Searching for non-active master cards with the specified criteria');
 };
 </script>
 
@@ -310,6 +411,30 @@ button:hover {
 
 button:active {
   transform: translateY(0);
+}
+
+/* Custom animation for slow ping effect */
+@keyframes ping-slow {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.8);
+    opacity: 0.15;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+}
+
+.animate-ping-slow {
+  animation: ping-slow 3s ease-in-out infinite;
+}
+
+.animation-delay-500 {
+  animation-delay: 1.5s;
 }
 
 /* Print styling */
