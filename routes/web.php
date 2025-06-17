@@ -398,6 +398,16 @@ Route::middleware('auth')->group(function () {
             return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-by-color');
         })->name('vue.master-card.view-and-print-mc-by-color');
 
+        // Add route for view-and-print-mc-by-psize-pquality
+        Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-by-psize-pquality', function() {
+            return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-by-psize-pquality');
+        })->name('vue.master-card.view-and-print-mc-by-psize-pquality');
+
+        // Add route for view-and-print-mc-by-machine
+        Route::get('/sales-management/system-requirement/master-card/view-and-print-mc-by-machine', function() {
+            return Inertia::render('sales-management/system-requirement/master-card/view-and-print-mc-by-machine');
+        })->name('vue.master-card.view-and-print-mc-by-machine');
+
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
