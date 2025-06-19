@@ -230,7 +230,34 @@
                     </select>
                 </div>
             </div>
-            <div class="overflow-x-auto">
+            
+            <!-- Error message if there's an error -->
+            <div v-if="error" class="p-6 text-center">
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200 inline-block">
+                    <div class="flex items-center mb-3">
+                        <div class="p-2 bg-red-100 rounded-full mr-3">
+                            <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        </div>
+                        <h4 class="text-red-800 font-medium">Error Loading Data</h4>
+                    </div>
+                    <p class="text-red-700 text-sm">{{ error }}</p>
+                    <button 
+                        @click="fetchData"
+                        class="mt-3 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    >
+                        <i class="fas fa-redo mr-2"></i> Try Again
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Loading indicator -->
+            <div v-else-if="loading" class="p-10 text-center">
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500 mb-4"></div>
+                <p class="text-gray-500">Loading master cards...</p>
+            </div>
+            
+            <!-- Table content when data is loaded -->
+            <div v-else class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
                         <tr>
@@ -605,13 +632,29 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { usePage, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import axios from 'axios';
+
+// Debug information
+console.log("Component loaded");
 
 const props = defineProps({
     masterCards: Array,
     customers: Array,
+});
+
+// Debug props received
+console.log("Props received:", props);
+
+// Initialize with API call if props are empty
+onMounted(async () => {
+    console.log("Component mounted");
+    
+    if (!props.masterCards || props.masterCards.length === 0) {
+        fetchData();
+    }
 });
 
 // Define reactive state variables
@@ -622,6 +665,12 @@ const showReleaseModal = ref(false);
 const showUnreleaseModal = ref(false);
 const releaseNotes = ref('');
 const masterCardToAction = ref(null);
+const form = ref({
+    mcsFrom: '',
+    mcsTo: ''
+});
+const loading = ref(false);
+const error = ref(null);
 
 // Notification system
 const notification = ref({
@@ -656,7 +705,7 @@ const hideNotification = () => {
 };
 
 // Sample master card data
-const masterCards = ref(props.masterCards || [
+const masterCards = ref(props.masterCards && props.masterCards.length ? props.masterCards : [
     { id: 1, mc_seq: 'MC001', mc_model: 'Box-Standard', customer_name: 'ACME Corp', approved_date: '2023-10-15T09:30:00', approved_by: 'John Doe', released_date: null, status: 'active' },
     { id: 2, mc_seq: 'MC002', mc_model: 'Box-Premium', customer_name: 'TechCorp Inc', approved_date: '2023-10-14T14:45:00', approved_by: 'Jane Smith', released_date: '2023-10-16T10:20:00', released_by: 'Admin User', status: 'active' },
     { id: 3, mc_seq: 'MC003', mc_model: 'Container-Small', customer_name: 'Global Shipping', approved_date: '2023-10-13T11:15:00', approved_by: 'Mike Johnson', released_date: null, status: 'active' }
@@ -728,44 +777,105 @@ const handleUnrelease = (mc) => {
     showUnreleaseModal.value = true;
 };
 
+// Confirm release action with API call
 const confirmRelease = async () => {
     try {
-        // Update the status locally for demo
-        const index = masterCards.value.findIndex(mc => mc.id === masterCardToAction.value.id);
-        if (index !== -1) {
-            masterCards.value[index].released_by = 'Current User';
-            masterCards.value[index].released_date = new Date().toISOString();
-            masterCards.value[index].release_notes = releaseNotes.value;
-        }
+        // Make API call to release the master card
+        const response = await axios.post(`/api/realese-approve-mc/release/${masterCardToAction.value.id}`, {
+            release_notes: releaseNotes.value
+        });
         
-        // Show success message
-        showNotification('Master Card released successfully!');
+        if (response.data.success) {
+            // Update the card in local state
+            const index = masterCards.value.findIndex(mc => mc.id === masterCardToAction.value.id);
+            if (index !== -1) {
+                masterCards.value[index].released_by = response.data.released_by || 'Current User';
+                masterCards.value[index].released_date = response.data.released_date || new Date().toISOString();
+                masterCards.value[index].release_notes = releaseNotes.value;
+            }
+            
+            // Show success message
+            showNotification('Master Card released successfully!');
+        } else {
+            throw new Error(response.data.message || 'Failed to release master card');
+        }
     } catch (error) {
         console.error('Error releasing master card:', error);
-        showNotification('An error occurred during release', 'error');
+        showNotification(error.message || 'An error occurred during release', 'error');
     }
     
     showReleaseModal.value = false;
 };
 
+// Confirm unreleased action with API call
 const confirmUnrelease = async () => {
     try {
-        // Update the status locally for demo
-        const index = masterCards.value.findIndex(mc => mc.id === masterCardToAction.value.id);
-        if (index !== -1) {
-            masterCards.value[index].released_by = null;
-            masterCards.value[index].released_date = null;
-            masterCards.value[index].release_notes = null;
-        }
+        // Make API call to unreleased the master card
+        const response = await axios.post(`/api/realese-approve-mc/unreleased/${masterCardToAction.value.id}`);
         
-        // Show success message
-        showNotification('Master Card un-released successfully!');
+        if (response.data.success) {
+            // Update the card in local state
+            const index = masterCards.value.findIndex(mc => mc.id === masterCardToAction.value.id);
+            if (index !== -1) {
+                masterCards.value[index].released_by = null;
+                masterCards.value[index].released_date = null;
+                masterCards.value[index].release_notes = null;
+            }
+            
+            // Show success message
+            showNotification('Master Card un-released successfully!');
+        } else {
+            throw new Error(response.data.message || 'Failed to unreleased master card');
+        }
     } catch (error) {
         console.error('Error un-releasing master card:', error);
-        showNotification('An error occurred during un-releasing', 'error');
+        showNotification(error.message || 'An error occurred during un-releasing', 'error');
     }
     
     showUnreleaseModal.value = false;
+};
+
+// Added functions for MCS handling
+const showMcsModal = () => {
+    console.log("Show MCS modal");
+    // This would typically open a modal dialog for selecting MCS numbers
+    // For now just log the action
+};
+
+const searchMcs = () => {
+    if (!form.value.mcsFrom || !form.value.mcsTo) {
+        showNotification('Please provide both Start and End MCS#', 'error');
+        return;
+    }
+    
+    console.log(`Searching for MCS from ${form.value.mcsFrom} to ${form.value.mcsTo}`);
+    // This would typically filter the masterCards by MCS range
+    // For now just log the search action
+};
+
+// Function to fetch data from API
+const fetchData = async () => {
+    loading.value = true;
+    error.value = null;
+    
+    try {
+        console.log("Fetching data from API");
+        const response = await axios.get('/api/realese-approve-mc');
+        if (response.data.success) {
+            masterCards.value = response.data.data;
+            console.log("Data fetched successfully:", masterCards.value);
+        } else {
+            console.error("API returned error:", response.data);
+            error.value = response.data.message || "Failed to load master cards";
+            showNotification(error.value, "error");
+        }
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        error.value = "Failed to connect to server";
+        showNotification(error.value, "error");
+    } finally {
+        loading.value = false;
+    }
 };
 </script>
 
