@@ -4,87 +4,181 @@
 -->
 <template>
     <AppLayout :header="'Approve MC'">
-        <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-            <div class="max-w-7xl mx-auto">
-                <!-- Header -->
-                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                                <!-- Check Circle Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                            </div>
-                            <div>
-                                <h1 class="text-2xl font-bold text-gray-800">Approve Master Card</h1>
-                                <p class="text-gray-600">Manage and approve master cards in the system</p>
-                            </div>
-                        </div>
-                        <div class="flex space-x-3">
-                            <button 
-                                @click="handleAddNew"
-                                class="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                            >
-                                <!-- Plus Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                <span>Add New</span>
-                            </button>
-                            <button 
-                                @click="showOptions = !showOptions"
-                                class="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                            >
-                                <!-- Filter Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                                <span>Options</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Search Bar -->
-                    <div class="relative">
-                        <!-- Search Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input
-                            type="text"
-                            placeholder="Search master cards..."
-                            v-model="searchTerm"
-                            class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                        />
-                    </div>
+        <!-- Header Section with animated elements -->
+        <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
+            <!-- Decorative Elements -->
+            <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20"></div>
+            <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10"></div>
+            <div class="absolute bottom-0 right-0 w-32 h-32 bg-yellow-400 opacity-5 rounded-full translate-y-10 translate-x-10"></div>
+            
+            <div class="flex items-center">
+                <div class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner flex items-center justify-center relative overflow-hidden mr-4">
+                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-300 opacity-30 rounded-full animate-ping-slow"></div>
+                    <div class="absolute -bottom-1 -left-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full animate-ping-slow animation-delay-500"></div>
+                    <i class="fas fa-check-circle text-white text-2xl z-10"></i>
                 </div>
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-1 text-shadow">Approve Master Card</h2>
+                    <p class="text-blue-100 max-w-2xl">Review and approve master cards submitted by users</p>
+                </div>
+            </div>
+        </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    <!-- Master Card List -->
-                    <div class="lg:col-span-3">
-                        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                            <div class="p-6 border-b border-gray-200">
-                                <h2 class="text-lg font-semibold text-gray-800">Master Card Table</h2>
+        <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-indigo-50">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - Main Content -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-indigo-500 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden">
+                        <div class="absolute -top-20 -right-20 w-40 h-40 bg-indigo-50 rounded-full opacity-20"></div>
+                        <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-purple-50 rounded-full opacity-20"></div>
+                        
+                        <div class="flex items-center mb-6 pb-2 border-b border-gray-200 relative z-10">
+                            <div class="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mr-3 shadow-md">
+                                <i class="fas fa-edit text-white"></i>
                             </div>
-                            
+                            <h3 class="text-xl font-semibold text-gray-800">Master Card Management</h3>
+                        </div>
+
+                        <!-- Form content -->
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="ac" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 shadow-sm">
+                                            <i class="fas fa-building text-white text-xs"></i>
+                                        </span>
+                                        AC#:
+                                    </label>
+                                    <div class="relative flex group">
+                                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+                                            <i class="fas fa-hashtag"></i>
+                                        </span>
+                                        <input 
+                                            type="text" 
+                                            id="ac" 
+                                            v-model="searchTerm"
+                                            placeholder="Search master cards..."
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
+                                        />
+                                        <button 
+                                            type="button"
+                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
+                                        >
+                                            <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
+                                            <i class="fas fa-search relative z-10"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-end">
+                                    <button 
+                                        type="button"
+                                        @click="handleAddNew"
+                                        class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
+                                    >
+                                        <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
+                                        <div class="bg-white bg-opacity-30 rounded-full p-1.5 mr-2 flex items-center justify-center">
+                                            <i class="fas fa-plus text-white text-xs"></i>
+                                        </div>
+                                        <span>Add New</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="mcs" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                    <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-pink-500 to-red-500 rounded-full mr-2 shadow-sm">
+                                        <i class="fas fa-barcode text-white text-xs"></i>
+                                    </span>
+                                    MCS#:
+                                </label>
+                                <div class="flex items-center space-x-2">
+                                    <div class="relative flex group flex-1">
+                                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+                                            <i class="fas fa-barcode"></i>
+                                        </span>
+                                        <input 
+                                            type="text" 
+                                            id="mcs" 
+                                            placeholder="Enter MCS number"
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
+                                        />
+                                        <button 
+                                            type="button"
+                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
+                                        >
+                                            <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
+                                            <i class="fas fa-search relative z-10"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <span class="text-gray-700 font-medium">to</span>
+                                    
+                                    <div class="relative flex group flex-1">
+                                        <input 
+                                            type="text" 
+                                            id="mcsTo" 
+                                            placeholder=""
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
+                                        />
+                                        <button 
+                                            type="button"
+                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
+                                        >
+                                            <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
+                                            <i class="fas fa-search relative z-10"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Master Card Table -->
                             <div class="overflow-x-auto">
-                                <table class="w-full">
+                                <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
                                         <tr>
-                                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">MC Seq#</th>
-                                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">MC Model</th>
-                                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Customer</th>
-                                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
-                                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Actions</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                MC Seq#
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                MC Model
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Customer
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Status
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Actions
+                                            </th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-200">
+                                    <tbody class="bg-white divide-y divide-gray-200">
                                         <tr 
                                             v-for="mc in filteredMasterCards"
                                             :key="mc.id"
-                                            class="hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
-                                            :class="{ 'bg-blue-50 border-l-4 border-blue-500': selectedMasterCard?.id === mc.id }"
+                                            class="hover:bg-indigo-50 transition-colors duration-150 cursor-pointer"
+                                            :class="{ 'bg-indigo-100 border-l-4 border-indigo-500': selectedMasterCard?.id === mc.id }"
                                             @click="selectedMasterCard = mc"
                                         >
-                                            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ mc.mc_seq }}</td>
-                                            <td class="px-6 py-4 text-sm text-gray-700">{{ mc.mc_model }}</td>
-                                            <td class="px-6 py-4 text-sm text-gray-700">{{ mc.customer_name }}</td>
-                                            <td class="px-6 py-4">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 h-8 w-8 bg-gradient-to-r from-indigo-400 to-purple-500 text-white rounded-md flex items-center justify-center mr-3 shadow-sm">
+                                                        <i class="fas fa-file-alt text-xs"></i>
+                                                    </div>
+                                                    {{ mc.mc_seq }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                                {{ mc.mc_model }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                                {{ mc.customer_name }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
                                                 <span 
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
                                                     :class="{
                                                         'bg-green-100 text-green-800': mc.status === 'active', 
                                                         'bg-yellow-100 text-yellow-800': mc.status === 'pending',
@@ -93,210 +187,192 @@
                                                     {{ mc.status.charAt(0).toUpperCase() + mc.status.slice(1) }}
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div class="flex space-x-2">
-                                                    <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-150" @click.stop="handleEdit(mc)">
-                                                        <!-- Edit Icon -->
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                    <button class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-1.5 rounded shadow-sm hover:shadow transition-all duration-200" @click.stop="handleEdit(mc)">
+                                                        <i class="fas fa-edit text-xs"></i>
                                                     </button>
-                                                    <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-150" @click.stop="handleApprove(mc)">
-                                                        <!-- Check Icon -->
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                                    <button class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-1.5 rounded shadow-sm hover:shadow transition-all duration-200" @click.stop="handleApprove(mc)">
+                                                        <i class="fas fa-check text-xs"></i>
                                                     </button>
-                                                    <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150" @click.stop="handleReject(mc)">
-                                                        <!-- X Icon -->
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                    <button class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-1.5 rounded shadow-sm hover:shadow transition-all duration-200" @click.stop="handleReject(mc)">
+                                                        <i class="fas fa-times text-xs"></i>
                                                     </button>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr v-if="filteredMasterCards.length === 0">
-                                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                                                No master cards found. Please adjust your search or filter criteria.
+                                            <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                                                <div class="flex flex-col items-center">
+                                                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                                                        <i class="fas fa-search text-gray-400 text-2xl"></i>
+                                                    </div>
+                                                    <p>No master cards found. Please adjust your search or filter criteria.</p>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="px-6 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between mt-4 rounded-b-lg">
+                                <span class="text-sm text-gray-500">
+                                    Showing {{ filteredMasterCards.length }} master cards
+                                </span>
+                                <div class="flex items-center space-x-2">
+                                    <button class="px-3 py-1 bg-white border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 shadow-sm">
+                                        <i class="fas fa-chevron-left mr-1 text-xs"></i> Previous
+                                    </button>
+                                    <button class="px-3 py-1 bg-gradient-to-r from-indigo-500 to-purple-600 border border-indigo-500 rounded-md text-sm text-white hover:from-indigo-600 hover:to-purple-700 shadow-sm">
+                                        Next <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Options Panel -->
-                    <div class="lg:col-span-1">
-                        <div 
-                            :class="[
-                                'bg-white rounded-xl shadow-lg transition-all duration-300',
-                                showOptions ? 'opacity-100 transform translate-y-0' : 'opacity-50 transform translate-y-2 pointer-events-none'
-                            ]"
-                        >
-                            <div class="p-6">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h3 class="text-lg font-semibold text-gray-800">Options</h3>
-                                    <!-- X Icon -->
-                                    <svg 
-                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
-                                        class="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" 
-                                        @click="showOptions = false">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </div>
+                <!-- Right Column - Quick Info -->
+                <div class="lg:col-span-1">
+                    <!-- Info Card -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden">
+                        <div class="absolute -top-16 -right-16 w-32 h-32 bg-teal-50 rounded-full opacity-20"></div>
+                        <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-green-50 rounded-full opacity-20"></div>
+                        
+                        <div class="flex items-center mb-4 pb-2 border-b border-gray-200 relative z-10">
+                            <div class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-3 shadow-md">
+                                <i class="fas fa-info-circle text-white"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800">Master Card Info</h3>
+                        </div>
 
-                                <!-- Sort By Section -->
-                                <div class="mb-6">
-                                    <label class="block text-sm font-medium text-gray-700 mb-3">Sort by:</label>
-                                    <div class="space-y-3">
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="sortBy"
-                                                value="seq"
-                                                v-model="sortBy"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">MC Sequence</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="sortBy"
-                                                value="model"
-                                                v-model="sortBy"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">MC Model</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="sortBy"
-                                                value="customer"
-                                                v-model="sortBy"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">Customer</span>
-                                        </label>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-teal-50 rounded-lg">
+                                <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2 flex items-center">
+                                    <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-teal-500 to-green-500 rounded-full mr-2 shadow-sm">
+                                        <i class="fas fa-book text-white text-xs"></i>
+                                    </span>
+                                    Instructions
+                                </h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li class="flex items-start">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                            <i class="fas fa-search text-white text-xs"></i>
+                                        </span>
+                                        <span>Enter AC# or MCS# to search for existing records</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                            <i class="fas fa-mouse-pointer text-white text-xs"></i>
+                                        </span>
+                                        <span>Click on a record to view details and approve/reject</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                            <i class="fas fa-check-circle text-white text-xs"></i>
+                                        </span>
+                                        <span>Use the action buttons to approve or reject master cards</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Selected Master Card Detail -->
+                        <div v-if="selectedMasterCard" class="mt-6">
+                            <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-100">
+                                <h4 class="text-sm font-semibold text-indigo-800 uppercase tracking-wider mb-3 flex items-center">
+                                    <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-2 shadow-sm">
+                                        <i class="fas fa-id-card text-white text-xs"></i>
+                                    </span>
+                                    Selected Master Card
+                                </h4>
+                                
+                                <div class="flex items-center mb-3">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-lg flex items-center justify-center mr-3 shadow-md">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-sm font-medium text-gray-900">{{ selectedMasterCard.mc_model }}</h5>
+                                        <p class="text-xs text-indigo-600 font-mono">{{ selectedMasterCard.mc_seq }}</p>
                                     </div>
                                 </div>
-
-                                <!-- Record Status Section -->
-                                <div class="mb-6">
-                                    <label class="block text-sm font-medium text-gray-700 mb-3">Record Status:</label>
-                                    <div class="space-y-3">
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="recordStatus"
-                                                value="active"
-                                                v-model="recordStatus"
-                                                class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">Active</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="recordStatus"
-                                                value="pending"
-                                                v-model="recordStatus"
-                                                class="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">Pending</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="recordStatus"
-                                                value="obsolete"
-                                                v-model="recordStatus"
-                                                class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">Obsolete</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="recordStatus"
-                                                value="all"
-                                                v-model="recordStatus"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">All</span>
-                                        </label>
+                                
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-500">Customer:</span>
+                                        <span class="font-medium text-gray-900">{{ selectedMasterCard.customer_name }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-500">Status:</span>
+                                        <span 
+                                            class="px-2 py-1 rounded-full text-xs font-medium"
+                                            :class="{
+                                                'bg-gradient-to-r from-green-400 to-green-500 text-white': selectedMasterCard.status === 'active', 
+                                                'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white': selectedMasterCard.status === 'pending',
+                                                'bg-gradient-to-r from-red-400 to-red-500 text-white': selectedMasterCard.status === 'obsolete'
+                                            }">
+                                            {{ selectedMasterCard.status.charAt(0).toUpperCase() + selectedMasterCard.status.slice(1) }}
+                                        </span>
                                     </div>
                                 </div>
-
-                                <!-- Select by option -->
-                                <div class="mb-6">
-                                    <label class="block text-sm font-medium text-gray-700 mb-3">Select by:</label>
-                                    <div class="space-y-3">
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="selectBy"
-                                                value="customer"
-                                                v-model="selectBy"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">Customer</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input
-                                                type="radio"
-                                                name="selectBy"
-                                                value="mastercard"
-                                                v-model="selectBy"
-                                                class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                            />
-                                            <span class="ml-3 text-sm text-gray-700">Master Card</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="flex flex-col space-y-3">
-                                    <button class="w-full px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2" @click="handleOK">
-                                        <!-- Check Icon -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        <span>OK</span>
+                                
+                                <div class="mt-4 grid grid-cols-2 gap-2">
+                                    <button 
+                                        @click="handleApprove(selectedMasterCard)" 
+                                        class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 py-1.5 rounded-lg flex items-center justify-center space-x-1 transform active:translate-y-px transition-all duration-300 shadow-md text-sm"
+                                    >
+                                        <i class="fas fa-check text-xs"></i>
+                                        <span>Approve</span>
                                     </button>
-                                    <button class="w-full px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2" @click="handleExit">
-                                        <!-- X Icon -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                        <span>Exit</span>
+                                    <button 
+                                        @click="handleReject(selectedMasterCard)" 
+                                        class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 py-1.5 rounded-lg flex items-center justify-center space-x-1 transform active:translate-y-px transition-all duration-300 shadow-md text-sm"
+                                    >
+                                        <i class="fas fa-times text-xs"></i>
+                                        <span>Reject</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Selected Master Card Detail -->
-                        <div v-if="selectedMasterCard" class="mt-6 bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Selected Master Card</h3>
-                            <div class="space-y-2">
-                                <p class="text-sm"><span class="font-medium text-gray-600">Sequence:</span> {{ selectedMasterCard.mc_seq }}</p>
-                                <p class="text-sm"><span class="font-medium text-gray-600">Model:</span> {{ selectedMasterCard.mc_model }}</p>
-                                <p class="text-sm"><span class="font-medium text-gray-600">Customer:</span> {{ selectedMasterCard.customer_name }}</p>
-                                <p class="text-sm">
-                                    <span class="font-medium text-gray-600">Status:</span> 
-                                    <span 
-                                        class="ml-2 px-2 py-1 rounded text-xs"
-                                        :class="{
-                                            'bg-green-100 text-green-800': selectedMasterCard.status === 'active', 
-                                            'bg-yellow-100 text-yellow-800': selectedMasterCard.status === 'pending',
-                                            'bg-red-100 text-red-800': selectedMasterCard.status === 'obsolete'
-                                        }">
-                                        {{ selectedMasterCard.status.charAt(0).toUpperCase() + selectedMasterCard.status.slice(1) }}
-                                    </span>
-                                </p>
-                            </div>
-                            <div class="mt-4 pt-4 border-t border-gray-200">
-                                <button class="w-full px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2" @click="handleApprove(selectedMasterCard)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    <span>Approve</span>
-                                </button>
-                                <button class="mt-2 w-full px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2" @click="handleReject(selectedMasterCard)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                    <span>Reject</span>
-                                </button>
+                        
+                        <!-- Filter Options -->
+                        <div class="mt-6">
+                            <h4 class="text-sm font-semibold text-gray-800 uppercase tracking-wider mb-3 flex items-center">
+                                <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full mr-2 shadow-sm">
+                                    <i class="fas fa-filter text-white text-xs"></i>
+                                </span>
+                                Filter Options
+                            </h4>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs font-medium text-gray-700 block mb-1">Status:</label>
+                                    <div class="flex space-x-2">
+                                        <label class="inline-flex items-center px-2 py-1 bg-gray-50 border border-gray-200 rounded-md text-xs cursor-pointer hover:bg-white transition-colors">
+                                            <input type="radio" name="recordStatus" value="all" v-model="recordStatus" class="h-3 w-3 text-blue-600 mr-1">
+                                            <span>All</span>
+                                        </label>
+                                        <label class="inline-flex items-center px-2 py-1 bg-green-50 border border-green-200 rounded-md text-xs cursor-pointer hover:bg-white transition-colors">
+                                            <input type="radio" name="recordStatus" value="active" v-model="recordStatus" class="h-3 w-3 text-green-600 mr-1">
+                                            <span>Active</span>
+                                        </label>
+                                        <label class="inline-flex items-center px-2 py-1 bg-yellow-50 border border-yellow-200 rounded-md text-xs cursor-pointer hover:bg-white transition-colors">
+                                            <input type="radio" name="recordStatus" value="pending" v-model="recordStatus" class="h-3 w-3 text-yellow-600 mr-1">
+                                            <span>Pending</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="text-xs font-medium text-gray-700 block mb-1">Sort by:</label>
+                                    <select 
+                                        v-model="sortBy" 
+                                        class="block w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                    >
+                                        <option value="seq">MC Sequence</option>
+                                        <option value="model">MC Model</option>
+                                        <option value="customer">Customer</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -307,34 +383,68 @@
         <!-- Approval Confirmation Modal -->
         <div v-if="showApprovalModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="showApprovalModal = false"></div>
+                <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" aria-hidden="true" @click="showApprovalModal = false"></div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full animate-modalScaleIn">
+                    <!-- Modal Header with gradient -->
+                    <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 relative overflow-hidden">
+                        <div class="absolute -top-8 -left-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                        <div class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                        
+                        <div class="flex items-center">
+                            <div class="bg-white bg-opacity-20 p-2 rounded-full mr-3">
+                                <i class="fas fa-check text-white text-xl"></i>
                             </div>
-                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                    Approve Master Card
-                                </h3>
-                                <div class="mt-2">
-                                    <p class="text-sm text-gray-500">
-                                        Are you sure you want to approve this master card? This action cannot be undone.
+                            <h3 class="text-xl font-bold text-white">Approve Master Card</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white px-6 py-5">
+                        <div class="sm:flex sm:items-start">
+                            <div class="bg-gradient-to-br from-green-400 to-green-500 p-3 rounded-lg shadow-md flex-shrink-0 mr-4">
+                                <i class="fas fa-file-alt text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-600 mb-3">
+                                    Are you sure you want to approve this master card? This action cannot be undone.
+                                </p>
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
+                                    <div class="flex items-center mb-1">
+                                        <i class="fas fa-info-circle text-green-600 mr-2"></i>
+                                        <span class="font-medium text-green-900">Master Card Details</span>
+                                    </div>
+                                    <p class="text-sm text-green-800">
+                                        <span class="font-medium">MC Seq#:</span> {{ masterCardToAction?.mc_seq }}
+                                    </p>
+                                    <p class="text-sm text-green-800">
+                                        <span class="font-medium">Model:</span> {{ masterCardToAction?.mc_model }}
+                                    </p>
+                                    <p class="text-sm text-green-800">
+                                        <span class="font-medium">Customer:</span> {{ masterCardToAction?.customer_name }}
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm" @click="confirmApproval">
-                            Approve
+                    
+                    <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+                        <button 
+                            type="button" 
+                            class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-5 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
+                            @click="confirmApproval"
+                        >
+                            <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
+                            <i class="fas fa-check text-sm mr-1"></i>
+                            <span>Approve</span>
                         </button>
-                        <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="showApprovalModal = false">
-                            Cancel
+                        <button 
+                            type="button" 
+                            class="bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-700 px-5 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
+                            @click="showApprovalModal = false"
+                        >
+                            <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
+                            <i class="fas fa-times text-sm mr-1"></i>
+                            <span>Cancel</span>
                         </button>
                     </div>
                 </div>
@@ -344,35 +454,80 @@
         <!-- Rejection Modal -->
         <div v-if="showRejectionModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="showRejectionModal = false"></div>
+                <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" aria-hidden="true" @click="showRejectionModal = false"></div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full animate-modalScaleIn">
+                    <!-- Modal Header with gradient -->
+                    <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 relative overflow-hidden">
+                        <div class="absolute -top-8 -left-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                        <div class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                        
+                        <div class="flex items-center">
+                            <div class="bg-white bg-opacity-20 p-2 rounded-full mr-3">
+                                <i class="fas fa-times text-white text-xl"></i>
                             </div>
-                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                    Reject Master Card
-                                </h3>
-                                <div class="mt-2">
-                                    <p class="text-sm text-gray-500">
-                                        Please provide a reason for rejecting this master card:
+                            <h3 class="text-xl font-bold text-white">Reject Master Card</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white px-6 py-5">
+                        <div class="sm:flex sm:items-start mb-4">
+                            <div class="bg-gradient-to-br from-red-400 to-red-500 p-3 rounded-lg shadow-md flex-shrink-0 mr-4">
+                                <i class="fas fa-file-alt text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+                                    <div class="flex items-center mb-1">
+                                        <i class="fas fa-info-circle text-red-600 mr-2"></i>
+                                        <span class="font-medium text-red-900">Master Card Details</span>
+                                    </div>
+                                    <p class="text-sm text-red-800">
+                                        <span class="font-medium">MC Seq#:</span> {{ masterCardToAction?.mc_seq }}
                                     </p>
-                                    <textarea v-model="rejectionReason" rows="4" class="mt-2 shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md"></textarea>
+                                    <p class="text-sm text-red-800">
+                                        <span class="font-medium">Model:</span> {{ masterCardToAction?.mc_model }}
+                                    </p>
+                                    <p class="text-sm text-red-800">
+                                        <span class="font-medium">Customer:</span> {{ masterCardToAction?.customer_name }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-red-500 to-red-600 rounded-full mr-2 shadow-sm">
+                                    <i class="fas fa-comment-alt text-white text-xs"></i>
+                                </span>
+                                Rejection Reason:
+                            </label>
+                            <textarea 
+                                v-model="rejectionReason" 
+                                rows="4" 
+                                placeholder="Please provide a detailed reason for rejecting this master card..."
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                            ></textarea>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm" @click="confirmRejection">
-                            Reject
+                    
+                    <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+                        <button 
+                            type="button" 
+                            class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-5 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
+                            @click="confirmRejection"
+                        >
+                            <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
+                            <i class="fas fa-times text-sm mr-1"></i>
+                            <span>Reject</span>
                         </button>
-                        <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="showRejectionModal = false">
-                            Cancel
+                        <button 
+                            type="button" 
+                            class="bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-700 px-5 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
+                            @click="showRejectionModal = false"
+                        >
+                            <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
+                            <i class="fas fa-arrow-left text-sm mr-1"></i>
+                            <span>Cancel</span>
                         </button>
                     </div>
                 </div>
@@ -384,33 +539,64 @@
             <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="showOptionModal = false"></div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div class="w-full">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modal-title">
-                                    Option
-                                </h3>
-                                <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4 mb-4">
-                                    <label class="flex items-center mb-4 cursor-pointer">
-                                        <input type="radio" v-model="selectOption" value="customer" class="form-radio h-5 w-5 text-blue-600">
-                                        <span class="ml-2 text-gray-800 font-bold">Select by Customer</span>
-                                    </label>
-                                    <label class="flex items-center cursor-pointer">
-                                        <input type="radio" v-model="selectOption" value="mastercard" class="form-radio h-5 w-5 text-blue-600">
-                                        <span class="ml-2 text-gray-800 font-bold">Select by Master Card</span>
-                                    </label>
-                                </div>
-                            </div>
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full animate-modalScaleIn">
+                    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-4 py-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
+                                Select Option
+                            </h3>
+                            <button 
+                                @click="showOptionModal = false" 
+                                class="text-white opacity-70 hover:opacity-100 focus:outline-none"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:justify-center">
-                        <button type="button" class="w-24 inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-300 text-base font-medium text-gray-700 hover:bg-gray-400 focus:outline-none sm:text-sm mx-2" @click="handleSelectOption">
-                            OK
-                        </button>
-                        <button type="button" class="w-24 inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-300 text-base font-medium text-gray-700 hover:bg-gray-400 focus:outline-none sm:text-sm mx-2" @click="showOptionModal = false">
-                            Exit
-                        </button>
+                    <div class="bg-white p-6">
+                        <div class="bg-gray-50 border border-gray-200 rounded-md p-4 mb-6">
+                            <div class="space-y-3">
+                                <label class="flex items-center cursor-pointer p-2 hover:bg-gray-100 rounded-md transition-colors">
+                                    <input type="radio" v-model="selectOption" value="customer" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <div class="ml-3">
+                                        <span class="font-medium text-gray-900 block">Select by Customer</span>
+                                        <span class="text-xs text-gray-500">Filter master cards by customer information</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-center cursor-pointer p-2 hover:bg-gray-100 rounded-md transition-colors">
+                                    <input type="radio" v-model="selectOption" value="mastercard" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <div class="ml-3">
+                                        <span class="font-medium text-gray-900 block">Select by Master Card</span>
+                                        <span class="text-xs text-gray-500">Filter by master card attributes</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-center space-x-4">
+                            <button 
+                                type="button" 
+                                class="inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" 
+                                @click="handleSelectOption"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Apply
+                            </button>
+                            <button 
+                                type="button" 
+                                class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" 
+                                @click="showOptionModal = false"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -723,5 +909,55 @@ const handleUpdateMasterCard = async (updatedMasterCardData) => {
 @keyframes modalScaleIn {
     from { transform: scale(0.95); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
+}
+
+.animate-modalScaleIn {
+    animation: modalScaleIn 0.3s ease-out forwards;
+}
+
+/* Add new animations for ping effects */
+@keyframes ping-slow {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+.animate-ping-slow {
+    animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animation-delay-500 {
+    animation-delay: 500ms;
+}
+
+/* Text shadow for header text */
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Add more attractive hover effects */
+button:hover svg {
+    transform: scale(1.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+tr.hover\:bg-gray-50:hover td {
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Add smooth transitions for form elements */
+input[type="radio"],
+input[type="checkbox"] {
+    transition: all 0.2s ease-in-out;
+}
+
+input[type="text"],
+textarea {
+    transition: all 0.2s ease-in-out;
 }
 </style>
