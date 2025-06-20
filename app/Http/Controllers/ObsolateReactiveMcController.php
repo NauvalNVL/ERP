@@ -19,7 +19,7 @@ class ObsolateReactiveMcController extends Controller
         $masterCards = ObsolateReactiveMC::orderBy('mc_seq')->get();
         $customers = UpdateCustomerAccount::orderBy('customer_name')->get();
         
-        return Inertia::render('sales-management/system-requirement/master-card/obsolate-reactive-mc', [
+        return Inertia::render('sales-management/system-requirement/master-card/obsolete-reactive-mc', [
             'masterCards' => $masterCards,
             'customers' => $customers
         ]);

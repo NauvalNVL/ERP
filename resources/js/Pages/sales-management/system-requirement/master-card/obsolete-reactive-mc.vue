@@ -3,9 +3,9 @@
   This component handles obsolating and reactivating master cards in the system
 -->
 <template>
-    <AppLayout :header="'Obsolate & Reactive MC'">
+    <AppLayout :header="'Obsolete & Reactive MC'">
         <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-            <div class="max-w-7xl mx-auto">
+            <div class="max-w-7xl mfx-auto">
                 <!-- Header -->
                 <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                     <div class="flex items-center justify-between mb-4">
@@ -15,8 +15,8 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                             </div>
                             <div>
-                                <h1 class="text-2xl font-bold text-gray-800">Obsolate & Reactive Master Card</h1>
-                                <p class="text-gray-600">Manage active and obsolate status of master cards</p>
+                                <h1 class="text-2xl font-bold text-gray-800">Obsolete & Reactive Master Card</h1>
+                                <p class="text-gray-600">Manage active and obsolete status of master cards</p>
                             </div>
                         </div>
                         <div class="flex space-x-3">
