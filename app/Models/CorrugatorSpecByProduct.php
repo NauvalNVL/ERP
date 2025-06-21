@@ -12,7 +12,6 @@ class CorrugatorSpecByProduct extends Model
     protected $table = 'corrugator_spec_by_products';
 
     protected $fillable = [
-        'product_id',
         'product_code',
         'compute',
         'min_sheet_length',

@@ -25,6 +25,17 @@ class RollTrimByCorrugator extends Model
         'corrugator_name',
         'flute_code',
         'trim_value',
+        'compute',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'compute' => 'boolean',
+        'trim_value' => 'float',
     ];
 
     /**

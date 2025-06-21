@@ -62,7 +62,7 @@ class RollTrimByProductDesignController extends Controller
                 'product_id' => 'required|exists:products,id',
                 'product_design_id' => 'required|exists:product_designs,id',
                 'flute_id' => 'required|exists:paper_flutes,id',
-                'is_composite' => 'required|boolean',
+                'compute' => 'required|boolean',
                 'min_trim' => 'required|integer|min:0',
                 'max_trim' => 'required|integer|min:0|gte:min_trim',
             ]);
@@ -74,7 +74,7 @@ class RollTrimByProductDesignController extends Controller
                     'flute_id' => $validated['flute_id'],
                 ],
                 [
-                    'is_composite' => $validated['is_composite'],
+                    'compute' => $validated['compute'],
                     'min_trim' => $validated['min_trim'],
                     'max_trim' => $validated['max_trim'],
                 ]
@@ -108,7 +108,7 @@ class RollTrimByProductDesignController extends Controller
                 'product_id' => 'required|exists:products,id',
                 'product_design_id' => 'required|exists:product_designs,id',
                 'flute_id' => 'required|exists:paper_flutes,id',
-                'is_composite' => 'required|boolean',
+                'compute' => 'required|boolean',
                 'min_trim' => 'required|integer|min:0',
                 'max_trim' => 'required|integer|min:0|gte:min_trim',
             ]);
@@ -167,7 +167,7 @@ class RollTrimByProductDesignController extends Controller
             $headers = [
                 'Product Design',
                 'Flute Code',
-                'To Computer',
+                'Compute',
                 'Min Trim (mm)',
                 'Max Trim (mm)',
                 'Created At',
@@ -182,7 +182,7 @@ class RollTrimByProductDesignController extends Controller
                     fputcsv($file, [
                         $trim->productDesign ? $trim->productDesign->pd_name : 'N/A',
                         $trim->paperFlute ? $trim->paperFlute->code : 'N/A',
-                        $trim->is_composite ? 'Yes' : 'No',
+                        $trim->compute ? 'Yes' : 'No',
                         $trim->min_trim,
                         $trim->max_trim,
                         $trim->created_at->format('Y-m-d H:i:s'),
@@ -234,7 +234,7 @@ class RollTrimByProductDesignController extends Controller
                                 'flute_id' => $flute->id,
                             ],
                             [
-                                'is_composite' => rand(0, 1) === 1,
+                                'compute' => rand(0, 1) === 1,
                                 'min_trim' => 20,
                                 'max_trim' => 65
                             ]
@@ -252,8 +252,90 @@ class RollTrimByProductDesignController extends Controller
             Log::error('Error seeding roll trim by product design data: ' . $e->getMessage());
             
             return response()->json([
-                'success' => false,
-                'message' => 'Failed to seed data: ' . $e->getMessage()
+                'status' => 'error',
+                'message' => 'Failed to seed roll trim data',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Batch update multiple roll trim records.
+     */
+    public function apiBatchUpdate(Request $request)
+    {
+        try {
+            $items = $request->all();
+            
+            if (!is_array($items)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid data format. Expected an array of roll trim specifications.'
+                ], 400);
+            }
+            
+            $results = [];
+            $errors = [];
+            
+            foreach ($items as $item) {
+                try {
+                    $validator = Validator::make($item, [
+                        'product_id' => 'required|exists:products,id',
+                        'product_design_id' => 'required|exists:product_designs,id',
+                        'flute_id' => 'required|exists:paper_flutes,id',
+                        'compute' => 'required|boolean',
+                        'min_trim' => 'required|integer|min:0',
+                        'max_trim' => 'required|integer|min:0|gte:min_trim',
+                    ]);
+                    
+                    if ($validator->fails()) {
+                        $errors[] = [
+                            'product_id' => $item['product_id'] ?? null,
+                            'product_design_id' => $item['product_design_id'] ?? null,
+                            'flute_id' => $item['flute_id'] ?? null,
+                            'error' => 'Validation failed: ' . implode(', ', $validator->errors()->all())
+                        ];
+                        continue;
+                    }
+                    
+                    $rollTrim = RollTrimByProductDesign::updateOrCreate(
+                        [
+                            'product_id' => $item['product_id'],
+                            'product_design_id' => $item['product_design_id'],
+                            'flute_id' => $item['flute_id'],
+                        ],
+                        [
+                            'compute' => $item['compute'],
+                            'min_trim' => $item['min_trim'],
+                            'max_trim' => $item['max_trim'],
+                        ]
+                    );
+                    
+                    $results[] = $rollTrim;
+                } catch (\Exception $e) {
+                    Log::error('Error updating roll trim by product design: ' . $e->getMessage());
+                    $errors[] = [
+                        'product_id' => $item['product_id'] ?? null,
+                        'product_design_id' => $item['product_design_id'] ?? null,
+                        'flute_id' => $item['flute_id'] ?? null,
+                        'error' => $e->getMessage()
+                    ];
+                }
+            }
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => count($results) . ' roll trim specifications saved successfully',
+                'results' => $results,
+                'errors' => $errors
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in batch update of roll trim by product design: ' . $e->getMessage());
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to save roll trim specifications',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

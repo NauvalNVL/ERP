@@ -121,6 +121,65 @@ class RollSizeController extends Controller
     }
 
     /**
+     * Batch update multiple roll size records.
+     */
+    public function apiBatchUpdate(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                '*.id' => 'required|exists:roll_sizes,id',
+                '*.flute_id' => 'required|exists:paper_flutes,id',
+                '*.roll_length' => 'required|numeric|min:0',
+                '*.is_composite' => 'required|boolean',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $results = [];
+            $errors = [];
+
+            foreach ($request->all() as $item) {
+                try {
+                    $rollSize = RollSize::findOrFail($item['id']);
+                    $rollSize->update([
+                        'flute_id' => $item['flute_id'],
+                        'roll_length' => $item['roll_length'],
+                        'is_composite' => $item['is_composite'],
+                    ]);
+                    $results[] = $rollSize;
+                } catch (\Exception $e) {
+                    $errors[] = [
+                        'id' => $item['id'] ?? null,
+                        'error' => $e->getMessage()
+                    ];
+                    Log::error('Error updating roll size in batch: ' . $e->getMessage());
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Roll sizes updated successfully',
+                'results' => $results,
+                'errors' => $errors
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in batch update of roll sizes: ' . $e->getMessage());
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update roll sizes',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Delete a roll size record.
      */
     public function apiDestroy($id)

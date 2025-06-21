@@ -6,104 +6,145 @@
       </h2>
     </template>
 
-    <div class="py-12">
+    <div class="py-6">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-          <!-- Header with buttons -->
-          <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 flex items-center justify-between">
-            <h2 class="text-lg font-bold text-white">Define Roll Size</h2>
+          <div class="p-6 sm:px-8 bg-white border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-2xl font-bold text-gray-800">Roll Size Settings</h2>
+                <p class="mt-1 text-sm text-gray-600">Manage roll size specifications for each flute.</p>
+              </div>
             <div class="flex space-x-2">
-              <button @click="exportData" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-                Export
-              </button>
-              <button @click="printData" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
-                </svg>
-                Print
-              </button>
-              <a :href="viewPrintUrl" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                  <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                </svg>
-                View & Print
-              </a>
-              <button @click="saveChanges" class="bg-green-700 hover:bg-green-600 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                <button @click="saveChanges" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring focus:ring-indigo-300 disabled:opacity-25 transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                 </svg>
                 Save
               </button>
+              </div>
             </div>
           </div>
 
-          <!-- Main content -->
-          <div class="p-6">
-            <!-- Loading Spinner -->
-            <div v-if="loading" class="flex justify-center items-center py-8">
-              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-              <span class="ml-3 text-gray-600">Loading...</span>
+          <div class="p-6 sm:px-8">
+            <div v-if="loading" class="flex justify-center items-center py-16">
+              <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+              <span class="ml-4 text-lg text-gray-700">Loading Flutes...</span>
             </div>
 
             <div v-else>
-              <!-- Table section -->
-              <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 border">
-                  <thead class="bg-teal-700">
+              <div class="mb-6">
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    v-model="searchQuery"
+                    @input="filterItems"
+                    placeholder="Search by flute code or name..."
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+
+              <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
                     <tr>
-                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r w-1/3">
-                        Flute (mm)
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Flute
                       </th>
-                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r w-1/3">
+                      <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Roll Length (mm)
                       </th>
-                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wider border-r w-1/3">
-                        Composite
+                      <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Compute
                       </th>
                     </tr>
                   </thead>
                   <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-if="rollSizes.length === 0" class="hover:bg-gray-50">
-                      <td colspan="3" class="px-4 py-4 text-center text-sm text-gray-500">
-                        No roll size data found. Please add new data.
+                    <tr v-if="paginatedItems.length === 0">
+                      <td colspan="3" class="px-6 py-12 text-center text-sm text-gray-500">
+                        <div class="flex flex-col items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                          <h3 class="mt-2 text-lg font-medium text-gray-900">No roll sizes found</h3>
+                          <p class="mt-1 text-sm text-gray-500">Please try a different search term or add new roll sizes.</p>
+                        </div>
                       </td>
                     </tr>
-                    <tr 
-                      v-for="(size, index) in rollSizes" 
-                      :key="size.id" 
-                      class="hover:bg-gray-50"
-                      :class="{ 'bg-yellow-100': index === 6 }"
-                    >
-                      <td class="px-4 py-2 text-sm font-medium text-gray-900 border-r">
-                        {{ size.flute_code }}
+                    <tr v-for="size in paginatedItems" :key="size.id" class="hover:bg-gray-50 transition-colors duration-150">
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ size.flute_code }}</div>
                       </td>
-                      <td class="px-4 py-2 text-sm text-gray-900 border-r">
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
                         <input 
                           type="number" 
                           v-model="size.roll_length" 
                           step="0.01"
-                          class="w-full text-center border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                          class="w-24 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                         />
                       </td>
-                      <td class="px-4 py-2 text-center border-r">
-                        <input 
-                          type="checkbox" 
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <Switch
                           v-model="size.is_composite"
-                          class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                        />
+                          @update:modelValue="toggleCompute(size)"
+                          :class="size.is_composite ? 'bg-blue-600' : 'bg-gray-200'"
+                          class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                          :disabled="savingCompute[size.id]"
+                        >
+                          <span class="sr-only">Enable compute</span>
+                          <span
+                            :class="size.is_composite ? 'translate-x-6' : 'translate-x-1'"
+                            class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform"
+                          />
+                          <div v-if="savingCompute[size.id]" class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        </Switch>
                       </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
+
+              <!-- Pagination -->
+              <div v-if="filteredItems.length > itemsPerPage" class="mt-6 flex items-center justify-between">
+                <p class="text-sm text-gray-700">
+                  Showing
+                  <span class="font-medium">{{ (currentPage - 1) * itemsPerPage + 1 }}</span>
+                  to
+                  <span class="font-medium">{{ Math.min(currentPage * itemsPerPage, filteredItems.length) }}</span>
+                  of
+                  <span class="font-medium">{{ filteredItems.length }}</span>
+                  results
+                </p>
+                <div class="flex-1 flex justify-end">
+                  <button
+                    @click="prevPage"
+                    :disabled="currentPage === 1"
+                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    @click="nextPage"
+                    :disabled="currentPage === totalPages"
+                    class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+              </div>
             </div>
 
             <!-- Add New Roll Size -->
-            <div class="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div class="p-6 sm:px-8 bg-gray-50 border-t border-gray-200">
               <h3 class="text-lg font-medium text-gray-700 mb-3">Add New Roll Size</h3>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -139,7 +180,7 @@
                         v-model="newRollSize.is_composite"
                         class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                       />
-                      <span class="ml-2 text-sm text-gray-700">Composite</span>
+                    <span class="ml-2 text-sm text-gray-700">Compute</span>
                     </label>
                   </div>
                   <button 
@@ -151,57 +192,36 @@
                   </button>
                 </div>
               </div>
-            </div>
-
-            <!-- Notification -->
-            <transition 
-              enter-active-class="transform ease-out duration-300 transition"
-              enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-              enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
-              leave-active-class="transition ease-in duration-200"
-              leave-from-class="opacity-100"
-              leave-to-class="opacity-0"
-            >
-              <div 
-                v-if="notification.show" 
-                class="fixed bottom-4 right-4 w-80 p-4 rounded-lg shadow-lg border border-l-4"
-                :class="notification.type === 'success' ? 'bg-green-50 border-green-500 text-green-800' : 'bg-red-50 border-red-500 text-red-800'"
-              >
-                <div class="flex items-center">
-                  <div class="flex-shrink-0">
-                    <svg v-if="notification.type === 'success'" class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                    </svg>
-                    <svg v-else class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <div class="ml-3">
-                    <p class="text-sm">{{ notification.message }}</p>
                   </div>
                 </div>
               </div>
-            </transition>
           </div>
-        </div>
-      </div>
-    </div>
+
+
   </AppLayout>
 </template>
 
 <script>
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, ref, computed, onMounted, reactive } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { Switch } from '@headlessui/vue';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default defineComponent({
   components: {
-    AppLayout
+    AppLayout,
+    Switch
   },
   setup() {
     const loading = ref(true);
     const rollSizes = ref([]);
+    const filteredItems = ref([]);
     const flutes = ref([]);
+    const searchQuery = ref('');
+    const currentPage = ref(1);
+    const itemsPerPage = ref(10);
+    const savingCompute = reactive({});
     const viewPrintUrl = '/standard-formula/setup-roll-size/view-print';
     
     const newRollSize = ref({
@@ -210,11 +230,22 @@ export default defineComponent({
       is_composite: false
     });
     
-    const notification = ref({
-      show: false,
-      message: '',
-      type: 'success'
+
+
+    const totalPages = computed(() => Math.ceil(filteredItems.value.length / itemsPerPage.value));
+    const paginatedItems = computed(() => {
+      const start = (currentPage.value - 1) * itemsPerPage.value;
+      const end = start + itemsPerPage.value;
+      return filteredItems.value.slice(start, end);
     });
+
+    const nextPage = () => {
+      if (currentPage.value < totalPages.value) currentPage.value++;
+    };
+
+    const prevPage = () => {
+      if (currentPage.value > 1) currentPage.value--;
+    };
 
     const canAddRollSize = computed(() => {
       return newRollSize.value.flute_id && 
@@ -222,16 +253,23 @@ export default defineComponent({
              newRollSize.value.roll_length > 0;
     });
 
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer);
+        toast.addEventListener('mouseleave', Swal.resumeTimer);
+      }
+    });
+
     const showNotification = (message, type = 'success') => {
-      notification.value = {
-        show: true,
-        message,
-        type
-      };
-      
-      setTimeout(() => {
-        notification.value.show = false;
-      }, 3000);
+      Toast.fire({
+        icon: type,
+        title: message
+      });
     };
 
     const loadData = async () => {
@@ -246,7 +284,6 @@ export default defineComponent({
         const sizesResponse = await axios.get('/api/roll-sizes');
         
         if (sizesResponse.data && sizesResponse.data.status === 'success' && Array.isArray(sizesResponse.data.data) && sizesResponse.data.data.length > 0) {
-          console.log('Received data from API:', sizesResponse.data.data);
           // Process the data from the API response
           rollSizes.value = sizesResponse.data.data.map(size => {
             const flute = size.paper_flute || {};
@@ -267,10 +304,7 @@ export default defineComponent({
             }
             return a.flute_code.localeCompare(b.flute_code);
           });
-          
-          console.log('Processed roll sizes:', rollSizes.value);
         } else {
-          console.log('No data found or invalid response format:', sizesResponse.data);
           // If no data from API, seed the database first
           try {
             showNotification('No roll size data found. Seeding initial data...', 'info');
@@ -309,6 +343,8 @@ export default defineComponent({
             showNotification('Failed to seed roll size data', 'error');
           }
         }
+        
+        filteredItems.value = [...rollSizes.value];
       } catch (error) {
         console.error('Error loading data:', error);
         
@@ -327,8 +363,55 @@ export default defineComponent({
         
         showNotification(errorMessage, 'error');
         rollSizes.value = [];
+        filteredItems.value = [];
       } finally {
         loading.value = false;
+      }
+    };
+
+    const filterItems = () => {
+      currentPage.value = 1;
+      if (!searchQuery.value) {
+        filteredItems.value = [...rollSizes.value];
+        return;
+      }
+      
+      const query = searchQuery.value.toLowerCase();
+      filteredItems.value = rollSizes.value.filter(size => 
+        size.flute_code.toLowerCase().includes(query)
+      );
+    };
+
+    // Function to toggle compute value with immediate save
+    const toggleCompute = async (size) => {
+      try {
+        // Set loading state for this specific item
+        savingCompute[size.id] = true;
+        
+        // Prepare data for saving
+        const dataToSave = {
+          id: size.id,
+          flute_id: size.flute_id,
+          roll_length: size.roll_length,
+          is_composite: size.is_composite
+        };
+        
+        // Save the data
+        await axios.put(`/api/roll-sizes/${size.id}`, dataToSave);
+        
+        // Show small notification
+        showNotification(`Compute status for ${size.flute_code} updated successfully`, 'success');
+      } catch (error) {
+        console.error('Error toggling compute status:', error);
+        
+        // Revert the change in the UI
+        size.is_composite = !size.is_composite;
+        
+        // Show error notification
+        showNotification(`Failed to update compute status for ${size.flute_code}`, 'error');
+      } finally {
+        // Clear loading state
+        savingCompute[size.id] = false;
       }
     };
 
@@ -337,16 +420,31 @@ export default defineComponent({
         loading.value = true;
         
         // Prepare data for saving
-        const promises = rollSizes.value.map(size => 
-          axios.post('/api/roll-sizes', {
+        const dataToSave = rollSizes.value.map(size => ({
+          id: size.id,
             flute_id: size.flute_id,
             roll_length: size.roll_length,
             is_composite: size.is_composite
-          })
-        );
+        }));
         
-        await Promise.all(promises);
-        showNotification('Roll size data saved successfully');
+        // Send data to the API
+        const response = await axios.post('/api/roll-sizes/batch', dataToSave);
+        
+        if (response.data.errors && response.data.errors.length > 0) {
+          const errorCount = response.data.errors.length;
+          Swal.fire({
+            icon: 'error',
+            title: 'Batch Save Error',
+            text: `${errorCount} roll sizes could not be saved.`,
+          });
+          console.error('Errors saving roll sizes:', response.data.errors);
+        } else {
+          Swal.fire({
+            icon: 'success',
+            title: 'Save Successful',
+            text: `All roll sizes have been saved.`,
+          });
+        }
         
         // Reload data to get the updated records
         await loadData();
@@ -366,7 +464,11 @@ export default defineComponent({
           errorMessage += `: ${error.message}`;
         }
         
-        showNotification(errorMessage, 'error');
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: errorMessage,
+        });
       } finally {
         loading.value = false;
       }
@@ -469,16 +571,26 @@ export default defineComponent({
     return {
       loading,
       rollSizes,
+      filteredItems,
+      paginatedItems,
       flutes,
       newRollSize,
-      notification,
+      searchQuery,
+      currentPage,
+      itemsPerPage,
+      totalPages,
       viewPrintUrl,
+      savingCompute,
       canAddRollSize,
+      filterItems,
       saveChanges,
       addRollSize,
       exportData,
       printData,
-      showNotification
+      showNotification,
+      nextPage,
+      prevPage,
+      toggleCompute
     };
   }
 });

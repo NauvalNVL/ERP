@@ -60,13 +60,13 @@ class SideTrimByFluteController extends Controller
                 'flute_id' => 'required|exists:paper_flutes,id',
                 'length_add' => 'required|integer|min:0',
                 'length_less' => 'required|integer|min:0',
-                'is_composite' => 'required|boolean',
+                'compute' => 'required|boolean',
             ]);
 
             $sideTrim = SideTrimByFlute::updateOrCreate(
                 [
                     'flute_id' => $validated['flute_id'],
-                    'is_composite' => $validated['is_composite'],
+                    'compute' => $validated['compute'],
                 ],
                 [
                     'length_add' => $validated['length_add'],
@@ -102,16 +102,48 @@ class SideTrimByFluteController extends Controller
                 'flute_id' => 'required|exists:paper_flutes,id',
                 'length_add' => 'required|integer|min:0',
                 'length_less' => 'required|integer|min:0',
-                'is_composite' => 'required|boolean',
+                'compute' => 'required|boolean',
             ]);
 
+            // Check if there's already a record with the same flute_id and compute value (excluding this record)
+            $duplicate = SideTrimByFlute::where('flute_id', $validated['flute_id'])
+                ->where('compute', $validated['compute'])
+                ->where('id', '!=', $id)
+                ->first();
+                
+            if ($duplicate) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'A record with this flute and compute status already exists',
+                ], 422);
+            }
+
             $sideTrim->update($validated);
+
+            // Load the relationship to include in the response
+            $sideTrim->load('paperFlute');
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Side trim data updated successfully',
                 'data' => $sideTrim
             ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Database error updating side trim by flute: ' . $e->getMessage());
+            
+            // Check for unique constraint violation
+            if ($e->getCode() == 23000) { // Integrity constraint violation
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'A record with this flute and compute status already exists',
+                ], 422);
+            }
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update side trim data: Database error',
+                'error' => $e->getMessage()
+            ], 500);
         } catch (\Exception $e) {
             Log::error('Error updating side trim by flute: ' . $e->getMessage());
             
@@ -162,7 +194,7 @@ class SideTrimByFluteController extends Controller
                     'Flute Name' => $trim->paperFlute ? $trim->paperFlute->name : 'N/A',
                     'Length Add (mm)' => $trim->length_add,
                     'Length Less (mm)' => $trim->length_less,
-                    'Composite' => $trim->is_composite ? 'Yes' : 'No',
+                    'Composite' => $trim->compute ? 'Yes' : 'No',
                     'Created At' => $trim->created_at->format('Y-m-d H:i:s'),
                     'Updated At' => $trim->updated_at->format('Y-m-d H:i:s'),
                 ];
@@ -202,7 +234,7 @@ class SideTrimByFluteController extends Controller
                 SideTrimByFlute::updateOrCreate(
                     [
                         'flute_id' => $flute->id,
-                        'is_composite' => false,
+                        'compute' => false,
                     ],
                     [
                         'length_add' => rand(10, 30),
@@ -215,7 +247,7 @@ class SideTrimByFluteController extends Controller
                 SideTrimByFlute::updateOrCreate(
                     [
                         'flute_id' => $flute->id,
-                        'is_composite' => true,
+                        'compute' => true,
                     ],
                     [
                         'length_add' => rand(20, 40),
@@ -235,6 +267,66 @@ class SideTrimByFluteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to seed data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update multiple side trim records at once.
+     */
+    public function apiBatchUpdate(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                '*.id' => 'required|exists:side_trims_by_flute,id',
+                '*.flute_id' => 'required|exists:paper_flutes,id',
+                '*.length_add' => 'required|integer|min:0',
+                '*.length_less' => 'required|integer|min:0',
+                '*.compute' => 'required|boolean',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $errors = [];
+            $updated = 0;
+
+            foreach ($request->all() as $item) {
+                try {
+                    $sideTrim = SideTrimByFlute::find($item['id']);
+                    if ($sideTrim) {
+                        $sideTrim->update([
+                            'flute_id' => $item['flute_id'],
+                            'length_add' => $item['length_add'],
+                            'length_less' => $item['length_less'],
+                            'compute' => $item['compute'],
+                        ]);
+                        $updated++;
+                    } else {
+                        $errors[] = "Side trim with ID {$item['id']} not found";
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = "Error updating side trim ID {$item['id']}: " . $e->getMessage();
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "$updated side trim records updated successfully",
+                'errors' => $errors
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error batch updating side trims: ' . $e->getMessage());
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update side trims',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

@@ -16,25 +16,26 @@ class RollTrimByCorrugatorSeeder extends Seeder
         // Get all paper flutes
         $paperFlutes = PaperFlute::all();
         
-        // Sample corrugator names
-        $corrugators = ['BHS', 'FOSBER', 'MHI'];
-        
-        // Create roll trim data for each flute and corrugator combination
+        // Create roll trim data for each flute
         foreach ($paperFlutes as $flute) {
-            foreach ($corrugators as $corrugator) {
-                // Generate random trim values between 5 and 15 cm
-                $trimValue = rand(5, 15);
-                
-                RollTrimByCorrugator::updateOrCreate(
-                    [
-                        'corrugator_name' => $corrugator,
-                        'flute_code' => $flute->code,
-                    ],
-                    [
-                        'trim_value' => $trimValue,
-                    ]
-                );
-            }
+            // Generate random trim values
+            $minTrim = rand(5, 15);
+            $maxTrim = rand($minTrim + 5, $minTrim + 20);
+            
+            RollTrimByCorrugator::updateOrCreate(
+                [
+                    'flute_id' => $flute->id,
+                ],
+                [
+                    'compute' => rand(0, 1) == 1, // Randomly set compute to true or false
+                    'min_trim' => $minTrim,
+                    'max_trim' => $maxTrim,
+                    'created_by' => 'SYSTEM',
+                    'updated_by' => 'SYSTEM',
+                ]
+            );
         }
+        
+        $this->command->info('Roll trim by corrugator data seeded successfully!');
     }
 } 

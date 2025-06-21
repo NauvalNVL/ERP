@@ -25,7 +25,7 @@ class RollTrimByProductDesign extends Model
         'product_id',
         'product_design_id',
         'flute_id',
-        'is_composite',
+        'compute',
         'min_trim',
         'max_trim',
     ];
@@ -36,7 +36,7 @@ class RollTrimByProductDesign extends Model
      * @var array
      */
     protected $casts = [
-        'is_composite' => 'boolean',
+        'compute' => 'boolean',
         'min_trim' => 'integer',
         'max_trim' => 'integer',
         'created_at' => 'datetime',

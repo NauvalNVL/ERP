@@ -51,7 +51,7 @@ class CorrugatorSpecByProductController extends Controller
     public function apiStore(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'product_id' => 'required|exists:products,id',
+            'product_code' => 'required|exists:products,product_code',
             'compute' => 'sometimes|boolean',
             'min_sheet_length' => 'nullable|integer|min:1',
             'max_sheet_length' => 'nullable|integer|min:1',
@@ -64,7 +64,7 @@ class CorrugatorSpecByProductController extends Controller
         }
 
         // Check if specification already exists for this product
-        $existingSpec = CorrugatorSpecByProduct::where('product_id', $request->product_id)->first();
+        $existingSpec = CorrugatorSpecByProduct::where('product_code', $request->product_code)->first();
         if ($existingSpec) {
             // Update existing specification
             $existingSpec->update($request->all());
@@ -81,7 +81,7 @@ class CorrugatorSpecByProductController extends Controller
     public function apiUpdate(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'product_id' => 'sometimes|exists:products,id',
+            'product_code' => 'sometimes|exists:products,product_code',
             'compute' => 'sometimes|boolean',
             'min_sheet_length' => 'nullable|integer|min:1',
             'max_sheet_length' => 'nullable|integer|min:1',
@@ -116,7 +116,7 @@ class CorrugatorSpecByProductController extends Controller
     public function apiBatchUpdate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            '*.product_id' => 'required|exists:products,id',
+            '*.product_code' => 'required|exists:products,product_code',
             '*.compute' => 'required|boolean',
             '*.min_sheet_length' => 'nullable|integer|min:1',
             '*.max_sheet_length' => 'nullable|integer|min:1',
@@ -134,14 +134,14 @@ class CorrugatorSpecByProductController extends Controller
         foreach ($request->all() as $specData) {
             try {
                 $spec = CorrugatorSpecByProduct::updateOrCreate(
-                    ['product_id' => $specData['product_id']],
+                    ['product_code' => $specData['product_code']],
                     $specData
                 );
                 $results[] = $spec;
             } catch (\Exception $e) {
-                Log::error('Error updating corrugator spec for product ' . $specData['product_id'] . ': ' . $e->getMessage());
+                Log::error('Error updating corrugator spec for product ' . $specData['product_code'] . ': ' . $e->getMessage());
                 $errors[] = [
-                    'product_id' => $specData['product_id'],
+                    'product_code' => $specData['product_code'],
                     'error' => $e->getMessage()
                 ];
             }
@@ -158,35 +158,6 @@ class CorrugatorSpecByProductController extends Controller
         return response()->json([
             'message' => 'All specifications updated successfully',
             'results' => $results
-        ]);
-    }
-
-    /**
-     * API: Export corrugator specifications by product to Excel
-     */
-    public function apiExport()
-    {
-        $specs = CorrugatorSpecByProduct::with('product')->get();
-        
-        // Transform data for export
-        $exportData = $specs->map(function ($spec) {
-            return [
-                'Product Code' => $spec->product->product_code ?? 'N/A',
-                'Product Name' => $spec->product->description ?? 'Unknown Product',
-                'Compute' => $spec->compute ? 'Yes' : 'No',
-                'Min Sheet Length' => $spec->min_sheet_length,
-                'Max Sheet Length' => $spec->max_sheet_length,
-                'Min Sheet Width' => $spec->min_sheet_width,
-                'Max Sheet Width' => $spec->max_sheet_width,
-                'Created At' => $spec->created_at->format('Y-m-d H:i:s'),
-                'Updated At' => $spec->updated_at->format('Y-m-d H:i:s'),
-            ];
-        });
-        
-        // Return JSON for now - in a real implementation, this would return an Excel file
-        return response()->json([
-            'data' => $exportData,
-            'filename' => 'corrugator_specifications_' . date('Y-m-d') . '.xlsx'
         ]);
     }
 } 

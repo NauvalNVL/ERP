@@ -19,6 +19,8 @@ use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController;
 use App\Http\Controllers\SalesManagement\CustomerService\CustomerServiceController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PaperFluteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +32,9 @@ use App\Http\Controllers\SalesManagement\CustomerService\CustomerServiceControll
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
+Route::get('/products', [ProductController::class, 'getProductsJson']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -68,7 +73,6 @@ Route::post('/corrugator-configs/seed', [CorrugatorConfigController::class, 'api
 
 // Corrugator Specification by Product Routes
 Route::get('/corrugator-specs-by-product', [CorrugatorSpecByProductController::class, 'apiIndex']);
-Route::get('/corrugator-specs-by-product/export', [CorrugatorSpecByProductController::class, 'apiExport']);
 Route::get('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiShow']);
 Route::post('/corrugator-specs-by-product', [CorrugatorSpecByProductController::class, 'apiStore']);
 Route::post('/corrugator-specs-by-product/batch', [CorrugatorSpecByProductController::class, 'apiBatchUpdate']);
@@ -76,16 +80,14 @@ Route::put('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductControll
 Route::delete('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiDestroy']); 
 
 // Roll Trim By Corrugator API Routes
-Route::get('/roll-trim-by-corrugator/export', [RollTrimByCorrugatorController::class, 'apiExport']);
 Route::get('/roll-trim-by-corrugator/flutes', [RollTrimByCorrugatorController::class, 'getPaperFlutes']);
 Route::get('/roll-trim-by-corrugator', [RollTrimByCorrugatorController::class, 'apiIndex']);
-Route::post('/roll-trim-by-corrugator', [RollTrimByCorrugatorController::class, 'apiStore']);
-Route::put('/roll-trim-by-corrugator/{id}', [RollTrimByCorrugatorController::class, 'apiUpdate']);
-Route::delete('/roll-trim-by-corrugator/{id}', [RollTrimByCorrugatorController::class, 'apiDestroy']); 
+Route::post('/roll-trim-by-corrugator/batch', [RollTrimByCorrugatorController::class, 'apiBatchUpdate']);
 
 // Roll Trim By Product Design API routes
 Route::get('/roll-trim-by-product-design', [RollTrimByProductDesignController::class, 'apiIndex']);
 Route::post('/roll-trim-by-product-design', [RollTrimByProductDesignController::class, 'apiStore']);
+Route::post('/roll-trim-by-product-design/batch', [RollTrimByProductDesignController::class, 'apiBatchUpdate']);
 Route::put('/roll-trim-by-product-design/{id}', [RollTrimByProductDesignController::class, 'apiUpdate']);
 Route::delete('/roll-trim-by-product-design/{id}', [RollTrimByProductDesignController::class, 'apiDestroy']);
 Route::get('/roll-trim-by-product-design/export', [RollTrimByProductDesignController::class, 'apiExport']);
@@ -94,6 +96,7 @@ Route::post('/roll-trim-by-product-design/seed', [RollTrimByProductDesignControl
 // Roll Size API routes
 Route::get('/roll-sizes', [RollSizeController::class, 'apiIndex']);
 Route::post('/roll-sizes', [RollSizeController::class, 'apiStore']);
+Route::post('/roll-sizes/batch', [RollSizeController::class, 'apiBatchUpdate']);
 Route::put('/roll-sizes/{id}', [RollSizeController::class, 'apiUpdate']);
 Route::delete('/roll-sizes/{id}', [RollSizeController::class, 'apiDestroy']);
 Route::get('/roll-sizes/export', [RollSizeController::class, 'apiExport']);
@@ -102,6 +105,7 @@ Route::post('/roll-sizes/seed', [RollSizeController::class, 'apiSeed']);
 // Side Trim By Flute API routes
 Route::get('/side-trims-by-flute', [SideTrimByFluteController::class, 'apiIndex']);
 Route::post('/side-trims-by-flute', [SideTrimByFluteController::class, 'apiStore']);
+Route::post('/side-trims-by-flute/batch', [SideTrimByFluteController::class, 'apiBatchUpdate']);
 Route::put('/side-trims-by-flute/{id}', [SideTrimByFluteController::class, 'apiUpdate']);
 Route::delete('/side-trims-by-flute/{id}', [SideTrimByFluteController::class, 'apiDestroy']);
 Route::get('/side-trims-by-flute/export', [SideTrimByFluteController::class, 'apiExport']);

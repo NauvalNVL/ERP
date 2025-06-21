@@ -364,4 +364,20 @@ class PaperFluteController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Display a listing of the resource for API.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $paperFlutes = PaperFlute::orderBy('code')->get();
+            return response()->json($paperFlutes);
+        } catch (\Exception $e) {
+            Log::error('Error fetching paper flutes for API: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load paper flute data'], 500);
+        }
+    }
 } 
