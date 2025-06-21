@@ -22,6 +22,7 @@ class ProductDesign extends Model
         'slot',
         'flute_style',
         'print_flute',
-        'input_weight'
+        'input_weight',
+        'compute'
     ];
 } 

@@ -12,8 +12,9 @@ class CorrugatorSpecByProduct extends Model
     protected $table = 'corrugator_spec_by_products';
 
     protected $fillable = [
+        'product_id',
         'product_code',
-        'composite',
+        'compute',
         'min_sheet_length',
         'max_sheet_length',
         'min_sheet_width',
@@ -21,7 +22,7 @@ class CorrugatorSpecByProduct extends Model
     ];
 
     protected $casts = [
-        'composite' => 'boolean',
+        'compute' => 'boolean',
         'min_sheet_length' => 'integer',
         'max_sheet_length' => 'integer',
         'min_sheet_width' => 'integer',

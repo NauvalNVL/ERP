@@ -52,11 +52,11 @@ class CorrugatorSpecByProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
-            'composite' => 'sometimes|boolean',
-            'min_sheet_length' => 'required|integer|min:1',
-            'max_sheet_length' => 'required|integer|min:1',
-            'min_sheet_width' => 'required|integer|min:1',
-            'max_sheet_width' => 'required|integer|min:1',
+            'compute' => 'sometimes|boolean',
+            'min_sheet_length' => 'nullable|integer|min:1',
+            'max_sheet_length' => 'nullable|integer|min:1',
+            'min_sheet_width' => 'nullable|integer|min:1',
+            'max_sheet_width' => 'nullable|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -82,11 +82,11 @@ class CorrugatorSpecByProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'product_id' => 'sometimes|exists:products,id',
-            'composite' => 'sometimes|boolean',
-            'min_sheet_length' => 'sometimes|integer|min:1',
-            'max_sheet_length' => 'sometimes|integer|min:1',
-            'min_sheet_width' => 'sometimes|integer|min:1',
-            'max_sheet_width' => 'sometimes|integer|min:1',
+            'compute' => 'sometimes|boolean',
+            'min_sheet_length' => 'nullable|integer|min:1',
+            'max_sheet_length' => 'nullable|integer|min:1',
+            'min_sheet_width' => 'nullable|integer|min:1',
+            'max_sheet_width' => 'nullable|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -117,11 +117,11 @@ class CorrugatorSpecByProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             '*.product_id' => 'required|exists:products,id',
-            '*.composite' => 'required|boolean',
-            '*.min_sheet_length' => 'required|integer|min:1',
-            '*.max_sheet_length' => 'required|integer|min:1',
-            '*.min_sheet_width' => 'required|integer|min:1',
-            '*.max_sheet_width' => 'required|integer|min:1',
+            '*.compute' => 'required|boolean',
+            '*.min_sheet_length' => 'nullable|integer|min:1',
+            '*.max_sheet_length' => 'nullable|integer|min:1',
+            '*.min_sheet_width' => 'nullable|integer|min:1',
+            '*.max_sheet_width' => 'nullable|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -173,7 +173,7 @@ class CorrugatorSpecByProductController extends Controller
             return [
                 'Product Code' => $spec->product->product_code ?? 'N/A',
                 'Product Name' => $spec->product->description ?? 'Unknown Product',
-                'Composite' => $spec->composite ? 'Yes' : 'No',
+                'Compute' => $spec->compute ? 'Yes' : 'No',
                 'Min Sheet Length' => $spec->min_sheet_length,
                 'Max Sheet Length' => $spec->max_sheet_length,
                 'Min Sheet Width' => $spec->min_sheet_width,

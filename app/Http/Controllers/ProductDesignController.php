@@ -72,6 +72,7 @@ class ProductDesignController extends Controller
             'flute_style' => 'nullable|string|max:100',
             'print_flute' => 'nullable|string|max:100',
             'input_weight' => 'nullable|string|max:100',
+            'compute' => 'nullable|string|max:10',
         ]);
 
         if ($validator->fails()) {
@@ -96,6 +97,7 @@ class ProductDesignController extends Controller
                 'flute_style' => $request->flute_style,
                 'print_flute' => $request->print_flute,
                 'input_weight' => $request->input_weight,
+                'compute' => $request->compute ?? 'No',
             ]);
 
             return redirect()
@@ -159,6 +161,7 @@ class ProductDesignController extends Controller
             'flute_style' => 'nullable|string|max:100',
             'print_flute' => 'nullable|string|max:100',
             'input_weight' => 'nullable|string|max:100',
+            'compute' => 'nullable|string|max:10',
         ]);
 
         if ($validator->fails()) {
@@ -184,6 +187,7 @@ class ProductDesignController extends Controller
                 'flute_style' => $request->flute_style,
                 'print_flute' => $request->print_flute,
                 'input_weight' => $request->input_weight,
+                'compute' => $request->compute ?? 'No',
             ]);
 
             return redirect()
@@ -284,7 +288,8 @@ class ProductDesignController extends Controller
                     'slot',
                     'flute_style',
                     'print_flute',
-                    'input_weight'
+                    'input_weight',
+                    'compute'
                 )
                 ->orderBy('pd_code')
                 ->get();
@@ -319,6 +324,7 @@ class ProductDesignController extends Controller
                 'flute_style' => 'nullable|string|max:100',
                 'print_flute' => 'nullable|string|max:100',
                 'input_weight' => 'nullable|string|max:100',
+                'compute' => 'nullable|string|max:10',
             ]);
 
             if ($validator->fails()) {
@@ -342,6 +348,7 @@ class ProductDesignController extends Controller
                 'flute_style' => $request->flute_style,
                 'print_flute' => $request->print_flute,
                 'input_weight' => $request->input_weight,
+                'compute' => $request->compute ?? 'No',
             ]);
 
             return response()->json([
@@ -390,6 +397,7 @@ class ProductDesignController extends Controller
                 'flute_style' => 'nullable|string|max:100',
                 'print_flute' => 'nullable|string|max:100',
                 'input_weight' => 'nullable|string|max:100',
+                'compute' => 'nullable|string|max:10',
             ]);
 
             if ($validator->fails()) {
@@ -412,6 +420,7 @@ class ProductDesignController extends Controller
                 'flute_style' => $request->flute_style,
                 'print_flute' => $request->print_flute,
                 'input_weight' => $request->input_weight,
+                'compute' => $request->compute ?? 'No',
             ]);
 
             return response()->json([
@@ -492,7 +501,8 @@ class ProductDesignController extends Controller
                 'Slot',
                 'Flute Style',
                 'Print Flute',
-                'Input Weight'
+                'Input Weight',
+                'Compute'
             ];
             
             $callback = function() use ($designs, $columns) {

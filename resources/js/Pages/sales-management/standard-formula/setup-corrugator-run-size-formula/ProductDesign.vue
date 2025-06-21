@@ -21,7 +21,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-search"></i>
                 </span>
-                <input type="text" v-model="searchQuery" placeholder="Search by design code, name or product..."
+                <input type="text" v-model="searchQuery" placeholder="Search by design code or name..."
                   class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
               </div>
             </div>
@@ -46,30 +46,24 @@
                   <tr>
                     <th @click="sortBy('pd_code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                       <div class="flex items-center">
-                        Design# <i class="fas fa-sort ml-1"></i>
+                        Product Design <i class="fas fa-sort ml-1"></i>
                       </div>
                     </th>
                     <th @click="sortBy('pd_name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                       <div class="flex items-center">
-                        Design Name <i class="fas fa-sort ml-1"></i>
+                        Product Design Name <i class="fas fa-sort ml-1"></i>
                       </div>
                     </th>
-                    <th @click="sortBy('product')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    <th @click="sortBy('compute')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                       <div class="flex items-center">
-                        Product <i class="fas fa-sort ml-1"></i>
+                        Compute <i class="fas fa-sort ml-1"></i>
                       </div>
                     </th>
-                    <th @click="sortBy('joint')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                      <div class="flex items-center">
-                        Joint <i class="fas fa-sort ml-1"></i>
-                      </div>
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                   <tr v-if="loading" class="animate-pulse">
-                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                    <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
                       <div class="flex justify-center items-center space-x-2">
                         <i class="fas fa-spinner fa-spin"></i>
                         <span>Loading product designs...</span>
@@ -77,7 +71,7 @@
                     </td>
                   </tr>
                   <tr v-else-if="filteredDesigns.length === 0" class="hover:bg-gray-50">
-                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                    <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
                       No product designs found. Try adjusting your search or create a new design.
                     </td>
                   </tr>
@@ -87,22 +81,22 @@
                       class="hover:bg-gray-50 cursor-pointer">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ design.pd_code }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ design.pd_name }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {{ design.product }}
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 cursor-pointer hover:bg-blue-100 active:bg-blue-200 transition-all duration-150 transform hover:scale-105 border border-transparent hover:border-blue-300 rounded-md" 
+                      @click.stop="toggleCompute(design)"
+                      title="Click to toggle Compute status"
+                      :class="{'opacity-75': toggleLoading[design.pd_code]}">
+                      <div class="flex items-center justify-between">
+                        <span v-if="toggleLoading[design.pd_code]" class="text-blue-500 font-medium flex items-center">
+                          <i class="fas fa-spinner fa-spin mr-1"></i> Updating...
+                        </span>
+                        <span v-else-if="design.compute === 'Yes'" class="text-green-600 font-medium flex items-center">
+                          <i class="fas fa-check-circle mr-1"></i> Yes
+                        </span>
+                        <span v-else class="text-red-600 font-medium flex items-center">
+                          <i class="fas fa-times-circle mr-1"></i> No
                       </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      <span v-if="design.joint === 'Yes'" class="text-green-500"><i class="fas fa-check-circle"></i> Yes</span>
-                      <span v-else class="text-red-500"><i class="fas fa-times-circle"></i> No</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button @click.stop="editDesign(design)" class="text-blue-600 hover:text-blue-900 mr-3">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button @click.stop="confirmDelete(design)" class="text-red-600 hover:text-red-900">
-                        <i class="fas fa-trash-alt"></i>
-                      </button>
+                        <i v-if="!toggleLoading[design.pd_code]" class="fas fa-exchange-alt text-blue-500 ml-2"></i>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -202,6 +196,12 @@
                 <span class="text-gray-600">Input Weight:</span>
                 <span class="font-medium" :class="{'text-green-600': selectedDesign.input_weight === 'Yes', 'text-red-600': selectedDesign.input_weight !== 'Yes'}">
                   {{ selectedDesign.input_weight }}
+                </span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Compute:</span>
+                <span class="font-medium" :class="{'text-green-600': selectedDesign.compute === 'Yes', 'text-red-600': selectedDesign.compute !== 'Yes'}">
+                  {{ selectedDesign.compute }}
                 </span>
               </div>
             </div>
@@ -459,6 +459,24 @@
                   </label>
                 </div>
               </div>
+              
+              <!-- Compute -->
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-calculator text-blue-500 mr-2"></i>
+                  Compute
+                </label>
+                <div class="flex gap-4">
+                  <label class="flex items-center">
+                    <input type="radio" v-model="formDesign.compute" value="Yes" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                    <span class="ml-2 text-sm text-gray-700">Yes</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" v-model="formDesign.compute" value="No" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                    <span class="ml-2 text-sm text-gray-700">No</span>
+                  </label>
+                </div>
+              </div>
             </div>
             
             <!-- Form Footer with Buttons -->
@@ -542,7 +560,8 @@ const formDesign = ref({
   slot: 'No',
   flute_style: 'Normal',
   print_flute: 'No',
-  input_weight: 'No'
+  input_weight: 'No',
+  compute: 'No'
 });
 
 // Reset form to default values
@@ -560,7 +579,8 @@ const resetForm = () => {
     slot: 'No',
     flute_style: 'Normal',
     print_flute: 'No',
-    input_weight: 'No'
+    input_weight: 'No',
+    compute: 'No'
   };
   isEditing.value = false;
 };
@@ -574,8 +594,7 @@ const filteredDesigns = computed(() => {
     const query = searchQuery.value.toLowerCase();
     result = result.filter(design => (
       (design.pd_code && design.pd_code.toLowerCase().includes(query)) ||
-      (design.pd_name && design.pd_name.toLowerCase().includes(query)) ||
-      (design.product && design.product.toLowerCase().includes(query))
+      (design.pd_name && design.pd_name.toLowerCase().includes(query))
     ));
   }
 
@@ -618,7 +637,14 @@ const fetchDesigns = async () => {
   loading.value = true;
   try {
     const response = await axios.get('/api/product-designs');
-    designs.value = response.data;
+    
+    // Ensure compute field has a value, default to 'No' if missing
+    designs.value = response.data.map(design => ({
+      ...design,
+      compute: design.compute || 'No'
+    }));
+    
+    console.log('Loaded designs:', designs.value);
   } catch (error) {
     console.error('Error fetching designs:', error);
     toast.error('Failed to load product designs');
@@ -724,6 +750,64 @@ const deleteDesign = async () => {
     toast.error('Failed to delete product design');
   } finally {
     loading.value = false;
+  }
+};
+
+// State for tracking which design is being toggled
+const toggleLoading = ref({});
+
+// Function to toggle compute status directly from the table
+const toggleCompute = async (design) => {
+  // Prevent multiple clicks
+  if (toggleLoading.value[design.pd_code]) return;
+  
+  // Set loading state for this specific design
+  toggleLoading.value[design.pd_code] = true;
+  const newComputeValue = design.compute === 'Yes' ? 'No' : 'Yes';
+  
+  try {
+    // Create a copy of the design object with only the required fields for the update
+    const designUpdate = {
+      pd_code: design.pd_code,
+      pd_name: design.pd_name,
+      pd_design_type: design.pd_design_type || '',
+      product: design.product || '',
+      idc: design.idc || '',
+      joint: design.joint || 'No',
+      joint_to_print: design.joint_to_print || 'No',
+      pcs_to_joint: design.pcs_to_joint || '0',
+      score: design.score || 'No',
+      slot: design.slot || 'No',
+      flute_style: design.flute_style || 'Normal',
+      print_flute: design.print_flute || 'No',
+      input_weight: design.input_weight || 'No',
+      compute: newComputeValue
+    };
+    
+    const response = await axios.put(`/api/product-designs/${design.pd_code}`, designUpdate);
+    
+    if (response.data.success) {
+      // Update the design in the local array
+      const index = designs.value.findIndex(d => d.pd_code === design.pd_code);
+      if (index !== -1) {
+        designs.value[index].compute = newComputeValue;
+        
+        // Also update selected design if it's the same one
+        if (selectedDesign.value?.pd_code === design.pd_code) {
+          selectedDesign.value.compute = newComputeValue;
+        }
+      }
+      
+      toast.success(`Compute value updated to ${newComputeValue}`);
+    } else {
+      throw new Error(response.data.message || 'Unknown error');
+    }
+  } catch (error) {
+    console.error('Error updating compute status:', error);
+    toast.error(error.response?.data?.message || 'Failed to update compute status');
+  } finally {
+    // Clear loading state
+    toggleLoading.value[design.pd_code] = false;
   }
 };
 

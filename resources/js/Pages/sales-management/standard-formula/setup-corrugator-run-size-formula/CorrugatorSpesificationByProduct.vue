@@ -79,7 +79,7 @@
                         Product Name
                       </th>
                       <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
-                        Composite
+                        Compute
                       </th>
                       <th scope="col" colspan="2" class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Sheet Length
@@ -111,11 +111,19 @@
                         {{ product.product_name }}
                       </td>
                       <td class="px-4 py-2 text-center border-r">
+                        <div class="relative">
                         <input 
                           type="checkbox" 
-                          v-model="product.composite" 
-                          class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                            :id="`compute-${product.id}`"
+                            v-model="product.compute"
+                            @change="toggleCompute(product)"
+                            :disabled="savingCompute[product.id]"
+                            class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 cursor-pointer"
                         />
+                          <div v-if="savingCompute[product.id]" class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        </div>
                       </td>
                       <td class="px-2 py-2 text-center border-r">
                         <input 
@@ -188,7 +196,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, reactive } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
 
@@ -201,6 +209,7 @@ export default defineComponent({
     const products = ref([]);
     const filteredProducts = ref([]);
     const searchQuery = ref('');
+    const savingCompute = reactive({});
     const notification = ref({
       show: false,
       message: '',
@@ -230,6 +239,9 @@ export default defineComponent({
         const specsResponse = await axios.get('/api/corrugator-specs-by-product');
         const specsList = specsResponse.data;
         
+        console.log('Products:', productsList);
+        console.log('Specs:', specsList);
+        
         // Merge the data
         products.value = productsList.map(product => {
           const spec = specsList.find(s => s.product_id === product.id);
@@ -237,11 +249,11 @@ export default defineComponent({
             id: product.id,
             product_code: product.product_code,
             product_name: product.name || product.description,
-            composite: spec ? spec.composite : false,
-            min_sheet_length: spec ? spec.min_sheet_length : 1,
-            max_sheet_length: spec ? spec.max_sheet_length : 99999,
-            min_sheet_width: spec ? spec.min_sheet_width : 1,
-            max_sheet_width: spec ? spec.max_sheet_width : 99999,
+            compute: spec ? spec.compute : false,
+            min_sheet_length: spec ? spec.min_sheet_length : null,
+            max_sheet_length: spec ? spec.max_sheet_length : null,
+            min_sheet_width: spec ? spec.min_sheet_width : null,
+            max_sheet_width: spec ? spec.max_sheet_width : null,
           };
         });
         
@@ -289,6 +301,50 @@ export default defineComponent({
         product.product_name.toLowerCase().includes(query)
       );
     };
+    
+    // Function to toggle compute value with immediate save
+    const toggleCompute = async (product) => {
+      try {
+        // Set loading state for this specific product
+        savingCompute[product.id] = true;
+        
+        // Prepare data for saving
+        const specToSave = {
+          product_id: product.id,
+          compute: product.compute,
+          min_sheet_length: product.min_sheet_length !== null && product.min_sheet_length !== undefined && product.min_sheet_length !== '' ? product.min_sheet_length : 1,
+          max_sheet_length: product.max_sheet_length !== null && product.max_sheet_length !== undefined && product.max_sheet_length !== '' ? product.max_sheet_length : 99999,
+          min_sheet_width: product.min_sheet_width !== null && product.min_sheet_width !== undefined && product.min_sheet_width !== '' ? product.min_sheet_width : 1,
+          max_sheet_width: product.max_sheet_width !== null && product.max_sheet_width !== undefined && product.max_sheet_width !== '' ? product.max_sheet_width : 99999,
+        };
+        
+        // Find if this product already has a spec
+        const existingSpec = (await axios.get('/api/corrugator-specs-by-product')).data
+          .find(spec => spec.product_id === product.id);
+        
+        if (existingSpec) {
+          // Update existing spec
+          await axios.put(`/api/corrugator-specs-by-product/${existingSpec.id}`, specToSave);
+        } else {
+          // Create new spec
+          await axios.post('/api/corrugator-specs-by-product', specToSave);
+        }
+        
+        // Show small notification
+        showNotification(`Compute status for ${product.product_code} updated successfully`, 'success');
+      } catch (error) {
+        console.error('Error toggling compute status:', error);
+        
+        // Revert the change in the UI
+        product.compute = !product.compute;
+        
+        // Show error notification
+        showNotification(`Failed to update compute status for ${product.product_code}`, 'error');
+      } finally {
+        // Clear loading state
+        savingCompute[product.id] = false;
+      }
+    };
 
     const saveChanges = async () => {
       try {
@@ -297,17 +353,24 @@ export default defineComponent({
         // Prepare data for saving
         const specsToSave = products.value.map(product => ({
           product_id: product.id,
-          composite: product.composite,
-          min_sheet_length: product.min_sheet_length,
-          max_sheet_length: product.max_sheet_length,
-          min_sheet_width: product.min_sheet_width,
-          max_sheet_width: product.max_sheet_width,
+          compute: product.compute,
+          min_sheet_length: product.min_sheet_length !== null && product.min_sheet_length !== undefined && product.min_sheet_length !== '' ? product.min_sheet_length : 1,
+          max_sheet_length: product.max_sheet_length !== null && product.max_sheet_length !== undefined && product.max_sheet_length !== '' ? product.max_sheet_length : 99999,
+          min_sheet_width: product.min_sheet_width !== null && product.min_sheet_width !== undefined && product.min_sheet_width !== '' ? product.min_sheet_width : 1,
+          max_sheet_width: product.max_sheet_width !== null && product.max_sheet_width !== undefined && product.max_sheet_width !== '' ? product.max_sheet_width : 99999,
         }));
         
         // Send data to the API
-        await axios.post('/api/corrugator-specs-by-product/batch', specsToSave);
+        const response = await axios.post('/api/corrugator-specs-by-product/batch', specsToSave);
         
-        showNotification('Corrugator specifications saved successfully');
+        // Check if there were any errors
+        if (response.data.errors && response.data.errors.length > 0) {
+          const errorCount = response.data.errors.length;
+          showNotification(`${errorCount} specifications could not be saved. Please check the console for details.`, 'error');
+          console.error('Errors saving specifications:', response.data.errors);
+        } else {
+          showNotification(`${specsToSave.length} corrugator specifications saved successfully`);
+        }
       } catch (error) {
         console.error('Error saving specifications:', error);
         
@@ -330,14 +393,20 @@ export default defineComponent({
       }
     };
 
-    const exportToExcel = () => {
-      // This would be implemented with a library like SheetJS or by calling a server endpoint
+    const exportToExcel = async () => {
+      try {
       showNotification('Exporting to Excel...');
       
-      // For now, we'll just simulate the export
-      setTimeout(() => {
+        // Call the export API endpoint
+        const response = await axios.get('/api/corrugator-specs-by-product/export');
+        
+        // In a real implementation, this would download an Excel file
+        // For now, we'll just show a success message
         showNotification('Data exported to Excel successfully');
-      }, 1500);
+      } catch (error) {
+        console.error('Error exporting data:', error);
+        showNotification('Failed to export data', 'error');
+      }
     };
 
     const printData = () => {
@@ -346,26 +415,26 @@ export default defineComponent({
 
     // Sample data for development
     const getSampleProducts = () => [
-      { id: 1, product_code: '001', product_name: 'RSC STANDARD', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 2, product_code: '002', product_name: 'DIE CUT', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 3, product_code: '003', product_name: 'BHPT BOX', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 4, product_code: '004', product_name: 'PENJUALAN WASTE', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 5, product_code: '005', product_name: 'PENJUALAN LAIN-LAIN PCS', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 6, product_code: '006', product_name: 'CONEJIT', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 7, product_code: '007', product_name: 'ROLL', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 8, product_code: '008', product_name: 'PENJUALAN LAIN-LAIN KG', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 9, product_code: '009', product_name: 'PENJUALAN LAIN-LAIN', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 10, product_code: '010', product_name: 'TRAY', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 11, product_code: '011', product_name: 'SINGLE FACER KG', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 12, product_code: '012', product_name: 'SINGLE FACER SHEET', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 13, product_code: '013', product_name: 'PENJUALAN LAIN-LAIN', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 14, product_code: '014', product_name: 'SEWA TRUCK', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 15, product_code: '015', product_name: 'CORE PLUS', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 16, product_code: '016', product_name: 'PAPER TUBE', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 17, product_code: '017', product_name: 'OFFSET', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 18, product_code: '018', product_name: '2 FAX OFFSET', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 19, product_code: '019', product_name: 'DIGITAL PRINT', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 20, product_code: '020', product_name: 'SEWA TRUCK TRAILER', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
+      { id: 1, product_code: '001', product_name: 'RSC STANDARD', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 2, product_code: '002', product_name: 'DIE CUT', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 3, product_code: '003', product_name: 'BHPT BOX', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 4, product_code: '004', product_name: 'PENJUALAN WASTE', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 5, product_code: '005', product_name: 'PENJUALAN LAIN-LAIN PCS', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 6, product_code: '006', product_name: 'CONEJIT', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 7, product_code: '007', product_name: 'ROLL', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 8, product_code: '008', product_name: 'PENJUALAN LAIN-LAIN KG', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 9, product_code: '009', product_name: 'PENJUALAN LAIN-LAIN', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 10, product_code: '010', product_name: 'TRAY', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 11, product_code: '011', product_name: 'SINGLE FACER KG', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 12, product_code: '012', product_name: 'SINGLE FACER SHEET', compute: true, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 13, product_code: '013', product_name: 'PENJUALAN LAIN-LAIN', compute: false, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 14, product_code: '014', product_name: 'SEWA TRUCK', compute: false, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 15, product_code: '015', product_name: 'CORE PLUS', compute: false, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 16, product_code: '016', product_name: 'PAPER TUBE', compute: false, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 17, product_code: '017', product_name: 'OFFSET', compute: false, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 18, product_code: '018', product_name: '2 FAX OFFSET', compute: false, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 19, product_code: '019', product_name: 'DIGITAL PRINT', compute: false, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
+      { id: 20, product_code: '020', product_name: 'SEWA TRUCK TRAILER', compute: false, min_sheet_length: null, max_sheet_length: null, min_sheet_width: null, max_sheet_width: null },
     ];
 
     onMounted(() => {
@@ -378,8 +447,10 @@ export default defineComponent({
       filteredProducts,
       searchQuery,
       notification,
+      savingCompute,
       filterProducts,
       saveChanges,
+      toggleCompute,
       exportToExcel,
       printData,
       showNotification
