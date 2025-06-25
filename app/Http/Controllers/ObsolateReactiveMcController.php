@@ -134,6 +134,76 @@ class ObsolateReactiveMcController extends Controller
     }
 
     /**
+     * Bulk obsolete master cards.
+     */
+    public function bulkObsolete(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:obsolate_reactive_mcs,id',
+            'reason' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $userId = Auth::id() ?? 1;
+        $ids = $request->input('ids');
+        $reason = $request->input('reason');
+
+        ObsolateReactiveMC::whereIn('id', $ids)->update([
+            'status' => 'obsolete',
+            'obsolate_date' => now(),
+            'obsolate_by' => $userId,
+            'obsolate_reason' => $reason,
+        ]);
+
+        $updatedMasterCards = ObsolateReactiveMC::whereIn('id', $ids)->get();
+
+        return response()->json([
+            'message' => 'Master cards have been obsoleted successfully.',
+            'count' => count($updatedMasterCards),
+            'data' => $updatedMasterCards,
+        ]);
+    }
+
+    /**
+     * Bulk reactivate master cards.
+     */
+    public function bulkReactivate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:obsolate_reactive_mcs,id',
+            'reason' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $userId = Auth::id() ?? 1;
+        $ids = $request->input('ids');
+        $reason = $request->input('reason');
+
+        ObsolateReactiveMC::whereIn('id', $ids)->update([
+            'status' => 'active',
+            'reactive_date' => now(),
+            'reactive_by' => $userId,
+            'reactive_reason' => $reason,
+        ]);
+
+        $updatedMasterCards = ObsolateReactiveMC::whereIn('id', $ids)->get();
+
+        return response()->json([
+            'message' => 'Master cards have been reactivated successfully.',
+            'count' => count($updatedMasterCards),
+            'data' => $updatedMasterCards,
+        ]);
+    }
+
+    /**
      * Get master cards by customer
      */
     public function getByCustomer($customerId)
