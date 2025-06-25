@@ -49,7 +49,7 @@
                                 </label>
                                 <div class="relative flex group">
                                     <input type="text" id="ac" v-model="form.ac" placeholder="Customer Account" class="input-field">
-                                    <button type="button" class="lookup-button">
+                                    <button @click="openCustomerLookup" type="button" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
@@ -64,7 +64,7 @@
                                 </label>
                                 <div class="relative flex group">
                                     <input type="text" id="product_code" v-model="form.product_code" placeholder="Product Code" class="input-field">
-                                    <button type="button" class="lookup-button">
+                                    <button @click="openProductLookup" type="button" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
@@ -80,14 +80,14 @@
                                 <div class="flex items-center gap-4">
                                     <div class="relative flex group flex-1">
                                         <input type="text" id="mcs_from" v-model="form.mcs_from" placeholder="From Sequence" class="input-field">
-                                        <button type="button" class="lookup-button">
+                                        <button @click="openMcsLookup('from')" type="button" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>
                                     <span class="text-gray-500 font-medium">TO</span>
                                     <div class="relative flex group flex-1">
                                         <input type="text" id="mcs_to" v-model="form.mcs_to" placeholder="To Sequence" class="input-field">
-                                        <button type="button" class="lookup-button">
+                                        <button @click="openMcsLookup('to')" type="button" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>
@@ -176,6 +176,15 @@
 
             </div>
         </div>
+
+        <LookupModal 
+            :show="lookup.show"
+            :title="lookup.title"
+            :items="lookup.items"
+            :headers="lookup.headers"
+            @close="lookup.show = false"
+            @select="handleLookupSelection"
+        />
     </AppLayout>
 </template>
 
@@ -183,6 +192,7 @@
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useToast } from '@/Composables/useToast';
+import LookupModal from '@/components/obsolete-reactive-modal.vue';
 import axios from 'axios';
 
 const { showToast } = useToast();
@@ -195,6 +205,88 @@ const form = ref({
     action: 'obsolete', // Default action
     reason: ''
 });
+
+// --- Lookup Modal State and Data ---
+const lookup = ref({
+    show: false,
+    title: '',
+    items: [],
+    headers: [],
+    type: '' // 'customer', 'product', 'mcs_from', 'mcs_to'
+});
+
+// Dummy data for lookups
+const customers = ref([
+    { id: 1, customer_code: 'CUST-001', customer_name: 'PT. Maju Jaya' },
+    { id: 2, customer_code: 'CUST-002', customer_name: 'CV. Abadi Selalu' },
+    { id: 3, customer_code: 'CUST-003', customer_name: 'Toko Kelontong Berkah' },
+]);
+const products = ref([
+    { id: 1, product_code: 'PROD-A1', description: 'Box Karton Standar' },
+    { id: 2, product_code: 'PROD-B2', description: 'Box Pizza' },
+    { id: 3, product_code: 'PROD-C3', description: 'Tray Telur' },
+]);
+const masterCards = ref([
+    { id: 1, mc_seq: 'MC-2023-001' },
+    { id: 2, mc_seq: 'MC-2023-002' },
+    { id: 3, mc_seq: 'MC-2023-003' },
+    { id: 4, mc_seq: 'MC-2023-004' },
+]);
+
+// Functions to open different lookups
+const openCustomerLookup = () => {
+    lookup.value = {
+        show: true,
+        title: 'Customer Account',
+        items: customers.value,
+        headers: [
+            { key: 'customer_code', label: 'Customer Code' },
+            { key: 'customer_name', label: 'Customer Name' },
+        ],
+        type: 'customer'
+    };
+};
+const openProductLookup = () => {
+    lookup.value = {
+        show: true,
+        title: 'Product Code',
+        items: products.value,
+        headers: [
+            { key: 'product_code', label: 'Product Code' },
+            { key: 'description', label: 'Description' },
+        ],
+        type: 'product'
+    };
+};
+const openMcsLookup = (target) => {
+    lookup.value = {
+        show: true,
+        title: 'Master Card Sequence',
+        items: masterCards.value,
+        headers: [{ key: 'mc_seq', label: 'MCS#' }],
+        type: target === 'from' ? 'mcs_from' : 'mcs_to'
+    };
+};
+
+// Function to handle selection from modal
+const handleLookupSelection = (selectedItem) => {
+    switch (lookup.value.type) {
+        case 'customer':
+            form.value.ac = selectedItem.customer_code;
+            break;
+        case 'product':
+            form.value.product_code = selectedItem.product_code;
+            break;
+        case 'mcs_from':
+            form.value.mcs_from = selectedItem.mc_seq;
+            break;
+        case 'mcs_to':
+            form.value.mcs_to = selectedItem.mc_seq;
+            break;
+    }
+    lookup.value.show = false;
+};
+// --- End Lookup Modal ---
 
 const processSelections = async () => {
     if (!form.value.reason || form.value.reason.trim() === '') {
@@ -240,9 +332,6 @@ const processSelections = async () => {
 
 .input-field {
     @apply flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 group-hover:border-indigo-400 shadow-sm focus:shadow-md;
-}
-.lookup-button {
-    @apply inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 bg-gray-50 hover:bg-indigo-100 text-indigo-600 rounded-r-md transition-colors duration-300;
 }
 .action-radio {
     @apply flex-1 p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 bg-white flex items-center gap-4 hover:border-gray-400;
