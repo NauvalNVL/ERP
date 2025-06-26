@@ -395,15 +395,15 @@ const materialManagementItems = [
           { title: 'Define Control Period', icon: 'fas fa-calendar-alt', route: '/material-management/system-requirement/standard-setup/control-period' },
           { title: 'Define Transaction Type', icon: 'fas fa-exchange-alt', route: '/material-management/system-requirement/standard-setup/transaction-type' },
           { title: 'Define Tax Type', icon: 'fas fa-percentage', route: '/material-management/system-requirement/standard-setup/tax-type' },
-          { title: 'Define Tax Group', icon: 'fas fa-layer-group', route: '/material-management/standard-setup/tax-group' },
-          { title: 'Define Receive Destination', icon: 'fas fa-map-marker-alt', route: '/material-management/standard-setup/receive-destination' },
-          { title: 'Define Analysis Code', icon: 'fas fa-tags', route: '/material-management/standard-setup/analysis-code' },
-          { title: 'View & Print Control Period', icon: 'fas fa-print', route: '/material-management/standard-setup/control-period/view-print' },
-          { title: 'View & Print Transaction Type', icon: 'fas fa-print', route: '/material-management/standard-setup/transaction-type/view-print' },
-          { title: 'View & Print Tax Type', icon: 'fas fa-print', route: '/material-management/standard-setup/tax-type/view-print' },
-          { title: 'View & Print Tax Group', icon: 'fas fa-print', route: '/material-management/standard-setup/tax-group/view-print' },
-          { title: 'View & Print Receive Destination', icon: 'fas fa-print', route: '/material-management/standard-setup/receive-destination/view-print' },
-          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/material-management/standard-setup/analysis-code/view-print' }
+          { title: 'Define Tax Group', icon: 'fas fa-layer-group', route: '/material-management/system-requirement/standard-setup/tax-group' },
+          { title: 'Define Receive Destination', icon: 'fas fa-map-marker-alt', route: '/material-management/system-requirement/standard-setup/receive-destination' },
+          { title: 'Define Analysis Code', icon: 'fas fa-tags', route: '/material-management/system-requirement/standard-setup/analysis-code' },
+          { title: 'View & Print Control Period', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/control-period/view-print' },
+          { title: 'View & Print Transaction Type', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/transaction-type/view-print' },
+          { title: 'View & Print Tax Type', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/tax-type/view-print' },
+          { title: 'View & Print Tax Group', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/tax-group/view-print' },
+          { title: 'View & Print Receive Destination', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/receive-destination/view-print' },
+          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/analysis-code/view-print' }
         ]
       },
       {

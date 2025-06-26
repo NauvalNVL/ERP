@@ -1,21 +1,47 @@
+import { reactive } from 'vue';
+
+const toastState = reactive({
+  toasts: [],
+  toastId: 0
+});
+
 /**
  * Simple toast notification composable
  */
 export function useToast() {
+    const addToast = (message, type = 'success', duration = 3000) => {
+        const id = toastState.toastId++;
+        const toast = { id, message, type, duration };
+        toastState.toasts.push(toast);
+        
+        setTimeout(() => {
+            removeToast(id);
+        }, duration);
+        
+        return id;
+    };
+    
+    const removeToast = (id) => {
+        const index = toastState.toasts.findIndex(toast => toast.id === id);
+        if (index !== -1) {
+            toastState.toasts.splice(index, 1);
+        }
+    };
+
     const success = (message) => {
-        showToast(message, 'success');
+        addToast(message, 'success');
     };
 
     const error = (message) => {
-        showToast(message, 'error');
+        addToast(message, 'error');
     };
 
     const warning = (message) => {
-        showToast(message, 'warning');
+        addToast(message, 'warning');
     };
 
     const info = (message) => {
-        showToast(message, 'info');
+        addToast(message, 'info');
     };
 
     /**
@@ -66,6 +92,9 @@ export function useToast() {
     };
 
     return {
+        toasts: toastState.toasts,
+        addToast,
+        removeToast,
         success,
         error,
         warning,

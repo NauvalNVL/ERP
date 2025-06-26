@@ -47,6 +47,7 @@ class MmTaxType extends Model
         'name',
         'is_applied',
         'rate',
+        'tax_group_code',
     ];
 
     /**
@@ -58,4 +59,12 @@ class MmTaxType extends Model
         'is_applied' => 'boolean',
         'rate' => 'float',
     ];
+
+    /**
+     * Get the tax group that this tax type belongs to
+     */
+    public function taxGroup()
+    {
+        return $this->belongsTo(MmTaxGroup::class, 'tax_group_code', 'code');
+    }
 } 

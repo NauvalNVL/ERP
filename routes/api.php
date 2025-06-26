@@ -24,6 +24,9 @@ use App\Http\Controllers\PaperFluteController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxGroupController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -192,3 +195,29 @@ Route::post('/material-management/tax-types', [MmTaxTypeController::class, 'stor
 Route::get('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'show']);
 Route::put('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'update']);
 Route::delete('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'destroy']); 
+
+// Add Tax Group API routes
+Route::get('/material-management/tax-groups', [MmTaxGroupController::class, 'getTaxGroups']);
+Route::post('/material-management/tax-groups', [MmTaxGroupController::class, 'store']);
+Route::get('/material-management/tax-groups/{code}', [MmTaxGroupController::class, 'show']);
+Route::put('/material-management/tax-groups/{code}', [MmTaxGroupController::class, 'update']);
+Route::delete('/material-management/tax-groups/{code}', [MmTaxGroupController::class, 'destroy']);
+Route::post('/material-management/tax-groups/seed', [MmTaxGroupController::class, 'seed']); 
+
+// Add Receive Destination API routes
+Route::get('/material-management/receive-destinations', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'getReceiveDestinations']);
+Route::post('/material-management/receive-destinations', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'store']);
+Route::get('/material-management/receive-destinations/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'show']);
+Route::put('/material-management/receive-destinations/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'update']);
+Route::delete('/material-management/receive-destinations/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'destroy']);
+Route::post('/material-management/receive-destinations/seed', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'seed']); 
+
+// Add Analysis Code API routes
+Route::get('/material-management/analysis-codes', [MmAnalysisCodeController::class, 'getAnalysisCodes']);
+Route::get('/material-management/analysis-codes/groups', [MmAnalysisCodeController::class, 'getGroups']);
+Route::get('/material-management/analysis-codes/group2s', [MmAnalysisCodeController::class, 'getGroup2s']);
+Route::post('/material-management/analysis-codes', [MmAnalysisCodeController::class, 'store']);
+Route::get('/material-management/analysis-codes/{code}', [MmAnalysisCodeController::class, 'show']);
+Route::put('/material-management/analysis-codes/{code}', [MmAnalysisCodeController::class, 'update']);
+Route::delete('/material-management/analysis-codes/{code}', [MmAnalysisCodeController::class, 'destroy']);
+Route::post('/material-management/analysis-codes/seed', [MmAnalysisCodeController::class, 'seed']); 
