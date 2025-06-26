@@ -752,6 +752,9 @@ Route::get('/material-management/system-requirement/standard-setup/receive-desti
 Route::get('/material-management/system-requirement/standard-setup/receive-destination/view-print', [MmReceiveDestinationController::class, 'viewPrint'])->name('mm.receive-destination.view-print');
 Route::get('/material-management/system-requirement/standard-setup/analysis-code', [MmAnalysisCodeController::class, 'index'])->name('mm.analysis-code');
 Route::get('/material-management/system-requirement/standard-setup/analysis-code/view-print', [MmAnalysisCodeController::class, 'viewPrint'])->name('mm.analysis-code.view-print');
+Route::get('/material-management/system-requirement/standard-setup/control-period/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'viewPrint'])->name('mm.control-period.view-print');
+Route::get('/material-management/system-requirement/standard-setup/transaction-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController::class, 'viewPrint'])->name('mm.transaction-type.view-print');
+Route::get('/material-management/system-requirement/standard-setup/tax-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController::class, 'viewPrint'])->name('mm.tax-type.view-print');
 
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');

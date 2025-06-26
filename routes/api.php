@@ -221,3 +221,5 @@ Route::get('/material-management/analysis-codes/{code}', [MmAnalysisCodeControll
 Route::put('/material-management/analysis-codes/{code}', [MmAnalysisCodeController::class, 'update']);
 Route::delete('/material-management/analysis-codes/{code}', [MmAnalysisCodeController::class, 'destroy']);
 Route::post('/material-management/analysis-codes/seed', [MmAnalysisCodeController::class, 'seed']); 
+
+Route::get('/material-management/control-periods/summary', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'getControlPeriodSummary']); 

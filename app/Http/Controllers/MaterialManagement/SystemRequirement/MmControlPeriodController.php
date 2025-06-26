@@ -184,4 +184,63 @@ class MmControlPeriodController extends Controller
             return response()->json(['error' => 'Failed to save control period settings: ' . $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Show the View & Print Control Period page.
+     */
+    public function viewPrint()
+    {
+        return Inertia::render('material-management/system-requirement/standard-setup/ViewPrintControlPeriod');
+    }
+
+    /**
+     * Get summary data for View & Print Control Period.
+     */
+    public function getControlPeriodSummary()
+    {
+        $controlPeriod = \App\Models\MmControlPeriod::first();
+        $result = [];
+        if ($controlPeriod) {
+            $result = [
+                [
+                    'documentType' => 'P/Req & P/Order',
+                    'currentPeriod' => sprintf('%02d/%04d', $controlPeriod->po_current_period_month, $controlPeriod->po_current_period_year),
+                    'controlDate' => $this->getControlDateLabel($controlPeriod->po_control_date),
+                ],
+                [
+                    'documentType' => 'Inventory',
+                    'currentPeriod' => sprintf('%02d/%04d', $controlPeriod->inv_current_period_month, $controlPeriod->inv_current_period_year),
+                    'controlDate' => $this->getControlDateLabel($controlPeriod->inv_control_date),
+                ],
+                [
+                    'documentType' => 'Costing Period',
+                    'currentPeriod' => sprintf('%02d/%04d', $controlPeriod->cost_current_period_month, $controlPeriod->cost_current_period_year),
+                    'controlDate' => $this->getControlDateLabel($controlPeriod->cost_control_date),
+                ],
+            ];
+        }
+        return response()->json([
+            'rows' => $result,
+            'summary' => [
+                'forwardPeriod' => $controlPeriod->po_forward_period ?? '01',
+                'backwardPeriod' => $controlPeriod->inv_backward_period ?? 'N/A',
+                'minAllow' => $controlPeriod->po_min_allow_percentage ?? 0,
+                'maxAllow' => $controlPeriod->po_max_allow_percentage ?? 0,
+            ]
+        ]);
+    }
+
+    /**
+     * Helper: Get control date label.
+     */
+    private function getControlDateLabel($val)
+    {
+        switch ($val) {
+            case '1': return 'U - Under Current Period';
+            case '2': return 'F - Under/Forward Current Period';
+            case '3': return 'B - Under/Backward Current Period';
+            case '4': return 'O - Open Date';
+            default: return '-';
+        }
+    }
 } 

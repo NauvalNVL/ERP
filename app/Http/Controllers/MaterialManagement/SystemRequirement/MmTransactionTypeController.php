@@ -148,4 +148,12 @@ class MmTransactionTypeController extends Controller
             return response()->json(['error' => 'Failed to delete transaction type: ' . $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Show the View & Print Transaction Type page.
+     */
+    public function viewPrint()
+    {
+        return \Inertia\Inertia::render('material-management/system-requirement/standard-setup/ViewPrintTransactionType');
+    }
 } 

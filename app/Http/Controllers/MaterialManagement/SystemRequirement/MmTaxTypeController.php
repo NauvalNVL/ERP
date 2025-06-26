@@ -179,4 +179,12 @@ class MmTaxTypeController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Show the View & Print Tax Type page.
+     */
+    public function viewPrint()
+    {
+        return \Inertia\Inertia::render('material-management/system-requirement/standard-setup/ViewPrintTaxType');
+    }
 } 
