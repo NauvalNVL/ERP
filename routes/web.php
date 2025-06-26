@@ -48,6 +48,7 @@ use App\Http\Controllers\SideTrimByProductDesignController;
 use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\BundlingComputationMethodController;
 use App\Http\Controllers\ComputationFormulaController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmConfigController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -86,7 +87,7 @@ Route::get('/test-finishings', function () {
 });
 
 Route::get('/', function () {
-    return redirect('/login');
+    return redirect()->route('login');
 });
 
 Route::get('/test-db', function () {
@@ -422,6 +423,10 @@ Route::prefix('api')->group(function () {
     Route::post('/users/{user}/permissions', [UserController::class, 'updateAccess']);
     Route::post('/users/update-password', [UserController::class, 'updatePassword']);
     
+    // Material Management Config API routes
+    Route::get('/mm-config', [MmConfigController::class, 'apiGetConfig']);
+    Route::post('/mm-config', [MmConfigController::class, 'apiUpdateConfig']);
+    
     // Salesperson API routes
     Route::get('/salesperson', [SalespersonController::class, 'apiIndex']);
     Route::post('/salesperson/store', [SalespersonController::class, 'store']);
@@ -722,3 +727,12 @@ Route::get('/standard-formula/diecut-computation/product-design', function() {
 Route::get('/standard-formula/diecut-computation/view-print-product-design', function() {
     return Inertia::render('sales-management/standard-formula/diecut-computation-method/ViewPrintProductDesign');
 })->name('vue.standard-formula.diecut-computation.view-print-product-design');
+
+Route::resource('sales-person-teams', SalespersonTeamController::class);
+Route::resource('update-customer-accounts', UpdateCustomerAccountController::class);
+Route::resource('mm-configs', MmConfigController::class);
+
+Route::get('/material-management/system-requirement/standard-setup/configuration', [MmConfigController::class, 'index'])->name('mm.config');
+
+// Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
+// Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');
