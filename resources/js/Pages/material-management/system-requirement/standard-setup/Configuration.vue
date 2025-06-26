@@ -38,6 +38,11 @@ const isRtLocationTableModalOpen = ref(false);
 const isDnSourceCodeTableModalOpen = ref(false);
 const isCnSourceCodeTableModalOpen = ref(false);
 const isIsGlSourceCodeTableModalOpen = ref(false);
+const isMiLocationModalOpen = ref(false);
+const isMiGlSourceCodeTableModalOpen = ref(false);
+const isMoGlSourceCodeTableModalOpen = ref(false);
+const isOldaCategoryModalOpen = ref(false);
+const isOldaSkuModalOpen = ref(false);
 
 const categories = ref([
   'PR', 'PO', 'RC', 'RT', 'DN', 'CN', 'IS', 'MI', 'MO', 'LT', 'OLDA'
@@ -60,6 +65,24 @@ if (!form.is_gl_ref) form.is_gl_ref = 'IS-IS#';
 if (!form.is_gl_posting) form.is_gl_posting = 'N-No';
 if (!form.mi_gl_remarks) form.mi_gl_remarks = ['', '', '', '', ''];
 if (!form.mo_gl_remarks) form.mo_gl_remarks = ['', '', '', '', ''];
+if (!form.mi_location) form.mi_location = '';
+if (!form.mi_gl_dist_edit) form.mi_gl_dist_edit = 'N';
+if (!form.mi_gl_source) form.mi_gl_source = 'GL';
+if (!form.mi_gl_source_desc) form.mi_gl_source_desc = 'ADJ';
+if (!form.mi_gl_ref) form.mi_gl_ref = 'MI-MI#';
+if (!form.mo_gl_dist_edit) form.mo_gl_dist_edit = 'N';
+if (!form.mo_gl_source) form.mo_gl_source = 'GL';
+if (!form.mo_gl_source_desc) form.mo_gl_source_desc = 'ADJ';
+if (!form.mo_gl_ref) form.mo_gl_ref = 'MO-MO#';
+if (!form.olda_online_daily_alert) form.olda_online_daily_alert = 'Y';
+if (!form.olda_name) form.olda_name = 'PT. MBI';
+if (!form.olda_email) form.olda_email = 'no-reply@ptmbi.com';
+if (!form.olda_password) form.olda_password = '';
+if (!form.olda_sku_reorder) form.olda_sku_reorder = 'Y';
+if (!form.olda_po_due_delivery) form.olda_po_due_delivery = 'Y';
+if (!form.olda_sku_reorder_control_step1) form.olda_sku_reorder_control_step1 = 'Y';
+if (!form.olda_po_due_total_item_min) form.olda_po_due_total_item_min = 50;
+if (!form.olda_po_due_total_item_max) form.olda_po_due_total_item_max = 150;
 
 // Add DN options array
 const dnApRemarkOptions = ref([
@@ -92,6 +115,24 @@ const isGlRemarkOptions = ref([
 const isCancelOptions = ref([
     '0-No Cancellation',
     '1-Allow 1 Previous Month Cancellation'
+]);
+
+const miGlRemarkOptions = ref([
+    'MI-MI#',
+    'MR-Miss Issue Ref#',
+    'S#-SKU#',
+    'SN-SKU Name',
+    'SQ-SKU Qty',
+    'N-None'
+]);
+
+const moGlRemarkOptions = ref([
+    'N-None',
+    'MO-MO#',
+    'SO-Stock-Out Ref#',
+    'S#-SKU#',
+    'SN-SKU Name',
+    'SQ-SKU Qty'
 ]);
 
 const saveConfiguration = () => {
@@ -170,9 +211,30 @@ const openIsGlSourceCodeTableModal = () => {
     isIsGlSourceCodeTableModalOpen.value = true;
 };
 
+const openMiLocationModal = () => {
+    isMiLocationModalOpen.value = true;
+};
+
+const openMiGlSourceCodeTableModal = () => {
+    isMiGlSourceCodeTableModalOpen.value = true;
+};
+
+const openMoGlSourceCodeTableModal = () => {
+    isMoGlSourceCodeTableModalOpen.value = true;
+};
+
+const openOldaCategoryModal = () => {
+    isOldaCategoryModalOpen.value = true;
+};
+
+const openOldaSkuModal = () => {
+    isOldaSkuModalOpen.value = true;
+};
+
 const selectTransactionType = (type) => {
     form.po_tran_type = type.code;
     isTransactionTypeModalOpen.value = false;
+    isMoGlSourceCodeTableModalOpen.value = false;
 };
 
 const selectPurchaser = (purchaser) => {
@@ -223,6 +285,23 @@ const selectCnSourceCode = (source) => {
 const selectIsGlSourceCode = (source) => {
     form.is_gl_source = source.code;
     isIsGlSourceCodeTableModalOpen.value = false;
+};
+
+const selectMiLocation = (location) => {
+    form.mi_location = location.code;
+    isMiLocationModalOpen.value = false;
+};
+
+const selectMiGlSourceCode = (source) => {
+    form.mi_gl_source = source.code;
+    form.mi_gl_source_desc = source.name.split(' ').slice(1).join(' '); // Basic logic to get desc
+    isMiGlSourceCodeTableModalOpen.value = false;
+};
+
+const selectMoGlSourceCode = (source) => {
+    form.mo_gl_source = source.code;
+    form.mo_gl_source_desc = source.name.split(' ').slice(1).join(' '); // Basic logic to get desc
+    isMoGlSourceCodeTableModalOpen.value = false;
 };
 
 // Demo data for selection tables
@@ -361,6 +440,63 @@ const glSourceCodeOptions = ref([
     { code: 'GL-MEM', name: 'JURNAL MEMORIAL' },
     { code: 'GL-MIG', name: 'DATA MIGRASI GL' }
 ]);
+
+// Demo data for OLDA modals
+const oldaCategoryOptions = ref([
+    { category: 'BA1.01', name: 'BEARING', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.02', name: 'BEARING', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.03', name: 'BEARING', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.04', name: 'BEARING', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.05', name: 'BEARING', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.06', name: 'BEARING', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.07', name: 'BEARING', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.08', name: 'BEARING', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.10', name: 'LOCKNUT', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.12', name: 'BEARING', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.13', name: 'PUSH BOTOM', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.14', name: 'FITING ANGIN', email: true, active: 'Yes', obsolete: 'Yes' },
+    { category: 'BA1.15', name: 'FITING ANGIN', email: true, active: 'Yes', obsolete: 'Yes' },
+]);
+
+const oldaSkuOptions = ref([
+    { sku: '007-S01227', name: 'SERVICE AC SERVO DRIVER TIPE D4S0-S60 SPEA', category: '007', category_name: 'JASA PP MESIN', email: true },
+    { sku: '000055', name: 'BOX SLEEVE DALAM PT. DELTAPACK', category: '201', category_name: 'SUBCON BOX KIM', email: true },
+    { sku: '000055A', name: 'BOX TOP OCTABIN PT. DELTAPACK', category: '201', category_name: 'SUBCON BOX KIM', email: true },
+    { sku: '000055A', name: 'BOX SLEEVE LUAR PT. DELTAPACK', category: '201', category_name: 'SUBCON BOX KIM', email: true },
+    { sku: '000055A', name: 'BOX BOTTOM OCTABIN PT. DELTAPACK', category: '201', category_name: 'SUBCON BOX KIM', email: true },
+    { sku: '000202', name: 'BOX TBE 12 X 350 ML NEW', category: '201', category_name: 'SUBCON BOX KIM', email: true },
+    { sku: '001-A01001', name: 'ANNELING WIRE 2.8MM (KAWAT PRESS BALLER)', category: '001', category_name: 'BAHAN PEMBANTU', email: true },
+    { sku: '001-A02001', name: 'ARMEX BAKING SODA POWDER (25KG/BAG)', category: '001', category_name: 'BAHAN PEMBANTU', email: true },
+    { sku: '001-A02002', name: 'ARMEX BAKING SODA POWDER (25KG/BAG)', category: '001', category_name: 'BAHAN PEMBANTU', email: true },
+    { sku: '001-A02003', name: 'ARMEX BAKING SODA POWDER (25KG/BAG)', category: '001', category_name: 'BAHAN PEMBANTU', email: true },
+    { sku: '001-A03001', name: 'ALUMINIUM CHLOROHYDRANT AIETAGARD 4040 (ACH)', category: '001', category_name: 'BAHAN PEMBANTU', email: true },
+    { sku: '001-A04001', name: 'AVAL BULAT SCM', category: '001', category_name: 'BAHAN PEMBANTU', email: true },
+    { sku: '001-A05001', name: 'AD OAIX', category: '001', category_name: 'BAHAN PEMBANTU', email: true },
+    { sku: '001-A06001', name: 'ANTIFOAM PKG-1800', category: '001', category_name: 'BAHAN PEMBANTU', email: true },
+    { sku: '001-A01001', name: 'BORAX', category: '001', category_name: 'BAHAN PEMBANTU', email: true },
+]);
+
+const oldaSkuSearchTerm = ref('');
+const filteredOldaSkuOptions = ref([...oldaSkuOptions.value]);
+
+const searchOldaSku = () => {
+    if (!oldaSkuSearchTerm.value) {
+        filteredOldaSkuOptions.value = [...oldaSkuOptions.value];
+        return;
+    }
+    filteredOldaSkuOptions.value = oldaSkuOptions.value.filter(sku =>
+        sku.sku.toLowerCase().includes(oldaSkuSearchTerm.value.toLowerCase()) ||
+        sku.name.toLowerCase().includes(oldaSkuSearchTerm.value.toLowerCase())
+    );
+};
+
+const tickAllSkus = () => {
+  filteredOldaSkuOptions.value.forEach(sku => sku.email = true);
+};
+
+const untickAllSkus = () => {
+  filteredOldaSkuOptions.value.forEach(sku => sku.email = false);
+};
 </script>
 
 <template>
@@ -1241,9 +1377,270 @@ const glSourceCodeOptions = ref([
                     </div>
                   </TabPanel>
 
+                  <!-- MI Tab Panel -->
+                  <TabPanel
+                    :class="['bg-white rounded-xl p-3', 'focus:outline-none focus:ring-2 ring-offset-2 ring-offset-blue-400 ring-white ring-opacity-60']"
+                  >
+                    <div class="space-y-4">
+                      <h3 class="text-lg font-medium leading-6 text-gray-900 bg-yellow-200 p-2">MI > Miscellaneous Issue Note</h3>
+
+                      <!-- Location -->
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label for="mi_location" class="block text-sm font-medium text-gray-700">Location:</label>
+                          <div class="mt-1 flex items-center">
+                            <input type="text" v-model="form.mi_location" id="mi_location" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <button type="button" @click="openMiLocationModal" class="ml-2 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                              ...
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- MI GL DIST# -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">MI GL DIST#:</label>
+                        <div class="mt-2 flex items-center space-x-4">
+                          <label class="inline-flex items-center">
+                            <input type="radio" v-model="form.mi_gl_dist_edit" value="Y" class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">
+                            <span class="ml-2">Y-Allowed Edit</span>
+                          </label>
+                          <label class="inline-flex items-center">
+                            <input type="radio" v-model="form.mi_gl_dist_edit" value="N" class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">
+                            <span class="ml-2">N-No</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <!-- Post MI Section -->
+                      <div class="mt-6">
+                        <h4 class="text-md font-medium text-white bg-green-500 p-2">Post MI</h4>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                          <!-- GL Source -->
+                          <div>
+                            <label for="mi_gl_source" class="block text-sm font-medium text-gray-700">GL Source:</label>
+                            <div class="mt-1 flex items-center">
+                              <input type="text" v-model="form.mi_gl_source" id="mi_gl_source" class="block w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="GL">
+                              <input type="text" v-model="form.mi_gl_source_desc" id="mi_gl_source_desc" class="ml-2 block w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="ADJ" readonly>
+                              <button type="button" @click="openMiGlSourceCodeTableModal" class="ml-2 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                ...
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- GL Ref# -->
+                        <div class="grid grid-cols-1 gap-4 mt-4">
+                          <div>
+                            <label for="mi_gl_ref" class="block text-sm font-medium text-gray-700">GL Ref#:</label>
+                            <select v-model="form.mi_gl_ref" id="mi_gl_ref" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                              <option value="MI-MI#">MI-MI#</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <!-- GL Remarks -->
+                        <div class="grid grid-cols-1 gap-4 mt-4">
+                          <div v-for="(_, index) in form.mi_gl_remarks" :key="`mi_gl_remark_${index}`">
+                            <label :for="`mi_gl_remark_${index + 1}`" class="block text-sm font-medium text-gray-700">GL Remark {{ index + 1 }}:</label>
+                            <select
+                              v-model="form.mi_gl_remarks[index]"
+                              :id="`mi_gl_remark_${index + 1}`"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            >
+                              <option v-for="option in miGlRemarkOptions" :key="option" :value="option">{{ option }}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabPanel>
+
+                  <!-- MO Tab Panel -->
+                  <TabPanel
+                    :class="['bg-white rounded-xl p-3', 'focus:outline-none focus:ring-2 ring-offset-2 ring-offset-blue-400 ring-white ring-opacity-60']"
+                  >
+                    <div class="space-y-4">
+                      <h3 class="text-lg font-medium leading-6 text-gray-900 bg-yellow-200 p-2">MO > Miscellaneous: Stock-Out Note, Inventory Stock-Out</h3>
+
+                      <!-- MO GL DIST# -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700">MO GL DIST#:</label>
+                        <div class="mt-2 flex items-center space-x-4">
+                          <label class="inline-flex items-center">
+                            <input type="radio" v-model="form.mo_gl_dist_edit" value="Y" class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">
+                            <span class="ml-2">Y-Allowed Edit</span>
+                          </label>
+                          <label class="inline-flex items-center">
+                            <input type="radio" v-model="form.mo_gl_dist_edit" value="N" class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">
+                            <span class="ml-2">N-No</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <!-- Post MO Section -->
+                      <div class="mt-6">
+                        <h4 class="text-md font-medium text-white bg-green-500 p-2">Post MO</h4>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                          <!-- GL Source -->
+                          <div>
+                            <label for="mo_gl_source" class="block text-sm font-medium text-gray-700">GL Source:</label>
+                            <div class="mt-1 flex items-center">
+                              <input type="text" v-model="form.mo_gl_source" id="mo_gl_source" class="block w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="GL">
+                              <input type="text" v-model="form.mo_gl_source_desc" id="mo_gl_source_desc" class="ml-2 block w-40 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="ADJ" readonly>
+                              <button type="button" @click="openMoGlSourceCodeTableModal" class="ml-2 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                ...
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- GL Ref# -->
+                        <div class="grid grid-cols-1 gap-4 mt-4">
+                          <div>
+                            <label for="mo_gl_ref" class="block text-sm font-medium text-gray-700">GL Ref#:</label>
+                            <select v-model="form.mo_gl_ref" id="mo_gl_ref" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                              <option value="MO-MO#">MO-MO#</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <!-- GL Remarks -->
+                        <div class="grid grid-cols-1 gap-4 mt-4">
+                          <div v-for="(_, index) in form.mo_gl_remarks" :key="`mo_gl_remark_${index}`">
+                            <label :for="`mo_gl_remark_${index + 1}`" class="block text-sm font-medium text-gray-700">GL Remark {{ index + 1 }}:</label>
+                            <select
+                              v-model="form.mo_gl_remarks[index]"
+                              :id="`mo_gl_remark_${index + 1}`"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            >
+                              <option v-for="option in moGlRemarkOptions" :key="option" :value="option">{{ option }}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabPanel>
+
+                  <!-- LT Tab Panel -->
+                  <TabPanel
+                    :class="['bg-white rounded-xl p-3', 'focus:outline-none focus:ring-2 ring-offset-2 ring-offset-blue-400 ring-white ring-opacity-60']"
+                  >
+                    <div class="p-4">
+                      <p class="font-bold">*Reserved*</p>
+                    </div>
+                  </TabPanel>
+
+                  <!-- OLDA Tab Panel -->
+                  <TabPanel
+                    :class="['bg-white rounded-xl p-3', 'focus:outline-none focus:ring-2 ring-offset-2 ring-offset-blue-400 ring-white ring-opacity-60']"
+                  >
+                    <div class="space-y-6 p-4">
+                      <!-- On-Line Daily Alert Section -->
+                      <div class="border rounded-lg p-4 space-y-4">
+                        <div class="flex items-center space-x-4">
+                          <label class="font-medium text-gray-700">On-Line Daily Alert:</label>
+                          <label class="inline-flex items-center">
+                            <input type="radio" v-model="form.olda_online_daily_alert" value="Y" class="form-radio h-4 w-4 text-indigo-600">
+                            <span class="ml-2">Yes</span>
+                          </label>
+                          <label class="inline-flex items-center">
+                            <input type="radio" v-model="form.olda_online_daily_alert" value="N" class="form-radio h-4 w-4 text-indigo-600">
+                            <span class="ml-2">No</span>
+                          </label>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                          <label for="olda_name" class="block text-sm font-medium text-gray-700">Name:</label>
+                          <input type="text" v-model="form.olda_name" id="olda_name" class="md:col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                          <label for="olda_email" class="block text-sm font-medium text-gray-700">Email:</label>
+                          <input type="email" v-model="form.olda_email" id="olda_email" class="md:col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                          <label for="olda_password" class="block text-sm font-medium text-gray-700">Password:</label>
+                          <input type="password" v-model="form.olda_password" id="olda_password" class="md:col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                        </div>
+                      </div>
+
+                      <!-- Daily Alert Report Section -->
+                      <div class="border rounded-lg p-4 space-y-4">
+                        <h4 class="font-medium text-gray-800">Daily Alert Report</h4>
+                        <div class="flex items-center space-x-8">
+                          <div class="flex items-center space-x-4">
+                            <label class="font-medium text-gray-700">SKU Reorder:</label>
+                            <label class="inline-flex items-center">
+                              <input type="radio" v-model="form.olda_sku_reorder" value="Y" class="form-radio h-4 w-4 text-indigo-600">
+                              <span class="ml-2">Yes</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                              <input type="radio" v-model="form.olda_sku_reorder" value="N" class="form-radio h-4 w-4 text-indigo-600">
+                              <span class="ml-2">No</span>
+                            </label>
+                          </div>
+                          <div class="flex items-center space-x-4">
+                            <label class="font-medium text-gray-700">PO Due Delivery:</label>
+                            <label class="inline-flex items-center">
+                              <input type="radio" v-model="form.olda_po_due_delivery" value="Y" class="form-radio h-4 w-4 text-indigo-600">
+                              <span class="ml-2">Yes</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                              <input type="radio" v-model="form.olda_po_due_delivery" value="N" class="form-radio h-4 w-4 text-indigo-600">
+                              <span class="ml-2">No</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- SKU Reorder Control Section -->
+                      <div class="border rounded-lg p-4 space-y-4">
+                        <h4 class="font-medium text-gray-800">SKU Reorder Control</h4>
+                        <div>
+                          <p class="text-sm font-medium text-gray-700">Step 1: SKU without Reorder</p>
+                          <div class="mt-2 flex items-center space-x-4">
+                            <label class="inline-flex items-center">
+                              <input type="radio" v-model="form.olda_sku_reorder_control_step1" value="Y" class="form-radio h-4 w-4 text-indigo-600">
+                              <span class="ml-2">Yes Skip Email</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                              <input type="radio" v-model="form.olda_sku_reorder_control_step1" value="N" class="form-radio h-4 w-4 text-indigo-600">
+                              <span class="ml-2">No</span>
+                            </label>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                          <div>
+                            <p class="text-sm font-medium text-gray-700">Step 2: Setup by Category</p>
+                            <button @click="openOldaCategoryModal" type="button" class="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                              Setup Email Yes/No
+                            </button>
+                          </div>
+                          <div>
+                            <p class="text-sm font-medium text-gray-700">Step 3: Setup by SKU</p>
+                            <button @click="openOldaSkuModal" type="button" class="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                              Setup Email Yes/No
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- PO Due Delivery Control Section -->
+                      <div class="border rounded-lg p-4 space-y-4">
+                        <h4 class="font-medium text-gray-800">PO Due Delivery Control</h4>
+                        <div class="flex items-center space-x-4">
+                          <label for="olda_po_due_total_item_min" class="text-sm font-medium text-gray-700">Total PO Item:</label>
+                          <input type="number" v-model="form.olda_po_due_total_item_min" id="olda_po_due_total_item_min" class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm sm:text-sm">
+                          <input type="number" v-model="form.olda_po_due_total_item_max" class="mt-1 block w-24 rounded-md border-gray-300 shadow-sm sm:text-sm">
+                        </div>
+                      </div>
+                    </div>
+                  </TabPanel>
+
                   <!-- Other Tab Panels -->
                   <TabPanel
-                    v-for="category in categories.filter(c => c !== 'PR' && c !== 'PO' && c !== 'RC' && c !== 'RT' && c !== 'DN' && c !== 'CN' && c !== 'IS')"
+                    v-for="category in categories.filter(c => c !== 'PR' && c !== 'PO' && c !== 'RC' && c !== 'RT' && c !== 'DN' && c !== 'CN' && c !== 'IS' && c !== 'MI' && c !== 'MO' && c !== 'LT' && c !== 'OLDA')"
                     :key="category"
                     :class="['bg-white rounded-xl p-3', 'focus:outline-none focus:ring-2 ring-offset-2 ring-offset-blue-400 ring-white ring-opacity-60']"
                   >
@@ -2229,6 +2626,327 @@ const glSourceCodeOptions = ref([
                     Exit
                   </button>
                 </div>
+              </div>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
+
+  <!-- MI Location Table Modal -->
+  <TransitionRoot appear :show="isMiLocationModalOpen" as="template">
+    <Dialog as="div" @close="isMiLocationModalOpen = false" class="relative z-10">
+      <TransitionChild
+        as="template"
+        enter="duration-300 ease-out"
+        enter-from="opacity-0"
+        enter-to="opacity-100"
+        leave="duration-200 ease-in"
+        leave-from="opacity-100"
+        leave-to="opacity-0"
+      >
+        <div class="fixed inset-0 bg-black bg-opacity-25" />
+      </TransitionChild>
+
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0 scale-95"
+            enter-to="opacity-100 scale-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100 scale-100"
+            leave-to="opacity-0 scale-95"
+          >
+            <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900 mb-4">
+                Location Table
+              </DialogTitle>
+              
+              <div class="border rounded-lg overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="location in locationOptions" :key="location.code" @click="selectMiLocation(location)" class="cursor-pointer hover:bg-blue-50">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ location.code }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ location.name }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="mt-4 flex justify-end space-x-3">
+                <button
+                  type="button"
+                  class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  @click="isMiLocationModalOpen = false"
+                >
+                  Exit
+                </button>
+              </div>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
+
+  <!-- Source Code Table Modal for MI -->
+  <TransitionRoot appear :show="isMiGlSourceCodeTableModalOpen" as="template">
+    <Dialog as="div" @close="isMiGlSourceCodeTableModalOpen = false" class="relative z-10">
+      <TransitionChild
+        as="template"
+        enter="duration-300 ease-out"
+        enter-from="opacity-0"
+        enter-to="opacity-100"
+        leave="duration-200 ease-in"
+        leave-from="opacity-100"
+        leave-to="opacity-0"
+      >
+        <div class="fixed inset-0 bg-black bg-opacity-25" />
+      </TransitionChild>
+
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0 scale-95"
+            enter-to="opacity-100 scale-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100 scale-100"
+            leave-to="opacity-0 scale-95"
+          >
+            <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900 mb-4">
+                Source Code Table
+              </DialogTitle>
+              
+              <div class="border rounded-lg overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SOURCE CODE</th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SOURCE NAME</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="source in glSourceCodeOptions" :key="source.code" @click="selectMiGlSourceCode(source)" class="cursor-pointer hover:bg-blue-50">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ source.code }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ source.name }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="mt-4 flex justify-between">
+                <div class="space-x-3">
+                  <button
+                    type="button"
+                    class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    @click="() => {}"
+                  >
+                    Select
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    @click="isMiGlSourceCodeTableModalOpen = false"
+                  >
+                    Exit
+                  </button>
+                </div>
+              </div>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
+
+  <!-- Source Code Table Modal for MO -->
+  <TransitionRoot appear :show="isMoGlSourceCodeTableModalOpen" as="template">
+    <Dialog as="div" @close="isMoGlSourceCodeTableModalOpen = false" class="relative z-10">
+      <TransitionChild
+        as="template"
+        enter="duration-300 ease-out"
+        enter-from="opacity-0"
+        enter-to="opacity-100"
+        leave="duration-200 ease-in"
+        leave-from="opacity-100"
+        leave-to="opacity-0"
+      >
+        <div class="fixed inset-0 bg-black bg-opacity-25" />
+      </TransitionChild>
+
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0 scale-95"
+            enter-to="opacity-100 scale-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100 scale-100"
+            leave-to="opacity-0 scale-95"
+          >
+            <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900 mb-4">
+                Source Code Table
+              </DialogTitle>
+              
+              <div class="border rounded-lg overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SOURCE CODE</th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SOURCE NAME</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="source in glSourceCodeOptions" :key="source.code" @click="selectMoGlSourceCode(source)" class="cursor-pointer hover:bg-blue-50">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ source.code }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ source.name }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="mt-4 flex justify-between">
+                <div class="space-x-3">
+                  <button
+                    type="button"
+                    class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    @click="() => {}"
+                  >
+                    Select
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    @click="isMoGlSourceCodeTableModalOpen = false"
+                  >
+                    Exit
+                  </button>
+                </div>
+              </div>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
+
+  <!-- OLDA Category Modal -->
+  <TransitionRoot appear :show="isOldaCategoryModalOpen" as="template">
+    <Dialog as="div" @close="isOldaCategoryModalOpen = false" class="relative z-10">
+      <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100" leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+        <div class="fixed inset-0 bg-black bg-opacity-25" />
+      </TransitionChild>
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+          <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95" enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100" leave-to="opacity-0 scale-95">
+            <DialogPanel class="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900 mb-4">Setup Category Email Yes/No</DialogTitle>
+              <div class="max-h-96 overflow-y-auto border rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50 sticky top-0">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category Name</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Obsolete</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="cat in oldaCategoryOptions" :key="cat.category">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ cat.category }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ cat.name }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <input type="checkbox" v-model="cat.email" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ cat.active }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ cat.obsolete }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="mt-4 flex justify-end">
+                <button type="button" @click="isOldaCategoryModalOpen = false" class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200">
+                  Close
+                </button>
+              </div>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
+
+  <!-- OLDA SKU Modal -->
+    <TransitionRoot appear :show="isOldaSkuModalOpen" as="template">
+    <Dialog as="div" @close="isOldaSkuModalOpen = false" class="relative z-10">
+      <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100" leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+        <div class="fixed inset-0 bg-black bg-opacity-25" />
+      </TransitionChild>
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+          <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0 scale-95" enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100" leave-to="opacity-0 scale-95">
+            <DialogPanel class="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900 mb-4">Setup SKU Email Yes/No</DialogTitle>
+              <div class="max-h-96 overflow-y-auto border rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50 sticky top-0">
+                    <tr>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU#</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU Name</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category Name</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="sku in filteredOldaSkuOptions" :key="sku.sku">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ sku.sku }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ sku.name }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ sku.category }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ sku.category_name }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <input type="checkbox" v-model="sku.email" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="mt-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <label for="olda_sku_search" class="text-sm font-medium">SKU#:</label>
+                    <input type="text" v-model="oldaSkuSearchTerm" id="olda_sku_search" class="block w-64 rounded-md border-gray-300 shadow-sm sm:text-sm">
+                    <button @click="searchOldaSku" type="button" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Search
+                    </button>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button @click="tickAllSkus" type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        Tick All
+                    </button>
+                    <button @click="untickAllSkus" type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        UnTick All
+                    </button>
+                </div>
+              </div>
+              <div class="mt-4 flex justify-end">
+                <button type="button" @click="isOldaSkuModalOpen = false" class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200">
+                  Close
+                </button>
               </div>
             </DialogPanel>
           </TransitionChild>
