@@ -21,6 +21,9 @@ use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportContr
 use App\Http\Controllers\SalesManagement\CustomerService\CustomerServiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaperFluteController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -172,4 +175,20 @@ Route::get('/area-groups', function() {
         ['code' => 'AG02', 'name' => 'East Region'],
         ['code' => 'AG03', 'name' => 'West Region'],
     ]);
-}); 
+});
+
+// Add to the end of the file
+Route::get('/material-management/control-period', [MmControlPeriodController::class, 'getControlPeriod']);
+Route::post('/material-management/control-period', [MmControlPeriodController::class, 'updateControlPeriod']);
+Route::get('/material-management/transaction-types', [MmTransactionTypeController::class, 'getTransactionTypes']);
+Route::post('/material-management/transaction-types', [MmTransactionTypeController::class, 'store']);
+Route::get('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'show']);
+Route::put('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'update']);
+Route::delete('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'destroy']); 
+
+// Add Tax Type API routes
+Route::get('/material-management/tax-types', [MmTaxTypeController::class, 'getTaxTypes']);
+Route::post('/material-management/tax-types', [MmTaxTypeController::class, 'store']);
+Route::get('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'show']);
+Route::put('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'update']);
+Route::delete('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'destroy']); 

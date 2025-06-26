@@ -42,5 +42,9 @@ class DatabaseSeeder extends Seeder
             CorrugatorSpecByProductSeeder::class,
             BundlingComputationMethodSeeder::class,
         ]);
+
+        $this->call(MmControlPeriodSeeder::class);
+        $this->call(MmTransactionTypeSeeder::class);
+        $this->call(MmTaxTypeSeeder::class);
     }
 }

@@ -392,9 +392,9 @@ const materialManagementItems = [
         icon: 'fas fa-cogs',
         children: [
           { title: 'Define Configuration', icon: 'fas fa-sliders-h', route: '/material-management/system-requirement/standard-setup/configuration' },
-          { title: 'Define Control Period', icon: 'fas fa-calendar-alt', route: '/material-management/standard-setup/control-period' },
-          { title: 'Define Transaction Type', icon: 'fas fa-exchange-alt', route: '/material-management/standard-setup/transaction-type' },
-          { title: 'Define Tax Type', icon: 'fas fa-percentage', route: '/material-management/standard-setup/tax-type' },
+          { title: 'Define Control Period', icon: 'fas fa-calendar-alt', route: '/material-management/system-requirement/standard-setup/control-period' },
+          { title: 'Define Transaction Type', icon: 'fas fa-exchange-alt', route: '/material-management/system-requirement/standard-setup/transaction-type' },
+          { title: 'Define Tax Type', icon: 'fas fa-percentage', route: '/material-management/system-requirement/standard-setup/tax-type' },
           { title: 'Define Tax Group', icon: 'fas fa-layer-group', route: '/material-management/standard-setup/tax-group' },
           { title: 'Define Receive Destination', icon: 'fas fa-map-marker-alt', route: '/material-management/standard-setup/receive-destination' },
           { title: 'Define Analysis Code', icon: 'fas fa-tags', route: '/material-management/standard-setup/analysis-code' },

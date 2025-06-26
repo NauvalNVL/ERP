@@ -49,6 +49,9 @@ use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\BundlingComputationMethodController;
 use App\Http\Controllers\ComputationFormulaController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmConfigController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -733,6 +736,9 @@ Route::resource('update-customer-accounts', UpdateCustomerAccountController::cla
 Route::resource('mm-configs', MmConfigController::class);
 
 Route::get('/material-management/system-requirement/standard-setup/configuration', [MmConfigController::class, 'index'])->name('mm.config');
+Route::get('/material-management/system-requirement/standard-setup/control-period', [MmControlPeriodController::class, 'index'])->name('mm.control-period');
+Route::get('/material-management/system-requirement/standard-setup/transaction-type', [MmTransactionTypeController::class, 'index'])->name('mm.transaction-type');
+Route::get('/material-management/system-requirement/standard-setup/tax-type', [MmTaxTypeController::class, 'index'])->name('mm.tax-type');
 
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');
