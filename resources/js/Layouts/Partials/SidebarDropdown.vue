@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import NestedDropdown from './NestedDropdown.vue';
 import sidebarStore from './sidebarStore';
@@ -102,7 +102,46 @@ const props = defineProps({
 });
 
 const menuId = computed(() => props.menuId || props.title.toLowerCase().replace(/\s+/g, '-'));
-const isMenuOpen = computed(() => sidebarStore.isOpen(menuId.value) || hasActiveChild.value);
+
+// If this menu has an active child, we want to open it automatically
+// But we don't want to save this automatic state to localStorage
+const hasActiveChild = computed(() => {
+  // Check direct children for exact matches
+  const directActive = props.items.some(item => item.route && isActive(item.route));
+  if (directActive) return true;
+  
+  // Check direct children for parent matches (same base path)
+  const directParentActive = props.items.some(item => item.route && isActiveParent(item.route));
+  if (directParentActive) return true;
+  
+  // Check nested children
+  return props.items.some(item => {
+    if (!item.children) return false;
+    return item.children.some(child => child.route && (isActive(child.route) || isActiveParent(child.route)));
+  });
+});
+
+// Calculate if the menu should be open based on stored state or active child
+const isMenuOpen = computed(() => {
+  // Check if this menu is manually opened/closed in the store
+  const isStoreOpen = sidebarStore.isOpen(menuId.value);
+  
+  // If this menu has an active child, it should be open regardless of stored state
+  // This ensures the current page's menu hierarchy is visible
+  if (hasActiveChild.value) {
+    // Only save this state if it's not already open
+    if (!isStoreOpen) {
+      // We do this in a setTimeout to avoid modifying state during render
+      setTimeout(() => {
+        sidebarStore.setOpen(menuId.value, true);
+      }, 0);
+    }
+    return true;
+  }
+  
+  // Otherwise, respect the stored state
+  return isStoreOpen;
+});
 
 // Check if the current route matches the given route exactly
 const isActive = (route) => {
@@ -134,26 +173,16 @@ const isActiveParent = (route) => {
   return currentBase === routeBase && normalizedCurrent !== normalizedRoute;
 };
 
-// Check if any child item is active
-const hasActiveChild = computed(() => {
-  // Check direct children for exact matches
-  const directActive = props.items.some(item => item.route && isActive(item.route));
-  if (directActive) return true;
-  
-  // Check direct children for parent matches (same base path)
-  const directParentActive = props.items.some(item => item.route && isActiveParent(item.route));
-  if (directParentActive) return true;
-  
-  // Check nested children
-  return props.items.some(item => {
-    if (!item.children) return false;
-    return item.children.some(child => child.route && (isActive(child.route) || isActiveParent(child.route)));
-  });
-});
-
 const toggleMenu = () => {
   sidebarStore.toggle(menuId.value);
 };
+
+// On mount, automatically open menus that lead to the current page
+onMounted(() => {
+  if (hasActiveChild.value) {
+    sidebarStore.setOpen(menuId.value, true);
+  }
+});
 </script> 
 
 <style scoped>

@@ -91,12 +91,21 @@
             </p>
           </div>
         </div>
-        <button v-if="user" @click="logout" class="text-gray-300 hover:text-red-400 transition-colors">
-          <i class="fas fa-sign-out-alt"></i>
-        </button>
-        <Link v-else href="/login" class="text-gray-300 hover:text-green-400 transition-colors">
-          <i class="fas fa-sign-in-alt"></i>
-        </Link>
+        <div class="flex items-center space-x-3">
+          <button 
+            @click="resetMenus" 
+            class="text-gray-300 hover:text-blue-400 transition-colors" 
+            title="Reset menu state"
+          >
+            <i class="fas fa-redo-alt text-sm"></i>
+          </button>
+          <button v-if="user" @click="logout" class="text-gray-300 hover:text-red-400 transition-colors">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+          <Link v-else href="/login" class="text-gray-300 hover:text-green-400 transition-colors">
+            <i class="fas fa-sign-in-alt"></i>
+          </Link>
+        </div>
       </div>
     </div>
   </div>
@@ -106,6 +115,7 @@
 import { ref, computed } from 'vue';
 import { usePage, Link, router } from '@inertiajs/vue3';
 import SidebarDropdown from './SidebarDropdown.vue';
+import sidebarStore from './sidebarStore';
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
@@ -136,6 +146,11 @@ const logout = () => {
       console.error('Logout failed');
     }
   });
+};
+
+// Reset all dropdown menus to their closed state
+const resetMenus = () => {
+  sidebarStore.resetState();
 };
 
 // System Manager Items

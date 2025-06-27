@@ -61,17 +61,21 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import sidebarStore from './sidebarStore';
 
 const page = usePage();
 const currentPath = computed(() => page.url);
 
-// Extract the base path from the URL (e.g., '/foreign-currency/view-print' -> '/foreign-currency')
+// Extract the base path from the URL
 const getBasePath = (path) => {
   if (!path) return '';
-  const parts = path.split('/').filter(Boolean);
+  // Normalize the path and split into segments
+  const normalizedPath = path.toLowerCase().replace(/^\/+|\/+$/g, '');
+  const parts = normalizedPath.split('/');
+  
+  // Return the first segment for base path comparison
   return parts.length > 0 ? `/${parts[0]}` : '';
 };
 
@@ -95,27 +99,6 @@ const props = defineProps({
 });
 
 const menuId = computed(() => props.menuId || props.title.toLowerCase().replace(/\s+/g, '-'));
-const isMenuOpen = computed(() => sidebarStore.isOpen(menuId.value) || hasActiveChild.value);
-
-// Check if the current route matches the given route exactly
-const isActive = (route) => {
-  if (!route) return false;
-  return currentPath.value === route;
-};
-
-// For parent highlighting, check if the current path's base matches the route's base
-const isActiveParent = (route) => {
-  if (!route) return false;
-  
-  // Check if the current path contains the route path for deep nested routes
-  if (currentPath.value.includes(route)) {
-    return true;
-  }
-  
-  const currentBase = getBasePath(currentPath.value);
-  const routeBase = getBasePath(route);
-  return currentBase === routeBase && currentPath.value !== route;
-};
 
 // Check if any child item is active
 const hasActiveChild = computed(() => {
@@ -134,9 +117,64 @@ const hasActiveChild = computed(() => {
   });
 });
 
+// Calculate if the menu should be open based on stored state or active child
+const isMenuOpen = computed(() => {
+  // Check if this menu is manually opened/closed in the store
+  const isStoreOpen = sidebarStore.isOpen(menuId.value);
+  
+  // If this menu has an active child, it should be open regardless of stored state
+  // This ensures the current page's menu hierarchy is visible
+  if (hasActiveChild.value) {
+    // Only save this state if it's not already open
+    if (!isStoreOpen) {
+      // We do this in a setTimeout to avoid modifying state during render
+      setTimeout(() => {
+        sidebarStore.setOpen(menuId.value, true);
+      }, 0);
+    }
+    return true;
+  }
+  
+  // Otherwise, respect the stored state
+  return isStoreOpen;
+});
+
+// Check if the current route matches the given route exactly
+const isActive = (route) => {
+  if (!route) return false;
+  
+  // Normalize both paths for comparison (remove trailing slash, lowercase)
+  const normalizedCurrent = currentPath.value.toLowerCase().replace(/\/+$/, '');
+  const normalizedRoute = route.toLowerCase().replace(/\/+$/, '');
+  
+  return normalizedCurrent === normalizedRoute;
+};
+
+// For parent highlighting, check if the current path's base matches the route's base
+const isActiveParent = (route) => {
+  if (!route) return false;
+  
+  // Check if the current path contains the route path for deep nested routes
+  if (currentPath.value.includes(route) && currentPath.value !== route) {
+    return true;
+  }
+  
+  // Check base path matching
+  const currentBase = getBasePath(currentPath.value);
+  const routeBase = getBasePath(route);
+  return currentBase === routeBase && currentPath.value !== route;
+};
+
 const toggleMenu = () => {
   sidebarStore.toggle(menuId.value);
 };
+
+// On mount, automatically open menus that lead to the current page
+onMounted(() => {
+  if (hasActiveChild.value) {
+    sidebarStore.setOpen(menuId.value, true);
+  }
+});
 </script> 
 
 <style scoped>
