@@ -701,7 +701,13 @@ const productionManagementItems = [
 
 // Warehouse Management Items
 const warehouseManagementItems = [
-  // Add Warehouse Management items here
+  { title: 'Finished Goods', icon: 'fas fa-box-open', route: '/warehouse-management/finished-goods' },
+  { title: 'Delivery Order', icon: 'fas fa-truck', route: '/warehouse-management/delivery-order' },
+  { title: 'Invoice', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice' },
+  { title: 'Debit & Credit Note', icon: 'fas fa-money-check-alt', route: '/warehouse-management/debit-credit-note' },
+  { title: 'Warehouse Analysis', icon: 'fas fa-chart-pie', route: '/warehouse-management/warehouse-analysis' },
+  { title: 'Custom Indonesia', icon: 'fas fa-flag', route: '/warehouse-management/custom-indonesia' },
+  { title: 'Accounts', icon: 'fas fa-cash-register', route: '/warehouse-management/accounts' },
 ];
 </script>
 

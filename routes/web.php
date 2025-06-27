@@ -410,6 +410,35 @@ Route::middleware('auth')->group(function () {
 
     // Auth Routes
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    // Warehouse Management Routes
+    Route::get('/warehouse-management/finished-goods', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/index');
+    })->name('vue.warehouse-management.finished-goods');
+
+    Route::get('/warehouse-management/delivery-order', function () {
+        return Inertia::render('warehouse-management/DeliveryOrder/index');
+    })->name('vue.warehouse-management.delivery-order');
+
+    Route::get('/warehouse-management/invoice', function () {
+        return Inertia::render('warehouse-management/Invoice/index');
+    })->name('vue.warehouse-management.invoice');
+
+    Route::get('/warehouse-management/debit-credit-note', function () {
+        return Inertia::render('warehouse-management/DebitCreditNote/index');
+    })->name('vue.warehouse-management.debit-credit-note');
+
+    Route::get('/warehouse-management/warehouse-analysis', function () {
+        return Inertia::render('warehouse-management/WarehouseAnalysis/index');
+    })->name('vue.warehouse-management.warehouse-analysis');
+
+    Route::get('/warehouse-management/custom-indonesia', function () {
+        return Inertia::render('warehouse-management/CustomIndonesia/index');
+    })->name('vue.warehouse-management.custom-indonesia');
+
+    Route::get('/warehouse-management/accounts', function () {
+        return Inertia::render('warehouse-management/Accounts/index');
+    })->name('vue.warehouse-management.accounts');
 });
 
 // API Routes for Vue components
