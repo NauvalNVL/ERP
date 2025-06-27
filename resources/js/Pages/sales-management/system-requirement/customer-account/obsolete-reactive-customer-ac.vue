@@ -8,47 +8,64 @@
     </form>
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-user-slash mr-3"></i> Obsolete/Reactive Customer Account
-        </h2>
-        <p class="text-cyan-100">Manage customer account status: Activate or Deactivate accounts</p>
+    <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
+        <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
+        <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
+        <div class="flex items-center">
+            <div class="bg-gradient-to-br from-cyan-500 to-teal-600 p-3 rounded-lg shadow-inner flex items-center justify-center mr-4">
+                <i class="fas fa-user-slash text-white text-2xl z-10"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-1 text-shadow">Obsolete/Reactive Customer Account</h2>
+                <p class="text-teal-100 max-w-2xl">Manage customer account status: Activate or Deactivate accounts</p>
+            </div>
+        </div>
     </div>
 
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+    <!-- Main Content -->
+    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-cyan-50 overflow-hidden relative">
+        <div class="absolute -top-16 -right-16 w-32 h-32 bg-cyan-50 rounded-full opacity-50"></div>
+        <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-teal-50 rounded-full opacity-50"></div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
-                    <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-blue-500 rounded-lg mr-3">
-                            <i class="fas fa-edit text-white"></i>
+                <div class="relative bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100 p-8 rounded-2xl shadow-2xl border-t-4 border-cyan-500 overflow-hidden mb-8 animate-fade-in-up">
+                    <div class="absolute -top-16 -right-16 w-40 h-40 bg-cyan-200 rounded-full opacity-30"></div>
+                    <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-teal-200 rounded-full opacity-30"></div>
+                    <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
+                        <div class="p-2 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-lg mr-4 shadow-md">
+                            <i class="fas fa-user-edit text-white"></i>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Customer Account Status Management</h3>
                     </div>
-                    
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Customer Account:</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-user"></i>
+                            <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 text-white mr-2 shadow-md">
+                                    <i class="fas fa-user text-xs"></i>
                                 </span>
-                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                                <button type="button" @click="openSortDialog" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                Customer Account:
+                            </label>
+                            <div class="relative flex">
+                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-cyan-500 focus:border-cyan-500 transition-colors">
+                                <button type="button" @click="openSortDialog" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
-                            <button type="button" @click="performAction" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                            <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white mr-2 shadow-md">
+                                    <i class="fas fa-sync-alt text-xs"></i>
+                                </span>
+                                Action:
+                            </label>
+                            <button type="button" @click="performAction" class="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-xl font-bold shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95">
                                 <i class="fas fa-sync-alt mr-2"></i> Update Status
                             </button>
                         </div>
                     </div>
-                    
                     <!-- Data Status Information -->
                     <div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
                         <div class="flex items-center">
@@ -72,7 +89,6 @@
                             </span>
                         </div>
                     </div>
-
                     <!-- Customer Details when selected -->
                     <div v-if="selectedAccount" class="mt-6 border-t border-gray-200 pt-6">
                         <h4 class="text-lg font-medium text-gray-800 mb-4">Customer Account Details</h4>
@@ -102,7 +118,6 @@
                                 <p class="font-medium">{{ selectedAccount.co_email || 'Not specified' }}</p>
                             </div>
                         </div>
-
                         <!-- Status Change Form -->
                         <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                             <h5 class="font-medium text-gray-700 mb-3">Update Account Status</h5>
@@ -117,11 +132,18 @@
                                 </label>
                             </div>
                             <div class="mt-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Reason for Change:</label>
-                                <textarea v-model="reason" rows="3" class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter reason for status change..."></textarea>
+                                <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                    <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-pink-500 to-red-500 text-white mr-2 shadow-md">
+                                        <i class="fas fa-comment-dots text-xs"></i>
+                                    </span>
+                                    Reason for Change:
+                                </label>
+                                <textarea v-model="reason" rows="3" class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Enter reason for status change..."></textarea>
                             </div>
                             <div class="mt-4 flex justify-end">
-                                <button type="button" @click="confirmStatusChange" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                <button type="button" @click="confirmStatusChange" class="save-btn group">
+                                    <span class="shimmer-effect"></span>
+                                    <i class="fas fa-sync-alt mr-2 text-lg group-hover:animate-pulse"></i>
                                     Update Status
                                 </button>
                             </div>
@@ -132,14 +154,15 @@
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
                 <!-- Info Card -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6 bg-gradient-to-br from-white to-teal-50 overflow-hidden relative">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-teal-50 rounded-full opacity-20"></div>
+                    <div class="absolute bottom-0 left-0 w-20 h-20 bg-cyan-50 rounded-full opacity-20"></div>
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                        <div class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-3 shadow-md">
                             <i class="fas fa-info-circle text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Account Status Information</h3>
                     </div>
-
                     <div class="space-y-4">
                         <div class="p-4 bg-teal-50 rounded-lg">
                             <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
@@ -150,7 +173,6 @@
                                 <li>Deactivated accounts will not appear in most reports</li>
                             </ul>
                         </div>
-
                         <div class="p-4 bg-blue-50 rounded-lg">
                             <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Status Definitions</h4>
                             <div class="space-y-3">
@@ -168,16 +190,16 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Quick Links -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500 bg-gradient-to-br from-white to-purple-50 overflow-hidden relative">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-full opacity-20"></div>
+                    <div class="absolute bottom-0 left-0 w-20 h-20 bg-indigo-50 rounded-full opacity-20"></div>
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                        <div class="p-2 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg mr-3 shadow-md">
                             <i class="fas fa-link text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
                     </div>
-
                     <div class="grid grid-cols-1 gap-3">
                         <Link href="/update-customer-account" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <div class="p-2 bg-blue-500 rounded-full mr-3">
@@ -188,7 +210,6 @@
                                 <p class="text-xs text-blue-700">Modify customer details</p>
                             </div>
                         </Link>
-
                         <Link href="/customer-group" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                             <div class="p-2 bg-purple-500 rounded-full mr-3">
                                 <i class="fas fa-users text-white text-sm"></i>
@@ -198,7 +219,6 @@
                                 <p class="text-xs text-purple-700">Manage customer groups</p>
                             </div>
                         </Link>
-
                         <Link href="/customer-alternate-address" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                             <div class="p-2 bg-green-500 rounded-full mr-3">
                                 <i class="fas fa-map-marker-alt text-white text-sm"></i>
@@ -227,7 +247,6 @@
     <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
         <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
-    
     <!-- Notification Toast -->
     <div v-if="notification.show" class="fixed bottom-4 right-4 z-50 shadow-xl rounded-lg transition-all duration-300"
          :class="{
@@ -498,3 +517,37 @@ const filteredCustomerAccounts = computed(() => {
     return filtered;
 });
 </script>
+
+<style scoped>
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.save-btn {
+  @apply relative flex items-center justify-center px-8 py-3 rounded-xl font-bold text-white text-lg bg-gradient-to-r from-green-500 via-cyan-500 to-blue-500 shadow-lg transition-all duration-200 overflow-hidden;
+  box-shadow: 0 4px 24px 0 rgba(0, 180, 216, 0.15);
+}
+.save-btn:hover, .save-btn:focus {
+  @apply scale-105 shadow-2xl bg-gradient-to-r from-blue-500 via-cyan-500 to-green-500;
+}
+.save-btn:active {
+  @apply scale-95;
+}
+.save-btn i {
+  @apply text-white drop-shadow-md;
+}
+.shimmer-effect {
+  @apply absolute top-0 -left-[150%] h-full w-[50%] skew-x-[-25deg] bg-white/20 pointer-events-none;
+  animation: shimmer 2.5s infinite;
+}
+@keyframes shimmer {
+  100% {
+    left: 150%;
+  }
+}
+.animate-pulse-slow {
+    animation: pulse-slow 5s infinite;
+}
+.animation-delay-500 { 
+    animation-delay: 0.5s; 
+}
+</style>
