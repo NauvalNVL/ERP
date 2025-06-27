@@ -40,6 +40,7 @@
         </div>
       </div>
     </div>
+    <ToastContainer />
   </div>
 </template>
 
@@ -48,6 +49,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import Sidebar from './Partials/Sidebar.vue';
 import sidebarStore from './Partials/sidebarStore';
+import ToastContainer from '@/Components/ToastContainer.vue';
 
 const props = defineProps({
   header: {

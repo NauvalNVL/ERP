@@ -48,6 +48,13 @@ use App\Http\Controllers\SideTrimByProductDesignController;
 use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\BundlingComputationMethodController;
 use App\Http\Controllers\ComputationFormulaController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmConfigController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxGroupController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -86,7 +93,7 @@ Route::get('/test-finishings', function () {
 });
 
 Route::get('/', function () {
-    return redirect('/login');
+    return redirect()->route('login');
 });
 
 Route::get('/test-db', function () {
@@ -331,6 +338,10 @@ Route::middleware('auth')->group(function () {
              return Inertia::render('sales-management/system-requirement/customer-account/obsolete-reactive-customer-ac');
          })->name('vue.obsolete-reactive-customer-account.index');
          
+         Route::get('/obsolete-reactive-customer-account/view-print', function () {
+            return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-nonactive-customer');
+        })->name('vue.obsolete-reactive-customer-account.view-print');
+         
          Route::get('/customer-alternate-address', [CustomerAlternateAddressController::class, 'index'])->name('vue.customer-alternate-address.index');
          Route::get('/customer-alternate-address/view-print', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/view-and-print-customer-alternate-address');
@@ -450,6 +461,10 @@ Route::prefix('api')->group(function () {
     Route::get('/users/{user}/permissions', [UserController::class, 'getUserPermissions']);
     Route::post('/users/{user}/permissions', [UserController::class, 'updateAccess']);
     Route::post('/users/update-password', [UserController::class, 'updatePassword']);
+    
+    // Material Management Config API routes
+    Route::get('/mm-config', [MmConfigController::class, 'apiGetConfig']);
+    Route::post('/mm-config', [MmConfigController::class, 'apiUpdateConfig']);
     
     // Salesperson API routes
     Route::get('/salesperson', [SalespersonController::class, 'apiIndex']);
@@ -751,3 +766,24 @@ Route::get('/standard-formula/diecut-computation/product-design', function() {
 Route::get('/standard-formula/diecut-computation/view-print-product-design', function() {
     return Inertia::render('sales-management/standard-formula/diecut-computation-method/ViewPrintProductDesign');
 })->name('vue.standard-formula.diecut-computation.view-print-product-design');
+
+Route::resource('sales-person-teams', SalespersonTeamController::class);
+Route::resource('update-customer-accounts', UpdateCustomerAccountController::class);
+Route::resource('mm-configs', MmConfigController::class);
+
+Route::get('/material-management/system-requirement/standard-setup/configuration', [MmConfigController::class, 'index'])->name('mm.config');
+Route::get('/material-management/system-requirement/standard-setup/control-period', [MmControlPeriodController::class, 'index'])->name('mm.control-period');
+Route::get('/material-management/system-requirement/standard-setup/transaction-type', [MmTransactionTypeController::class, 'index'])->name('mm.transaction-type');
+Route::get('/material-management/system-requirement/standard-setup/tax-type', [MmTaxTypeController::class, 'index'])->name('mm.tax-type');
+Route::get('/material-management/system-requirement/standard-setup/tax-group', [MmTaxGroupController::class, 'index'])->name('mm.tax-group');
+Route::get('/material-management/system-requirement/standard-setup/tax-group/view-print', [MmTaxGroupController::class, 'viewPrint'])->name('mm.tax-group.view-print');
+Route::get('/material-management/system-requirement/standard-setup/receive-destination', [MmReceiveDestinationController::class, 'index'])->name('mm.receive-destination');
+Route::get('/material-management/system-requirement/standard-setup/receive-destination/view-print', [MmReceiveDestinationController::class, 'viewPrint'])->name('mm.receive-destination.view-print');
+Route::get('/material-management/system-requirement/standard-setup/analysis-code', [MmAnalysisCodeController::class, 'index'])->name('mm.analysis-code');
+Route::get('/material-management/system-requirement/standard-setup/analysis-code/view-print', [MmAnalysisCodeController::class, 'viewPrint'])->name('mm.analysis-code.view-print');
+Route::get('/material-management/system-requirement/standard-setup/control-period/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'viewPrint'])->name('mm.control-period.view-print');
+Route::get('/material-management/system-requirement/standard-setup/transaction-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController::class, 'viewPrint'])->name('mm.transaction-type.view-print');
+Route::get('/material-management/system-requirement/standard-setup/tax-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController::class, 'viewPrint'])->name('mm.tax-type.view-print');
+
+// Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
+// Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');

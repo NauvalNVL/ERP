@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            MmConfigSeeder::class,
             SalesTeamSeeder::class,
             SalespersonSeeder::class,
             SalespersonTeamSeeder::class,
@@ -40,6 +41,13 @@ class DatabaseSeeder extends Seeder
             CorrugatorConfigSeeder::class,
             CorrugatorSpecByProductSeeder::class,
             BundlingComputationMethodSeeder::class,
+            MmReceiveDestinationSeeder::class,
+            MmAnalysisCodeSeeder::class,
         ]);
+
+        $this->call(MmControlPeriodSeeder::class);
+        $this->call(MmTransactionTypeSeeder::class);
+        $this->call(MmTaxTypeSeeder::class);
+        $this->call(MmTaxGroupSeeder::class);
     }
 }
