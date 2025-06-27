@@ -44,8 +44,6 @@ class DatabaseSeeder extends Seeder
             MmReceiveDestinationSeeder::class,
             MmAnalysisCodeSeeder::class,
             WarehouseLocationSeeder::class,
-            MmCategorySeeder::class,
-            MmSkuSeeder::class,
         ]);
 
         $this->call(MmControlPeriodSeeder::class);

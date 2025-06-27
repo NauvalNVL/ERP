@@ -257,6 +257,8 @@ Route::prefix('material-management')->group(function () {
     Route::post('/skus/seed', [MmSkuController::class, 'seedSampleData']);
     Route::get('/sku-types', [MmSkuController::class, 'getTypes']);
     Route::get('/sku-uoms', [MmSkuController::class, 'getUoms']);
+});
+
 // Add to the end of the file
 Route::get('/material-management/control-period', [MmControlPeriodController::class, 'getControlPeriod']);
 Route::post('/material-management/control-period', [MmControlPeriodController::class, 'updateControlPeriod']);
