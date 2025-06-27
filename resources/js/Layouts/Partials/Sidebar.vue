@@ -657,7 +657,7 @@ const warehouseManagementItems = [
       { title: 'Print Stock Balance Report', icon: 'fas fa-print', route: null },
       { title: 'Print Stock Movement Report', icon: 'fas fa-print', route: null }
     ]
-  }
+  },
   { title: 'Finished Goods', icon: 'fas fa-box-open', route: '/warehouse-management/finished-goods' },
   { title: 'Delivery Order', icon: 'fas fa-truck', route: '/warehouse-management/delivery-order' },
   { title: 'Invoice', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice' },
