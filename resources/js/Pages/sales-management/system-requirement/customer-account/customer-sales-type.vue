@@ -31,9 +31,24 @@
                     <table class="min-w-full text-sm">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-600 w-1/2">Customer Code & Name</th>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-600 w-1/4">Sales Type</th>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-600 w-1/4">Actions</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-600 w-1/2">
+                                    <span class="inline-flex items-center">
+                                        <i class="fas fa-id-card text-cyan-500 mr-2"></i>
+                                        Customer Code & Name
+                                    </span>
+                                </th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-600 w-1/4">
+                                    <span class="inline-flex items-center">
+                                        <i class="fas fa-tags text-purple-500 mr-2"></i>
+                                        Sales Type
+                                    </span>
+                                </th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-600 w-1/4">
+                                    <span class="inline-flex items-center">
+                                        <i class="fas fa-cogs text-green-500 mr-2"></i>
+                                        Actions
+                                    </span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
