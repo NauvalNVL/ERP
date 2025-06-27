@@ -27,6 +27,9 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeControlle
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxGroupController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmLocationController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController;
 use App\Http\Controllers\WarehouseLocationController;
 use App\Http\Controllers\FgDoConfigController;
 
@@ -182,6 +185,78 @@ Route::get('/area-groups', function() {
     ]);
 });
 
+// Material Management Routes
+Route::prefix('material-management')->group(function () {
+    // System Requirement - Standard Setup
+    Route::get('/control-period', [MmControlPeriodController::class, 'getControlPeriod']);
+    Route::post('/control-period', [MmControlPeriodController::class, 'updateControlPeriod']);
+    Route::get('/control-period/view-print', [MmControlPeriodController::class, 'getControlPeriodForPrint']);
+    
+    Route::get('/transaction-types', [MmTransactionTypeController::class, 'getTransactionTypes']);
+    Route::get('/transaction-types/{code}', [MmTransactionTypeController::class, 'show']);
+    Route::post('/transaction-types', [MmTransactionTypeController::class, 'store']);
+    Route::put('/transaction-types/{code}', [MmTransactionTypeController::class, 'update']);
+    Route::delete('/transaction-types/{code}', [MmTransactionTypeController::class, 'destroy']);
+    Route::post('/transaction-types/seed', [MmTransactionTypeController::class, 'seedSampleData']);
+    
+    Route::get('/tax-types', [MmTaxTypeController::class, 'getTaxTypes']);
+    Route::get('/tax-types/{code}', [MmTaxTypeController::class, 'show']);
+    Route::post('/tax-types', [MmTaxTypeController::class, 'store']);
+    Route::put('/tax-types/{code}', [MmTaxTypeController::class, 'update']);
+    Route::delete('/tax-types/{code}', [MmTaxTypeController::class, 'destroy']);
+    Route::post('/tax-types/seed', [MmTaxTypeController::class, 'seedSampleData']);
+    
+    Route::get('/tax-groups', [MmTaxGroupController::class, 'getTaxGroups']);
+    Route::get('/tax-groups/{code}', [MmTaxGroupController::class, 'show']);
+    Route::post('/tax-groups', [MmTaxGroupController::class, 'store']);
+    Route::put('/tax-groups/{code}', [MmTaxGroupController::class, 'update']);
+    Route::delete('/tax-groups/{code}', [MmTaxGroupController::class, 'destroy']);
+    
+    Route::get('/receive-destinations', [MmReceiveDestinationController::class, 'getReceiveDestinations']);
+    Route::get('/receive-destinations/{code}', [MmReceiveDestinationController::class, 'show']);
+    Route::post('/receive-destinations', [MmReceiveDestinationController::class, 'store']);
+    Route::put('/receive-destinations/{code}', [MmReceiveDestinationController::class, 'update']);
+    Route::delete('/receive-destinations/{code}', [MmReceiveDestinationController::class, 'destroy']);
+    Route::post('/receive-destinations/seed', [MmReceiveDestinationController::class, 'seedSampleData']);
+    
+    Route::get('/analysis-codes', [MmAnalysisCodeController::class, 'getAnalysisCodes']);
+    Route::get('/analysis-codes/{code}', [MmAnalysisCodeController::class, 'show']);
+    Route::post('/analysis-codes', [MmAnalysisCodeController::class, 'store']);
+    Route::put('/analysis-codes/{code}', [MmAnalysisCodeController::class, 'update']);
+    Route::delete('/analysis-codes/{code}', [MmAnalysisCodeController::class, 'destroy']);
+    Route::post('/analysis-codes/seed', [MmAnalysisCodeController::class, 'seedSampleData']);
+
+    // System Requirement - Inventory Setup
+    Route::get('/locations', [MmLocationController::class, 'getLocations']);
+    Route::get('/locations/{code}', [MmLocationController::class, 'show']);
+    Route::post('/locations', [MmLocationController::class, 'store']);
+    Route::put('/locations/{code}', [MmLocationController::class, 'update']);
+    Route::delete('/locations/{code}', [MmLocationController::class, 'destroy']);
+    Route::patch('/locations/{code}/toggle-active', [MmLocationController::class, 'toggleActive']);
+    Route::get('/locations/view-print', [MmLocationController::class, 'getLocationsForPrint']);
+    Route::post('/locations/seed', [MmLocationController::class, 'seedSampleData']);
+
+    // Category Routes
+    Route::get('/categories', [MmCategoryController::class, 'getCategories']);
+    Route::get('/categories/{code}', [MmCategoryController::class, 'show']);
+    Route::post('/categories', [MmCategoryController::class, 'store']);
+    Route::put('/categories/{code}', [MmCategoryController::class, 'update']);
+    Route::delete('/categories/{code}', [MmCategoryController::class, 'destroy']);
+    Route::patch('/categories/{code}/toggle-active', [MmCategoryController::class, 'toggleActive']);
+    Route::get('/categories/view-print', [MmCategoryController::class, 'getCategoriesForPrint']);
+    Route::post('/categories/seed', [MmCategoryController::class, 'seedSampleData']);
+
+    // SKU Routes
+    Route::get('/skus', [MmSkuController::class, 'getSkus']);
+    Route::get('/skus/{sku}', [MmSkuController::class, 'show']);
+    Route::post('/skus', [MmSkuController::class, 'store']);
+    Route::put('/skus/{sku}', [MmSkuController::class, 'update']);
+    Route::delete('/skus/{sku}', [MmSkuController::class, 'destroy']);
+    Route::patch('/skus/{sku}/toggle-active', [MmSkuController::class, 'toggleActive']);
+    Route::get('/skus-for-print', [MmSkuController::class, 'getSkusForPrint']);
+    Route::post('/skus/seed', [MmSkuController::class, 'seedSampleData']);
+    Route::get('/sku-types', [MmSkuController::class, 'getTypes']);
+    Route::get('/sku-uoms', [MmSkuController::class, 'getUoms']);
 // Add to the end of the file
 Route::get('/material-management/control-period', [MmControlPeriodController::class, 'getControlPeriod']);
 Route::post('/material-management/control-period', [MmControlPeriodController::class, 'updateControlPeriod']);
