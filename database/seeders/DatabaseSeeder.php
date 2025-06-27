@@ -43,6 +43,8 @@ class DatabaseSeeder extends Seeder
             BundlingComputationMethodSeeder::class,
             MmReceiveDestinationSeeder::class,
             MmAnalysisCodeSeeder::class,
+            MmCategorySeeder::class,
+            MmSkuSeeder::class,
         ]);
 
         $this->call(MmControlPeriodSeeder::class);

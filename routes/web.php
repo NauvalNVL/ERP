@@ -34,7 +34,6 @@ use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\RealeseApproveMcController;
 use App\Http\Controllers\StandardFormulaController;
-use App\Http\Controllers\SOConfigController;
 use App\Http\Controllers\ScoringFormulaController;
 use App\Http\Controllers\ObsolateReactiveMcController;
 use App\Http\Controllers\CustomerSalesTypeController;
@@ -55,6 +54,10 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeControlle
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxGroupController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmLocationController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController;
+use App\Http\Controllers\SOConfigController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -882,19 +885,36 @@ Route::resource('sales-person-teams', SalespersonTeamController::class);
 Route::resource('update-customer-accounts', UpdateCustomerAccountController::class);
 Route::resource('mm-configs', MmConfigController::class);
 
-Route::get('/material-management/system-requirement/standard-setup/configuration', [MmConfigController::class, 'index'])->name('mm.config');
-Route::get('/material-management/system-requirement/standard-setup/control-period', [MmControlPeriodController::class, 'index'])->name('mm.control-period');
-Route::get('/material-management/system-requirement/standard-setup/transaction-type', [MmTransactionTypeController::class, 'index'])->name('mm.transaction-type');
-Route::get('/material-management/system-requirement/standard-setup/tax-type', [MmTaxTypeController::class, 'index'])->name('mm.tax-type');
-Route::get('/material-management/system-requirement/standard-setup/tax-group', [MmTaxGroupController::class, 'index'])->name('mm.tax-group');
-Route::get('/material-management/system-requirement/standard-setup/tax-group/view-print', [MmTaxGroupController::class, 'viewPrint'])->name('mm.tax-group.view-print');
-Route::get('/material-management/system-requirement/standard-setup/receive-destination', [MmReceiveDestinationController::class, 'index'])->name('mm.receive-destination');
-Route::get('/material-management/system-requirement/standard-setup/receive-destination/view-print', [MmReceiveDestinationController::class, 'viewPrint'])->name('mm.receive-destination.view-print');
-Route::get('/material-management/system-requirement/standard-setup/analysis-code', [MmAnalysisCodeController::class, 'index'])->name('mm.analysis-code');
-Route::get('/material-management/system-requirement/standard-setup/analysis-code/view-print', [MmAnalysisCodeController::class, 'viewPrint'])->name('mm.analysis-code.view-print');
-Route::get('/material-management/system-requirement/standard-setup/control-period/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'viewPrint'])->name('mm.control-period.view-print');
-Route::get('/material-management/system-requirement/standard-setup/transaction-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController::class, 'viewPrint'])->name('mm.transaction-type.view-print');
-Route::get('/material-management/system-requirement/standard-setup/tax-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController::class, 'viewPrint'])->name('mm.tax-type.view-print');
+Route::get('/material-management/system-requirement/standard-setup/configuration', [MmConfigController::class, 'index'])->name('material-management.system-requirement.standard-setup.configuration');
+Route::get('/material-management/system-requirement/standard-setup/control-period', [MmControlPeriodController::class, 'index'])->name('material-management.system-requirement.standard-setup.control-period');
+Route::get('/material-management/system-requirement/standard-setup/control-period/view-print', [MmControlPeriodController::class, 'viewPrint'])->name('material-management.system-requirement.standard-setup.control-period.view-print');
+Route::get('/material-management/system-requirement/standard-setup/transaction-type', [MmTransactionTypeController::class, 'index'])->name('material-management.system-requirement.standard-setup.transaction-type');
+Route::get('/material-management/system-requirement/standard-setup/transaction-type/view-print', [MmTransactionTypeController::class, 'viewPrint'])->name('material-management.system-requirement.standard-setup.transaction-type.view-print');
+Route::get('/material-management/system-requirement/standard-setup/tax-type', [MmTaxTypeController::class, 'index'])->name('material-management.system-requirement.standard-setup.tax-type');
+Route::get('/material-management/system-requirement/standard-setup/tax-type/view-print', [MmTaxTypeController::class, 'viewPrint'])->name('material-management.system-requirement.standard-setup.tax-type.view-print');
+Route::get('/material-management/system-requirement/standard-setup/tax-group', [MmTaxGroupController::class, 'index'])->name('material-management.system-requirement.standard-setup.tax-group');
+Route::get('/material-management/system-requirement/standard-setup/tax-group/view-print', [MmTaxGroupController::class, 'viewPrint'])->name('material-management.system-requirement.standard-setup.tax-group.view-print');
+Route::get('/material-management/system-requirement/standard-setup/receive-destination', [MmReceiveDestinationController::class, 'index'])->name('material-management.system-requirement.standard-setup.receive-destination');
+Route::get('/material-management/system-requirement/standard-setup/receive-destination/view-print', [MmReceiveDestinationController::class, 'viewPrint'])->name('material-management.system-requirement.standard-setup.receive-destination.view-print');
+Route::get('/material-management/system-requirement/standard-setup/analysis-code', [MmAnalysisCodeController::class, 'index'])->name('material-management.system-requirement.standard-setup.analysis-code');
+Route::get('/material-management/system-requirement/standard-setup/analysis-code/view-print', [MmAnalysisCodeController::class, 'viewPrint'])->name('material-management.system-requirement.standard-setup.analysis-code.view-print');
+
+// System Requirement - Inventory Setup
+Route::get('/material-management/system-requirement/inventory-setup/location', [MmLocationController::class, 'index'])->name('material-management.system-requirement.inventory-setup.location');
+Route::get('/material-management/system-requirement/inventory-setup/location/view-print', [MmLocationController::class, 'viewPrint'])->name('material-management.system-requirement.inventory-setup.location.view-print');
+
+Route::get('/material-management/system-requirement/inventory-setup/category', [MmCategoryController::class, 'index'])->name('material-management.system-requirement.inventory-setup.category');
+Route::get('/material-management/system-requirement/inventory-setup/category/view-print', [MmCategoryController::class, 'viewPrint'])->name('material-management.system-requirement.inventory-setup.category.view-print');
+
+// Add after the category routes and before // Route::get('colors-export', ...
+Route::get('/material-management/system-requirement/inventory-setup/sku', [MmSkuController::class, 'index'])->name('material-management.system-requirement.inventory-setup.sku');
+Route::get('/material-management/system-requirement/inventory-setup/sku/view-print', [MmSkuController::class, 'viewPrint'])->name('material-management.system-requirement.inventory-setup.sku.view-print');
 
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');
+
+// Add this at the end of the file
+Route::get('/check-categories', function () {
+    $categories = \App\Models\MmCategory::all();
+    return response()->json($categories);
+});
