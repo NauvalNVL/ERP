@@ -633,36 +633,39 @@ const productionManagementItems = [
 // Warehouse Management Items
 const warehouseManagementItems = [
   {
-    title: 'System Requirement',
-    icon: 'fas fa-cogs',
+    title: 'Finished Goods',
+    icon: 'fas fa-boxes',
     children: [
-      { title: 'Define Warehouse Location', icon: 'fas fa-map-marker-alt', route: null },
-      { title: 'Define Forklift', icon: 'fas fa-truck-loading', route: null },
-      { title: 'Define Pallet', icon: 'fas fa-pallet', route: null }
+      {
+        title: 'Setup Maintenance',
+        icon: 'fas fa-cogs',
+        children: [
+          { title: 'Setup F/Goods & D/Order Configuration', icon: 'fas fa-cogs', route: '/warehouse-management/finished-goods/setup-maintenance/fg-do-configuration' },
+          { title: 'Define Control Period', icon: 'fas fa-calendar-alt', route: '/warehouse-management/finished-goods/setup-maintenance/define-control-period' },
+          { title: 'Define Warehouse Location', icon: 'fas fa-map-marker-alt', route: '/warehouse-management/finished-goods/setup-maintenance/define-warehouse-location' },
+          { title: 'Define Customer Warehouse Location', icon: 'fas fa-users-cog', route: '/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-location' },
+          { title: 'Define Delivery Order Format', icon: 'fas fa-file-invoice', route: '/warehouse-management/finished-goods/setup-maintenance/define-delivery-order-format' },
+          { title: 'Define Customer Warehouse Requirement', icon: 'fas fa-tasks', route: '/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-requirement' },
+          { title: 'Define Analysis Code', icon: 'fas fa-tags', route: '/warehouse-management/finished-goods/setup-maintenance/define-analysis-code' },
+          { title: 'View & Print Control Period', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-control-period' },
+          { title: 'View & Print Warehouse Location', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-warehouse-location' },
+          { title: 'View & Print Customer Warehouse Location', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-customer-warehouse-location' },
+          { title: 'View & Print Delivery Order Format', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-delivery-order-format' },
+          { title: 'View & Print Customer Warehouse Requirement', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-customer-warehouse-requirement' },
+          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-analysis-code' },
+        ]
+      },
+      { title: 'FG Normal', icon: 'fas fa-box-open', route: '/warehouse-management/finished-goods/fg-normal' },
+      { title: 'FG Excess', icon: 'fas fa-box', route: '/warehouse-management/finished-goods/fg-excess' },
+      { title: 'Period-End Closing', icon: 'fas fa-calendar-alt', route: '/warehouse-management/finished-goods/period-end-closing' },
+      { title: 'Finished Goods Stock-Take V2', icon: 'fas fa-clipboard-check', route: '/warehouse-management/finished-goods/stock-take-v2' },
+      { title: 'FG Stock-Take V3 (GRX and Non-GRX)', icon: 'fas fa-clipboard-check', route: '/warehouse-management/finished-goods/stock-take-v3' }
     ]
   },
-  {
-    title: 'Warehouse Operations',
-    icon: 'fas fa-dolly-flatbed',
-    children: [
-      { title: 'Stock In', icon: 'fas fa-arrow-circle-down', route: null },
-      { title: 'Stock Out', icon: 'fas fa-arrow-circle-up', route: null },
-      { title: 'Stock Transfer', icon: 'fas fa-exchange-alt', route: null }
-    ]
-  },
-  {
-    title: 'Warehouse Reports',
-    icon: 'fas fa-chart-area',
-    children: [
-      { title: 'Print Stock Balance Report', icon: 'fas fa-print', route: null },
-      { title: 'Print Stock Movement Report', icon: 'fas fa-print', route: null }
-    ]
-  },
-  { title: 'Finished Goods', icon: 'fas fa-box-open', route: '/warehouse-management/finished-goods' },
   { title: 'Delivery Order', icon: 'fas fa-truck', route: '/warehouse-management/delivery-order' },
   { title: 'Invoice', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice' },
-  { title: 'Debit & Credit Note', icon: 'fas fa-money-check-alt', route: '/warehouse-management/debit-credit-note' },
-  { title: 'Warehouse Analysis', icon: 'fas fa-chart-pie', route: '/warehouse-management/warehouse-analysis' },
+  { title: 'Debit/Credit Note', icon: 'fas fa-exchange-alt', route: '/warehouse-management/debit-credit-note' },
+  { title: 'Warehouse Analysis', icon: 'fas fa-chart-bar', route: '/warehouse-management/warehouse-analysis' },
   { title: 'Custom Indonesia', icon: 'fas fa-flag', route: '/warehouse-management/custom-indonesia' },
   { title: 'Accounts', icon: 'fas fa-cash-register', route: '/warehouse-management/accounts' },
 ];

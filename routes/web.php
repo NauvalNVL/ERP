@@ -427,6 +427,65 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('warehouse-management/FinishedGoods/index');
     })->name('vue.warehouse-management.finished-goods');
 
+    Route::get('/warehouse-management/finished-goods/setup-maintenance', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal');
+    })->name('vue.warehouse-management.finished-goods.fg-normal');
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/fg-do-configuration', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/fg-do-configuration');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.fg-do-configuration');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-control-period', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-control-period');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-control-period');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-warehouse-location', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-warehouse-location');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-warehouse-location');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-location', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-customer-warehouse-location');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-customer-warehouse-location');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-delivery-order-format', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-delivery-order-format');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-delivery-order-format');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-requirement', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-customer-warehouse-requirement');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-customer-warehouse-requirement');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-analysis-code', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-analysis-code');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-analysis-code');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-control-period', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-control-period');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-control-period');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-warehouse-location', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-warehouse-location');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-warehouse-location');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-customer-warehouse-location', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-customer-warehouse-location');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-customer-warehouse-location');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-delivery-order-format', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-delivery-order-format');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-delivery-order-format');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-customer-warehouse-requirement', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-customer-warehouse-requirement');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-customer-warehouse-requirement');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-analysis-code', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-analysis-code');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-analysis-code');
+
     Route::get('/warehouse-management/delivery-order', function () {
         return Inertia::render('warehouse-management/DeliveryOrder/index');
     })->name('vue.warehouse-management.delivery-order');
@@ -450,6 +509,58 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehouse-management/accounts', function () {
         return Inertia::render('warehouse-management/Accounts/index');
     })->name('vue.warehouse-management.accounts');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/fg-do-configuration', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/fg-do-configuration');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.fg-do-configuration');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-control-period', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-control-period');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-control-period');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-warehouse-location', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-warehouse-location');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-warehouse-location');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-location', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-customer-warehouse-location');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-customer-warehouse-location');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-delivery-order-format', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-delivery-order-format');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-delivery-order-format');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-requirement', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-customer-warehouse-requirement');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-customer-warehouse-requirement');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/define-analysis-code', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/define-analysis-code');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.define-analysis-code');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-control-period', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-control-period');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-control-period');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-warehouse-location', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-warehouse-location');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-warehouse-location');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-customer-warehouse-location', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-customer-warehouse-location');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-customer-warehouse-location');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-delivery-order-format', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-delivery-order-format');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-delivery-order-format');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-customer-warehouse-requirement', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-customer-warehouse-requirement');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-customer-warehouse-requirement');
+
+    Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-analysis-code', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-analysis-code');
+    })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-analysis-code');
 });
 
 // API Routes for Vue components
