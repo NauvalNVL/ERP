@@ -22,6 +22,7 @@
         "@inertiajs/vue3": "^2.0.8",
         "@tailwindcss/postcss": "^4.0.12",
         "chart.js": "^4.4.9",
+        "lodash": "^4.17.21",
         "sweetalert2": "^11.22.1",
         "vue": "^3.5.13",
         "ziggy-js": "^2.5.3"
