@@ -23,9 +23,9 @@
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-cyan-50">
         <div class="max-w-7xl mx-auto">
-             <div class="bg-white p-8 rounded-lg shadow-lg border-t-4 border-cyan-500 transition-all duration-300 hover:shadow-xl relative overflow-hidden">
-                <div class="absolute -top-20 -right-20 w-40 h-40 bg-cyan-50 rounded-full opacity-50"></div>
-                <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-teal-50 rounded-full opacity-50"></div>
+             <div class="relative bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100 p-8 rounded-2xl shadow-2xl border-t-4 border-cyan-500 overflow-hidden mb-8 animate-fade-in-up">
+                <div class="absolute -top-16 -right-16 w-40 h-40 bg-cyan-200 rounded-full opacity-30"></div>
+                <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-teal-200 rounded-full opacity-30"></div>
                 
                 <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
                     <div class="p-2 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-lg mr-4 shadow-md">

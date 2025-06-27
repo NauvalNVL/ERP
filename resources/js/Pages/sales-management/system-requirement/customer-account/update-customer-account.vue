@@ -2,11 +2,18 @@
     <AppLayout :header="'Update Customer Account'">
     <div>
         <!-- Header Section -->
-        <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg mb-0">
-            <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-                <i class="fas fa-user-edit mr-3"></i> Update Customer Account
-            </h2>
-            <p class="text-cyan-100">Perbarui data akun customer di sistem</p>
+        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
+            <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
+            <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
+            <div class="flex items-center">
+                <div class="bg-gradient-to-br from-cyan-500 to-teal-600 p-3 rounded-lg shadow-inner flex items-center justify-center mr-4">
+                    <i class="fas fa-user-edit text-white text-2xl z-10"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-1 text-shadow">Update Customer Account</h2>
+                    <p class="text-teal-100 max-w-2xl">Perbarui data akun customer di sistem</p>
+                </div>
+            </div>
         </div>
 
         <!-- Success Message -->
@@ -17,33 +24,36 @@
             </span>
         </div>
 
-        <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+        <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-cyan-50 overflow-hidden relative">
+            <div class="absolute -top-16 -right-16 w-32 h-32 bg-cyan-50 rounded-full opacity-50"></div>
+            <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-teal-50 rounded-full opacity-50"></div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Left Column - Main Content -->
                 <div class="lg:col-span-2">
-                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
-                        <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                            <div class="p-2 bg-blue-500 rounded-lg mr-3">
-                                <i class="fas fa-edit text-white"></i>
+                    <div class="relative bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100 p-8 rounded-2xl shadow-2xl border-t-4 border-cyan-500 overflow-hidden mb-8 animate-fade-in-up">
+                        <div class="absolute -top-16 -right-16 w-40 h-40 bg-cyan-200 rounded-full opacity-30"></div>
+                        <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-teal-200 rounded-full opacity-30"></div>
+                        <div class="flex items-center mb-8 pb-3 border-b border-gray-200 relative z-10">
+                            <div class="p-4 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-2xl shadow-lg flex items-center justify-center mr-6">
+                                <i class="fas fa-user-edit text-white text-3xl"></i>
                             </div>
-                            <h3 class="text-xl font-semibold text-gray-800">Customer Account Management</h3>
+                            <h3 class="text-2xl md:text-3xl font-bold text-gray-800 text-shadow">Customer Account Management</h3>
                         </div>
-
-                        <!-- Header with navigation buttons -->
-                        <div class="flex items-center space-x-2 mb-6">
-                            <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" @click="goToDashboard">
+                        <!-- Gradient Action Buttons -->
+                        <div class="flex flex-wrap gap-4 mb-8">
+                            <button type="button" class="action-btn bg-gradient-to-br from-red-500 to-pink-500 shadow-lg" @click="goToDashboard">
                                 <i class="fas fa-power-off"></i>
                             </button>
-                            <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                            <button type="button" class="action-btn bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg">
                                 <i class="fas fa-arrow-right"></i>
                             </button>
-                            <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                            <button type="button" class="action-btn bg-gradient-to-br from-blue-500 to-indigo-500 shadow-lg">
                                 <i class="fas fa-arrow-left"></i>
                             </button>
-                            <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px">
+                            <button type="button" class="action-btn bg-gradient-to-br from-cyan-500 to-blue-500 shadow-lg">
                                 <i class="fas fa-search"></i>
                             </button>
-                            <button type="button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2 transform active:translate-y-px" @click="saveCustomerAccount">
+                            <button type="button" class="action-btn bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg" @click="saveCustomerAccount">
                                 <i class="fas fa-save"></i>
                             </button>
                         </div>
@@ -52,20 +62,27 @@
                         <form @submit.prevent="saveCustomerAccount" class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label for="customer_code" class="block text-sm font-medium text-gray-700 mb-1">Customer Code</label>
-                                    <div class="relative flex">
-                                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                            <i class="fas fa-id-card"></i>
+                                    <label for="customer_code" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                        <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-cyan-500 to-teal-600 text-white mr-2 shadow-md">
+                                            <i class="fas fa-id-card text-xs"></i>
                                         </span>
+                                        Customer Code
+                                    </label>
+                                    <div class="relative flex">
                                         <input type="text" v-model="form.customer_code" id="customer_code" required maxlength="20"
-                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                                         <button type="button" @click="openCustomerAccountModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                             <i class="fas fa-table"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-1">Customer Name</label>
+                                    <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                        <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white mr-2 shadow-md">
+                                            <i class="fas fa-user text-xs"></i>
+                                        </span>
+                                        Customer Name
+                                    </label>
                                     <input type="text" v-model="form.customer_name" id="customer_name" maxlength="100"
                                         class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                                 </div>
@@ -203,7 +220,9 @@
                             </div>
 
                             <div class="flex justify-end">
-                                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                <button type="submit" class="save-btn group">
+                                    <span class="shimmer-effect"></span>
+                                    <i class="fas fa-save mr-2 text-lg group-hover:animate-pulse"></i>
                                     Save
                                 </button>
                             </div>
@@ -213,9 +232,11 @@
 
                 <!-- Right Column - Information -->
                 <div class="lg:col-span-1">
-                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500 mb-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500 mb-6 bg-gradient-to-br from-white to-blue-50 overflow-hidden relative">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full opacity-20"></div>
+                        <div class="absolute bottom-0 left-0 w-20 h-20 bg-teal-50 rounded-full opacity-20"></div>
                         <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                            <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                            <div class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-3 shadow-md">
                                 <i class="fas fa-info-circle text-white"></i>
                             </div>
                             <h3 class="text-xl font-semibold text-gray-800">Information</h3>
@@ -237,9 +258,11 @@
                     </div>
 
                     <!-- Quick Links -->
-                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500 bg-gradient-to-br from-white to-purple-50 overflow-hidden relative">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-full opacity-20"></div>
+                        <div class="absolute bottom-0 left-0 w-20 h-20 bg-indigo-50 rounded-full opacity-20"></div>
                         <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                            <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                            <div class="p-2 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg mr-3 shadow-md">
                                 <i class="fas fa-link text-white"></i>
                             </div>
                             <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
@@ -482,3 +505,38 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.action-btn {
+  @apply flex items-center justify-center w-14 h-14 rounded-xl text-white text-2xl transition-all duration-200 transform hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-400;
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.7s cubic-bezier(0.4,0,0.2,1) both;
+}
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.save-btn {
+  @apply relative flex items-center justify-center px-8 py-3 rounded-xl font-bold text-white text-lg bg-gradient-to-r from-green-500 via-cyan-500 to-blue-500 shadow-lg transition-all duration-200 overflow-hidden;
+  box-shadow: 0 4px 24px 0 rgba(0, 180, 216, 0.15);
+}
+.save-btn:hover, .save-btn:focus {
+  @apply scale-105 shadow-2xl bg-gradient-to-r from-blue-500 via-cyan-500 to-green-500;
+}
+.save-btn:active {
+  @apply scale-95;
+}
+.save-btn i {
+  @apply text-white drop-shadow-md;
+}
+.shimmer-effect {
+  @apply absolute top-0 -left-[150%] h-full w-[50%] skew-x-[-25deg] bg-white/20 pointer-events-none;
+  animation: shimmer 2.5s infinite;
+}
+@keyframes shimmer {
+  100% {
+    left: 150%;
+  }
+}
+</style>
