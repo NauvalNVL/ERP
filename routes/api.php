@@ -28,6 +28,7 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxGroupControll
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController;
 use App\Http\Controllers\WarehouseLocationController;
+use App\Http\Controllers\FgDoConfigController;
 
 /*
 |--------------------------------------------------------------------------
@@ -223,7 +224,13 @@ Route::put('/material-management/analysis-codes/{code}', [MmAnalysisCodeControll
 Route::delete('/material-management/analysis-codes/{code}', [MmAnalysisCodeController::class, 'destroy']);
 Route::post('/material-management/analysis-codes/seed', [MmAnalysisCodeController::class, 'seed']); 
 
-Route::get('/material-management/control-periods/summary', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'getControlPeriodSummary']);
+Route::get('/material-management/control-periods/summary', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'getControlPeriodSummary']); 
+
+// FgDoConfig API routes
+Route::prefix('fg-do-config')->group(function () {
+    Route::get('/', [FgDoConfigController::class, 'getConfig']);
+    Route::post('/', [FgDoConfigController::class, 'updateConfig']);
+});
 
 // Warehouse Location API routes
 Route::prefix('warehouse-locations')->group(function () {
@@ -232,5 +239,5 @@ Route::prefix('warehouse-locations')->group(function () {
     Route::get('/{code}', [WarehouseLocationController::class, 'show']);
     Route::put('/{code}', [WarehouseLocationController::class, 'update']);
     Route::delete('/{code}', [WarehouseLocationController::class, 'destroy']);
-    Route::get('/json', [WarehouseLocationController::class, 'getWarehouseLocationsJson']); // For search/listing in modal
+    Route::get('/json', [WarehouseLocationController::class, 'getWarehouseLocationsJson'])->name('warehouse-locations.json'); // For search/listing in modal
 }); 
