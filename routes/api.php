@@ -230,7 +230,7 @@ Route::put('/material-management/analysis-codes/{code}', [MmAnalysisCodeControll
 Route::delete('/material-management/analysis-codes/{code}', [MmAnalysisCodeController::class, 'destroy']);
 Route::post('/material-management/analysis-codes/seed', [MmAnalysisCodeController::class, 'seed']); 
 
-Route::get('/material-management/control-periods/summary', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'getControlPeriodSummary']);
+Route::get('/material-management/control-periods/summary', [MmControlPeriodController::class, 'getControlPeriodSummary']);
 
 // FgDoConfig API routes
 Route::prefix('fg-do-config')->group(function () {
