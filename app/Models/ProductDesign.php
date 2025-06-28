@@ -25,4 +25,12 @@ class ProductDesign extends Model
         'input_weight',
         'compute'
     ];
+
+    /**
+     * Get the product associated with the product design.
+     */
+    public function productDetail()
+    {
+        return $this->belongsTo(Product::class, 'product', 'product_code');
+    }
 } 

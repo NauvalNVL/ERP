@@ -15,16 +15,16 @@ class CreateSideTrimsByProductDesignTable extends Migration
     {
         Schema::create('side_trims_by_product_design', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_design_id')->constrained('product_designs', 'id')->onDelete('cascade');
-            $table->foreignId('product_id')->constrained('products', 'id')->onDelete('cascade');
-            $table->foreignId('flute_id')->constrained('paper_flutes', 'id')->onDelete('cascade');
-            $table->integer('length_add')->default(0);
-            $table->integer('length_less')->default(0);
+            $table->foreignId('product_design_id')->constrained('product_designs')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->foreignId('flute_id')->constrained('paper_flutes')->onDelete('cascade');
             $table->boolean('compute')->default(false);
+            $table->decimal('length_less', 8, 2)->default(0);
+            $table->decimal('length_add', 8, 2)->default(0);
             $table->timestamps();
-            
-            // Add a unique constraint to prevent duplicate entries
-            $table->unique(['product_design_id', 'product_id', 'flute_id'], 'side_trim_product_design_unique');
+
+            // Add unique constraint for the combination
+            $table->unique(['product_design_id', 'product_id', 'flute_id'], 'side_trims_by_product_design_unique');
         });
     }
 

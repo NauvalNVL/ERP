@@ -276,29 +276,29 @@ class ProductDesignController extends Controller
     {
         try {
             $designs = ProductDesign::select(
-                    'id',
-                    'pd_code', 
-                    'pd_name', 
-                    'pd_design_type',
-                    'idc',
-                    'product',
-                    'joint',
-                    'joint_to_print',
-                    'pcs_to_joint',
-                    'score',
-                    'slot',
-                    'flute_style',
-                    'print_flute',
-                    'input_weight',
-                    'compute'
-                )
-                ->orderBy('pd_code')
-                ->get();
+                'pd_code', 
+                'pd_name', 
+                'pd_design_type', 
+                'idc', 
+                'product', 
+                'joint', 
+                'joint_to_print', 
+                'pcs_to_joint', 
+                'score', 
+                'slot', 
+                'flute_style', 
+                'print_flute', 
+                'input_weight', 
+                'compute'
+            )->get()->map(function ($design) {
+                $design->compute = (strtolower($design->compute) === 'yes');
+                return $design;
+            });
             
             return response()->json($designs);
         } catch (\Exception $e) {
-            Log::error('Error fetching product designs: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch product designs'], 500);
+            Log::error('Error in ProductDesignController@getDesignsJson: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to retrieve product designs'], 500);
         }
     }
 
@@ -375,37 +375,40 @@ class ProductDesignController extends Controller
      */
     public function apiUpdate(Request $request, $id)
     {
-        try {
-            $productDesign = ProductDesign::where('pd_code', $id)->first();
-            
-            if (!$productDesign) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Product design not found'
-                ], 404);
-            }
-            
-            $validator = Validator::make($request->all(), [
-                'pd_name' => 'required|string|max:255',
-                'pd_design_type' => 'required|string|max:255',
-                'product' => 'required|string|max:255',
-                'idc' => 'nullable|string|max:100',
-                'joint' => 'nullable|string|max:100',
-                'joint_to_print' => 'nullable|string|max:100',
-                'pcs_to_joint' => 'nullable|string|max:100',
-                'score' => 'nullable|string|max:100',
-                'slot' => 'nullable|string|max:100',
-                'flute_style' => 'nullable|string|max:100',
-                'print_flute' => 'nullable|string|max:100',
-                'input_weight' => 'nullable|string|max:100',
-                'compute' => 'nullable|string|max:10',
-            ]);
+        $validator = Validator::make($request->all(), [
+            'pd_code' => 'required|string|max:10',
+            'pd_name' => 'required|string|max:255',
+            'pd_design_type' => 'required|string|max:255',
+            'product' => 'required|string|max:255',
+            'idc' => 'nullable|string|max:100',
+            'joint' => 'nullable|string|max:100',
+            'joint_to_print' => 'nullable|string|max:100',
+            'pcs_to_joint' => 'nullable|string|max:100',
+            'score' => 'nullable|string|max:100',
+            'slot' => 'nullable|string|max:100',
+            'flute_style' => 'nullable|string|max:100',
+            'print_flute' => 'nullable|string|max:100',
+            'input_weight' => 'nullable|string|max:100',
+            'compute' => 'nullable',
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $validator->errors()->first()
-                ], 422);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $productDesign = ProductDesign::where('pd_code', $id)->firstOrFail();
+            
+            $computeValue = $request->compute;
+            // Handle boolean and string 'true'/'false' from JS
+            if (is_bool($computeValue)) {
+                $computeString = $computeValue ? 'Yes' : 'No';
+            } elseif (in_array(strtolower($computeValue), ['true', 'yes', '1'])) {
+                $computeString = 'Yes';
+            } elseif (in_array(strtolower($computeValue), ['false', 'no', '0'])) {
+                $computeString = 'No';
+            } else {
+                $computeString = 'No'; // Default value
             }
 
             $productDesign->update([
@@ -421,20 +424,19 @@ class ProductDesignController extends Controller
                 'flute_style' => $request->flute_style,
                 'print_flute' => $request->print_flute,
                 'input_weight' => $request->input_weight,
-                'compute' => $request->compute ?? 'No',
+                'compute' => $computeString,
             ]);
+            
+            // Refresh the model from the database to get the latest state
+            $productDesign->refresh();
+            
+            // Apply the same transformation as getDesignsJson
+            $productDesign->compute = (strtolower($productDesign->compute) === 'yes');
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Product design updated successfully',
-                'data' => $productDesign
-            ]);
+            return response()->json(['success' => true, 'data' => $productDesign]);
         } catch (\Exception $e) {
-            Log::error('Error updating product design: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update product design: ' . $e->getMessage()
-            ], 500);
+            Log::error('Error in ProductDesignController@apiUpdate: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to update product design'], 500);
         }
     }
 
@@ -479,65 +481,88 @@ class ProductDesignController extends Controller
     public function apiExport()
     {
         try {
-            $designs = ProductDesign::orderBy('pd_code')->get();
-            
+            $productDesigns = ProductDesign::with('productDetail')->get();
+
+            $data = $productDesigns->map(function ($design) {
+                return [
+                    'pd_code' => $design->pd_code,
+                    'pd_name' => $design->pd_name,
+                    'pd_design_type' => $design->pd_design_type,
+                    'product' => optional($design->productDetail)->description,
+                    'joint' => $design->joint ? 'Yes' : 'No',
+                    'joint_to_print' => $design->joint_to_print ? 'Yes' : 'No',
+                    'pcs_to_joint' => $design->pcs_to_joint,
+                    'score' => $design->score ? 'Yes' : 'No',
+                    'slot' => $design->slot ? 'Yes' : 'No',
+                    'flute_style' => $design->flute_style,
+                    'print_flute' => $design->print_flute ? 'Yes' : 'No',
+                    'input_weight' => $design->input_weight ? 'Yes' : 'No',
+                    'compute' => $design->compute ? 'Yes' : 'No',
+                ];
+            });
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Set Title
+            $sheet->mergeCells('A1:M1');
+            $sheet->setCellValue('A1', 'Product Design List');
+            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+            $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            // Set Date
+            $sheet->mergeCells('A2:M2');
+            $sheet->setCellValue('A2', 'Date: ' . now()->format('Y-m-d'));
+            $sheet->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+            // Set Headers
             $headers = [
-                'Content-Type' => 'text/csv',
-                'Content-Disposition' => 'attachment; filename="product_designs_' . date('Y-m-d') . '.csv"',
-                'Pragma' => 'no-cache',
-                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                'Expires' => '0'
+                'Product Design Code', 'Product Design Name', 'Design Type', 'Product',
+                'Joint', 'Joint to Print', 'Pcs to Joint', 'Score', 'Slot',
+                'Flute Style', 'Print Flute', 'Input Weight', 'To Compute'
             ];
-            
-            $columns = [
-                'Design Code', 
-                'Design Name', 
-                'Design Type', 
-                'IDC', 
-                'Product', 
-                'Joint', 
-                'Joint to Print', 
-                'PCS to Joint',
-                'Score',
-                'Slot',
-                'Flute Style',
-                'Print Flute',
-                'Input Weight',
-                'Compute'
+            $sheet->fromArray($headers, NULL, 'A4');
+            $headerStyle = $sheet->getStyle('A4:M4');
+            $headerStyle->getFont()->setBold(true);
+            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFE0E0E0');
+
+            // Populate Data
+            $sheet->fromArray($data->toArray(), NULL, 'A5');
+
+            // Apply borders to the entire table
+            $highestRow = $sheet->getHighestRow();
+            $styleArray = [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
+                    ],
+                ],
             ];
+            $sheet->getStyle('A4:M' . $highestRow)->applyFromArray($styleArray);
+
+            // Auto-size columns
+            foreach (range('A', 'M') as $columnID) {
+                $sheet->getColumnDimension($columnID)->setAutoSize(true);
+            }
             
-            $callback = function() use ($designs, $columns) {
-                $file = fopen('php://output', 'w');
-                fputcsv($file, $columns);
-                
-                foreach ($designs as $design) {
-                    fputcsv($file, [
-                        $design->pd_code,
-                        $design->pd_name,
-                        $design->pd_design_type,
-                        $design->idc,
-                        $design->product,
-                        $design->joint,
-                        $design->joint_to_print,
-                        $design->pcs_to_joint,
-                        $design->score,
-                        $design->slot,
-                        $design->flute_style,
-                        $design->print_flute,
-                        $design->input_weight
-                    ]);
-                }
-                
-                fclose($file);
-            };
-            
-            return response()->stream($callback, 200, $headers);
-            
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'product_designs_' . now()->format('Ymd') . '.xlsx';
+
+            return response()->stream(function () use ($writer) {
+                $writer->save('php://output');
+            }, 200, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
+                'Cache-Control' => 'max-age=0',
+            ]);
+
         } catch (\Exception $e) {
-            Log::error('Error exporting product designs: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Export Product Designs Failed: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to export product designs: ' . $e->getMessage()
+                'message' => 'Server error while exporting product designs: ' . $e->getMessage(),
             ], 500);
         }
     }

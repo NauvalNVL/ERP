@@ -89,12 +89,12 @@
                         <span v-if="toggleLoading[design.pd_code]" class="text-blue-500 font-medium flex items-center">
                           <i class="fas fa-spinner fa-spin mr-1"></i> Updating...
                         </span>
-                        <span v-else-if="design.compute === 'Yes'" class="text-green-600 font-medium flex items-center">
+                        <span v-else-if="design.compute" class="text-green-600 font-medium flex items-center">
                           <i class="fas fa-check-circle mr-1"></i> Yes
                         </span>
                         <span v-else class="text-red-600 font-medium flex items-center">
                           <i class="fas fa-times-circle mr-1"></i> No
-                      </span>
+                        </span>
                         <i v-if="!toggleLoading[design.pd_code]" class="fas fa-exchange-alt text-blue-500 ml-2"></i>
                       </div>
                     </td>
@@ -200,8 +200,8 @@
               </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Compute:</span>
-                <span class="font-medium" :class="{'text-green-600': selectedDesign.compute === 'Yes', 'text-red-600': selectedDesign.compute !== 'Yes'}">
-                  {{ selectedDesign.compute }}
+                <span class="font-medium" :class="{'text-green-600': selectedDesign.compute, 'text-red-600': !selectedDesign.compute}">
+                  {{ selectedDesign.compute ? 'Yes' : 'No' }}
                 </span>
               </div>
             </div>
@@ -468,11 +468,11 @@
                 </label>
                 <div class="flex gap-4">
                   <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.compute" value="Yes" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                    <input type="radio" v-model="formDesign.compute" :value="true" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
                     <span class="ml-2 text-sm text-gray-700">Yes</span>
                   </label>
                   <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.compute" value="No" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+                    <input type="radio" v-model="formDesign.compute" :value="false" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
                     <span class="ml-2 text-sm text-gray-700">No</span>
                   </label>
                 </div>
@@ -561,7 +561,7 @@ const formDesign = ref({
   flute_style: 'Normal',
   print_flute: 'No',
   input_weight: 'No',
-  compute: 'No'
+  compute: false
 });
 
 // Reset form to default values
@@ -580,7 +580,7 @@ const resetForm = () => {
     flute_style: 'Normal',
     print_flute: 'No',
     input_weight: 'No',
-    compute: 'No'
+    compute: false
   };
   isEditing.value = false;
 };
@@ -638,10 +638,10 @@ const fetchDesigns = async () => {
   try {
     const response = await axios.get('/api/product-designs');
     
-    // Ensure compute field has a value, default to 'No' if missing
+    // Ensure compute field is a boolean
     designs.value = response.data.map(design => ({
       ...design,
-      compute: design.compute || 'No'
+      compute: !!design.compute
     }));
     
     console.log('Loaded designs:', designs.value);
@@ -763,7 +763,7 @@ const toggleCompute = async (design) => {
   
   // Set loading state for this specific design
   toggleLoading.value[design.pd_code] = true;
-  const newComputeValue = design.compute === 'Yes' ? 'No' : 'Yes';
+  const newComputeValue = !design.compute;
   
   try {
     // Create a copy of the design object with only the required fields for the update
@@ -776,17 +776,18 @@ const toggleCompute = async (design) => {
     
     if (response.data.success) {
       // Update the design in the local array
+      const updatedDesignFromServer = response.data.data;
       const index = designs.value.findIndex(d => d.pd_code === design.pd_code);
       if (index !== -1) {
-        designs.value[index].compute = newComputeValue;
+        designs.value[index].compute = !!updatedDesignFromServer.compute;
         
         // Also update selected design if it's the same one
         if (selectedDesign.value?.pd_code === design.pd_code) {
-          selectedDesign.value.compute = newComputeValue;
+          selectedDesign.value.compute = !!updatedDesignFromServer.compute;
         }
       }
       
-      toast.success(`Compute value updated to ${newComputeValue}`);
+      toast.success(`Compute value updated to ${newComputeValue ? 'Yes' : 'No'}`);
     } else {
       throw new Error(response.data.message || 'Unknown error');
     }

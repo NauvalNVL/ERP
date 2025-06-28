@@ -39,31 +39,31 @@
           <div class="bg-white rounded-lg overflow-hidden border border-gray-200">
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200" id="sideTrimsTable">
-                <thead class="bg-gray-50">
-                  <tr>
+                  <thead class="bg-gray-50">
+                    <tr>
                     <th @click="sortBy('flute_code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                       <div class="flex items-center">Flute <i class="fas fa-sort ml-1"></i></div>
-                    </th>
+                      </th>
                     <th @click="sortBy('flute_name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                       <div class="flex items-center">Flute Name <i class="fas fa-sort ml-1"></i></div>
-                    </th>
+                      </th>
                     <th @click="sortBy('compute')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                       <div class="flex items-center">Compute <i class="fas fa-sort ml-1"></i></div>
-                    </th>
+                      </th>
                     <th @click="sortBy('length_less')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                       <div class="flex items-center">Length Less [mm] <i class="fas fa-sort ml-1"></i></div>
-                    </th>
+                      </th>
                     <th @click="sortBy('length_add')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                       <div class="flex items-center">Length Add [mm] <i class="fas fa-sort ml-1"></i></div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
                   <tr v-if="loading" class="animate-pulse">
                     <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
                       <div class="flex justify-center items-center space-x-2"><i class="fas fa-spinner fa-spin"></i><span>Loading side trims...</span></div>
-                    </td>
-                  </tr>
+                      </td>
+                    </tr>
                   <tr v-else-if="paginatedItems.length === 0" class="hover:bg-gray-50">
                     <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No side trims found. Try adjusting your search.</td>
                   </tr>
@@ -77,18 +77,18 @@
                       ]">
                         {{ item.compute ? 'Yes' : 'No' }}
                       </button>
-                    </td>
+                      </td>
                     <td class="px-2 py-1 whitespace-nowrap">
                       <input type="number" :value="item.length_less" @input="handleInput(item, 'length_less', $event)" @blur="updateTrim(item)" class="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Length Less">
-                    </td>
+                      </td>
                     <td class="px-2 py-1 whitespace-nowrap">
                       <input type="number" :value="item.length_add" @input="handleInput(item, 'length_add', $event)" @blur="updateTrim(item)" class="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Length Add">
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
             </div>
-          </div>
+              </div>
 
           <!-- Pagination Controls -->
           <div class="mt-4 flex justify-between items-center text-sm text-gray-600">
@@ -105,13 +105,13 @@
               <button :disabled="currentPage === 1" @click="currentPage--" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50"><i class="fas fa-chevron-left"></i></button>
               <span class="px-4">{{ currentPage }} / {{ totalPages }}</span>
               <button :disabled="currentPage === totalPages" @click="currentPage++" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50"><i class="fas fa-chevron-right"></i></button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
         <!-- Side Panel with Details -->
         <div class="w-full md:w-96 bg-gray-50 rounded-lg p-4 border border-gray-200 space-y-6">
-          <div>
+                <div>
             <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
               <i class="fas fa-info-circle mr-2 text-blue-500"></i> Trim Details
             </h3>
@@ -119,21 +119,21 @@
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Flute Code:</span>
                 <span class="font-medium text-gray-900">{{ selectedItem.flute_code }}</span>
-              </div>
+                </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Flute Name:</span>
                 <span class="font-medium text-gray-900">{{ selectedItem.flute_name }}</span>
-              </div>
+                </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Compute:</span>
                 <span class="font-medium" :class="{'text-green-600': selectedItem.compute, 'text-red-600': !selectedItem.compute}">
                   {{ selectedItem.compute ? 'Yes' : 'No' }}
                 </span>
-              </div>
+                </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Length Less (mm):</span>
                 <span class="font-medium text-gray-900">{{ selectedItem.length_less }}</span>
-              </div>
+                </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">Length Add (mm):</span>
                 <span class="font-medium text-gray-900">{{ selectedItem.length_add }}</span>
@@ -164,11 +164,11 @@ import { useToast } from '@/Composables/useToast';
 const items = ref([]);
 const selectedItem = ref(null);
 const loading = ref(false);
-const searchQuery = ref('');
+    const searchQuery = ref('');
 const sortOrder = ref({ field: 'flute_code', direction: 'asc' });
 const toast = useToast();
-const currentPage = ref(1);
-const itemsPerPage = ref(10);
+    const currentPage = ref(1);
+    const itemsPerPage = ref(10);
 const savingStatus = ref({});
 
 // --- Computed Properties ---
@@ -209,8 +209,8 @@ const filteredItems = computed(() => {
 const totalPages = computed(() => Math.ceil(filteredItems.value.length / itemsPerPage.value));
 
 const paginatedItems = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value;
-  const end = start + itemsPerPage.value;
+      const start = (currentPage.value - 1) * itemsPerPage.value;
+      const end = start + itemsPerPage.value;
   return filteredItems.value.slice(start, end);
 });
 
@@ -226,7 +226,7 @@ const handleInput = (item, field, event) => {
   }
 };
 
-const loadData = async () => {
+    const loadData = async () => {
   loading.value = true;
   try {
     let response = await axios.get('/api/side-trims-by-flute');
@@ -238,7 +238,7 @@ const loadData = async () => {
             await axios.post('/api/side-trims-by-flute/seed');
             toast.success('Initial data seeded. Reloading...');
             response = await axios.get('/api/side-trims-by-flute');
-        } catch (seedError) {
+          } catch (seedError) {
             console.error('Error seeding data:', seedError);
             toast.error('Failed to seed initial side trim data.');
             items.value = [];
@@ -257,7 +257,7 @@ const loadData = async () => {
             length_less: trim.length_less,
             length_add: trim.length_add,
         }));
-    } else {
+        } else {
         items.value = [];
         toast.error('Failed to parse side trim data from server.');
     }
@@ -265,10 +265,10 @@ const loadData = async () => {
   } catch (error) {
     console.error('Error loading data:', error);
     toast.error(error.response?.data?.message || 'Failed to load side trim data.');
-  } finally {
-    loading.value = false;
-  }
-};
+      } finally {
+        loading.value = false;
+      }
+    };
 
 const refreshData = () => {
   selectedItem.value = null;
@@ -293,8 +293,8 @@ const updateTrim = async (item) => {
 
   try {
     const response = await axios.put(`/api/side-trims-by-flute/${item.id}`, payload);
-    
-    if (response.data.status === 'success') {
+        
+        if (response.data.status === 'success') {
       toast.success(`${item.flute_code} (${item.compute ? 'Yes' : 'No'}) trim updated.`);
       
       // Update local data with server response to ensure consistency
@@ -313,15 +313,15 @@ const updateTrim = async (item) => {
           selectItem(updatedItem);
         }
       }
-    } else {
+        } else {
       toast.error(response.data.message || `Failed to update trim.`);
       loadData(); // Revert changes on failure
-    }
-  } catch (error) {
+        }
+      } catch (error) {
     console.error(`Error updating trim:`, error);
     toast.error(error.response?.data?.message || `Failed to update trim.`);
     loadData(); // Revert changes on failure
-  } finally {
+      } finally {
     savingStatus.value[statusKey] = false;
   }
 };
@@ -343,8 +343,8 @@ const toggleCompute = async (itemToToggle) => {
     const response = await axios.put(`/api/side-trims-by-flute/${itemToToggle.id}`, {
       compute: itemToToggle.compute
     });
-
-    if (response.data.status === 'success') {
+        
+        if (response.data.status === 'success') {
       // Update the toggled item with data from the server
       const updatedItemFromServer = response.data.data;
       const index = items.value.findIndex(i => i.id === updatedItemFromServer.id);
@@ -359,20 +359,20 @@ const toggleCompute = async (itemToToggle) => {
       
       // The controller now handles updating the other record, so we just need to refresh our data
       // to reflect the true state from the database.
-      await loadData();
-      
+          await loadData();
+          
       toast.success(`'${itemToToggle.flute_code}' compute status updated.`);
       
       // Update the selected item if it was the one toggled
       if (selectedItem.value && selectedItem.value.id === itemToToggle.id) {
         selectItem(items.value.find(i => i.id === itemToToggle.id));
       }
-    } else {
+        } else {
       // Revert on failure
       itemToToggle.compute = originalValue;
       toast.error(response.data.message || 'Failed to update compute status.');
-    }
-  } catch (error) {
+        }
+      } catch (error) {
     // Revert on error
     itemToToggle.compute = originalValue;
      // Also revert the other item if it was changed optimistically

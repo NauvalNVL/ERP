@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\Rule;
 
 class SideTrimByProductDesignController extends Controller
 {
@@ -36,22 +37,52 @@ class SideTrimByProductDesignController extends Controller
     /**
      * Get all side trim data for API.
      */
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
         try {
-            $sideTrims = SideTrimByProductDesign::with('paperFlute', 'productDesign', 'product')->get();
-            
+            $productDesigns = ProductDesign::select('id', 'pd_name as code', 'pd_code')->orderBy('pd_name')->get();
+            $products = Product::select('id', 'product_code as code')->orderBy('product_code')->get();
+            $flutes = PaperFlute::select('id', 'code')->orderBy('code')->get();
+
+            $existingTrims = SideTrimByProductDesign::all()
+                ->keyBy(function ($item) {
+                    return $item->product_design_id . '-' . $item->product_id . '-' . $item->flute_id;
+                });
+
+            $allCombinations = [];
+            $tempIdCounter = 1;
+
+            foreach ($productDesigns as $design) {
+                foreach ($products as $product) {
+                    foreach ($flutes as $flute) {
+                        $key = $design->id . '-' . $product->id . '-' . $flute->id;
+                        $existingTrim = $existingTrims->get($key);
+
+                        $allCombinations[] = [
+                            'id' => $existingTrim ? $existingTrim->id : 'new-' . $tempIdCounter++,
+                            'product_design_id' => $design->id,
+                            'product_id' => $product->id,
+                            'flute_id' => $flute->id,
+                            'product_design_code' => $design->pd_code,
+                            'product_code' => $product->code,
+                            'flute_code' => $flute->code,
+                            'compute' => $existingTrim ? (bool)$existingTrim->compute : false,
+                            'length_less' => $existingTrim ? $existingTrim->length_less : 0,
+                            'length_add' => $existingTrim ? $existingTrim->length_add : 0,
+                        ];
+                    }
+                }
+            }
+
             return response()->json([
                 'status' => 'success',
-                'data' => $sideTrims
+                'data' => $allCombinations,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error retrieving side trims by product design: ' . $e->getMessage());
-            
+            Log::error('Error fetching side trims by product design: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to retrieve side trims data',
-                'error' => $e->getMessage()
+                'message' => 'Failed to load data. ' . $e->getMessage(),
             ], 500);
         }
     }
