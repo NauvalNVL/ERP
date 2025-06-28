@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,18 +12,31 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('side_trims_by_flute', function (Blueprint $table) {
-            // Drop the old unique constraint
-            $table->dropUnique('side_trim_flute_unique');
-            
-            // Rename the column
-            $table->renameColumn('is_composite', 'compute');
-        });
-        
-        // Add the new unique constraint with updated column name
-        Schema::table('side_trims_by_flute', function (Blueprint $table) {
-            $table->unique(['flute_id', 'compute'], 'side_trim_flute_unique');
-        });
+        // First, check if the column exists
+        if (Schema::hasColumn('side_trims_by_flute', 'is_composite')) {
+            // Drop the unique index first
+            Schema::table('side_trims_by_flute', function (Blueprint $table) {
+                $table->dropUnique('side_trim_flute_unique');
+            });
+
+            // Add the new column
+            Schema::table('side_trims_by_flute', function (Blueprint $table) {
+                $table->boolean('compute')->nullable();
+            });
+
+            // Copy data from old column to new column
+            DB::statement('UPDATE side_trims_by_flute SET [compute] = [is_composite]');
+
+            // Drop the old column
+            Schema::table('side_trims_by_flute', function (Blueprint $table) {
+                $table->dropColumn('is_composite');
+            });
+
+            // Recreate the unique index with the new column name
+            Schema::table('side_trims_by_flute', function (Blueprint $table) {
+                $table->unique(['flute_id', 'compute'], 'side_trim_flute_unique');
+            });
+        }
     }
 
     /**
@@ -30,17 +44,30 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('side_trims_by_flute', function (Blueprint $table) {
-            // Drop the new unique constraint
-            $table->dropUnique('side_trim_flute_unique');
-            
-            // Rename the column back
-            $table->renameColumn('compute', 'is_composite');
-        });
-        
-        // Add back the old unique constraint
-        Schema::table('side_trims_by_flute', function (Blueprint $table) {
-            $table->unique(['flute_id', 'is_composite'], 'side_trim_flute_unique');
-        });
+        // First, check if the column exists
+        if (Schema::hasColumn('side_trims_by_flute', 'compute')) {
+            // Drop the unique index first
+            Schema::table('side_trims_by_flute', function (Blueprint $table) {
+                $table->dropUnique('side_trim_flute_unique');
+            });
+
+            // Add the old column back
+            Schema::table('side_trims_by_flute', function (Blueprint $table) {
+                $table->boolean('is_composite')->nullable();
+            });
+
+            // Copy data from new column to old column
+            DB::statement('UPDATE side_trims_by_flute SET [is_composite] = [compute]');
+
+            // Drop the new column
+            Schema::table('side_trims_by_flute', function (Blueprint $table) {
+                $table->dropColumn('compute');
+            });
+
+            // Recreate the unique index with the original column name
+            Schema::table('side_trims_by_flute', function (Blueprint $table) {
+                $table->unique(['flute_id', 'is_composite'], 'side_trim_flute_unique');
+            });
+        }
     }
 };

@@ -19,6 +19,9 @@
         <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded shadow flex items-center" @click="fetchFormulaData">
           <i class="fas fa-sync-alt mr-2"></i> Refresh
         </button>
+        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow flex items-center" @click="seedData">
+          <i class="fas fa-database mr-2"></i> Seed Data
+        </button>
       </div>
 
       <!-- Loading indicator -->
@@ -328,6 +331,29 @@ const showNotification = (message, type = 'success') => {
   setTimeout(() => {
     notification.value.show = false;
   }, 3000);
+};
+
+// Add this new function
+const seedData = async () => {
+  if (!confirm('Are you sure you want to seed the database with scoring formula data? This may create duplicate entries if data already exists.')) {
+    return;
+  }
+  
+  loading.value = true;
+  try {
+    const response = await axios.post('/api/scoring-formulas/seed');
+    if (response.data.success) {
+      showNotification('Data seeded successfully. Refreshing list...', 'success');
+      fetchFormulaData(); // Refresh the data after seeding
+    } else {
+      showNotification(response.data.message || 'Error seeding data.', 'error');
+    }
+  } catch (error) {
+    console.error('Error seeding data:', error);
+    showNotification('An error occurred while seeding data: ' + (error.response?.data?.message || error.message), 'error');
+  } finally {
+    loading.value = false;
+  }
 };
 
 // Load data on component mount

@@ -35,7 +35,7 @@ class RollTrimByProductDesignSeeder extends Seeder
                             'flute_id' => $flute->id,
                         ],
                         [
-                            'is_composite' => rand(0, 1) === 1,
+                            'compute' => rand(0, 1) === 1,
                             'min_trim' => 20,
                             'max_trim' => 65
                         ]

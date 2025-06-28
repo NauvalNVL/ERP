@@ -41,7 +41,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Don't drop the table here as it might be used by other migrations
-        // Schema::dropIfExists('corrugator_spec_by_products');
+        Schema::dropIfExists('corrugator_spec_by_products');
     }
 }; 

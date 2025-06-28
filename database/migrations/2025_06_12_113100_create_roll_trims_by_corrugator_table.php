@@ -16,6 +16,7 @@ return new class extends Migration
             Schema::create('roll_trims_by_corrugator', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('flute_id')->constrained('paper_flutes');
+                $table->boolean('compute')->default(false);
                 $table->integer('min_trim')->default(0);
                 $table->integer('max_trim')->default(100);
                 $table->timestamps();
@@ -28,7 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Don't drop the table here as it might be used by other migrations
-        // Schema::dropIfExists('roll_trims_by_corrugator');
+        Schema::dropIfExists('roll_trims_by_corrugator');
     }
 };

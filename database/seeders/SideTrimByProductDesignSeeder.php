@@ -34,7 +34,7 @@ class SideTrimByProductDesignSeeder extends Seeder
         foreach ($productDesigns->take(5) as $design) {
             foreach ($products->take(4) as $product) {
                 foreach ($flutes->take(3) as $flute) {
-                    // Create a non-composite entry
+                    // Create a non-compute entry
                     SideTrimByProductDesign::updateOrCreate(
                         [
                             'product_design_id' => $design->id,
@@ -44,12 +44,12 @@ class SideTrimByProductDesignSeeder extends Seeder
                         [
                             'length_add' => rand(10, 30),
                             'length_less' => rand(5, 20),
-                            'is_composite' => false,
+                            'compute' => false,
                         ]
                     );
                     $count++;
                     
-                    // Create a composite entry for some combinations
+                    // Create a compute entry for some combinations
                     if (rand(0, 1) > 0) {
                         SideTrimByProductDesign::updateOrCreate(
                             [
@@ -60,7 +60,7 @@ class SideTrimByProductDesignSeeder extends Seeder
                             [
                                 'length_add' => rand(20, 40),
                                 'length_less' => rand(10, 25),
-                                'is_composite' => true,
+                                'compute' => true,
                             ]
                         );
                         $count++;

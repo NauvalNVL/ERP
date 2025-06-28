@@ -20,7 +20,7 @@ class CreateSideTrimsByProductDesignTable extends Migration
             $table->foreignId('flute_id')->constrained('paper_flutes', 'id')->onDelete('cascade');
             $table->integer('length_add')->default(0);
             $table->integer('length_less')->default(0);
-            $table->boolean('is_composite')->default(false);
+            $table->boolean('compute')->default(false);
             $table->timestamps();
             
             // Add a unique constraint to prevent duplicate entries

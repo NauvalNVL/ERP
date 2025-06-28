@@ -27,7 +27,7 @@ class SideTrimByProductDesign extends Model
         'flute_id',
         'length_add',
         'length_less',
-        'is_composite',
+        'compute',
     ];
 
     /**
@@ -36,7 +36,7 @@ class SideTrimByProductDesign extends Model
      * @var array
      */
     protected $casts = [
-        'is_composite' => 'boolean',
+        'compute' => 'boolean',
         'length_add' => 'integer',
         'length_less' => 'integer',
         'created_at' => 'datetime',

@@ -46,6 +46,12 @@ class DatabaseSeeder extends Seeder
             WarehouseLocationSeeder::class,
             MmCategorySeeder::class,
             MmSkuSeeder::class,
+            SideTrimByFluteSeeder::class,
+            RollTrimByCorrugatorSeeder::class,
+            RollTrimByProductDesignSeeder::class,
+            RollSizeSeeder::class,
+            SideTrimByProductDesignSeeder::class,
+            ComputationMethodSeeder::class,
         ]);
 
         $this->call(MmControlPeriodSeeder::class);

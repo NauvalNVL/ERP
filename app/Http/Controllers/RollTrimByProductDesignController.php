@@ -279,6 +279,8 @@ class RollTrimByProductDesignController extends Controller
             
             foreach ($items as $item) {
                 try {
+                    Log::debug('Processing item for batch update', ['item' => $item]);
+
                     $validator = Validator::make($item, [
                         'product_id' => 'required|exists:products,id',
                         'product_design_id' => 'required|exists:product_designs,id',
@@ -289,11 +291,13 @@ class RollTrimByProductDesignController extends Controller
                     ]);
                     
                     if ($validator->fails()) {
+                        $errorMessages = $validator->errors()->all();
+                        Log::warning('Validation failed for item', ['item' => $item, 'errors' => $errorMessages]);
                         $errors[] = [
                             'product_id' => $item['product_id'] ?? null,
                             'product_design_id' => $item['product_design_id'] ?? null,
                             'flute_id' => $item['flute_id'] ?? null,
-                            'error' => 'Validation failed: ' . implode(', ', $validator->errors()->all())
+                            'error' => 'Validation failed: ' . implode(', ', $errorMessages)
                         ];
                         continue;
                     }
@@ -311,9 +315,10 @@ class RollTrimByProductDesignController extends Controller
                         ]
                     );
                     
+                    Log::debug('Item processed successfully', ['rollTrim' => $rollTrim]);
                     $results[] = $rollTrim;
                 } catch (\Exception $e) {
-                    Log::error('Error updating roll trim by product design: ' . $e->getMessage());
+                    Log::error('Error updating roll trim by product design: ' . $e->getMessage(), ['item' => $item, 'exception' => $e]);
                     $errors[] = [
                         'product_id' => $item['product_id'] ?? null,
                         'product_design_id' => $item['product_design_id'] ?? null,
@@ -323,6 +328,8 @@ class RollTrimByProductDesignController extends Controller
                 }
             }
             
+            Log::info('Batch update summary', ['saved_count' => count($results), 'error_count' => count($errors)]);
+
             return response()->json([
                 'status' => 'success',
                 'message' => count($results) . ' roll trim specifications saved successfully',

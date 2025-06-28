@@ -34,22 +34,21 @@ class RollTrimByCorrugatorController extends Controller
      */
     public function apiIndex()
     {
-        $trims = RollTrimByCorrugator::all();
-        
-        // Transform the data to match the expected format in the frontend
-        $transformedTrims = $trims->map(function ($trim) {
-            $flute = PaperFlute::where('code', $trim->flute_code)->first();
-            
+        $flutes = PaperFlute::all();
+        $transformedFlutes = $flutes->map(function ($flute) {
+            $trim = RollTrimByCorrugator::where('flute_id', $flute->id)->first();
             return [
-                'id' => $trim->id,
-                'flute_id' => $flute ? $flute->id : null,
-                'compute' => (bool)$trim->compute,
-                'min_trim' => $trim->trim_value,
-                'max_trim' => $trim->trim_value + 10, // Default max is 10 more than min
+                'id' => $flute->id,
+                'flute_id' => $flute->id,
+                'flute_code' => $flute->code,
+                'flute_name' => $flute->name,
+                'compute' => $trim ? (bool)$trim->compute : false,
+                'min_trim' => $trim ? $trim->min_trim : null,
+                'max_trim' => $trim ? $trim->max_trim : null,
+                'trim_id' => $trim ? $trim->id : null,
             ];
         });
-        
-        return response()->json($transformedTrims);
+        return response()->json($transformedFlutes);
     }
 
     /**
@@ -60,7 +59,7 @@ class RollTrimByCorrugatorController extends Controller
     public function getPaperFlutes()
     {
         try {
-            $flutes = \App\Models\PaperFlute::all();
+            $flutes = PaperFlute::all();
             return response()->json($flutes);
         } catch (\Exception $e) {
             Log::error('Error fetching paper flutes: ' . $e->getMessage());
@@ -76,87 +75,32 @@ class RollTrimByCorrugatorController extends Controller
      */
     public function apiBatchUpdate(Request $request)
     {
-        try {
-            $validator = Validator::make($request->all(), [
-                '*.flute_id' => 'required|integer|exists:paper_flutes,id',
-                '*.compute' => 'required|boolean',
-                '*.min_trim' => 'nullable|numeric|min:0',
-                '*.max_trim' => 'nullable|numeric',
-            ]);
+        $validator = Validator::make($request->all(), [
+            '*.flute_id' => 'required|integer|exists:paper_flutes,id',
+            '*.compute' => 'required|boolean',
+            '*.min_trim' => 'nullable|numeric|min:0',
+            '*.max_trim' => 'nullable|numeric|gte:*.min_trim',
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $results = [];
-            $errors = [];
-
-            foreach ($request->all() as $specData) {
-                try {
-                    // Get the flute code from the flute_id
-                    $flute = PaperFlute::find($specData['flute_id']);
-                    if (!$flute) {
-                        $errors[] = [
-                            'flute_id' => $specData['flute_id'],
-                            'error' => 'Flute not found'
-                        ];
-                        continue;
-                    }
-                    
-                    // Set default values for empty fields
-                    $min_trim = isset($specData['min_trim']) && $specData['min_trim'] !== '' && $specData['min_trim'] !== null ? $specData['min_trim'] : 0;
-                    
-                    // Use the default corrugator name
-                    $corrugatorName = 'DEFAULT';
-                    
-                    $spec = RollTrimByCorrugator::updateOrCreate(
-                        [
-                            'corrugator_name' => $corrugatorName,
-                            'flute_code' => $flute->code,
-                        ],
-                        [
-                            'compute' => $specData['compute'],
-                            'trim_value' => $min_trim,
-                        ]
-                    );
-                    
-                    $results[] = [
-                        'id' => $spec->id,
-                        'flute_id' => $specData['flute_id'],
-                        'compute' => $spec->compute,
-                        'min_trim' => $spec->trim_value,
-                        'max_trim' => $spec->trim_value + 10, // Default max is 10 more than min
-                    ];
-                } catch (\Exception $e) {
-                    $errors[] = [
-                        'flute_id' => $specData['flute_id'],
-                        'error' => $e->getMessage()
-                    ];
-                    Log::error('Error updating roll trim for flute ' . $specData['flute_id'] . ': ' . $e->getMessage());
-                }
-            }
-
-            if (count($errors) > 0) {
-                return response()->json([
-                    'message' => 'Some specifications could not be saved.',
-                    'results' => $results,
-                    'errors' => $errors
-                ], 207); // 207 Multi-Status
-            }
-
-            return response()->json([
-                'message' => 'All specifications saved successfully.',
-                'results' => $results
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in batch update: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'An error occurred during batch update.',
-                'error' => $e->getMessage()
-            ], 500);
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
         }
+
+        $results = [];
+        foreach ($request->all() as $trimData) {
+            $updateData = [
+                'compute' => $trimData['compute'] ?? false,
+                'min_trim' => $trimData['min_trim'] ?? 0,
+                'max_trim' => $trimData['max_trim'] ?? null,
+            ];
+
+            $trim = RollTrimByCorrugator::updateOrCreate(
+                ['flute_id' => $trimData['flute_id']],
+                $updateData
+            );
+            $results[] = $trim;
+        }
+
+        return response()->json(['success' => true, 'results' => $results]);
     }
 } 

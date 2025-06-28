@@ -70,12 +70,12 @@
                       </div>
                     </td>
                   </tr>
-                  <tr v-else-if="filteredDesigns.length === 0" class="hover:bg-gray-50">
+                  <tr v-else-if="paginatedDesigns.length === 0" class="hover:bg-gray-50">
                     <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
                       No product designs found. Try adjusting your search or create a new design.
                     </td>
                   </tr>
-                  <tr v-for="design in filteredDesigns" :key="design.pd_code" 
+                  <tr v-for="design in paginatedDesigns" :key="design.pd_code" 
                       @click="selectDesign(design)" 
                       :class="{'bg-blue-50': selectedDesign && selectedDesign.pd_code === design.pd_code}"
                       class="hover:bg-gray-50 cursor-pointer">
@@ -107,7 +107,7 @@
           <!-- Pagination Controls -->
           <div class="mt-4 flex justify-between items-center text-sm text-gray-600">
             <div>
-              <span>Showing {{ filteredDesigns.length }} of {{ designs.length }} designs</span>
+              <span>Showing {{ paginatedDesigns.length }} of {{ filteredDesigns.length }} designs</span>
             </div>
             <div class="flex items-center space-x-2">
               <select v-model="itemsPerPage" class="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -259,7 +259,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <!-- Design Code -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-hashtag text-blue-500 mr-2"></i>
                   Design Code<span class="text-red-500">*</span>
                 </label>
@@ -271,7 +271,7 @@
               
               <!-- Design Name -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-tag text-blue-500 mr-2"></i>
                   Design Name<span class="text-red-500">*</span>
                 </label>
@@ -282,7 +282,7 @@
               
               <!-- Design Type -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-cube text-blue-500 mr-2"></i>
                   Design Type<span class="text-red-500">*</span>
                 </label>
@@ -297,7 +297,7 @@
               
               <!-- IDC -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-barcode text-blue-500 mr-2"></i>
                   IDC
                 </label>
@@ -308,7 +308,7 @@
               
               <!-- Product -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-box text-blue-500 mr-2"></i>
                   Product<span class="text-red-500">*</span>
                 </label>
@@ -328,7 +328,7 @@
               
               <!-- Joint -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-link text-blue-500 mr-2"></i>
                   Joint
                 </label>
@@ -346,7 +346,7 @@
               
               <!-- Joint to Print -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-print text-blue-500 mr-2"></i>
                   Joint to Print
                 </label>
@@ -364,7 +364,7 @@
               
               <!-- PCS to Joint -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-puzzle-piece text-blue-500 mr-2"></i>
                   PCS to Joint
                 </label>
@@ -375,7 +375,7 @@
               
               <!-- Score -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-chart-line text-blue-500 mr-2"></i>
                   Score
                 </label>
@@ -393,7 +393,7 @@
               
               <!-- Slot -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-columns text-blue-500 mr-2"></i>
                   Slot
                 </label>
@@ -411,7 +411,7 @@
               
               <!-- Flute Style -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-layer-group text-blue-500 mr-2"></i>
                   Flute Style
                 </label>
@@ -426,7 +426,7 @@
               
               <!-- Print Flute -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-print text-blue-500 mr-2"></i>
                   Print Flute
                 </label>
@@ -444,7 +444,7 @@
               
               <!-- Input Weight -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-weight text-blue-500 mr-2"></i>
                   Input Weight
                 </label>
@@ -462,7 +462,7 @@
               
               <!-- Compute -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-calculator text-blue-500 mr-2"></i>
                   Compute
                 </label>
@@ -768,19 +768,7 @@ const toggleCompute = async (design) => {
   try {
     // Create a copy of the design object with only the required fields for the update
     const designUpdate = {
-      pd_code: design.pd_code,
-      pd_name: design.pd_name,
-      pd_design_type: design.pd_design_type || '',
-      product: design.product || '',
-      idc: design.idc || '',
-      joint: design.joint || 'No',
-      joint_to_print: design.joint_to_print || 'No',
-      pcs_to_joint: design.pcs_to_joint || '0',
-      score: design.score || 'No',
-      slot: design.slot || 'No',
-      flute_style: design.flute_style || 'Normal',
-      print_flute: design.print_flute || 'No',
-      input_weight: design.input_weight || 'No',
+      ...design,
       compute: newComputeValue
     };
     

@@ -30,8 +30,6 @@ class RollTrimByCorrugatorSeeder extends Seeder
                     'compute' => rand(0, 1) == 1, // Randomly set compute to true or false
                     'min_trim' => $minTrim,
                     'max_trim' => $maxTrim,
-                    'created_by' => 'SYSTEM',
-                    'updated_by' => 'SYSTEM',
                 ]
             );
         }

@@ -68,11 +68,11 @@ class CorrugatorSpecByProductController extends Controller
         if ($existingSpec) {
             // Update existing specification
             $existingSpec->update($request->all());
-            return response()->json($existingSpec, 200);
+            return response()->json(['success' => true, 'data' => $existingSpec], 200);
         }
 
         $spec = CorrugatorSpecByProduct::create($request->all());
-        return response()->json($spec, 201);
+        return response()->json(['success' => true, 'data' => $spec], 201);
     }
 
     /**
@@ -96,7 +96,7 @@ class CorrugatorSpecByProductController extends Controller
         $spec = CorrugatorSpecByProduct::findOrFail($id);
         $spec->update($request->all());
         
-        return response()->json($spec);
+        return response()->json(['success' => true, 'data' => $spec]);
     }
 
     /**

@@ -16,25 +16,6 @@
                 <p class="mt-1 text-sm text-gray-600">Manage side trim specifications for each flute type.</p>
               </div>
             <div class="flex space-x-2">
-                <button @click="exportData" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25 transition">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Export
-              </button>
-                <button @click="printData" class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-600 active:bg-blue-800 focus:outline-none focus:border-blue-800 focus:ring focus:ring-blue-300 disabled:opacity-25 transition">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                Print
-              </button>
-                <a :href="viewPrintUrl" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring focus:ring-indigo-300 disabled:opacity-25 transition">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                View & Print
-              </a>
                 <button @click="saveChanges" class="inline-flex items-center px-4 py-2 bg-green-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-800 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring focus:ring-green-300 disabled:opacity-25 transition">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -116,7 +97,7 @@
                       <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm text-gray-500">{{ trim.flute_name }}</div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                      <td class="px-6 py-4 whitespace-nowrap text-center relative">
                         <Switch
                           v-model="trim.compute"
                           @update:modelValue="toggleCompute(trim)"
@@ -134,32 +115,28 @@
                           </div>
                         </Switch>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="relative">
+                      <td class="px-6 py-4 whitespace-nowrap text-center relative">
                         <input 
                           type="number" 
                           v-model="trim.length_less" 
-                            @change="updateTrimValue(trim, 'length_less')" 
-                            class="w-24 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                            :disabled="savingTrim[trim.id]"
+                          @change="updateTrimValue(trim, 'length_less')"
+                          class="w-24 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          :disabled="savingTrim[trim.id]"
                         />
-                          <div v-if="savingTrim[trim.id]" class="absolute right-0 top-1/2 transform -translate-y-1/2 mr-2">
-                            <div class="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                          </div>
+                        <div v-if="savingTrim[trim.id]" class="absolute inset-0 flex items-center justify-center">
+                          <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                         </div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="relative">
+                      <td class="px-6 py-4 whitespace-nowrap text-center relative">
                         <input 
                           type="number" 
                           v-model="trim.length_add" 
-                            @change="updateTrimValue(trim, 'length_add')" 
-                            class="w-24 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                            :disabled="savingTrim[trim.id]"
+                          @change="updateTrimValue(trim, 'length_add')"
+                          class="w-24 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          :disabled="savingTrim[trim.id]"
                         />
-                          <div v-if="savingTrim[trim.id]" class="absolute right-0 top-1/2 transform -translate-y-1/2 mr-2">
-                            <div class="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                          </div>
+                        <div v-if="savingTrim[trim.id]" class="absolute inset-0 flex items-center justify-center">
+                          <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                         </div>
                       </td>
                     </tr>
@@ -285,7 +262,6 @@ export default defineComponent({
     const sideTrims = ref([]);
     const filteredSideTrims = ref([]);
     const flutes = ref([]);
-    const viewPrintUrl = '/standard-formula/setup-side-trim-by-flute/view-print';
     const searchQuery = ref('');
     const currentPage = ref(1);
     const itemsPerPage = ref(10);
@@ -322,8 +298,8 @@ export default defineComponent({
 
     const canAddSideTrim = computed(() => {
       return newSideTrim.value.flute_id && 
-             newSideTrim.value.length_add >= 0 && 
-             newSideTrim.value.length_less >= 0;
+             newSideTrim.value.length_less !== '' && 
+             newSideTrim.value.length_add !== '';
     });
 
     const Toast = Swal.mixin({
@@ -363,17 +339,13 @@ export default defineComponent({
       try {
         loading.value = true;
         
-        // Load flutes
-        const flutesResponse = await axios.get('/api/paper-flutes');
-        flutes.value = flutesResponse.data;
+        const response = await axios.get('/api/side-trims-by-flute');
         
-        // Load side trims
-        const trimsResponse = await axios.get('/api/side-trims-by-flute');
-        
-        if (trimsResponse.data && trimsResponse.data.status === 'success' && Array.isArray(trimsResponse.data.data) && trimsResponse.data.data.length > 0) {
-          console.log('Received data from API:', trimsResponse.data.data);
+        console.log('API Response for side trims:', response.data);
+          
           // Process the data from the API response
-          sideTrims.value = trimsResponse.data.data.map(trim => {
+        if (response.data && response.data.status === 'success' && Array.isArray(response.data.data) && response.data.data.length > 0) {
+          sideTrims.value = response.data.data.map(trim => {
             const flute = trim.paper_flute || {};
             
             return {
@@ -381,24 +353,15 @@ export default defineComponent({
               flute_id: trim.flute_id,
               flute_code: flute.code || 'N/A',
               flute_name: flute.name || 'N/A',
-              length_add: trim.length_add,
-              length_less: trim.length_less,
-              compute: trim.compute === 1 || trim.compute === true
+              compute: trim.compute === 1 || trim.compute === true || trim.compute === 'true',
+              length_less: trim.length_less || 0,
+              length_add: trim.length_add || 0
             };
+          }).sort((a, b) => {
+            if (a.flute_code !== b.flute_code) return a.flute_code.localeCompare(b.flute_code);
+            return a.compute === b.compute ? 0 : (a.compute ? -1 : 1);
           });
-          
-          // Sort by flute code and then by compute status
-          sideTrims.value.sort((a, b) => {
-            if (a.flute_code === b.flute_code) {
-              return a.compute === b.compute ? 0 : a.compute ? 1 : -1;
-            }
-            return a.flute_code.localeCompare(b.flute_code);
-          });
-          
-          filteredSideTrims.value = [...sideTrims.value];
-          console.log('Processed side trims:', sideTrims.value);
         } else {
-          console.log('No data found or invalid response format:', trimsResponse.data);
           // If no data from API, seed the database first
           try {
             showNotification('No side trim data found. Seeding initial data...', 'info');
@@ -406,9 +369,9 @@ export default defineComponent({
             showNotification('Initial data has been seeded. Loading data...', 'success');
             
             // Try to fetch the data again after seeding
-            const newTrimsResponse = await axios.get('/api/side-trims-by-flute');
-            if (newTrimsResponse.data && newTrimsResponse.data.status === 'success' && Array.isArray(newTrimsResponse.data.data) && newTrimsResponse.data.data.length > 0) {
-              sideTrims.value = newTrimsResponse.data.data.map(trim => {
+            const newResponse = await axios.get('/api/side-trims-by-flute');
+            if (newResponse.data && newResponse.data.status === 'success' && Array.isArray(newResponse.data.data) && newResponse.data.data.length > 0) {
+              sideTrims.value = newResponse.data.data.map(trim => {
                 const flute = trim.paper_flute || {};
                 
                 return {
@@ -416,35 +379,32 @@ export default defineComponent({
                   flute_id: trim.flute_id,
                   flute_code: flute.code || 'N/A',
                   flute_name: flute.name || 'N/A',
-                  length_add: trim.length_add,
-                  length_less: trim.length_less,
-                  compute: trim.compute === 1 || trim.compute === true
+                  compute: trim.compute === 1 || trim.compute === true || trim.compute === 'true',
+                  length_less: trim.length_less || 0,
+                  length_add: trim.length_add || 0
                 };
+              }).sort((a, b) => {
+                if (a.flute_code !== b.flute_code) return a.flute_code.localeCompare(b.flute_code);
+                return a.compute === b.compute ? 0 : (a.compute ? -1 : 1);
               });
-              
-              // Sort by flute code and then by compute status
-              sideTrims.value.sort((a, b) => {
-                if (a.flute_code === b.flute_code) {
-                  return a.compute === b.compute ? 0 : a.compute ? 1 : -1;
-                }
-                return a.flute_code.localeCompare(b.flute_code);
-              });
-              
-              filteredSideTrims.value = [...sideTrims.value];
             } else {
               sideTrims.value = [];
-              filteredSideTrims.value = [];
               showNotification('Failed to load side trim data after seeding', 'error');
             }
           } catch (seedError) {
             console.error('Error seeding data:', seedError);
             sideTrims.value = [];
-            filteredSideTrims.value = [];
             showNotification('Failed to seed side trim data', 'error');
           }
         }
+        
+        // Explicitly convert filtered items
+        filteredSideTrims.value = sideTrims.value.map(trim => ({
+          ...trim,
+          compute: trim.compute === 1 || trim.compute === true || trim.compute === 'true'
+        }));
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('Error loading side trims:', error);
         
         let errorMessage = 'Failed to load side trim data';
         
@@ -470,123 +430,105 @@ export default defineComponent({
     // Save a single field update
     const updateTrimValue = async (trim, field) => {
       try {
-        // Don't save if already saving this item
-        if (savingTrim[trim.id]) {
-          return;
-        }
-        
-        // Set saving state
-        savingTrim[trim.id] = true;
-        
-        // Store original value
+        // Store the original value in case of rollback
         const originalValue = trim[field];
         
-        // Prepare data for saving
-        const response = await axios.put(`/api/side-trims-by-flute/${trim.id}`, {
-          flute_id: trim.flute_id,
-          length_add: trim.length_add,
-          length_less: trim.length_less,
-          compute: trim.compute
-        });
+        // Set loading state for this specific item
+        savingTrim[trim.id] = true;
         
-        if (response.data && response.data.status === 'success') {
-          showNotification(`Updated ${field.replace('_', ' ')} successfully`, 'success');
+        // Validate input
+        const numericValue = trim[field] === '' ? 0 : parseInt(trim[field], 10);
+        
+        // Prepare data for saving
+        const dataToSave = {
+          id: trim.id,
+          flute_id: trim.flute_id,
+          length_add: field === 'length_add' ? numericValue : trim.length_add,
+          length_less: field === 'length_less' ? numericValue : trim.length_less,
+          compute: trim.compute
+        };
+        
+        // Save the data
+        const response = await axios.put(`/api/side-trims-by-flute/${trim.id}`, dataToSave);
+        
+        if (response.data.status === 'success') {
+          // Update the local data with the server response
+          trim[field] = numericValue;
           
-          // Update the local data with the server response to ensure consistency
-          if (response.data.data) {
-            trim.compute = response.data.data.compute === 1 || response.data.data.compute === true;
-            trim.length_add = response.data.data.length_add;
-            trim.length_less = response.data.data.length_less;
-          }
+          // Show small notification
+          showNotification(`${field} updated successfully for ${trim.flute_code}`, 'success');
         } else {
-          showNotification(`Failed to update ${field.replace('_', ' ')}`, 'error');
-          // Revert to original value
+          // Revert the change in the UI
           trim[field] = originalValue;
+          
+          // Show error notification
+          showNotification(response.data.message || `Failed to update ${field}`, 'error');
         }
       } catch (error) {
         console.error(`Error updating ${field}:`, error);
         
-        // Revert to original value
+        // Revert the change in the UI
         trim[field] = originalValue;
         
-        let errorMessage = `Failed to update ${field.replace('_', ' ')}`;
-        
-        if (error.response && error.response.data) {
-          if (error.response.data.message) {
-            errorMessage = error.response.data.message;
-          } else if (error.response.data.errors) {
-            const firstError = Object.values(error.response.data.errors)[0];
-            errorMessage = Array.isArray(firstError) ? firstError[0] : firstError;
-          }
-        } else if (error.message) {
-          errorMessage += `: ${error.message}`;
-        }
+        // Show detailed error notification
+        const errorMessage = error.response?.data?.message || 
+          `Failed to update ${field} for ${trim.flute_code}`;
         
         showNotification(errorMessage, 'error');
       } finally {
-        // Clear saving state after a short delay to show the spinner
-        setTimeout(() => {
-          savingTrim[trim.id] = false;
-        }, 500);
+        // Clear loading state
+        savingTrim[trim.id] = false;
       }
     };
     
     // Toggle compute value with immediate save
     const toggleCompute = async (trim) => {
       try {
-        // Set saving state for this specific trim
-        savingTrim[trim.id] = true;
-        
-        // Store the original value in case we need to revert
+        // Store the original value in case of rollback
         const originalValue = trim.compute;
         
-        // Prepare data for saving
-        const response = await axios.put(`/api/side-trims-by-flute/${trim.id}`, {
-          flute_id: trim.flute_id,
-          length_add: trim.length_add,
-          length_less: trim.length_less,
-          compute: trim.compute
-        });
+        // Set loading state for this specific item
+        savingTrim[trim.id] = true;
         
-        if (response.data && response.data.status === 'success') {
-          showNotification(`Compute status for ${trim.flute_code} updated successfully`, 'success');
+        // Prepare data for saving
+        const dataToSave = {
+          id: trim.id,
+          flute_id: trim.flute_id,
+          length_add: trim.length_add || 0,
+          length_less: trim.length_less || 0,
+          compute: !originalValue // Toggle the compute value
+        };
+        
+        // Save the data
+        const response = await axios.put(`/api/side-trims-by-flute/${trim.id}`, dataToSave);
+        
+        if (response.data.status === 'success') {
+          // Update the local data with the server response
+          trim.compute = response.data.data.compute;
           
-          // Update the local data with the server response to ensure consistency
-          if (response.data.data) {
-            trim.compute = response.data.data.compute === 1 || response.data.data.compute === true;
-            trim.length_add = response.data.data.length_add;
-            trim.length_less = response.data.data.length_less;
-          }
+          // Show small notification
+          showNotification(`Compute status for ${trim.flute_code} updated successfully`, 'success');
         } else {
-          showNotification(`Failed to update compute status for ${trim.flute_code}`, 'error');
-          // Revert the change in UI
+          // Revert the change in the UI
           trim.compute = originalValue;
+          
+          // Show error notification
+          showNotification(response.data.message || `Failed to update compute status for ${trim.flute_code}`, 'error');
         }
       } catch (error) {
         console.error('Error toggling compute status:', error);
         
-        // Revert the change in UI
-        trim.compute = !trim.compute;
+        // Revert the change in the UI
+        trim.compute = originalValue;
         
-        let errorMessage = `Failed to update compute status for ${trim.flute_code}`;
-        
-        if (error.response && error.response.data) {
-          if (error.response.data.message) {
-            errorMessage = error.response.data.message;
-          } else if (error.response.data.errors) {
-            const firstError = Object.values(error.response.data.errors)[0];
-            errorMessage = Array.isArray(firstError) ? firstError[0] : firstError;
-          }
-        } else if (error.message) {
-          errorMessage += `: ${error.message}`;
-        }
+        // Show detailed error notification
+        const errorMessage = error.response?.data?.message || 
+          `Failed to update compute status for ${trim.flute_code}`;
         
         showNotification(errorMessage, 'error');
       } finally {
-        // Clear saving state after a short delay to show the spinner
-        setTimeout(() => {
-          savingTrim[trim.id] = false;
-        }, 500);
+        // Clear loading state
+        savingTrim[trim.id] = false;
       }
     };
 
@@ -595,20 +537,54 @@ export default defineComponent({
         loading.value = true;
         
         // Prepare data for saving
-        const promises = sideTrims.value.map(trim => 
-          axios.put(`/api/side-trims-by-flute/${trim.id}`, {
+        const dataToSave = sideTrims.value.map(trim => ({
+          id: trim.id,
             flute_id: trim.flute_id,
-            length_add: trim.length_add,
-            length_less: trim.length_less,
-            compute: trim.compute
-          })
-        );
+          length_less: trim.length_less === '' ? null : parseInt(trim.length_less),
+          length_add: trim.length_add === '' ? null : parseInt(trim.length_add),
+          // Explicitly convert compute to numeric value
+          compute: trim.compute ? 1 : 0
+        }));
         
-        await Promise.all(promises);
-        showNotification('All side trim data saved successfully');
+        // Send data to the API
+        const response = await axios.post('/api/side-trims-by-flute/batch', dataToSave);
         
-        // Reload data to get the updated records
+        if (response.data.status === 'success') {
+          // Reload data to ensure consistency
+          await loadData();
+          
+          Swal.fire({
+            icon: 'success',
+            title: 'Save Successful',
+            text: `All side trims have been saved.`,
+            confirmButtonText: 'OK'
+          });
+        } else if (response.data.errors && response.data.errors.length > 0) {
+          const errorCount = response.data.errors.length;
+          Swal.fire({
+            icon: 'warning',
+            title: 'Partial Update',
+            html: `
+              <p>Some side trims could not be saved:</p>
+              <ul>
+                ${response.data.errors.map(error => 
+                  `<li>${error}</li>`
+                ).join('')}
+              </ul>
+            `,
+            confirmButtonText: 'OK'
+          });
+          
+          // Reload data to reflect any successful updates
         await loadData();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Save Failed',
+            text: response.data.message || 'An unknown error occurred while saving.',
+            confirmButtonText: 'OK'
+          });
+        }
       } catch (error) {
         console.error('Error saving side trims:', error);
         
@@ -616,19 +592,21 @@ export default defineComponent({
         
         if (error.response && error.response.data) {
           if (error.response.data.message) {
-            errorMessage = error.response.data.message;
+            errorMessage += `: ${error.response.data.message}`;
           } else if (error.response.data.errors) {
             const firstError = Object.values(error.response.data.errors)[0];
-            errorMessage = Array.isArray(firstError) ? firstError[0] : firstError;
+            errorMessage += `: ${Array.isArray(firstError) ? firstError[0] : firstError}`;
           }
-        } else if (error.message) {
+        } else {
           errorMessage += `: ${error.message}`;
         }
         
-        showNotification(errorMessage, 'error');
-        
-        // Reload data to ensure UI is consistent with database
-        await loadData();
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: errorMessage,
+          confirmButtonText: 'OK'
+        });
       } finally {
         loading.value = false;
       }
@@ -650,7 +628,7 @@ export default defineComponent({
         );
         
         if (exists) {
-          showNotification('This flute and compute status combination already exists', 'error');
+          showNotification('This flute and compute combination already exists', 'error');
           loading.value = false;
           return;
         }
@@ -658,26 +636,47 @@ export default defineComponent({
         // Add new side trim
         const response = await axios.post('/api/side-trims-by-flute', {
           flute_id: newSideTrim.value.flute_id,
-          length_add: newSideTrim.value.length_add,
-          length_less: newSideTrim.value.length_less,
-          compute: newSideTrim.value.compute
+          length_add: newSideTrim.value.length_add || 0,
+          length_less: newSideTrim.value.length_less || 0,
+          // Explicitly convert compute to numeric value
+          compute: newSideTrim.value.compute ? 1 : 0
         });
         
         if (response.data && response.data.status === 'success') {
-          showNotification('Side trim added successfully');
+          // Show success message with details
+          Swal.fire({
+            icon: 'success',
+            title: 'Side Trim Added',
+            html: `
+              <p>Successfully added side trim for:</p>
+              <ul>
+                <li>Flute: ${response.data.data.paper_flute?.code || 'N/A'}</li>
+                <li>Length Add: ${response.data.data.length_add} mm</li>
+                <li>Length Less: ${response.data.data.length_less} mm</li>
+                <li>Compute: ${response.data.data.compute ? 'Yes' : 'No'}</li>
+              </ul>
+            `,
+            confirmButtonText: 'OK'
+          });
           
           // Reset form
           newSideTrim.value = {
             flute_id: '',
-            compute: false,
-            length_add: 0,
-            length_less: 0
+            length_add: '',
+            length_less: '',
+            compute: false
           };
           
           // Reload data
           await loadData();
         } else {
-          showNotification('Failed to add side trim', 'error');
+          // Show error message
+          Swal.fire({
+            icon: 'error',
+            title: 'Failed to Add Side Trim',
+            text: response.data.message || 'An unknown error occurred',
+            confirmButtonText: 'OK'
+          });
         }
       } catch (error) {
         console.error('Error adding side trim:', error);
@@ -686,47 +685,25 @@ export default defineComponent({
         
         if (error.response && error.response.data) {
           if (error.response.data.message) {
-            errorMessage = error.response.data.message;
+            errorMessage += `: ${error.response.data.message}`;
           } else if (error.response.data.errors) {
             const firstError = Object.values(error.response.data.errors)[0];
-            errorMessage = Array.isArray(firstError) ? firstError[0] : firstError;
+            errorMessage += `: ${Array.isArray(firstError) ? firstError[0] : firstError}`;
           }
-        } else if (error.message) {
+        } else {
           errorMessage += `: ${error.message}`;
         }
         
-        // Reload data to ensure UI is consistent with database
-        await loadData();
-        
-        showNotification(errorMessage, 'error');
+        // Show error message
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: errorMessage,
+          confirmButtonText: 'OK'
+        });
       } finally {
         loading.value = false;
       }
-    };
-
-    const exportData = () => {
-      showNotification('Exporting data...');
-      
-      // Call the export API endpoint
-      axios.get('/api/side-trims-by-flute/export', { responseType: 'blob' })
-        .then(response => {
-          // Create a download link for the exported file
-          const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          const link = document.createElement('a');
-          link.href = window.URL.createObjectURL(blob);
-          link.download = `side_trims_by_flute_${new Date().toISOString().split('T')[0]}.xlsx`;
-          link.click();
-          
-          showNotification('Data exported successfully');
-        })
-        .catch(error => {
-          console.error('Error exporting data:', error);
-          showNotification('Failed to export data', 'error');
-        });
-    };
-
-    const printData = () => {
-      window.print();
     };
 
     onMounted(() => {
@@ -740,21 +717,18 @@ export default defineComponent({
       paginatedSideTrims,
       flutes,
       newSideTrim,
-      viewPrintUrl,
       searchQuery,
       currentPage,
       itemsPerPage,
       totalPages,
       savingTrim,
       canAddSideTrim,
+      filterSideTrims,
       saveChanges,
       addSideTrim,
-      exportData,
-      printData,
       showNotification,
       nextPage,
       prevPage,
-      filterSideTrims,
       updateTrimValue,
       toggleCompute
     };

@@ -7,101 +7,138 @@
         @csrf
     </form>
 
-    <!-- Header Section -->
-    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-calculator mr-3"></i> Define Scoring Formula
-        </h2>
-        <p class="text-cyan-100">Configure scoring formulas for product manufacturing</p>
+    <!-- Header Section with animated elements -->
+    <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
+        <!-- Decorative Elements -->
+        <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20"></div>
+        <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10"></div>
+        <div class="absolute bottom-0 right-0 w-32 h-32 bg-yellow-400 opacity-5 rounded-full translate-y-10 translate-x-10"></div>
+        
+        <div class="flex items-center">
+            <div class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner flex items-center justify-center relative overflow-hidden mr-4">
+                <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-300 opacity-30 rounded-full animate-ping-slow"></div>
+                <div class="absolute -bottom-1 -left-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full animate-ping-slow animation-delay-500"></div>
+                <i class="fas fa-calculator text-white text-2xl z-10"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-1 text-shadow">Define Scoring Formula</h2>
+                <p class="text-blue-100 max-w-2xl">Configure scoring formulas for product manufacturing</p>
+            </div>
+        </div>
     </div>
 
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-indigo-50">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
-                    <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-indigo-500 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden">
+                    <div class="absolute -top-20 -right-20 w-40 h-40 bg-indigo-50 rounded-full opacity-20"></div>
+                    <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-purple-50 rounded-full opacity-20"></div>
+                    
+                    <div class="flex items-center mb-6 pb-2 border-b border-gray-200 relative z-10">
+                        <div class="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mr-3 shadow-md">
                             <i class="fas fa-edit text-white"></i>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Scoring Formula Management</h3>
                     </div>
                     
                     <!-- Form Fields Section -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Product Design:</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-drafting-compass"></i>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="productDesign" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 shadow-sm">
+                                    <i class="fas fa-drafting-compass text-white text-xs"></i>
                                 </span>
+                                Product Design:
+                            </label>
+                            <div class="relative flex group">
                                 <input 
                                   type="text" 
+                                  id="productDesign"
                                   v-model="form.productDesign" 
-                                  class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                  placeholder="B1-1CR"
+                                  class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
+                                  placeholder="Enter or select product design"
                                 >
                                 <button 
+                                  type="button"
                                   @click="openProductDesignModal"
-                                  class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md"
+                                  class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
                                 >
-                                  <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                            
-                            <label class="block text-sm font-medium text-gray-700 mb-1 mt-4">Paper Flute:</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-layer-group"></i>
-                                </span>
-                                <input 
-                                  type="text" 
-                                  v-model="form.paperFlute" 
-                                  class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                  placeholder="Select flute"
-                                >
-                                <button 
-                                  @click="showPaperFluteModal = true"
-                                  class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md"
-                                >
-                                  <i class="fas fa-search"></i>
+                                  <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
+                                  <i class="fas fa-search relative z-10"></i>
                                 </button>
                             </div>
                         </div>
                         
-                        <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                        <div>
+                             <label for="paperFlute" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mr-2 shadow-sm">
+                                    <i class="fas fa-layer-group text-white text-xs"></i>
+                                </span>
+                                Paper Flute:
+                            </label>
+                            <div class="relative flex group">
+                                <input 
+                                  type="text" 
+                                  id="paperFlute"
+                                  v-model="form.paperFlute" 
+                                  class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-all group-hover:border-blue-300"
+                                  placeholder="Enter or select paper flute"
+                                >
+                                <button
+                                  type="button"
+                                  @click="showPaperFluteModal = true"
+                                  class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
+                                >
+                                  <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
+                                  <i class="fas fa-search relative z-10"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <!-- Action Buttons -->
+                        <div class="flex items-end space-x-4">
                             <button 
                               @click="openRecordModal"
-                              class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded"
+                              class="text-white px-4 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700"
                             >
-                                <i class="fas fa-search mr-2"></i> Find Records
+                                <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
+                                <div class="bg-white bg-opacity-30 rounded-full p-1.5 mr-2 flex items-center justify-center">
+                                    <i class="fas fa-search text-white text-xs"></i>
+                                </div>
+                                <span>Find Records</span>
                             </button>
                             
                             <button 
                               @click="saveFormula"
-                              class="w-full mt-4 flex items-center justify-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
+                              class="text-white px-4 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
                             >
-                                <i class="fas fa-save mr-2"></i> Save Formula
+                                <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
+                                <div class="bg-white bg-opacity-30 rounded-full p-1.5 mr-2 flex items-center justify-center">
+                                    <i class="fas fa-save text-white text-xs"></i>
+                                </div>
+                                <span>Save Formula</span>
                             </button>
                         </div>
                     </div>
                     
                     <!-- Data Status Information -->
-                    <div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
+                    <div v-if="loading" class="mt-6 bg-yellow-100 p-3 rounded-lg border border-yellow-200">
                         <div class="flex items-center">
                             <div class="mr-3">
                                 <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
                             </div>
-                            <p class="text-sm font-medium text-yellow-800">Loading paper flute data...</p>
+                            <p class="text-sm font-medium text-yellow-800">Loading data...</p>
                         </div>
                     </div>
-                    <div v-else-if="paperFlutes.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
-                        <p class="text-sm font-medium text-yellow-800">No paper flute data available.</p>
-                        <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured.</p>
+                    <div v-else-if="paperFlutes.length === 0 && productDesigns.length === 0" class="mt-6 bg-red-100 p-3 rounded-lg border border-red-200">
+                        <p class="text-sm font-medium text-red-800">No data available.</p>
+                        <p class="text-xs text-red-700 mt-1">Make sure the database is properly configured and APIs are running.</p>
                     </div>
-                    <div v-else class="mt-4 bg-green-100 p-3 rounded">
-                        <p class="text-sm font-medium text-green-800">Paper flute data available: {{ paperFlutes.length }} flutes found.</p>
+                    <div v-else class="mt-6 bg-green-100 p-3 rounded-lg border border-green-200">
+                        <p class="text-sm font-medium text-green-800">Data loaded successfully. Ready to configure formulas.</p>
                         <p v-if="form.paperFlute" class="text-xs text-green-700 mt-1">
                             Selected Paper Flute: <span class="font-semibold">{{ form.paperFlute }}</span>
                         </p>
@@ -109,32 +146,32 @@
                             Selected Product Design: <span class="font-semibold">{{ form.productDesign }}</span>
                         </p>
                     </div>
-                </div>
-
-                <!-- Formula Preview Section -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500 mt-6">
-                    <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-green-500 rounded-lg mr-3">
-                            <i class="fas fa-eye text-white"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Formula Preview</h3>
-                    </div>
                     
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <div v-if="form.productDesign && form.paperFlute" class="space-y-3">
-                            <div class="grid grid-cols-3 gap-4">
-                                <div class="col-span-1 text-right font-medium text-gray-600">Product Design:</div>
-                                <div class="col-span-2 font-semibold text-gray-800">{{ form.productDesign }}</div>
+                    <!-- Formula Preview Section -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="flex items-center mb-6">
+                            <div class="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg mr-3 shadow-md">
+                                <i class="fas fa-eye text-white"></i>
                             </div>
-                            <div class="grid grid-cols-3 gap-4">
-                                <div class="col-span-1 text-right font-medium text-gray-600">Paper Flute:</div>
-                                <div class="col-span-2 font-semibold text-gray-800">{{ form.paperFlute }}</div>
-                            </div>
-                            <!-- Add more formula details here as needed -->
+                            <h3 class="text-xl font-semibold text-gray-800">Formula Preview</h3>
                         </div>
-                        <div v-else class="text-center text-gray-500 py-6">
-                            <i class="fas fa-info-circle text-blue-500 text-xl mb-2"></i>
-                            <p>Select Product Design and Paper Flute to see formula details</p>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <div v-if="form.productDesign && form.paperFlute" class="space-y-3">
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="col-span-1 text-right font-medium text-gray-600">Product Design:</div>
+                                    <div class="col-span-2 font-semibold text-gray-800">{{ form.productDesign }}</div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="col-span-1 text-right font-medium text-gray-600">Paper Flute:</div>
+                                    <div class="col-span-2 font-semibold text-gray-800">{{ form.paperFlute }}</div>
+                                </div>
+                                <!-- Add more formula details here as needed -->
+                            </div>
+                            <div v-else class="text-center text-gray-500 py-6">
+                                <i class="fas fa-info-circle text-blue-500 text-xl mb-2"></i>
+                                <p>Select Product Design and Paper Flute to see formula details</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -143,9 +180,12 @@
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
                 <!-- Formula Info Card -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
-                    <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden">
+                    <div class="absolute -top-16 -right-16 w-32 h-32 bg-teal-50 rounded-full opacity-20"></div>
+                    <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-green-50 rounded-full opacity-20"></div>
+
+                    <div class="flex items-center mb-4 pb-2 border-b border-gray-200 relative z-10">
+                        <div class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-3 shadow-md">
                             <i class="fas fa-info-circle text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Scoring Formula Info</h3>
@@ -153,12 +193,37 @@
 
                     <div class="space-y-4">
                         <div class="p-4 bg-teal-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
-                            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                                <li>Select a Product Design for the scoring formula</li>
-                                <li>Choose a Paper Flute from the available options</li>
-                                <li>Use the search buttons to find existing items</li>
-                                <li>Save the formula when you're finished</li>
+                             <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2 flex items-center">
+                                <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                    <i class="fas fa-question text-white text-xs"></i>
+                                </span>
+                                How to Use
+                            </h4>
+                            <ul class="text-sm text-gray-600 space-y-2">
+                                <li class="flex items-start">
+                                    <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </span>
+                                    <span>Select a Product Design for the scoring formula.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </span>
+                                    <span>Choose a Paper Flute from the available options.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </span>
+                                    <span>Use the search buttons to find existing items.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </span>
+                                    <span>Save the formula when you're finished.</span>
+                                </li>
                             </ul>
                         </div>
 
@@ -183,9 +248,9 @@
                 </div>
 
                 <!-- Quick Links -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                        <div class="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg mr-3 shadow-md">
                             <i class="fas fa-link text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
@@ -760,6 +825,21 @@ onMounted(() => {
 });
 </script>
 
+<style>
+.text-shadow {
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.animate-ping-slow {
+  animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animation-delay-500 {
+  animation-delay: 0.5s;
+}
+</style>
+
 <style scoped>
 /* Add any additional styling here */
 </style>
+

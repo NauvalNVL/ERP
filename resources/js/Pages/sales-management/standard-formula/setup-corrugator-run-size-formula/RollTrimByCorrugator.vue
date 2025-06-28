@@ -1,159 +1,183 @@
 <template>
-  <AppLayout title="Define Roll Trim By Corrugator">
-    <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        Define Roll Trim By Corrugator
-      </h2>
-    </template>
+  <AppLayout :header="'Roll Trim By Corrugator'">
+    <Head title="Define Roll Trim By Corrugator" />
 
-    <div class="py-6">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-          <div class="p-6 sm:px-8 bg-white border-b border-gray-200">
-            <div class="flex items-center justify-between">
-              <div>
-                <h2 class="text-2xl font-bold text-gray-800">Roll Trim Settings</h2>
-                <p class="mt-1 text-sm text-gray-600">Manage roll trim specifications for each flute.</p>
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-lg shadow-md">
+      <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-layer-group mr-3"></i> Define Roll Trim By Corrugator
+      </h2>
+      <p class="text-blue-100">Manage roll trim specifications for each flute type</p>
+    </div>
+
+    <div class="bg-white rounded-b-lg shadow-md p-6 mb-6">
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Main Content Area -->
+        <div class="flex-1">
+          <!-- Action Bar -->
+          <div class="mb-6 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+            <div class="flex-1 w-full">
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-search"></i>
+                </span>
+                <input type="text" v-model="searchQuery" placeholder="Search by flute code or name..."
+                  class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
               </div>
-            <div class="flex space-x-2">
-                <button @click="saveChanges" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring focus:ring-indigo-300 disabled:opacity-25 transition">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                </svg>
-                Save
+            </div>
+            <div class="flex gap-2 w-full md:w-auto">
+              <button @click="refreshData" class="btn-secondary flex-1 md:flex-none">
+                <i class="fas fa-sync-alt mr-2"></i> Refresh
               </button>
-              </div>
+              <button @click="printTrims" class="btn-info flex-1 md:flex-none">
+                <i class="fas fa-print mr-2"></i> Print
+              </button>
             </div>
           </div>
 
-          <div class="p-6 sm:px-8">
-            <div v-if="loading" class="flex justify-center items-center py-16">
-              <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-              <span class="ml-4 text-lg text-gray-700">Loading Flutes...</span>
-            </div>
-
-            <div v-else>
-              <div class="mb-6">
-                    <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                        </svg>
-                  </div>
-                  <input
-                    type="text"
-                    v-model="searchQuery"
-                    @input="filterItems"
-                    placeholder="Search by flute code or name..."
-                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div class="overflow-x-auto bg-white rounded-lg shadow">
+          <!-- Table Section -->
+          <div class="bg-white rounded-lg overflow-hidden border border-gray-200">
+            <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                   <thead class="bg-gray-50">
                     <tr>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Flute
+                    <th @click="sortBy('flute_code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Flute <i class="fas fa-sort ml-1"></i>
+                      </div>
                       </th>
-                      <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Compute
+                    <th @click="sortBy('compute')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Compute <i class="fas fa-sort ml-1"></i>
+                      </div>
                       </th>
-                      <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Min Trim (mm)
+                      <th @click="sortBy('min_trim')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                        <div class="flex items-center">
+                          Min (mm) <i class="fas fa-sort ml-1"></i>
+                        </div>
                       </th>
-                      <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Max Trim (mm)
+                      <th @click="sortBy('max_trim')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                        <div class="flex items-center">
+                          Max (mm) <i class="fas fa-sort ml-1"></i>
+                        </div>
                       </th>
                     </tr>
                   </thead>
                   <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-if="paginatedItems.length === 0">
-                      <td colspan="4" class="px-6 py-12 text-center text-sm text-gray-500">
-                        <div class="flex flex-col items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                          </svg>
-                          <h3 class="mt-2 text-lg font-medium text-gray-900">No flutes found</h3>
-                          <p class="mt-1 text-sm text-gray-500">Please try a different search term.</p>
+                  <tr v-if="loading" class="animate-pulse">
+                    <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                      <div class="flex justify-center items-center space-x-2">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading roll trims...</span>
                         </div>
                       </td>
                     </tr>
-                    <tr v-for="item in paginatedItems" :key="item.id" class="hover:bg-gray-50 transition-colors duration-150">
+                  <tr v-else-if="paginatedFlutes.length === 0" class="hover:bg-gray-50">
+                    <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                      No flutes found.
+                    </td>
+                  </tr>
+                  <tr v-for="flute in paginatedFlutes" :key="flute.id" 
+                      @click="selectFlute(flute)" 
+                      :class="{'bg-blue-50': selectedFlute && selectedFlute.id === flute.id}"
+                      class="hover:bg-gray-50 cursor-pointer">
                       <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">{{ item.flute_code }}</div>
-                        <div class="text-sm text-gray-500">{{ item.flute_name }}</div>
+                        <div class="text-sm font-medium text-gray-900">{{ flute.flute_code }}</div>
+                        <div class="text-sm text-gray-500">{{ flute.flute_name }}</div>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <Switch
-                          v-model="item.compute"
-                          @update:modelValue="toggleCompute(item)"
-                          :class="item.compute ? 'bg-blue-600' : 'bg-gray-200'"
-                          class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                          :disabled="savingCompute[item.id]"
-                        >
-                          <span class="sr-only">Enable compute</span>
-                          <span
-                            :class="item.compute ? 'translate-x-6' : 'translate-x-1'"
-                            class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform"
-                          />
-                          <div v-if="savingCompute[item.id]" class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 cursor-pointer hover:bg-blue-100 active:bg-blue-200 transition-all duration-150 transform hover:scale-105 border border-transparent hover:border-blue-300 rounded-md" 
+                      @click.stop="toggleCompute(flute)"
+                      title="Click to toggle Compute status"
+                      :class="{'opacity-75': toggleLoading[flute.id]}">
+                      <div class="flex items-center justify-between">
+                        <span v-if="toggleLoading[flute.id]" class="text-blue-500 font-medium flex items-center">
+                          <i class="fas fa-spinner fa-spin mr-1"></i> Updating...
+                        </span>
+                        <span v-else-if="flute.compute" class="text-green-600 font-medium flex items-center">
+                          <i class="fas fa-check-circle mr-1"></i> Yes
+                        </span>
+                        <span v-else class="text-red-600 font-medium flex items-center">
+                          <i class="fas fa-times-circle mr-1"></i> No
+                        </span>
+                        <i v-if="!toggleLoading[flute.id]" class="fas fa-exchange-alt text-blue-500 ml-2"></i>
                           </div>
-                        </Switch>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <input 
-                          type="number" 
-                          v-model.number="item.min_trim"
-                          class="w-24 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                          placeholder="Min"
-                        />
+                      <td class="px-2 py-1 whitespace-nowrap">
+                        <input type="number" v-model.number="flute.min_trim" @blur="updateTrim(flute, 'min_trim')"
+                               class="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Min">
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <input 
-                          type="number" 
-                          v-model.number="item.max_trim" 
-                          class="w-24 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                          placeholder="Max"
-                          disabled
-                        />
+                      <td class="px-2 py-1 whitespace-nowrap">
+                        <input type="number" v-model.number="flute.max_trim" @blur="updateTrim(flute, 'max_trim')"
+                               class="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Max">
                       </td>
                     </tr>
                   </tbody>
                 </table>
             </div>
+            </div>
 
-              <!-- Pagination -->
-              <div v-if="filteredItems.length > itemsPerPage" class="mt-6 flex items-center justify-between">
-                <p class="text-sm text-gray-700">
-                  Showing
-                  <span class="font-medium">{{ (currentPage - 1) * itemsPerPage + 1 }}</span>
-                  to
-                  <span class="font-medium">{{ Math.min(currentPage * itemsPerPage, filteredItems.length) }}</span>
-                  of
-                  <span class="font-medium">{{ filteredItems.length }}</span>
-                  results
-                </p>
-                <div class="flex-1 flex justify-end">
-                  <button
-                    @click="prevPage"
-                    :disabled="currentPage === 1"
-                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    Previous
+          <!-- Pagination Controls -->
+          <div class="mt-4 flex justify-between items-center text-sm text-gray-600">
+             <div>
+                <span>Showing {{ paginatedFlutes.length }} of {{ filteredFlutes.length }} results</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <select v-model="itemsPerPage" class="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option :value="10">10 per page</option>
+                <option :value="20">20 per page</option>
+                <option :value="50">50 per page</option>
+                <option :value="100">100 per page</option>
+              </select>
+              <button :disabled="currentPage === 1" @click="currentPage--" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">
+                <i class="fas fa-chevron-left"></i>
                   </button>
-                  <button
-                    @click="nextPage"
-                    :disabled="currentPage === totalPages"
-                    class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    Next
+              <span class="px-4">{{ currentPage }} / {{ totalPages }}</span>
+              <button :disabled="currentPage === totalPages" @click="currentPage++" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">
+                <i class="fas fa-chevron-right"></i>
                   </button>
                 </div>
+          </div>
+        </div>
+
+        <!-- Side Panel with Details -->
+        <div class="w-full md:w-96 bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div v-if="selectedFlute" class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+              <i class="fas fa-info-circle mr-2 text-blue-500"></i> Trim Details
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Flute Code:</span>
+                <span class="font-medium text-gray-900">{{ selectedFlute.flute_code }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Flute Name:</span>
+                <span class="font-medium text-gray-900">{{ selectedFlute.flute_name }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Compute:</span>
+                <span class="font-medium" :class="{'text-green-600': selectedFlute.compute, 'text-red-600': !selectedFlute.compute}">
+                  {{ selectedFlute.compute ? 'Yes' : 'No' }}
+                </span>
+              </div>
+              <div class="border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Min (mm):</span>
+                <span class="font-medium text-gray-900 block">{{ selectedFlute.min_trim || 'N/A' }}</span>
+              </div>
+               <div class="border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Max (mm):</span>
+                <span class="font-medium text-gray-900 block">{{ selectedFlute.max_trim || 'N/A' }}</span>
               </div>
             </div>
+          </div>
+          <div v-else class="flex flex-col items-center justify-center h-64 text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-layer-group text-blue-500 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No Flute Selected</h3>
+            <p class="text-gray-500 mb-4">Select a flute to view its trim details</p>
           </div>
         </div>
       </div>
@@ -161,253 +185,196 @@
   </AppLayout>
 </template>
 
-<script>
-import { defineComponent, ref, onMounted, reactive, computed, watch } from 'vue';
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { Switch } from '@headlessui/vue';
+<script setup>
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
-import Swal from 'sweetalert2';
+import { Head } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import { useToast } from '@/Composables/useToast';
 
-export default defineComponent({
-  components: {
-    AppLayout,
-    Switch,
-  },
-  setup() {
-    const loading = ref(true);
-    const items = ref([]);
-    const filteredItems = ref([]);
+// State
+const flutes = ref([]);
+const selectedFlute = ref(null);
+const loading = ref(false);
     const searchQuery = ref('');
-    const savingCompute = reactive({});
+const sortOrder = ref({ field: 'flute_code', direction: 'asc' });
+const toast = useToast();
     const currentPage = ref(1);
     const itemsPerPage = ref(10);
+const toggleLoading = ref({});
+const savingStatus = ref({});
 
-    const totalPages = computed(() => Math.ceil(filteredItems.value.length / itemsPerPage.value));
-    const paginatedItems = computed(() => {
-      const start = (currentPage.value - 1) * itemsPerPage.value;
-      const end = start + itemsPerPage.value;
-      return filteredItems.value.slice(start, end);
-    });
+// Computed Properties
+const filteredFlutes = computed(() => {
+  let result = flutes.value;
 
-    const nextPage = () => {
-      if (currentPage.value < totalPages.value) currentPage.value++;
-    };
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    result = result.filter(f =>
+      (f.flute_code && f.flute_code.toLowerCase().includes(query)) ||
+      (f.flute_name && f.flute_name.toLowerCase().includes(query))
+    );
+  }
 
-    const prevPage = () => {
-      if (currentPage.value > 1) currentPage.value--;
-    };
+  return [...result].sort((a, b) => {
+    const field = sortOrder.value.field;
+    const direction = sortOrder.value.direction === 'asc' ? 1 : -1;
+    
+    if ((a[field] || '') < (b[field] || '')) return -1 * direction;
+    if ((a[field] || '') > (b[field] || '')) return 1 * direction;
+    return 0;
+  });
+});
 
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer);
-        toast.addEventListener('mouseleave', Swal.resumeTimer);
-      }
-    });
+const totalPages = computed(() => Math.ceil(filteredFlutes.value.length / itemsPerPage.value));
 
-    const showNotification = (message, type = 'success') => {
-      Toast.fire({
-        icon: type,
-        title: message
-      });
-    };
+const paginatedFlutes = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return filteredFlutes.value.slice(start, end);
+});
 
-    // Watch for changes to min_trim and update max_trim accordingly
-    const updateMaxTrim = (item) => {
-      if (item.min_trim !== null && item.min_trim !== undefined) {
-        item.max_trim = item.min_trim + 10;
-      }
-    };
+// Watchers
+watch(filteredFlutes, () => { currentPage.value = 1; });
+watch(itemsPerPage, () => { currentPage.value = 1; });
 
-    const loadData = async () => {
-      try {
-        loading.value = true;
-        const [flutesResponse, trimsResponse] = await Promise.all([
-          axios.get('/api/paper-flutes'),
-          axios.get('/api/roll-trim-by-corrugator')
-        ]);
-        
-        const flutesList = flutesResponse.data;
-        const trimsList = trimsResponse.data;
-        
-        items.value = flutesList.map(flute => {
-          const trim = trimsList.find(t => t.flute_id === flute.id);
-          return {
-            id: flute.id, // Use flute id as the key
-            flute_id: flute.id,
-            flute_code: flute.code,
-            flute_name: flute.name,
-            compute: trim ? !!trim.compute : false,
-            min_trim: trim ? trim.min_trim : 0,
-            max_trim: trim ? trim.max_trim : 10,
-          };
-        });
-        
-        filteredItems.value = [...items.value];
+// Main Methods
+const loadData = async () => {
+  loading.value = true;
+  try {
+    const response = await axios.get('/api/roll-trim-by-corrugator');
+    flutes.value = response.data;
       } catch (error) {
         console.error('Error loading data:', error);
-        let errorMessage = 'Failed to load data';
-        if (error.response && error.response.data && error.response.data.message) {
-            errorMessage += `: ${error.response.data.message}`;
-        }
-        Swal.fire({
-          icon: 'error',
-          title: 'Loading Error',
-          text: errorMessage,
-        });
+    toast.error('Failed to load roll trims.');
       } finally {
         loading.value = false;
       }
     };
 
-    const filterItems = () => {
-      currentPage.value = 1;
-      if (!searchQuery.value) {
-        filteredItems.value = [...items.value];
-        return;
+const refreshData = () => {
+  selectedFlute.value = null;
+  searchQuery.value = '';
+  loadData();
+};
+
+const selectFlute = (flute) => {
+  selectedFlute.value = flute;
+};
+
+// Helper function to save trim data
+async function _saveTrimData(trimData) {
+    const payload = {
+        flute_id: trimData.id,
+        flute_code: trimData.flute_code,
+        compute: trimData.compute,
+        min_trim: trimData.min_trim ?? 0,
+        max_trim: trimData.max_trim,
+    };
+
+    // Ensure empty string is sent as null to the backend
+    if (payload.max_trim === '') {
+        payload.max_trim = null;
+    }
+
+    return axios.post('/api/roll-trim-by-corrugator/batch', [payload]);
+}
+
+const updateTrim = async (flute, field) => {
+  const statusKey = `${flute.id}-${field}`;
+  savingStatus.value[statusKey] = true;
+
+  try {
+    const response = await _saveTrimData(flute);
+    const updatedResult = response.data.results[0];
+
+    const index = flutes.value.findIndex(f => f.id === flute.id);
+    if (index !== -1) {
+      flutes.value[index].min_trim = updatedResult.min_trim;
+      flutes.value[index].max_trim = updatedResult.max_trim;
+      flutes.value[index].trim_id = updatedResult.id;
+      
+      if (selectedFlute.value && selectedFlute.value.id === flute.id) {
+        selectedFlute.value = flutes.value[index];
       }
-      const query = searchQuery.value.toLowerCase();
-      filteredItems.value = items.value.filter(item => 
-        item.flute_code.toLowerCase().includes(query) || 
-        item.flute_name.toLowerCase().includes(query)
-      );
-    };
-
-    // Function to toggle compute value with immediate save
-    const toggleCompute = async (item) => {
-      try {
-        // Set loading state for this specific item
-        savingCompute[item.id] = true;
-        
-        // Prepare data for saving
-        const specToSave = {
-          flute_id: item.flute_id,
-          compute: item.compute,
-          min_trim: item.min_trim !== null && item.min_trim !== undefined && item.min_trim !== '' ? item.min_trim : 0,
-          max_trim: item.max_trim !== null && item.max_trim !== undefined && item.max_trim !== '' ? item.max_trim : 10,
-        };
-        
-        // Save the data
-        const response = await axios.post('/api/roll-trim-by-corrugator/batch', [specToSave]);
-        
-        if (response.data.results && response.data.results.length > 0) {
-          const updatedItem = response.data.results[0];
-          item.min_trim = updatedItem.min_trim;
-          item.max_trim = updatedItem.max_trim;
-        }
-        
-        // Show small notification
-        showNotification(`Compute status for ${item.flute_code} updated successfully`, 'success');
-      } catch (error) {
-        console.error('Error toggling compute status:', error);
-        
-        // Revert the change in the UI
-        item.compute = !item.compute;
-        
-        // Show error notification
-        showNotification(`Failed to update compute status for ${item.flute_code}`, 'error');
-      } finally {
-        // Clear loading state
-        savingCompute[item.id] = false;
-      }
-    };
-
-    const saveChanges = async () => {
-      try {
-        loading.value = true;
-        const specsToSave = items.value.map(item => ({
-          flute_id: item.flute_id,
-          compute: item.compute,
-          min_trim: item.min_trim !== null && item.min_trim !== undefined && item.min_trim !== '' ? item.min_trim : 0,
-          max_trim: item.max_trim !== null && item.max_trim !== undefined && item.max_trim !== '' ? item.max_trim : 10,
-        }));
-        
-        const response = await axios.post('/api/roll-trim-by-corrugator/batch', specsToSave);
-        
-        if (response.data.errors && response.data.errors.length > 0) {
-          const errorCount = response.data.errors.length;
-          Swal.fire({
-            icon: 'error',
-            title: 'Batch Save Error',
-            text: `${errorCount} specifications could not be saved.`,
-          });
-          console.error('Errors saving specifications:', response.data.errors);
-        } else {
-          // Update items with the returned results
-          if (response.data.results && response.data.results.length > 0) {
-            response.data.results.forEach(result => {
-              const item = items.value.find(i => i.flute_id === result.flute_id);
-              if (item) {
-                item.min_trim = result.min_trim;
-                item.max_trim = result.max_trim;
-              }
-            });
-          }
-          
-          Swal.fire({
-            icon: 'success',
-            title: 'Save Successful',
-            text: `All roll trim specifications have been saved.`,
-          });
-        }
-      } catch (error) {
-        console.error('Error saving specifications:', error);
-        let errorMessage = 'Failed to save specifications';
-        if (error.response && error.response.data) {
-          if (error.response.data.message) {
-            errorMessage += `: ${error.response.data.message}`;
-          } else if (error.response.data.errors) {
-            const firstError = Object.values(error.response.data.errors)[0];
-            errorMessage += `: ${Array.isArray(firstError) ? firstError[0] : firstError}`;
-          }
-        } else {
-          errorMessage += `: ${error.message}`;
-        }
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: errorMessage,
-        });
-      } finally {
-        loading.value = false;
-      }
-    };
-
-    // Watch for changes to min_trim and update max_trim accordingly
-    watch(items, (newItems) => {
-      newItems.forEach(item => {
-        watch(() => item.min_trim, () => updateMaxTrim(item), { immediate: true });
-      });
-    }, { deep: true });
-
-    onMounted(loadData);
-
-    return {
-      loading,
-      items,
-      filteredItems,
-      paginatedItems,
-      searchQuery,
-      savingCompute,
-      currentPage,
-      itemsPerPage,
-      totalPages,
-      filterItems,
-      saveChanges,
-      toggleCompute,
-      showNotification,
-      nextPage,
-      prevPage,
-      updateMaxTrim,
-    };
+    }
+    
+    toast.success(`${flute.flute_code} ${field.replace('_', ' ')} updated.`);
+  } catch (error) {
+    console.error(`Error updating ${field}:`, error);
+    toast.error(error.response?.data?.message || `Failed to update ${field}.`);
+    loadData();
+  } finally {
+    savingStatus.value[statusKey] = false;
   }
-});
+};
+
+const toggleCompute = async (flute) => {
+  if (toggleLoading.value[flute.id]) return;
+  toggleLoading.value[flute.id] = true;
+  
+  try {
+    const updatedFluteData = { ...flute, compute: !flute.compute };
+    const response = await _saveTrimData(updatedFluteData);
+    
+    const index = flutes.value.findIndex(f => f.id === flute.id);
+    if (index !== -1) {
+      flutes.value[index].compute = !flute.compute;
+      if (response.data.results.length > 0 && !flutes.value[index].trim_id) {
+        flutes.value[index].trim_id = response.data.results[0].id;
+      }
+    }
+    
+    toast.success(`Compute for ${flute.flute_code} updated.`);
+      } catch (error) {
+    console.error('Error toggling compute:', error);
+    toast.error(error.response?.data?.message || 'Failed to update compute status.');
+    const index = flutes.value.findIndex(f => f.id === flute.id);
+    if (index !== -1) {
+      flutes.value[index].compute = flute.compute;
+    }
+      } finally {
+    toggleLoading.value[flute.id] = false;
+  }
+};
+
+// UI Methods
+const sortBy = (field) => {
+  if (sortOrder.value.field === field) {
+    sortOrder.value.direction = sortOrder.value.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortOrder.value.field = field;
+    sortOrder.value.direction = 'asc';
+  }
+};
+
+const printTrims = () => {
+  window.location.href = '/standard-formula/setup-roll-trim-by-corrugator/view-print';
+};
+
+// Lifecycle
+onMounted(loadData);
+
 </script>
 
-<style>
-/* No additional styles needed */
+<style scoped>
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center justify-center whitespace-nowrap;
+}
+.btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow transition flex items-center justify-center whitespace-nowrap;
+}
+.btn-info {
+  @apply bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center justify-center whitespace-nowrap;
+}
+.btn-blue {
+  @apply bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition flex items-center justify-center whitespace-nowrap;
+}
+tbody tr {
+  transition: all 0.2s;
+}
+tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
 </style>

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class SideTrimByFluteController extends Controller
 {
@@ -63,16 +64,19 @@ class SideTrimByFluteController extends Controller
                 'compute' => 'required|boolean',
             ]);
 
-            $sideTrim = SideTrimByFlute::updateOrCreate(
-                [
-                    'flute_id' => $validated['flute_id'],
-                    'compute' => $validated['compute'],
-                ],
-                [
-                    'length_add' => $validated['length_add'],
-                    'length_less' => $validated['length_less'],
-                ]
-            );
+            // Check if a record with this flute_id and compute status already exists
+            $existing = SideTrimByFlute::where('flute_id', $validated['flute_id'])
+                ->where('compute', $validated['compute'])
+                ->first();
+
+            if ($existing) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'A record with this flute and compute status already exists.',
+                ], 422);
+            }
+
+            $sideTrim = SideTrimByFlute::create($validated);
 
             return response()->json([
                 'status' => 'success',
@@ -102,23 +106,51 @@ class SideTrimByFluteController extends Controller
                 'flute_id' => 'required|exists:paper_flutes,id',
                 'length_add' => 'required|integer|min:0',
                 'length_less' => 'required|integer|min:0',
-                'compute' => 'required|boolean',
+                'compute' => 'required|in:0,1,true,false,TRUE,FALSE',
             ]);
 
-            // Check if there's already a record with the same flute_id and compute value (excluding this record)
-            $duplicate = SideTrimByFlute::where('flute_id', $validated['flute_id'])
-                ->where('compute', $validated['compute'])
-                ->where('id', '!=', $id)
-                ->first();
-                
-            if ($duplicate) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'A record with this flute and compute status already exists',
-                ], 422);
+            // Normalize compute value with multiple input type handling
+            if (is_string($validated['compute'])) {
+                $computeValue = strtolower($validated['compute']) === 'true' || $validated['compute'] === '1';
+            } elseif (is_numeric($validated['compute'])) {
+                $computeValue = $validated['compute'] == 1;
+            } else {
+                $computeValue = (bool)$validated['compute'];
             }
 
-            $sideTrim->update($validated);
+            // Check if this compute status already exists for the same flute
+            $existingRecord = SideTrimByFlute::where('flute_id', $validated['flute_id'])
+                ->where('compute', $computeValue)
+                    ->where('id', '!=', $id)
+                    ->first();
+                    
+            if ($existingRecord) {
+                    return response()->json([
+                        'status' => 'error',
+                    'message' => 'A record with the same flute and compute status already exists',
+                    ], 422);
+            }
+
+            // Extensive logging for compute toggle
+            \Illuminate\Support\Facades\Log::channel('single')->info('Side Trim Compute Toggle Debug', [
+                'record_id' => $id,
+                'current_compute' => $sideTrim->compute,
+                'incoming_compute' => $computeValue,
+                'incoming_raw' => $request->input('compute'),
+                'request_data' => $request->all(),
+                'validated_data' => $validated
+            ]);
+
+            // Update the record
+            $sideTrim->update([
+                'flute_id' => $validated['flute_id'],
+                'length_add' => $validated['length_add'],
+                'length_less' => $validated['length_less'],
+                'compute' => $computeValue,
+            ]);
+
+            // Reload the record to get the latest data
+            $sideTrim->refresh();
 
             // Load the relationship to include in the response
             $sideTrim->load('paperFlute');
@@ -141,7 +173,7 @@ class SideTrimByFluteController extends Controller
             
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to update side trim data: Database error',
+                'message' => 'Failed to update side trim data',
                 'error' => $e->getMessage()
             ], 500);
         } catch (\Exception $e) {
@@ -282,7 +314,7 @@ class SideTrimByFluteController extends Controller
                 '*.flute_id' => 'required|exists:paper_flutes,id',
                 '*.length_add' => 'required|integer|min:0',
                 '*.length_less' => 'required|integer|min:0',
-                '*.compute' => 'required|boolean',
+                '*.compute' => 'required|in:0,1,true,false,TRUE,FALSE',
             ]);
 
             if ($validator->fails()) {
@@ -300,12 +332,38 @@ class SideTrimByFluteController extends Controller
                 try {
                     $sideTrim = SideTrimByFlute::find($item['id']);
                     if ($sideTrim) {
+                        // Normalize compute value with multiple input type handling
+                        if (is_string($item['compute'])) {
+                            $computeValue = strtolower($item['compute']) === 'true' || $item['compute'] === '1';
+                        } elseif (is_numeric($item['compute'])) {
+                            $computeValue = $item['compute'] == 1;
+                        } else {
+                            $computeValue = (bool)$item['compute'];
+                        }
+
+                        // Check if this compute status already exists for the same flute
+                        $existingRecord = SideTrimByFlute::where('flute_id', $item['flute_id'])
+                            ->where('compute', $computeValue)
+                            ->where('id', '!=', $item['id'])
+                            ->first();
+
+                        if ($existingRecord) {
+                            $errors[] = "A record with the same flute and compute status already exists for ID {$item['id']}";
+                            continue;
+                        }
+
+                        // Update the record
                         $sideTrim->update([
                             'flute_id' => $item['flute_id'],
                             'length_add' => $item['length_add'],
                             'length_less' => $item['length_less'],
-                            'compute' => $item['compute'],
+                            'compute' => $computeValue,
                         ]);
+
+                        // Reload the record to get the latest data
+                        $sideTrim->refresh();
+                        $sideTrim->load('paperFlute');
+
                         $updated++;
                     } else {
                         $errors[] = "Side trim with ID {$item['id']} not found";
@@ -326,6 +384,42 @@ class SideTrimByFluteController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to update side trims',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Diagnostic method to help understand compute toggle issues
+     */
+    public function diagnosticComputeToggle(Request $request)
+    {
+        try {
+            // Get all side trims
+            $sideTrims = SideTrimByFlute::with('paperFlute')->get();
+            
+            // Prepare diagnostic information
+            $diagnosticInfo = $sideTrims->map(function ($trim) {
+                return [
+                    'id' => $trim->id,
+                    'flute_code' => $trim->paperFlute->code ?? 'N/A',
+                    'compute' => $trim->compute,
+                    'length_add' => $trim->length_add,
+                    'length_less' => $trim->length_less
+                ];
+            });
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Diagnostic information retrieved',
+                'data' => $diagnosticInfo
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Diagnostic Compute Toggle Error: ' . $e->getMessage());
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to retrieve diagnostic information',
                 'error' => $e->getMessage()
             ], 500);
         }

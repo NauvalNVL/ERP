@@ -22,10 +22,10 @@ class RollTrimByCorrugator extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'corrugator_name',
-        'flute_code',
-        'trim_value',
+        'flute_id',
         'compute',
+        'min_trim',
+        'max_trim',
     ];
 
     /**
@@ -35,7 +35,6 @@ class RollTrimByCorrugator extends Model
      */
     protected $casts = [
         'compute' => 'boolean',
-        'trim_value' => 'float',
     ];
 
     /**
@@ -43,6 +42,6 @@ class RollTrimByCorrugator extends Model
      */
     public function paperFlute()
     {
-        return $this->belongsTo(PaperFlute::class, 'flute_code', 'code');
+        return $this->belongsTo(PaperFlute::class, 'flute_id');
     }
 } 

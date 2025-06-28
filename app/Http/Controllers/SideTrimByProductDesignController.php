@@ -10,6 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Schema;
 
 class SideTrimByProductDesignController extends Controller
 {
@@ -35,27 +39,11 @@ class SideTrimByProductDesignController extends Controller
     public function apiIndex()
     {
         try {
-            $sideTrims = SideTrimByProductDesign::with(['productDesign', 'product', 'paperFlute'])->get();
-            
-            // Transform data to match desktop version format
-            $transformedData = $sideTrims->map(function ($trim) {
-                return [
-                    'id' => $trim->id,
-                    'product_design_id' => $trim->product_design_id,
-                    'product_id' => $trim->product_id,
-                    'flute_id' => $trim->flute_id,
-                    'product_design' => null,  // Set to null to match desktop version
-                    'product' => null,         // Set to null to match desktop version
-                    'paper_flute' => $trim->paperFlute,
-                    'is_composite' => $trim->is_composite,
-                    'length_less' => $trim->length_less,
-                    'length_add' => $trim->length_add
-                ];
-            });
+            $sideTrims = SideTrimByProductDesign::with('paperFlute', 'productDesign', 'product')->get();
             
             return response()->json([
                 'status' => 'success',
-                'data' => $transformedData
+                'data' => $sideTrims
             ]);
         } catch (\Exception $e) {
             Log::error('Error retrieving side trims by product design: ' . $e->getMessage());
@@ -69,38 +57,49 @@ class SideTrimByProductDesignController extends Controller
     }
 
     /**
-     * Store a new side trim record or update if exists.
+     * Store a new side trim record.
      */
     public function apiStore(Request $request)
     {
         try {
+            Log::info('Received side trim data:', $request->all());
             $validated = $request->validate([
                 'product_design_id' => 'required|exists:product_designs,id',
                 'product_id' => 'required|exists:products,id',
                 'flute_id' => 'required|exists:paper_flutes,id',
-                'length_add' => 'required|integer|min:0',
-                'length_less' => 'required|integer|min:0',
-                'is_composite' => 'required|boolean',
+                'length_add' => 'nullable|integer|min:0',
+                'length_less' => 'nullable|integer|min:0',
+                'compute' => 'required|boolean',
             ]);
 
-            $sideTrim = SideTrimByProductDesign::updateOrCreate(
-                [
-                    'product_design_id' => $validated['product_design_id'],
-                    'product_id' => $validated['product_id'],
-                    'flute_id' => $validated['flute_id'],
-                ],
-                [
-                    'length_add' => $validated['length_add'],
-                    'length_less' => $validated['length_less'],
-                    'is_composite' => $validated['is_composite'],
-                ]
-            );
+            // Prevent duplicates
+            $existing = SideTrimByProductDesign::where('product_design_id', $validated['product_design_id'])
+                ->where('product_id', $validated['product_id'])
+                ->where('flute_id', $validated['flute_id'])
+                ->first();
 
+            if ($existing) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'This combination already exists'
+                ], 422);
+            }
+            
+            $dataToCreate = $validated;
+            $dataToCreate['length_add'] = $validated['length_add'] ?? 0;
+            $dataToCreate['length_less'] = $validated['length_less'] ?? 0;
+
+            SideTrimByProductDesign::create($dataToCreate);
+            
+            return response()->json(['status' => 'success', 'message' => 'Side trim added successfully']);
+        } catch (ValidationException $e) {
+            Log::error('Validation errors:', $e->errors());
             return response()->json([
-                'status' => 'success',
-                'message' => 'Side trim data saved successfully',
-                'data' => $sideTrim
-            ]);
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+                'input' => $request->all()
+            ], 422);
         } catch (\Exception $e) {
             Log::error('Error saving side trim by product design: ' . $e->getMessage());
             
@@ -124,18 +123,40 @@ class SideTrimByProductDesignController extends Controller
                 'product_design_id' => 'required|exists:product_designs,id',
                 'product_id' => 'required|exists:products,id',
                 'flute_id' => 'required|exists:paper_flutes,id',
-                'length_add' => 'required|integer|min:0',
-                'length_less' => 'required|integer|min:0',
-                'is_composite' => 'required|boolean',
+                'length_add' => 'nullable|integer|min:0',
+                'length_less' => 'nullable|integer|min:0',
+                'compute' => 'required|boolean',
             ]);
+
+            // Prevent duplicates on update
+            $existing = SideTrimByProductDesign::where('product_design_id', $validated['product_design_id'])
+                ->where('product_id', $validated['product_id'])
+                ->where('flute_id', $validated['flute_id'])
+                ->where('id', '!=', $id)
+                ->first();
+
+            if ($existing) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'This combination already exists'
+                ], 422);
+            }
 
             $sideTrim->update($validated);
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Side trim data updated successfully',
+                'message' => 'Side trim updated successfully',
                 'data' => $sideTrim
             ]);
+        } catch (ValidationException $e) {
+            Log::error('Validation errors:', $e->errors());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+                'input' => $request->all()
+            ], 422);
         } catch (\Exception $e) {
             Log::error('Error updating side trim by product design: ' . $e->getMessage());
             
@@ -156,10 +177,7 @@ class SideTrimByProductDesignController extends Controller
             $sideTrim = SideTrimByProductDesign::findOrFail($id);
             $sideTrim->delete();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Side trim data deleted successfully'
-            ]);
+            return response()->json(['status' => 'success', 'message' => 'Side trim deleted successfully']);
         } catch (\Exception $e) {
             Log::error('Error deleting side trim by product design: ' . $e->getMessage());
             
@@ -177,136 +195,154 @@ class SideTrimByProductDesignController extends Controller
     public function apiExport()
     {
         try {
-            $sideTrims = SideTrimByProductDesign::with(['productDesign', 'product', 'paperFlute'])->get();
-            
-            // Set the filename
-            $filename = 'side_trim_by_product_design_' . date('Y-m-d') . '.csv';
-            
-            // Create CSV content with headers
-            $headers = [
-                'Product Design', 
-                'Product', 
-                'Flute', 
-                'Composite', 
-                'Length Less (mm)', 
-                'Length Add (mm)', 
-                'Created At', 
-                'Updated At'
-            ];
-            
-            $callback = function() use ($sideTrims, $headers) {
-                $file = fopen('php://output', 'w');
-                
-                // Add headers
-                fputcsv($file, $headers);
-                
-                // Add data rows
-                foreach ($sideTrims as $trim) {
-                    fputcsv($file, [
-                        $trim->productDesign ? $trim->productDesign->code : 'N/A',
-                        $trim->product ? $trim->product->code : 'N/A',
-                        $trim->paperFlute ? $trim->paperFlute->code : 'N/A',
-                        $trim->is_composite ? 'Yes' : 'No',
-                        $trim->length_less,
-                        $trim->length_add,
-                        $trim->created_at->format('Y-m-d H:i:s'),
-                        $trim->updated_at->format('Y-m-d H:i:s'),
-                    ]);
-                }
-                
-                fclose($file);
-            };
-            
-            // Return a downloadable response
-            return response()->stream($callback, 200, [
-                'Content-Type' => 'text/csv',
-                'Content-Disposition' => "attachment; filename=\"$filename\"",
-            ]);
+            // This part can be implemented with a library like Laravel Excel
+            // For now, we'll just return a placeholder response
+            return response()->json(['message' => 'Export functionality not yet implemented'], 501);
         } catch (\Exception $e) {
             Log::error('Error exporting side trim data: ' . $e->getMessage());
-            
+            return response()->json(['status' => 'error', 'message' => 'Failed to export data'], 500);
+        }
+    }
+
+    /**
+     * Seed the database with initial side trim data.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiSeed()
+    {
+        try {
+            // Use the seeder to populate the data
+            Artisan::call('db:seed', [
+                '--class' => 'SideTrimByProductDesignSeeder',
+                '--force' => true // Use force in production
+            ]);
+
             return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to export side trim data',
+                'success' => true,
+                'message' => 'Side trim data seeded successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to seed side trim data.',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * API: Seed initial data for side trims by product design
+     * Batch update side trim records.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function apiSeed()
+    public function apiBatchUpdate(Request $request)
     {
         try {
-            // Get all product designs, products, and flutes
-            $productDesigns = ProductDesign::all();
-            $products = Product::all();
-            $flutes = PaperFlute::all();
+            // Log the full request data with sensitive information masked
+            $logData = $request->except(['_token']);
+            Log::info('Received batch update data for side trims', [
+                'count' => count($logData),
+                'sample' => array_slice($logData, 0, 2)
+            ]);
             
-            if ($productDesigns->count() === 0 || $products->count() === 0 || $flutes->count() === 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Missing required data. Please ensure ProductDesign, Product, and PaperFlute models have data.'
-                ], 400);
-            }
+            // Validate the entire request
+            $validated = $request->validate([
+                '*.id' => 'required|exists:side_trims_by_product_design,id',
+                '*.product_design_id' => 'required|exists:product_designs,id',
+                '*.product_id' => 'required|exists:products,id',
+                '*.flute_id' => 'required|exists:paper_flutes,id',
+                '*.length_add' => 'nullable|integer|min:0',
+                '*.length_less' => 'nullable|integer|min:0',
+                '*.compute' => 'required|boolean',
+            ]);
 
-            $count = 0;
-            $maxEntries = 60; // Limit the number of entries to avoid creating too many
-            
-            // Create sample data
-            foreach ($productDesigns->take(5) as $design) {
-                foreach ($products->take(4) as $product) {
-                    foreach ($flutes->take(3) as $flute) {
-                        // Create a non-composite entry
-                        SideTrimByProductDesign::updateOrCreate(
-                            [
-                                'product_design_id' => $design->id,
-                                'product_id' => $product->id,
-                                'flute_id' => $flute->id,
-                            ],
-                            [
-                                'length_add' => rand(10, 30),
-                                'length_less' => rand(5, 20),
-                                'is_composite' => false,
-                            ]
-                        );
-                        $count++;
-                        
-                        // Create a composite entry for some combinations
-                        if (rand(0, 1) > 0) {
-                            SideTrimByProductDesign::updateOrCreate(
-                                [
-                                    'product_design_id' => $design->id,
-                                    'product_id' => $product->id,
-                                    'flute_id' => $flute->id,
-                                ],
-                                [
-                                    'length_add' => rand(20, 40),
-                                    'length_less' => rand(10, 25),
-                                    'is_composite' => true,
-                                ]
-                            );
-                            $count++;
-                        }
-                        
-                        if ($count >= $maxEntries) {
-                            break 3; // Exit all loops if we've reached the maximum
-                        }
+            $errors = [];
+            $updatedCount = 0;
+            $processedIds = [];
+
+            // Use a database transaction to ensure data integrity
+            DB::beginTransaction();
+
+            foreach ($validated as $data) {
+                try {
+                    // Find the side trim record
+                    $sideTrim = SideTrimByProductDesign::findOrFail($data['id']);
+                    
+                    // Explicitly set each attribute
+                    $sideTrim->product_design_id = $data['product_design_id'];
+                    $sideTrim->product_id = $data['product_id'];
+                    $sideTrim->flute_id = $data['flute_id'];
+                    $sideTrim->length_add = $data['length_add'] ?? 0;
+                    $sideTrim->length_less = $data['length_less'] ?? 0;
+                    
+                    // Determine which column to update based on database schema
+                    $computeColumn = Schema::hasColumn('side_trims_by_product_design', 'compute') 
+                        ? 'compute' 
+                        : 'is_composite';
+                    
+                    $sideTrim->setAttribute($computeColumn, $data['compute']);
+
+                    // Check for duplicate combination
+                    $existingTrim = SideTrimByProductDesign::where('product_design_id', $data['product_design_id'])
+                        ->where('product_id', $data['product_id'])
+                        ->where('flute_id', $data['flute_id'])
+                        ->where('id', '!=', $data['id'])
+                        ->first();
+
+                    if ($existingTrim) {
+                        throw new \Exception('Duplicate combination for product design, product, and flute');
                     }
+
+                    $sideTrim->save();
+                    $updatedCount++;
+                    $processedIds[] = $data['id'];
+                } catch (\Exception $e) {
+                    // Log individual record update errors
+                    Log::error("Error updating side trim {$data['id']}: " . $e->getMessage(), [
+                        'data' => $data,
+                        'error' => $e->getMessage()
+                    ]);
+                    $errors[] = [
+                        'id' => $data['id'],
+                        'message' => $e->getMessage()
+                    ];
                 }
             }
-            
-            return response()->json([
-                'success' => true,
-                'message' => "Side trim by product design data seeded successfully ($count records created)"
-            ]);
+
+            // Commit the transaction if all updates are successful
+            DB::commit();
+
+            // Prepare response based on update results
+            $response = [
+                'status' => !empty($errors) ? 'partial_success' : 'success',
+                'updated_count' => $updatedCount,
+                'processed_ids' => $processedIds,
+            ];
+
+            if (!empty($errors)) {
+                $response['errors'] = $errors;
+                Log::warning('Batch update completed with errors', $response);
+                return response()->json($response, 206);
+            }
+
+            Log::info('Batch update completed successfully', $response);
+            return response()->json($response);
+
         } catch (\Exception $e) {
-            Log::error('Error seeding side trim by product design data: ' . $e->getMessage());
+            // Rollback the transaction in case of any unexpected errors
+            DB::rollBack();
+
+            Log::error('Batch update error: ' . $e->getMessage(), [
+                'error_details' => $e->getTraceAsString(),
+                'input' => $request->all()
+            ]);
             
             return response()->json([
-                'success' => false,
-                'message' => 'Failed to seed data: ' . $e->getMessage()
+                'status' => 'error',
+                'message' => 'An error occurred during the batch update.',
+                'error_details' => $e->getMessage()
             ], 500);
         }
     }
