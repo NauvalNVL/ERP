@@ -1,36 +1,36 @@
 <template>
     <AppLayout :header="'Define Customer Sales Type'">
-        <!-- Header -->
+                <!-- Header -->
         <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 p-6 rounded-t-lg shadow-lg overflow-hidden relative mb-6">
             <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
             <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
             <div class="flex items-center">
                 <div class="bg-gradient-to-br from-purple-500 to-indigo-600 p-3 rounded-lg shadow-inner flex items-center justify-center mr-4">
                     <i class="fas fa-tags text-white text-2xl z-10"></i>
-                </div>
-                <div>
+                            </div>
+    <div>
                     <h2 class="text-2xl md:text-3xl font-bold text-white mb-1 text-shadow">Define Customer Sales Type</h2>
                     <p class="text-indigo-100">Kelola tipe penjualan customer dengan mudah</p>
                 </div>
-            </div>
-        </div>
+                            </div>
+                        </div>
         <div class="max-w-7xl mx-auto">
             <!-- Card Container -->
             <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <!-- Action Buttons -->
                 <div class="flex items-center space-x-3 mb-4">
                     <button @click="refreshData" class="action-btn bg-gradient-to-r from-green-500 to-green-600">
-                        <i class="fas fa-sync-alt"></i>
+                                <i class="fas fa-sync-alt"></i>
                     </button>
                     <button @click="showSalesTypeModal = true" class="action-btn bg-gradient-to-r from-blue-500 to-cyan-500">
                         <i class="fas fa-search"></i>
-                    </button>
+                            </button>
                 </div>
                 <!-- Table -->
                 <div class="overflow-x-auto rounded-lg border border-gray-100">
                     <table class="min-w-full text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
+                            <thead class="bg-gray-50">
+                                <tr>
                                 <th class="px-4 py-3 text-left font-semibold text-gray-600 w-1/2">
                                     <span class="inline-flex items-center">
                                         <i class="fas fa-id-card text-cyan-500 mr-2"></i>
@@ -49,55 +49,55 @@
                                         Actions
                                     </span>
                                 </th>
-                            </tr>
-                        </thead>
+                                </tr>
+                            </thead>
                         <tbody class="divide-y divide-gray-100">
                             <tr v-for="customer in filteredCustomers" :key="customer.customer_code" :class="{'bg-blue-50': selectedCustomer && selectedCustomer.customer_code === customer.customer_code, 'hover:bg-cyan-50': true}">
                                 <td class="px-4 py-2 font-mono">
                                     <span class="font-bold text-blue-700">{{ customer.customer_code }}</span>
                                     <span class="ml-2 text-gray-700">{{ customer.customer_name }}</span>
-                                </td>
+                                    </td>
                                 <td class="px-4 py-2">
                                     <input type="text" v-model="customer.sales_type" class="border border-gray-300 rounded-md px-3 py-1 w-20 text-center font-semibold" maxlength="2" @change="updateSalesType(customer)" />
-                                </td>
+                                    </td>
                                 <td class="px-4 py-2">
                                     <button class="text-blue-600 hover:text-blue-800 mr-3" @click="saveCustomerSalesType(customer)">
-                                        <i class="fas fa-save"></i>
-                                    </button>
+                                            <i class="fas fa-save"></i>
+                                        </button>
                                     <button class="text-gray-500 hover:text-gray-700" @click="openSalesTypeSelector(customer)">
                                         <i class="fas fa-table"></i>
                                     </button>
-                                </td>
-                            </tr>
-                            <tr v-if="filteredCustomers.length === 0">
+                                    </td>
+                                </tr>
+                                <tr v-if="filteredCustomers.length === 0">
                                 <td colspan="3" class="px-4 py-8 text-center text-gray-400">No customers found. Please adjust your search criteria.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                </tr>
+                            </tbody>
+                        </table>
                 </div>
             </div>
-            <!-- Sales Type Selector Modal -->
-            <div v-if="showSalesTypeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div class="bg-white rounded-lg shadow-xl w-80">
-                    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-4 py-3 rounded-t-lg flex justify-between items-center">
-                        <h3 class="font-medium">Select Sales Type</h3>
-                        <button @click="showSalesTypeModal = false" class="text-white hover:text-gray-200">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="p-4 space-y-2">
+        <!-- Sales Type Selector Modal -->
+        <div v-if="showSalesTypeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-80">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-4 py-3 rounded-t-lg flex justify-between items-center">
+                    <h3 class="font-medium">Select Sales Type</h3>
+                    <button @click="showSalesTypeModal = false" class="text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="p-4 space-y-2">
                         <button class="w-full text-left px-4 py-2 hover:bg-blue-50 rounded-md flex items-center" @click="selectSalesType('LC')">
-                            <span class="w-8">LC</span>
-                            <span class="ml-2">Local</span>
-                        </button>
+                        <span class="w-8">LC</span>
+                        <span class="ml-2">Local</span>
+                    </button>
                         <button class="w-full text-left px-4 py-2 hover:bg-blue-50 rounded-md flex items-center" @click="selectSalesType('EX')">
-                            <span class="w-8">EX</span>
-                            <span class="ml-2">Export</span>
-                        </button>
+                        <span class="w-8">EX</span>
+                        <span class="ml-2">Export</span>
+                    </button>
                     </div>
                 </div>
             </div>
-        </div>
+    </div>
     </AppLayout>
 </template>
 

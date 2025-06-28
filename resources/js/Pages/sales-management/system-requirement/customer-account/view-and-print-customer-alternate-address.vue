@@ -34,8 +34,8 @@
                         <i class="fas fa-print text-white"></i>
                       </div>
                       <span>Print</span>
-                    </div>
-                  </button>
+    </div>
+                </button>
                   <button @click="exportToExcel" class="bg-gradient-to-r from-green-600 to-teal-500 text-white hover:from-green-700 hover:to-teal-600 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md relative overflow-hidden group">
                     <span class="absolute inset-0 bg-white opacity-20 transform scale-x-0 origin-left transition-transform group-hover:scale-x-100"></span>
                     <div class="relative z-10 flex items-center">
@@ -44,7 +44,7 @@
                       </div>
                       <span>Export to Excel</span>
                     </div>
-                  </button>
+                </button>
                 </div>
               </div>
             </div>
@@ -78,9 +78,9 @@
                   Search:
                 </label>
                 <div class="relative flex-grow">
-                  <input 
-                    type="text" 
-                    v-model="searchTerm" 
+                    <input 
+                        type="text" 
+                        v-model="searchTerm" 
                     class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                     placeholder="Search by customer name, code, or address..."
                   />
@@ -99,12 +99,12 @@
                   Record Status:
                 </label>
                 <select 
-                  v-model="recordStatus" 
+                    v-model="recordStatus" 
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                 >
-                  <option value="both">All Records</option>
-                  <option value="Active">Active Only</option>
-                  <option value="Obsolete">Obsolete Only</option>
+                    <option value="both">All Records</option>
+                    <option value="Active">Active Only</option>
+                    <option value="Obsolete">Obsolete Only</option>
                 </select>
               </div>
               
@@ -120,7 +120,7 @@
                 </button>
               </div>
             </div>
-          </div>
+            </div>
         </div>
 
         <!-- Data Table -->
@@ -129,67 +129,67 @@
             <div class="flex items-center">
               <div class="mr-4 bg-white bg-opacity-20 p-2 rounded-full shadow-inner">
                 <i class="fas fa-table text-2xl"></i>
-              </div>
-              <div>
+                </div>
+    <div>
                 <h2 class="text-xl font-bold">Customer Alternate Addresses Data</h2>
                 <p class="text-sm opacity-80">View and manage customer alternate address information</p>
-              </div>
+                </div>
             </div>
-          </div>
-          
+        </div>
+
           <div class="overflow-x-auto bg-white rounded-lg" id="printable-table">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gradient-to-r from-cyan-50 to-blue-50">
-                <tr>
+                    <tr>
                   <th @click="sortBy('customer_name')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                     <div class="flex items-center">
                       <span>Customer Name</span>
-                      <i class="fas fa-sort ml-1"></i>
+                            <i class="fas fa-sort ml-1"></i>
                     </div>
-                  </th>
+                        </th>
                   <th @click="sortBy('customer_code')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                     <div class="flex items-center">
                       <span>Customer Code</span>
-                      <i class="fas fa-sort ml-1"></i>
+                            <i class="fas fa-sort ml-1"></i>
                     </div>
-                  </th>
+                        </th>
                   <th @click="sortBy('address')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                     <div class="flex items-center">
                       <span>Address</span>
-                      <i class="fas fa-sort ml-1"></i>
+                            <i class="fas fa-sort ml-1"></i>
                     </div>
-                  </th>
+                        </th>
                   <th @click="sortBy('city')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                     <div class="flex items-center">
                       <span>City</span>
-                      <i class="fas fa-sort ml-1"></i>
+                            <i class="fas fa-sort ml-1"></i>
                     </div>
-                  </th>
+                        </th>
                   <th @click="sortBy('phone')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                     <div class="flex items-center">
                       <span>Phone</span>
-                      <i class="fas fa-sort ml-1"></i>
+                            <i class="fas fa-sort ml-1"></i>
                     </div>
-                  </th>
+                        </th>
                   <th @click="sortBy('status')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                     <div class="flex items-center">
                       <span>Status</span>
-                      <i class="fas fa-sort ml-1"></i>
+                            <i class="fas fa-sort ml-1"></i>
                     </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-if="loading">
-                  <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                    <div class="flex justify-center items-center">
-                      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                      <span class="ml-3">Loading data...</span>
-                    </div>
-                  </td>
-                </tr>
-                <tr v-else-if="filteredAddresses.length === 0">
-                  <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-if="loading">
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                            <div class="flex justify-center items-center">
+                                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                <span class="ml-3">Loading data...</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr v-else-if="filteredAddresses.length === 0">
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
                     <div class="flex flex-col items-center">
                       <i class="fas fa-map-marker-alt text-4xl text-gray-300 mb-2"></i>
                       <p class="text-lg font-medium">No customer alternate addresses found</p>
@@ -198,39 +198,39 @@
                         <button @click="searchTerm = ''; recordStatus = 'both'" class="mt-2 text-blue-500 hover:underline">Clear filters</button>
                       </template>
                     </div>
-                  </td>
-                </tr>
+                        </td>
+                    </tr>
                 <tr v-for="(address, index) in filteredAddresses" :key="address.id" 
                     :class="{'bg-blue-50': index % 2 === 0}" 
                     class="hover:bg-blue-100 transition-colors">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {{ address.customer_name }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ address.customer_code }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ address.address }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ address.city }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ address.phone }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <span :class="{
-                      'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full': true,
-                      'bg-green-100 text-green-800': address.status === 'Active',
-                      'bg-red-100 text-red-800': address.status === 'Obsolete'
-                    }">
-                      {{ address.status }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ address.customer_name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ address.customer_code }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ address.address }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ address.city }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ address.phone }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span :class="{
+                                'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full': true,
+                                'bg-green-100 text-green-800': address.status === 'Active',
+                                'bg-red-100 text-red-800': address.status === 'Obsolete'
+                            }">
+                                {{ address.status }}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
-          </div>
+        </div>
 
           <!-- Table Footer -->
           <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
@@ -263,8 +263,8 @@
               </ul>
             </div>
           </div>
+            </div>
         </div>
-      </div>
     </div>
     </AppLayout>
 </template>

@@ -30,57 +30,57 @@
                 <div class="absolute -top-16 -right-16 w-40 h-40 bg-cyan-200 rounded-full opacity-30"></div>
                 <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-teal-200 rounded-full opacity-30"></div>
                 <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
-                  <div class="p-2 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-lg mr-4 shadow-md">
-                    <i class="fas fa-edit text-white"></i>
-                  </div>
-                  <h3 class="text-xl font-semibold text-gray-800">Customer Group Management</h3>
+                    <div class="p-2 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-lg mr-4 shadow-md">
+                        <i class="fas fa-edit text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800">Customer Group Management</h3>
                 </div>
                 <!-- Search and Actions -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10">
-                  <div class="md:col-span-2">
-                    <label for="searchQuery" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                      <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 text-white mr-3 shadow-md">
-                        <i class="fas fa-search text-xs"></i>
+                    <div class="md:col-span-2">
+                      <label for="searchQuery" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 text-white mr-3 shadow-md">
+                          <i class="fas fa-search text-xs"></i>
                       </span>
-                      Find Customer Group
-                    </label>
-                    <div class="relative flex group">
-                      <input id="searchQuery" type="text" v-model="searchQuery" placeholder="Search by code or description..." class="input-field">
-                      <button type="button" @click="showModal = true" class="lookup-button from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+                        Find Customer Group
+                      </label>
+                      <div class="relative flex group">
+                        <input id="searchQuery" type="text" v-model="searchQuery" placeholder="Search by code or description..." class="input-field">
+                        <button type="button" @click="showModal = true" class="lookup-button from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
                         <i class="fas fa-table"></i>
                       </button>
                     </div>
                   </div>
-                  <div class="md:col-span-1 flex flex-col justify-end">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
-                    <button type="button" @click="createNewCustomerGroup" class="primary-button group w-full">
-                      <span class="shimmer-effect"></span>
-                      <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300"></i>
-                      Add New Group
+                    <div class="md:col-span-1 flex flex-col justify-end">
+                      <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
+                      <button type="button" @click="createNewCustomerGroup" class="primary-button group w-full">
+                          <span class="shimmer-effect"></span>
+                          <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300"></i>
+                          Add New Group
                     </button>
                   </div>
                 </div>
                 <!-- Data Status Information -->
                 <div class="relative z-10 mt-4 p-4 rounded-lg shadow-inner border" :class="{
-                  'bg-yellow-50 border-yellow-200 text-yellow-800': loading || customerGroups.length === 0,
-                  'bg-green-50 border-green-200 text-green-800': !loading && customerGroups.length > 0
-                }">
-                  <div v-if="loading" class="flex items-center">
-                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-700 mr-3"></div>
-                    <p class="text-sm font-medium">Loading customer group data...</p>
+                    'bg-yellow-50 border-yellow-200 text-yellow-800': loading || customerGroups.length === 0,
+                    'bg-green-50 border-green-200 text-green-800': !loading && customerGroups.length > 0
+                  }">
+                    <div v-if="loading" class="flex items-center">
+                      <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-700 mr-3"></div>
+                      <p class="text-sm font-medium">Loading customer group data...</p>
+                    </div>
+                    <div v-else-if="customerGroups.length === 0">
+                      <p class="text-sm font-medium">No customer group data available.</p>
+                      <p class="text-xs text-yellow-700 mt-1">Make sure the database is configured and seeders have been run.</p>
+                      <button @click="loadSeedData" class="mt-2 text-xs px-3 py-1 rounded-md transition-colors bg-yellow-400 text-yellow-900 hover:bg-yellow-500">
+                          Run Customer Group Seeder
+                      </button>
                   </div>
-                  <div v-else-if="customerGroups.length === 0">
-                    <p class="text-sm font-medium">No customer group data available.</p>
-                    <p class="text-xs text-yellow-700 mt-1">Make sure the database is configured and seeders have been run.</p>
-                    <button @click="loadSeedData" class="mt-2 text-xs px-3 py-1 rounded-md transition-colors bg-yellow-400 text-yellow-900 hover:bg-yellow-500">
-                      Run Customer Group Seeder
-                    </button>
-                  </div>
-                  <div v-else>
-                    <p class="text-sm font-medium">Data ready: {{ customerGroups.length }} customer groups found.</p>
-                    <p v-if="selectedRow" class="text-xs text-green-700 mt-1">
-                      Selected: <span class="font-semibold">{{ selectedRow.group_code }}</span> - {{ selectedRow.description }}
-                    </p>
+                    <div v-else>
+                      <p class="text-sm font-medium">Data ready: {{ customerGroups.length }} customer groups found.</p>
+                  <p v-if="selectedRow" class="text-xs text-green-700 mt-1">
+                    Selected: <span class="font-semibold">{{ selectedRow.group_code }}</span> - {{ selectedRow.description }}
+                  </p>
                   </div>
                 </div>
               </div>
@@ -138,9 +138,9 @@
                     </div>
                   </a>
                 </div>
+                </div>
               </div>
             </div>
-          </div>
         </div>
     </div>
 

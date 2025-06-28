@@ -473,7 +473,7 @@ export default {
                 await router.post(route('update-customer-account.store'), form)
             } catch (error) {
                 console.error('Error saving customer account:', error)
-            }
+                 }
         }
 
         return {
@@ -532,11 +532,11 @@ export default {
 }
 .shimmer-effect {
   @apply absolute top-0 -left-[150%] h-full w-[50%] skew-x-[-25deg] bg-white/20 pointer-events-none;
-  animation: shimmer 2.5s infinite;
+    animation: shimmer 2.5s infinite;
 }
 @keyframes shimmer {
-  100% {
-    left: 150%;
-  }
+    100% {
+        left: 150%;
+    }
 }
 </style>
