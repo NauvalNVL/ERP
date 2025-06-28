@@ -2,94 +2,180 @@
     <AppLayout :header="'View & Print Customer Alternate Addresses'">
     <Head title="View & Print Customer Alternate Addresses" />
 
-    <!-- Header Section -->
-    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-print mr-3"></i> View & Print Customer Alternate Addresses
-        </h2>
-        <p class="text-cyan-100">Preview and print customer alternate address data</p>
+    <!-- Main Container with vibrant gradient background -->
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 p-4 md:p-6">
+      <div class="max-w-7xl mx-auto">
+        <!-- Header Section with animated elements -->
+        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 rounded-xl shadow-lg overflow-hidden mb-6 transform transition-all duration-500 hover:shadow-xl">
+          <div class="relative overflow-hidden">
+            <!-- Decorative Elements -->
+            <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
+            <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
+            <div class="absolute bottom-0 right-0 w-32 h-32 bg-cyan-400 opacity-5 rounded-full translate-y-10 translate-x-10"></div>
+            
+            <div class="p-6 md:p-8 relative z-10">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="flex items-start md:items-center space-x-4 mb-4 md:mb-0">
+                  <div class="bg-gradient-to-br from-cyan-500 to-teal-600 p-3 rounded-lg shadow-inner flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-blue-300 opacity-30 rounded-full animate-ping-slow"></div>
+                    <div class="absolute -bottom-1 -left-1 w-4 h-4 bg-teal-300 opacity-30 rounded-full animate-ping-slow animation-delay-500"></div>
+                    <i class="fas fa-map-marker-alt text-white text-2xl z-10"></i>
+                  </div>
+                  <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-white text-shadow">View & Print Customer Alternate Addresses</h1>
+                    <p class="text-teal-100 max-w-2xl">Preview and print customer alternate address data</p>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                  <button @click="printTable" class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md relative overflow-hidden group">
+                    <span class="absolute inset-0 bg-white opacity-20 transform scale-x-0 origin-left transition-transform group-hover:scale-x-100"></span>
+                    <div class="relative z-10 flex items-center">
+                      <div class="bg-white bg-opacity-30 rounded-full p-1 mr-2">
+                        <i class="fas fa-print text-white"></i>
+                      </div>
+                      <span>Print</span>
     </div>
-
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
-        <!-- Actions Bar -->
-        <div class="flex flex-wrap items-center justify-between mb-6">
-            <div class="flex items-center space-x-2 mb-3 sm:mb-0">
-                <button @click="printTable" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                    <i class="fas fa-print mr-2"></i> Print
                 </button>
-                <button @click="exportToExcel" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
-                    <i class="fas fa-file-excel mr-2"></i> Export to Excel
+                  <button @click="exportToExcel" class="bg-gradient-to-r from-green-600 to-teal-500 text-white hover:from-green-700 hover:to-teal-600 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md relative overflow-hidden group">
+                    <span class="absolute inset-0 bg-white opacity-20 transform scale-x-0 origin-left transition-transform group-hover:scale-x-100"></span>
+                    <div class="relative z-10 flex items-center">
+                      <div class="bg-white bg-opacity-30 rounded-full p-1 mr-2">
+                        <i class="fas fa-file-excel text-white"></i>
+                      </div>
+                      <span>Export to Excel</span>
+                    </div>
                 </button>
+                </div>
+              </div>
             </div>
-            <div class="flex items-center space-x-2">
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                        <i class="fas fa-search"></i>
-                    </span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+          <div class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 px-6">
+            <div class="flex items-center">
+              <div class="mr-3 bg-white bg-opacity-20 p-2 rounded-full shadow-inner relative overflow-hidden">
+                <div class="absolute -top-1 -right-1 w-4 h-4 bg-cyan-300 opacity-30 rounded-full"></div>
+                <div class="absolute -bottom-1 -left-1 w-3 h-3 bg-teal-300 opacity-30 rounded-full"></div>
+                <i class="fas fa-filter text-xl relative z-10"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold">Search Parameters</h2>
+                <p class="text-xs text-cyan-100 opacity-80">Filter customer alternate addresses by various criteria</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-6">
+            <!-- Actions Bar -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Search Field -->
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-blue-700 mb-2 flex items-center">
+                  <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                    <i class="fas fa-search text-white text-sm"></i>
+                  </div>
+                  Search:
+                </label>
+                <div class="relative flex-grow">
                     <input 
                         type="text" 
                         v-model="searchTerm" 
-                        placeholder="Search..." 
-                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
-                    >
+                    class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                    placeholder="Search by customer name, code, or address..."
+                  />
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-gray-400"></i>
+                  </div>
                 </div>
+              </div>
+              
+              <!-- Status Filter -->
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-blue-700 mb-2 flex items-center">
+                  <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
+                    <i class="fas fa-tag text-white text-sm"></i>
+                  </div>
+                  Record Status:
+                </label>
                 <select 
                     v-model="recordStatus" 
-                    class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                 >
                     <option value="both">All Records</option>
                     <option value="Active">Active Only</option>
                     <option value="Obsolete">Obsolete Only</option>
                 </select>
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="flex items-end">
+                <button @click="searchTerm = ''; recordStatus = 'both'" class="px-6 py-2.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 text-gray-700 transition-all duration-300 shadow-sm flex items-center mr-3">
+                  <i class="fas fa-undo mr-2 text-gray-500"></i>
+                  Reset Filters
+                </button>
+                <button @click="fetchData()" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-lg transition-all duration-300 shadow-md flex items-center">
+                  <i class="fas fa-sync mr-2"></i>
+                  Refresh Data
+                </button>
+              </div>
             </div>
-        </div>
-
-        <!-- Instructions Card -->
-        <div class="bg-teal-50 border border-teal-200 rounded-lg p-4 mb-6">
-            <div class="flex items-start">
-                <div class="text-teal-600 mr-3 mt-1">
-                    <i class="fas fa-info-circle text-xl"></i>
-                </div>
-    <div>
-                    <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
-                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                        <li>Use the search box to filter by customer name, code, or address</li>
-                        <li>Click the column headers to sort the data</li>
-                        <li>Use the status filter to show active or obsolete records</li>
-                        <li>Click the print button to print the current view</li>
-                    </ul>
-                </div>
             </div>
         </div>
 
         <!-- Data Table -->
-        <div class="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-md" id="printable-table">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 px-6">
+            <div class="flex items-center">
+              <div class="mr-4 bg-white bg-opacity-20 p-2 rounded-full shadow-inner">
+                <i class="fas fa-table text-2xl"></i>
+                </div>
+    <div>
+                <h2 class="text-xl font-bold">Customer Alternate Addresses Data</h2>
+                <p class="text-sm opacity-80">View and manage customer alternate address information</p>
+                </div>
+            </div>
+        </div>
+
+          <div class="overflow-x-auto bg-white rounded-lg" id="printable-table">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+              <thead class="bg-gradient-to-r from-cyan-50 to-blue-50">
                     <tr>
-                        <th @click="sortBy('customer_name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            Customer Name
+                  <th @click="sortBy('customer_name')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <div class="flex items-center">
+                      <span>Customer Name</span>
                             <i class="fas fa-sort ml-1"></i>
+                    </div>
                         </th>
-                        <th @click="sortBy('customer_code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            Customer Code
+                  <th @click="sortBy('customer_code')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <div class="flex items-center">
+                      <span>Customer Code</span>
                             <i class="fas fa-sort ml-1"></i>
+                    </div>
                         </th>
-                        <th @click="sortBy('address')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            Address
+                  <th @click="sortBy('address')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <div class="flex items-center">
+                      <span>Address</span>
                             <i class="fas fa-sort ml-1"></i>
+                    </div>
                         </th>
-                        <th @click="sortBy('city')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            City
+                  <th @click="sortBy('city')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <div class="flex items-center">
+                      <span>City</span>
                             <i class="fas fa-sort ml-1"></i>
+                    </div>
                         </th>
-                        <th @click="sortBy('phone')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            Phone
+                  <th @click="sortBy('phone')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <div class="flex items-center">
+                      <span>Phone</span>
                             <i class="fas fa-sort ml-1"></i>
+                    </div>
                         </th>
-                        <th @click="sortBy('status')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            Status
+                  <th @click="sortBy('status')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <div class="flex items-center">
+                      <span>Status</span>
                             <i class="fas fa-sort ml-1"></i>
+                    </div>
                         </th>
                     </tr>
                 </thead>
@@ -104,10 +190,19 @@
                     </tr>
                     <tr v-else-if="filteredAddresses.length === 0">
                         <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                            No customer alternate addresses found
+                    <div class="flex flex-col items-center">
+                      <i class="fas fa-map-marker-alt text-4xl text-gray-300 mb-2"></i>
+                      <p class="text-lg font-medium">No customer alternate addresses found</p>
+                      <template v-if="searchTerm || recordStatus !== 'both'">
+                        <p class="mt-2 text-sm">No results match your search criteria</p>
+                        <button @click="searchTerm = ''; recordStatus = 'both'" class="mt-2 text-blue-500 hover:underline">Clear filters</button>
+                      </template>
+                    </div>
                         </td>
                     </tr>
-                    <tr v-for="address in filteredAddresses" :key="address.id" class="hover:bg-gray-50">
+                <tr v-for="(address, index) in filteredAddresses" :key="address.id" 
+                    :class="{'bg-blue-50': index % 2 === 0}" 
+                    class="hover:bg-blue-100 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {{ address.customer_name }}
                         </td>
@@ -137,10 +232,37 @@
             </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="flex items-center justify-between mt-4">
-            <div class="text-sm text-gray-500">
-                Showing {{ filteredAddresses.length }} of {{ addresses.length }} entries
+          <!-- Table Footer -->
+          <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                <span>Showing {{ filteredAddresses.length }} of {{ addresses.length }} entries</span>
+              </div>
+              <div class="text-xs text-gray-400">Generated: {{ new Date().toLocaleString() }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instructions Card -->
+        <div class="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-xl p-6 mb-6 shadow-md">
+          <div class="flex items-start">
+            <div class="text-teal-600 mr-4 mt-1">
+              <div class="w-10 h-10 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full flex items-center justify-center shadow-sm">
+                <i class="fas fa-info-circle text-white text-lg"></i>
+              </div>
+            </div>
+            <div class="flex-1">
+              <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-3">Instructions</h4>
+              <ul class="list-disc pl-5 text-sm text-gray-600 space-y-2">
+                <li>Use the search box to filter by customer name, code, or address</li>
+                <li>Click the column headers to sort the data</li>
+                <li>Use the status filter to show active or obsolete records</li>
+                <li>Click the print button to print the current view</li>
+                <li>Use the export button to download data in Excel format</li>
+              </ul>
+            </div>
+          </div>
             </div>
         </div>
     </div>
@@ -251,6 +373,34 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes pulse-slow {
+    0%, 100% { transform: scale(1); opacity: 0.05; }
+    50% { transform: scale(1.1); opacity: 0.08; }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 5s infinite;
+}
+
+.animation-delay-500 { 
+    animation-delay: 0.5s; 
+}
+
+@keyframes ping-slow {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+.animate-ping-slow {
+    animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
 @media print {
     .no-print {
         display: none !important;

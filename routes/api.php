@@ -27,8 +27,16 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeControlle
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxGroupController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController;
+<<<<<<< HEAD
 use App\Http\Controllers\WarehouseLocationController;
 use App\Http\Controllers\CustomerSalesTypeController;
+=======
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmLocationController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController;
+use App\Http\Controllers\WarehouseLocationController;
+use App\Http\Controllers\FgDoConfigController;
+>>>>>>> e2ce3c4ee637ae2a229d9f87dc8591a2009115fc
 
 /*
 |--------------------------------------------------------------------------
@@ -208,6 +216,46 @@ Route::put('/material-management/tax-groups/{code}', [MmTaxGroupController::clas
 Route::delete('/material-management/tax-groups/{code}', [MmTaxGroupController::class, 'destroy']);
 Route::post('/material-management/tax-groups/seed', [MmTaxGroupController::class, 'seed']); 
 
+<<<<<<< HEAD
+=======
+    // SKU Routes
+    Route::get('/skus', [MmSkuController::class, 'getSkus']);
+    Route::get('/skus/{sku}', [MmSkuController::class, 'show']);
+    Route::post('/skus', [MmSkuController::class, 'store']);
+    Route::put('/skus/{sku}', [MmSkuController::class, 'update']);
+    Route::delete('/skus/{sku}', [MmSkuController::class, 'destroy']);
+    Route::patch('/skus/{sku}/toggle-active', [MmSkuController::class, 'toggleActive']);
+    Route::get('/skus-for-print', [MmSkuController::class, 'getSkusForPrint']);
+    Route::post('/skus/seed', [MmSkuController::class, 'seedSampleData']);
+    Route::get('/sku-types', [MmSkuController::class, 'getTypes']);
+    Route::get('/sku-uoms', [MmSkuController::class, 'getUoms']);
+});
+
+// Add to the end of the file
+Route::get('/material-management/control-period', [MmControlPeriodController::class, 'getControlPeriod']);
+Route::post('/material-management/control-period', [MmControlPeriodController::class, 'updateControlPeriod']);
+Route::get('/material-management/transaction-types', [MmTransactionTypeController::class, 'getTransactionTypes']);
+Route::post('/material-management/transaction-types', [MmTransactionTypeController::class, 'store']);
+Route::get('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'show']);
+Route::put('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'update']);
+Route::delete('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'destroy']); 
+
+// Add Tax Type API routes
+Route::get('/material-management/tax-types', [MmTaxTypeController::class, 'getTaxTypes']);
+Route::post('/material-management/tax-types', [MmTaxTypeController::class, 'store']);
+Route::get('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'show']);
+Route::put('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'update']);
+Route::delete('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'destroy']); 
+
+// Add Tax Group API routes
+Route::get('/material-management/tax-groups', [MmTaxGroupController::class, 'getTaxGroups']);
+Route::post('/material-management/tax-groups', [MmTaxGroupController::class, 'store']);
+Route::get('/material-management/tax-groups/{code}', [MmTaxGroupController::class, 'show']);
+Route::put('/material-management/tax-groups/{code}', [MmTaxGroupController::class, 'update']);
+Route::delete('/material-management/tax-groups/{code}', [MmTaxGroupController::class, 'destroy']);
+Route::post('/material-management/tax-groups/seed', [MmTaxGroupController::class, 'seed']); 
+
+>>>>>>> e2ce3c4ee637ae2a229d9f87dc8591a2009115fc
 // Add Receive Destination API routes
 Route::get('/material-management/receive-destinations', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'getReceiveDestinations']);
 Route::post('/material-management/receive-destinations', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'store']);
@@ -226,7 +274,17 @@ Route::put('/material-management/analysis-codes/{code}', [MmAnalysisCodeControll
 Route::delete('/material-management/analysis-codes/{code}', [MmAnalysisCodeController::class, 'destroy']);
 Route::post('/material-management/analysis-codes/seed', [MmAnalysisCodeController::class, 'seed']); 
 
+<<<<<<< HEAD
 Route::get('/material-management/control-periods/summary', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'getControlPeriodSummary']);
+=======
+Route::get('/material-management/control-periods/summary', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'getControlPeriodSummary']); 
+
+// FgDoConfig API routes
+Route::prefix('fg-do-config')->group(function () {
+    Route::get('/', [FgDoConfigController::class, 'getConfig']);
+    Route::post('/', [FgDoConfigController::class, 'updateConfig']);
+});
+>>>>>>> e2ce3c4ee637ae2a229d9f87dc8591a2009115fc
 
 // Warehouse Location API routes
 Route::prefix('warehouse-locations')->group(function () {
@@ -235,8 +293,13 @@ Route::prefix('warehouse-locations')->group(function () {
     Route::get('/{code}', [WarehouseLocationController::class, 'show']);
     Route::put('/{code}', [WarehouseLocationController::class, 'update']);
     Route::delete('/{code}', [WarehouseLocationController::class, 'destroy']);
+<<<<<<< HEAD
     Route::get('/json', [WarehouseLocationController::class, 'getWarehouseLocationsJson']); // For search/listing in modal
 }); 
 
 Route::get('/customer-sales-types', [CustomerSalesTypeController::class, 'index']);
 Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'store']); 
+=======
+    Route::get('/json', [WarehouseLocationController::class, 'getWarehouseLocationsJson'])->name('warehouse-locations.json'); // For search/listing in modal
+}); 
+>>>>>>> e2ce3c4ee637ae2a229d9f87dc8591a2009115fc

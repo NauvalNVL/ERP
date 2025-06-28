@@ -47,21 +47,21 @@
                   <i class="fas fa-truck"></i>
                 </span>
                 Delivery Code
-              </label>
+                    </label>
               <div class="flex">
                 <input type="text" class="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:ring-2 focus:ring-pink-400" v-model="deliveryCode" />
                 <button type="button" class="bg-gradient-to-br from-pink-400 to-purple-500 text-white px-3 rounded-r-lg hover:from-pink-500 hover:to-purple-600 transition" @click="openDeliveryLookup">
                   <i class="fas fa-search"></i>
                 </button>
-              </div>
+                  </div>
               <!-- New Delivery Code input and button below -->
               <div class="flex mt-3">
                 <input type="text" class="flex-1 border border-gray-300 rounded-l-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400" v-model="newDeliveryCode" placeholder="Enter new delivery code..." />
                 <button type="button" class="bg-gradient-to-br from-yellow-400 to-orange-400 text-white px-3 rounded-r-lg hover:from-yellow-500 hover:to-orange-500 transition" @click="handleAddDeliveryCode">
                   <i class="fas fa-search"></i>
                 </button>
-              </div>
-            </div>
+                  </div>
+                </div>
                 <!-- Action Buttons -->
             <div class="flex space-x-3 mt-8 justify-end">
               <button type="button" class="action-btn bg-gradient-to-r from-red-500 to-pink-500" @click="handlePower">
@@ -114,7 +114,7 @@
             <a href="#" class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition">
               <span class="inline-flex items-center justify-center w-9 h-9 bg-green-400 rounded-lg mr-3">
                 <i class="fas fa-print text-white text-xl"></i>
-              </span>
+                  </span>
               <div>
                 <div class="font-bold text-green-800">View & Print</div>
                 <div class="text-xs text-green-700">Print customer list</div>
@@ -127,7 +127,7 @@
               <div>
                 <div class="font-bold text-blue-800">Customer Groups</div>
                 <div class="text-xs text-blue-700">Manage customer groups</div>
-              </div>
+            </div>
             </a>
           </div>
         </div>

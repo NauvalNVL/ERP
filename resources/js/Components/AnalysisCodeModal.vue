@@ -1,124 +1,159 @@
 <template>
-  <transition name="modal-fade">
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div class="bg-white rounded-lg shadow-xl overflow-hidden w-11/12 md:w-2/3 lg:w-1/2 max-h-[90vh] flex flex-col">
-        <!-- Modal Header -->
-        <div class="px-6 py-4 bg-gray-100 border-b border-gray-200 flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-gray-800">Analysis Code Table</h3>
-          <button @click="close" class="text-gray-500 hover:text-gray-700">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none backdrop-blur-sm bg-black bg-opacity-50 transition-opacity duration-300">
+        <div class="relative w-full max-w-3xl mx-auto my-6 transform transition-all duration-300 scale-100 opacity-100" :class="{'scale-95 opacity-0': !show}">
+            <!-- Modal content -->
+            <div class="relative flex flex-col w-full bg-white border-0 rounded-xl shadow-2xl outline-none focus:outline-none overflow-hidden">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-6 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-xl shadow-md">
+                    <h3 class="text-2xl font-bold text-white">
+                        Analysis Code Table
+                    </h3>
+                    <button 
+                        class="p-2 ml-auto bg-transparent border-0 text-white hover:text-gray-200 transition-colors duration-200 text-3xl leading-none font-semibold outline-none focus:outline-none"
+                        @click="$emit('close')"
+                    >
+                        <span class="block outline-none focus:outline-none transform hover:rotate-90 transition-transform duration-300">
+                            ×
+                        </span>
           </button>
         </div>
-
-        <!-- Modal Body - Analysis Code List Table -->
-        <div class="flex-grow overflow-auto p-4">
-          <table class="min-w-full divide-y divide-gray-200 border border-gray-200">
-            <thead class="bg-gray-50">
+                <!-- Modal body -->
+                <div class="relative p-6 flex-auto max-h-[70vh] overflow-y-auto custom-scrollbar">
+                    <div class="mb-6">
+                        <input 
+                            type="text" 
+                            v-model="searchQuery"
+                            @input="debouncedSearch"
+                            placeholder="Search by Code or Name..."
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        />
+                    </div>
+                    <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-blue-50">
               <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group2</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Code</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Grouping</th>
+                                    <th scope="col" class="relative px-6 py-3"><span class="sr-only">Select</span></th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr 
-                v-for="(analysisCode, index) in filteredAnalysisCodes" 
-                :key="index" 
-                @click="selectAnalysisCode(analysisCode)"
-                :class="{'bg-blue-100': selectedAnalysisCode === analysisCode, 'hover:bg-gray-50 cursor-pointer': true}"
-              >
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ analysisCode.code }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ analysisCode.name }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ analysisCode.group }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ analysisCode.group2 }}</td>
+                                <tr v-for="code in filteredAnalysisCodes" :key="code.code" @click="selectAnalysisCode(code)" class="hover:bg-blue-50 cursor-pointer transition-colors duration-150">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ code.code }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.grouping }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button @click.stop="selectAnalysisCode(code)" class="text-blue-600 hover:text-blue-900 font-semibold transition-colors duration-150">Select</button>
+                                    </td>
+                                </tr>
+                                <tr v-if="filteredAnalysisCodes.length === 0">
+                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No analysis codes found.</td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        <!-- Modal Footer -->
-        <div class="px-6 py-4 bg-gray-100 border-t border-gray-200 flex justify-end space-x-3">
+                </div>
+                <!-- Modal footer -->
+                <div class="flex items-center justify-end p-6 bg-gray-50 border-t border-solid border-gray-200 rounded-b-xl">
           <button 
-            @click="emitSelectedAnalysisCode" 
-            :disabled="!selectedAnalysisCode"
-            class="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Select
-          </button>
-          <button 
-            @click="close" 
-            class="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200"
+                        class="text-gray-700 bg-gray-200 hover:bg-gray-300 font-bold uppercase px-6 py-2 text-sm rounded-lg shadow hover:shadow-md outline-none focus:outline-none mr-3 transition-all duration-150"
+                        type="button"
+                        @click="$emit('close')"
           >
             Exit
           </button>
         </div>
       </div>
     </div>
-  </transition>
+    </div>
+    <div v-if="show" class="fixed inset-0 z-40 bg-black opacity-50 transition-opacity duration-300"></div>
 </template>
 
-<script>
-export default {
-  props: {
-    modalType: {
-      type: String,
-      required: true,
-      validator: (value) => ['amend', 'cancel', 'close'].includes(value),
+<script setup>
+import { defineProps, defineEmits, ref, watch, computed } from 'vue';
+import debounce from 'lodash/debounce';
+import axios from 'axios';
+
+const props = defineProps({
+    show: {
+        type: Boolean,
+        default: false,
     },
-  },
-  data() {
-    return {
-      allAnalysisCodes: {
-        amend: [
-          { code: 'AM01', name: 'EDIT SO', group: 'SO', group2: 'AM' },
-          { code: 'AM02', name: 'EDIT HARGA SO MISS TRIM', group: 'SO', group2: 'AM' },
-          { code: 'AM03', name: 'EDIT HARGA', group: 'SO', group2: 'AM' },
-        ],
-        cancel: [
-          { code: 'CL01', name: 'SALAH INPUT', group: 'SO', group2: 'CL' },
-          { code: 'CL02', name: 'PO BATAL (PERMINTAAN CUSTOMER)', group: 'SO', group2: 'CL' },
-        ],
-        close: [
-          { code: 'CM01', name: 'GANTI HARGA BARU', group: 'SO', group2: 'CM' },
-          { code: 'CM02', name: 'DISCONTINUE', group: 'SO', group2: 'CM' },
-          { code: 'CM03', name: 'PO TIDAK LUNAS/KURANG PRODUKSI', group: 'SO', group2: 'CM' },
-          { code: 'CM04', name: 'PO SELESAI', group: 'SO', group2: 'CM' },
-        ],
-      },
-      selectedAnalysisCode: null,
-    };
-  },
-  computed: {
-    filteredAnalysisCodes() {
-      return this.allAnalysisCodes[this.modalType] || [];
+    grouping: {
+        type: String,
+        default: null,
     },
-  },
-  methods: {
-    selectAnalysisCode(code) {
-      this.selectedAnalysisCode = code;
-    },
-    emitSelectedAnalysisCode() {
-      if (this.selectedAnalysisCode) {
-        this.$emit('analysis-code-selected', this.selectedAnalysisCode.code);
-      }
-      this.close();
-    },
-    close() {
-      this.selectedAnalysisCode = null; 
-      this.$emit('close');
-    },
-  },
+});
+
+const emits = defineEmits(['close', 'select-analysis-code']);
+
+const searchQuery = ref('');
+const analysisCodes = ref([]);
+
+const fetchAnalysisCodes = async (grouping = null) => {
+    try {
+        const response = await axios.get(route('api.material-management.analysis-codes'), {
+            params: { grouping: grouping }
+        });
+        analysisCodes.value = response.data;
+    } catch (error) {
+        console.error('Error fetching analysis codes:', error);
+    }
 };
+
+const filteredAnalysisCodes = computed(() => {
+    if (!searchQuery.value) {
+        return analysisCodes.value;
+    }
+    const query = searchQuery.value.toLowerCase();
+    return analysisCodes.value.filter(code => 
+        code.code.toLowerCase().includes(query) || 
+        code.name.toLowerCase().includes(query)
+    );
+});
+
+const selectAnalysisCode = (code) => {
+    emits('select-analysis-code', code);
+    emits('close');
+};
+
+const debouncedSearch = debounce(() => {
+    // Re-filter the already fetched data
+}, 300);
+
+watch(() => props.show, (newValue) => {
+    if (newValue) {
+        fetchAnalysisCodes(props.grouping);
+        searchQuery.value = ''; // Reset search query when modal opens
+    }
+});
+
+watch(() => props.grouping, (newGrouping) => {
+    if (props.show) {
+        fetchAnalysisCodes(newGrouping);
+    }
+});
+
 </script>
 
 <style scoped>
-.modal-fade-enter-active, .modal-fade-leave-active {
-  transition: opacity 0.3s ease;
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
 }
-.modal-fade-enter, .modal-fade-leave-to {
-  opacity: 0;
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 </style> 

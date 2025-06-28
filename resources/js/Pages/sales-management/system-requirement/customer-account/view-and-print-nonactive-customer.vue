@@ -15,12 +15,15 @@
             </div>
         </div>
 
-        <!-- Form Content -->
+        <!-- Main Content -->
         <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-cyan-50">
-            <div class="max-w-4xl mx-auto">
-                 <div class="bg-white p-8 rounded-lg shadow-lg border-t-4 border-cyan-500 transition-all duration-300 hover:shadow-xl relative overflow-hidden">
-                    <div class="absolute -top-20 -right-20 w-40 h-40 bg-cyan-50 rounded-full opacity-50"></div>
-                    <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-teal-50 rounded-full opacity-50"></div>
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left: Main Form (col-span-2) -->
+                    <div class="lg:col-span-2">
+                        <div class="relative bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100 p-8 rounded-2xl shadow-2xl border-t-4 border-cyan-500 overflow-hidden mb-8 animate-fade-in-up">
+                            <div class="absolute -top-16 -right-16 w-40 h-40 bg-cyan-200 rounded-full opacity-30"></div>
+                            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-teal-200 rounded-full opacity-30"></div>
                     
                     <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
                         <div class="p-2 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-lg mr-4 shadow-md">
@@ -172,6 +175,77 @@
                             </button>
                         </div>
                     </form>
+                        </div>
+                    </div>
+
+                    <!-- Right: Information & Quick Links (col-span-1) -->
+                    <div class="flex flex-col space-y-6">
+                        <!-- Information Card -->
+                        <div class="bg-white rounded-xl shadow-md border-t-4 border-blue-400 p-6">
+                            <div class="flex items-center mb-2">
+                                <div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-400 to-teal-400 rounded-lg mr-3">
+                                    <i class="fas fa-info text-white text-2xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800">Information</h3>
+                            </div>
+                            <hr class="my-2 border-blue-100">
+                            <div class="text-gray-700 mb-4">
+                                Gunakan form ini untuk menghasilkan laporan customer yang tidak aktif. Pastikan semua kriteria yang dimasukkan sudah benar dan sesuai kebutuhan.
+                            </div>
+                            <div class="bg-blue-50 rounded-lg p-4">
+                                <div class="font-bold text-blue-700 mb-2">Petunjuk:</div>
+                                <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
+                                    <li>Pilih periode sales yang akan dianalisis</li>
+                                    <li>Tentukan range kode salesman jika diperlukan</li>
+                                    <li>Tentukan range kode customer jika diperlukan</li>
+                                    <li>Pilih status customer (Active/Obsolete)</li>
+                                    <li>Tentukan kriteria customer dengan S/O</li>
+                                    <li>Set jumlah bulan non-aktif minimum</li>
+                                    <li>Klik Print untuk menghasilkan laporan</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Quick Links Card -->
+                        <div class="bg-white rounded-xl shadow-md border-t-4 border-purple-400 p-6">
+                            <div class="flex items-center mb-2">
+                                <div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg mr-3">
+                                    <i class="fas fa-link text-white text-2xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800">Quick Links</h3>
+                            </div>
+                            <hr class="my-2 border-purple-100">
+                            <div class="space-y-3 mt-4">
+                                <a href="#" class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition">
+                                    <span class="inline-flex items-center justify-center w-9 h-9 bg-green-400 rounded-lg mr-3">
+                                        <i class="fas fa-users text-white text-xl"></i>
+                                    </span>
+                                    <div>
+                                        <div class="font-bold text-green-800">Customer Group</div>
+                                        <div class="text-xs text-green-700">Manage customer groups</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="flex items-center p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition">
+                                    <span class="inline-flex items-center justify-center w-9 h-9 bg-blue-400 rounded-lg mr-3">
+                                        <i class="fas fa-user-edit text-white text-xl"></i>
+                                    </span>
+                                    <div>
+                                        <div class="font-bold text-blue-800">Update Customer</div>
+                                        <div class="text-xs text-blue-700">Update customer accounts</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="flex items-center p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition">
+                                    <span class="inline-flex items-center justify-center w-9 h-9 bg-purple-400 rounded-lg mr-3">
+                                        <i class="fas fa-map-marker-alt text-white text-xl"></i>
+                                    </span>
+                                    <div>
+                                        <div class="font-bold text-purple-800">Alternate Address</div>
+                                        <div class="text-xs text-purple-700">Manage customer addresses</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                  </div>
             </div>
         </div>

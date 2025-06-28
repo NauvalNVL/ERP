@@ -66,7 +66,7 @@
                                         <label for="whse_location_normal" class="block text-sm font-medium text-gray-700 mb-1">Whse Location [Normal]:</label>
                                         <div class="relative flex group">
                                             <input type="text" id="whse_location_normal" v-model="form.whseLocationNormal" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" />
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
+                                            <button type="button" @click="openWarehouseLocationModal('normal')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
                                                 <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
                                                 <i class="fas fa-search relative z-10"></i>
                                             </button>
@@ -76,7 +76,7 @@
                                         <label for="whse_location_excess" class="block text-sm font-medium text-gray-700 mb-1">Whse Location [Excess]:</label>
                                         <div class="relative flex group">
                                             <input type="text" id="whse_location_excess" v-model="form.whseLocationExcess" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" />
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
+                                            <button type="button" @click="openWarehouseLocationModal('excess')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
                                                 <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
                                                 <i class="fas fa-search relative z-10"></i>
                                             </button>
@@ -86,7 +86,7 @@
                                         <label for="whse_location_transit" class="block text-sm font-medium text-gray-700 mb-1">Whse Location [Transit]:</label>
                                         <div class="relative flex group">
                                             <input type="text" id="whse_location_transit" v-model="form.whseLocationTransit" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" />
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
+                                            <button type="button" @click="openWarehouseLocationModal('transit')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
                                                 <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
                                                 <i class="fas fa-search relative z-10"></i>
                                             </button>
@@ -102,8 +102,8 @@
                                     <div>
                                         <label for="stock_in_normal" class="block text-sm font-medium text-gray-700 mb-1">Stock-In - Normal:</label>
                                         <div class="relative flex group">
-                                            <input type="text" id="stock_in_normal" v-model="form.stockInNormal" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" value="SI01" />
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
+                                            <input type="text" id="stock_in_normal" v-model="form.stockInNormal" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" readonly />
+                                            <button type="button" @click="openAnalysisCodeModal('stock_in_normal', 'FGSI')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
                                                 <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
                                                 <i class="fas fa-search relative z-10"></i>
                                             </button>
@@ -112,8 +112,8 @@
                                     <div>
                                         <label for="stock_in_booking" class="block text-sm font-medium text-gray-700 mb-1">Stock-In for Booking:</label>
                                         <div class="relative flex group">
-                                            <input type="text" id="stock_in_booking" v-model="form.stockInBooking" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" value="SI01" />
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
+                                            <input type="text" id="stock_in_booking" v-model="form.stockInBooking" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" readonly />
+                                            <button type="button" @click="openAnalysisCodeModal('stock_in_booking', 'FGSI')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
                                                 <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
                                                 <i class="fas fa-search relative z-10"></i>
                                             </button>
@@ -122,8 +122,8 @@
                                     <div>
                                         <label for="stock_out_normal" class="block text-sm font-medium text-gray-700 mb-1">Stock-Out - Normal:</label>
                                         <div class="relative flex group">
-                                            <input type="text" id="stock_out_normal" v-model="form.stockOutNormal" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" value="SO01" />
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
+                                            <input type="text" id="stock_out_normal" v-model="form.stockOutNormal" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" readonly />
+                                            <button type="button" @click="openAnalysisCodeModal('stock_out_normal', 'FGSO')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
                                                 <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
                                                 <i class="fas fa-search relative z-10"></i>
                                             </button>
@@ -132,8 +132,8 @@
                                     <div>
                                         <label for="stock_out_booking" class="block text-sm font-medium text-gray-700 mb-1">Stock-Out for Booking:</label>
                                         <div class="relative flex group">
-                                            <input type="text" id="stock_out_booking" v-model="form.stockOutBooking" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" value="SO01" />
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
+                                            <input type="text" id="stock_out_booking" v-model="form.stockOutBooking" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" readonly />
+                                            <button type="button" @click="openAnalysisCodeModal('stock_out_booking', 'FGSO')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
                                                 <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
                                                 <i class="fas fa-search relative z-10"></i>
                                             </button>
@@ -142,8 +142,8 @@
                                     <div>
                                         <label for="warehouse_transfer" class="block text-sm font-medium text-gray-700 mb-1">Warehouse Transfer:</label>
                                         <div class="relative flex group">
-                                            <input type="text" id="warehouse_transfer" v-model="form.warehouseTransfer" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" value="WT01" />
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
+                                            <input type="text" id="warehouse_transfer" v-model="form.warehouseTransfer" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300" readonly />
+                                            <button type="button" @click="openAnalysisCodeModal('warehouse_transfer', 'FGTR')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
                                                 <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
                                                 <i class="fas fa-search relative z-10"></i>
                                             </button>
@@ -213,10 +213,6 @@
                                     <i class="fas fa-save"></i>
                                     <span>Save Configuration</span>
                                 </button>
-                                <button type="button" @click="openModal" class="ml-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white px-6 py-2 rounded-lg shadow-md flex items-center space-x-2 transition-all duration-300 transform active:scale-95">
-                                    <i class="fas fa-plus"></i>
-                                    <span>Open FG/DO Modal</span>
-                                </button>
                             </div>
                         </form>
                     </div>
@@ -248,19 +244,54 @@
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
                                             <i class="fas fa-check text-white text-xs"></i>
                                         </span>
-                                        <span>Fill in all required fields accurately.</span>
+                                        Define default warehouse locations and analysis codes for various finished goods transactions.
                                     </li>
                                     <li class="flex items-start">
-                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
                                             <i class="fas fa-check text-white text-xs"></i>
                                         </span>
-                                        <span>Click 'Save Configuration' to apply changes.</span>
+                                        Choose whether to lock customer warehouse locations, or specific customers.
                                     </li>
                                     <li class="flex items-start">
-                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
                                             <i class="fas fa-check text-white text-xs"></i>
                                         </span>
-                                        <span>Review settings after saving.</span>
+                                        Configure direct printing for stock-in, stock-out, and warehouse transfer transactions.
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                        </span>
+                                        Set the retention period for finished goods records after period-end closing.
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                        </span>
+                                        Click the search icon next to warehouse location fields to open a selection modal.
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                                <h4 class="text-sm font-semibold text-yellow-800 uppercase tracking-wider mb-2 flex items-center">
+                                    <span class="inline-flex items-center justify-center w-5 h-5 bg-yellow-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                        <i class="fas fa-exclamation text-white text-xs"></i>
+                                    </span>
+                                    Important Notes
+                                </h4>
+                                <ul class="text-sm text-gray-600 space-y-2">
+                                    <li class="flex items-start">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-yellow-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                            <i class="fas fa-info text-white text-xs"></i>
+                                        </span>
+                                        Ensure all default analysis codes are correctly configured to avoid transaction errors.
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-yellow-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                            <i class="fas fa-info text-white text-xs"></i>
+                                        </span>
+                                        Changes to period-end closing settings will affect historical data retention.
                                     </li>
                                 </ul>
                             </div>
@@ -269,18 +300,35 @@
                 </div>
             </div>
         </div>
+
+        <!-- FgDoConfig Modal -->
+        <FgDoConfigModal 
+            :show="showWarehouseLocationModal"
+            :warehouseLocations="warehouseLocations"
+            @close="closeWarehouseLocationModal"
+            @select-location="handleSelectLocation"
+        />
+
+        <!-- Analysis Code Modal -->
+        <AnalysisCodeModal 
+            :show="showAnalysisCodeModal"
+            :grouping="currentAnalysisCodeGrouping"
+            @close="closeAnalysisCodeModal"
+            @select-analysis-code="handleSelectAnalysisCode"
+        />
     </AppLayout>
 </template>
 
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Head } from '@inertiajs/vue3';
-import { ref, reactive } from 'vue'; // Import reactive
-import FgDoConfigModal from '@/Components/FgDoConfigModal.vue'; // Import the new modal component
+import { Head, usePage } from '@inertiajs/vue3';
+import { ref, reactive, onMounted } from 'vue';
+import FgDoConfigModal from '@/Components/FgDoConfigModal.vue';
+import AnalysisCodeModal from '@/Components/AnalysisCodeModal.vue';
+import axios from 'axios';
 
-const isModalOpen = ref(false);
+const page = usePage();
 
-// Reactive form data to hold the values for the input fields
 const form = reactive({
     lockCustomerLocation: 'N-No',
     whseLocationNormal: '',
@@ -297,29 +345,95 @@ const form = reactive({
     keepFgRecordsFor: '1',
 });
 
-const openModal = () => {
-    isModalOpen.value = true;
+const showWarehouseLocationModal = ref(false);
+const warehouseLocations = ref([]);
+const targetWhseField = ref(null);
+
+const showAnalysisCodeModal = ref(false);
+const targetAnalysisCodeField = ref(null);
+const currentAnalysisCodeGrouping = ref(null);
+
+const saveConfiguration = async () => {
+    try {
+        const response = await axios.post(route('api.fg-do-config'), form);
+        console.log('Configuration Saved:', response.data);
+        // Optionally, show a success message
+    } catch (error) {
+        console.error('Error saving configuration:', error);
+        // Optionally, show an error message
+    }
 };
 
-const closeModal = () => {
-    isModalOpen.value = false;
+const openWarehouseLocationModal = (field) => {
+    targetWhseField.value = field;
+    showWarehouseLocationModal.value = true;
 };
 
-const handleModalSave = () => {
-    // Logic when save button in modal is clicked
-    alert('Modal Save clicked (placeholder)!');
-    closeModal();
+const closeWarehouseLocationModal = () => {
+    showWarehouseLocationModal.value = false;
+    targetWhseField.value = null;
 };
 
-const saveConfiguration = () => {
-    // Logic to save configuration using form.value
-    console.log('Saving configuration:', form);
-    alert('Configuration saved (placeholder)!');
+const handleSelectLocation = (location) => {
+    if (targetWhseField.value === 'normal') {
+        form.whseLocationNormal = location.code;
+    } else if (targetWhseField.value === 'excess') {
+        form.whseLocationExcess = location.code;
+    } else if (targetWhseField.value === 'transit') {
+        form.whseLocationTransit = location.code;
+    }
 };
+
+const openAnalysisCodeModal = (field, grouping) => {
+    targetAnalysisCodeField.value = field;
+    currentAnalysisCodeGrouping.value = grouping;
+    showAnalysisCodeModal.value = true;
+};
+
+const closeAnalysisCodeModal = () => {
+    showAnalysisCodeModal.value = false;
+    targetAnalysisCodeField.value = null;
+    currentAnalysisCodeGrouping.value = null;
+};
+
+const handleSelectAnalysisCode = (code) => {
+    if (targetAnalysisCodeField.value === 'stock_in_normal') {
+        form.stockInNormal = code.code;
+    } else if (targetAnalysisCodeField.value === 'stock_in_booking') {
+        form.stockInBooking = code.code;
+    } else if (targetAnalysisCodeField.value === 'stock_out_normal') {
+        form.stockOutNormal = code.code;
+    } else if (targetAnalysisCodeField.value === 'stock_out_booking') {
+        form.stockOutBooking = code.code;
+    } else if (targetAnalysisCodeField.value === 'warehouse_transfer') {
+        form.warehouseTransfer = code.code;
+    }
+};
+
+const fetchWarehouseLocations = async () => {
+    try {
+        const response = await axios.get(route('api.warehouse-locations.json'));
+        warehouseLocations.value = response.data;
+    } catch (error) {
+        console.error('Error fetching warehouse locations:', error);
+    }
+};
+
+const fetchFgDoConfig = async () => {
+    try {
+        const response = await axios.get(route('api.fg-do-config'));
+        Object.assign(form, response.data);
+    } catch (error) {
+        console.error('Error fetching FG/DO config:', error);
+    }
+};
+
+onMounted(() => {
+    fetchWarehouseLocations();
+    fetchFgDoConfig();
+});
 </script>
 
 <style scoped>
-/* Component-specific styles if any, for now using Tailwind utility classes */
-</style>
-
-<FgDoConfigModal :show="isModalOpen" @close="closeModal" @save="handleModalSave" /> 
+/* Add any specific styles for this page here if necessary */
+</style> 
