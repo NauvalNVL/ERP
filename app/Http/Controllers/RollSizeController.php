@@ -35,9 +35,21 @@ class RollSizeController extends Controller
         try {
             $rollSizes = RollSize::with('paperFlute')->get();
             
+            $data = $rollSizes->map(function($rollSize) {
+                return [
+                    'id' => $rollSize->id,
+                    'flute_id' => $rollSize->flute_id,
+                    'roll_length' => $rollSize->roll_length,
+                    'compute' => $rollSize->compute,
+                    'created_at' => $rollSize->created_at,
+                    'updated_at' => $rollSize->updated_at,
+                    'flute_code' => $rollSize->paperFlute ? $rollSize->paperFlute->code : null,
+                ];
+            });
+
             return response()->json([
                 'status' => 'success',
-                'data' => $rollSizes
+                'data' => $data
             ]);
         } catch (\Exception $e) {
             Log::error('Error retrieving roll sizes: ' . $e->getMessage());
@@ -59,23 +71,42 @@ class RollSizeController extends Controller
             $validated = $request->validate([
                 'flute_id' => 'required|exists:paper_flutes,id',
                 'roll_length' => 'required|numeric|min:0',
-                'is_composite' => 'required|boolean',
+                'compute' => 'required|boolean',
             ]);
 
-            $rollSize = RollSize::updateOrCreate(
-                [
-                    'flute_id' => $validated['flute_id'],
-                ],
-                [
-                    'roll_length' => $validated['roll_length'],
-                    'is_composite' => $validated['is_composite'],
-                ]
-            );
+            // Manual validation for uniqueness
+            $existing = RollSize::where('flute_id', $validated['flute_id'])
+                               ->where('roll_length', $validated['roll_length'])
+                               ->first();
+
+            if ($existing) {
+                return response()->json([
+                    'message' => 'The roll length ' . $validated['roll_length'] . 'mm already exists for this flute.',
+                    'errors' => [
+                        'roll_length' => ['The roll length ' . $validated['roll_length'] . 'mm already exists for this flute.']
+                    ]
+                ], 422);
+            }
+
+            $rollSize = RollSize::create($validated);
+            
+            // Reload with the relationship to get flute_code
+            $rollSize->load('paperFlute');
+            
+            $responseData = [
+                'id' => $rollSize->id,
+                'flute_id' => $rollSize->flute_id,
+                'roll_length' => $rollSize->roll_length,
+                'compute' => $rollSize->compute,
+                'created_at' => $rollSize->created_at,
+                'updated_at' => $rollSize->updated_at,
+                'flute_code' => $rollSize->paperFlute ? $rollSize->paperFlute->code : null,
+            ];
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Roll size data saved successfully',
-                'data' => $rollSize
+                'data' => $responseData
             ]);
         } catch (\Exception $e) {
             Log::error('Error saving roll size: ' . $e->getMessage());
@@ -99,15 +130,43 @@ class RollSizeController extends Controller
             $validated = $request->validate([
                 'flute_id' => 'required|exists:paper_flutes,id',
                 'roll_length' => 'required|numeric|min:0',
-                'is_composite' => 'required|boolean',
+                'compute' => 'required|boolean',
             ]);
 
+            // Manual validation for uniqueness
+            $existing = RollSize::where('flute_id', $validated['flute_id'])
+                               ->where('roll_length', $validated['roll_length'])
+                               ->where('id', '!=', $id)
+                               ->first();
+
+            if ($existing) {
+                return response()->json([
+                    'message' => 'The roll length ' . $validated['roll_length'] . 'mm already exists for this flute.',
+                    'errors' => [
+                        'roll_length' => ['The roll length ' . $validated['roll_length'] . 'mm already exists for this flute.']
+                    ]
+                ], 422);
+            }
+
             $rollSize->update($validated);
+
+            // Reload to get relationship data and ensure response is consistent
+            $rollSize->load('paperFlute');
+
+            $responseData = [
+                'id' => $rollSize->id,
+                'flute_id' => $rollSize->flute_id,
+                'roll_length' => $rollSize->roll_length,
+                'compute' => (bool)$rollSize->compute,
+                'created_at' => $rollSize->created_at,
+                'updated_at' => $rollSize->updated_at,
+                'flute_code' => $rollSize->paperFlute ? $rollSize->paperFlute->code : null,
+            ];
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Roll size data updated successfully',
-                'data' => $rollSize
+                'data' => $responseData
             ]);
         } catch (\Exception $e) {
             Log::error('Error updating roll size: ' . $e->getMessage());
@@ -130,7 +189,7 @@ class RollSizeController extends Controller
                 '*.id' => 'required|exists:roll_sizes,id',
                 '*.flute_id' => 'required|exists:paper_flutes,id',
                 '*.roll_length' => 'required|numeric|min:0',
-                '*.is_composite' => 'required|boolean',
+                '*.compute' => 'required|boolean',
             ]);
 
             if ($validator->fails()) {
@@ -150,7 +209,7 @@ class RollSizeController extends Controller
                     $rollSize->update([
                         'flute_id' => $item['flute_id'],
                         'roll_length' => $item['roll_length'],
-                        'is_composite' => $item['is_composite'],
+                        'compute' => $item['compute'],
                     ]);
                     $results[] = $rollSize;
                 } catch (\Exception $e) {
@@ -216,7 +275,7 @@ class RollSizeController extends Controller
                 return [
                     'Flute Code' => $size->paperFlute ? $size->paperFlute->code : 'N/A',
                     'Roll Length (mm)' => $size->roll_length,
-                    'Composite' => $size->is_composite ? 'Yes' : 'No',
+                    'Compute' => $size->compute ? 'Yes' : 'No',
                     'Created At' => $size->created_at->format('Y-m-d H:i:s'),
                     'Updated At' => $size->updated_at->format('Y-m-d H:i:s'),
                 ];
@@ -273,14 +332,14 @@ class RollSizeController extends Controller
                 $fluteCode = strtoupper($flute->code);
                 
                 // For demonstration, we'll create entries for all flutes with predefined roll lengths
-                foreach ($rollLengths as $length => $isComposite) {
+                foreach ($rollLengths as $length => $compute) {
                     RollSize::updateOrCreate(
                         [
                             'flute_id' => $flute->id,
                             'roll_length' => $length,
                         ],
                         [
-                            'is_composite' => $isComposite,
+                            'compute' => $compute,
                         ]
                     );
                     $count++;

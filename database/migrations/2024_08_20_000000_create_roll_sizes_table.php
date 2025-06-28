@@ -17,7 +17,7 @@ class CreateRollSizesTable extends Migration
             $table->id();
             $table->foreignId('flute_id')->constrained('paper_flutes', 'id')->onDelete('cascade');
             $table->float('roll_length', 8, 2);
-            $table->boolean('is_composite')->default(false);
+            $table->boolean('compute')->default(false);
             $table->timestamps();
             
             // Add a unique constraint to prevent duplicate entries

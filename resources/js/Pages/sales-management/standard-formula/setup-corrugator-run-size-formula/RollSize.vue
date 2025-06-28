@@ -1,194 +1,204 @@
 <template>
-  <AppLayout title="Define Roll Size">
-    <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        Define Roll Size
-      </h2>
-    </template>
+  <AppLayout :header="'Define Roll Size'">
+    <Head title="Define Roll Size" />
 
-    <div class="py-6">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-          <div class="p-6 sm:px-8 bg-white border-b border-gray-200">
-            <div class="flex items-center justify-between">
-              <div>
-                <h2 class="text-2xl font-bold text-gray-800">Roll Size Settings</h2>
-                <p class="mt-1 text-sm text-gray-600">Manage roll size specifications for each flute.</p>
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-lg shadow-md">
+      <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-ruler-combined mr-3"></i> Define Roll Size
+      </h2>
+      <p class="text-blue-100">Manage roll size specifications for each flute.</p>
+    </div>
+
+    <div class="bg-white rounded-b-lg shadow-md p-6 mb-6">
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Main Content Area -->
+        <div class="flex-1">
+          <!-- Action Bar -->
+          <div class="mb-6 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+            <div class="flex-1 w-full">
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-search"></i>
+                </span>
+                <input type="text" v-model="searchQuery" placeholder="Search by flute code..."
+                  class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
               </div>
-            <div class="flex space-x-2">
-                <button @click="saveChanges" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring focus:ring-indigo-300 disabled:opacity-25 transition">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                </svg>
-                Save
+            </div>
+            <div class="flex gap-2 w-full md:w-auto">
+              <button @click="refreshData" class="btn-secondary flex-1 md:flex-none">
+                <i class="fas fa-sync-alt mr-2"></i> Refresh
               </button>
-              </div>
+              <button @click="printData" class="btn-info flex-1 md:flex-none">
+                <i class="fas fa-print mr-2"></i> Print
+              </button>
             </div>
           </div>
 
-          <div class="p-6 sm:px-8">
-            <div v-if="loading" class="flex justify-center items-center py-16">
-              <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-              <span class="ml-4 text-lg text-gray-700">Loading Flutes...</span>
-            </div>
-
-            <div v-else>
-              <div class="mb-6">
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    v-model="searchQuery"
-                    @input="filterItems"
-                    placeholder="Search by flute code or name..."
-                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div class="overflow-x-auto bg-white rounded-lg shadow">
-                <table class="min-w-full divide-y divide-gray-200">
+          <!-- Table Section -->
+          <div class="bg-white rounded-lg overflow-hidden border border-gray-200">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200" id="rollSizeTable">
                   <thead class="bg-gray-50">
                     <tr>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Flute
+                    <th @click="sortBy('roll_length')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Roll (mm) <i class="fas fa-sort ml-1"></i>
+                      </div>
                       </th>
-                      <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Roll Length (mm)
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Roll (inches)
                       </th>
-                      <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Compute
+                    <th @click="sortBy('compute')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Compute <i class="fas fa-sort ml-1"></i>
+                      </div>
                       </th>
                     </tr>
                   </thead>
                   <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-if="paginatedItems.length === 0">
-                      <td colspan="3" class="px-6 py-12 text-center text-sm text-gray-500">
-                        <div class="flex flex-col items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                          </svg>
-                          <h3 class="mt-2 text-lg font-medium text-gray-900">No roll sizes found</h3>
-                          <p class="mt-1 text-sm text-gray-500">Please try a different search term or add new roll sizes.</p>
+                  <tr v-if="loading" class="animate-pulse">
+                    <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                      <div class="flex justify-center items-center space-x-2">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading roll sizes...</span>
                         </div>
                       </td>
                     </tr>
-                    <tr v-for="size in paginatedItems" :key="size.id" class="hover:bg-gray-50 transition-colors duration-150">
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">{{ size.flute_code }}</div>
+                  <tr v-else-if="paginatedItems.length === 0" class="hover:bg-gray-50">
+                    <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                      No roll sizes found. Try adjusting your search or add a new one.
+                    </td>
+                  </tr>
+                  <tr v-for="item in paginatedItems" :key="item.id" @click="selectItem(item)"
+                    :class="{'bg-blue-50': selectedItem && selectedItem.id === item.id}"
+                    class="hover:bg-gray-50 cursor-pointer">
+                    <td class="px-2 py-1 whitespace-nowrap">
+                      <input type="number"
+                        :value="item.roll_length"
+                        @input="handleInput(item, 'roll_length', $event)"
+                        @blur="updateRollSize(item, 'roll_length')"
+                        class="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="mm">
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <input 
-                          type="number" 
-                          v-model="size.roll_length" 
-                          step="0.01"
-                          class="w-24 text-center border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                        />
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {{ (item.roll_length / 25.4).toFixed(2) }}
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <Switch
-                          v-model="size.is_composite"
-                          @update:modelValue="toggleCompute(size)"
-                          :class="size.is_composite ? 'bg-blue-600' : 'bg-gray-200'"
-                          class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                          :disabled="savingCompute[size.id]"
-                        >
-                          <span class="sr-only">Enable compute</span>
-                          <span
-                            :class="size.is_composite ? 'translate-x-6' : 'translate-x-1'"
-                            class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform"
-                          />
-                          <div v-if="savingCompute[size.id]" class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 cursor-pointer hover:bg-blue-100 active:bg-blue-200 transition-all duration-150 transform hover:scale-105 border border-transparent hover:border-blue-300 rounded-md"
+                      @click.stop="toggleCompute(item)"
+                      title="Click to toggle Compute status"
+                      :class="{'opacity-75': savingStatus[item.id]}">
+                      <div class="flex items-center justify-between">
+                        <span v-if="savingStatus[item.id]" class="text-blue-500 font-medium flex items-center">
+                          <i class="fas fa-spinner fa-spin mr-1"></i> Updating...
+                        </span>
+                        <span v-else-if="item.compute" class="text-green-600 font-medium flex items-center">
+                          <i class="fas fa-check-circle mr-1"></i> Yes
+                        </span>
+                        <span v-else class="text-red-600 font-medium flex items-center">
+                          <i class="fas fa-times-circle mr-1"></i> No
+                        </span>
+                        <i v-if="!savingStatus[item.id]" class="fas fa-exchange-alt text-blue-500 ml-2"></i>
                           </div>
-                        </Switch>
                       </td>
                     </tr>
                   </tbody>
                 </table>
+            </div>
               </div>
 
-              <!-- Pagination -->
-              <div v-if="filteredItems.length > itemsPerPage" class="mt-6 flex items-center justify-between">
-                <p class="text-sm text-gray-700">
-                  Showing
-                  <span class="font-medium">{{ (currentPage - 1) * itemsPerPage + 1 }}</span>
-                  to
-                  <span class="font-medium">{{ Math.min(currentPage * itemsPerPage, filteredItems.length) }}</span>
-                  of
-                  <span class="font-medium">{{ filteredItems.length }}</span>
-                  results
-                </p>
-                <div class="flex-1 flex justify-end">
-                  <button
-                    @click="prevPage"
-                    :disabled="currentPage === 1"
-                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    Previous
+          <!-- Pagination Controls -->
+          <div class="mt-4 flex justify-between items-center text-sm text-gray-600">
+            <div>
+              <span>Showing {{ paginatedItems.length }} of {{ filteredItems.length }} results</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <select v-model="itemsPerPage" class="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option :value="10">10 per page</option>
+                <option :value="20">20 per page</option>
+                <option :value="50">50 per page</option>
+                <option :value="100">100 per page</option>
+              </select>
+              <button :disabled="currentPage === 1" @click="currentPage--" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">
+                <i class="fas fa-chevron-left"></i>
                   </button>
-                  <button
-                    @click="nextPage"
-                    :disabled="currentPage === totalPages"
-                    class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    Next
+              <span class="px-4">{{ currentPage }} / {{ totalPages }}</span>
+              <button :disabled="currentPage === totalPages" @click="currentPage++" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">
+                <i class="fas fa-chevron-right"></i>
                   </button>
                 </div>
+          </div>
+        </div>
+
+        <!-- Side Panel -->
+        <div class="w-full md:w-96 bg-gray-50 rounded-lg p-4 border border-gray-200 space-y-6">
+          <!-- Details Section -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+              <i class="fas fa-info-circle mr-2 text-blue-500"></i> Details
+            </h3>
+            <div v-if="selectedItem" class="space-y-3">
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Flute:</span>
+                <span class="font-medium text-gray-900">{{ selectedItem.flute_code }}</span>
               </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Roll (mm):</span>
+                <span class="font-medium text-gray-900">{{ selectedItem.roll_length }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Roll (inches):</span>
+                <span class="font-medium text-gray-900">{{ (selectedItem.roll_length / 25.4).toFixed(2) }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Compute:</span>
+                <span class="font-medium" :class="{'text-green-600': selectedItem.compute, 'text-red-600': !selectedItem.compute}">
+                  {{ selectedItem.compute ? 'Yes' : 'No' }}
+                </span>
+              </div>
+                <div class="pt-2">
+                    <button @click="deleteRollSize(selectedItem)" class="btn-danger w-full">
+                        <i class="fas fa-trash-alt mr-2"></i> Delete
+                    </button>
+                </div>
+            </div>
+            <div v-else class="flex flex-col items-center justify-center h-40 text-center">
+              <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-ruler-combined text-blue-500 text-2xl"></i>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900 mb-1">No Item Selected</h3>
+              <p class="text-gray-500 text-sm">Select an item from the table to view its details</p>
               </div>
             </div>
 
-            <!-- Add New Roll Size -->
-          <div class="p-6 sm:px-8 bg-gray-50 border-t border-gray-200">
-              <h3 class="text-lg font-medium text-gray-700 mb-3">Add New Roll Size</h3>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Add New Roll Size Form -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+              <i class="fas fa-plus-circle mr-2 text-green-500"></i> Add New Roll Size
+            </h3>
+            <div class="space-y-4">
                 <div>
-                  <label for="new-flute" class="block text-sm font-medium text-gray-700 mb-1">Flute</label>
-                  <select
-                    id="new-flute"
-                    v-model="newRollSize.flute_id"
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  >
-                    <option value="">Select Flute</option>
-                    <option v-for="flute in flutes" :key="flute.id" :value="flute.id">
-                      {{ flute.code }}
-                    </option>
+                  <label for="new-flute" class="block text-sm font-medium text-gray-700">Flute</label>
+                  <select id="new-flute" v-model="newRollSize.flute_id"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                    <option disabled value="">Select a flute</option>
+                    <option v-for="flute in flutes" :key="flute.id" :value="flute.id">{{ flute.code }}</option>
                   </select>
                 </div>
-                
                 <div>
-                  <label for="new-roll-length" class="block text-sm font-medium text-gray-700 mb-1">Roll Length (mm)</label>
-                  <input
-                    id="new-roll-length"
-                    type="number"
-                    v-model="newRollSize.roll_length"
-                    step="0.01"
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                  />
+                  <label for="new-roll-length" class="block text-sm font-medium text-gray-700">Roll Length (mm)</label>
+                  <input type="number" id="new-roll-length" v-model.number="newRollSize.roll_length"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    placeholder="e.g., 1200">
                 </div>
-                
-                <div class="flex items-end">
-                  <div class="mr-4">
-                    <label class="flex items-center">
-                      <input
-                        type="checkbox"
-                        v-model="newRollSize.is_composite"
-                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                      />
-                    <span class="ml-2 text-sm text-gray-700">Compute</span>
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center text-sm font-medium text-gray-700">
+                        <input type="checkbox" v-model="newRollSize.compute"
+                          class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                        <span class="ml-2">Compute</span>
                     </label>
-                  </div>
-                  <button 
-                    @click="addRollSize" 
-                    class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm"
-                    :disabled="!canAddRollSize"
-                  >
-                    Add Roll Size
+                  <button @click="addRollSize" :disabled="!canAddRollSize" class="btn-primary">
+                    <i class="fas fa-plus mr-2"></i> Add
                   </button>
                 </div>
               </div>
@@ -196,421 +206,293 @@
                 </div>
               </div>
           </div>
-
-
   </AppLayout>
 </template>
 
-<script>
-import { defineComponent, ref, computed, onMounted, reactive } from 'vue';
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { Switch } from '@headlessui/vue';
+<script setup>
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
+import { Head } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import { useToast } from '@/Composables/useToast';
 import Swal from 'sweetalert2';
 
-export default defineComponent({
-  components: {
-    AppLayout,
-    Switch
-  },
-  setup() {
-    const loading = ref(true);
-    const rollSizes = ref([]);
-    const filteredItems = ref([]);
+// --- State ---
+const items = ref([]);
     const flutes = ref([]);
+const selectedItem = ref(null);
+const loading = ref(false);
     const searchQuery = ref('');
+const sortOrder = ref({ field: 'flute_code', direction: 'asc' });
     const currentPage = ref(1);
     const itemsPerPage = ref(10);
-    const savingCompute = reactive({});
-    const viewPrintUrl = '/standard-formula/setup-roll-size/view-print';
-    
+const savingStatus = ref({});
+const toast = useToast();
     const newRollSize = ref({
       flute_id: '',
       roll_length: '',
-      is_composite: false
-    });
-    
+      compute: false,
+});
 
+// --- Computed Properties ---
+const filteredItems = computed(() => {
+  let result = items.value;
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    result = result.filter(item =>
+      (item.flute_code && item.flute_code.toLowerCase().includes(query))
+    );
+  }
+
+  return [...result].sort((a, b) => {
+    const field = sortOrder.value.field;
+    const direction = sortOrder.value.direction === 'asc' ? 1 : -1;
+    const valA = a[field];
+    const valB = b[field];
+
+    if (valA < valB) return -1 * direction;
+    if (valA > valB) return 1 * direction;
+
+    // Secondary sort by roll_length if flutes are the same
+    if (field === 'flute_code') {
+        return a.roll_length - b.roll_length;
+    }
+    return 0;
+  });
+});
 
     const totalPages = computed(() => Math.ceil(filteredItems.value.length / itemsPerPage.value));
+
     const paginatedItems = computed(() => {
       const start = (currentPage.value - 1) * itemsPerPage.value;
       const end = start + itemsPerPage.value;
       return filteredItems.value.slice(start, end);
     });
 
-    const nextPage = () => {
-      if (currentPage.value < totalPages.value) currentPage.value++;
-    };
-
-    const prevPage = () => {
-      if (currentPage.value > 1) currentPage.value--;
-    };
-
     const canAddRollSize = computed(() => {
-      return newRollSize.value.flute_id && 
-             newRollSize.value.roll_length && 
-             newRollSize.value.roll_length > 0;
-    });
+  return newRollSize.value.flute_id && newRollSize.value.roll_length > 0;
+});
 
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer);
-        toast.addEventListener('mouseleave', Swal.resumeTimer);
-      }
-    });
+// --- Watchers ---
+watch(filteredItems, () => { currentPage.value = 1; });
+watch(itemsPerPage, () => { currentPage.value = 1; });
 
-    const showNotification = (message, type = 'success') => {
-      Toast.fire({
-        icon: type,
-        title: message
-      });
-    };
-
+// --- Methods ---
     const loadData = async () => {
+  loading.value = true;
       try {
-        loading.value = true;
+    const [sizesResponse, flutesResponse] = await Promise.all([
+      axios.get('/api/roll-sizes'),
+      axios.get('/api/paper-flutes'),
+    ]);
         
-        // Load flutes
-        const flutesResponse = await axios.get('/api/paper-flutes');
         flutes.value = flutesResponse.data;
         
-        // Load roll sizes
-        const sizesResponse = await axios.get('/api/roll-sizes');
-        
-        if (sizesResponse.data && sizesResponse.data.status === 'success' && Array.isArray(sizesResponse.data.data) && sizesResponse.data.data.length > 0) {
-          // Process the data from the API response
-          rollSizes.value = sizesResponse.data.data.map(size => {
-            const flute = size.paper_flute || {};
-            
-            return {
-              id: size.id,
-              flute_id: size.flute_id,
-              flute_code: flute.code || 'N/A',
-              roll_length: size.roll_length,
-              is_composite: size.is_composite === 1 || size.is_composite === true
-            };
-          });
-          
-          // Sort by flute code and then by roll length
-          rollSizes.value.sort((a, b) => {
-            if (a.flute_code === b.flute_code) {
-              return a.roll_length - b.roll_length;
-            }
-            return a.flute_code.localeCompare(b.flute_code);
-          });
-        } else {
-          // If no data from API, seed the database first
-          try {
-            showNotification('No roll size data found. Seeding initial data...', 'info');
-            await axios.post('/api/roll-sizes/seed');
-            showNotification('Initial data has been seeded. Loading data...', 'success');
-            
-            // Try to fetch the data again after seeding
-            const newSizesResponse = await axios.get('/api/roll-sizes');
-            if (newSizesResponse.data && newSizesResponse.data.status === 'success' && Array.isArray(newSizesResponse.data.data) && newSizesResponse.data.data.length > 0) {
-              rollSizes.value = newSizesResponse.data.data.map(size => {
-                const flute = size.paper_flute || {};
-                
-                return {
-                  id: size.id,
-                  flute_id: size.flute_id,
-                  flute_code: flute.code || 'N/A',
-                  roll_length: size.roll_length,
-                  is_composite: size.is_composite === 1 || size.is_composite === true
-                };
-              });
-              
-              // Sort by flute code and then by roll length
-              rollSizes.value.sort((a, b) => {
-                if (a.flute_code === b.flute_code) {
-                  return a.roll_length - b.roll_length;
-                }
-                return a.flute_code.localeCompare(b.flute_code);
-              });
-            } else {
-              rollSizes.value = [];
-              showNotification('Failed to load roll size data after seeding', 'error');
-            }
-          } catch (seedError) {
-            console.error('Error seeding data:', seedError);
-            rollSizes.value = [];
-            showNotification('Failed to seed roll size data', 'error');
-          }
-        }
-        
-        filteredItems.value = [...rollSizes.value];
+    if (sizesResponse.data && sizesResponse.data.status === 'success' && Array.isArray(sizesResponse.data.data)) {
+      items.value = sizesResponse.data.data.map(size => ({
+        ...size,
+              compute: size.compute === 1 || size.compute === true
+      }));
+    }
       } catch (error) {
         console.error('Error loading data:', error);
-        
-        let errorMessage = 'Failed to load roll size data';
-        
-        if (error.response) {
-          errorMessage += ` (Status: ${error.response.status})`;
-          if (error.response.data && error.response.data.message) {
-            errorMessage += `: ${error.response.data.message}`;
-          }
-        } else if (error.request) {
-          errorMessage += ': No response received from server';
-        } else {
-          errorMessage += `: ${error.message}`;
-        }
-        
-        showNotification(errorMessage, 'error');
-        rollSizes.value = [];
-        filteredItems.value = [];
+    toast.error(error.response?.data?.message || 'Failed to load roll size data.');
+    items.value = [];
       } finally {
         loading.value = false;
       }
     };
 
-    const filterItems = () => {
-      currentPage.value = 1;
-      if (!searchQuery.value) {
-        filteredItems.value = [...rollSizes.value];
-        return;
-      }
-      
-      const query = searchQuery.value.toLowerCase();
-      filteredItems.value = rollSizes.value.filter(size => 
-        size.flute_code.toLowerCase().includes(query)
-      );
-    };
+const refreshData = () => {
+  selectedItem.value = null;
+  searchQuery.value = '';
+  loadData();
+};
 
-    // Function to toggle compute value with immediate save
-    const toggleCompute = async (size) => {
-      try {
-        // Set loading state for this specific item
-        savingCompute[size.id] = true;
-        
-        // Prepare data for saving
-        const dataToSave = {
-          id: size.id,
-          flute_id: size.flute_id,
-          roll_length: size.roll_length,
-          is_composite: size.is_composite
-        };
-        
-        // Save the data
-        await axios.put(`/api/roll-sizes/${size.id}`, dataToSave);
-        
-        // Show small notification
-        showNotification(`Compute status for ${size.flute_code} updated successfully`, 'success');
-      } catch (error) {
-        console.error('Error toggling compute status:', error);
-        
-        // Revert the change in the UI
-        size.is_composite = !size.is_composite;
-        
-        // Show error notification
-        showNotification(`Failed to update compute status for ${size.flute_code}`, 'error');
-      } finally {
-        // Clear loading state
-        savingCompute[size.id] = false;
-      }
-    };
+const selectItem = (item) => {
+  selectedItem.value = item;
+};
 
-    const saveChanges = async () => {
-      try {
-        loading.value = true;
-        
-        // Prepare data for saving
-        const dataToSave = rollSizes.value.map(size => ({
-          id: size.id,
-            flute_id: size.flute_id,
-            roll_length: size.roll_length,
-            is_composite: size.is_composite
-        }));
-        
-        // Send data to the API
-        const response = await axios.post('/api/roll-sizes/batch', dataToSave);
-        
-        if (response.data.errors && response.data.errors.length > 0) {
-          const errorCount = response.data.errors.length;
-          Swal.fire({
-            icon: 'error',
-            title: 'Batch Save Error',
-            text: `${errorCount} roll sizes could not be saved.`,
-          });
-          console.error('Errors saving roll sizes:', response.data.errors);
-        } else {
-          Swal.fire({
-            icon: 'success',
-            title: 'Save Successful',
-            text: `All roll sizes have been saved.`,
-          });
-        }
-        
-        // Reload data to get the updated records
-        await loadData();
+const handleInput = (item, field, event) => {
+  const originalItem = items.value.find(i => i.id === item.id);
+  if (originalItem) {
+    originalItem[field] = Number(event.target.value);
+  }
+};
+
+const updateRollSize = async (item, field) => {
+  const statusKey = `${item.id}-${field}`;
+  if (savingStatus.value[statusKey]) return;
+
+  savingStatus.value[statusKey] = true;
+
+  const payload = {
+      flute_id: item.flute_id,
+      roll_length: item.roll_length,
+      compute: item.compute,
+  };
+
+  try {
+    const response = await axios.put(`/api/roll-sizes/${item.id}`, payload);
+    toast.success(`Roll size for ${item.flute_code} updated.`);
+    const index = items.value.findIndex(i => i.id === item.id);
+    if (index !== -1) {
+        items.value[index] = response.data.data;
+    }
       } catch (error) {
-        console.error('Error saving roll sizes:', error);
-        
-        let errorMessage = 'Failed to save roll sizes';
-        
-        if (error.response && error.response.data) {
-          if (error.response.data.message) {
-            errorMessage += `: ${error.response.data.message}`;
-          } else if (error.response.data.errors) {
-            const firstError = Object.values(error.response.data.errors)[0];
-            errorMessage += `: ${Array.isArray(firstError) ? firstError[0] : firstError}`;
-          }
-        } else {
-          errorMessage += `: ${error.message}`;
-        }
-        
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: errorMessage,
-        });
+    console.error(`Error updating ${field}:`, error);
+    toast.error(error.response?.data?.message || `Failed to update ${field}.`);
+    loadData(); // Revert changes on error
       } finally {
-        loading.value = false;
+    savingStatus.value[statusKey] = false;
+  }
+};
+
+const toggleCompute = async (item) => {
+  if (savingStatus.value[item.id]) return;
+  savingStatus.value[item.id] = true;
+
+  const originalValue = item.compute;
+  item.compute = !item.compute;
+
+  const payload = {
+      flute_id: item.flute_id,
+      roll_length: item.roll_length,
+      compute: item.compute,
+  };
+
+  try {
+    await axios.put(`/api/roll-sizes/${item.id}`, payload);
+    toast.success(`Compute for ${item.flute_code} (${item.roll_length}mm) updated.`);
+      } catch (error) {
+    item.compute = originalValue; // Revert on error
+    console.error('Error toggling compute:', error);
+    toast.error(error.response?.data?.message || 'Failed to update compute status.');
+      } finally {
+    savingStatus.value[item.id] = false;
       }
     };
 
     const addRollSize = async () => {
-      if (!canAddRollSize.value) {
-        showNotification('Please fill in all required fields', 'error');
-        return;
-      }
-      
-      try {
-        loading.value = true;
-        
-        // Check if this combination already exists
-        const exists = rollSizes.value.some(size => 
+  if (!canAddRollSize.value) return;
+
+  const exists = items.value.some(size => 
           size.flute_id === newRollSize.value.flute_id && 
-          size.roll_length === parseFloat(newRollSize.value.roll_length)
+    size.roll_length === newRollSize.value.roll_length
         );
         
         if (exists) {
-          showNotification('This flute and roll length combination already exists', 'error');
-          loading.value = false;
+    toast.error('This flute and roll length combination already exists.');
           return;
         }
         
-        // Add new roll size
-        const response = await axios.post('/api/roll-sizes', {
-          flute_id: newRollSize.value.flute_id,
-          roll_length: newRollSize.value.roll_length,
-          is_composite: newRollSize.value.is_composite
-        });
-        
+  try {
+    const response = await axios.post('/api/roll-sizes', newRollSize.value);
         if (response.data && response.data.status === 'success') {
-          showNotification('Roll size added successfully');
-          
-          // Reset form
-          newRollSize.value = {
-            flute_id: '',
-            roll_length: '',
-            is_composite: false
-          };
-          
-          // Reload data
-          await loadData();
+            const newItem = response.data.data;
+      toast.success('Roll size added successfully.');
+            items.value.push(newItem);
+      newRollSize.value = { flute_id: '', roll_length: '', compute: false };
         } else {
-          showNotification('Failed to add roll size', 'error');
+      toast.error('Failed to add roll size.');
         }
       } catch (error) {
         console.error('Error adding roll size:', error);
-        
-        let errorMessage = 'Failed to add roll size';
-        
-        if (error.response && error.response.data) {
-          if (error.response.data.message) {
-            errorMessage += `: ${error.response.data.message}`;
-          } else if (error.response.data.errors) {
-            const firstError = Object.values(error.response.data.errors)[0];
-            errorMessage += `: ${Array.isArray(firstError) ? firstError[0] : firstError}`;
-          }
-        } else {
-          errorMessage += `: ${error.message}`;
-        }
-        
-        showNotification(errorMessage, 'error');
-      } finally {
-        loading.value = false;
-      }
-    };
+    toast.error(error.response?.data?.message || 'Failed to add roll size.');
+  }
+};
 
-    const exportData = () => {
-      showNotification('Exporting data...');
-      
-      // Call the export API endpoint
-      axios.get('/api/roll-sizes/export', { responseType: 'blob' })
-        .then(response => {
-          // Create a download link for the exported file
-          const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          const link = document.createElement('a');
-          link.href = window.URL.createObjectURL(blob);
-          link.download = `roll_sizes_${new Date().toISOString().split('T')[0]}.xlsx`;
-          link.click();
-          
-          showNotification('Data exported successfully');
-        })
-        .catch(error => {
-          console.error('Error exporting data:', error);
-          showNotification('Failed to export data', 'error');
-        });
-    };
+const deleteRollSize = async (itemToDelete) => {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: `You are about to delete the roll size ${itemToDelete.roll_length}mm for flute ${itemToDelete.flute_code}. You won't be able to revert this!`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`/api/roll-sizes/${itemToDelete.id}`);
+                toast.success('Roll size deleted successfully.');
+                
+                const index = items.value.findIndex(i => i.id === itemToDelete.id);
+                if (index !== -1) {
+                    items.value.splice(index, 1);
+                }
+
+                if (selectedItem.value && selectedItem.value.id === itemToDelete.id) {
+                    selectedItem.value = null;
+                }
+            } catch (error) {
+                console.error('Error deleting roll size:', error);
+                toast.error(error.response?.data?.message || 'Failed to delete roll size.');
+            }
+        }
+    });
+};
+
+const sortBy = (field) => {
+  if (sortOrder.value.field === field) {
+    sortOrder.value.direction = sortOrder.value.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortOrder.value.field = field;
+    sortOrder.value.direction = 'asc';
+  }
+};
 
     const printData = () => {
+    const printContents = document.getElementById('rollSizeTable').outerHTML;
+    const originalContents = document.body.innerHTML;
+    document.body.innerHTML = printContents;
       window.print();
-    };
+    document.body.innerHTML = originalContents;
+    location.reload();
+};
 
-    onMounted(() => {
-      loadData();
-    });
 
-    return {
-      loading,
-      rollSizes,
-      filteredItems,
-      paginatedItems,
-      flutes,
-      newRollSize,
-      searchQuery,
-      currentPage,
-      itemsPerPage,
-      totalPages,
-      viewPrintUrl,
-      savingCompute,
-      canAddRollSize,
-      filterItems,
-      saveChanges,
-      addRollSize,
-      exportData,
-      printData,
-      showNotification,
-      nextPage,
-      prevPage,
-      toggleCompute
-    };
-  }
-});
+// --- Lifecycle ---
+onMounted(loadData);
 </script>
 
-<style>
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  .max-w-7xl, .max-w-7xl * {
-    visibility: visible;
-  }
-  .max-w-7xl {
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-  button, .bg-gray-50:not(.border) {
-    display: none !important;
-  }
+<style scoped>
+/* Button styles */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center whitespace-nowrap;
+}
+.btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow transition flex items-center justify-center whitespace-nowrap;
+}
+.btn-info {
+  @apply bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center justify-center whitespace-nowrap;
+}
+.btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center whitespace-nowrap;
+}
+
+/* Table hover animation */
+tbody tr {
+  transition: all 0.2s;
+}
+tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar styling */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+}
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
 }
 </style>

@@ -281,6 +281,10 @@ class RollTrimByProductDesignController extends Controller
                 try {
                     Log::debug('Processing item for batch update', ['item' => $item]);
 
+                    if (isset($item['compute'])) {
+                        $item['compute'] = filter_var($item['compute'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    }
+
                     $validator = Validator::make($item, [
                         'product_id' => 'required|exists:products,id',
                         'product_design_id' => 'required|exists:product_designs,id',

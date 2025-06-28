@@ -276,6 +276,7 @@ class ProductDesignController extends Controller
     {
         try {
             $designs = ProductDesign::select(
+                    'id',
                     'pd_code', 
                     'pd_name', 
                     'pd_design_type',

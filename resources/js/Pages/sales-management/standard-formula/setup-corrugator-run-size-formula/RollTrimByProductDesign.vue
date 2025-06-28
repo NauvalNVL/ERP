@@ -114,7 +114,7 @@
                     <td class="px-2 py-1 whitespace-nowrap">
                       <input type="number" 
                              :value="item.min_trim" 
-                             @input="item.min_trim = Number($event.target.value)" 
+                             @input="handleTrimInput(item, 'min_trim', $event)" 
                              @blur="updateTrim(item, 'min_trim')"
                              class="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                              placeholder="Min">
@@ -122,7 +122,7 @@
                     <td class="px-2 py-1 whitespace-nowrap">
                       <input type="number" 
                              :value="item.max_trim" 
-                             @input="item.max_trim = Number($event.target.value)" 
+                             @input="handleTrimInput(item, 'max_trim', $event)" 
                              @blur="updateTrim(item, 'max_trim')"
                              class="w-full px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                              placeholder="Max">
@@ -262,6 +262,14 @@ const paginatedItems = computed(() => {
 watch(filteredItems, () => { currentPage.value = 1; });
 watch(itemsPerPage, () => { currentPage.value = 1; });
 
+// Method to handle inline input changes
+const handleTrimInput = (item, field, event) => {
+  const originalItem = items.value.find(i => i.id === item.id);
+  if (originalItem) {
+    originalItem[field] = Number(event.target.value);
+  }
+};
+
 // Main Methods
 const loadData = async () => {
   loading.value = true;
@@ -365,6 +373,7 @@ const updateTrim = async (item, field) => {
     
     if (response.data.status === 'success') {
       const updatedResult = response.data.results && response.data.results.length > 0 ? response.data.results[0] : null;
+      const validationErrors = response.data.errors && response.data.errors.length > 0 ? response.data.errors : null;
 
       if (updatedResult) {
         const index = items.value.findIndex(i => i.id === item.id);
@@ -384,6 +393,9 @@ const updateTrim = async (item, field) => {
         }
         
         toast.success(`${item.product_design_name} - ${item.flute_code} ${field.replace(/_/g, ' ')} updated.`);
+      } else if (validationErrors) {
+        toast.error(`Update failed: ${validationErrors[0].error}`);
+        loadData(); // Revert changes
       } else {
         // If updatedResult is null, it means the update failed on the backend for this specific item
         toast.error(response.data.message || `Failed to update ${field}. No data returned for this item.`);
@@ -422,6 +434,7 @@ const toggleCompute = async (item) => {
     
     if (response.data.status === 'success') {
       const updatedResult = response.data.results && response.data.results.length > 0 ? response.data.results[0] : null;
+      const validationErrors = response.data.errors && response.data.errors.length > 0 ? response.data.errors : null;
 
       if (updatedResult) {
         const index = items.value.findIndex(i => i.id === item.id);
@@ -437,6 +450,12 @@ const toggleCompute = async (item) => {
         }
         
         toast.success(`Compute for ${item.product_design_name} - ${item.flute_code} updated.`);
+      } else if (validationErrors) {
+        toast.error(`Update failed: ${validationErrors[0].error}`);
+        const index = items.value.findIndex(i => i.id === item.id);
+        if (index !== -1) {
+          items.value[index].compute = item.compute; // Revert on error
+        }
       } else {
         // If updatedResult is null, it means the update failed on the backend for this specific item
         toast.error(response.data.message || 'Failed to update compute status. No data returned for this item.');

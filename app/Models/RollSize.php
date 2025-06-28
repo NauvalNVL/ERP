@@ -24,7 +24,7 @@ class RollSize extends Model
     protected $fillable = [
         'flute_id',
         'roll_length',
-        'is_composite',
+        'compute',
     ];
 
     /**
@@ -33,7 +33,7 @@ class RollSize extends Model
      * @var array
      */
     protected $casts = [
-        'is_composite' => 'boolean',
+        'compute' => 'boolean',
         'roll_length' => 'float',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

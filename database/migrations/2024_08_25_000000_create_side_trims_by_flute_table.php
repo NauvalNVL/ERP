@@ -20,9 +20,6 @@ class CreateSideTrimsByFluteTable extends Migration
             $table->integer('length_less')->default(0);
             $table->boolean('compute')->default(false);
             $table->timestamps();
-            
-            // Add a unique constraint to prevent duplicate entries
-            $table->unique(['flute_id', 'compute'], 'side_trim_flute_unique');
         });
     }
 

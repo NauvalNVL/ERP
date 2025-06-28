@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SideTrimByFlute extends Model
 {
@@ -44,8 +45,8 @@ class SideTrimByFlute extends Model
     /**
      * Get the paper flute associated with the side trim.
      */
-    public function paperFlute()
+    public function paperFlute(): BelongsTo
     {
         return $this->belongsTo(PaperFlute::class, 'flute_id');
     }
-} 
+}
