@@ -293,61 +293,83 @@ export default defineComponent({
     };
 
     const loadData = async () => {
+      loading.value = true;
       try {
-        loading.value = true;
-        
-        // Load product designs
-        const designsResponse = await axios.get('/api/product-designs');
-        productDesigns.value = designsResponse.data;
-        
-        // Load products
-        const productsResponse = await axios.get('/api/products');
-        products.value = productsResponse.data;
-        
-        // Load flutes
-        const flutesResponse = await axios.get('/api/paper-flutes');
-        flutes.value = flutesResponse.data;
-        
-        // Load roll trim by product design data
+        // Fetch all necessary base data first
+        const [designsResponse, productsResponse, flutesResponse] = await Promise.all([
+          axios.get('/api/product-designs'),
+          axios.get('/api/products'),
+          axios.get('/api/paper-flutes'),
+        ]);
+
+        console.log('Product Designs from API:', designsResponse.data);
+        console.log('Products from API:', productsResponse.data);
+        console.log('Paper Flutes from API:', flutesResponse.data);
+
+        const allProductDesigns = designsResponse.data;
+        const allProducts = productsResponse.data;
+        const allFlutes = flutesResponse.data;
+
+        // Try to load existing roll trims
         const trimResponse = await axios.get('/api/roll-trim-by-product-design');
+        console.log('Raw Trim Response:', trimResponse);
+        console.log('Raw Trim Response Data Property:', trimResponse.data);
         
-        if (trimResponse.data && trimResponse.data.status === 'success' && trimResponse.data.data.length > 0) {
-          // Process the data from the API response
-          const processedData = [];
-          const groupedData = {};
-          
-          // Group by product design and flute
-          trimResponse.data.data.forEach(trim => {
-            // Get related objects
-            const product = trim.product || {};
-            const design = trim.product_design || {};
-            const flute = trim.paper_flute || {};
-            
-            if (design && flute) {
-              const key = `${design.id}_${flute.id}`;
-              
-              if (!groupedData[key]) {
-                groupedData[key] = {
-                  id: trim.id,
-                  product_design_id: design.id,
-                  product_design_name: design.pd_name || design.pd_alt_name || 'N/A',
-                  flute_id: flute.id,
-                  flute_code: flute.code || 'N/A',
-                  is_composite: trim.is_composite,
-                  min_trim: trim.min_trim,
-                  max_trim: trim.max_trim
-                };
-              }
-            }
-          });
-          
-          items.value = Object.values(groupedData);
-        } else {
-          // If no data or error, initialize with sample data
-          items.value = getSampleData();
+        let existingTrims = [];
+
+        if (trimResponse.data && trimResponse.data.status === 'success' && Array.isArray(trimResponse.data.data)) {
+          existingTrims = trimResponse.data.data;
         }
-        
-        filteredItems.value = [...items.value];
+
+        // Create a map for quick lookup of existing trims
+        const existingTrimsMap = new Map();
+        existingTrims.forEach(trim => {
+          // Ensure IDs are treated as numbers for consistent key generation
+          existingTrimsMap.set(`${Number(trim.product_design_id)}-${Number(trim.product_id)}-${Number(trim.flute_id)}`, trim);
+        });
+
+        // Generate all combinations and merge with existing data
+        const combinations = [];
+        let idCounter = 1; // For unique frontend IDs if no backend ID exists yet
+
+        for (const design of allProductDesigns) {
+          // Ensure design.id is a valid number before proceeding
+          const designId = Number(design.id);
+          if (isNaN(designId) || designId <= 0) continue; 
+
+          for (const product of allProducts) {
+            const productId = Number(product.id);
+            if (isNaN(productId) || productId <= 0) continue;
+
+            for (const flute of allFlutes) {
+              const fluteId = Number(flute.id);
+              if (isNaN(fluteId) || fluteId <= 0) continue;
+
+              const key = `${designId}-${productId}-${fluteId}`;
+              const existingTrim = existingTrimsMap.get(key);
+
+              // Log for debugging: Check if key is generated and if existingTrim is found
+              console.log('Combination Key:', key, 'Existing Trim Found:', !!existingTrim);
+
+              combinations.push({
+                id: existingTrim ? existingTrim.id : `new-${idCounter++}`, // Use backend ID if exists, otherwise generate temp ID
+                product_id: productId,
+                product_code: product.product_code || product.name || 'N/A',
+                product_design_id: designId,
+                product_design_name: design.pd_name || design.pd_alt_name || 'N/A',
+                flute_id: fluteId,
+                flute_code: flute.code || 'N/A',
+                compute: existingTrim ? (existingTrim.compute === 1 || existingTrim.compute === true) : false,
+                min_trim: existingTrim ? existingTrim.min_trim : 0,
+                max_trim: existingTrim ? existingTrim.max_trim : 0,
+              });
+            }
+          }
+        }
+
+        items.value = combinations;
+        console.log('Final Combinations Array Length:', items.value.length);
+        // filteredItems is a computed property, it will update automatically
       } catch (error) {
         console.error('Error loading data:', error);
         
@@ -366,10 +388,8 @@ export default defineComponent({
         }
         
         showNotification(errorMessage, 'error');
-        
-        // Initialize with sample data for development
-        items.value = getSampleData();
-        filteredItems.value = [...items.value];
+        // Show empty state on error
+        items.value = [];
       } finally {
         loading.value = false;
       }
@@ -377,10 +397,11 @@ export default defineComponent({
 
     const filterItems = () => {
       filteredItems.value = items.value.filter(item => {
-        const matchesProductDesign = !filters.value.productDesign || item.product_design_id === filters.value.productDesign;
-        const matchesFlute = !filters.value.flute || item.flute_id === filters.value.flute;
+        const matchesProductDesign = !filters.value.productDesign || item.product_design_id === Number(filters.value.productDesign);
+        const matchesProduct = !filters.value.product || item.product_id === Number(filters.value.product);
+        const matchesFlute = !filters.value.flute || item.flute_id === Number(filters.value.flute);
         
-        return matchesProductDesign && matchesFlute;
+        return matchesProductDesign && matchesProduct && matchesFlute;
       });
     };
 
@@ -419,26 +440,6 @@ export default defineComponent({
     const printData = () => {
       window.print();
     };
-
-    // Sample data for development/fallback
-    const getSampleData = () => [
-      { id: 1, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 1, flute_code: 'AC', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 2, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 2, flute_code: 'AF', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 3, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 3, flute_code: 'BC', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 4, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 4, flute_code: 'BF', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 5, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 5, flute_code: 'CF', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 6, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 6, flute_code: 'EB', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 7, product_design_id: 1, product_design_name: 'PUNCH', flute_id: 7, flute_code: 'EF', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 8, product_design_id: 2, product_design_name: 'HDC-FB', flute_id: 1, flute_code: 'AC', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 9, product_design_id: 2, product_design_name: 'HDC-FB', flute_id: 2, flute_code: 'AF', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 10, product_design_id: 2, product_design_name: 'HDC-FB', flute_id: 3, flute_code: 'BC', is_composite: true, min_trim: 0, max_trim: 65 },
-      { id: 11, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 1, flute_code: 'AC', is_composite: false, min_trim: 20, max_trim: 65 },
-      { id: 12, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 2, flute_code: 'AF', is_composite: false, min_trim: 20, max_trim: 65 },
-      { id: 13, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 3, flute_code: 'BC', is_composite: false, min_trim: 20, max_trim: 65 },
-      { id: 14, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 4, flute_code: 'BF', is_composite: false, min_trim: 20, max_trim: 65 },
-      { id: 15, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 5, flute_code: 'CF', is_composite: false, min_trim: 20, max_trim: 65 },
-      { id: 16, product_design_id: 3, product_design_name: 'SF-SH', flute_id: 6, flute_code: 'EB', is_composite: false, min_trim: 20, max_trim: 65 },
-    ];
 
     onMounted(() => {
       loadData();

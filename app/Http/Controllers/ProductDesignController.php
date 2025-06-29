@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class ProductDesignController extends Controller
 {
@@ -276,19 +279,20 @@ class ProductDesignController extends Controller
     {
         try {
             $designs = ProductDesign::select(
-                'pd_code', 
-                'pd_name', 
-                'pd_design_type', 
-                'idc', 
-                'product', 
-                'joint', 
-                'joint_to_print', 
-                'pcs_to_joint', 
-                'score', 
-                'slot', 
-                'flute_style', 
-                'print_flute', 
-                'input_weight', 
+                'id',
+                'pd_code',
+                'pd_name',
+                'pd_design_type',
+                'idc',
+                'product',
+                'joint',
+                'joint_to_print',
+                'pcs_to_joint',
+                'score',
+                'slot',
+                'flute_style',
+                'print_flute',
+                'input_weight',
                 'compute'
             )->get()->map(function ($design) {
                 $design->compute = (strtolower($design->compute) === 'yes');

@@ -304,18 +304,37 @@ const loadData = async () => {
     let idCounter = 1; // For unique frontend IDs if no backend ID exists yet
 
     for (const design of allProductDesigns) {
+      // Ensure design.id is a valid number before proceeding
+      const designId = Number(design.id);
+      if (isNaN(designId) || designId <= 0) {
+        console.warn('Skipping product design with invalid ID:', design);
+        continue; // Skip this design if its ID is not a valid positive number
+      }
+
       for (const product of allProducts) {
+        const productId = Number(product.id);
+        if (isNaN(productId) || productId <= 0) {
+          console.warn('Skipping product with invalid ID:', product);
+          continue; // Skip this product if its ID is not a valid positive number
+        }
+
         for (const flute of allFlutes) {
-          const key = `${design.id}-${product.id}-${flute.id}`;
+          const fluteId = Number(flute.id);
+          if (isNaN(fluteId) || fluteId <= 0) {
+            console.warn('Skipping flute with invalid ID:', flute);
+            continue; // Skip this flute if its ID is not a valid positive number
+          }
+
+          const key = `${designId}-${productId}-${fluteId}`;
           const existingTrim = existingTrimsMap.get(key);
 
           combinations.push({
             id: existingTrim ? existingTrim.id : `new-${idCounter++}`, // Use backend ID if exists, otherwise generate temp ID
-            product_id: product.id,
+            product_id: productId,
             product_code: product.product_code || product.name || 'N/A',
-            product_design_id: design.id,
+            product_design_id: designId,
             product_design_name: design.pd_name || design.pd_alt_name || 'N/A',
-            flute_id: flute.id,
+            flute_id: fluteId,
             flute_code: flute.code || 'N/A',
             compute: existingTrim ? (existingTrim.compute === 1 || existingTrim.compute === true) : false,
             min_trim: existingTrim ? existingTrim.min_trim : 0,
@@ -326,10 +345,12 @@ const loadData = async () => {
     }
 
     items.value = combinations;
-    filteredItems.value = [...items.value];
+    // filteredItems is a computed property, it will update automatically
   } catch (error) {
     console.error('Error loading data:', error);
     toast.error(error.response?.data?.message || 'Failed to load roll trim by product design data.');
+    // On error, clear items to reflect no data, filteredItems will update automatically
+    items.value = [];
   } finally {
     loading.value = false;
   }
@@ -346,14 +367,21 @@ const selectItem = (item) => {
 };
 
 // Helper function to save trim data
-async function _saveTrimData(trimData) {
+async function _saveTrimData(itemToSave) {
+  // Find the original item from the reactive 'items' array to ensure all properties are present
+  const originalItem = items.value.find(i => i.id === itemToSave.id);
+
+  if (!originalItem) {
+    throw new Error('Original item not found for saving.');
+  }
+
   const payload = {
-    product_id: trimData.product_id,
-    product_design_id: trimData.product_design_id,
-    flute_id: trimData.flute_id,
-    compute: trimData.compute,
-    min_trim: trimData.min_trim === '' || trimData.min_trim === null ? 0 : Number(trimData.min_trim),
-    max_trim: trimData.max_trim === '' || trimData.max_trim === null ? 0 : Number(trimData.max_trim),
+    product_id: Number(originalItem.product_id),
+    product_design_id: Number(originalItem.product_design_id),
+    flute_id: Number(originalItem.flute_id),
+    compute: itemToSave.compute, // Use the potentially toggled compute from itemToSave
+    min_trim: itemToSave.min_trim === '' || itemToSave.min_trim === null ? 0 : Number(itemToSave.min_trim),
+    max_trim: itemToSave.max_trim === '' || itemToSave.max_trim === null ? 0 : Number(itemToSave.max_trim),
   };
 
   // Send as batch update/create. The backend should handle upsert logic based on combination.

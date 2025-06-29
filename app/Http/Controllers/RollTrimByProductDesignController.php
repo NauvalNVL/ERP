@@ -264,90 +264,59 @@ class RollTrimByProductDesignController extends Controller
      */
     public function apiBatchUpdate(Request $request)
     {
-        try {
-            $items = $request->all();
-            
-            if (!is_array($items)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Invalid data format. Expected an array of roll trim specifications.'
-                ], 400);
-            }
-            
-            $results = [];
-            $errors = [];
-            
-            foreach ($items as $item) {
-                try {
-                    Log::debug('Processing item for batch update', ['item' => $item]);
+        $results = [];
+        $errors = [];
 
-                    if (isset($item['compute'])) {
-                        $item['compute'] = filter_var($item['compute'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                    }
+        foreach ($request->all() as $itemData) {
+            try {
+                $validator = Validator::make($itemData, [
+                    'product_id' => 'required|integer|exists:products,id',
+                    'product_design_id' => 'required|integer|exists:product_designs,id',
+                    'flute_id' => 'required|integer|exists:paper_flutes,id',
+                    'compute' => 'required|boolean',
+                    'min_trim' => 'nullable|numeric|min:0',
+                    'max_trim' => 'nullable|numeric|min:0',
+                ]);
 
-                    $validator = Validator::make($item, [
-                        'product_id' => 'required|exists:products,id',
-                        'product_design_id' => 'required|exists:product_designs,id',
-                        'flute_id' => 'required|exists:paper_flutes,id',
-                        'compute' => 'required|boolean',
-                        'min_trim' => 'required|integer|min:0',
-                        'max_trim' => 'required|integer|min:0|gte:min_trim',
-                    ]);
-                    
-                    if ($validator->fails()) {
-                        $errorMessages = $validator->errors()->all();
-                        Log::warning('Validation failed for item', ['item' => $item, 'errors' => $errorMessages]);
-                        $errors[] = [
-                            'product_id' => $item['product_id'] ?? null,
-                            'product_design_id' => $item['product_design_id'] ?? null,
-                            'flute_id' => $item['flute_id'] ?? null,
-                            'error' => 'Validation failed: ' . implode(', ', $errorMessages)
-                        ];
-                        continue;
-                    }
-                    
-                    $rollTrim = RollTrimByProductDesign::updateOrCreate(
-                        [
-                            'product_id' => $item['product_id'],
-                            'product_design_id' => $item['product_design_id'],
-                            'flute_id' => $item['flute_id'],
-                        ],
-                        [
-                            'compute' => $item['compute'],
-                            'min_trim' => $item['min_trim'],
-                            'max_trim' => $item['max_trim'],
-                        ]
-                    );
-                    
-                    Log::debug('Item processed successfully', ['rollTrim' => $rollTrim]);
-                    $results[] = $rollTrim;
-                } catch (\Exception $e) {
-                    Log::error('Error updating roll trim by product design: ' . $e->getMessage(), ['item' => $item, 'exception' => $e]);
+                if ($validator->fails()) {
                     $errors[] = [
-                        'product_id' => $item['product_id'] ?? null,
-                        'product_design_id' => $item['product_design_id'] ?? null,
-                        'flute_id' => $item['flute_id'] ?? null,
-                        'error' => $e->getMessage()
+                        'product_id' => $itemData['product_id'] ?? null,
+                        'product_design_id' => $itemData['product_design_id'] ?? null,
+                        'flute_id' => $itemData['flute_id'] ?? null,
+                        'error' => $validator->errors()->first(),
                     ];
+                    continue;
                 }
-            }
-            
-            Log::info('Batch update summary', ['saved_count' => count($results), 'error_count' => count($errors)]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => count($results) . ' roll trim specifications saved successfully',
-                'results' => $results,
-                'errors' => $errors
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in batch update of roll trim by product design: ' . $e->getMessage());
-            
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to save roll trim specifications',
-                'error' => $e->getMessage()
-            ], 500);
+                $rollTrim = RollTrimByProductDesign::updateOrCreate(
+                    [
+                        'product_id' => $itemData['product_id'],
+                        'product_design_id' => $itemData['product_design_id'],
+                        'flute_id' => $itemData['flute_id'],
+                    ],
+                    [
+                        'compute' => $itemData['compute'],
+                        'min_trim' => $itemData['min_trim'] ?? 0,
+                        'max_trim' => $itemData['max_trim'] ?? null,
+                    ]
+                );
+
+                $results[] = $rollTrim;
+            } catch (\Exception $e) {
+                $errors[] = [
+                    'product_id' => $itemData['product_id'] ?? null,
+                    'product_design_id' => $itemData['product_design_id'] ?? null,
+                    'flute_id' => $itemData['flute_id'] ?? null,
+                    'error' => $e->getMessage()
+                ];
+            }
         }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => count($results) . ' roll trim specifications saved successfully',
+            'results' => $results,
+            'errors' => $errors
+        ]);
     }
 } 

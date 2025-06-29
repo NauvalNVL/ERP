@@ -391,7 +391,7 @@ const exportToExcel = async () => {
       reader.readAsText(error.response.data);
     } else {
       alert('Failed to export product designs due to a network or server error.');
-      console.error('Error exporting designs:', error);
+    console.error('Error exporting designs:', error);
     }
   }
 };

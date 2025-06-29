@@ -17,7 +17,7 @@ class CorrugatorSpecByProduct extends Model
         'min_sheet_length',
         'max_sheet_length',
         'min_sheet_width',
-        'max_sheet_width'
+        'max_sheet_width',
     ];
 
     protected $casts = [

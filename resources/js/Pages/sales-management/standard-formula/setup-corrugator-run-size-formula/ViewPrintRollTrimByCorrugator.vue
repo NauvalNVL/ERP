@@ -13,18 +13,30 @@
           <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 flex items-center justify-between">
             <h2 class="text-lg font-bold text-white">View & Print Roll Trim By Corrugator</h2>
             <div class="flex space-x-2">
-              <button @click="exportToExcel" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-                Export
-              </button>
-              <button @click="printReport" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
-                </svg>
-                Print
-              </button>
+              <div class="relative" ref="printDropdownContainer">
+                <button @click="printDropdownOpen = !printDropdownOpen" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center">
+                  <i class="fas fa-print mr-2"></i>
+                  <span>Print</span>
+                  <i class="fas fa-chevron-down ml-2 transition-transform" :class="{'rotate-180': printDropdownOpen}"></i>
+                </button>
+                <transition
+                  enter-active-class="transition ease-out duration-200"
+                  enter-from-class="transform opacity-0 scale-95"
+                  enter-to-class="transform opacity-100 scale-100"
+                  leave-active-class="transition ease-in duration-75"
+                  leave-from-class="transform opacity-100 scale-100"
+                  leave-to-class="transform opacity-0 scale-95"
+                >
+                  <div v-if="printDropdownOpen" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
+                    <a @click.prevent="printAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
+                    </a>
+                    <a @click.prevent="printAsExcel" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-excel mr-2 text-green-500"></i> Export as Excel
+                    </a>
+                  </div>
+                </transition>
+              </div>
               <Link
                 :href="setupRollTrimByCorRoute"
                 class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm flex items-center"
@@ -113,7 +125,7 @@
                         Flute Name
                       </th>
                       <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
-                        To Computer
+                        To Compute
                       </th>
                       <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Min Trim (mm)
@@ -134,12 +146,12 @@
                         {{ trim.flute_code }}
                       </td>
                       <td class="px-4 py-2 text-sm text-gray-900 border-r">
-                        {{ trim.paper_flute ? trim.paper_flute.name : 'N/A' }}
+                        {{ trim.flute_name || 'N/A' }}
                       </td>
                       <td class="px-4 py-2 text-center border-r">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
-                          :class="trim.to_computer ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'">
-                          {{ trim.to_computer ? 'Yes' : 'No' }}
+                          :class="trim.compute ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'">
+                          {{ trim.compute ? 'Yes' : 'No' }}
                         </span>
                       </td>
                       <td class="px-4 py-2 text-center border-r">
@@ -191,10 +203,12 @@
 </template>
 
 <script>
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, ref, computed, onMounted, onUnmounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default defineComponent({
   components: {
@@ -209,6 +223,8 @@ export default defineComponent({
     const flutes = ref([]);
     const corrugators = ['BHS', 'FOSBER', 'MHI'];
     const setupRollTrimByCorRoute = '/standard-formula/setup-roll-trim-by-corrugator';
+    const printDropdownOpen = ref(false);
+    const printDropdownContainer = ref(null);
     
     // Filters
     const filters = ref({
@@ -269,31 +285,22 @@ export default defineComponent({
         
         // Fetch roll trims
         const rollTrimsResponse = await axios.get('/api/roll-trim-by-corrugator');
-        if (rollTrimsResponse.data.status === 'success') {
-          // Enhance the data with min and max trim values
-          rollTrims.value = rollTrimsResponse.data.data.map(trim => ({
-            ...trim,
-            to_computer: true, // Default to Yes based on screenshot
-            min_trim: trim.trim_value,
-            max_trim: trim.trim_value + 40 // Example calculation
-          }));
+        if (Array.isArray(rollTrimsResponse.data)) {
+          rollTrims.value = rollTrimsResponse.data;
         } else {
-          throw new Error(rollTrimsResponse.data.message || 'Failed to fetch roll trim data');
+          throw new Error('Received unexpected data format for roll trims.');
         }
         
-        // Fetch flutes
+        // Fetch flutes for filtering
         const flutesResponse = await axios.get('/api/paper-flutes');
         if (flutesResponse.data) {
           flutes.value = flutesResponse.data;
         } else {
-          throw new Error('Failed to fetch flute data');
+          throw new Error('Failed to fetch flute data for filters');
         }
       } catch (err) {
         console.error('Error fetching data:', err);
         showNotification(err.message || 'An error occurred while fetching data', 'error');
-        
-        // Use sample data if API fails
-        rollTrims.value = getSampleData();
       } finally {
         loading.value = false;
       }
@@ -332,26 +339,75 @@ export default defineComponent({
       }
     };
 
-    const printReport = () => {
-      window.print();
+    const generatePdf = () => {
+      const doc = new jsPDF();
+      
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Roll Trim By Corrugator Report', 15, 22);
+
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generated on: ${formattedDate.value}`, 15, 28);
+      
+      const tableData = filteredRollTrims.value.map(trim => [
+        trim.flute_code,
+        trim.flute_name || 'N/A',
+        trim.compute ? 'Yes' : 'No',
+        trim.min_trim,
+        trim.max_trim,
+      ]);
+
+      autoTable(doc, {
+        head: [['Flute Code', 'Flute Name', 'To Compute', 'Min Trim (mm)', 'Max Trim (mm)']],
+        body: tableData,
+        startY: 35,
+        theme: 'grid',
+        styles: {
+          fontSize: 10,
+          cellPadding: 2,
+        },
+        headStyles: {
+          fillColor: [41, 128, 185], // A shade of blue
+          textColor: 255,
+          fontStyle: 'bold',
+        },
+        columnStyles: {
+            0: { cellWidth: 'auto' },
+            1: { cellWidth: '*' },
+            2: { halign: 'center' },
+            3: { halign: 'center' },
+            4: { halign: 'center' },
+        }
+      });
+      
+      doc.output('dataurlnewwindow');
     };
 
-    // Sample data for development/fallback
-    const getSampleData = () => [
-      { id: 1, corrugator_name: 'BHS', flute_code: 'A', paper_flute: { name: 'A FLUTE' }, to_computer: true, min_trim: 20, max_trim: 65, trim_value: 20 },
-      { id: 2, corrugator_name: 'BHS', flute_code: 'AF', paper_flute: { name: 'A FLUTE' }, to_computer: true, min_trim: 20, max_trim: 65, trim_value: 20 },
-      { id: 3, corrugator_name: 'BHS', flute_code: 'BC', paper_flute: { name: 'BC' }, to_computer: true, min_trim: 20, max_trim: 65, trim_value: 20 },
-      { id: 4, corrugator_name: 'FOSBER', flute_code: 'BF2', paper_flute: { name: 'BF2 FLUTE' }, to_computer: true, min_trim: 20, max_trim: 65, trim_value: 20 },
-      { id: 5, corrugator_name: 'FOSBER', flute_code: 'BF', paper_flute: { name: 'BF FLUTE' }, to_computer: true, min_trim: 20, max_trim: 65, trim_value: 20 },
-      { id: 6, corrugator_name: 'FOSBER', flute_code: 'B', paper_flute: { name: 'B FLUTE' }, to_computer: true, min_trim: 20, max_trim: 65, trim_value: 20 },
-      { id: 7, corrugator_name: 'MHI', flute_code: 'BFS', paper_flute: { name: 'BF SINGLE FACER' }, to_computer: true, min_trim: 20, max_trim: 65, trim_value: 20 },
-      { id: 8, corrugator_name: 'MHI', flute_code: 'CF', paper_flute: { name: 'CF' }, to_computer: true, min_trim: 20, max_trim: 65, trim_value: 20 },
-      { id: 9, corrugator_name: 'MHI', flute_code: 'EF', paper_flute: { name: 'E FLUTE' }, to_computer: true, min_trim: 20, max_trim: 65, trim_value: 20 },
-    ];
+    const printAsPdf = () => {
+      generatePdf();
+      printDropdownOpen.value = false;
+    };
+
+    const printAsExcel = () => {
+      exportToExcel();
+      printDropdownOpen.value = false;
+    };
+
+    const handleClickOutside = (event) => {
+      if (printDropdownContainer.value && !printDropdownContainer.value.contains(event.target)) {
+        printDropdownOpen.value = false;
+      }
+    };
 
     // Initialize
     onMounted(() => {
       fetchData();
+      document.addEventListener('click', handleClickOutside);
+    });
+
+    onUnmounted(() => {
+      document.removeEventListener('click', handleClickOutside);
     });
 
     return {
@@ -364,11 +420,13 @@ export default defineComponent({
       filteredRollTrims,
       formattedDate,
       setupRollTrimByCorRoute,
+      printDropdownOpen,
+      printDropdownContainer,
       showNotification,
       applyFilters,
       resetFilters,
-      exportToExcel,
-      printReport
+      printAsPdf,
+      printAsExcel,
     };
   }
 });

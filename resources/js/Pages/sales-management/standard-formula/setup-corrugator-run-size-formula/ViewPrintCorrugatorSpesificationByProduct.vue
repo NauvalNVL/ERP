@@ -12,19 +12,29 @@
           <!-- Header with buttons -->
           <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 flex items-center justify-between">
             <h2 class="text-lg font-bold text-white">View & Print Corrugator Specification by Product</h2>
-            <div class="flex space-x-2">
-              <button @click="exportToExcel" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-                Export
+            <div class="relative" ref="printDropdownContainer">
+              <button @click="togglePrintDropdown" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-lg text-sm flex items-center shadow-md transition-transform transform hover:scale-105">
+                  <i class="fas fa-print mr-2"></i>
+                  <span>Print</span>
+                  <i class="fas fa-chevron-down ml-2 transition-transform duration-200" :class="{'rotate-180': printDropdownOpen}"></i>
               </button>
-              <button @click="printData" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
-                </svg>
-                Print
-              </button>
+              <transition
+                  enter-active-class="transition ease-out duration-200"
+                  enter-from-class="transform opacity-0 scale-95"
+                  enter-to-class="transform opacity-100 scale-100"
+                  leave-active-class="transition ease-in duration-75"
+                  leave-from-class="transform opacity-100 scale-100"
+                  leave-to-class="transform opacity-0 scale-95"
+              >
+                  <div v-if="printDropdownOpen" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
+                      <a @click.prevent="printAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                          <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
+                      </a>
+                      <a @click.prevent="printAsExcel" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                          <i class="fas fa-file-excel mr-2 text-green-500"></i> Export as Excel
+                      </a>
+                  </div>
+              </transition>
             </div>
           </div>
 
@@ -59,16 +69,16 @@
                     </div>
                   </div>
                   <div>
-                    <label for="composite-filter" class="block text-sm font-medium text-gray-700 mb-1">Composite Filter</label>
+                    <label for="composite-filter" class="block text-sm font-medium text-gray-700 mb-1">To Compute</label>
                     <select
                       id="composite-filter"
-                      v-model="compositeFilter"
+                      v-model="computeFilter"
                       @change="filterProducts"
                       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                     >
                       <option value="all">All</option>
-                      <option value="true">Composite Only</option>
-                      <option value="false">Non-Composite Only</option>
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
                     </select>
                   </div>
                 </div>
@@ -86,7 +96,7 @@
                         Product Name
                       </th>
                       <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
-                        Composite
+                        To Compute
                       </th>
                       <th scope="col" colspan="2" class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Sheet Length
@@ -120,9 +130,9 @@
                       <td class="px-4 py-2 text-center border-r">
                         <span 
                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                          :class="product.composite ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
+                          :class="product.compute ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
                         >
-                          {{ product.composite ? 'Yes' : 'No' }}
+                          {{ product.compute ? 'Yes' : 'No' }}
                         </span>
                       </td>
                       <td class="px-2 py-2 text-center border-r">
@@ -180,9 +190,11 @@
 </template>
 
 <script>
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default defineComponent({
   components: {
@@ -193,7 +205,9 @@ export default defineComponent({
     const products = ref([]);
     const filteredProducts = ref([]);
     const searchQuery = ref('');
-    const compositeFilter = ref('all');
+    const computeFilter = ref('all');
+    const printDropdownOpen = ref(false);
+    const printDropdownContainer = ref(null);
     const notification = ref({
       show: false,
       message: '',
@@ -220,11 +234,11 @@ export default defineComponent({
         
         // Transform the data for display
         products.value = response.data.map(spec => ({
-          id: spec.id,
+          id: spec.spec_id || spec.product_id,
           product_id: spec.product_id,
-          product_code: spec.product?.product_code || 'N/A',
-          product_name: spec.product?.description || 'Unknown Product',
-          composite: spec.composite,
+          product_code: spec.product_code || 'N/A',
+          product_name: spec.product_name || 'Unknown Product',
+          compute: spec.compute,
           min_sheet_length: spec.min_sheet_length,
           max_sheet_length: spec.max_sheet_length,
           min_sheet_width: spec.min_sheet_width,
@@ -251,9 +265,6 @@ export default defineComponent({
         
         showNotification(errorMessage, 'error');
         
-        // Initialize with sample data for development
-        products.value = getSampleProducts();
-        filterProducts();
       } finally {
         loading.value = false;
       }
@@ -272,62 +283,80 @@ export default defineComponent({
       }
       
       // Apply composite filter
-      if (compositeFilter.value !== 'all') {
-        const isComposite = compositeFilter.value === 'true';
-        filtered = filtered.filter(product => product.composite === isComposite);
+      if (computeFilter.value !== 'all') {
+        const isCompute = computeFilter.value === 'true';
+        filtered = filtered.filter(product => product.compute === isCompute);
       }
       
       filteredProducts.value = filtered;
     };
 
-    const exportToExcel = () => {
+    const exportToExcel = async () => {
       showNotification('Exporting to Excel...');
+      try {
+        const response = await axios.get('/api/corrugator-specs-by-product/export', { responseType: 'blob' });
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = `corrugator_specs_${new Date().toISOString().split('T')[0]}.xlsx`;
+        link.click();
+        showNotification('Data exported to Excel successfully.', 'success');
+      } catch (error) {
+        console.error('Error exporting data:', error);
+        showNotification('Failed to export data. Please check the console for details.', 'error');
+      }
+    };
+
+    const printAsPdf = () => {
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text('Corrugator Specification by Product', 14, 22);
+      doc.setFontSize(11);
+      doc.setTextColor(100);
+      doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 29);
+
+      const tableData = filteredProducts.value.map(p => [
+        p.product_code,
+        p.product_name,
+        p.compute ? 'Yes' : 'No',
+        `${p.min_sheet_length} / ${p.max_sheet_length}`,
+        `${p.min_sheet_width} / ${p.max_sheet_width}`
+      ]);
+
+      autoTable(doc, {
+        head: [['Code', 'Name', 'To Compute', 'Sheet Length (Min/Max)', 'Sheet Width (Min/Max)']],
+        body: tableData,
+        startY: 35,
+        theme: 'grid',
+        headStyles: { fillColor: [22, 160, 133] },
+      });
       
-      // Call the export API endpoint
-      axios.get('/api/corrugator-specs-by-product/export', { responseType: 'blob' })
-        .then(response => {
-          // For now, we'll just show a success message
-          // In a real implementation, this would download the Excel file
-          showNotification('Data exported to Excel successfully');
-          
-          console.log('Export data:', response.data);
-        })
-        .catch(error => {
-          console.error('Error exporting data:', error);
-          showNotification('Failed to export data', 'error');
-        });
+      doc.output('dataurlnewwindow');
+      printDropdownOpen.value = false;
     };
 
-    const printData = () => {
-      window.print();
+    const printAsExcel = () => {
+      exportToExcel();
+      printDropdownOpen.value = false;
     };
 
-    // Sample data for development
-    const getSampleProducts = () => [
-      { id: 1, product_id: 1, product_code: '001', product_name: 'RSC STANDARD', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 2, product_id: 2, product_code: '002', product_name: 'DIE CUT', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 3, product_id: 3, product_code: '003', product_name: 'BHPT BOX', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 4, product_id: 4, product_code: '004', product_name: 'PENJUALAN WASTE', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 5, product_id: 5, product_code: '005', product_name: 'PENJUALAN LAIN-LAIN PCS', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 6, product_id: 6, product_code: '006', product_name: 'CONEJIT', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 7, product_id: 7, product_code: '007', product_name: 'ROLL', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 8, product_id: 8, product_code: '008', product_name: 'PENJUALAN LAIN-LAIN KG', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 9, product_id: 9, product_code: '009', product_name: 'PENJUALAN LAIN-LAIN', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 10, product_id: 10, product_code: '010', product_name: 'TRAY', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 11, product_id: 11, product_code: '011', product_name: 'SINGLE FACER KG', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 12, product_id: 12, product_code: '012', product_name: 'SINGLE FACER SHEET', composite: true, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 13, product_id: 13, product_code: '013', product_name: 'PENJUALAN LAIN-LAIN', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 14, product_id: 14, product_code: '014', product_name: 'SEWA TRUCK', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 15, product_id: 15, product_code: '015', product_name: 'CORE PLUS', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 16, product_id: 16, product_code: '016', product_name: 'PAPER TUBE', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 17, product_id: 17, product_code: '017', product_name: 'OFFSET', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 18, product_id: 18, product_code: '018', product_name: '2 FAX OFFSET', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 19, product_id: 19, product_code: '019', product_name: 'DIGITAL PRINT', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-      { id: 20, product_id: 20, product_code: '020', product_name: 'SEWA TRUCK TRAILER', composite: false, min_sheet_length: 1, max_sheet_length: 99999, min_sheet_width: 1, max_sheet_width: 99999 },
-    ];
+    const togglePrintDropdown = () => {
+      printDropdownOpen.value = !printDropdownOpen.value;
+    };
+
+    const handleClickOutside = (event) => {
+      if (printDropdownContainer.value && !printDropdownContainer.value.contains(event.target)) {
+        printDropdownOpen.value = false;
+      }
+    };
 
     onMounted(() => {
       loadProducts();
+      document.addEventListener('click', handleClickOutside);
+    });
+    
+    onUnmounted(() => {
+      document.removeEventListener('click', handleClickOutside);
     });
 
     return {
@@ -335,11 +364,14 @@ export default defineComponent({
       products,
       filteredProducts,
       searchQuery,
-      compositeFilter,
+      computeFilter,
       notification,
+      printDropdownOpen,
+      printDropdownContainer,
       filterProducts,
-      exportToExcel,
-      printData,
+      printAsPdf,
+      printAsExcel,
+      togglePrintDropdown,
       showNotification
     };
   }

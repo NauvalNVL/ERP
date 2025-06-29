@@ -278,32 +278,17 @@ watch(itemsPerPage, () => { currentPage.value = 1; });
 
 // Main Methods
     const loadProducts = async () => {
-  loading.value = true;
-  try {
-    const [productsResponse, specsResponse] = await Promise.all([
-      axios.get('/api/products'),
-      axios.get('/api/corrugator-specs-by-product')
-    ]);
-
-    const specsMap = new Map(specsResponse.data.map(s => [s.product_code, s]));
-    
-    products.value = productsResponse.data.map(product => {
-      const spec = specsMap.get(product.product_code);
-          return {
-            id: product.id,
-            product_code: product.product_code,
-            product_name: product.name || product.description,
-            compute: spec ? !!spec.compute : false,
-        spec_id: spec ? spec.id : null,
-            min_sheet_length: spec ? spec.min_sheet_length : null,
-            max_sheet_length: spec ? spec.max_sheet_length : null,
-            min_sheet_width: spec ? spec.min_sheet_width : null,
-            max_sheet_width: spec ? spec.max_sheet_width : null,
-          };
-        });
+      loading.value = true;
+      try {
+        const response = await axios.get('/api/corrugator-specs-by-product');
+        products.value = response.data.map(p => ({
+          ...p,
+          id: p.product_id, 
+          compute: !!p.compute,
+        }));
       } catch (error) {
-    console.error('Error loading data:', error);
-    toast.error('Failed to load specifications.');
+        console.error('Error loading data:', error);
+        toast.error('Failed to load specifications.');
       } finally {
         loading.value = false;
       }
@@ -331,8 +316,8 @@ async function _saveSpec(specData) {
   };
 
   for (const key of ['min_sheet_length', 'max_sheet_length', 'min_sheet_width', 'max_sheet_width']) {
-    if (payload[key] === '') {
-      payload[key] = null;
+    if (payload[key] === '' || payload[key] === null) {
+      payload[key] = 0;
     }
   }
 
@@ -372,8 +357,8 @@ const updateSheetDimensions = async (product, field) => {
   } catch (error) {
     console.error(`Error updating ${field}:`, error);
     toast.error(error.response?.data?.message || `Failed to update ${field}.`);
-    loadProducts();
-      } finally {
+    await loadProducts();
+  } finally {
     savingStatus.value[statusKey] = false;
   }
 };
@@ -382,28 +367,44 @@ const toggleCompute = async (product) => {
   if (toggleLoading.value[product.id]) return;
   toggleLoading.value[product.id] = true;
   
+  const productIndex = products.value.findIndex(p => p.id === product.id);
+  if (productIndex === -1) {
+    toggleLoading.value[product.id] = false;
+    return;
+  }
+  
+  const originalComputeState = product.compute;
+
+  // Optimistically update UI
+  products.value[productIndex].compute = !originalComputeState;
+  if (selectedProduct.value && selectedProduct.value.id === product.id) {
+    selectedProduct.value.compute = !originalComputeState;
+  }
+
   try {
-    const updatedProductData = { ...product, compute: !product.compute };
-    const response = await _saveSpec(updatedProductData);
+    const productDataForApi = { ...products.value[productIndex] };
+    const response = await _saveSpec(productDataForApi);
+
+    // Success: solidify the change from the response
+    const updatedResult = response.data.results[0];
+    products.value[productIndex].compute = !!updatedResult.compute; // Coerce to boolean
+    if (updatedResult.id) {
+        products.value[productIndex].spec_id = updatedResult.id;
+    }
     
-    const index = products.value.findIndex(p => p.id === product.id);
-    if (index !== -1) {
-      products.value[index].compute = !product.compute;
-      if (response.data.results.length > 0 && !products.value[index].spec_id) {
-        products.value[index].spec_id = response.data.results[0].id;
-      }
-      if (selectedProduct.value && selectedProduct.value.id === product.id) {
-        selectedProduct.value = products.value[index];
-      }
+    if (selectedProduct.value && selectedProduct.value.id === product.id) {
+        selectedProduct.value.compute = !!updatedResult.compute;
     }
     
     toast.success(`Compute for ${product.product_code} updated.`);
   } catch (error) {
     console.error('Error toggling compute:', error);
     toast.error(error.response?.data?.message || 'Failed to update compute status.');
-    const index = products.value.findIndex(f => f.id === product.id);
-    if (index !== -1) {
-      products.value[index].compute = product.compute;
+    
+    // Failure: revert to the original state
+    products.value[productIndex].compute = originalComputeState;
+    if (selectedProduct.value && selectedProduct.value.id === product.id) {
+        selectedProduct.value.compute = originalComputeState;
     }
   } finally {
     toggleLoading.value[product.id] = false;

@@ -15,7 +15,7 @@ return new class extends Migration
             Schema::create('corrugator_spec_by_products', function (Blueprint $table) {
                 $table->id();
                 $table->string('product_code', 50);
-                $table->boolean('composite')->default(false);
+                $table->boolean('compute')->default(false);
                 $table->integer('min_sheet_length')->default(1);
                 $table->integer('max_sheet_length')->default(99999);
                 $table->integer('min_sheet_width')->default(1);
