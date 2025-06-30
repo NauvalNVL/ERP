@@ -34,8 +34,8 @@
                         <i class="fas fa-print text-white"></i>
                       </div>
                       <span>Print List</span>
-                    </div>
-                  </button>
+    </div>
+                </button>
                   <Link href="/customer-group" class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center transition-all duration-300 relative overflow-hidden">
                     <span class="absolute inset-0 bg-white opacity-10 transform scale-x-0 origin-left transition-transform hover:scale-x-100"></span>
                     <div class="relative z-10 flex items-center">
@@ -44,7 +44,7 @@
                       </div>
                       <span>Back</span>
                     </div>
-                  </Link>
+                </Link>
                 </div>
               </div>
             </div>
@@ -74,11 +74,11 @@
                 <label class="block text-sm font-medium text-blue-700 mb-2 flex items-center">
                   <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full mr-2 flex items-center justify-center shadow-sm">
                     <i class="fas fa-search text-white text-sm"></i>
-                  </div>
+                </div>
                   Search:
                 </label>
                 <div class="relative flex-grow">
-                  <input 
+                <input 
                     type="text" 
                     v-model="searchQuery" 
                     class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
@@ -118,98 +118,98 @@
                 </button>
               </div>
             </div>
-          </div>
+            </div>
         </div>
 
         <!-- Table Section -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
           <div class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 px-6">
-            <div class="flex items-center">
+                    <div class="flex items-center">
               <div class="mr-4 bg-white bg-opacity-20 p-2 rounded-full shadow-inner">
                 <i class="fas fa-users text-2xl"></i>
-              </div>
-              <div>
+                        </div>
+    <div>
                 <h2 class="text-xl font-bold">Customer Groups List</h2>
                 <p class="text-sm opacity-80">View and manage customer group data</p>
-              </div>
-            </div>
-          </div>
-          
+                        </div>
+                    </div>
+                </div>
+
           <div class="overflow-x-auto">
             <div id="printableTable" class="min-w-full bg-white">
-              <!-- Table Content -->
-              <table class="min-w-full divide-y divide-gray-200">
+                <!-- Table Content -->
+                <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gradient-to-r from-cyan-50 to-blue-50">
-                  <tr>
+                        <tr>
                     <th @click="sortTable('group_code')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                       <div class="flex items-center">
                         <span>Group Code</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
-                    </th>
+                            </th>
                     <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                       <div class="flex items-center">
                         <span>Description</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
-                    </th>
+                            </th>
                     <th @click="sortTable('created_at')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                       <div class="flex items-center">
                         <span>Created At</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
-                    </th>
+                            </th>
                     <th @click="sortTable('updated_at')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                       <div class="flex items-center">
                         <span>Updated At</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-if="loading" class="hover:bg-gray-50">
-                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-                      <div class="flex justify-center">
-                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                      </div>
-                      <p class="mt-2">Loading customer group data...</p>
-                    </td>
-                  </tr>
-                  <tr v-else-if="filteredCustomerGroups.length === 0" class="hover:bg-gray-50">
-                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr v-if="loading" class="hover:bg-gray-50">
+                            <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                <div class="flex justify-center">
+                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                </div>
+                                <p class="mt-2">Loading customer group data...</p>
+                            </td>
+                        </tr>
+                        <tr v-else-if="filteredCustomerGroups.length === 0" class="hover:bg-gray-50">
+                            <td colspan="4" class="px-6 py-4 text-center text-gray-500">
                       <div class="flex flex-col items-center">
                         <i class="fas fa-users text-4xl text-gray-300 mb-2"></i>
                         <p class="text-lg font-medium">No customer groups found</p>
-                        <template v-if="searchQuery">
+                                <template v-if="searchQuery">
                           <p class="mt-2 text-sm">No results match your search query: "{{ searchQuery }}"</p>
-                          <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
-                        </template>
+                                    <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
+                                </template>
                       </div>
-                    </td>
-                  </tr>
-                  <tr v-for="(group, index) in filteredCustomerGroups" :key="group.group_code" 
-                      :class="{'bg-blue-50': index % 2 === 0}" 
+                            </td>
+                        </tr>
+                        <tr v-for="(group, index) in filteredCustomerGroups" :key="group.group_code" 
+                            :class="{'bg-blue-50': index % 2 === 0}" 
                       class="hover:bg-blue-100 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-medium text-gray-900">{{ group.group_code }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">{{ group.description }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">{{ formatDate(group.created_at) }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">{{ formatDate(group.updated_at) }}</div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ group.group_code }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ group.description }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ formatDate(group.created_at) }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ formatDate(group.updated_at) }}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-              <!-- Table Footer -->
+                <!-- Table Footer -->
               <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
-                <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between">
                   <div class="flex items-center">
                     <i class="fas fa-info-circle mr-2 text-blue-500"></i>
                     <span>Total Customer Groups: <span class="font-semibold text-blue-700">{{ filteredCustomerGroups.length }}</span></span>
@@ -217,11 +217,11 @@
                   <div v-if="searchQuery" class="text-blue-600">
                     Filtered from {{ customerGroups.length }} total records
                   </div>
-                  <div class="text-xs text-gray-400">Generated: {{ currentDate }}</div>
+                        <div class="text-xs text-gray-400">Generated: {{ currentDate }}</div>
                 </div>
-              </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
 
         <!-- Print Instructions -->
@@ -231,16 +231,16 @@
               <i class="fas fa-info text-white text-sm"></i>
             </div>
             Print Instructions
-          </h3>
+            </h3>
           <ul class="list-disc pl-5 text-sm text-gray-600 space-y-2">
-            <li>Click the "Print List" button above to print this customer group list</li>
-            <li>Use landscape orientation for better results</li>
-            <li>You can search or sort data before printing</li>
-            <li>Only the table will be included in the print output</li>
+                <li>Click the "Print List" button above to print this customer group list</li>
+                <li>Use landscape orientation for better results</li>
+                <li>You can search or sort data before printing</li>
+                <li>Only the table will be included in the print output</li>
             <li>Make sure your printer is properly configured</li>
-          </ul>
+            </ul>
         </div>
-      </div>
+        </div>
     </div>
     </AppLayout>
 </template>

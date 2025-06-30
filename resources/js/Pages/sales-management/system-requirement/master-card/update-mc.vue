@@ -703,7 +703,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    </div>
+                </div>
                 </div>
                 <div class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl">
                     <button 

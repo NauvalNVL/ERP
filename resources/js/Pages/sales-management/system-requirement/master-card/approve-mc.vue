@@ -62,6 +62,7 @@
                                         />
                                         <button 
                                             type="button"
+                                            @click="openCustomerAccountModal"
                                             class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
                                         >
                                             <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
@@ -105,6 +106,7 @@
                                         />
                                         <button 
                                             type="button"
+                                            @click="openMcsModal"
                                             class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
                                         >
                                             <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
@@ -611,6 +613,424 @@
             @close="closeEditModal"
             @update="handleUpdateMasterCard"
         />
+
+        <!-- Customer Account Modal -->
+        <div v-if="showCustomerAccountModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+            <!-- Modal backdrop -->
+            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showCustomerAccountModal = false"></div>
+            
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow-xl w-96 mx-auto max-w-lg z-10 transform transition-all">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-lg relative overflow-hidden">
+                    <div class="absolute -top-8 -left-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                    <div class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                    
+                    <h3 class="text-xl font-semibold flex items-center relative z-10">
+                        <span class="inline-flex items-center justify-center w-8 h-8 bg-white bg-opacity-20 rounded-full mr-3 shadow-inner">
+                            <i class="fas fa-filter text-white"></i>
+                        </span>
+                        Options
+                    </h3>
+                    <button type="button" @click="showCustomerAccountModal = false" 
+                        class="text-white hover:text-gray-200 focus:outline-none transition-transform hover:scale-110 relative z-10 bg-red-500 bg-opacity-30 hover:bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 space-y-6">
+                    <!-- Sort By Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-sort mr-2 text-blue-500"></i>Sort by:
+                        </h4>
+                        <div class="space-y-2 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="sortOption" value="code" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">Customer Code</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="sortOption" value="name" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">Customer Name</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Record Status Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-tag mr-2 text-blue-500"></i>Record Status:
+                        </h4>
+                        <div class="flex items-center space-x-6 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="checkbox" v-model="recordStatusFilter.active" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                                <span class="ml-2 text-gray-700">Active</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="checkbox" v-model="recordStatusFilter.obsolete" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                                <span class="ml-2 text-gray-700">Obsolete</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-center space-x-4 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+                    <button 
+                        @click="applyFilter" 
+                        class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium py-2 px-8 rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg relative overflow-hidden group"
+                    >
+                        <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                        <span class="inline-flex items-center">
+                            <i class="fas fa-check mr-2"></i>
+                        OK
+                        </span>
+                    </button>
+                    <button 
+                        @click="showCustomerAccountModal = false" 
+                        class="bg-gradient-to-r from-gray-300 to-gray-400 hover:from-gray-400 hover:to-gray-500 text-gray-800 font-medium py-2 px-8 rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 shadow-md hover:shadow-lg relative overflow-hidden group"
+                    >
+                        <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                        <span class="inline-flex items-center">
+                            <i class="fas fa-times mr-2"></i> Exit
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Account Table (after selecting options) -->
+        <div v-if="showCustomerAccountTable" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+            <!-- Modal backdrop -->
+            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showCustomerAccountTable = false"></div>
+            
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto z-10 transform transition-all border-2 border-indigo-200">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-5 border-b-2 border-indigo-200 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white rounded-t-2xl relative overflow-hidden">
+                    <!-- Decorative animated circles -->
+                    <div class="absolute -top-8 -left-8 w-24 h-24 bg-white opacity-10 rounded-full animate-ping-slow"></div>
+                    <div class="absolute -bottom-8 -right-8 w-20 h-20 bg-cyan-300 opacity-10 rounded-full animate-ping-slow animation-delay-500"></div>
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-white opacity-5 rounded-full"></div>
+                    <h3 class="text-2xl font-bold flex items-center relative z-10 text-shadow">
+                        <span class="inline-flex items-center justify-center w-10 h-10 bg-white bg-opacity-20 rounded-full mr-4 shadow-inner">
+                            <i class="fas fa-table text-white text-xl"></i>
+                        </span>
+                        Customer Account Table
+                    </h3>
+                    <button type="button" @click="showCustomerAccountTable = false" 
+                        class="text-white hover:text-gray-200 focus:outline-none transition-transform hover:scale-110 relative z-10 bg-red-500 bg-opacity-30 hover:bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 bg-gradient-to-br from-white via-blue-50 to-cyan-50 rounded-b-2xl overflow-auto" style="max-height: 440px;">
+                    <div class="mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="text-gray-700 text-base font-medium">
+                            <span class="font-bold text-indigo-700">Filter:</span> 
+                            <span class="text-gray-600">{{ recordStatusFilter.active && recordStatusFilter.obsolete ? 'All Records' : recordStatusFilter.active ? 'Active Records Only' : recordStatusFilter.obsolete ? 'Obsolete Records Only' : 'No Records' }}</span>
+                        </div>
+                        <div class="relative w-full md:w-64">
+                            <input 
+                                type="text" 
+                                v-model="tableSearchTerm" 
+                                placeholder="Search..." 
+                                class="border border-indigo-200 rounded-lg py-2 px-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 w-full shadow-sm"
+                            />
+                            <i class="fas fa-search absolute right-4 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto rounded-lg shadow">
+                    <table class="min-w-full border border-indigo-200 text-base bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-400 text-white">
+                            <tr>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Customer Name</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Customer Code</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">S/person</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">AC Type</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Currency</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-indigo-100">
+                            <tr v-for="(customer, index) in displayedCustomers" :key="customer.code" 
+                                class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedCustomer?.code === customer.code }"
+                                @click="selectForView(customer)" 
+                                @dblclick="selectCustomer(customer)">
+                                <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ customer.name }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100">{{ customer.code }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100">{{ customer.salesperson }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100">{{ customer.acType }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100">{{ customer.currency }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100">
+                                    <span v-if="customer.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                    <span v-else-if="customer.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                    <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ customer.status }}</span>
+                                </td>
+                            </tr>
+                            <tr v-if="displayedCustomers.length === 0">
+                                <td colspan="6" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
+                                    No customer accounts found matching your criteria
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl">
+                    <button 
+                        class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-teal-400 via-blue-500 to-indigo-500 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-cyan-200 before:via-blue-300 before:to-indigo-200 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+                    >
+                        <span class="relative z-10 flex items-center">
+                            <i class="fas fa-cog mr-2 animate-spin-slow"></i> More Options
+                        </span>
+                    </button>
+                    <button 
+                        class="bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-500 hover:to-cyan-600 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow transition-all group relative overflow-hidden flex items-center"
+                    >
+                        <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                        <i class="fas fa-search-plus mr-2"></i> Zoom
+                    </button>
+                    <button 
+                        @click="selectCustomer(selectedCustomer)" 
+                        :disabled="!selectedCustomer"
+                        class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed transition-all group relative overflow-hidden flex items-center"
+                    >
+                        <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                        <i class="fas fa-check-circle mr-2"></i> Select
+                    </button>
+                    <button 
+                        @click="showCustomerAccountTable = false" 
+                        class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-pink-500 via-red-500 to-orange-400 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-rose-200 before:via-red-200 before:to-orange-100 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+                    >
+                        <span class="relative z-10 flex items-center">
+                            <i class="fas fa-times mr-2"></i> Exit
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCS Options Modal -->
+        <div v-if="showMcsOptionsModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+            <!-- Modal backdrop -->
+            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showMcsOptionsModal = false"></div>
+            
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow-xl w-96 mx-auto max-w-lg z-10 transform transition-all">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-t-lg relative overflow-hidden">
+                    <div class="absolute -top-8 -left-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                    <div class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                    
+                    <h3 class="text-xl font-semibold flex items-center relative z-10">
+                        <span class="inline-flex items-center justify-center w-8 h-8 bg-white bg-opacity-20 rounded-full mr-3 shadow-inner">
+                            <i class="fas fa-filter text-white"></i>
+                        </span>
+                        Options
+                    </h3>
+                    <button type="button" @click="showMcsOptionsModal = false" 
+                        class="text-white hover:text-gray-200 focus:outline-none transition-transform hover:scale-110 relative z-10 bg-red-500 bg-opacity-30 hover:bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 space-y-6">
+                    <!-- Sort By Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-sort mr-2 text-blue-500"></i>Sort by:
+                        </h4>
+                        <div class="space-y-2 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsSortOption" value="seq" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">MC Seq#</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsSortOption" value="model" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">MC Model</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsSortOption" value="part" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">MC PD Part#</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsSortOption" value="ed" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">MC PD ED</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsSortOption" value="id" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">MC PD ID</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Sort Order Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-arrow-up-long mr-2 text-blue-500"></i>Sort Order:
+                        </h4>
+                        <div class="flex items-center space-x-6 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsSortOrder" value="asc" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">Ascending</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsSortOrder" value="desc" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">Descending</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- MC Status Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-tag mr-2 text-blue-500"></i>MC Status:
+                        </h4>
+                        <div class="flex items-center space-x-6 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="checkbox" v-model="mcsRecordStatus.active" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                                <span class="ml-2 text-gray-700">Active</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="checkbox" v-model="mcsRecordStatus.obsolete" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                                <span class="ml-2 text-gray-700">Obsolete</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-center space-x-4 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+                    <button 
+                        @click="applyMcsFilter" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                        OK
+                    </button>
+                    <button 
+                        @click="showMcsOptionsModal = false" 
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
+                    >
+                        Exit
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCS Table Modal (after selecting options) -->
+        <div v-if="showMcsTableModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+            <!-- Modal backdrop -->
+            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showMcsTableModal = false"></div>
+            
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto z-10 transform transition-all border-2 border-indigo-200">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-5 border-b-2 border-indigo-200 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white rounded-t-2xl relative overflow-hidden">
+                    <!-- Decorative animated circles -->
+                    <div class="absolute -top-8 -left-8 w-24 h-24 bg-white opacity-10 rounded-full animate-ping-slow"></div>
+                    <div class="absolute -bottom-8 -right-8 w-20 h-20 bg-cyan-300 opacity-10 rounded-full animate-ping-slow animation-delay-500"></div>
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-white opacity-5 rounded-full"></div>
+                    <h3 class="text-2xl font-bold flex items-center relative z-10 text-shadow">
+                        <span class="inline-flex items-center justify-center w-10 h-10 bg-white bg-opacity-20 rounded-full mr-4 shadow-inner">
+                            <i class="fas fa-id-card text-white text-xl"></i>
+                        </span>
+                        Master Card Seq Table
+                    </h3>
+                    <button type="button" @click="showMcsTableModal = false" 
+                        class="text-white hover:text-gray-200 focus:outline-none transition-transform hover:scale-110 relative z-10 bg-red-500 bg-opacity-30 hover:bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 bg-gradient-to-br from-white via-blue-50 to-cyan-50 rounded-b-2xl overflow-auto" style="max-height: 440px;">
+                    <div class="mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="text-gray-700 text-base font-medium">
+                            <span class="font-bold text-indigo-700">Filter:</span> 
+                            <span class="text-gray-600">{{ mcsRecordStatus.active && mcsRecordStatus.obsolete ? 'All Records' : mcsRecordStatus.active ? 'Active Records Only' : mcsRecordStatus.obsolete ? 'Obsolete Records Only' : 'No Records' }}</span>
+                        </div>
+                        <div class="relative w-full md:w-64">
+                            <input 
+                                type="text" 
+                                v-model="mcsSearchTerm" 
+                                placeholder="Search..." 
+                                class="border border-indigo-200 rounded-lg py-2 px-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 w-full shadow-sm"
+                            />
+                            <i class="fas fa-search absolute right-4 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto rounded-lg shadow">
+                    <table class="min-w-full border border-indigo-200 text-base bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-400 text-white">
+                            <tr>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Model</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC PD Part#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC PD ED</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC PD ID</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-indigo-100">
+                            <tr v-for="(mcs, index) in filteredMcsData" :key="mcs.seq" 
+                                class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
+                                @click="selectForViewMcs(mcs)"
+                                @dblclick="selectMcs(mcs)">
+                                <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ mcs.seq }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.model }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.part }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.ed }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.id }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100">
+                                    <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                    <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                    <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                </td>
+                            </tr>
+                            <tr v-if="filteredMcsData.length === 0">
+                                <td colspan="6" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
+                                    No master card records found matching your criteria
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+                <div class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl">
+                    <button 
+                        class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-teal-400 via-blue-500 to-indigo-500 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-cyan-200 before:via-blue-300 before:to-indigo-200 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+                    >
+                        <span class="relative z-10 flex items-center">
+                            <i class="fas fa-cog mr-2 animate-spin-slow"></i> More Options
+                        </span>
+                    </button>
+                    <button 
+                        class="bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-500 hover:to-cyan-600 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow transition-all group relative overflow-hidden flex items-center"
+                    >
+                        <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                        <i class="fas fa-search-plus mr-2"></i> Zoom
+                    </button>
+                    <button 
+                        @click="selectMcs(selectedMcs)" 
+                        :disabled="!selectedMcs"
+                        class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed transition-all group relative overflow-hidden flex items-center"
+                    >
+                        <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                        <i class="fas fa-check-circle mr-2"></i> Select
+                    </button>
+                    <button 
+                        @click="showMcsTableModal = false" 
+                        class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-pink-500 via-red-500 to-orange-400 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-rose-200 before:via-red-200 before:to-orange-100 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+                    >
+                        <span class="relative z-10 flex items-center">
+                            <i class="fas fa-times mr-2"></i> Exit
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>
 
@@ -640,6 +1060,49 @@ const showEditModal = ref(false);
 const editingMasterCard = ref(null);
 const modalMode = ref('edit');
 
+// Customer Account Modal variables
+const showCustomerAccountModal = ref(false);
+const showCustomerAccountTable = ref(false);
+const sortOption = ref('code');
+const tableSearchTerm = ref('');
+const selectedCustomer = ref(null);
+
+// MCS Modal variables
+const showMcsOptionsModal = ref(false);
+const showMcsTableModal = ref(false);
+const mcsSortOption = ref('seq');
+const mcsSortOrder = ref('asc');
+const mcsRecordStatus = ref({
+    active: true,
+    obsolete: false
+});
+const selectedMcs = ref(null);
+const mcsSearchTerm = ref('');
+
+// Customer data (sample data - replace with actual API call)
+const customerData = ref([
+    { code: 'CUST0001', name: 'PT. Indah Karya', salesperson: 'John Doe', acType: 'Regular', currency: 'IDR', status: 'Active' },
+    { code: 'CUST0002', name: 'PT. Maju Bersama', salesperson: 'Jane Smith', acType: 'Premium', currency: 'USD', status: 'Active' },
+    { code: 'CUST0003', name: 'CV. Berkah Jaya', salesperson: 'Bob Johnson', acType: 'Regular', currency: 'IDR', status: 'Obsolete' },
+    { code: 'CUST0004', name: 'UD. Sukses Mandiri', salesperson: 'Alice Brown', acType: 'Premium', currency: 'USD', status: 'Active' },
+    { code: 'CUST0005', name: 'PT. Sejahtera Abadi', salesperson: 'Charlie Wilson', acType: 'Regular', currency: 'IDR', status: 'Active' },
+]);
+
+// MCS data (sample data - replace with actual API call)
+const mcsData = ref([
+    { seq: 'MC001', model: 'Box-Standard', part: 'P123', ed: 'ED001', id: 'ID001', status: 'Active' },
+    { seq: 'MC002', model: 'Box-Premium', part: 'P124', ed: 'ED002', id: 'ID002', status: 'Active' },
+    { seq: 'MC003', model: 'Container-Small', part: 'P125', ed: 'ED003', id: 'ID003', status: 'Obsolete' },
+    { seq: 'MC004', model: 'Container-Medium', part: 'P126', ed: 'ED004', id: 'ID004', status: 'Active' },
+    { seq: 'MC005', model: 'Container-Large', part: 'P127', ed: 'ED005', id: 'ID005', status: 'Active' },
+]);
+
+// Record status filter
+const recordStatusFilter = ref({
+    active: true,
+    obsolete: true
+});
+
 // Replace the hardcoded masterCards with props data
 const masterCards = ref(props.masterCards || []);
 const customers = ref(props.customers || []);
@@ -667,6 +1130,114 @@ const filteredMasterCards = computed(() => {
             return a.customer_name.localeCompare(b.customer_name);
         }
     });
+});
+
+// Customer Account Modal Computed Properties
+const filteredCustomers = computed(() => {
+    return customerData.value.filter(customer => {
+        // Filter by status
+        if (recordStatusFilter.value.active && customer.status === 'Active') {
+            return true;
+        }
+        if (recordStatusFilter.value.obsolete && customer.status === 'Obsolete') {
+            return true;
+        }
+        return false;
+    });
+});
+
+// Filter and sort the displayed customers
+const displayedCustomers = computed(() => {
+    let result = [...filteredCustomers.value];
+    
+    // Apply search filter
+    if (tableSearchTerm.value) {
+        const searchLower = tableSearchTerm.value.toLowerCase();
+        result = result.filter(customer => 
+            customer.code.toLowerCase().includes(searchLower) ||
+            customer.name.toLowerCase().includes(searchLower)
+        );
+    }
+    
+    // Apply sorting
+    if (sortOption.value === 'code') {
+        result.sort((a, b) => a.code.localeCompare(b.code));
+    } else if (sortOption.value === 'name') {
+        result.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    return result;
+});
+
+// MCS Computed Properties
+const filteredMcs = computed(() => {
+    return mcsData.value.filter(mcs => {
+        if (mcsRecordStatus.value.active && mcs.status === 'Active') {
+            return true;
+        }
+        if (mcsRecordStatus.value.obsolete && mcs.status === 'Obsolete') {
+            return true;
+        }
+        return false;
+    });
+});
+
+// Filter and sort MCS data
+const filteredMcsData = computed(() => {
+    let result = [...filteredMcs.value];
+    
+    // Apply search filter if there's a search term
+    if (mcsSearchTerm.value) {
+        const searchLower = mcsSearchTerm.value.toLowerCase();
+        result = result.filter(mcs => 
+            mcs.seq.toLowerCase().includes(searchLower) ||
+            mcs.model.toLowerCase().includes(searchLower) ||
+            mcs.part.toLowerCase().includes(searchLower) ||
+            mcs.ed.toLowerCase().includes(searchLower) ||
+            mcs.id.toLowerCase().includes(searchLower)
+        );
+    }
+    
+    // Apply sorting
+    result.sort((a, b) => {
+        let aValue, bValue;
+        
+        // Determine which field to sort by
+        switch (mcsSortOption.value) {
+            case 'seq':
+                aValue = a.seq;
+                bValue = b.seq;
+                break;
+            case 'model':
+                aValue = a.model;
+                bValue = b.model;
+                break;
+            case 'part':
+                aValue = a.part;
+                bValue = b.part;
+                break;
+            case 'ed':
+                aValue = a.ed;
+                bValue = b.ed;
+                break;
+            case 'id':
+                aValue = a.id;
+                bValue = b.id;
+                break;
+            default:
+                aValue = a.seq;
+                bValue = b.seq;
+        }
+        
+        // Apply sort order
+        if (mcsSortOrder.value === 'asc') {
+            return aValue.localeCompare(bValue);
+        } else {
+            return bValue.localeCompare(aValue);
+        }
+    });
+    
+    return result;
 });
 
 // Action handlers
@@ -892,6 +1463,52 @@ const handleUpdateMasterCard = async (updatedMasterCardData) => {
     } catch (error) {
         console.error('Error processing master card data:', error);
     }
+};
+
+const openCustomerAccountModal = () => {
+    showCustomerAccountModal.value = true;
+};
+
+const applyFilter = () => {
+    showCustomerAccountModal.value = false;
+    showCustomerAccountTable.value = true;
+};
+
+const selectCustomer = (customer) => {
+    if (!customer) return;
+    
+    selectedCustomer.value = customer;
+    searchTerm.value = customer.code; // Update the search term with selected customer code
+    showCustomerAccountTable.value = false;
+};
+
+const selectForView = (customer) => {
+    selectedCustomer.value = customer;
+};
+
+// MCS Modal functions
+const openMcsModal = () => {
+    showMcsOptionsModal.value = true;
+};
+
+const applyMcsFilter = () => {
+    showMcsOptionsModal.value = false;
+    showMcsTableModal.value = true;
+};
+
+const selectMcs = (mcs) => {
+    if (!mcs) return;
+    
+    selectedMcs.value = mcs;
+    
+    // Update the search term with selected MCS sequence
+    searchTerm.value = mcs.seq;
+    
+    showMcsTableModal.value = false;
+};
+
+const selectForViewMcs = (mcs) => {
+    selectedMcs.value = mcs;
 };
 </script>
 
