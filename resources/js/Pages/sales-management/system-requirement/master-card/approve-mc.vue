@@ -101,6 +101,7 @@
                                         <input 
                                             type="text" 
                                             id="mcs" 
+                                            v-model="mcsInput"
                                             placeholder="Enter MCS number"
                                             class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
                                         />
@@ -1038,7 +1039,7 @@
 import { ref, computed } from 'vue';
 import { usePage, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import MasterCardModal from '@/components/master-card-modal.vue';
+import MasterCardModal from '@/Components/master-card-modal.vue';
 
 const props = defineProps({
     masterCards: Array,
@@ -1078,6 +1079,7 @@ const mcsRecordStatus = ref({
 });
 const selectedMcs = ref(null);
 const mcsSearchTerm = ref('');
+const mcsInput = ref('');
 
 // Customer data (sample data - replace with actual API call)
 const customerData = ref([
@@ -1498,12 +1500,8 @@ const applyMcsFilter = () => {
 
 const selectMcs = (mcs) => {
     if (!mcs) return;
-    
     selectedMcs.value = mcs;
-    
-    // Update the search term with selected MCS sequence
-    searchTerm.value = mcs.seq;
-    
+    mcsInput.value = mcs.seq;
     showMcsTableModal.value = false;
 };
 
