@@ -4,30 +4,30 @@
 -->
 <template>
     <AppLayout :header="'Release Approved MC'">
-        <!-- Header Section with animated elements -->
+        <!-- Header Section -->
         <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
-            <!-- Decorative Elements -->
-            <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20"></div>
-            <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10"></div>
-            <div class="absolute bottom-0 right-0 w-32 h-32 bg-yellow-400 opacity-5 rounded-full translate-y-10 translate-x-10"></div>
-            
+            <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
+            <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
             <div class="flex items-center">
-                <div class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner flex items-center justify-center relative overflow-hidden mr-4">
-                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-300 opacity-30 rounded-full animate-ping-slow"></div>
-                    <div class="absolute -bottom-1 -left-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full animate-ping-slow animation-delay-500"></div>
-                    <i class="fas fa-unlock-alt text-white text-2xl z-10"></i>
+                <div class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner mr-4">
+                    <i class="fas fa-unlock-alt text-white text-2xl"></i>
                 </div>
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-1 text-shadow">Release Approved Master Card</h2>
-                    <p class="text-blue-100 max-w-2xl">Release approved master cards for production use</p>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white text-shadow">Release Approved Master Card</h2>
+                    <p class="text-blue-100">Release approved master cards for production use</p>
                 </div>
             </div>
         </div>
 
+        <!-- Main Content Section -->
+        <div class="rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left/Main Column -->
+                <div class="lg:col-span-2 animate-fade-in-up">
         <!-- Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <!-- Total Cards -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border-t-4 border-blue-500 hover:shadow-md transition-shadow flex">
                 <div class="p-3 rounded-full bg-blue-100 mr-4">
                     <i class="fas fa-clipboard-list text-blue-600 text-xl"></i>
                 </div>
@@ -37,9 +37,8 @@
                     <p class="text-xs text-gray-500">Master Cards</p>
                 </div>
             </div>
-            
             <!-- Released Cards -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border-t-4 border-green-500 hover:shadow-md transition-shadow flex">
                 <div class="p-3 rounded-full bg-green-100 mr-4">
                     <i class="fas fa-unlock-alt text-green-600 text-xl"></i>
                 </div>
@@ -49,9 +48,8 @@
                     <p class="text-xs text-gray-500">Master Cards</p>
                 </div>
             </div>
-            
             <!-- Unreleased Cards -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border-t-4 border-yellow-500 hover:shadow-md transition-shadow flex">
                 <div class="p-3 rounded-full bg-yellow-100 mr-4">
                     <i class="fas fa-clock text-yellow-600 text-xl"></i>
                 </div>
@@ -61,9 +59,8 @@
                     <p class="text-xs text-gray-500">Master Cards</p>
                 </div>
             </div>
-            
             <!-- Active Cards -->
-            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow flex">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border-t-4 border-purple-500 hover:shadow-md transition-shadow flex">
                 <div class="p-3 rounded-full bg-purple-100 mr-4">
                     <i class="fas fa-check-circle text-purple-600 text-xl"></i>
                 </div>
@@ -75,138 +72,90 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
             <!-- Form Fields Section -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-indigo-500 transition-all duration-300 hover:shadow-xl relative overflow-hidden mb-6">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50 rounded-full opacity-50"></div>
+                        <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-purple-50 rounded-full opacity-50"></div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <!-- AC# Field -->
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md">
+                            <div>
                     <label for="ac" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                        <span class="inline-flex items-center justify-center w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 shadow-sm">
-                            <i class="fas fa-building text-white text-xs"></i>
+                                    <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white mr-3 shadow-md transition-transform group-hover:scale-110">
+                                        <i class="fas fa-building text-xs"></i>
                         </span>
-                        <span class="text-base">AC#:</span>
+                                    AC#:
                     </label>
                     <div class="relative flex group">
-                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
-                            <i class="fas fa-hashtag"></i>
-                        </span>
-                        <input 
-                            type="text" 
-                            id="ac" 
-                            v-model="searchTerm"
-                            placeholder="Enter customer AC#"
-                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
-                        />
-                        <button 
-                            type="button"
-                            @click="showOptions = !showOptions"
-                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
-                        >
-                            <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
-                            <i class="fas fa-search relative z-10"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- MCS# Field -->
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md">
-                    <label for="mcs" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                        <span class="inline-flex items-center justify-center w-6 h-6 bg-gradient-to-r from-pink-500 to-red-500 rounded-full mr-2 shadow-sm">
-                            <i class="fas fa-barcode text-white text-xs"></i>
-                        </span>
-                        <span class="text-base">MCS#:</span>
-                    </label>
-                    <div class="relative flex group">
-                        <button
-                            type="button"
-                            @click="showMcsModal"
-                            class="inline-flex items-center justify-center px-3 py-2 rounded-l-md border border-r-0 border-gray-300 bg-red-500 text-white hover:bg-red-600 transition-colors"
-                        >
-                            <i class="fas fa-barcode text-white"></i>
-                        </button>
-                        <input 
-                            type="text" 
-                            id="mcsFrom" 
-                            v-model="form.mcsFrom"
-                            placeholder="Start MCS#"
-                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
-                        />
-                        <span class="inline-flex items-center px-3 border border-l-0 border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                            <i class="fas fa-arrow-right text-xs"></i>
-                        </span>
-                        <input 
-                            type="text" 
-                            id="mcsTo"
-                            v-model="form.mcsTo"
-                            placeholder="End MCS#"
-                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
-                        />
-                        <button 
-                            type="button"
-                            @click="searchMcs"
-                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
-                        >
-                            <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
-                            <i class="fas fa-search relative z-10"></i>
+                                    <input type="text" id="ac" v-model="searchTerm" placeholder="Enter customer AC#" class="input-field">
+                                    <button type="button" @click="showOptions = !showOptions" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
+                                        <i class="fas fa-search"></i>
                         </button>
                     </div>
                 </div>
             </div>
-            
-            <!-- Status Checkboxes -->
-            <div class="mb-6 flex items-center space-x-6 bg-blue-50 p-4 rounded-lg border border-blue-100 shadow-sm">
-                <label class="text-sm font-medium text-gray-700 flex items-center">
-                    <span class="inline-flex items-center justify-center w-6 h-6 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full mr-2 shadow-sm">
-                        <i class="fas fa-filter text-white text-xs"></i>
+            <!-- MCS# Range Field as separate block below AC# -->
+            <div class="mb-6">
+                <label for="mcs" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                    <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-pink-500 to-orange-500 text-white mr-3 shadow-md transition-transform group-hover:scale-110">
+                        <i class="fas fa-barcode text-xs"></i>
                     </span>
-                    <span class="text-base">MC Status:</span>
+                    MCS# Range:
                 </label>
-                <div class="flex items-center bg-white px-3 py-2 rounded-md shadow-sm border border-gray-200">
-                    <input 
-                        type="checkbox" 
-                        id="status-active" 
-                        v-model="releaseStatus" 
-                        value="active"
-                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                    />
-                    <label for="status-active" class="ml-2 block text-sm text-gray-700">
-                        <i class="fas fa-check-circle text-green-500 mr-1"></i>
-                        Active
-                    </label>
-                </div>
-                <div class="flex items-center bg-white px-3 py-2 rounded-md shadow-sm border border-gray-200">
-                    <input 
-                        type="checkbox" 
-                        id="status-obsolete" 
-                        v-model="releaseStatus" 
-                        value="obsolete"
-                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                    />
-                    <label for="status-obsolete" class="ml-2 block text-sm text-gray-700">
-                        <i class="fas fa-ban text-red-500 mr-1"></i>
-                        Obsolete
-                    </label>
+                <div class="flex items-center gap-4">
+                    <div class="relative flex group">
+                        <input type="text" id="mcsFrom" v-model="form.mcsFrom" placeholder="Start MCS#" class="input-field" style="min-width:220px;max-width:340px;width:100%;" />
+                        <button type="button" @click="showMcsModal" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <span class="text-gray-500 font-medium">TO</span>
+                    <div class="relative flex group">
+                        <input type="text" id="mcsTo" v-model="form.mcsTo" placeholder="End MCS#" class="input-field" style="min-width:220px;max-width:340px;width:100%;" />
+                        <button type="button" @click="searchMcs" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            <!-- Action Button -->
-            <div class="flex justify-end">
-                <button 
-                    type="button" 
-                    @click="handleOK"
-                    class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-5 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
-                >
-                    <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
-                    <div class="bg-white bg-opacity-30 rounded-full p-1.5 mr-2 flex items-center justify-center">
-                        <i class="fas fa-play text-white text-xs"></i>
+            <!-- Status Checkboxes -->
+            <div class="mb-6">
+                <div class="flex flex-col md:flex-row items-center gap-4 p-4 rounded-xl shadow-lg border-t-4 border-blue-400 bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 relative overflow-hidden animate-fade-in-up">
+                    <div class="flex items-center mb-2 md:mb-0">
+                        <span class="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full mr-3 shadow-md">
+                            <i class="fas fa-filter text-white text-lg"></i>
+                        </span>
+                        <span class="text-lg font-semibold text-blue-800 tracking-wide">MC Status:</span>
                     </div>
-                    <span class="font-medium">Proceed</span>
+                    <div class="flex flex-1 flex-col sm:flex-row gap-3 w-full">
+                        <label class="flex items-center flex-1 cursor-pointer bg-white/80 hover:bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 shadow-sm transition-all duration-200 group">
+                            <input type="checkbox" id="status-active" v-model="releaseStatus" value="active" class="h-5 w-5 text-green-500 border-green-300 rounded focus:ring-green-400 transition-all mr-3" />
+                            <span class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 text-xl mr-2 group-hover:scale-110 transition-transform"></i>
+                                <span class="font-medium text-green-800 text-base">Active</span>
+                            </span>
+                        </label>
+                        <label class="flex items-center flex-1 cursor-pointer bg-white/80 hover:bg-pink-50 border border-pink-200 rounded-lg px-4 py-2 shadow-sm transition-all duration-200 group">
+                            <input type="checkbox" id="status-obsolete" v-model="releaseStatus" value="obsolete" class="h-5 w-5 text-pink-500 border-pink-300 rounded focus:ring-pink-400 transition-all mr-3" />
+                            <span class="flex items-center">
+                                <i class="fas fa-ban text-pink-500 text-xl mr-2 group-hover:scale-110 transition-transform"></i>
+                                <span class="font-medium text-pink-800 text-base">Obsolete</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- Action Button -->
+                        <div class="pt-6 text-center border-t border-gray-200">
+                            <button type="button" @click="handleOK" class="process-button group">
+                                <span class="shimmer-effect"></span>
+                                <i class="fas fa-play mr-3 text-xl group-hover:animate-spin"></i>
+                                Proceed
                 </button>
             </div>
         </div>
 
         <!-- Master Card Table Section -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6 animate-fade-in-up animation-delay-300">
             <div class="border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50 p-4 flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-gray-800 flex items-center">
                     <span class="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-3 shadow-sm">
@@ -219,10 +168,7 @@
                         <i class="fas fa-sort text-indigo-500 mr-1"></i>
                         <span>Sort by:</span>
                     </div>
-                    <select 
-                        v-model="sortBy" 
-                        class="border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500"
-                    >
+                                <select v-model="sortBy" class="border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
                         <option value="seq">MC Seq#</option>
                         <option value="model">MC Model</option>
                         <option value="customer">Customer</option>
@@ -357,6 +303,26 @@
                         </tr>
                     </tbody>
                 </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right/Info Column -->
+                <div class="lg:col-span-1 animate-fade-in-up animation-delay-300">
+                    <!-- Quick Info Panel -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-indigo-500 transition-all duration-300 hover:shadow-xl relative overflow-hidden mb-6">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50 rounded-full opacity-50"></div>
+                        <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-purple-50 rounded-full opacity-50"></div>
+                        <div class="flex items-center justify-center h-full">
+                            <div class="text-center">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Quick Info</h3>
+                                <p class="text-base text-gray-700">
+                                    This section provides quick information about the master cards.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -880,66 +846,47 @@ const fetchData = async () => {
 </script>
 
 <style>
-/* Add transition effects */
-.fixed.inset-0 {
-    animation: modalFadeIn 0.2s ease-out forwards;
-}
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 
-.animate-modal {
-    animation: modalScaleIn 0.3s ease-out forwards;
-}
-
-.animate-notification {
-    animation: slideInRight 0.5s ease-out forwards;
-}
-
-@keyframes modalFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes modalScaleIn {
-    from { transform: scale(0.95); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-@keyframes slideInRight {
-    from { 
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to { 
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* Custom animation for slow ping effect */
-@keyframes ping-slow {
-    0% {
-        transform: scale(1);
-        opacity: 0.5;
-    }
-    50% {
-        transform: scale(1.8);
-        opacity: 0.15;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 0.5;
-    }
-}
-
-.animate-ping-slow {
-    animation: ping-slow 3s ease-in-out infinite;
-}
-
-.animation-delay-500 {
-    animation-delay: 1.5s;
-}
-
-/* Text shadow for headings */
 .text-shadow {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.input-field {
+    @apply flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 group-hover:border-indigo-400 shadow-sm focus:shadow-md;
+}
+.process-button {
+    @apply w-full md:w-auto bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold py-3 px-12 rounded-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center mx-auto relative overflow-hidden;
+}
+.shimmer-effect {
+    @apply absolute top-0 -left-[150%] h-full w-[50%] skew-x-[-25deg] bg-white/20;
+    animation: shimmer 2.5s infinite;
+}
+@keyframes shimmer {
+    100% {
+        left: 150%;
+    }
+}
+@keyframes fade-in-up {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+}
+@keyframes pulse-slow {
+    0%, 100% { transform: scale(1); opacity: 0.05; }
+    50% { transform: scale(1.1); opacity: 0.08; }
+}
+.animate-pulse-slow {
+    animation: pulse-slow 5s infinite;
+}
+.animation-delay-300 { animation-delay: 0.3s; }
+.animation-delay-500 { animation-delay: 0.5s; }
 </style>
