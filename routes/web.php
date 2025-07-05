@@ -577,6 +577,14 @@ Route::prefix('api')->group(function () {
     Route::get('/mm-config', [MmConfigController::class, 'apiGetConfig']);
     Route::post('/mm-config', [MmConfigController::class, 'apiUpdateConfig']);
     
+    // Roll Trim By Product Design API routes
+    Route::get('/roll-trims-by-product-design', [RollTrimByProductDesignController::class, 'apiIndex']);
+    Route::post('/roll-trims-by-product-design', [RollTrimByProductDesignController::class, 'apiStore']);
+    Route::put('/roll-trims-by-product-design/{id}', [RollTrimByProductDesignController::class, 'apiUpdate']);
+    Route::delete('/roll-trims-by-product-design/{id}', [RollTrimByProductDesignController::class, 'apiDestroy']);
+    Route::get('/roll-trims-by-product-design/export', [RollTrimByProductDesignController::class, 'apiExport']);
+    Route::post('/roll-trims-by-product-design/batch', [RollTrimByProductDesignController::class, 'apiBatchUpdate']);
+    
     // Salesperson API routes
     Route::get('/salesperson', [SalespersonController::class, 'apiIndex']);
     Route::post('/salesperson/store', [SalespersonController::class, 'store']);

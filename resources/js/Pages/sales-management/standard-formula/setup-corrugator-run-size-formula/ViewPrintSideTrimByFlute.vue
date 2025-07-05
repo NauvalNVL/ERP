@@ -6,30 +6,40 @@
       </h2>
     </template>
 
-    <div class="py-12">
+    <div class="py-6">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+        <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
           <!-- Header with buttons -->
           <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 flex items-center justify-between">
             <h2 class="text-lg font-bold text-white">View & Print Side Trim By Flute</h2>
             <div class="flex space-x-2">
-              <button @click="exportData" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-                Export
-              </button>
-              <button @click="printData" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
-                </svg>
-                Print
-              </button>
-              <a href="/standard-formula/setup-side-trim-by-flute" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                </svg>
-                Back to Define
+              <div class="relative" ref="printDropdownContainer">
+                <button @click="printDropdownOpen = !printDropdownOpen" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center">
+                  <i class="fas fa-print mr-2"></i>
+                  <span>Print</span>
+                  <i class="fas fa-chevron-down ml-2 transition-transform" :class="{'rotate-180': printDropdownOpen}"></i>
+                </button>
+                <transition
+                  enter-active-class="transition ease-out duration-200"
+                  enter-from-class="transform opacity-0 scale-95"
+                  enter-to-class="transform opacity-100 scale-100"
+                  leave-active-class="transition ease-in duration-75"
+                  leave-from-class="transform opacity-100 scale-100"
+                  leave-to-class="transform opacity-0 scale-95"
+                >
+                  <div v-if="printDropdownOpen" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
+                    <a @click.prevent="printAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
+                    </a>
+                    <a @click.prevent="printAsExcel" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-excel mr-2 text-green-500"></i> Export as Excel
+                    </a>
+                  </div>
+                </transition>
+              </div>
+              <a href="/standard-formula/setup-side-trim-by-flute" class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back
               </a>
             </div>
           </div>
@@ -45,8 +55,8 @@
             <div v-else>
               <!-- Filters -->
               <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
+                <div class="flex flex-wrap gap-4 items-end">
+                  <div class="flex-grow md:flex-grow-0 md:w-48">
                     <label for="flute-filter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Flute</label>
                     <select
                       id="flute-filter"
@@ -60,11 +70,11 @@
                       </option>
                     </select>
                   </div>
-                  <div>
-                    <label for="composite-filter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Composite</label>
+                  <div class="flex-grow md:flex-grow-0 md:w-48">
+                    <label for="compute-filter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Compute</label>
                     <select
-                      id="composite-filter"
-                      v-model="filter.isComposite"
+                      id="compute-filter"
+                      v-model="filter.compute"
                       class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                       @change="filterData"
                     >
@@ -73,35 +83,43 @@
                       <option value="false">No</option>
                     </select>
                   </div>
-                  <div class="flex items-end">
+                  
+                  <!-- Reset Button -->
+                  <div>
                     <button 
                       @click="resetFilters" 
-                      class="bg-gray-500 hover:bg-gray-400 text-white px-4 py-2 rounded text-sm"
+                      class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
-                      Reset Filters
+                      <i class="fas fa-redo-alt mr-1"></i>
+                      Reset
                     </button>
                   </div>
                 </div>
               </div>
 
               <!-- Table section -->
-              <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 border">
-                  <thead class="bg-blue-700">
+              <div id="printable-content" class="overflow-x-auto">
+                <div class="mb-6 print:mb-8 hidden print:block">
+                  <h1 class="text-2xl font-bold text-center print:text-3xl">Side Trim By Flute Report</h1>
+                  <p class="text-center text-gray-600 print:text-lg">Generated on {{ formattedDate }}</p>
+                </div>
+
+                <table class="min-w-full divide-y divide-gray-200 border" id="sideTrimsTable">
+                  <thead class="bg-gray-100">
                     <tr>
-                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r w-1/4">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Flute
                       </th>
-                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r w-1/4">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Flute Name
                       </th>
-                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wider border-r w-1/6">
-                        Composite
+                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
+                        Compute
                       </th>
-                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wider border-r w-1/6">
+                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Length Add (mm)
                       </th>
-                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wider border-r w-1/6">
+                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Length Less (mm)
                       </th>
                     </tr>
@@ -113,10 +131,9 @@
                       </td>
                     </tr>
                     <tr 
-                      v-for="(trim, index) in filteredSideTrims" 
+                      v-for="trim in filteredSideTrims" 
                       :key="trim.id" 
                       class="hover:bg-gray-50"
-                      :class="{ 'bg-yellow-100': index === 6 }"
                     >
                       <td class="px-4 py-2 text-sm font-medium text-gray-900 border-r">
                         {{ trim.flute_code }}
@@ -125,11 +142,9 @@
                         {{ trim.flute_name }}
                       </td>
                       <td class="px-4 py-2 text-center border-r">
-                        <span v-if="trim.is_composite" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          Yes
-                        </span>
-                        <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                          No
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
+                          :class="trim.compute ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'">
+                          {{ trim.compute ? 'Yes' : 'No' }}
                         </span>
                       </td>
                       <td class="px-4 py-2 text-center text-sm text-gray-900 border-r">
@@ -181,9 +196,11 @@
 </template>
 
 <script>
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, ref, computed, onMounted, onUnmounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default defineComponent({
   components: {
@@ -196,13 +213,28 @@ export default defineComponent({
     const flutes = ref([]);
     const filter = ref({
       fluteId: '',
-      isComposite: ''
+      compute: ''
     });
+    
+    const printDropdownOpen = ref(false);
+    const printDropdownContainer = ref(null);
     
     const notification = ref({
       show: false,
       message: '',
       type: 'success'
+    });
+
+    // Formatted current date
+    const formattedDate = computed(() => {
+      const now = new Date();
+      return new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(now);
     });
 
     const showNotification = (message, type = 'success') => {
@@ -239,14 +271,14 @@ export default defineComponent({
               flute_name: flute.name || 'N/A',
               length_add: trim.length_add,
               length_less: trim.length_less,
-              is_composite: trim.is_composite
+              compute: trim.compute === true || trim.compute === 1
             };
           });
           
-          // Sort by flute code and then by composite status
+          // Sort by flute code and then by compute status
           sideTrims.value.sort((a, b) => {
             if (a.flute_code === b.flute_code) {
-              return a.is_composite === b.is_composite ? 0 : a.is_composite ? 1 : -1;
+              return a.compute === b.compute ? 0 : a.compute ? 1 : -1;
             }
             return a.flute_code.localeCompare(b.flute_code);
           });
@@ -285,23 +317,23 @@ export default defineComponent({
     const filterData = () => {
       filteredSideTrims.value = sideTrims.value.filter(trim => {
         const matchesFlute = !filter.value.fluteId || trim.flute_id === filter.value.fluteId;
-        const matchesComposite = filter.value.isComposite === '' || 
-          (filter.value.isComposite === 'true' && trim.is_composite) || 
-          (filter.value.isComposite === 'false' && !trim.is_composite);
+        const matchesCompute = filter.value.compute === '' || 
+          (filter.value.compute === 'true' && trim.compute) || 
+          (filter.value.compute === 'false' && !trim.compute);
         
-        return matchesFlute && matchesComposite;
+        return matchesFlute && matchesCompute;
       });
     };
 
     const resetFilters = () => {
       filter.value = {
         fluteId: '',
-        isComposite: ''
+        compute: ''
       };
       filteredSideTrims.value = [...sideTrims.value];
     };
 
-    const exportData = () => {
+    const printAsExcel = () => {
       showNotification('Exporting data...');
       
       // Call the export API endpoint
@@ -320,14 +352,73 @@ export default defineComponent({
           console.error('Error exporting data:', error);
           showNotification('Failed to export data', 'error');
         });
+        
+      printDropdownOpen.value = false;
     };
 
-    const printData = () => {
-      window.print();
+    const generatePdf = () => {
+      const doc = new jsPDF();
+      
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Side Trim By Flute Report', 15, 22);
+
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generated on: ${formattedDate.value}`, 15, 28);
+      
+      const tableData = filteredSideTrims.value.map(trim => [
+        trim.flute_code,
+        trim.flute_name,
+        trim.compute ? 'Yes' : 'No',
+        trim.length_add,
+        trim.length_less
+      ]);
+
+      autoTable(doc, {
+        head: [['Flute', 'Flute Name', 'Compute', 'Length Add (mm)', 'Length Less (mm)']],
+        body: tableData,
+        startY: 35,
+        theme: 'grid',
+        styles: {
+          fontSize: 10,
+          cellPadding: 2,
+        },
+        headStyles: {
+          fillColor: [41, 128, 185], // A shade of blue
+          textColor: 255,
+          fontStyle: 'bold',
+        },
+        columnStyles: {
+          0: { cellWidth: 'auto' },
+          1: { cellWidth: 'auto', halign: 'left' },
+          2: { halign: 'center' },
+          3: { halign: 'center' },
+          4: { halign: 'center' }
+        }
+      });
+      
+      doc.output('dataurlnewwindow');
+    };
+
+    const printAsPdf = () => {
+      generatePdf();
+      printDropdownOpen.value = false;
+    };
+
+    const handleClickOutside = (event) => {
+      if (printDropdownContainer.value && !printDropdownContainer.value.contains(event.target)) {
+        printDropdownOpen.value = false;
+      }
     };
 
     onMounted(() => {
       loadData();
+      document.addEventListener('click', handleClickOutside);
+    });
+
+    onUnmounted(() => {
+      document.removeEventListener('click', handleClickOutside);
     });
 
     return {
@@ -337,10 +428,13 @@ export default defineComponent({
       flutes,
       filter,
       notification,
+      printDropdownOpen,
+      printDropdownContainer,
+      formattedDate,
       filterData,
       resetFilters,
-      exportData,
-      printData,
+      printAsPdf,
+      printAsExcel,
       showNotification
     };
   }
@@ -349,19 +443,61 @@ export default defineComponent({
 
 <style>
 @media print {
-  body * {
-    visibility: hidden;
+  @page {
+    size: A4;
+    margin: 1cm;
   }
-  .max-w-7xl, .max-w-7xl * {
-    visibility: visible;
+  
+  body {
+    font-size: 12pt;
   }
-  .max-w-7xl {
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-  button, .bg-gray-50:not(.border) {
+  
+  /* Hide non-printable elements */
+  button, select, .print\:hidden, .bg-gray-50 {
     display: none !important;
   }
+  
+  /* Ensure tables fit on page */
+  table {
+    page-break-inside: avoid;
+    width: 100%;
+  }
+  
+  /* Show print-only elements */
+  .hidden.print\:block {
+    display: block !important;
+  }
+  
+  /* Remove background colors for better printing */
+  .bg-gray-100 {
+    background-color: #f9fafb !important;
+    -webkit-print-color-adjust: exact;
+  }
+  
+  /* Ensure text is visible */
+  .text-gray-500, .text-gray-900 {
+    color: #000 !important;
+  }
+  
+  /* Make borders more visible */
+  .border, .border-r {
+    border-color: #000 !important;
+  }
+}
+
+/* Scrollbar styling */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+}
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
 }
 </style> 
