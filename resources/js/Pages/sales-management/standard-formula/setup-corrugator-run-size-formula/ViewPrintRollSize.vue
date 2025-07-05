@@ -18,7 +18,7 @@
                   <i class="fas fa-print mr-2"></i>
                   <span>Print</span>
                   <i class="fas fa-chevron-down ml-2 transition-transform" :class="{'rotate-180': printDropdownOpen}"></i>
-                </button>
+              </button>
                 <transition
                   enter-active-class="transition ease-out duration-200"
                   enter-from-class="transform opacity-0 scale-95"

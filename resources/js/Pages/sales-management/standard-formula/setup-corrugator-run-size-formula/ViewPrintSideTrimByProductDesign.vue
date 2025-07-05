@@ -18,7 +18,7 @@
                   <i class="fas fa-print mr-2"></i>
                   <span>Print</span>
                   <i class="fas fa-chevron-down ml-2 transition-transform" :class="{'rotate-180': printDropdownOpen}"></i>
-                </button>
+              </button>
                 <transition
                   enter-active-class="transition ease-out duration-200"
                   enter-from-class="transform opacity-0 scale-95"
@@ -119,20 +119,20 @@
                       <option value="true">Yes</option>
                       <option value="false">No</option>
                     </select>
-                  </div>
-                  
-                  <!-- Reset Button -->
+                </div>
+                
+                <!-- Reset Button -->
                   <div>
-                    <button 
-                      @click="resetFilters" 
-                      class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <button 
+                    @click="resetFilters" 
+                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 100-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-                      </svg>
+                    </svg>
                       Reset
-                    </button>
-                  </div>
+                  </button>
+                </div>
                 </div>
               </div>
 
@@ -401,10 +401,10 @@ export default defineComponent({
       filteredSideTrims.value = [...sideTrims.value];
     };
 
-    const printAsExcel = () => {
-      showNotification('Preparing Excel export...');
-      
+    const exportToExcel = () => {
       try {
+        showNotification('Preparing Excel export...');
+        
         // Since backend export is not implemented, we'll create the Excel file on the frontend
         // We'll use a simple CSV format that Excel can open
         const headers = ['Product Design', 'Product', 'Flute', 'Compute', 'Length Less (mm)', 'Length Add (mm)'];
@@ -439,117 +439,110 @@ export default defineComponent({
         console.error('Error exporting to Excel:', error);
         showNotification('Failed to export data to Excel', 'error');
       }
-      
+    };
+    
+    const printAsExcel = () => {
+      exportToExcel();
       printDropdownOpen.value = false;
     };
-
+    
     const generatePdf = () => {
-      try {
-        showNotification('Preparing PDF export...');
-        
-        // Create new PDF document
-        const doc = new jsPDF();
-        
-        // Add title
-        doc.setFontSize(16);
+      const doc = new jsPDF();
+      
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Side Trim By Product Design Report', 15, 22);
+
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generated on: ${formattedDate.value}`, 15, 28);
+      
+      // Add filter information if filters are applied
+      let yPos = 35;
+      if (filters.value.productDesignId || filters.value.productId || filters.value.fluteId || filters.value.compute !== '') {
+        doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
-        doc.text('Side Trim By Product Design Report', 14, 20);
+        doc.text('Applied Filters:', 15, yPos);
+        yPos += 6;
         
-        // Add date
-        doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Generated: ${formattedDate.value}`, 14, 26);
         
-        // Add filter information if filters are applied
-        let yPos = 32;
-        if (filters.value.productDesignId || filters.value.productId || filters.value.fluteId || filters.value.compute !== '') {
-          doc.setFontSize(10);
-          doc.setFont('helvetica', 'bold');
-          doc.text('Applied Filters:', 14, yPos);
-          yPos += 6;
-          
-          doc.setFont('helvetica', 'normal');
-          
-          if (filters.value.productDesignId) {
-            const design = productDesigns.value.find(d => d.id === filters.value.productDesignId);
-            doc.text(`Product Design: ${design?.pd_name || 'Unknown'}`, 14, yPos);
-            yPos += 5;
-          }
-          
-          if (filters.value.productId) {
-            const product = products.value.find(p => p.id === filters.value.productId);
-            doc.text(`Product: ${product?.product_code || 'Unknown'}`, 14, yPos);
-            yPos += 5;
-          }
-          
-          if (filters.value.fluteId) {
-            const flute = flutes.value.find(f => f.id === filters.value.fluteId);
-            doc.text(`Flute: ${flute?.code || 'Unknown'}`, 14, yPos);
-            yPos += 5;
-          }
-          
-          if (filters.value.compute !== '') {
-            doc.text(`Compute: ${filters.value.compute === 'true' ? 'Yes' : 'No'}`, 14, yPos);
-            yPos += 5;
-          }
-          
+        if (filters.value.productDesignId) {
+          const design = productDesigns.value.find(d => d.id === filters.value.productDesignId);
+          doc.text(`Product Design: ${design?.pd_name || design?.code || 'Unknown'}`, 15, yPos);
           yPos += 5;
         }
         
-        // Create table with autotable
-        doc.autoTable({
-          startY: yPos,
-          head: [['Product Design', 'Product', 'Flute', 'Compute', 'Length Less (mm)', 'Length Add (mm)']],
-          body: filteredSideTrims.value.map(trim => [
-            trim.product_design_code,
-            trim.product_code,
-            trim.flute_code,
-            trim.compute ? 'Yes' : 'No',
-            trim.length_less,
-            trim.length_add
-          ]),
-          styles: {
-            fontSize: 9,
-            cellPadding: 3
-          },
-          headStyles: {
-            fillColor: [66, 139, 202],
-            textColor: 255,
-            fontStyle: 'bold'
-          },
-          alternateRowStyles: {
-            fillColor: [245, 245, 245]
-          },
-          columnStyles: {
-            0: { cellWidth: 'auto' },
-            1: { cellWidth: 'auto' },
-            2: { cellWidth: 'auto' },
-            3: { cellWidth: 'auto', halign: 'center' },
-            4: { cellWidth: 'auto', halign: 'center' },
-            5: { cellWidth: 'auto', halign: 'center' }
-          },
-          margin: { top: 15 }
-        });
-        
-        // Add page number
-        const pageCount = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= pageCount; i++) {
-          doc.setPage(i);
-          doc.setFontSize(8);
-          doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - 30, doc.internal.pageSize.height - 10);
+        if (filters.value.productId) {
+          const product = products.value.find(p => p.id === filters.value.productId);
+          doc.text(`Product: ${product?.product_code || product?.code || 'Unknown'}`, 15, yPos);
+          yPos += 5;
         }
         
-        // Save the PDF
-        doc.save(`side_trim_by_product_design_${new Date().toISOString().split('T')[0]}.pdf`);
+        if (filters.value.fluteId) {
+          const flute = flutes.value.find(f => f.id === filters.value.fluteId);
+          doc.text(`Flute: ${flute?.code || 'Unknown'}`, 15, yPos);
+          yPos += 5;
+        }
         
-        showNotification('PDF export completed successfully');
-      } catch (error) {
-        console.error('Error generating PDF:', error);
-        showNotification('Failed to generate PDF', 'error');
+        if (filters.value.compute !== '') {
+          doc.text(`Compute: ${filters.value.compute === 'true' ? 'Yes' : 'No'}`, 15, yPos);
+          yPos += 5;
+        }
+        
+        yPos += 5;
       }
       
+      const tableData = filteredSideTrims.value.map(trim => [
+        trim.product_design_code,
+        trim.product_code,
+        trim.flute_code,
+        trim.compute ? 'Yes' : 'No',
+        trim.length_less,
+        trim.length_add
+      ]);
+
+      autoTable(doc, {
+        head: [['Product Design', 'Product', 'Flute', 'Compute', 'Length Less (mm)', 'Length Add (mm)']],
+        body: tableData,
+        startY: yPos,
+        theme: 'grid',
+        styles: {
+          fontSize: 10,
+          cellPadding: 2,
+        },
+        headStyles: {
+          fillColor: [41, 128, 185], // A shade of blue
+          textColor: 255,
+          fontStyle: 'bold',
+        },
+        columnStyles: {
+          0: { cellWidth: 'auto' },
+          1: { cellWidth: 'auto' },
+          2: { cellWidth: 'auto' },
+          3: { halign: 'center' },
+          4: { halign: 'center' },
+          5: { halign: 'center' }
+        }
+      });
+      
+      // Add page number
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - 30, doc.internal.pageSize.height - 10);
+      }
+      
+      doc.save(`side_trim_by_product_design_${new Date().toISOString().split('T')[0]}.pdf`);
+    };
+
+    const printAsPdf = () => {
+      generatePdf();
       printDropdownOpen.value = false;
     };
+
+    // PDF function is now implemented as printAsPdf
 
     // Close dropdown when clicking outside
     const handleClickOutside = (event) => {
@@ -583,8 +576,55 @@ export default defineComponent({
       filterData,
       resetFilters,
       printAsExcel,
-      generatePdf
+      printAsPdf,
+      generatePdf,
+      exportToExcel
     };
   }
 });
 </script>
+
+<style>
+@media print {
+  @page {
+    size: A4;
+    margin: 1cm;
+  }
+  
+  body {
+    font-size: 12pt;
+  }
+  
+  /* Hide non-printable elements */
+  button, select, .print\:hidden, .bg-gray-50 {
+    display: none !important;
+  }
+  
+  /* Ensure tables fit on page */
+  table {
+    page-break-inside: avoid;
+    width: 100%;
+  }
+  
+  /* Show print-only elements */
+  .hidden.print\:block {
+    display: block !important;
+  }
+  
+  /* Remove background colors for better printing */
+  .bg-gray-100 {
+    background-color: #f9fafb !important;
+    -webkit-print-color-adjust: exact;
+  }
+  
+  /* Ensure text is visible */
+  .text-gray-500, .text-gray-900 {
+    color: #000 !important;
+  }
+  
+  /* Make borders more visible */
+  .border, .border-r {
+    border-color: #000 !important;
+  }
+}
+</style> 
