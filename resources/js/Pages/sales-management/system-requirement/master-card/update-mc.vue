@@ -671,11 +671,12 @@
                     <table class="min-w-full border border-indigo-200 text-base bg-white rounded-lg overflow-hidden">
                         <thead class="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-400 text-white">
                             <tr>
-                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th v-if="mcsSortOption !== 'model'" class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
                                 <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Model</th>
-                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC PD Part#</th>
-                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC PD ED</th>
-                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC PD ID</th>
+                                <th v-if="mcsSortOption === 'model'" class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th v-if="!['seq', 'model'].includes(mcsSortOption)" class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC PD Part#</th>
+                                <th v-if="!['seq', 'model'].includes(mcsSortOption)" class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC PD ED</th>
+                                <th v-if="!['seq', 'model'].includes(mcsSortOption)" class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC PD ID</th>
                                 <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
                             </tr>
                         </thead>
@@ -685,11 +686,12 @@
                                 :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
                                 @click="selectForViewMcs(mcs)"
                                 @dblclick="selectMcs(mcs)">
-                                <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ mcs.seq }}</td>
+                                <td v-if="mcsSortOption !== 'model'" class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ mcs.seq }}</td>
                                 <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.model }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.part }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.ed }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.id }}</td>
+                                <td v-if="mcsSortOption === 'model'" class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ mcs.seq }}</td>
+                                <td v-if="!['seq', 'model'].includes(mcsSortOption)" class="px-4 py-2 border-b border-indigo-100">{{ mcs.part }}</td>
+                                <td v-if="!['seq', 'model'].includes(mcsSortOption)" class="px-4 py-2 border-b border-indigo-100">{{ mcs.ed }}</td>
+                                <td v-if="!['seq', 'model'].includes(mcsSortOption)" class="px-4 py-2 border-b border-indigo-100">{{ mcs.id }}</td>
                                 <td class="px-4 py-2 border-b border-indigo-100">
                                     <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
                                     <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
@@ -697,7 +699,7 @@
                                 </td>
                             </tr>
                             <tr v-if="filteredMcsData.length === 0">
-                                <td colspan="6" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
+                                <td :colspan="['seq', 'model'].includes(mcsSortOption) ? 3 : 6" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
                                     No master card records found matching your criteria
                                 </td>
                             </tr>
@@ -796,11 +798,18 @@ const customers = ref([
 
 // Sample MCS data
 const mcsData = ref([
-    { seq: 'MC001', model: 'Box-Standard', part: 'P123', ed: 'ED001', id: 'ID001', status: 'Active' },
-    { seq: 'MC002', model: 'Box-Premium', part: 'P124', ed: 'ED002', id: 'ID002', status: 'Active' },
-    { seq: 'MC003', model: 'Container-Small', part: 'P125', ed: 'ED003', id: 'ID003', status: 'Obsolete' },
-    { seq: 'MC004', model: 'Container-Medium', part: 'P126', ed: 'ED004', id: 'ID004', status: 'Active' },
-    { seq: 'MC005', model: 'Container-Large', part: 'P127', ed: 'ED005', id: 'ID005', status: 'Active' },
+    { seq: '1609182', model: 'BIHUN DELLIS 5 KG', part: '', ed: '', id: '', status: 'Active' },
+    { seq: '1609162', model: 'BIHUN FANIA 5 KG', part: '', ed: '', id: '', status: 'Active' },
+    { seq: '1609163', model: 'BIHUN IKAN TUNA 4.5 KG BARU', part: '', ed: '', id: '', status: 'Active' },
+    { seq: '1609164', model: 'BIHUN IKAN TUNA 5 KG BARU', part: '', ed: '', id: '', status: 'Active' },
+    { seq: '1609166', model: 'BIHUN PIRING MAS 5 KG', part: '', ed: '', id: '', status: 'Active' },
+    { seq: '1609181', model: 'BIHUN POHON KOPI 5 KG', part: '', ed: '', id: '', status: 'Active' },
+    { seq: '1609138', model: 'BOX BASO 4.5 KG', part: '', ed: '', id: '', status: 'Active' },
+    { seq: '1609144', model: 'BOX IKAN HARIMAU 4.5 KG', part: '', ed: '', id: '', status: 'Active' },
+    { seq: '1609173', model: 'BOX JAGUNG SRIKAYA 5 KG', part: '', ed: '', id: '', status: 'Active' },
+    { seq: '1609145', model: 'BOX SRIKAYA 4.5 KG', part: '', ed: '', id: '', status: 'Active' },
+    { seq: '1609186', model: 'POLOS 480 X 410 X 401', part: '', ed: '', id: '', status: 'Active' },
+    { seq: '1609185', model: 'POLOS UK 506 X 356 X 407', part: '', ed: '', id: '', status: 'Active' }
 ]);
 
 // Computed
@@ -899,11 +908,15 @@ const filteredMcsData = computed(() => {
                 bValue = b.seq;
         }
         
+        // Coerce to string and handle null/undefined
+        const strA = String(aValue ?? '');
+        const strB = String(bValue ?? '');
+
         // Apply sort order
         if (mcsSortOrder.value === 'asc') {
-            return aValue.localeCompare(bValue);
+            return strA.localeCompare(strB);
         } else {
-            return bValue.localeCompare(aValue);
+            return strB.localeCompare(strA);
         }
     });
     
