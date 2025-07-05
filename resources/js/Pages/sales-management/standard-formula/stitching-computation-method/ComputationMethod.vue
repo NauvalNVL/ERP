@@ -25,12 +25,6 @@
                 </svg>
                 Reset
               </button>
-              <Link :href="viewPrintRoute" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
-                </svg>
-                View & Print
-              </Link>
             </div>
           </div>
 
@@ -167,14 +161,12 @@
 
 <script>
 import { defineComponent, ref, onMounted } from 'vue';
-import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
 
 export default defineComponent({
   components: {
     AppLayout,
-    Link
   },
   setup() {
     const loading = ref(true);
@@ -191,9 +183,6 @@ export default defineComponent({
       type: 'success'
     });
     
-    // Define route for view & print
-    const viewPrintRoute = '/standard-formula/stitching-computation-method/view-print';
-
     const showNotification = (message, type = 'success') => {
       notification.value = {
         show: true,
@@ -312,7 +301,6 @@ export default defineComponent({
       loading,
       method,
       notification,
-      viewPrintRoute,
       saveMethod,
       resetForm,
       showNotification

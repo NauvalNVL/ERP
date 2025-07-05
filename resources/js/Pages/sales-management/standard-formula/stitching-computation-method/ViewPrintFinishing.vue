@@ -13,23 +13,35 @@
           <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 flex items-center justify-between">
             <h2 class="text-lg font-bold text-white">View & Print Finishing</h2>
             <div class="flex space-x-2">
-              <button @click="exportData" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-sm flex items-center print:hidden">
+              <div class="relative" ref="printDropdownContainer">
+                <button @click="printDropdownOpen = !printDropdownOpen" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center">
+                  <i class="fas fa-print mr-2"></i>
+                  <span>Print</span>
+                  <i class="fas fa-chevron-down ml-2 transition-transform" :class="{'rotate-180': printDropdownOpen}"></i>
+                </button>
+                <transition
+                  enter-active-class="transition ease-out duration-200"
+                  enter-from-class="transform opacity-0 scale-95"
+                  enter-to-class="transform opacity-100 scale-100"
+                  leave-active-class="transition ease-in duration-75"
+                  leave-from-class="transform opacity-100 scale-100"
+                  leave-to-class="transform opacity-0 scale-95"
+                >
+                  <div v-if="printDropdownOpen" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
+                    <a @click.prevent="printAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
+                    </a>
+                    <a @click.prevent="printAsCsv" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-csv mr-2 text-green-500"></i> Export as CSV
+                    </a>
+                  </div>
+                </transition>
+              </div>
+              <Link :href="defineRoute" class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z" clip-rule="evenodd" />
                 </svg>
-                Export
-              </button>
-              <button @click="printData" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center print:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
-                </svg>
-                Print
-              </button>
-              <Link :href="defineRoute" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded text-sm flex items-center print:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L4.414 9H17a1 1 0 110 2H4.414l5.293 5.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                </svg>
-                Back to Define
+                Back
               </Link>
             </div>
           </div>
@@ -44,7 +56,7 @@
 
             <div v-else>
               <!-- Search and Filter -->
-              <div class="mb-4 flex items-center print:hidden">
+              <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200 print:hidden">
                 <div class="relative flex-grow">
                   <input
                     type="text"
@@ -63,23 +75,23 @@
               <!-- Report header for print -->
               <div class="hidden print:block mb-6">
                 <div class="text-center">
-                  <h1 class="text-xl font-bold">Finishing Report</h1>
-                  <p class="text-gray-600">Generated on {{ formattedDate }}</p>
+                  <h1 class="text-2xl font-bold text-center print:text-3xl">Finishing Report</h1>
+                  <p class="text-center text-gray-600 print:text-lg">Generated on {{ formattedDate }}</p>
                 </div>
               </div>
 
               <!-- Table section -->
               <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 border">
-                  <thead class="bg-blue-700">
+                  <thead class="bg-gray-100">
                     <tr>
-                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r w-24">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r w-24">
                         Finishing
                       </th>
-                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Description
                       </th>
-                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
+                      <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Compute
                       </th>
                     </tr>
@@ -98,7 +110,8 @@
                         {{ finishing.description }}
                       </td>
                       <td class="px-4 py-2 text-sm text-center text-gray-900">
-                        <span :class="finishing.is_compute ? 'text-green-600' : 'text-red-600'">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
+                          :class="finishing.is_compute ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'">
                           {{ finishing.is_compute ? 'Yes' : 'No' }}
                         </span>
                       </td>
@@ -145,10 +158,13 @@
 </template>
 
 <script>
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, ref, computed, onMounted, onUnmounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 
 export default defineComponent({
   components: {
@@ -159,6 +175,8 @@ export default defineComponent({
     const loading = ref(true);
     const finishings = ref([]);
     const searchQuery = ref('');
+    const printDropdownOpen = ref(false);
+    const printDropdownContainer = ref(null);
     const notification = ref({
       show: false,
       message: '',
@@ -166,7 +184,7 @@ export default defineComponent({
     });
     
     // Define route for back button
-    const defineRoute = '/standard-formula/stitching-computation/finishing';
+    const defineRoute = '/standard-formula/stitching-computation-method/finishing';
 
     // Filtered finishings based on search query
     const filteredFinishings = computed(() => {
@@ -236,15 +254,15 @@ export default defineComponent({
       }
     };
 
-    const exportData = async () => {
+    const exportAsCsv = () => {
       try {
-        showNotification('Exporting data...');
+        showNotification('Exporting data as CSV...');
         
         // Create CSV content
         const headers = ['Code', 'Description', 'Compute'];
         const csvContent = [
           headers.join(','),
-          ...finishings.value.map(finishing => [
+          ...filteredFinishings.value.map(finishing => [
             finishing.code,
             `"${finishing.description.replace(/"/g, '""')}"`, // Escape quotes in description
             finishing.is_compute ? 'Yes' : 'No'
@@ -265,15 +283,68 @@ export default defineComponent({
       } catch (error) {
         console.error('Error exporting data:', error);
         showNotification('Failed to export data', 'error');
+      } finally {
+        printDropdownOpen.value = false;
       }
     };
 
-    const printData = () => {
-      window.print();
+    const printAsPdf = () => {
+      const doc = new jsPDF();
+      
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Finishing Report', 15, 22);
+
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generated on: ${formattedDate.value}`, 15, 28);
+      
+      const tableData = filteredFinishings.value.map(item => [
+        item.code,
+        item.description,
+        item.is_compute ? 'Yes' : 'No',
+      ]);
+
+      autoTable(doc, {
+        head: [['Finishing', 'Description', 'Compute']],
+        body: tableData,
+        startY: 35,
+        theme: 'grid',
+        styles: {
+          fontSize: 10,
+          cellPadding: 2,
+        },
+        headStyles: {
+          fillColor: [41, 128, 185], // A shade of blue
+          textColor: 255,
+          fontStyle: 'bold',
+        },
+        columnStyles: {
+            0: { cellWidth: 30 },
+            1: { cellWidth: '*' },
+            2: { halign: 'center', cellWidth: 25 },
+        }
+      });
+      
+      doc.output('dataurlnewwindow');
+      printDropdownOpen.value = false;
+    };
+
+    const printAsCsv = exportAsCsv;
+
+    const handleClickOutside = (event) => {
+      if (printDropdownContainer.value && !printDropdownContainer.value.contains(event.target)) {
+        printDropdownOpen.value = false;
+      }
     };
 
     onMounted(() => {
       loadData();
+      document.addEventListener('click', handleClickOutside);
+    });
+
+    onUnmounted(() => {
+      document.removeEventListener('click', handleClickOutside);
     });
 
     return {
@@ -284,15 +355,20 @@ export default defineComponent({
       notification,
       defineRoute,
       formattedDate,
-      exportData,
-      printData,
-      showNotification
+      printDropdownOpen,
+      printDropdownContainer,
+      showNotification,
+      printAsPdf,
+      printAsCsv,
     };
   }
 });
 </script>
 
 <style>
+/* Add Font Awesome if not already available */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
 @media print {
   @page {
     size: A4;
