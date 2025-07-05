@@ -1,140 +1,387 @@
 <template>
   <AppLayout title="Define Bundling Computation Method">
     <template #header>
-      <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-          Define Bundling Computation Method
+      <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-lg shadow-md">
+        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+          <i class="fas fa-calculator mr-3"></i> Define Bundling Computation Method
         </h2>
-        <div class="flex space-x-2">
-          <button @click="resetForm" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md transition duration-200 flex items-center">
-            <i class="fas fa-redo-alt mr-2"></i> Reset
-          </button>
-          <button @click="saveMethod" :disabled="loading" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition duration-200 flex items-center">
-            <i class="fas fa-save mr-2"></i> {{ editingId ? 'Update' : 'Save' }}
-          </button>
-        </div>
+        <p class="text-blue-100">Manage computation methods for bundling processes</p>
       </div>
     </template>
 
-    <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+    <div class="bg-white rounded-b-lg shadow-md p-6 mb-6">
+      <div class="flex flex-col md:flex-row gap-6">
           <!-- Main Content -->
-          <div class="p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <!-- Left Panel: Data Table -->
-              <div class="lg:col-span-2 bg-white rounded-lg shadow">
-                <div class="p-4 border-b border-gray-200">
-                  <h3 class="text-lg font-medium text-gray-700">Computation Methods</h3>
-                </div>
+        <div class="flex-1">
+          <!-- Action Bar -->
+          <div class="mb-6 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+            <div class="flex-1 w-full">
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-search"></i>
+                </span>
+                <input type="text" v-model="searchTerm" placeholder="Search by product design, product or flute..."
+                  class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+              </div>
+            </div>
+            <div class="flex gap-2 w-full md:w-auto">
+              <button @click="newMethod" class="btn-primary flex-1 md:flex-none">
+                <i class="fas fa-plus-circle mr-2"></i> New Method
+              </button>
+              <button @click="refreshData" class="btn-secondary flex-1 md:flex-none">
+                <i class="fas fa-sync-alt mr-2"></i> Refresh
+              </button>
+              <button @click="seedData" class="btn-info flex-1 md:flex-none" :disabled="loading">
+                <i class="fas fa-database mr-2"></i> Seed Data
+              </button>
+            </div>
+          </div>
+            
+            <!-- Loading Overlay -->
+            <div v-if="loading" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+              <div class="bg-white p-4 rounded-lg shadow-lg flex items-center space-x-3">
+                <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-gray-700 font-medium">Processing...</span>
+              </div>
+            </div>
+
+          <!-- Table Section -->
+          <div class="bg-white rounded-lg overflow-hidden border border-gray-200">
                 <div class="overflow-x-auto">
                   <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                       <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Design</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Flute</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pieces Per Bundle</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compute</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th @click="sortBy('product_design')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Product Design <i class="fas fa-sort ml-1"></i>
+                      </div>
+                    </th>
+                    <th @click="sortBy('product')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Product <i class="fas fa-sort ml-1"></i>
+                      </div>
+                    </th>
+                    <th @click="sortBy('flute')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Flute <i class="fas fa-sort ml-1"></i>
+                      </div>
+                    </th>
+                    <th @click="sortBy('formula_pieces')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Pieces Per Bundle <i class="fas fa-sort ml-1"></i>
+                      </div>
+                    </th>
+                    <th @click="sortBy('is_compute')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Compute <i class="fas fa-sort ml-1"></i>
+                      </div>
+                    </th>
                       </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                      <tr v-for="method in computationMethods" :key="method.id" :class="{'bg-blue-50': selectedMethod && selectedMethod.id === method.id}">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ method.product_design || 'APFI' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ method.product || 'BKS' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ method.flute || 'AB' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ method.formula_pieces }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <span :class="method.is_compute ? 'text-green-600' : 'text-red-600'">
-                            {{ method.is_compute ? 'Yes' : 'No' }}
-                          </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button @click="editMethod(method)" class="text-indigo-600 hover:text-indigo-900 mr-3">
-                            <i class="fas fa-edit"></i>
-                          </button>
-                          <button @click="confirmDelete(method)" class="text-red-600 hover:text-red-900">
-                            <i class="fas fa-trash"></i>
-                          </button>
+                      <tr v-if="isLoading" class="animate-pulse">
+                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                      <div class="flex justify-center items-center space-x-2">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading computation methods...</span>
+                          </div>
                         </td>
                       </tr>
-                      <tr v-if="computationMethods.length === 0">
-                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No computation methods found</td>
+                  <tr v-else-if="paginatedMethods.length === 0" class="hover:bg-gray-50">
+                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                      No computation methods found. Try adjusting your search or create a new method.
+                    </td>
+                      </tr>
+                  <tr v-for="method in paginatedMethods" :key="method.id" 
+                      @click="selectMethod(method)" 
+                      :class="{'bg-blue-50': selectedMethod && selectedMethod.id === method.id}"
+                      class="hover:bg-gray-50 cursor-pointer">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ method.product_design || '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ method.product || '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ method.flute || '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ method.formula_pieces }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 cursor-pointer hover:bg-blue-100 active:bg-blue-200 transition-all duration-150 transform hover:scale-105 border border-transparent hover:border-blue-300 rounded-md" 
+                      @click.stop="toggleCompute(method)"
+                      title="Click to toggle Compute status"
+                      :class="{'opacity-75': toggleLoading[method.id]}">
+                      <div class="flex items-center justify-between">
+                        <span v-if="toggleLoading[method.id]" class="text-blue-500 font-medium flex items-center">
+                          <i class="fas fa-spinner fa-spin mr-1"></i> Updating...
+                        </span>
+                        <span v-else-if="method.is_compute" class="text-green-600 font-medium flex items-center">
+                          <i class="fas fa-check-circle mr-1"></i> Yes
+                        </span>
+                        <span v-else class="text-red-600 font-medium flex items-center">
+                          <i class="fas fa-times-circle mr-1"></i> No
+                          </span>
+                        <i v-if="!toggleLoading[method.id]" class="fas fa-exchange-alt text-blue-500 ml-2"></i>
+                      </div>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
 
-              <!-- Right Panel: Form -->
-              <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-medium text-gray-700 mb-4">{{ editingId ? 'Edit' : 'Add' }} Computation Method</h3>
-                
-                <div class="space-y-4">
+          <!-- Pagination Controls -->
+          <div class="mt-4 flex justify-between items-center text-sm text-gray-600">
+            <div>
+              <span>Showing {{ paginatedMethods.length }} of {{ filteredMethods.length }} methods</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <select v-model="itemsPerPage" class="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option :value="10">10 per page</option>
+                <option :value="20">20 per page</option>
+                <option :value="50">50 per page</option>
+                <option :value="100">100 per page</option>
+              </select>
+              <button :disabled="currentPage === 1" @click="currentPage--" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <span class="px-4">{{ currentPage }} / {{ totalPages }}</span>
+              <button :disabled="currentPage === totalPages" @click="currentPage++" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Side Panel with Details -->
+        <div class="w-full md:w-96 bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div v-if="selectedMethod" class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+              <i class="fas fa-info-circle mr-2 text-blue-500"></i> Method Details
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Product Design:</span>
+                <span class="font-medium text-gray-900">{{ selectedMethod.product_design || '-' }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Product:</span>
+                <span class="font-medium text-gray-900">{{ selectedMethod.product || '-' }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Product Name:</span>
+                <span class="font-medium text-gray-900">{{ selectedMethod.product_name || '-' }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Flute:</span>
+                <span class="font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">{{ selectedMethod.flute || '-' }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Pieces Per Bundle:</span>
+                <span class="font-medium text-gray-900">{{ selectedMethod.formula_pieces }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Formula Divisor:</span>
+                <span class="font-medium text-gray-900">{{ selectedMethod.formula_divisor || 1 }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Height Type:</span>
+                <span class="font-medium text-gray-900 capitalize">{{ selectedMethod.height_type || 'Internal' }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Rounding Type:</span>
+                <span class="font-medium text-gray-900 capitalize">{{ selectedMethod.rounding_type || 'Down' }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Compute:</span>
+                <span class="font-medium" :class="{'text-green-600': selectedMethod.is_compute, 'text-red-600': !selectedMethod.is_compute}">
+                  {{ selectedMethod.is_compute ? 'Yes' : 'No' }}
+                </span>
+              </div>
+            </div>
+            <div class="mt-6 flex space-x-2">
+              <button @click="editMethod(selectedMethod)" class="flex-1 btn-blue">
+                <i class="fas fa-edit mr-1"></i> Edit
+              </button>
+              <button @click="confirmDelete(selectedMethod)" class="flex-1 btn-danger">
+                <i class="fas fa-trash-alt mr-1"></i> Delete
+              </button>
+            </div>
+          </div>
+          <div v-else class="flex flex-col items-center justify-center h-64 text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-calculator text-blue-500 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No Method Selected</h3>
+            <p class="text-gray-500 mb-4">Select a method from the table to view details</p>
+            <button @click="newMethod" class="btn-primary">
+              <i class="fas fa-plus-circle mr-1"></i> Create New Method
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Method Form Modal -->
+    <div v-if="showFormModal" class="fixed inset-0 flex items-center justify-center z-50">
+      <div class="absolute inset-0 bg-black opacity-50" @click="showFormModal = false"></div>
+      <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl z-10 relative transform transition-all duration-300 ease-in-out">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-800 rounded-t-xl">
+          <div class="flex items-center">
+            <div class="bg-white/20 p-2 rounded-lg mr-3">
+              <i class="fas fa-calculator text-white text-xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-white">{{ editingId ? 'Edit' : 'New' }} Computation Method</h3>
+          </div>
+          <button @click="showFormModal = false" class="bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg transition-all duration-200">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <!-- Form Content -->
+        <div class="p-6 max-h-[70vh] overflow-y-auto">
+          <form @submit.prevent="saveMethod">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <!-- Product Name -->
-                  <div>
-                    <label for="product_name" class="block text-sm font-medium text-gray-700">Product Name:</label>
-                    <input 
-                      type="text" 
-                      id="product_name" 
-                      v-model="form.product_name"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      placeholder="PENJUALAN LAIN LAIN PCS"
-                    />
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-tag text-blue-500 mr-2"></i>
+                  Product Name
+                </label>
+                <input type="text" v-model="form.product_name"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Enter product name">
                   </div>
 
-                  <!-- Product Design Name -->
-                  <div>
-                    <label for="product_design" class="block text-sm font-medium text-gray-700">P/Design Name:</label>
-                    <input 
-                      type="text" 
-                      id="product_design" 
-                      v-model="form.product_design"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      placeholder="APFI"
-                    />
+                  <!-- Product Design Dropdown -->
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-drafting-compass text-blue-500 mr-2"></i>
+                  Product Design
+                </label>
+                <select v-model="form.product_design"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none bg-white bg-no-repeat bg-right pr-10"
+                  style="background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23666%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>'); background-size: 16px;">
+                      <option value="">Select Product Design</option>
+                      <option v-for="design in productDesigns" :key="design.pd_code" :value="design.pd_code">
+                        {{ design.pd_code }} - {{ design.pd_name }}
+                      </option>
+                    </select>
+                    <div v-if="errors.product_design" class="text-red-500 text-xs mt-1">{{ errors.product_design }}</div>
+                  </div>
+
+                  <!-- Product Dropdown -->
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-box text-blue-500 mr-2"></i>
+                  Product
+                </label>
+                <select v-model="form.product"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none bg-white bg-no-repeat bg-right pr-10"
+                  style="background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23666%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>'); background-size: 16px;">
+                      <option value="">Select Product</option>
+                      <option v-for="product in products" :key="product.product_code" :value="product.product_code">
+                        {{ product.product_code }} - {{ product.description }}
+                      </option>
+                    </select>
+                    <div v-if="errors.product" class="text-red-500 text-xs mt-1">{{ errors.product }}</div>
+                  </div>
+
+                  <!-- Flute Dropdown -->
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-layer-group text-blue-500 mr-2"></i>
+                  Flute
+                </label>
+                <select v-model="form.flute"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none bg-white bg-no-repeat bg-right pr-10"
+                  style="background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23666%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>'); background-size: 16px;">
+                      <option value="">Select Flute</option>
+                      <option v-for="flute in flutes" :key="flute.code" :value="flute.code">
+                        {{ flute.code }} - {{ flute.description }}
+                      </option>
+                    </select>
+                    <div v-if="errors.flute" class="text-red-500 text-xs mt-1">{{ errors.flute }}</div>
                   </div>
 
                   <!-- Pieces Per Bundle -->
-                  <div>
-                    <label for="formula_pieces" class="block text-sm font-medium text-gray-700">Pieces Per Bundle:</label>
-                    <input 
-                      type="number" 
-                      id="formula_pieces" 
-                      v-model.number="form.formula_pieces"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      min="0"
-                    />
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-boxes text-blue-500 mr-2"></i>
+                  Pieces Per Bundle<span class="text-red-500">*</span>
+                </label>
+                <input type="number" v-model.number="form.formula_pieces" min="0" required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Enter number of pieces">
+                    <div v-if="errors.formula_pieces" class="text-red-500 text-xs mt-1">{{ errors.formula_pieces }}</div>
+                  </div>
+              
+              <!-- Formula Divisor -->
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-divide text-blue-500 mr-2"></i>
+                  Formula Divisor
+                </label>
+                <input type="number" v-model.number="form.formula_divisor" min="1"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Enter divisor">
+              </div>
+
+                  <!-- Height Type -->
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-arrows-alt-v text-blue-500 mr-2"></i>
+                  Height Type
+                </label>
+                <select v-model="form.height_type"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none bg-white bg-no-repeat bg-right pr-10"
+                  style="background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23666%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>'); background-size: 16px;">
+                      <option value="internal">Internal</option>
+                      <option value="extended">Extended</option>
+                    </select>
+                  </div>
+
+                  <!-- Rounding Type -->
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-circle-notch text-blue-500 mr-2"></i>
+                  Rounding Type
+                </label>
+                <select v-model="form.rounding_type"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none bg-white bg-no-repeat bg-right pr-10"
+                  style="background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23666%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>'); background-size: 16px;">
+                      <option value="up">Round Up</option>
+                      <option value="down">Round Down</option>
+                    </select>
                   </div>
 
                   <!-- To Compute -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700">To Compute:</label>
-                    <div class="mt-2 flex items-center space-x-4">
-                      <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.is_compute" :value="true" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-calculator text-blue-500 mr-2"></i>
+                  To Compute
+                </label>
+                <div class="flex gap-4">
+                  <label class="flex items-center">
+                    <input type="radio" v-model="form.is_compute" :value="true" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
                         <span class="ml-2 text-sm text-gray-700">Yes</span>
                       </label>
-                      <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.is_compute" :value="false" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
+                  <label class="flex items-center">
+                    <input type="radio" v-model="form.is_compute" :value="false" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
                         <span class="ml-2 text-sm text-gray-700">No</span>
                       </label>
                     </div>
-                  </div>
-
-                  <!-- Formula Divisor (Hidden in UI but used in backend) -->
-                  <input type="hidden" v-model.number="form.formula_divisor" />
-                  
-                  <!-- Height Type (Hidden in UI but used in backend) -->
-                  <input type="hidden" v-model="form.height_type" />
-                  
-                  <!-- Rounding Type (Hidden in UI but used in backend) -->
-                  <input type="hidden" v-model="form.rounding_type" />
-                </div>
               </div>
             </div>
+            
+            <!-- Form Footer with Buttons -->
+            <div class="flex justify-end space-x-3 border-t border-gray-200 pt-5 mt-4">
+              <button type="button" @click="showFormModal = false" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition-all duration-200 flex items-center">
+                <i class="fas fa-times mr-2"></i> Cancel
+              </button>
+              <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition-all duration-200 flex items-center" :disabled="loading">
+                <i class="fas fa-save mr-2"></i> {{ editingId ? 'Update' : 'Create' }}
+                <span v-if="loading" class="ml-2 animate-spin"><i class="fas fa-spinner"></i></span>
+              </button>
           </div>
+          </form>
         </div>
       </div>
     </div>
@@ -173,52 +420,222 @@
         </div>
       </div>
     </div>
+
+    <!-- Toast Messages -->
+    <div v-if="toast.show" class="fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50"
+      :class="{
+        'bg-green-500': toast.type === 'success',
+        'bg-red-500': toast.type === 'error',
+        'bg-blue-500': toast.type === 'info',
+      }"
+    >
+      <div class="flex items-center text-white">
+        <span class="mr-2">
+          <i :class="{
+            'fas fa-check-circle': toast.type === 'success',
+            'fas fa-exclamation-circle': toast.type === 'error',
+            'fas fa-info-circle': toast.type === 'info',
+          }"></i>
+        </span>
+        <span>{{ toast.message }}</span>
+      </div>
+    </div>
   </AppLayout>
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { ref, onMounted, reactive, computed, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import { useToast } from '@/Composables/useToast';
 
 // State
 const computationMethods = ref([]);
+const productDesigns = ref([]);
+const products = ref([]);
+const flutes = ref([]);
 const selectedMethod = ref(null);
 const editingId = ref(null);
 const loading = ref(false);
+const isLoading = ref(true);
 const showDeleteModal = ref(false);
+const showFormModal = ref(false);
 const methodToDelete = ref(null);
+const searchTerm = ref('');
+const errors = ref({});
+const toggleLoading = ref({});
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+const sortOrder = ref({
+  field: 'product_design',
+  direction: 'asc'
+});
+
+// Use toast composable
+const toast = useToast();
 
 // Form data
 const form = reactive({
   product_name: '',
   product_design: '',
+  product: '',
+  flute: '',
   formula_divisor: 1,
   formula_pieces: 0,
   height_type: 'internal',
   rounding_type: 'down',
-  is_compute: false,
-  product: '',
-  flute: ''
+  is_compute: false
+});
+
+// Filtered methods based on search term and sorting
+const filteredMethods = computed(() => {
+  let result = computationMethods.value;
+  
+  // Apply search filter
+  if (searchTerm.value) {
+  const term = searchTerm.value.toLowerCase();
+    result = result.filter(method => 
+    (method.product_design && method.product_design.toLowerCase().includes(term)) ||
+    (method.product && method.product.toLowerCase().includes(term)) ||
+    (method.flute && method.flute.toLowerCase().includes(term)) ||
+    (method.product_name && method.product_name.toLowerCase().includes(term))
+  );
+  }
+  
+  // Apply sorting
+  result = [...result].sort((a, b) => {
+    const field = sortOrder.value.field;
+    const direction = sortOrder.value.direction === 'asc' ? 1 : -1;
+    
+    if ((a[field] || '') < (b[field] || '')) return -1 * direction;
+    if ((a[field] || '') > (b[field] || '')) return 1 * direction;
+    return 0;
+  });
+  
+  return result;
+});
+
+// Pagination computed properties
+const paginatedMethods = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return filteredMethods.value.slice(start, end);
+});
+
+const totalPages = computed(() => {
+  return Math.max(1, Math.ceil(filteredMethods.value.length / itemsPerPage.value));
+});
+
+// Watch for changes in filtered methods to update pagination
+watch(filteredMethods, () => {
+  currentPage.value = 1;
+});
+
+// Watch for changes in items per page
+watch(itemsPerPage, () => {
+  currentPage.value = 1;
 });
 
 // Fetch computation methods on component mount
 onMounted(async () => {
-  await fetchComputationMethods();
+  await Promise.all([
+    fetchComputationMethods(),
+    fetchProductDesigns(),
+    fetchProducts(),
+    fetchFlutes()
+  ]);
 });
 
 // Fetch computation methods from API
 const fetchComputationMethods = async () => {
   try {
-    loading.value = true;
+    isLoading.value = true;
     const response = await axios.get('/api/bundling-computation-methods');
-    computationMethods.value = response.data.data;
+    if (response.data.status === 'success') {
+      computationMethods.value = response.data.data;
+    } else {
+      toast.error('Failed to load computation methods');
+    }
   } catch (error) {
     console.error('Error fetching computation methods:', error);
-    // Show error notification
+    toast.error('Error loading computation methods');
   } finally {
-    loading.value = false;
+    isLoading.value = false;
+  }
+};
+
+// Fetch product designs
+const fetchProductDesigns = async () => {
+  try {
+    const response = await axios.get('/api/product-designs');
+    productDesigns.value = response.data;
+  } catch (error) {
+    console.error('Error fetching product designs:', error);
+    toast.error('Error loading product designs');
+  }
+};
+
+// Fetch products
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get('/api/products');
+    products.value = response.data;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    toast.error('Error loading products');
+  }
+};
+
+// Fetch flutes
+const fetchFlutes = async () => {
+  try {
+    const response = await axios.get('/api/paper-flutes');
+    flutes.value = response.data;
+  } catch (error) {
+    console.error('Error fetching flutes:', error);
+    toast.error('Error loading flutes');
+  }
+};
+
+// Validate form
+const validateForm = () => {
+  errors.value = {};
+  let isValid = true;
+  
+  if (!form.formula_pieces && form.formula_pieces !== 0) {
+    errors.value.formula_pieces = 'Pieces per bundle is required';
+    isValid = false;
+  }
+  
+  return isValid;
+};
+
+// Function to refresh data
+const refreshData = () => {
+  selectedMethod.value = null;
+  fetchComputationMethods();
+};
+
+// Function to select a method
+const selectMethod = (method) => {
+  selectedMethod.value = method;
+};
+
+// Function to open the new method form modal
+const newMethod = () => {
+  resetForm();
+  showFormModal.value = true;
+};
+
+// Function to sort table by a given field
+const sortBy = (field) => {
+  if (sortOrder.value.field === field) {
+    // Toggle direction if same field
+    sortOrder.value.direction = sortOrder.value.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    // Change field and reset direction
+    sortOrder.value.field = field;
+    sortOrder.value.direction = 'asc';
   }
 };
 
@@ -227,16 +644,60 @@ const resetForm = () => {
   Object.assign(form, {
     product_name: '',
     product_design: '',
+    product: '',
+    flute: '',
     formula_divisor: 1,
     formula_pieces: 0,
     height_type: 'internal',
     rounding_type: 'down',
-    is_compute: false,
-    product: '',
-    flute: ''
+    is_compute: false
   });
   editingId.value = null;
   selectedMethod.value = null;
+  errors.value = {};
+};
+
+// Function to toggle compute status directly from the table
+const toggleCompute = async (method) => {
+  // Prevent multiple clicks
+  if (toggleLoading.value[method.id]) return;
+  
+  // Set loading state for this specific method
+  toggleLoading.value[method.id] = true;
+  const newComputeValue = !method.is_compute;
+  
+  try {
+    // Create a copy of the method object with only the required fields for the update
+    const methodUpdate = {
+      ...method,
+      is_compute: newComputeValue
+    };
+    
+    const response = await axios.put(`/api/bundling-computation-methods/${method.id}`, methodUpdate);
+    
+    if (response.data.status === 'success') {
+      // Update the method in the local array
+      const index = computationMethods.value.findIndex(m => m.id === method.id);
+      if (index !== -1) {
+        computationMethods.value[index].is_compute = newComputeValue;
+        
+        // Also update selected method if it's the same one
+        if (selectedMethod.value?.id === method.id) {
+          selectedMethod.value.is_compute = newComputeValue;
+        }
+      }
+      
+      toast.success(`Compute value updated to ${newComputeValue ? 'Yes' : 'No'}`);
+    } else {
+      throw new Error(response.data.message || 'Unknown error');
+    }
+  } catch (error) {
+    console.error('Error updating compute status:', error);
+    toast.error(error.response?.data?.message || 'Failed to update compute status');
+  } finally {
+    // Clear loading state
+    toggleLoading.value[method.id] = false;
+  }
 };
 
 // Edit a computation method
@@ -247,51 +708,74 @@ const editMethod = (method) => {
   Object.assign(form, {
     product_name: method.product_name || '',
     product_design: method.product_design || '',
+    product: method.product || '',
+    flute: method.flute || '',
     formula_divisor: method.formula_divisor || 1,
     formula_pieces: method.formula_pieces || 0,
     height_type: method.height_type || 'internal',
     rounding_type: method.rounding_type || 'down',
-    is_compute: method.is_compute || false,
-    product: method.product || '',
-    flute: method.flute || ''
+    is_compute: method.is_compute || false
   });
+  
+  errors.value = {};
+  showFormModal.value = true;
 };
 
 // Save or update a computation method
 const saveMethod = async () => {
+  if (!validateForm()) {
+    return;
+  }
+  
   try {
     loading.value = true;
     
     const methodData = {
       product_name: form.product_name,
       product_design: form.product_design,
+      product: form.product,
+      flute: form.flute,
       formula_divisor: form.formula_divisor,
       formula_pieces: form.formula_pieces,
       height_type: form.height_type,
       rounding_type: form.rounding_type,
-      is_compute: form.is_compute,
-      product: form.product,
-      flute: form.flute
+      is_compute: form.is_compute
     };
     
     if (editingId.value) {
       // Update existing method
-      await axios.put(`/api/bundling-computation-methods/${editingId.value}`, methodData);
+      const response = await axios.put(`/api/bundling-computation-methods/${editingId.value}`, methodData);
+      if (response.data.status === 'success') {
+        toast.success('Computation method updated successfully');
+      } else {
+        toast.error('Failed to update computation method');
+      }
     } else {
       // Create new method
-      await axios.post('/api/bundling-computation-methods', methodData);
+      const response = await axios.post('/api/bundling-computation-methods', methodData);
+      if (response.data.status === 'success') {
+        toast.success('Computation method created successfully');
+      } else {
+        toast.error('Failed to create computation method');
+      }
     }
     
     // Refresh the data
     await fetchComputationMethods();
     
-    // Reset the form
+    // Reset the form and close modal
     resetForm();
-    
-    // Show success notification
+    showFormModal.value = false;
   } catch (error) {
     console.error('Error saving computation method:', error);
-    // Show error notification
+    
+    // Handle validation errors
+    if (error.response && error.response.data && error.response.data.errors) {
+      errors.value = error.response.data.errors;
+      toast.error('Please correct the errors in the form');
+    } else {
+      toast.error('An error occurred while saving');
+    }
   } finally {
     loading.value = false;
   }
@@ -309,19 +793,52 @@ const deleteMethod = async () => {
   
   try {
     loading.value = true;
-    await axios.delete(`/api/bundling-computation-methods/${methodToDelete.value.id}`);
+    const response = await axios.delete(`/api/bundling-computation-methods/${methodToDelete.value.id}`);
+    
+    if (response.data.status === 'success') {
+      toast.success('Computation method deleted successfully');
+    } else {
+      toast.error('Failed to delete computation method');
+    }
     
     // Refresh the data
     await fetchComputationMethods();
     
+    // Clear the selected method if it was the one deleted
+    if (selectedMethod.value && selectedMethod.value.id === methodToDelete.value.id) {
+      selectedMethod.value = null;
+    }
+    
     // Close the modal
     showDeleteModal.value = false;
     methodToDelete.value = null;
-    
-    // Show success notification
   } catch (error) {
     console.error('Error deleting computation method:', error);
-    // Show error notification
+    toast.error('Error deleting computation method');
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Seed sample data
+const seedData = async () => {
+  if (!confirm('Are you sure you want to seed sample data? This will add example computation methods to the database.')) {
+    return;
+  }
+  
+  try {
+    loading.value = true;
+    const response = await axios.post('/api/bundling-computation-methods/seed');
+    
+    if (response.data.success) {
+      toast.success('Sample data seeded successfully');
+      await fetchComputationMethods();
+    } else {
+      toast.error('Failed to seed sample data');
+    }
+  } catch (error) {
+    console.error('Error seeding data:', error);
+    toast.error('Error seeding sample data');
   } finally {
     loading.value = false;
   }
@@ -329,33 +846,58 @@ const deleteMethod = async () => {
 </script>
 
 <style scoped>
-/* Add any additional custom styles here */
-.form-radio {
-  appearance: none;
-  -webkit-appearance: none;
-  border-radius: 50%;
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid #d1d5db;
-  outline: none;
-  transition: all 0.2s ease-in-out;
+/* Button styles */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
 }
 
-.form-radio:checked {
-  background-color: #2563eb;
-  border-color: #2563eb;
-  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='4'/%3e%3c/svg%3e");
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
+.btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
 }
 
-/* Animate table row hover */
+.btn-info {
+  @apply bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+.btn-blue {
+  @apply bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+/* Table hover animation */
 tbody tr {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s;
 }
 
 tbody tr:hover {
-  background-color: rgba(243, 244, 246, 0.7);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar styling */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
 }
 </style>

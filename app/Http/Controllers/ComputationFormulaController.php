@@ -26,7 +26,10 @@ class ComputationFormulaController extends Controller
     public function apiIndex()
     {
         $formulas = ComputationFormula::orderBy('id', 'asc')->get();
-        return response()->json(['data' => $formulas]);
+        return response()->json([
+            'status' => 'success',
+            'data' => $formulas
+        ]);
     }
 
     /**
@@ -38,7 +41,10 @@ class ComputationFormulaController extends Controller
     public function apiShow($id)
     {
         $formula = ComputationFormula::findOrFail($id);
-        return response()->json(['data' => $formula]);
+        return response()->json([
+            'status' => 'success',
+            'data' => $formula
+        ]);
     }
 
     /**
@@ -65,6 +71,7 @@ class ComputationFormulaController extends Controller
         $formula = ComputationFormula::create($validatedData);
         
         return response()->json([
+            'status' => 'success',
             'message' => 'Formula created successfully',
             'data' => $formula
         ], 201);
@@ -97,6 +104,7 @@ class ComputationFormulaController extends Controller
         $formula->update($validatedData);
         
         return response()->json([
+            'status' => 'success',
             'message' => 'Formula updated successfully',
             'data' => $formula
         ]);
@@ -114,6 +122,7 @@ class ComputationFormulaController extends Controller
         $formula->delete();
         
         return response()->json([
+            'status' => 'success',
             'message' => 'Formula deleted successfully'
         ]);
     }
@@ -128,6 +137,7 @@ class ComputationFormulaController extends Controller
         $created = self::seedData();
         
         return response()->json([
+            'status' => 'success',
             'message' => 'Seed data created successfully',
             'data' => $created
         ]);

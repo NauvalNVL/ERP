@@ -251,3 +251,11 @@ Route::prefix('warehouse-locations')->group(function () {
 
 Route::get('/customer-sales-types', [CustomerSalesTypeController::class, 'index']);
 Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'store']); 
+
+// Diecut Computation Formula API routes
+Route::get('/diecut-computation-formulas', [App\Http\Controllers\ComputationFormulaController::class, 'apiIndex']);
+Route::get('/diecut-computation-formulas/{id}', [App\Http\Controllers\ComputationFormulaController::class, 'apiShow']);
+Route::post('/diecut-computation-formulas', [App\Http\Controllers\ComputationFormulaController::class, 'apiStore']);
+Route::put('/diecut-computation-formulas/{id}', [App\Http\Controllers\ComputationFormulaController::class, 'apiUpdate']);
+Route::delete('/diecut-computation-formulas/{id}', [App\Http\Controllers\ComputationFormulaController::class, 'apiDestroy']);
+Route::post('/diecut-computation-formulas/seed', [App\Http\Controllers\ComputationFormulaController::class, 'apiSeed']); 
