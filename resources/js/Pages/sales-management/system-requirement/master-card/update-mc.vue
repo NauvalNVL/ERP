@@ -615,14 +615,14 @@
                         class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
                     >
                         <i class="fas fa-check mr-2"></i>
-                         OK
+                        OK
                     </button>
                     <button 
                         @click="showMcsOptionsModal = false" 
                         class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 flex items-center"
                     >
                         <i class="fas fa-times mr-2"></i>
-                         Exit
+                        Exit
                     </button>
                 </div>
             </div>
@@ -685,6 +685,14 @@
                                 <th v-if="mcsSortOption === 'model'" class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
                                 <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
                             </tr>
+                            <tr v-else-if="mcsSortOption === 'ed'">
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Ext. Dimension</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Comp#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">P/Design</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Model</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                            </tr>
                             <tr v-else>
                                 <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
                                 <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Model</th>
@@ -696,16 +704,16 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-indigo-100">
                             <template v-if="mcsSortOption === 'part'">
-                                <tr v-for="(mcs, index) in filteredMcsData" :key="mcs.seq + '-part'" 
-                                class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                <tr v-for="(mcs, index) in filteredMcsData" :key="mcs.seq + '-part'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
                                     :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
                                     @click="selectForViewMcs(mcs)"
                                     @dblclick="selectMcs(mcs)">
-                                    <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.part }}</td>
-                                    <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ mcs.seq }}</td>
-                                    <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.comp }}</td>
-                                    <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.p_design }}</td>
-                                    <td class="px-4 py-2 border-b border-indigo-100">
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.part }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.comp }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.p_design }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
                                         <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
                                         <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
                                         <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
@@ -718,10 +726,28 @@
                                     :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
                                     @click="selectForViewMcs(mcs)"
                                     @dblclick="selectMcs(mcs)">
-                                    <td v-if="mcsSortOption !== 'model'" class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ mcs.seq }}</td>
-                                    <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.model }}</td>
-                                    <td v-if="mcsSortOption === 'model'" class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ mcs.seq }}</td>
-                                    <td class="px-4 py-2 border-b border-indigo-100">
+                                    <td v-if="mcsSortOption !== 'model'" class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.model }}</td>
+                                    <td v-if="mcsSortOption === 'model'" class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else-if="mcsSortOption === 'ed'">
+                                <tr v-for="(mcs, index) in filteredMcsData" :key="mcs.seq + '-ed'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
+                                    @click="selectForViewMcs(mcs)"
+                                    @dblclick="selectMcs(mcs)">
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.ed }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.comp }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.p_design }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.model }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
                                         <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
                                         <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
                                         <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
@@ -731,29 +757,29 @@
                             <template v-else>
                                 <tr v-for="(mcs, index) in filteredMcsData" :key="mcs.seq + '-other'"
                                     class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
-                                :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
-                                @click="selectForViewMcs(mcs)"
-                                @dblclick="selectMcs(mcs)">
-                                <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ mcs.seq }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.model }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.part }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.ed }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.id }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">
-                                    <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
-                                    <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
-                                    <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
-                                </td>
-                            </tr>
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
+                                    @click="selectForViewMcs(mcs)"
+                                    @dblclick="selectMcs(mcs)">
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.model }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.part }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.ed }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.id }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
                             </template>
                             <tr v-if="filteredMcsData.length === 0">
-                                <td :colspan="mcsSortOption === 'part' ? 5 : (['seq', 'model'].includes(mcsSortOption) ? 4 : 6)" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
+                                <td :colspan="mcsSortOption === 'part' ? 5 : (['seq', 'model'].includes(mcsSortOption) ? 4 : mcsSortOption === 'ed' ? 6 : 6)" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
                                     No master card records found matching your criteria
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    </div>
+                </div>
                      <!-- Dimension and Model Details -->
                     <div v-if="mcsSortOption === 'part'" class="mt-4 p-4 border border-indigo-200 rounded-lg bg-white">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
@@ -787,7 +813,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                </div>
+                <!-- Tambahkan textbox Model khusus untuk sort by MC PD ED -->
+                <div v-if="mcsSortOption === 'ed'" class="mt-4 flex items-center gap-2">
+                    <label for="mcs-model-ed" class="font-bold w-20">Model:</label>
+                    <input type="text" id="mcs-model-ed" :value="selectedMcsModel" readonly class="flex-grow bg-gray-100 border-2 border-gray-400 rounded-sm py-1 px-2 font-bold text-black focus:outline-none" />
+                </div>
                 </div>
                 <div class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl">
                     <button @click="showMcsOptionsModal = true" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-lg shadow-md hover:from-blue-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition-all duration-150 ease-in-out">
@@ -970,25 +1001,13 @@ const filteredMcsData = computed(() => {
         
         // Determine which field to sort by
         switch (mcsSortOption.value) {
-            case 'seq':
-                aValue = a.seq;
-                bValue = b.seq;
-                break;
-            case 'model':
-                aValue = a.model;
-                bValue = b.model;
-                break;
-            case 'part':
-                aValue = a.part;
-                bValue = b.part;
-                break;
-            case 'ed':
-                aValue = a.ed;
-                bValue = b.ed;
-                break;
-            case 'id':
-                aValue = a.id;
-                bValue = b.id;
+            case 'seq':   // MC Seq#
+            case 'model': // MC Model
+            case 'part':  // MC PD Part#
+            case 'ed':    // MC PD ED
+            case 'id':    // MC PD ID
+                aValue = a[mcsSortOption.value];
+                bValue = b[mcsSortOption.value];
                 break;
             default:
                 aValue = a.seq;
