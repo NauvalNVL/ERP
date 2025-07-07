@@ -138,87 +138,8 @@
                             </div>
 
                             <!-- Master Card Table -->
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                MC Seq#
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                MC Model
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Customer
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Status
-                                            </th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        <tr 
-                                            v-for="mc in filteredMasterCards"
-                                            :key="mc.id"
-                                            class="hover:bg-indigo-50 transition-colors duration-150 cursor-pointer"
-                                            :class="{ 'bg-indigo-100 border-l-4 border-indigo-500': selectedMasterCard?.id === mc.id }"
-                                            @click="selectedMasterCard = mc"
-                                        >
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 h-8 w-8 bg-gradient-to-r from-indigo-400 to-purple-500 text-white rounded-md flex items-center justify-center mr-3 shadow-sm">
-                                                        <i class="fas fa-file-alt text-xs"></i>
-                                                    </div>
-                                                    {{ mc.mc_seq }}
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                                {{ mc.mc_model }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                                {{ mc.customer_name }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span 
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                                                    :class="{
-                                                        'bg-green-100 text-green-800': mc.status === 'active', 
-                                                        'bg-yellow-100 text-yellow-800': mc.status === 'pending',
-                                                        'bg-red-100 text-red-800': mc.status === 'obsolete'
-                                                    }">
-                                                    {{ mc.status.charAt(0).toUpperCase() + mc.status.slice(1) }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div class="flex space-x-2">
-                                                    <button class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-1.5 rounded shadow-sm hover:shadow transition-all duration-200" @click.stop="handleEdit(mc)">
-                                                        <i class="fas fa-edit text-xs"></i>
-                                                    </button>
-                                                    <button class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-1.5 rounded shadow-sm hover:shadow transition-all duration-200" @click.stop="handleApprove(mc)">
-                                                        <i class="fas fa-check text-xs"></i>
-                                                    </button>
-                                                    <button class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-1.5 rounded shadow-sm hover:shadow transition-all duration-200" @click.stop="handleReject(mc)">
-                                                        <i class="fas fa-times text-xs"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr v-if="filteredMasterCards.length === 0">
-                                            <td colspan="5" class="px-6 py-10 text-center text-gray-500">
-                                                <div class="flex flex-col items-center">
-                                                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-                                                        <i class="fas fa-search text-gray-400 text-2xl"></i>
-                                                    </div>
-                                                    <p>No master cards found. Please adjust your search or filter criteria.</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <!-- Bagian tabel dihapus sesuai permintaan user -->
+
                             <div class="px-6 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between mt-4 rounded-b-lg">
                                 <span class="text-sm text-gray-500">
                                     Showing {{ filteredMasterCards.length }} master cards
@@ -702,118 +623,93 @@
         </div>
 
         <!-- Customer Account Table (after selecting options) -->
-        <div v-if="showCustomerAccountTable" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
-            <!-- Modal backdrop -->
-            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showCustomerAccountTable = false"></div>
-            
-            <!-- Modal content -->
-            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto z-10 transform transition-all border-2 border-indigo-200">
-                <!-- Modal header -->
-                <div class="flex items-center justify-between p-5 border-b-2 border-indigo-200 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white rounded-t-2xl relative overflow-hidden">
-                    <!-- Decorative animated circles -->
-                    <div class="absolute -top-8 -left-8 w-24 h-24 bg-white opacity-10 rounded-full animate-ping-slow"></div>
-                    <div class="absolute -bottom-8 -right-8 w-20 h-20 bg-cyan-300 opacity-10 rounded-full animate-ping-slow animation-delay-500"></div>
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-white opacity-5 rounded-full"></div>
-                    <h3 class="text-2xl font-bold flex items-center relative z-10 text-shadow">
-                        <span class="inline-flex items-center justify-center w-10 h-10 bg-white bg-opacity-20 rounded-full mr-4 shadow-inner">
-                            <i class="fas fa-table text-white text-xl"></i>
-                        </span>
-                        Customer Account Table
-                    </h3>
-                    <button type="button" @click="showCustomerAccountTable = false" 
-                        class="text-white hover:text-gray-200 focus:outline-none transition-transform hover:scale-110 relative z-10 bg-red-500 bg-opacity-30 hover:bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                
-                <div class="p-6 bg-gradient-to-br from-white via-blue-50 to-cyan-50 rounded-b-2xl overflow-auto" style="max-height: 440px;">
-                    <div class="mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="text-gray-700 text-base font-medium">
-                            <span class="font-bold text-indigo-700">Filter:</span> 
-                            <span class="text-gray-600">{{ recordStatusFilter.active && recordStatusFilter.obsolete ? 'All Records' : recordStatusFilter.active ? 'Active Records Only' : recordStatusFilter.obsolete ? 'Obsolete Records Only' : 'No Records' }}</span>
-                        </div>
-                        <div class="relative w-full md:w-64">
-                            <input 
-                                type="text" 
-                                v-model="tableSearchTerm" 
-                                placeholder="Search..." 
-                                class="border border-indigo-200 rounded-lg py-2 px-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 w-full shadow-sm"
-                            />
-                            <i class="fas fa-search absolute right-4 top-3 text-gray-400"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="overflow-x-auto rounded-lg shadow">
-                    <table class="min-w-full border border-indigo-200 text-base bg-white rounded-lg overflow-hidden">
-                        <thead class="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-400 text-white">
-                            <tr>
-                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Customer Name</th>
-                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Customer Code</th>
-                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">S/person</th>
-                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">AC Type</th>
-                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Currency</th>
-                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-indigo-100">
-                            <tr v-for="(customer, index) in displayedCustomers" :key="customer.code" 
-                                class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
-                                :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedCustomer?.code === customer.code }"
-                                @click="selectForView(customer)" 
-                                @dblclick="selectCustomer(customer)">
-                                <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ customer.name }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ customer.code }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ customer.salesperson }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ customer.acType }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ customer.currency }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">
-                                    <span v-if="customer.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
-                                    <span v-else-if="customer.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
-                                    <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ customer.status }}</span>
-                                </td>
-                            </tr>
-                            <tr v-if="displayedCustomers.length === 0">
-                                <td colspan="6" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
-                                    No customer accounts found matching your criteria
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
-                
-                <div class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl">
-                    <button 
-                        class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-teal-400 via-blue-500 to-indigo-500 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-cyan-200 before:via-blue-300 before:to-indigo-200 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl"
-                    >
-                        <span class="relative z-10 flex items-center">
-                            <i class="fas fa-cog mr-2 animate-spin-slow"></i> More Options
-                        </span>
-                    </button>
-                    <button 
-                        class="bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-500 hover:to-cyan-600 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow transition-all group relative overflow-hidden flex items-center"
-                    >
-                        <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
-                        <i class="fas fa-search-plus mr-2"></i> Zoom
-                    </button>
-                    <button 
-                        @click="selectCustomer(selectedCustomer)" 
-                        :disabled="!selectedCustomer"
-                        class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed transition-all group relative overflow-hidden flex items-center"
-                    >
-                        <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
-                        <i class="fas fa-check-circle mr-2"></i> Select
-                    </button>
-                    <button 
-                        @click="showCustomerAccountTable = false" 
-                        class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-pink-500 via-red-500 to-orange-400 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-rose-200 before:via-red-200 before:to-orange-100 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl"
-                    >
-                        <span class="relative z-10 flex items-center">
-                            <i class="fas fa-times mr-2"></i> Exit
-                        </span>
-                    </button>
-                </div>
+        <div v-if="showCustomerAccountTable && sortOption === 'name'" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+          <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showCustomerAccountTable = false"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto z-10 transform transition-all border-2 border-indigo-200">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-5 border-b-2 border-indigo-200 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white rounded-t-2xl relative overflow-hidden">
+              <div class="absolute -top-8 -left-8 w-24 h-24 bg-white opacity-10 rounded-full animate-ping-slow"></div>
+              <div class="absolute -bottom-8 -right-8 w-20 h-20 bg-cyan-300 opacity-10 rounded-full animate-ping-slow animation-delay-500"></div>
+              <div class="absolute top-0 right-0 w-16 h-16 bg-white opacity-5 rounded-full"></div>
+              <h3 class="text-2xl font-bold flex items-center relative z-10 text-shadow">
+                <span class="inline-flex items-center justify-center w-10 h-10 bg-white bg-opacity-20 rounded-full mr-4 shadow-inner">
+                  <i class="fas fa-table text-white text-xl"></i>
+                </span>
+                Customer Account Table
+              </h3>
+              <button type="button" @click="showCustomerAccountTable = false" class="text-white hover:text-gray-200 focus:outline-none transition-transform hover:scale-110 relative z-10 bg-red-500 bg-opacity-30 hover:bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center">
+                <i class="fas fa-times text-xl"></i>
+              </button>
             </div>
+            <div class="p-6 bg-gradient-to-br from-white via-blue-50 to-cyan-50 rounded-b-2xl overflow-auto" style="max-height: 440px;">
+              <div class="mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-gray-700 text-base font-medium">
+                  <span class="font-bold text-indigo-700">Filter:</span>
+                  <span class="text-gray-600">{{ recordStatusFilter.active && recordStatusFilter.obsolete ? 'All Records' : recordStatusFilter.active ? 'Active Records Only' : recordStatusFilter.obsolete ? 'Obsolete Records Only' : 'No Records' }}</span>
+                </div>
+                <div class="relative w-full md:w-64">
+                  <input type="text" v-model="tableSearchTerm" placeholder="Search..." class="border border-indigo-200 rounded-lg py-2 px-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 w-full shadow-sm" />
+                  <i class="fas fa-search absolute right-4 top-3 text-gray-400"></i>
+                </div>
+              </div>
+              <div class="overflow-x-auto rounded-lg shadow">
+                <table class="min-w-full border border-indigo-200 text-base bg-white rounded-lg overflow-hidden">
+                  <thead class="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-400 text-white">
+                    <tr>
+                      <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Customer Name</th>
+                      <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Customer Code</th>
+                      <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">S/person</th>
+                      <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">AC Type</th>
+                      <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Currency</th>
+                      <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-indigo-100">
+                    <tr v-for="(customer, idx) in displayedCustomers" :key="customer.code"
+                        class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                        :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedCustomer && selectedCustomer.code === customer.code }"
+                        @click="selectedCustomer = customer">
+                      <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ customer.name }}</td>
+                      <td class="px-4 py-2 border-b border-indigo-100">{{ customer.code }}</td>
+                      <td class="px-4 py-2 border-b border-indigo-100">{{ customer.salesperson }}</td>
+                      <td class="px-4 py-2 border-b border-indigo-100">{{ customer.acType }}</td>
+                      <td class="px-4 py-2 border-b border-indigo-100">{{ customer.currency }}</td>
+                      <td class="px-4 py-2 border-b border-indigo-100">
+                        <span v-if="customer.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                        <span v-else-if="customer.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ customer.status }}</span>
+                      </td>
+                    </tr>
+                    <tr v-if="displayedCustomers.length === 0">
+                      <td colspan="6" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
+                        No customer accounts found matching your criteria
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl">
+              <button class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-teal-400 via-blue-500 to-indigo-500 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-cyan-200 before:via-blue-300 before:to-indigo-200 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl">
+                <span class="relative z-10 flex items-center">
+                  <i class="fas fa-cog mr-2 animate-spin-slow"></i> More Options
+                </span>
+              </button>
+              <button class="bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-500 hover:to-cyan-600 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow transition-all group relative overflow-hidden flex items-center">
+                <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                <i class="fas fa-search-plus mr-2"></i> Zoom
+              </button>
+              <button @click="selectCustomer(selectedCustomer)" :disabled="!selectedCustomer" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed transition-all group relative overflow-hidden flex items-center">
+                <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                <i class="fas fa-check-circle mr-2"></i> Select
+              </button>
+              <button @click="showCustomerAccountTable = false" class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-pink-500 via-red-500 to-orange-400 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-rose-200 before:via-red-200 before:to-orange-100 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl">
+                <span class="relative z-10 flex items-center">
+                  <i class="fas fa-times mr-2"></i> Exit
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- MCS Options Modal -->
@@ -966,7 +862,36 @@
                     <div class="overflow-x-auto rounded-lg shadow">
                     <table class="min-w-full border border-indigo-200 text-base bg-white rounded-lg overflow-hidden">
                         <thead class="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-400 text-white">
-                            <tr>
+                            <tr v-if="mcsSortOption === 'part'">
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Part No</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Comp#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">P/Design</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                            </tr>
+                            <tr v-else-if="['seq', 'model'].includes(mcsSortOption)">
+                                <th v-if="mcsSortOption !== 'model'" class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Model</th>
+                                <th v-if="mcsSortOption === 'model'" class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                            </tr>
+                            <tr v-else-if="mcsSortOption === 'ed'">
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Ext. Dimension</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Comp#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">P/Design</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Model</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                            </tr>
+                            <tr v-else-if="mcsSortOption === 'id'">
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Int. Dimension</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Comp#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">P/Design</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Model</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                            </tr>
+                            <tr v-else>
                                 <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
                                 <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Model</th>
                                 <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC PD Part#</th>
@@ -976,31 +901,103 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-indigo-100">
-                            <tr v-for="(mcs, index) in filteredMcsData" :key="mcs.seq" 
-                                class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
-                                :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
-                                @click="selectForViewMcs(mcs)"
-                                @dblclick="selectMcs(mcs)">
-                                <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ mcs.seq }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.model }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.part }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.ed }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.id }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">
-                                    <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
-                                    <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
-                                    <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
-                                </td>
-                            </tr>
+                            <template v-if="mcsSortOption === 'part'">
+                                <tr v-for="(mcs, index) in filteredMcsData" :key="mcs.seq + '-part'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
+                                    @click="selectForViewMcs(mcs)"
+                                    @dblclick="selectMcs(mcs)">
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.part }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.comp }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.p_design }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else-if="['seq', 'model'].includes(mcsSortOption)">
+                                <tr v-for="(mcs, index) in filteredMcsData" :key="mcs.seq + '-seqmodel'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
+                                    @click="selectForViewMcs(mcs)"
+                                    @dblclick="selectMcs(mcs)">
+                                    <td v-if="mcsSortOption !== 'model'" class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.model }}</td>
+                                    <td v-if="mcsSortOption === 'model'" class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else-if="mcsSortOption === 'ed'">
+                                <tr v-for="(mcs, index) in filteredMcsData" :key="mcs.seq + '-ed'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
+                                    @click="selectForViewMcs(mcs)"
+                                    @dblclick="selectMcs(mcs)">
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.ed }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.comp }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.p_design }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.model }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else-if="mcsSortOption === 'id'">
+                                <tr v-for="(mcs, index) in filteredMcsData" :key="mcs.seq + '-id'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
+                                    @click="selectForViewMcs(mcs)"
+                                    @dblclick="selectMcs(mcs)">
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.id }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.comp }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.p_design }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.model }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr v-for="(mcs, index) in filteredMcsData" :key="mcs.seq + '-other'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcs?.seq === mcs.seq }"
+                                    @click="selectForViewMcs(mcs)"
+                                    @dblclick="selectMcs(mcs)">
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.model }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.part }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.ed }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.id }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
+                            </template>
                             <tr v-if="filteredMcsData.length === 0">
-                                <td colspan="6" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
+                                <td :colspan="mcsSortOption === 'part' ? 5 : (['seq', 'model'].includes(mcsSortOption) ? 4 : (['ed','id'].includes(mcsSortOption) ? 6 : 6))" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
                                     No master card records found matching your criteria
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                    </div>
                 </div>
-                </div>
+                
                 <div class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl">
                     <button 
                         class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-teal-400 via-blue-500 to-indigo-500 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-cyan-200 before:via-blue-300 before:to-indigo-200 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl"
@@ -1185,7 +1182,36 @@
                     <div class="overflow-x-auto rounded-lg shadow">
                     <table class="min-w-full border border-indigo-200 text-base bg-white rounded-lg overflow-hidden">
                         <thead class="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-400 text-white">
-                            <tr>
+                            <tr v-if="mcsSortOption === 'part'">
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Part No</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Comp#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">P/Design</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                            </tr>
+                            <tr v-else-if="['seq', 'model'].includes(mcsSortOption)">
+                                <th v-if="mcsSortOption !== 'model'" class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Model</th>
+                                <th v-if="mcsSortOption === 'model'" class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                            </tr>
+                            <tr v-else-if="mcsSortOption === 'ed'">
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Ext. Dimension</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Comp#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">P/Design</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Model</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                            </tr>
+                            <tr v-else-if="mcsSortOption === 'id'">
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Int. Dimension</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Comp#</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">P/Design</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Model</th>
+                                <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">Status</th>
+                            </tr>
+                            <tr v-else>
                                 <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Seq#</th>
                                 <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC Model</th>
                                 <th class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold">MC PD Part#</th>
@@ -1195,24 +1221,95 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-indigo-100">
-                            <tr v-for="(mcs, index) in filteredMcsDataTo" :key="mcs.seq" 
-                                class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
-                                :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcsTo?.seq === mcs.seq }"
-                                @click="selectForViewMcsTo(mcs)"
-                                @dblclick="selectMcsTo(mcs)">
-                                <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ mcs.seq }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.model }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.part }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.ed }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">{{ mcs.id }}</td>
-                                <td class="px-4 py-2 border-b border-indigo-100">
-                                    <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
-                                    <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
-                                    <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
-                                </td>
-                            </tr>
+                            <template v-if="mcsSortOption === 'part'">
+                                <tr v-for="(mcs, index) in filteredMcsDataTo" :key="mcs.seq + '-part'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcsTo?.seq === mcs.seq }"
+                                    @click="selectForViewMcsTo(mcs)"
+                                    @dblclick="selectMcsTo(mcs)">
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.part }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.comp }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.p_design }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else-if="['seq', 'model'].includes(mcsSortOption)">
+                                <tr v-for="(mcs, index) in filteredMcsDataTo" :key="mcs.seq + '-seqmodel'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcsTo?.seq === mcs.seq }"
+                                    @click="selectForViewMcsTo(mcs)"
+                                    @dblclick="selectMcsTo(mcs)">
+                                    <td v-if="mcsSortOption !== 'model'" class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.model }}</td>
+                                    <td v-if="mcsSortOption === 'model'" class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else-if="mcsSortOption === 'ed'">
+                                <tr v-for="(mcs, index) in filteredMcsDataTo" :key="mcs.seq + '-ed'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcsTo?.seq === mcs.seq }"
+                                    @click="selectForViewMcsTo(mcs)"
+                                    @dblclick="selectMcsTo(mcs)">
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.ed }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.comp }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.p_design }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.model }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else-if="mcsSortOption === 'id'">
+                                <tr v-for="(mcs, index) in filteredMcsDataTo" :key="mcs.seq + '-id'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcsTo?.seq === mcs.seq }"
+                                    @click="selectForViewMcsTo(mcs)"
+                                    @dblclick="selectMcsTo(mcs)">
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.id }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.comp }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.p_design }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.model }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr v-for="(mcs, index) in filteredMcsDataTo" :key="mcs.seq + '-other'"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedMcsTo?.seq === mcs.seq }"
+                                    @click="selectForViewMcsTo(mcs)"
+                                    @dblclick="selectMcsTo(mcs)">
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-semibold">{{ mcs.seq }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.model }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.part }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.ed }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">{{ mcs.id }}</td>
+                                    <td class="px-4 py-2 border-b border-indigo-100 align-middle text-left font-normal">
+                                        <span v-if="mcs.status === 'Active'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow">Active</span>
+                                        <span v-else-if="mcs.status === 'Obsolete'" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-rose-400 to-red-500 text-white shadow">Obsolete</span>
+                                        <span v-else class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow">{{ mcs.status }}</span>
+                                    </td>
+                                </tr>
+                            </template>
                             <tr v-if="filteredMcsDataTo.length === 0">
-                                <td colspan="6" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
+                                <td :colspan="mcsSortOption === 'part' ? 5 : (['seq', 'model'].includes(mcsSortOption) ? 4 : (['ed','id'].includes(mcsSortOption) ? 6 : 6))" class="px-4 py-8 text-center text-gray-500 border-b border-indigo-100 bg-white">
                                     No master card records found matching your criteria
                                 </td>
                             </tr>
@@ -1320,11 +1417,18 @@ const customerData = ref([
 
 // MCS data (sample data - replace with actual API call)
 const mcsData = ref([
-    { seq: 'MC001', model: 'Box-Standard', part: 'P123', ed: 'ED001', id: 'ID001', status: 'Active' },
-    { seq: 'MC002', model: 'Box-Premium', part: 'P124', ed: 'ED002', id: 'ID002', status: 'Active' },
-    { seq: 'MC003', model: 'Container-Small', part: 'P125', ed: 'ED003', id: 'ID003', status: 'Obsolete' },
-    { seq: 'MC004', model: 'Container-Medium', part: 'P126', ed: 'ED004', id: 'ID004', status: 'Active' },
-    { seq: 'MC005', model: 'Container-Large', part: 'P127', ed: 'ED005', id: 'ID005', status: 'Active' },
+    { seq: '1609138', model: 'BOX BASO 4,5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-01', id: 'ID-01', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
+    { seq: '1609144', model: 'BOX IKAN HARIMAU 4.5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-02', id: 'ID-02', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
+    { seq: '1609145', model: 'BOX SRIKAYA 4.5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-03', id: 'ID-03', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
+    { seq: '1609162', model: 'BIHUN FANIA 5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-04', id: 'ID-04', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
+    { seq: '1609163', model: 'BIHUN IKAN TUNA 4.5 KG BARU', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-05', id: 'ID-05', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
+    { seq: '1609164', model: 'BIHUN IKAN TUNA 5 KG BARU', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-06', id: 'ID-06', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
+    { seq: '1609166', model: 'BIHUN PIRING MAS 5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-07', id: 'ID-07', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
+    { seq: '1609173', model: 'BOX JAGUNG SRIKAYA 5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-08', id: 'ID-08', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
+    { seq: '1609181', model: 'BIHUN POHON KOPI 5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-09', id: 'ID-09', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
+    { seq: '1609182', model: 'BIHUN DELLIS 5 KG', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-10', id: 'ID-10', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
+    { seq: '1609185', model: 'POLOS UK 506 X 356 X 407', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-11', id: 'ID-11', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
+    { seq: '1609186', model: 'POLOS 480 X 410 X 401', part: 'BOX', comp: 'Main', p_design: 'B1', status: 'Active', ed: 'ED-12', id: 'ID-12', ext_dim_1: '396', ext_dim_2: '243', ext_dim_3: '297', int_dim_1: '393', int_dim_2: '240', int_dim_3: '292' },
 ]);
 
 // Record status filter
@@ -1415,58 +1519,41 @@ const filteredMcs = computed(() => {
 // Filter and sort MCS data
 const filteredMcsData = computed(() => {
     let result = [...filteredMcs.value];
-    
-    // Apply search filter if there's a search term
     if (mcsSearchTerm.value) {
         const searchLower = mcsSearchTerm.value.toLowerCase();
         result = result.filter(mcs => 
             mcs.seq.toLowerCase().includes(searchLower) ||
             mcs.model.toLowerCase().includes(searchLower) ||
             mcs.part.toLowerCase().includes(searchLower) ||
+            (mcs.comp && mcs.comp.toLowerCase().includes(searchLower)) ||
+            (mcs.p_design && mcs.p_design.toLowerCase().includes(searchLower)) ||
             mcs.ed.toLowerCase().includes(searchLower) ||
             mcs.id.toLowerCase().includes(searchLower)
         );
     }
-    
-    // Apply sorting
     result.sort((a, b) => {
         let aValue, bValue;
-        
-        // Determine which field to sort by
         switch (mcsSortOption.value) {
             case 'seq':
-                aValue = a.seq;
-                bValue = b.seq;
-                break;
             case 'model':
-                aValue = a.model;
-                bValue = b.model;
-                break;
             case 'part':
-                aValue = a.part;
-                bValue = b.part;
-                break;
             case 'ed':
-                aValue = a.ed;
-                bValue = b.ed;
-                break;
             case 'id':
-                aValue = a.id;
-                bValue = b.id;
+                aValue = a[mcsSortOption.value];
+                bValue = b[mcsSortOption.value];
                 break;
             default:
                 aValue = a.seq;
                 bValue = b.seq;
         }
-        
-        // Apply sort order
+        const strA = String(aValue ?? '');
+        const strB = String(bValue ?? '');
         if (mcsSortOrder.value === 'asc') {
-            return aValue.localeCompare(bValue);
+            return strA.localeCompare(strB);
         } else {
-            return bValue.localeCompare(aValue);
+            return strB.localeCompare(strA);
         }
     });
-    
     return result;
 });
 
