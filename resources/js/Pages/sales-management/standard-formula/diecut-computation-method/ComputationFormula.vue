@@ -163,10 +163,10 @@
                   </button>
                   <button @click="resetForm" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition duration-200 flex items-center shadow-sm">
                     <i class="fas fa-redo-alt mr-2"></i> Reset
-                  </button>
+                    </button>
                   <button v-if="editingId" @click="cancelEdit" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition duration-200 flex items-center shadow-sm">
                     <i class="fas fa-times mr-2"></i> Cancel Edit
-                  </button>
+                    </button>
                   <button 
                     @click="saveFormula" 
                     :disabled="loading" 
@@ -179,7 +179,7 @@
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
                     </span>
-                  </button>
+                    </button>
                 </div>
               </div>
 
@@ -423,7 +423,7 @@ const fetchFormulas = async () => {
     const response = await axios.get('/api/diecut-computation-formulas');
     
     if (response.data && response.data.status === 'success') {
-      formulas.value = response.data.data;
+    formulas.value = response.data.data;
     } else {
       showToast('Failed to load formulas', 'error');
     }

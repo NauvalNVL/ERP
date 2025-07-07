@@ -161,12 +161,16 @@
                 <span class="font-medium text-gray-900">{{ selectedMethod.product_design || '-' }}</span>
               </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">P/Design Name:</span>
+                <span class="font-medium text-gray-900">{{ getProductDesignName(selectedMethod.product_design) }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Product:</span>
                 <span class="font-medium text-gray-900">{{ selectedMethod.product || '-' }}</span>
               </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Product Name:</span>
-                <span class="font-medium text-gray-900">{{ selectedMethod.product_name || '-' }}</span>
+                <span class="font-medium text-gray-900">{{ getProductName(selectedMethod.product) }}</span>
               </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Flute:</span>
@@ -246,8 +250,8 @@
                   Product Name
                 </label>
                 <input type="text" v-model="form.product_name"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                  placeholder="Enter product name">
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-100"
+                  placeholder="Select a product to see its name" readonly>
                   </div>
 
                   <!-- Product Design Dropdown -->
@@ -322,7 +326,7 @@
                 <input type="number" v-model.number="form.formula_divisor" min="1"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Enter divisor">
-              </div>
+                  </div>
 
                   <!-- Height Type -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
@@ -487,6 +491,19 @@ const form = reactive({
   is_compute: false
 });
 
+watch(() => form.product, (newProductCode) => {
+  if (newProductCode) {
+    const selectedProduct = products.value.find(p => p.product_code === newProductCode);
+    if (selectedProduct) {
+      form.product_name = selectedProduct.description;
+    } else {
+      form.product_name = '';
+    }
+  } else {
+    form.product_name = '';
+  }
+});
+
 // Filtered methods based on search term and sorting
 const filteredMethods = computed(() => {
   let result = computationMethods.value;
@@ -535,6 +552,18 @@ watch(filteredMethods, () => {
 watch(itemsPerPage, () => {
   currentPage.value = 1;
 });
+
+const getProductName = (productCode) => {
+    if (!productCode) return '-';
+    const product = products.value.find(p => p.product_code === productCode);
+    return product ? product.description : (selectedMethod.value?.product_name || 'N/A');
+};
+
+const getProductDesignName = (pdCode) => {
+    if (!pdCode) return '-';
+    const design = productDesigns.value.find(d => d.pd_code === pdCode);
+    return design ? design.pd_name : 'N/A';
+};
 
 // Fetch computation methods on component mount
 onMounted(async () => {
