@@ -90,7 +90,7 @@ Route::get('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductControll
 Route::post('/corrugator-specs-by-product', [CorrugatorSpecByProductController::class, 'apiStore']);
 Route::post('/corrugator-specs-by-product/batch', [CorrugatorSpecByProductController::class, 'apiBatchUpdate']);
 Route::put('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiUpdate']);
-Route::delete('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiDestroy']);
+Route::delete('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiDestroy']); 
 Route::get('/corrugator-specs-by-product/export', [CorrugatorSpecByProductController::class, 'apiExport']);
 
 // Roll Trim By Corrugator API Routes
@@ -132,7 +132,7 @@ Route::post('/side-trims-by-product-design', [SideTrimByProductDesignController:
 Route::put('/side-trims-by-product-design/{id}', [SideTrimByProductDesignController::class, 'apiUpdate']);
 Route::delete('/side-trims-by-product-design/{id}', [SideTrimByProductDesignController::class, 'apiDestroy']);
 Route::get('/side-trims-by-product-design/export', [SideTrimByProductDesignController::class, 'apiExport']);
-Route::post('/side-trims-by-product-design/seed', [SideTrimByProductDesignController::class, 'apiSeed']);
+Route::post('/side-trims-by-product-design/seed', [SideTrimByProductDesignController::class, 'apiSeed']); 
 Route::post('/side-trims-by-product-design/batch', [SideTrimByProductDesignController::class, 'apiBatchUpdate']);
 
 // Product Design API routes
@@ -191,8 +191,8 @@ Route::get('/area-groups', function() {
 });
 
 // Add to the end of the file
-Route::get('/material-management/control-period', [MmControlPeriodController::class, 'getControlPeriod']);
-Route::post('/material-management/control-period', [MmControlPeriodController::class, 'updateControlPeriod']);
+Route::get('/material-management/control-period', [MmControlPeriodController::class, 'getControlPeriod'])->name('mm.control-period.get');
+Route::post('/material-management/control-period', [MmControlPeriodController::class, 'updateControlPeriod'])->name('mm.control-period.update');
 Route::get('/material-management/transaction-types', [MmTransactionTypeController::class, 'getTransactionTypes']);
 Route::post('/material-management/transaction-types', [MmTransactionTypeController::class, 'store']);
 Route::get('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'show']);

@@ -34,6 +34,10 @@ class MmControlPeriodController extends Controller
             if (!$controlPeriod) {
                 // Return default values if no settings exist
                 return response()->json([
+                    'current_period' => date('m/Y'),
+                    'fg_entry_date' => '',
+                    'do_entry_date' => '',
+                    'do_rejection_entry_date' => '',
                     'prRequisition' => [
                         'currentPeriod' => 'Same as P/Order Period',
                         'forwardPeriod' => '0',
@@ -66,6 +70,10 @@ class MmControlPeriodController extends Controller
             
             // Format the response data
             $responseData = [
+                'current_period' => $controlPeriod->po_current_period_month ? str_pad($controlPeriod->po_current_period_month, 2, '0', STR_PAD_LEFT) . '/' . $controlPeriod->po_current_period_year : '',
+                'fg_entry_date' => $controlPeriod->fg_entry_date,
+                'do_entry_date' => $controlPeriod->do_entry_date,
+                'do_rejection_entry_date' => $controlPeriod->do_rejection_entry_date,
                 'prRequisition' => [
                     'currentPeriod' => 'Same as P/Order Period',
                     'forwardPeriod' => $controlPeriod->pr_forward_period,
@@ -112,6 +120,10 @@ class MmControlPeriodController extends Controller
         try {
             // Validate incoming request data
             $validator = Validator::make($request->all(), [
+                'current_period' => 'required|string|regex:/^\\d{2}\\/{1}\\d{4}$/',
+                'fg_entry_date' => 'required|string',
+                'do_entry_date' => 'required|string',
+                'do_rejection_entry_date' => 'required|string',
                 'prRequisition.forwardPeriod' => 'required|string',
                 'prRequisition.controlDate' => 'required|string',
                 'pOrder.currentPeriodMonth' => 'required|integer|min:1|max:12',
@@ -146,6 +158,14 @@ class MmControlPeriodController extends Controller
             }
             
             // Update control period data
+            $currentPeriodParts = explode('/', $request->input('current_period'));
+            $controlPeriod->po_current_period_month = (int)$currentPeriodParts[0];
+            $controlPeriod->po_current_period_year = (int)$currentPeriodParts[1];
+            
+            $controlPeriod->fg_entry_date = $request->input('fg_entry_date');
+            $controlPeriod->do_entry_date = $request->input('do_entry_date');
+            $controlPeriod->do_rejection_entry_date = $request->input('do_rejection_entry_date');
+
             $controlPeriod->pr_forward_period = $request->input('prRequisition.forwardPeriod');
             $controlPeriod->pr_control_date = $request->input('prRequisition.controlDate');
             
