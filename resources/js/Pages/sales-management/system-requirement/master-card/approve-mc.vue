@@ -1025,6 +1025,12 @@
                         </div>
                     </div>
                     <!-- END Tambah textbox -->
+                    <!-- Tambahkan textbox Model khusus untuk sort by MC PD ED -->
+                    <div v-if="mcsSortOption === 'ed'" class="mt-4 flex items-center gap-2">
+                        <label for="mcs-model-ed" class="font-bold w-20">Model:</label>
+                        <input type="text" id="mcs-model-ed" :value="selectedMcs?.model || ''" readonly class="flex-grow bg-gray-100 border-2 border-gray-400 rounded-sm py-1 px-2 font-bold text-black focus:outline-none" />
+                    </div>
+                    <!-- END Tambah textbox -->
                 </div>
                 <div class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl">
                     <!-- BUTTONS: More Option, Zoom, Select, Exit (JANGAN DIUBAH POSISINYA) -->
@@ -1369,6 +1375,12 @@
                     </div>
                   </div>
                 </div>
+              </div>
+              <!-- END Tambah textbox -->
+              <!-- Tambahkan textbox Model khusus untuk sort by MC PD ED pada Table To -->
+              <div v-if="mcsSortOption === 'ed'" class="mt-4 flex items-center gap-2">
+                <label for="mcs-model-ed-to" class="font-bold w-20">Model:</label>
+                <input type="text" id="mcs-model-ed-to" :value="selectedMcsTo?.model || ''" readonly class="flex-grow bg-gray-100 border-2 border-gray-400 rounded-sm py-1 px-2 font-bold text-black focus:outline-none" />
               </div>
               <!-- END Tambah textbox -->
             </div>
