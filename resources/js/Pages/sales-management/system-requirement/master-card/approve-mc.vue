@@ -628,9 +628,6 @@
           <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto z-10 transform transition-all border-2 border-indigo-200">
             <!-- Modal header -->
             <div class="flex items-center justify-between p-5 border-b-2 border-indigo-200 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white rounded-t-2xl relative overflow-hidden">
-              <div class="absolute -top-8 -left-8 w-24 h-24 bg-white opacity-10 rounded-full animate-ping-slow"></div>
-              <div class="absolute -bottom-8 -right-8 w-20 h-20 bg-cyan-300 opacity-10 rounded-full animate-ping-slow animation-delay-500"></div>
-              <div class="absolute top-0 right-0 w-16 h-16 bg-white opacity-5 rounded-full"></div>
               <h3 class="text-2xl font-bold flex items-center relative z-10 text-shadow">
                 <span class="inline-flex items-center justify-center w-10 h-10 bg-white bg-opacity-20 rounded-full mr-4 shadow-inner">
                   <i class="fas fa-table text-white text-xl"></i>
@@ -1382,7 +1379,7 @@ const modalMode = ref('edit');
 // Customer Account Modal variables
 const showCustomerAccountModal = ref(false);
 const showCustomerAccountTable = ref(false);
-const sortOption = ref('code');
+const sortOption = ref('name');
 const tableSearchTerm = ref('');
 const selectedCustomer = ref(null);
 
@@ -1408,11 +1405,9 @@ const mcsSearchTermTo = ref('');
 
 // Customer data (sample data - replace with actual API call)
 const customerData = ref([
-    { code: 'CUST0001', name: 'PT. Indah Karya', salesperson: 'John Doe', acType: 'Regular', currency: 'IDR', status: 'Active' },
-    { code: 'CUST0002', name: 'PT. Maju Bersama', salesperson: 'Jane Smith', acType: 'Premium', currency: 'USD', status: 'Active' },
-    { code: 'CUST0003', name: 'CV. Berkah Jaya', salesperson: 'Bob Johnson', acType: 'Regular', currency: 'IDR', status: 'Obsolete' },
-    { code: 'CUST0004', name: 'UD. Sukses Mandiri', salesperson: 'Alice Brown', acType: 'Premium', currency: 'USD', status: 'Active' },
-    { code: 'CUST0005', name: 'PT. Sejahtera Abadi', salesperson: 'Charlie Wilson', acType: 'Regular', currency: 'IDR', status: 'Active' },
+    { name: 'ABDULLAH, BPK', code: '000211-08', salesperson: 'S111', acType: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'ACEP SUNANDAR, BPK', code: '000680-06', salesperson: 'S140', acType: 'Local', currency: 'IDR', status: 'Active' },
+    // ... (isi sesuai screenshot Anda)
 ]);
 
 // MCS data (sample data - replace with actual API call)
