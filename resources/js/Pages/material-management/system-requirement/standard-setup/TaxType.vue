@@ -37,7 +37,7 @@
               </button>
             </div>
           </div>
-
+          
           <!-- Table Section -->
           <div class="bg-white rounded-lg overflow-hidden border border-gray-200">
             <div class="overflow-x-auto">
@@ -97,7 +97,7 @@
               </table>
             </div>
           </div>
-
+          
           <!-- Pagination Controls -->
           <div class="mt-4 flex justify-between items-center text-sm text-gray-600">
             <div>
@@ -171,7 +171,7 @@
         </div>
       </div>
     </div>
-
+    
     <!-- Form Modal -->
     <div v-if="showFormModal" class="fixed inset-0 flex items-center justify-center z-50">
       <div class="absolute inset-0 bg-black opacity-50" @click="showFormModal = false"></div>
@@ -198,7 +198,7 @@
                 <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-hashtag text-blue-500 mr-2"></i>
                   Tax Code<span class="text-red-500">*</span>
-                </label>
+                      </label>
                 <select v-model="formTaxType.code" required :disabled="isEditing"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none bg-white bg-no-repeat bg-right pr-10"
                   style="background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23666%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>'); background-size: 16px;">
@@ -208,71 +208,71 @@
                   </option>
                 </select>
                 <p class="text-xs text-gray-500 mt-2 italic">Code is selected from available Tax Groups and cannot be changed later.</p>
-              </div>
-              
+                    </div>
+                    
               <!-- Name -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
                 <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-tag text-blue-500 mr-2"></i>
                   Tax Name<span class="text-red-500">*</span>
-                </label>
+                      </label>
                 <input type="text" v-model="formTaxType.name" required
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Enter tax name">
-              </div>
-
+                    </div>
+                    
               <!-- Applied -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
                  <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-check-circle text-blue-500 mr-2"></i>
                   Tax Applied<span class="text-red-500">*</span>
                 </label>
-                <div class="mt-2 space-x-4">
-                    <label class="inline-flex items-center">
+                      <div class="mt-2 space-x-4">
+                        <label class="inline-flex items-center">
                         <input v-model="formTaxType.is_applied" type="radio" :value="true" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"/>
-                        <span class="ml-2 text-gray-700">Y-Yes</span>
-                    </label>
-                    <label class="inline-flex items-center">
+                          <span class="ml-2 text-gray-700">Y-Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
                         <input v-model="formTaxType.is_applied" type="radio" :value="false" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"/>
-                        <span class="ml-2 text-gray-700">N-No</span>
-                    </label>
-                </div>
-              </div>
-              
+                          <span class="ml-2 text-gray-700">N-No</span>
+                        </label>
+                      </div>
+                    </div>
+                    
                <!-- Rate -->
               <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
                 <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
                   <i class="fas fa-percent text-blue-500 mr-2"></i>
                   Tax Rate (%)<span class="text-red-500">*</span>
-                </label>
-                 <input
-                    id="rate"
+                      </label>
+                        <input
+                          id="rate"
                     v-model="formTaxType.rate"
-                    type="number"
-                    step="0.01"
-                    min="0"
+                          type="number"
+                          step="0.01"
+                          min="0"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                    placeholder="0.00"
+                          placeholder="0.00"
                     :disabled="!formTaxType.is_applied"
-                />
-              </div>
+                        />
+                        </div>
 
-            </div>
-            
+                </div>
+
             <!-- Form Footer with Buttons -->
             <div class="flex justify-end space-x-3 border-t border-gray-200 pt-5 mt-4">
               <button type="button" @click="showFormModal = false" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition-all duration-200 flex items-center">
                 <i class="fas fa-times mr-2"></i> Cancel
-              </button>
+                  </button>
               <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition-all duration-200 flex items-center" :disabled="loading">
                 <i class="fas fa-save mr-2"></i> {{ isEditing ? 'Update' : 'Create' }}
                 <span v-if="loading" class="ml-2 animate-spin"><i class="fas fa-spinner"></i></span>
-              </button>
-            </div>
+                  </button>
+                </div>
           </form>
         </div>
-      </div>
-    </div>
+          </div>
+        </div>
 
     <!-- Confirmation Modal -->
     <div v-if="showConfirmation" class="fixed inset-0 flex items-center justify-center z-50">
@@ -282,7 +282,7 @@
           <div class="flex items-center mb-4">
             <div class="bg-red-100 rounded-full p-2 mr-3">
               <i class="fas fa-exclamation-triangle text-red-600"></i>
-            </div>
+          </div>
             <h3 class="text-lg font-medium text-gray-900">Confirm Delete</h3>
           </div>
           <p class="mb-4 text-gray-600">Are you sure you want to delete the tax type <span class="font-semibold">{{ typeToDelete?.code }}</span>? This action cannot be undone.</p>
@@ -481,7 +481,7 @@ const saveTaxType = async () => {
         ...formTaxType.value,
         tax_group_code: formTaxType.value.code
     };
-
+    
     if (isEditing.value) {
       response = await axios.put(`/api/material-management/tax-types/${formTaxType.value.code}`, dataToSend);
       toast.success('Tax type updated successfully');
@@ -555,7 +555,7 @@ const printTaxTypes = () => {
 };
 
 onMounted(() => {
-    fetchTaxTypes();
+  fetchTaxTypes();
     fetchTaxGroups();
 });
 </script>

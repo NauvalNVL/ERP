@@ -234,6 +234,15 @@ Route::post('/material-management/analysis-codes/seed', [MmAnalysisCodeControlle
 
 Route::get('/material-management/control-periods/summary', [MmControlPeriodController::class, 'getControlPeriodSummary']);
 
+// Add Location API routes
+Route::prefix('material-management/locations')->group(function () {
+    Route::get('for-print', [MmLocationController::class, 'getLocationsForPrint']);
+    Route::post('seed', [MmLocationController::class, 'seed']);
+    Route::patch('{code}/toggle-active', [MmLocationController::class, 'toggleActive']);
+});
+Route::apiResource('material-management/locations', MmLocationController::class)->except(['index'])->parameters(['locations' => 'code']);
+Route::get('material-management/locations', [MmLocationController::class, 'index']);
+
 // FgDoConfig API routes
 Route::prefix('fg-do-config')->group(function () {
     Route::get('/', [FgDoConfigController::class, 'getConfig']);

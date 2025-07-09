@@ -55,6 +55,8 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeControlle
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxGroupController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmLocationController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -561,6 +563,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehouse-management/finished-goods/setup-maintenance/view-print-analysis-code', function () {
         return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-analysis-code');
     })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-analysis-code');
+
+    Route::prefix('material-management/system-requirement/standard-setup')->name('mm.sr.ss.')->group(function () {
+        Route::get('configuration', [MmConfigController::class, 'index'])->name('config');
+        Route::get('control-period', [MmControlPeriodController::class, 'index'])->name('cp.index');
+        Route::get('control-period/view-print', [MmControlPeriodController::class, 'viewPrint'])->name('cp.vp');
+        Route::get('transaction-type', [MmTransactionTypeController::class, 'index'])->name('tt.index');
+        Route::get('transaction-type/view-print', [MmTransactionTypeController::class, 'viewPrint'])->name('tt.vp');
+        Route::get('tax-type', [MmTaxTypeController::class, 'index'])->name('taxtype.index');
+        Route::get('tax-type/view-print', [MmTaxTypeController::class, 'viewPrint'])->name('taxtype.vp');
+        Route::get('tax-group', [MmTaxGroupController::class, 'index'])->name('taxgroup.index');
+        Route::get('tax-group/view-print', [MmTaxGroupController::class, 'viewPrint'])->name('taxgroup.vp');
+        Route::get('receive-destination', [MmReceiveDestinationController::class, 'index'])->name('rd.index');
+        Route::get('receive-destination/view-print', [MmReceiveDestinationController::class, 'viewPrint'])->name('rd.vp');
+        Route::get('analysis-code', [MmAnalysisCodeController::class, 'index'])->name('ac.index');
+        Route::get('analysis-code/view-print', [MmAnalysisCodeController::class, 'viewPrint'])->name('ac.vp');
+    });
+
+    Route::prefix('material-management/system-requirement/inventory-setup')->name('mm.sr.is.')->group(function () {
+        Route::get('category', [MmCategoryController::class, 'indexView'])->name('category.index');
+        Route::get('category/view-print', [MmCategoryController::class, 'viewPrint'])->name('category.vp');
+        Route::get('location', [MmLocationController::class, 'indexView'])->name('location.index');
+        Route::get('location/view-print', [MmLocationController::class, 'viewPrint'])->name('location.vp');
+    });
 });
 
 // API Routes for Vue components
@@ -903,6 +928,9 @@ Route::get('/material-management/system-requirement/standard-setup/analysis-code
 Route::get('/material-management/system-requirement/standard-setup/control-period/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'viewPrint'])->name('mm.control-period.view-print');
 Route::get('/material-management/system-requirement/standard-setup/transaction-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController::class, 'viewPrint'])->name('mm.transaction-type.view-print');
 Route::get('/material-management/system-requirement/standard-setup/tax-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController::class, 'viewPrint'])->name('mm.tax-type.view-print');
+
+// Material Management - System Requirement - Inventory Setup
+Route::get('/material-management/system-requirement/inventory-setup/location', [MmLocationController::class, 'indexView'])->name('material-management.system-requirement.inventory-setup.location');
 
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');

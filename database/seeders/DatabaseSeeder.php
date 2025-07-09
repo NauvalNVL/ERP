@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
             BundlingComputationMethodSeeder::class,
             MmReceiveDestinationSeeder::class,
             MmAnalysisCodeSeeder::class,
+            MmLocationSeeder::class,
             WarehouseLocationSeeder::class,
             MmCategorySeeder::class,
             MmSkuSeeder::class,

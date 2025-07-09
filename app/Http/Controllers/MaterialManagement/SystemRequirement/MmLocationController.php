@@ -15,7 +15,7 @@ class MmLocationController extends Controller
      *
      * @return \Inertia\Response
      */
-    public function index()
+    public function indexView()
     {
         return Inertia::render('material-management/system-requirement/inventory-setup/Location');
     }
@@ -33,7 +33,7 @@ class MmLocationController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getLocations()
+    public function index()
     {
         $locations = MmLocation::orderBy('code')->get();
         return response()->json($locations);
@@ -146,7 +146,7 @@ class MmLocationController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function seedSampleData()
+    public function seed()
     {
         $sampleLocations = [
             [
