@@ -1,172 +1,136 @@
 <template>
-  <AppLayout :header="'View & Print Receive Destinations'">
+  <AppLayout title="View & Print Receive Destination">
+    <template #header>
+      <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        View & Print Receive Destination
+      </h2>
+    </template>
+
     <div class="py-6">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Main Content Card -->
-        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
+          <!-- Header with buttons -->
+          <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-white">View & Print Receive Destination</h2>
+            <div class="flex space-x-2">
+              <div class="relative" ref="printDropdownContainer">
+                <button @click="printDropdownOpen = !printDropdownOpen" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center">
+                  <i class="fas fa-print mr-2"></i>
+                  <span>Print/Export</span>
+                  <i class="fas fa-chevron-down ml-2 transition-transform" :class="{'rotate-180': printDropdownOpen}"></i>
+                </button>
+                <transition
+                  enter-active-class="transition ease-out duration-200"
+                  enter-from-class="transform opacity-0 scale-95"
+                  enter-to-class="transform opacity-100 scale-100"
+                  leave-active-class="transition ease-in duration-75"
+                  leave-from-class="transform opacity-100 scale-100"
+                  leave-to-class="transform opacity-0 scale-95"
+                >
+                  <div v-if="printDropdownOpen" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
+                    <a @click.prevent="printAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
+                    </a>
+                    <a @click.prevent="exportAsCsv" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-csv mr-2 text-green-500"></i> Export as CSV
+                    </a>
+                  </div>
+                </transition>
+              </div>
+              <Link :href="defineRoute" class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm flex items-center">
+                <i class="fas fa-arrow-left mr-1"></i>
+                Back
+              </Link>
+            </div>
+          </div>
+
+          <!-- Main content -->
           <div class="p-6">
-            <!-- Action buttons -->
-            <div class="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
-              <h2 class="text-xl font-semibold text-gray-800">Receive Destinations List</h2>
-              
-              <div class="flex flex-wrap gap-2">
-                <div class="relative">
+            <!-- Loading Spinner -->
+            <div v-if="loading" class="flex justify-center items-center py-8">
+              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <span class="ml-3 text-gray-600">Loading...</span>
+            </div>
+            
+            <div v-else>
+            <!-- Search and Filter -->
+              <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200 print:hidden">
+                <div class="relative flex-grow">
                   <input 
+                  type="text" 
                     v-model="searchQuery"
-                    type="text" 
-                    placeholder="Search destinations..."
-                    class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Search by code, name, address or contact..."
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <SearchIcon class="w-5 h-5 text-gray-400" />
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <i class="fas fa-search text-gray-400"></i>
+                  </div>
                   </div>
                 </div>
                 
-                <button 
-                  @click="printTable"
-                  class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors inline-flex items-center"
-                >
-                  <PrinterIcon class="w-5 h-5 mr-1" />
-                  Print
-                </button>
-                
-                <button 
-                  @click="exportData"
-                  class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors inline-flex items-center"
-                >
-                  <DocumentDownloadIcon class="w-5 h-5 mr-1" />
-                  Export
-                </button>
-
-                <button 
-                  @click="refreshData"
-                  class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors inline-flex items-center"
-                >
-                  <RefreshIcon class="w-5 h-5 mr-1" />
-                  Refresh
-                </button>
+              <!-- Report header for print -->
+              <div class="hidden print:block mb-6">
+                <div class="text-center">
+                  <h1 class="text-2xl font-bold text-center print:text-3xl">Receive Destination Report</h1>
+                  <p class="text-center text-gray-600 print:text-lg">Generated on {{ formattedDate }}</p>
               </div>
             </div>
             
-            <!-- Destinations Table -->
-            <div id="print-section" class="border border-gray-200 rounded-lg overflow-hidden">
+              <!-- Table section -->
               <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
+                <table class="min-w-full divide-y divide-gray-200 border">
+                  <thead class="bg-gray-100">
                     <tr>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Code
                       </th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Name
                       </th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Address
                       </th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Contact
                       </th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
                         Telephone
                       </th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Fax
                       </th>
                     </tr>
                   </thead>
                   <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-if="loading">
-                      <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center">
-                        <div class="flex justify-center">
-                          <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                        </div>
+                    <tr v-if="filteredRows.length === 0" class="hover:bg-gray-50">
+                      <td colspan="6" class="px-4 py-4 text-center text-sm text-gray-500">
+                        No data found.
                       </td>
                     </tr>
-                    <tr v-else-if="filteredDestinations.length === 0">
-                      <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
-                        No receive destinations found
+                    <tr v-for="row in filteredRows" :key="row.code" class="hover:bg-gray-50">
+                      <td class="px-4 py-2 text-sm font-medium text-gray-900 border-r">
+                        {{ row.code }}
                       </td>
-                    </tr>
-                    <tr v-for="destination in filteredDestinations" 
-                        :key="destination.code" 
-                        class="hover:bg-gray-50 transition-colors">
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="font-medium text-gray-900">{{ destination.code }}</div>
+                      <td class="px-4 py-2 text-sm text-gray-900 border-r">
+                        {{ row.name }}
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-gray-700">
-                        {{ destination.name }}
+                      <td class="px-4 py-2 text-sm text-gray-900 border-r">
+                        {{ row.address }}
                       </td>
-                      <td class="px-6 py-4 text-gray-700 max-w-[200px]">
-                        {{ destination.address || '—' }}
+                      <td class="px-4 py-2 text-sm text-gray-900 border-r">
+                        {{ row.contact }}
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-gray-700">
-                        {{ destination.contact || '—' }}
+                      <td class="px-4 py-2 text-sm text-gray-900 border-r">
+                        {{ row.tel }}
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-gray-700">
-                        {{ destination.tel || '—' }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-gray-700">
-                        {{ destination.fax || '—' }}
+                      <td class="px-4 py-2 text-sm text-gray-900">
+                        {{ row.fax }}
                       </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-              
-              <!-- Table Footer with Pagination -->
-              <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 print:hidden">
-                <div class="flex items-center justify-between">
-                  <div class="text-sm text-gray-700">
-                    Showing {{ filteredDestinations.length > 0 ? 1 : 0 }} 
-                    to {{ filteredDestinations.length }} 
-                    of {{ filteredDestinations.length }} results
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Success/Error Toast Notification -->
-    <div 
-      v-if="notification.show" 
-      class="fixed bottom-4 right-4 p-4 rounded-lg shadow-lg w-80 z-50 transition-all transform duration-500 ease-in-out print:hidden"
-      :class="{
-        'bg-green-50 border border-green-200': notification.type === 'success',
-        'bg-red-50 border border-red-200': notification.type === 'error',
-        'translate-x-0': notification.show,
-        'translate-x-full': !notification.show
-      }">
-      <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <CheckCircleIcon v-if="notification.type === 'success'" class="h-6 w-6 text-green-500" />
-          <ExclamationCircleIcon v-else class="h-6 w-6 text-red-500" />
-        </div>
-        <div class="ml-3">
-          <p class="text-sm font-medium" 
-            :class="{
-              'text-green-800': notification.type === 'success',
-              'text-red-800': notification.type === 'error'
-            }">
-            {{ notification.message }}
-          </p>
-        </div>
-        <div class="ml-auto pl-3">
-          <div class="-mx-1.5 -my-1.5">
-            <button
-              @click="notification.show = false"
-              class="inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2"
-              :class="{
-                'bg-green-100 text-green-500 hover:bg-green-200 focus:ring-green-600': notification.type === 'success',
-                'bg-red-100 text-red-500 hover:bg-red-200 focus:ring-red-600': notification.type === 'error'
-              }">
-              <XIcon class="h-4 w-4" />
-            </button>
           </div>
         </div>
       </div>
@@ -175,137 +139,148 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { 
-  RefreshIcon, 
-  DocumentDownloadIcon, 
-  SearchIcon,
-  PrinterIcon,
-  XIcon,
-  CheckCircleIcon,
-  ExclamationCircleIcon
-} from '@heroicons/vue/solid';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
+import { useToast } from '@/Composables/useToast';
 
-// Reactive data
-const destinations = ref([]);
+const rows = ref([]);
 const loading = ref(true);
 const searchQuery = ref('');
-const notification = ref({
-  show: false,
-  type: 'success',
-  message: ''
-});
+const printDropdownOpen = ref(false);
+const printDropdownContainer = ref(null);
+const toast = useToast();
 
-// Computed properties
-const filteredDestinations = computed(() => {
-  if (!searchQuery.value) {
-    return destinations.value;
-  }
-  
-  const query = searchQuery.value.toLowerCase();
-  return destinations.value.filter(dest => 
-    dest.code.toLowerCase().includes(query) || 
-    dest.name.toLowerCase().includes(query) ||
-    (dest.address && dest.address.toLowerCase().includes(query)) ||
-    (dest.contact && dest.contact.toLowerCase().includes(query))
+const defineRoute = '/material-management/system-requirement/standard-setup/receive-destination';
+
+const filteredRows = computed(() => {
+  if (!searchQuery.value) return rows.value;
+  const q = searchQuery.value.toLowerCase();
+  return rows.value.filter(row =>
+    (row.code && row.code.toLowerCase().includes(q)) ||
+    (row.name && row.name.toLowerCase().includes(q)) ||
+    (row.address && row.address.toLowerCase().includes(q)) ||
+    (row.contact && row.contact.toLowerCase().includes(q))
   );
 });
 
-// Methods
-const fetchDestinations = async () => {
+const formattedDate = computed(() => {
+    const now = new Date();
+    return new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }).format(now);
+});
+
+const loadData = async () => {
   loading.value = true;
   try {
     const response = await axios.get('/api/material-management/receive-destinations');
-    destinations.value = response.data;
+    rows.value = response.data;
   } catch (error) {
-    showNotification('Error loading receive destinations', 'error');
-    console.error('Failed to load receive destinations:', error);
+    console.error('Error fetching receive destinations:', error);
+    toast.error('Failed to load receive destinations. Please try again.');
   } finally {
     loading.value = false;
   }
 };
 
-const refreshData = () => {
-  fetchDestinations();
-  searchQuery.value = '';
-};
-
-const exportData = () => {
-  const csvRows = [];
-  // Add CSV header
-  csvRows.push(['Code', 'Name', 'Address', 'Contact', 'Telephone', 'Fax'].join(','));
+const exportAsCsv = () => {
+  let csvContent = 'data:text/csv;charset=utf-8,';
+  csvContent += 'Code,Name,Address,Contact,Telephone,Fax\n';
   
-  // Add data rows
-  filteredDestinations.value.forEach(dest => {
-    csvRows.push([
-      // Wrap fields in quotes to handle commas in text
-      `"${dest.code}"`,
-      `"${dest.name}"`,
-      `"${dest.address || ''}"`,
-      `"${dest.contact || ''}"`,
-      `"${dest.tel || ''}"`,
-      `"${dest.fax || ''}"`,
-    ].join(','));
+  filteredRows.value.forEach(row => {
+    csvContent += `"${row.code}","${row.name}","${row.address || ''}","${row.contact || ''}","${row.tel || ''}","${row.fax || ''}"\n`;
   });
-  
-  const csvContent = csvRows.join('\n');
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  
-  const a = document.createElement('a');
-  a.setAttribute('hidden', '');
-  a.setAttribute('href', url);
-  a.setAttribute('download', 'receive-destinations.csv');
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', `receive_destinations_${new Date().toISOString().slice(0, 10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  printDropdownOpen.value = false;
 };
 
-const printTable = () => {
-  window.print();
-};
-
-const showNotification = (message, type = 'success') => {
-  notification.value = {
-    show: true,
-    type,
-    message
-  };
+const printAsPdf = () => {
+  const doc = new jsPDF({ orientation: 'landscape' });
   
-  // Auto-hide notification after 3 seconds
-  setTimeout(() => {
-    notification.value.show = false;
-  }, 3000);
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Receive Destination Report', 15, 22);
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Generated on: ${formattedDate.value}`, 15, 28);
+  
+  const tableData = filteredRows.value.map(item => [
+    item.code,
+    item.name,
+    item.address,
+    item.contact,
+    item.tel,
+    item.fax
+  ]);
+
+  autoTable(doc, {
+    head: [['Code', 'Name', 'Address', 'Contact', 'Telephone', 'Fax']],
+    body: tableData,
+    startY: 35,
+    theme: 'grid',
+    styles: {
+      fontSize: 8,
+      cellPadding: 2,
+    },
+    headStyles: {
+      fillColor: [41, 128, 185],
+      textColor: 255,
+      fontStyle: 'bold',
+    },
+    columnStyles: {
+        0: { cellWidth: 20 },
+        1: { cellWidth: 40 },
+        2: { cellWidth: 80 },
+        3: { cellWidth: 40 },
+        4: { cellWidth: 30 },
+        5: { cellWidth: 30 },
+    }
+  });
+
+  doc.output('dataurlnewwindow');
+  printDropdownOpen.value = false;
 };
 
-// Initialize data
+const handleClickOutside = (event) => {
+  if (printDropdownContainer.value && !printDropdownContainer.value.contains(event.target)) {
+    printDropdownOpen.value = false;
+  }
+};
+
 onMounted(() => {
-  fetchDestinations();
+  loadData();
+  document.addEventListener('click', handleClickOutside);
 });
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+
 </script>
 
-<style scoped>
+<style>
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  
-  #print-section,
-  #print-section * {
-    visibility: visible;
-  }
-  
-  #print-section {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-  }
-  
-  .print\:hidden {
-    display: none;
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
 </style> 

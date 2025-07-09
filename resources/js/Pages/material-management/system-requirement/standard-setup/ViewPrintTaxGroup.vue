@@ -1,144 +1,122 @@
 <template>
-  <AppLayout :header="'View & Print Tax Groups'">
+  <AppLayout title="View & Print Tax Group">
+    <template #header>
+      <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        View & Print Tax Group
+      </h2>
+    </template>
+
     <div class="py-6">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Content Card -->
-        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-          <div class="p-6">
-            <!-- Header -->
-            <div class="flex justify-between items-center mb-6">
-              <h2 class="text-xl font-semibold text-gray-800">Tax Group List</h2>
-              
-              <div class="flex space-x-3">
-                <button 
-                  @click="print" 
-                  class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
-                >
-                  <i class="fas fa-print w-5 h-5 mr-2"></i>
-                  Print
+      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
+          <!-- Header with buttons -->
+          <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-white">View & Print Tax Group</h2>
+            <div class="flex space-x-2">
+              <div class="relative" ref="printDropdownContainer">
+                <button @click="printDropdownOpen = !printDropdownOpen" class="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1 rounded text-sm flex items-center">
+                  <i class="fas fa-print mr-2"></i>
+                  <span>Print/Export</span>
+                  <i class="fas fa-chevron-down ml-2 transition-transform" :class="{'rotate-180': printDropdownOpen}"></i>
                 </button>
-                <button 
-                  @click="exportToCsv" 
-                  class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white tracking-widest hover:bg-green-500 active:bg-green-700 focus:outline-none focus:border-green-700 focus:ring focus:ring-green-300 disabled:opacity-25 transition"
+                <transition
+                  enter-active-class="transition ease-out duration-200"
+                  enter-from-class="transform opacity-0 scale-95"
+                  enter-to-class="transform opacity-100 scale-100"
+                  leave-active-class="transition ease-in duration-75"
+                  leave-from-class="transform opacity-100 scale-100"
+                  leave-to-class="transform opacity-0 scale-95"
                 >
-                  <i class="fas fa-download w-5 h-5 mr-2"></i>
-                  Export
-                </button>
+                  <div v-if="printDropdownOpen" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
+                    <a @click.prevent="printAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
+                    </a>
+                    <a @click.prevent="exportAsCsv" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-csv mr-2 text-green-500"></i> Export as CSV
+                    </a>
+                  </div>
+                </transition>
               </div>
+              <Link :href="defineRoute" class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm flex items-center">
+                <i class="fas fa-arrow-left mr-1"></i>
+                Back
+              </Link>
+            </div>
+          </div>
+
+          <!-- Main content -->
+          <div class="p-6">
+            <!-- Loading Spinner -->
+            <div v-if="loading" class="flex justify-center items-center py-8">
+              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <span class="ml-3 text-gray-600">Loading...</span>
             </div>
             
+            <div v-else>
             <!-- Search and Filter -->
-            <div class="flex justify-between mb-6">
-              <div class="relative flex-1 max-w-md">
+              <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200 print:hidden">
+                <div class="relative flex-grow">
                 <input 
                   type="text" 
                   v-model="searchQuery" 
-                  placeholder="Search tax groups..." 
-                  class="pl-10 w-full pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    placeholder="Search by code or name..."
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <i class="fas fa-search h-5 w-5 text-gray-400"></i>
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <i class="fas fa-search text-gray-400"></i>
+                  </div>
                 </div>
+              </div>
+
+              <!-- Report header for print -->
+              <div class="hidden print:block mb-6">
+                <div class="text-center">
+                  <h1 class="text-2xl font-bold text-center print:text-3xl">Tax Group Report</h1>
+                  <p class="text-center text-gray-600 print:text-lg">Generated on {{ formattedDate }}</p>
               </div>
             </div>
             
-            <!-- Tax Group Table -->
-            <div class="overflow-x-auto" id="printable-area">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tax Group Code
+              <!-- Table section -->
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 border">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
+                        Code
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tax Group Name
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r">
+                        Name
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Tax Types
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Created At
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Updated At
                     </th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-if="loading">
-                    <td colspan="5" class="px-6 py-4 text-center">
-                      <div class="flex justify-center">
-                        <svg class="animate-spin h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                      </div>
+                    <tr v-if="filteredRows.length === 0" class="hover:bg-gray-50">
+                      <td colspan="3" class="px-4 py-4 text-center text-sm text-gray-500">
+                        No data found.
                     </td>
                   </tr>
-                  <tr v-else-if="filteredTaxGroups.length === 0">
-                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                      No tax groups found. Try adjusting your search criteria.
+                    <tr v-for="row in filteredRows" :key="row.code" class="hover:bg-gray-50">
+                      <td class="px-4 py-2 text-sm font-medium text-gray-900 border-r">
+                        {{ row.code }}
                     </td>
-                  </tr>
-                  <tr v-for="taxGroup in filteredTaxGroups" :key="taxGroup.code" class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {{ taxGroup.code }}
+                      <td class="px-4 py-2 text-sm text-gray-900 border-r">
+                        {{ row.name }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {{ taxGroup.name }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      <!-- Display the tax types count and names when data is available -->
-                      <span v-if="taxGroup.tax_types && taxGroup.tax_types.length > 0">
-                        {{ taxGroup.tax_types.length }} types
-                        <button 
-                          @click="() => showTaxTypes(taxGroup)"
-                          class="ml-1 text-blue-600 hover:text-blue-800 hover:underline text-xs"
-                        >
-                          (View details)
+                      <td class="px-4 py-2 text-sm text-gray-900">
+                        <span v-if="row.tax_types && row.tax_types.length > 0">
+                          {{ row.tax_types.length }} types
+                          <button @click="showTaxTypes(row)" class="ml-1 text-blue-600 hover:text-blue-800 hover:underline text-xs">
+                            (View)
                         </button>
                       </span>
                       <span v-else class="text-gray-400 italic">None</span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {{ formatDate(taxGroup.created_at) }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {{ formatDate(taxGroup.updated_at) }}
-                    </td>
                   </tr>
                 </tbody>
               </table>
-            </div>
-            
-            <!-- Pagination -->
-            <div class="flex items-center justify-between py-3 bg-white">
-              <div class="flex justify-between w-full">
-                <div class="text-sm text-gray-700">
-                  Showing <span class="font-medium">{{ firstItemIndex }}</span> to <span class="font-medium">{{ lastItemIndex }}</span> of <span class="font-medium">{{ totalItems }}</span> items
-                </div>
-                <div class="flex space-x-2">
-                  <button 
-                    @click="previousPage" 
-                    :disabled="currentPage === 1"
-                    :class="[
-                      'px-3 py-1 rounded-md',
-                      currentPage === 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    ]"
-                  >
-                    Previous
-                  </button>
-                  <button 
-                    @click="nextPage" 
-                    :disabled="currentPage >= totalPages"
-                    :class="[
-                      'px-3 py-1 rounded-md',
-                      currentPage >= totalPages ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    ]"
-                  >
-                    Next
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -148,7 +126,7 @@
     
     <!-- Tax Types Modal -->
     <TransitionRoot appear :show="isModalOpen" as="template">
-      <Dialog as="div" @close="closeModal" class="relative z-10">
+      <Dialog as="div" @close="closeModal" class="relative z-50">
         <TransitionChild
           as="template"
           enter="duration-300 ease-out"
@@ -174,31 +152,20 @@
             >
               <DialogPanel class="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                  Tax Types in {{ selectedTaxGroup?.name }}
+                  Tax Types in "{{ selectedTaxGroup?.name }}"
                 </DialogTitle>
                 
-                <div class="mt-2">
-                  <div v-if="selectedTaxGroup && selectedTaxGroup.tax_types && selectedTaxGroup.tax_types.length > 0" 
-                       class="max-h-96 overflow-y-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                      <thead class="bg-gray-50">
-                        <tr>
-                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
-                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                        </tr>
-                      </thead>
-                      <tbody class="divide-y divide-gray-200">
-                        <tr v-for="taxType in selectedTaxGroup.tax_types" :key="taxType.code" class="hover:bg-gray-50">
-                          <td class="px-4 py-2 text-sm text-gray-900">{{ taxType.code }}</td>
-                          <td class="px-4 py-2 text-sm text-gray-700">{{ taxType.name }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <p v-else class="text-gray-500 text-center py-4">No tax types found for this group.</p>
+                <div class="mt-4 max-h-80 overflow-y-auto">
+                  <ul v-if="selectedTaxGroup?.tax_types?.length > 0" class="space-y-2">
+                    <li v-for="taxType in selectedTaxGroup.tax_types" :key="taxType.code" class="p-3 bg-gray-50 rounded-md border border-gray-200">
+                      <p class="font-semibold text-gray-800">{{ taxType.code }} - {{ taxType.name }}</p>
+                      <p class="text-sm text-gray-600">Rate: {{ taxType.rate }}%</p>
+                    </li>
+                  </ul>
+                  <p v-else class="text-gray-500 text-center py-4">No tax types associated with this group.</p>
                 </div>
                 
-                <div class="mt-4 flex justify-end">
+                <div class="mt-6 flex justify-end">
                   <button
                     type="button"
                     class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
@@ -217,154 +184,119 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import { Dialog, DialogPanel, DialogTitle, TransitionRoot, TransitionChild } from '@headlessui/vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
+import { useToast } from '@/Composables/useToast';
 
-// Data
-const taxGroups = ref([]);
+const rows = ref([]);
 const loading = ref(true);
 const searchQuery = ref('');
-const currentPage = ref(1);
-const itemsPerPage = ref(10);
+const printDropdownOpen = ref(false);
+const printDropdownContainer = ref(null);
 const isModalOpen = ref(false);
 const selectedTaxGroup = ref(null);
+const toast = useToast();
 
-// Computed properties for pagination
-const filteredTaxGroups = computed(() => {
-  if (!searchQuery.value) {
-    return paginatedTaxGroups.value;
-  }
-  
-  const query = searchQuery.value.toLowerCase();
-  return taxGroups.value
-    .filter(taxGroup => 
-      taxGroup.code.toLowerCase().includes(query) || 
-      taxGroup.name.toLowerCase().includes(query)
-    )
-    .slice(startIndex.value, endIndex.value);
+const defineRoute = '/material-management/system-requirement/standard-setup/tax-group';
+
+const filteredRows = computed(() => {
+  if (!searchQuery.value) return rows.value;
+  const q = searchQuery.value.toLowerCase();
+  return rows.value.filter(row =>
+    (row.code && row.code.toLowerCase().includes(q)) ||
+    (row.name && row.name.toLowerCase().includes(q))
+  );
 });
 
-const startIndex = computed(() => {
-  return (currentPage.value - 1) * itemsPerPage.value;
+const formattedDate = computed(() => {
+    const now = new Date();
+    return new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }).format(now);
 });
 
-const endIndex = computed(() => {
-  return Math.min(startIndex.value + itemsPerPage.value, taxGroups.value.length);
-});
-
-const paginatedTaxGroups = computed(() => {
-  return taxGroups.value.slice(startIndex.value, endIndex.value);
-});
-
-const totalItems = computed(() => {
-  if (!searchQuery.value) {
-    return taxGroups.value.length;
-  }
-  
-  const query = searchQuery.value.toLowerCase();
-  return taxGroups.value.filter(taxGroup => 
-    taxGroup.code.toLowerCase().includes(query) || 
-    taxGroup.name.toLowerCase().includes(query)
-  ).length;
-});
-
-const totalPages = computed(() => {
-  return Math.ceil(totalItems.value / itemsPerPage.value);
-});
-
-const firstItemIndex = computed(() => {
-  return taxGroups.value.length === 0 ? 0 : startIndex.value + 1;
-});
-
-const lastItemIndex = computed(() => {
-  return Math.min(startIndex.value + itemsPerPage.value, totalItems.value);
-});
-
-// Methods
-const fetchTaxGroups = async () => {
+const loadData = async () => {
   loading.value = true;
   try {
     const response = await axios.get('/api/material-management/tax-groups');
-    taxGroups.value = response.data;
+    rows.value = response.data;
   } catch (error) {
     console.error('Error fetching tax groups:', error);
-    alert('Failed to load tax groups');
+    toast.error('Failed to load tax groups. Please try again.');
   } finally {
     loading.value = false;
   }
 };
 
-const formatDate = (dateString) => {
-  if (!dateString) return 'N/A';
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date);
-};
-
-const previousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-  }
-};
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-  }
-};
-
-const exportToCsv = () => {
-  const csvContent = 
-    'Tax Group Code,Tax Group Name,Created At,Updated At\n' + 
-    taxGroups.value.map(item => 
-      `${item.code},${item.name},${item.created_at || ''},${item.updated_at || ''}`
-    ).join('\n');
+const exportAsCsv = () => {
+  let csvContent = 'data:text/csv;charset=utf-8,';
+  csvContent += 'Code,Name,Tax Types Count\n';
   
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  filteredRows.value.forEach(row => {
+    const taxTypesCount = row.tax_types ? row.tax_types.length : 0;
+    csvContent += `"${row.code}","${row.name}","${taxTypesCount}"\n`;
+  });
+
+  const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', 'tax-groups.csv');
-  link.style.visibility = 'hidden';
-  
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', `tax_groups_${new Date().toISOString().slice(0, 10)}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  printDropdownOpen.value = false;
 };
 
-const print = () => {
-  const printContents = document.getElementById('printable-area').innerHTML;
-  const originalContents = document.body.innerHTML;
+const printAsPdf = () => {
+  const doc = new jsPDF();
   
-  document.body.innerHTML = `
-    <html>
-      <head>
-        <title>Tax Groups Report</title>
-        <style>
-          body { font-family: Arial, sans-serif; }
-          table { width: 100%; border-collapse: collapse; }
-          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-          th { background-color: #f2f2f2; }
-          h1 { text-align: center; }
-        </style>
-      </head>
-      <body>
-        <h1>Tax Groups Report</h1>
-        ${printContents}
-      </body>
-    </html>
-  `;
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Tax Group Report', 15, 22);
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Generated on: ${formattedDate.value}`, 15, 28);
   
-  window.print();
-  document.body.innerHTML = originalContents;
+  const tableData = filteredRows.value.map(item => [
+    item.code,
+    item.name,
+    item.tax_types ? item.tax_types.map(t => `${t.code} (${t.rate}%)`).join(', ') : 'None'
+  ]);
+
+  autoTable(doc, {
+    head: [['Code', 'Name', 'Associated Tax Types']],
+    body: tableData,
+    startY: 35,
+    theme: 'grid',
+    styles: {
+      fontSize: 10,
+      cellPadding: 2,
+    },
+    headStyles: {
+      fillColor: [41, 128, 185],
+      textColor: 255,
+      fontStyle: 'bold',
+    },
+    columnStyles: {
+        0: { cellWidth: 30 },
+        1: { cellWidth: 60 },
+        2: { cellWidth: '*' },
+    }
+  });
+
+  doc.output('dataurlnewwindow');
+  printDropdownOpen.value = false;
 };
 
 const showTaxTypes = (taxGroup) => {
@@ -374,28 +306,31 @@ const showTaxTypes = (taxGroup) => {
 
 const closeModal = () => {
   isModalOpen.value = false;
-  selectedTaxGroup.value = null;
 };
 
-// Lifecycle hooks
+const handleClickOutside = (event) => {
+  if (printDropdownContainer.value && !printDropdownContainer.value.contains(event.target)) {
+    printDropdownOpen.value = false;
+  }
+};
+
 onMounted(() => {
-  fetchTaxGroups();
+  loadData();
+  document.addEventListener('click', handleClickOutside);
 });
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+
 </script>
 
-<style scoped>
+<style>
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  #printable-area, #printable-area * {
-    visibility: visible;
-  }
-  #printable-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
 </style> 

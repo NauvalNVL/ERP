@@ -28,14 +28,8 @@ class MmTaxTypeController extends Controller
      */
     public function getTaxTypes()
     {
-        try {
-            $taxTypes = MmTaxType::orderBy('code')->get();
-            return response()->json($taxTypes);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error fetching tax types: ' . $e->getMessage()
-            ], 500);
-        }
+        $taxTypes = MmTaxType::with('taxGroup')->get();
+        return response()->json($taxTypes);
     }
 
     /**
@@ -46,37 +40,21 @@ class MmTaxTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'code' => 'required|string|max:6|unique:mm_tax_types,code',
             'name' => 'required|string|max:255',
             'is_applied' => 'required|boolean',
-            'rate' => 'required_if:is_applied,true|numeric|min:0'
+            'rate' => 'required|numeric|min:0',
+            'tax_group_code' => 'required|string|exists:mm_tax_groups,code',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        $taxType = MmTaxType::create($request->all());
+        $taxType->load('taxGroup');
 
-        try {
-            $taxType = new MmTaxType();
-            $taxType->code = $request->code;
-            $taxType->name = $request->name;
-            $taxType->is_applied = $request->is_applied;
-            $taxType->rate = $request->is_applied ? $request->rate : 0;
-            $taxType->save();
-
-            return response()->json([
-                'message' => 'Tax type created successfully',
-                'data' => $taxType
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error creating tax type: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'data' => $taxType,
+        ]);
     }
 
     /**
@@ -113,42 +91,22 @@ class MmTaxTypeController extends Controller
      */
     public function update(Request $request, $code)
     {
-        $validator = Validator::make($request->all(), [
+        $taxType = MmTaxType::findOrFail($code);
+
+        $request->validate([
             'name' => 'required|string|max:255',
             'is_applied' => 'required|boolean',
-            'rate' => 'required_if:is_applied,true|numeric|min:0'
+            'rate' => 'required|numeric|min:0',
+            'tax_group_code' => 'required|string|exists:mm_tax_groups,code',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        $taxType->update($request->all());
+        $taxType->load('taxGroup');
 
-        try {
-            $taxType = MmTaxType::where('code', $code)->first();
-            
-            if (!$taxType) {
-                return response()->json([
-                    'message' => 'Tax type not found'
-                ], 404);
-            }
-
-            $taxType->name = $request->name;
-            $taxType->is_applied = $request->is_applied;
-            $taxType->rate = $request->is_applied ? $request->rate : 0;
-            $taxType->save();
-
-            return response()->json([
-                'message' => 'Tax type updated successfully',
-                'data' => $taxType
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error updating tax type: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'data' => $taxType,
+        ]);
     }
 
     /**

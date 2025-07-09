@@ -224,4 +224,9 @@ class MmReceiveDestinationController extends Controller
             'message' => 'Sample receive destinations seeded successfully',
         ], 200);
     }
+
+    public function getAll()
+    {
+        return response()->json(MmReceiveDestination::all());
+    }
 } 

@@ -226,4 +226,9 @@ class MmLocationController extends Controller
         
         return response()->json(['message' => 'Sample locations seeded successfully']);
     }
+
+    public function getAll()
+    {
+        return response()->json(MmLocation::all());
+    }
 } 

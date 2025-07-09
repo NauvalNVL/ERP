@@ -149,6 +149,11 @@ class MmTransactionTypeController extends Controller
         }
     }
 
+    public function getAll()
+    {
+        return response()->json(MmTransactionType::all());
+    }
+
     /**
      * Show the View & Print Transaction Type page.
      */

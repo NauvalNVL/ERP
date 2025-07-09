@@ -305,12 +305,14 @@ import { ref, onMounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useToast } from '@/Composables/useToast';
 
-const { showToast } = useToast();
+const toast = useToast();
 const loading = ref(true);
 const errorMessage = ref('');
 const successMessage = ref('');
 
 // Form data structure
+const initialFormData = ref(null);
+
 const formData = ref({
   prRequisition: {
     currentPeriod: 'Same as P/Order Period',
@@ -341,9 +343,6 @@ const formData = ref({
   }
 });
 
-// Create a backup of the initial form state
-const initialFormData = JSON.parse(JSON.stringify(formData.value));
-
 // Fetch settings from the API
 const fetchSettings = async () => {
   loading.value = true;
@@ -353,61 +352,22 @@ const fetchSettings = async () => {
     const response = await fetch('/api/material-management/control-period');
     
     if (!response.ok) {
-      throw new Error('Failed to fetch control period settings');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to fetch control period settings');
     }
     
     const data = await response.json();
     
-    // Update form data with API response
-    if (data) {
-      // Handle PR Requisition
-      if (data.prRequisition) {
-        formData.value.prRequisition = {
-          ...formData.value.prRequisition,
-          ...data.prRequisition
-        };
-      }
-      
-      // Handle P Order
-      if (data.pOrder) {
-        formData.value.pOrder = {
-          ...formData.value.pOrder,
-          ...data.pOrder,
-          currentPeriodMonth: parseInt(data.pOrder.currentPeriodMonth) || new Date().getMonth() + 1,
-          currentPeriodYear: parseInt(data.pOrder.currentPeriodYear) || new Date().getFullYear(),
-          minAllowPercentage: parseFloat(data.pOrder.minAllowPercentage) || 0,
-          maxAllowPercentage: parseFloat(data.pOrder.maxAllowPercentage) || 0,
-        };
-      }
-      
-      // Handle Inventory
-      if (data.inventory) {
-        formData.value.inventory = {
-          ...formData.value.inventory,
-          ...data.inventory,
-          currentPeriodMonth: parseInt(data.inventory.currentPeriodMonth) || new Date().getMonth() + 1,
-          currentPeriodYear: parseInt(data.inventory.currentPeriodYear) || new Date().getFullYear(),
-        };
-      }
-      
-      // Handle Costing
-      if (data.costing) {
-        formData.value.costing = {
-          ...formData.value.costing,
-          ...data.costing,
-          currentPeriodMonth: parseInt(data.costing.currentPeriodMonth) || new Date().getMonth() + 1,
-          currentPeriodYear: parseInt(data.costing.currentPeriodYear) || new Date().getFullYear(),
-          yAllowAfterPeriod: data.costing.yAllowAfterPeriod === true || data.costing.yAllowAfterPeriod === 'true',
-        };
-      }
-      
-      // Update the initialFormData backup
-      initialFormData = JSON.parse(JSON.stringify(formData.value));
-    }
+    // Directly update form data with API response
+    formData.value = data;
+    
+    // Update the initialFormData backup after fetching
+    initialFormData.value = JSON.parse(JSON.stringify(data));
+    
   } catch (error) {
     console.error('Error fetching control period settings:', error);
     errorMessage.value = `Error loading settings: ${error.message}`;
-    showToast('Error loading settings. Please try again.', 'error');
+    toast.error('Error loading settings. Please try again.');
   } finally {
     loading.value = false;
   }
@@ -424,25 +384,33 @@ const saveSettings = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        'Accept': 'application/json',
       },
       body: JSON.stringify(formData.value)
     });
     
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to save settings');
+      if (data.errors) {
+        // Handle validation errors
+        const firstError = Object.values(data.errors)[0][0];
+        throw new Error(firstError);
+      }
+      throw new Error(data.error || 'Failed to save settings');
     }
     
-    successMessage.value = 'Control period settings saved successfully!';
-    showToast('Settings saved successfully!', 'success');
+    successMessage.value = data.message || 'Control period settings saved successfully!';
+    toast.success(successMessage.value);
     
     // Update the initialFormData backup
-    initialFormData = JSON.parse(JSON.stringify(formData.value));
+    initialFormData.value = JSON.parse(JSON.stringify(formData.value));
+
   } catch (error) {
     console.error('Error saving control period settings:', error);
     errorMessage.value = `Error saving settings: ${error.message}`;
-    showToast('Error saving settings. Please try again.', 'error');
+    toast.error(errorMessage.value);
   } finally {
     loading.value = false;
   }
@@ -450,8 +418,10 @@ const saveSettings = async () => {
 
 // Reset form to initial state
 const resetForm = () => {
-  formData.value = JSON.parse(JSON.stringify(initialFormData));
-  showToast('Form has been reset', 'info');
+  if (initialFormData.value) {
+    formData.value = JSON.parse(JSON.stringify(initialFormData.value));
+    toast.info('Form has been reset to the last saved state');
+  }
 };
 
 // Fetch data when component mounts

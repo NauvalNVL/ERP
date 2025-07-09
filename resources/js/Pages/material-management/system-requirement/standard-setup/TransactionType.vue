@@ -1,348 +1,270 @@
 <template>
   <AppLayout :header="'Define Transaction Type'">
-    <div class="py-6 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto">
-        <!-- Header Card -->
-        <div class="bg-white shadow-lg sm:rounded-lg overflow-hidden">
-          <div class="bg-blue-600 px-4 py-4 sm:px-6 flex justify-between items-center">
-            <h2 class="text-xl font-bold text-white">Define Transaction Type</h2>
-            <div class="flex space-x-2">
-              <button 
-                @click="openAddModal" 
-                class="bg-white hover:bg-gray-100 text-blue-700 font-semibold py-2 px-4 border border-blue-500 rounded shadow-sm flex items-center"
-              >
-                <i class="fas fa-plus-circle mr-2"></i>
-                Add New
-              </button>
-              <button 
-                @click="refreshData" 
-                class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded shadow-sm flex items-center"
-              >
-                <i class="fas fa-sync-alt mr-2"></i>
-                Refresh
-              </button>
-            </div>
-          </div>
-          
-          <!-- Loading State -->
-          <div v-if="loading" class="p-8 flex justify-center items-center">
-            <div class="flex flex-col items-center">
-              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-              <p class="mt-3 text-gray-600">Loading transaction types...</p>
-            </div>
-          </div>
-          
-          <!-- Search and Table Container -->
-          <div v-else class="p-6">
-            <!-- Search Bar -->
-            <div class="mb-6">
+    <Head title="Define Transaction Type" />
+
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-lg shadow-md">
+      <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-exchange-alt mr-3"></i> Define Transaction Type
+      </h2>
+      <p class="text-blue-100">Manage transaction types for material management</p>
+    </div>
+
+    <div class="bg-white rounded-b-lg shadow-md p-6 mb-6">
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Main Content Area -->
+        <div class="flex-1">
+          <!-- Action Bar -->
+          <div class="mb-6 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+            <div class="flex-1 w-full">
               <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <i class="fas fa-search text-gray-400"></i>
-                </div>
-                <input
-                  v-model="searchTerm"
-                  type="text"
-                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Search by code or name..."
-                />
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-search"></i>
+                </span>
+                <input type="text" v-model="searchQuery" placeholder="Search by code or name..."
+                  class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
               </div>
             </div>
+            <div class="flex gap-2 w-full md:w-auto">
+              <button @click="newTransactionType" class="btn-primary flex-1 md:flex-none">
+                <i class="fas fa-plus-circle mr-2"></i> New Type
+              </button>
+              <button @click="refreshData" class="btn-secondary flex-1 md:flex-none">
+                <i class="fas fa-sync-alt mr-2"></i> Refresh
+              </button>
+              <button @click="printTransactionTypes" class="btn-info flex-1 md:flex-none">
+                <i class="fas fa-print mr-2"></i> Print
+              </button>
+            </div>
+          </div>
 
-            <!-- Transaction Types Table -->
-            <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto">
+          <!-- Table Section -->
+          <div class="bg-white rounded-lg overflow-hidden border border-gray-200">
+            <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Code
+                    <th @click="sortBy('code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Code <i class="fas fa-sort ml-1"></i>
+                      </div>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Name
+                    <th @click="sortBy('name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Name <i class="fas fa-sort ml-1"></i>
+                      </div>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Group
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                    <th @click="sortBy('group')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Group <i class="fas fa-sort ml-1"></i>
+                      </div>
                     </th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-if="filteredTransactionTypes.length === 0">
-                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-                      No transaction types found
+                  <tr v-if="loading" class="animate-pulse">
+                    <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                      <div class="flex justify-center items-center space-x-2">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading transaction types...</span>
+                      </div>
                     </td>
                   </tr>
-                  <tr v-for="type in filteredTransactionTypes" :key="type.id" class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {{ type.code }}
+                  <tr v-else-if="paginatedTransactionTypes.length === 0" class="hover:bg-gray-50">
+                    <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                      No transaction types found. Try adjusting your search.
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {{ type.name }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span 
-                        :class="getGroupBadgeClass(type.group)"
-                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                      >
+                  </tr>
+                  <tr v-for="type in paginatedTransactionTypes" :key="type.code" 
+                      @click="selectTransactionType(type)" 
+                      :class="{'bg-blue-50': selectedType && selectedType.code === type.code}"
+                      class="hover:bg-gray-50 cursor-pointer">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ type.code }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ type.name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                       <span :class="getGroupBadgeClass(type.group)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                         {{ type.group }}
                       </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button 
-                        @click="editTransactionType(type)" 
-                        class="text-indigo-600 hover:text-indigo-900 mr-3"
-                      >
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button 
-                        @click="confirmDelete(type)" 
-                        class="text-red-600 hover:text-red-900"
-                      >
-                        <i class="fas fa-trash"></i>
-                      </button>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
-          
-          <!-- Error Messages -->
-          <div v-if="errorMessage" class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <i class="fas fa-exclamation-circle text-red-400"></i>
+
+          <!-- Pagination Controls -->
+          <div class="mt-4 flex justify-between items-center text-sm text-gray-600">
+            <div>
+              <span>Showing {{ paginatedTransactionTypes.length }} of {{ filteredTransactionTypes.length }} types</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <select v-model="itemsPerPage" class="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option :value="10">10 per page</option>
+                <option :value="20">20 per page</option>
+                <option :value="50">50 per page</option>
+                <option :value="100">100 per page</option>
+              </select>
+              <button :disabled="currentPage === 1" @click="currentPage--" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <span class="px-4">{{ currentPage }} / {{ totalPages }}</span>
+              <button :disabled="currentPage === totalPages || totalPages === 0" @click="currentPage++" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Side Panel with Details -->
+        <div class="w-full md:w-96 bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div v-if="selectedType" class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+              <i class="fas fa-info-circle mr-2 text-blue-500"></i> Transaction Type Details
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Code:</span>
+                <span class="font-medium text-gray-900">{{ selectedType.code }}</span>
               </div>
-              <div class="ml-3">
-                <p class="text-sm text-red-700">{{ errorMessage }}</p>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Name:</span>
+                <span class="font-medium text-gray-900">{{ selectedType.name }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Group:</span>
+                <span class="font-medium text-gray-900">
+                    <span :class="getGroupBadgeClass(selectedType.group)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                        {{ selectedType.group }}
+                    </span>
+                </span>
               </div>
             </div>
+            <div class="mt-6 flex space-x-2">
+              <button @click="editTransactionType(selectedType)" class="flex-1 btn-blue">
+                <i class="fas fa-edit mr-1"></i> Edit
+              </button>
+              <button @click="confirmDelete(selectedType)" class="flex-1 btn-danger">
+                <i class="fas fa-trash-alt mr-1"></i> Delete
+              </button>
+            </div>
+          </div>
+          <div v-else class="flex flex-col items-center justify-center h-64 text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-exchange-alt text-blue-500 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No Type Selected</h3>
+            <p class="text-gray-500 mb-4">Select a transaction type from the table to view details</p>
+            <button @click="newTransactionType" class="btn-primary">
+              <i class="fas fa-plus-circle mr-1"></i> Create New Type
+            </button>
           </div>
         </div>
       </div>
     </div>
-    
-    <!-- Add/Edit Modal -->
-    <TransitionRoot appear :show="isModalOpen" as="template">
-      <Dialog as="div" @close="closeModal" class="relative z-10">
-        <TransitionChild
-          as="template"
-          enter="duration-300 ease-out"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
-          leave="duration-200 ease-in"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
-        >
-          <div class="fixed inset-0 bg-black bg-opacity-25" />
-        </TransitionChild>
 
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4 text-center">
-            <TransitionChild
-              as="template"
-              enter="duration-300 ease-out"
-              enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100"
-              leave="duration-200 ease-in"
-              leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95"
-            >
-              <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900 pb-2 border-b">
-                  {{ isEditing ? 'Edit Transaction Type' : 'Add New Transaction Type' }}
-                </DialogTitle>
-
-                <div class="mt-4">
-                  <div class="space-y-4">
-                    <div>
-                      <label for="code" class="block text-sm font-medium text-gray-700">
-                        Transaction Code:
-                      </label>
-                      <input
-                        id="code"
-                        v-model="form.code"
-                        type="text"
-                        :disabled="isEditing"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                        maxlength="6"
-                      />
-                      <p v-if="formErrors.code" class="mt-1 text-sm text-red-600">{{ formErrors.code }}</p>
-                    </div>
-                    
-                    <div>
-                      <label for="name" class="block text-sm font-medium text-gray-700">
-                        Transaction Name:
-                      </label>
-                      <input
-                        id="name"
-                        v-model="form.name"
-                        type="text"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      />
-                      <p v-if="formErrors.name" class="mt-1 text-sm text-red-600">{{ formErrors.name }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Transaction Group:</label>
-                      <fieldset class="mt-2">
-                        <div class="space-y-2">
-                          <div class="flex items-center">
-                            <input
-                              id="po-group"
-                              v-model="form.group"
-                              type="radio"
-                              value="PO"
-                              class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
-                            />
-                            <label for="po-group" class="ml-2 block text-sm text-gray-700">PO-P/Order</label>
-                          </div>
-                          <div class="flex items-center">
-                            <input
-                              id="ic-group"
-                              v-model="form.group"
-                              type="radio"
-                              value="IC"
-                              class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
-                            />
-                            <label for="ic-group" class="ml-2 block text-sm text-gray-700">IC-Inventory</label>
-                          </div>
-                          <div class="flex items-center">
-                            <input
-                              id="cx-group"
-                              v-model="form.group"
-                              type="radio"
-                              value="CX"
-                              class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
-                            />
-                            <label for="cx-group" class="ml-2 block text-sm text-gray-700">CX-Costing</label>
-                          </div>
-                        </div>
-                      </fieldset>
-                      <p v-if="formErrors.group" class="mt-1 text-sm text-red-600">{{ formErrors.group }}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mt-6 flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    @click="closeModal"
-                    class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    @click="saveTransactionType"
-                    class="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  >
-                    {{ isEditing ? 'Update' : 'Save' }}
-                  </button>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
+    <!-- Form Modal -->
+    <div v-if="showFormModal" class="fixed inset-0 flex items-center justify-center z-50">
+      <div class="absolute inset-0 bg-black opacity-50" @click="showFormModal = false"></div>
+      <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg z-10 relative transform transition-all duration-300 ease-in-out">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-800 rounded-t-xl">
+          <div class="flex items-center">
+            <div class="bg-white/20 p-2 rounded-lg mr-3">
+              <i class="fas fa-exchange-alt text-white text-xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-white">{{ isEditing ? 'Edit' : 'New' }} Transaction Type</h3>
           </div>
+          <button @click="showFormModal = false" class="bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg transition-all duration-200">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-      </Dialog>
-    </TransitionRoot>
-    
-    <!-- Confirmation Dialog -->
-    <TransitionRoot appear :show="isConfirmDialogOpen" as="template">
-      <Dialog as="div" @close="closeConfirmDialog" class="relative z-10">
-        <TransitionChild
-          as="template"
-          enter="duration-300 ease-out"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
-          leave="duration-200 ease-in"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
-        >
-          <div class="fixed inset-0 bg-black bg-opacity-25" />
-        </TransitionChild>
+        
+        <!-- Form Content -->
+        <div class="p-6 max-h-[70vh] overflow-y-auto">
+          <form @submit.prevent="saveTransactionType">
+            <div class="space-y-6">
+              <!-- Code -->
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-hashtag text-blue-500 mr-2"></i>
+                  Transaction Code<span class="text-red-500">*</span>
+                </label>
+                <input type="text" v-model="formTransactionType.code" required :disabled="isEditing"
+                  maxlength="6"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Enter transaction code">
+                <p class="text-xs text-gray-500 mt-2 italic">Code must be unique (max 6 chars) and cannot be changed later</p>
+              </div>
+              
+              <!-- Name -->
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-tag text-blue-500 mr-2"></i>
+                  Transaction Name<span class="text-red-500">*</span>
+                </label>
+                <input type="text" v-model="formTransactionType.name" required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Enter transaction name">
+              </div>
 
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4 text-center">
-            <TransitionChild
-              as="template"
-              enter="duration-300 ease-out"
-              enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100"
-              leave="duration-200 ease-in"
-              leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95"
-            >
-              <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                  Delete Transaction Type
-                </DialogTitle>
-                
-                <div class="mt-3">
-                  <p class="text-sm text-gray-600">
-                    Are you sure you want to delete the transaction type <span class="font-bold">{{ selectedType?.code }}</span>? This action cannot be undone.
-                  </p>
-                </div>
-                
-                <div class="mt-6 flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    @click="closeConfirmDialog"
-                    class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    @click="deleteTransactionType"
-                    class="inline-flex justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
+              <!-- Group -->
+              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                  <i class="fas fa-layer-group text-blue-500 mr-2"></i>
+                  Transaction Group<span class="text-red-500">*</span>
+                </label>
+                 <fieldset class="mt-2">
+                    <div class="space-y-2 sm:flex sm:space-y-0 sm:space-x-10">
+                      <div class="flex items-center">
+                        <input id="po-group" v-model="formTransactionType.group" type="radio" value="PO" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                        <label for="po-group" class="ml-2 block text-sm text-gray-700">PO-P/Order</label>
+                      </div>
+                      <div class="flex items-center">
+                        <input id="ic-group" v-model="formTransactionType.group" type="radio" value="IC" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                        <label for="ic-group" class="ml-2 block text-sm text-gray-700">IC-Inventory</label>
+                      </div>
+                      <div class="flex items-center">
+                        <input id="cx-group" v-model="formTransactionType.group" type="radio" value="CX" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                        <label for="cx-group" class="ml-2 block text-sm text-gray-700">CX-Costing</label>
+                      </div>
+                    </div>
+                  </fieldset>
+              </div>
+            </div>
+            
+            <!-- Form Footer with Buttons -->
+            <div class="flex justify-end space-x-3 border-t border-gray-200 pt-5 mt-4">
+              <button type="button" @click="showFormModal = false" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition-all duration-200 flex items-center">
+                <i class="fas fa-times mr-2"></i> Cancel
+              </button>
+              <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition-all duration-200 flex items-center" :disabled="loading">
+                <i class="fas fa-save mr-2"></i> {{ isEditing ? 'Update' : 'Create' }}
+                <span v-if="loading" class="ml-2 animate-spin"><i class="fas fa-spinner"></i></span>
+              </button>
+            </div>
+          </form>
         </div>
-      </Dialog>
-    </TransitionRoot>
+      </div>
+    </div>
 
-    <!-- Toast Notification -->
-    <div 
-      v-if="notification.show" 
-      :class="[
-        'fixed bottom-4 right-4 z-50 rounded-md shadow-lg max-w-sm w-full transition-all transform',
-        notification.type === 'success' ? 'bg-green-50' : 'bg-red-50'
-      ]"
-    >
-      <div class="p-4">
-        <div class="flex items-start">
-          <div class="flex-shrink-0">
-            <i 
-              :class="[
-                'text-xl',
-                notification.type === 'success' ? 'text-green-500 fas fa-check-circle' : 'text-red-500 fas fa-exclamation-circle'
-              ]"
-            ></i>
+    <!-- Confirmation Modal -->
+    <div v-if="showConfirmation" class="fixed inset-0 flex items-center justify-center z-50">
+      <div class="absolute inset-0 bg-black opacity-50" @click="showConfirmation = false"></div>
+      <div class="bg-white rounded-lg shadow-lg max-w-md z-10 w-full">
+        <div class="p-6">
+          <div class="flex items-center mb-4">
+            <div class="bg-red-100 rounded-full p-2 mr-3">
+              <i class="fas fa-exclamation-triangle text-red-600"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900">Confirm Delete</h3>
           </div>
-          <div class="ml-3 w-0 flex-1">
-            <p 
-              :class="[
-                'text-sm font-medium',
-                notification.type === 'success' ? 'text-green-800' : 'text-red-800'
-              ]"
-            >
-              {{ notification.message }}
-            </p>
-          </div>
-          <div class="ml-4 flex-shrink-0 flex">
-            <button
-              @click="closeNotification"
-              class="inline-flex text-gray-400 focus:outline-none focus:text-gray-500 transition ease-in-out duration-150"
-            >
-              <i class="fas fa-times"></i>
+          <p class="mb-4 text-gray-600">Are you sure you want to delete the transaction type <span class="font-semibold">{{ typeToDelete?.code }}</span>? This action cannot be undone.</p>
+          <div class="flex justify-end space-x-3">
+            <button @click="showConfirmation = false" class="px-4 py-2 text-gray-700 border border-gray-300 rounded hover:bg-gray-50">
+              <i class="fas fa-times mr-1"></i> Cancel
+            </button>
+            <button @click="deleteTransactionType" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" :disabled="loading">
+              <i class="fas fa-trash-alt mr-1"></i> Delete
             </button>
           </div>
         </div>
@@ -352,42 +274,90 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import axios from 'axios';
+import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useToast } from '@/Composables/useToast';
 
-// State management
+// State variables
 const transactionTypes = ref([]);
-const searchTerm = ref('');
-const loading = ref(true);
-const errorMessage = ref('');
-const isModalOpen = ref(false);
-const isConfirmDialogOpen = ref(false);
-const isEditing = ref(false);
 const selectedType = ref(null);
-const { showToast } = useToast();
-const notification = ref({ show: false, message: '', type: 'success' });
+const loading = ref(false);
+const searchQuery = ref('');
+const showFormModal = ref(false);
+const showConfirmation = ref(false);
+const typeToDelete = ref(null);
+const isEditing = ref(false);
+const sortOrder = ref({
+  field: 'code',
+  direction: 'asc'
+});
+const toast = useToast();
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
 
-// Form state
-const form = ref({
+// Form for creating/editing transaction type
+const formTransactionType = ref({
   code: '',
   name: '',
   group: 'PO',
 });
-const formErrors = ref({});
 
-// Filtered transaction types based on search term
+// Reset form to default values
+const resetForm = () => {
+  formTransactionType.value = {
+    code: '',
+    name: '',
+    group: 'PO',
+  };
+  isEditing.value = false;
+};
+
+// Computed properties
 const filteredTransactionTypes = computed(() => {
-  if (!searchTerm.value) {
-    return transactionTypes.value;
+  let result = transactionTypes.value;
+
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    result = result.filter(type =>
+      (type.code && type.code.toLowerCase().includes(query)) ||
+      (type.name && type.name.toLowerCase().includes(query))
+    );
   }
-  
-  const term = searchTerm.value.toLowerCase();
-  return transactionTypes.value.filter(type => {
-    return type.code.toLowerCase().includes(term) || 
-           type.name.toLowerCase().includes(term);
+
+  result = [...result].sort((a, b) => {
+    const field = sortOrder.value.field;
+    const direction = sortOrder.value.direction === 'asc' ? 1 : -1;
+    
+    if ((a[field] || '') < (b[field] || '')) return -1 * direction;
+    if ((a[field] || '') > (b[field] || '')) return 1 * direction;
+    return 0;
   });
+
+  return result;
+});
+
+const paginatedTransactionTypes = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return filteredTransactionTypes.value.slice(start, end);
+});
+
+const totalPages = computed(() => {
+    const total = filteredTransactionTypes.value.length;
+    if (total === 0) return 1;
+    return Math.ceil(total / itemsPerPage.value);
+});
+
+watch(filteredTransactionTypes, () => {
+  if (currentPage.value > totalPages.value) {
+      currentPage.value = totalPages.value || 1;
+  }
+});
+
+watch(itemsPerPage, () => {
+  currentPage.value = 1;
 });
 
 // Get CSS class for group badge
@@ -404,212 +374,170 @@ const getGroupBadgeClass = (group) => {
   }
 };
 
-// Fetch transaction types
 const fetchTransactionTypes = async () => {
   loading.value = true;
-  errorMessage.value = '';
-  
   try {
-    const response = await fetch('/api/material-management/transaction-types');
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch transaction types');
-    }
-    
-    const data = await response.json();
-    transactionTypes.value = data;
+    const response = await axios.get('/api/material-management/transaction-types');
+    transactionTypes.value = response.data;
   } catch (error) {
     console.error('Error fetching transaction types:', error);
-    errorMessage.value = `Error: ${error.message}`;
-    showNotification('Failed to load transaction types. Please try again.', 'error');
+    toast.error('Failed to load transaction types');
   } finally {
     loading.value = false;
   }
 };
 
-// Open modal for adding a new transaction type
-const openAddModal = () => {
-  isEditing.value = false;
-  resetForm();
-  isModalOpen.value = true;
+const refreshData = () => {
+  selectedType.value = null;
+  searchQuery.value = '';
+  fetchTransactionTypes();
 };
 
-// Open modal for editing a transaction type
+const selectTransactionType = (type) => {
+  selectedType.value = type;
+};
+
+const newTransactionType = () => {
+  resetForm();
+  showFormModal.value = true;
+};
+
 const editTransactionType = (type) => {
   isEditing.value = true;
-  selectedType.value = type;
-  
-  form.value = {
-    code: type.code,
-    name: type.name,
-    group: type.group
-  };
-  
-  isModalOpen.value = true;
+  formTransactionType.value = { ...type };
+  showFormModal.value = true;
 };
 
-// Close modal and reset form
-const closeModal = () => {
-  isModalOpen.value = false;
-  resetForm();
+const confirmDelete = (type) => {
+  typeToDelete.value = type;
+  showConfirmation.value = true;
 };
 
-// Reset form values and errors
-const resetForm = () => {
-  form.value = {
-    code: '',
-    name: '',
-    group: 'PO'
-  };
-  formErrors.value = {};
-};
-
-// Validate form inputs
-const validateForm = () => {
-  const errors = {};
-  
-  if (!form.value.code) {
-    errors.code = 'Transaction code is required';
-  } else if (form.value.code.length > 6) {
-    errors.code = 'Transaction code cannot exceed 6 characters';
-  }
-  
-  if (!form.value.name) {
-    errors.name = 'Transaction name is required';
-  }
-  
-  if (!form.value.group) {
-    errors.group = 'Transaction group is required';
-  }
-  
-  formErrors.value = errors;
-  return Object.keys(errors).length === 0;
-};
-
-// Save transaction type (create or update)
 const saveTransactionType = async () => {
-  if (!validateForm()) {
-    return;
-  }
-  
+  loading.value = true;
   try {
     let response;
     
     if (isEditing.value) {
-      response = await fetch(`/api/material-management/transaction-types/${form.value.code}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify(form.value)
-      });
-    } else {
-      // Check if code already exists
-      const exists = transactionTypes.value.some(type => type.code === form.value.code);
+      response = await axios.put(`/api/material-management/transaction-types/${formTransactionType.value.code}`, formTransactionType.value);
+      toast.success('Transaction type updated successfully');
       
-      if (exists) {
-        formErrors.value.code = 'Transaction code already exists';
-        return;
+      const index = transactionTypes.value.findIndex(d => d.code === formTransactionType.value.code);
+      if (index !== -1) {
+        transactionTypes.value[index] = response.data.data;
+        selectedType.value = response.data.data;
       }
-      
-      response = await fetch('/api/material-management/transaction-types', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify(form.value)
-      });
+    } else {
+      response = await axios.post('/api/material-management/transaction-types', formTransactionType.value);
+      toast.success('Transaction type created successfully');
+      transactionTypes.value.push(response.data.data);
+      selectedType.value = response.data.data;
     }
     
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to save transaction type');
-    }
-    
-    closeModal();
-    fetchTransactionTypes();
-    showNotification(
-      isEditing.value ? 'Transaction type updated successfully!' : 'Transaction type created successfully!',
-      'success'
-    );
+    showFormModal.value = false;
   } catch (error) {
     console.error('Error saving transaction type:', error);
-    showNotification(`Failed to save: ${error.message}`, 'error');
+    toast.error(error.response?.data?.message || 'Failed to save transaction type');
+  } finally {
+    loading.value = false;
   }
 };
 
-// Confirm delete
-const confirmDelete = (type) => {
-  selectedType.value = type;
-  isConfirmDialogOpen.value = true;
-};
-
-// Close confirmation dialog
-const closeConfirmDialog = () => {
-  isConfirmDialogOpen.value = false;
-  selectedType.value = null;
-};
-
-// Delete transaction type
 const deleteTransactionType = async () => {
-  if (!selectedType.value) {
-    return;
-  }
+  if (!typeToDelete.value) return;
   
+  loading.value = true;
   try {
-    const response = await fetch(`/api/material-management/transaction-types/${selectedType.value.code}`, {
-      method: 'DELETE',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    });
+    await axios.delete(`/api/material-management/transaction-types/${typeToDelete.value.code}`);
+    toast.success('Transaction type deleted successfully');
     
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to delete transaction type');
+    transactionTypes.value = transactionTypes.value.filter(d => d.code !== typeToDelete.value.code);
+    
+    if (selectedType.value?.code === typeToDelete.value.code) {
+      selectedType.value = null;
     }
     
-    closeConfirmDialog();
-    fetchTransactionTypes();
-    showNotification('Transaction type deleted successfully!', 'success');
+    showConfirmation.value = false;
+    typeToDelete.value = null;
   } catch (error) {
     console.error('Error deleting transaction type:', error);
-    showNotification(`Failed to delete: ${error.message}`, 'error');
+    toast.error(error.response?.data?.message || 'Failed to delete transaction type');
+  } finally {
+    loading.value = false;
   }
 };
 
-// Refresh data
-const refreshData = () => {
-  fetchTransactionTypes();
+const sortBy = (field) => {
+  if (sortOrder.value.field === field) {
+    sortOrder.value.direction = sortOrder.value.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortOrder.value.field = field;
+    sortOrder.value.direction = 'asc';
+  }
 };
 
-// Show notification
-const showNotification = (message, type = 'success') => {
-  notification.value = {
-    show: true,
-    message,
-    type
-  };
-  
-  // Hide notification after 3 seconds
-  setTimeout(() => {
-    closeNotification();
-  }, 3000);
+const printTransactionTypes = () => {
+  // This can be implemented later
+  toast.info('Print functionality is not yet available.');
 };
 
-// Close notification
-const closeNotification = () => {
-  notification.value.show = false;
-};
-
-// Fetch data on component mount
-onMounted(() => {
-  fetchTransactionTypes();
-});
+onMounted(fetchTransactionTypes);
 </script>
 
 <style scoped>
-/* You can add component-specific styles here */
+/* Button styles */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+.btn-info {
+  @apply bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+.btn-blue {
+  @apply bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+/* Table hover animation */
+tbody tr {
+  transition: all 0.2s;
+}
+
+tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar styling */
+.overflow-x-auto, .overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar, .overflow-y-auto::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track, .overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb, .overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
+}
 </style>

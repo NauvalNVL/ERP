@@ -33,6 +33,7 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController;
 use App\Http\Controllers\WarehouseLocationController;
 use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\FgDoConfigController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmConfigController;
 
 /*
 |--------------------------------------------------------------------------
@@ -259,3 +260,13 @@ Route::post('/diecut-computation-formulas', [App\Http\Controllers\ComputationFor
 Route::put('/diecut-computation-formulas/{id}', [App\Http\Controllers\ComputationFormulaController::class, 'apiUpdate']);
 Route::delete('/diecut-computation-formulas/{id}', [App\Http\Controllers\ComputationFormulaController::class, 'apiDestroy']);
 Route::post('/diecut-computation-formulas/seed', [App\Http\Controllers\ComputationFormulaController::class, 'apiSeed']); 
+
+Route::prefix('material-management/config-data')->group(function () {
+    Route::get('transaction-types', [MmTransactionTypeController::class, 'getAll']);
+    Route::get('purchasers', [\App\Http\Controllers\SalespersonController::class, 'getAllPurchasers']);
+    Route::get('receive-locations', [MmReceiveDestinationController::class, 'getAll']);
+    Route::get('tax-groups', [MmTaxGroupController::class, 'getAll']);
+    Route::get('locations', [MmLocationController::class, 'getAll']);
+    Route::get('source-codes', [MmConfigController::class, 'getSourceCodes']); // Placeholder, assuming it's simple
+    Route::get('gl-distributions', [MmConfigController::class, 'getGlDistributions']); // Placeholder
+});

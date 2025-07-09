@@ -302,4 +302,10 @@ class SalespersonController extends Controller
             return response()->json(['error' => 'Failed to load salesperson data'], 500);
         }
     }
+
+    public function getAllPurchasers()
+    {
+        $purchasers = Salesperson::where('position', 'PU')->orWhere('position', 'PU/RQ')->get();
+        return response()->json($purchasers);
+    }
 }

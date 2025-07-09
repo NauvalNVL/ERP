@@ -156,4 +156,9 @@ class MmTaxGroupController extends Controller
             'message' => 'Sample tax groups seeded successfully',
         ], 200);
     }
+
+    public function getAll()
+    {
+        return response()->json(MmTaxGroup::all());
+    }
 } 
