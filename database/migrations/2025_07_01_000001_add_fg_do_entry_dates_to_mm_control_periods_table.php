@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('mm_control_periods', function (Blueprint $table) {
-            //
+            $table->string('fg_entry_date')->nullable();
+            $table->string('do_entry_date')->nullable();
+            $table->string('do_rejection_entry_date')->nullable();
         });
     }
 
@@ -22,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('mm_control_periods', function (Blueprint $table) {
-            //
+            $table->dropColumn(['fg_entry_date', 'do_entry_date', 'do_rejection_entry_date']);
         });
     }
 };

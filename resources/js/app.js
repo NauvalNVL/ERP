@@ -2,6 +2,8 @@ import "./bootstrap";
 import { createApp, h } from "vue";
 import { createInertiaApp, Link } from "@inertiajs/vue3";
 import AppLayout from "./Layouts/AppLayout.vue";
+import { ZiggyVue } from 'ziggy-js';
+import { Ziggy } from './ziggy'; // Pastikan path ini benar jika ziggy.js tidak di root js
 
 // Fungsi global untuk mendapatkan CSRF token
 window.getCsrfToken = () => {
@@ -108,6 +110,7 @@ createInertiaApp({
         });
         
         app.use(plugin);
+        app.use(ZiggyVue, Ziggy);
         app.mount(el);
     },
     progress: {

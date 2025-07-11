@@ -87,7 +87,7 @@
                     </label>
                     <div class="relative flex group">
                                     <input type="text" id="ac" v-model="searchTerm" placeholder="Enter customer AC#" class="input-field">
-                                    <button type="button" @click="showOptions = !showOptions" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
+                                    <button type="button" @click="showOptions = true" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                                         <i class="fas fa-search"></i>
                         </button>
                     </div>
@@ -104,14 +104,14 @@
                 <div class="flex items-center gap-4">
                     <div class="relative flex group">
                         <input type="text" id="mcsFrom" v-model="form.mcsFrom" placeholder="Start MCS#" class="input-field" style="min-width:220px;max-width:340px;width:100%;" />
-                        <button type="button" @click="showMcsModal" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
+                        <button type="button" @click="showMcsOptions = true" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
                     <span class="text-gray-500 font-medium">TO</span>
                     <div class="relative flex group">
                         <input type="text" id="mcsTo" v-model="form.mcsTo" placeholder="End MCS#" class="input-field" style="min-width:220px;max-width:340px;width:100%;" />
-                        <button type="button" @click="searchMcs" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
+                        <button type="button" @click="showMcsOptions = true" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
@@ -545,6 +545,56 @@
             </div>
         </div>
 
+        <!-- Modal Options -->
+        <transition name="fade">
+            <div v-if="showOptions" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto relative animate-fade-in-up">
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-t-xl px-6 py-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex items-center justify-center w-10 h-10 bg-white/20 rounded-full"><i class="fas fa-filter text-white text-2xl"></i></span>
+                            <span class="text-white text-xl font-bold">Options</span>
+                        </div>
+                        <button @click="showOptions = false" class="text-white text-2xl hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center"><i class="fas fa-times"></i></button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="p-6 space-y-6">
+                        <div class="border rounded-xl p-4 bg-gray-50">
+                            <div class="flex items-center gap-2 mb-2"><i class="fas fa-sort text-indigo-500"></i><span class="font-semibold text-lg">Sort by:</span></div>
+                            <div class="flex flex-col gap-2 mt-2">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="optionSortBy" value="code" class="accent-indigo-500 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">Customer Code</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="optionSortBy" value="name" class="accent-indigo-500 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">Customer Name</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="border rounded-xl p-4 bg-gray-50">
+                            <div class="flex items-center gap-2 mb-2"><i class="fas fa-tag text-blue-500"></i><span class="font-semibold text-lg">Record Status:</span></div>
+                            <div class="flex items-center gap-6 mt-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" v-model="optionStatus" value="active" class="accent-blue-500 h-5 w-5" />
+                                    <span class="text-blue-800 font-medium">Active</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" v-model="optionStatus" value="obsolete" class="accent-blue-500 h-5 w-5" />
+                                    <span class="text-blue-800 font-medium">Obsolete</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal Footer -->
+                    <div class="flex justify-center gap-4 px-6 pb-6">
+                        <button @click="applyOptions" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold px-8 py-2 rounded-lg shadow hover:from-blue-600 hover:to-purple-600 flex items-center gap-2"><i class="fas fa-check"></i> OK</button>
+                        <button @click="showOptions = false" class="bg-gray-200 text-gray-700 font-bold px-8 py-2 rounded-lg shadow flex items-center gap-2"><i class="fas fa-times"></i> Exit</button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
         <!-- Success Notification -->
         <div 
             v-if="notification.show" 
@@ -594,6 +644,82 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal MCS Options -->
+        <transition name="fade">
+            <div v-if="showMcsOptions" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto relative animate-fade-in-up">
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-green-500 to-teal-500 rounded-t-xl px-6 py-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex items-center justify-center w-10 h-10 bg-white/20 rounded-full"><i class="fas fa-filter text-white text-2xl"></i></span>
+                            <span class="text-white text-xl font-bold">Options</span>
+                        </div>
+                        <button @click="showMcsOptions = false" class="text-white text-2xl hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center"><i class="fas fa-times"></i></button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="p-6 space-y-6">
+                        <div class="border rounded-xl p-4 bg-gray-50">
+                            <div class="flex items-center gap-2 mb-2"><i class="fas fa-sort text-blue-500"></i><span class="font-semibold text-lg">Sort by:</span></div>
+                            <div class="flex flex-col gap-2 mt-2">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="mcsSortBy" value="seq" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">MC Seq#</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="mcsSortBy" value="model" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">MC Model</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="mcsSortBy" value="part" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">MC PD Part#</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="mcsSortBy" value="ed" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">MC PD ED</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="mcsSortBy" value="id" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">MC PD ID</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="border rounded-xl p-4 bg-gray-50">
+                            <div class="flex items-center gap-2 mb-2"><i class="fas fa-arrow-up text-blue-500"></i><span class="font-semibold text-lg">Sort Order:</span></div>
+                            <div class="flex items-center gap-6 mt-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" v-model="mcsSortOrder" value="asc" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 font-medium">Ascending</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" v-model="mcsSortOrder" value="desc" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 font-medium">Descending</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="border rounded-xl p-4 bg-gray-50">
+                            <div class="flex items-center gap-2 mb-2"><i class="fas fa-tag text-blue-500"></i><span class="font-semibold text-lg">MC Status:</span></div>
+                            <div class="flex items-center gap-6 mt-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" v-model="mcsStatus" value="active" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-blue-800 font-medium">Active</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" v-model="mcsStatus" value="obsolete" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-blue-800 font-medium">Obsolete</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal Footer -->
+                    <div class="flex justify-center gap-4 px-6 pb-6">
+                        <button @click="applyMcsOptions" class="bg-blue-600 text-white font-bold px-8 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2"><i class="fas fa-check"></i> OK</button>
+                        <button @click="showMcsOptions = false" class="bg-gray-200 text-gray-700 font-bold px-8 py-2 rounded-lg shadow flex items-center gap-2"><i class="fas fa-times"></i> Exit</button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
     </AppLayout>
 </template>
 
@@ -843,6 +969,24 @@ const fetchData = async () => {
         loading.value = false;
     }
 };
+
+const optionSortBy = ref('code');
+const optionStatus = ref(['active']);
+
+function applyOptions() {
+    // Terapkan filter/sort sesuai pilihan modal
+    // (Implementasi filter bisa disesuaikan kebutuhan)
+    showOptions.value = false;
+}
+
+const showMcsOptions = ref(false);
+const mcsSortBy = ref('seq');
+const mcsSortOrder = ref('asc');
+const mcsStatus = ref(['active']);
+function applyMcsOptions() {
+    // Terapkan filter/sort sesuai pilihan modal
+    showMcsOptions.value = false;
+}
 </script>
 
 <style>

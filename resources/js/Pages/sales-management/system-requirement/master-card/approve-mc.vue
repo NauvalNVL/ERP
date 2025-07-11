@@ -306,6 +306,91 @@
             </div>
         </div>
 
+        <!-- Main Table & Log Panel (Layout Rapi) -->
+        <div v-if="showMainPanel" class="rounded-xl shadow-2xl p-6 mt-4 bg-gradient-to-br from-blue-50 via-cyan-50 to-purple-100 border-2 border-indigo-200">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <!-- Left: Table & Search -->
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <div class="flex flex-col md:flex-row md:items-center gap-3 mb-2">
+                        <label class="font-bold text-lg text-indigo-800 flex-shrink-0">AC#:</label>
+                        <input type="text" :value="searchTerm" readonly class="border-2 border-indigo-200 rounded-lg px-3 py-1 w-40 bg-white font-mono font-bold text-indigo-700 shadow-sm" />
+                        <input type="text" :value="selectedCustomer?.name || ''" readonly class="border-2 border-indigo-200 rounded-lg px-3 py-1 flex-1 bg-white font-semibold text-gray-700 shadow-sm" />
+                    </div>
+                    <div class="rounded-xl overflow-hidden shadow-lg border-2 border-cyan-200 bg-gradient-to-br from-white via-blue-50 to-cyan-100 flex-1 flex flex-col min-h-[200px]">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 text-white">
+                                <tr>
+                                    <th class="px-3 py-2 border-r border-cyan-100 font-bold">MCS#</th>
+                                    <th class="px-3 py-2 border-r border-cyan-100 font-bold">Model</th>
+                                    <th class="px-3 py-2 border-r border-cyan-100 font-bold">Sts</th>
+                                    <th class="px-3 py-2 font-bold">To Approve</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="mc in filteredMasterCards" :key="mc.mc_seq" class="hover:bg-gradient-to-r hover:from-blue-100 hover:to-cyan-100 transition-all">
+                                    <td class="border-r border-cyan-100 px-3 py-2">{{ mc.mc_seq }}</td>
+                                    <td class="border-r border-cyan-100 px-3 py-2">{{ mc.mc_model }}</td>
+                                    <td class="border-r border-cyan-100 px-3 py-2">
+                                        <span :class="{
+                                            'bg-gradient-to-r from-green-400 to-emerald-500 text-white px-2 py-1 rounded-full text-xs font-bold': mc.status === 'Active',
+                                            'bg-gradient-to-r from-rose-400 to-red-500 text-white px-2 py-1 rounded-full text-xs font-bold': mc.status === 'Obsolete',
+                                            'bg-gradient-to-r from-gray-400 to-gray-500 text-white px-2 py-1 rounded-full text-xs font-bold': mc.status !== 'Active' && mc.status !== 'Obsolete'
+                                        }">{{ mc.status }}</span>
+                                    </td>
+                                    <td class="text-center px-3 py-2"><input type="checkbox" class="accent-indigo-500 scale-125" /></td>
+                                </tr>
+                                <tr v-if="filteredMasterCards.length === 0">
+                                    <td colspan="4" class="text-center text-gray-400 py-8">No data found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex flex-col md:flex-row md:items-center gap-3 mt-2 justify-between">
+                        <div class="flex items-center gap-2">
+                            <label class="font-semibold text-gray-700">Search:</label>
+                            <input type="text" class="border-2 border-cyan-200 rounded-lg px-3 py-1 w-40 bg-white shadow-sm" style="max-width:180px;" />
+                            <button class="bg-gradient-to-r from-blue-400 to-cyan-500 text-white font-bold px-4 py-1 rounded-lg shadow hover:from-blue-500 hover:to-cyan-600 transition">Search</button>
+                            <span class="ml-2 font-semibold text-gray-700">MCS#</span>
+                        </div>
+                        <button class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold px-4 py-1 rounded-lg shadow hover:from-indigo-600 hover:to-purple-700 transition">Zoom MC</button>
+                    </div>
+                </div>
+                <!-- Right: Log Cards -->
+                <div class="flex flex-col gap-6 w-full">
+                    <!-- Log Card: Maintenance -->
+                    <div class="rounded-xl border-2 border-green-200 bg-gradient-to-br from-green-50 via-white to-emerald-100 p-4 shadow-md">
+                        <div class="font-bold text-base text-green-800 mb-2 flex items-center gap-2">
+                            <i class="fas fa-tools"></i> Last Maintenance Log
+                        </div>
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-2 items-center mb-1">
+                            <label class="text-sm font-medium text-green-900">Process:</label>
+                            <input type="text" class="border border-green-200 rounded px-2 py-1 text-sm bg-white" />
+                            <label class="text-sm font-medium text-green-900">User ID:</label>
+                            <input type="text" class="border border-green-200 rounded px-2 py-1 text-sm bg-white" />
+                            <label class="text-sm font-medium text-green-900">Date:</label>
+                            <input type="text" class="border border-green-200 rounded px-2 py-1 text-sm bg-white" />
+                            <label class="text-sm font-medium text-green-900">Time:</label>
+                            <input type="text" class="border border-green-200 rounded px-2 py-1 text-sm bg-white" />
+                        </div>
+                    </div>
+                    <!-- Log Card: Approval -->
+                    <div class="rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-cyan-100 p-4 shadow-md mt-6">
+                        <div class="font-bold text-base text-blue-800 mb-2 flex items-center gap-2">
+                            <i class="fas fa-user-check"></i> Last Approval Log
+                        </div>
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-2 items-center mb-1">
+                            <label class="text-sm font-medium text-blue-900">User ID:</label>
+                            <input type="text" class="border border-blue-200 rounded px-2 py-1 text-sm bg-white" />
+                            <label class="text-sm font-medium text-blue-900">Date:</label>
+                            <input type="text" class="border border-blue-200 rounded px-2 py-1 text-sm bg-white" />
+                            <label class="text-sm font-medium text-blue-900">Time:</label>
+                            <input type="text" class="border border-blue-200 rounded px-2 py-1 text-sm bg-white" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Approval Confirmation Modal -->
         <div v-if="showApprovalModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -1025,6 +1110,17 @@
                         </div>
                     </div>
                     <!-- END Tambah textbox -->
+                    <!-- Tambahkan textbox Model khusus untuk sort by MC PD ED -->
+                    <div v-if="mcsSortOption === 'ed'" class="mt-4 flex items-center gap-2">
+                        <label for="mcs-model-ed" class="font-bold w-20">Model:</label>
+                        <input type="text" id="mcs-model-ed" :value="selectedMcs?.model || ''" readonly class="flex-grow bg-gray-100 border-2 border-gray-400 rounded-sm py-1 px-2 font-bold text-black focus:outline-none" />
+                    </div>
+                    <!-- Tambahkan textbox Model khusus untuk sort by MC PD ID -->
+                    <div v-if="mcsSortOption === 'id'" class="mt-4 flex items-center gap-2">
+                        <label for="mcs-model-id" class="font-bold w-20">Model:</label>
+                        <input type="text" id="mcs-model-id" :value="selectedMcs?.model || ''" readonly class="flex-grow bg-gray-100 border-2 border-gray-400 rounded-sm py-1 px-2 font-bold text-black focus:outline-none" />
+                    </div>
+                    <!-- END Tambah textbox -->
                 </div>
                 <div class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl">
                     <!-- BUTTONS: More Option, Zoom, Select, Exit (JANGAN DIUBAH POSISINYA) -->
@@ -1369,6 +1465,17 @@
                     </div>
                   </div>
                 </div>
+              </div>
+              <!-- END Tambah textbox -->
+              <!-- Tambahkan textbox Model khusus untuk sort by MC PD ED pada Table To -->
+              <div v-if="mcsSortOption === 'ed'" class="mt-4 flex items-center gap-2">
+                <label for="mcs-model-ed-to" class="font-bold w-20">Model:</label>
+                <input type="text" id="mcs-model-ed-to" :value="selectedMcsTo?.model || ''" readonly class="flex-grow bg-gray-100 border-2 border-gray-400 rounded-sm py-1 px-2 font-bold text-black focus:outline-none" />
+              </div>
+              <!-- Tambahkan textbox Model khusus untuk sort by MC PD ID pada Table To -->
+              <div v-if="mcsSortOption === 'id'" class="mt-4 flex items-center gap-2">
+                <label for="mcs-model-id-to" class="font-bold w-20">Model:</label>
+                <input type="text" id="mcs-model-id-to" :value="selectedMcsTo?.model || ''" readonly class="flex-grow bg-gray-100 border-2 border-gray-400 rounded-sm py-1 px-2 font-bold text-black focus:outline-none" />
               </div>
               <!-- END Tambah textbox -->
             </div>
@@ -1927,6 +2034,10 @@ const selectMcsTo = (mcs) => {
 const selectForViewMcsTo = (mcs) => {
     selectedMcsTo.value = mcs;
 };
+
+const showMainPanel = computed(() => {
+    return searchTerm.value && mcsInput.value && mcsInputTo.value;
+});
 </script>
 
 <style>

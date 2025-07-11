@@ -99,12 +99,12 @@
           >
             <i class="fas fa-redo-alt text-sm"></i>
           </button>
-          <button v-if="user" @click="logout" class="text-gray-300 hover:text-red-400 transition-colors">
-            <i class="fas fa-sign-out-alt"></i>
-          </button>
-          <Link v-else href="/login" class="text-gray-300 hover:text-green-400 transition-colors">
-            <i class="fas fa-sign-in-alt"></i>
-          </Link>
+        <button v-if="user" @click="logout" class="text-gray-300 hover:text-red-400 transition-colors">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+        <Link v-else href="/login" class="text-gray-300 hover:text-green-400 transition-colors">
+          <i class="fas fa-sign-in-alt"></i>
+        </Link>
         </div>
       </div>
     </div>

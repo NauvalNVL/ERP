@@ -55,30 +55,64 @@ class UpdateCustomerAccountController extends Controller
         }
     }
 
-    public function apiIndex()
+    public function apiIndex(Request $request)
     {
         try {
             Log::info('Fetching customer accounts...');
-            $accounts = UpdateCustomerAccount::orderBy('customer_code')->get();
-            Log::info('Found ' . $accounts->count() . ' customer accounts');
+            $query = UpdateCustomerAccount::query();
+
+            // Apply search filter
+            if ($request->has('search')) {
+                $search = $request->input('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('customer_code', 'like', '%' . $search . '%')
+                      ->orWhere('customer_name', 'like', '%' . $search . '%');
+                });
+            }
+
+            // Apply sort order
+            if ($request->has('sort_by')) {
+                $sortBy = $request->input('sort_by');
+                $query->orderBy($sortBy);
+            } else {
+                $query->orderBy('customer_code'); // Default sort
+            }
+
+            // Temporarily disable status filters for testing
+            // $filterActive = filter_var($request->input('filter_active', false), FILTER_VALIDATE_BOOLEAN);
+            // $filterObsolete = filter_var($request->input('filter_obsolete', false), FILTER_VALIDATE_BOOLEAN);
+
+            // if ($filterActive && !$filterObsolete) {
+            //     $query->where('status', 'Active');
+            // } elseif (!$filterActive && $filterObsolete) {
+            //     $query->where('status', 'Obsolete');
+            // } elseif (!($filterActive && $filterObsolete)) {
+            //     if (!$filterActive && !$filterObsolete) {
+            //          return response()->json(['data' => []]);
+            //     }
+            // }
+
+            $accounts = $query->get();
+            Log::info('Found ' . $accounts->count() . ' customer accounts with applied filters');
             
             // Transform data to ensure consistent format with expected fields
             $formatted = $accounts->map(function($account) {
-                // Default to Active if status is not set
-                $status = $account->status ?? 'Active';
+                // Default to Active if status is not set, or map to 'Active'/'Obsolete'
+                $status = $account->status ?? 'Active'; // Assuming 'status' column exists
                 
                 return [
+                    'id' => $account->id, // Ensure ID is returned for keying in Vue
                     'customer_code' => $account->customer_code,
                     'customer_name' => $account->customer_name,
                     'short_name' => $account->short_name,
-                    'salesperson' => $account->salesperson_code,
-                    'ac_type' => $account->ac_type,
-                    'currency' => $account->currency_code,
+                    'salesperson_code' => $account->salesperson_code, // Use salesperson_code
+                    'account_type' => $account->ac_type,
+                    'currency_code' => $account->currency_code,
                     'address' => $account->address,
                     'contact_person' => $account->contact_person,
                     'telephone_no' => $account->telephone_no,
                     'co_email' => $account->co_email,
-                    'status' => $status, // Use the default or actual status
+                    'status' => $status, 
                 ];
             });
             
@@ -87,7 +121,7 @@ class UpdateCustomerAccountController extends Controller
                 'count' => $formatted->count()
             ]);
             
-            return response()->json($formatted);
+            return response()->json(['data' => $formatted]);
         } catch (\Exception $e) {
             Log::error('Error in CustomerAccount API:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['error' => 'Gagal mengambil data customer account: ' . $e->getMessage()], 500);

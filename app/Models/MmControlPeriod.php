@@ -40,6 +40,9 @@ class MmControlPeriod extends Model
         'cost_current_period_year',
         'cost_control_date',
         'cost_y_allow_after_period',
+        'fg_entry_date',
+        'do_entry_date',
+        'do_rejection_entry_date',
     ];
 
     /**
