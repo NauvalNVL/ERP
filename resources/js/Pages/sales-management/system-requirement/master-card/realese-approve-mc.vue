@@ -720,7 +720,7 @@
             </div>
         </transition>
 
-        <!-- Customer Account Table Modal -->
+        <!-- Customer Account Table Modal (Colorful Modern Style) -->
         <transition name="fade">
             <div v-if="showCustomerAccountModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
                 <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl mx-auto relative animate-fade-in-up transform transition-all duration-300 scale-95 opacity-0" :class="{'scale-100 opacity-100': showCustomerAccountModal}">
@@ -1076,12 +1076,14 @@ const optionSortBy = ref('code');
 const optionStatus = ref(['active']);
 
 function applyOptions() {
-    // Terapkan filter/sort sesuai pilihan modal
-    // (Implementasi filter bisa disesuaikan kebutuhan)
+    console.log('applyOptions triggered');
+    console.log('optionSortBy before setting showOptions:', optionSortBy.value);
     showOptions.value = false;
     if (optionSortBy.value === 'code' || optionSortBy.value === 'name') {
         showCustomerAccountModal.value = true;
+        console.log('showCustomerAccountModal set to true for:', optionSortBy.value);
     }
+    console.log('showCustomerAccountModal after applyOptions:', showCustomerAccountModal.value);
 }
 
 const showMcsOptions = ref(false);
@@ -1098,13 +1100,26 @@ const selectedCustomer = ref(null); // New ref for selected customer
 
 // Dummy customer data (replace with actual API fetch later)
 const customerAccounts = ref([
-    { code: '000004', name: 'AGILITY INTERNATIONAL, PT', salesperson: 'S118', ac_type: 'Local', currency: 'IDR', status: 'Active' },
-    { code: '000211-03', name: 'ABDULLAH, BPK', salesperson: 'S111', ac_type: 'Local', currency: 'IDR', status: 'Active' },
-    { code: '000283', name: 'ACOSTA SUPER FOOD, PT', salesperson: 'S143', ac_type: 'Local', currency: 'IDR', status: 'Active' },
-    { code: '000507', name: 'ADISATYA GEMILANG, PT', salesperson: 'S140', ac_type: 'Local', currency: 'IDR', status: 'Active' },
-    { code: '000585-01', name: 'ACHMAD JAMAL', salesperson: 'S102', ac_type: 'Local', currency: 'IDR', status: 'Active' },
-    { code: '000676', name: 'AGRINDO MAJU LESTARI, PT', salesperson: 'S142', ac_type: 'Local', currency: 'IDR', status: 'Active' },
-    { code: '000680-06', name: 'ACEP SUNANDAH, BPK', salesperson: 'S140', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'ABDULLAH, BPK', code: '000211-08', salesperson: 'S111', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'ACEP SUNANDAR, BPK', code: '000680-06', salesperson: 'S140', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'ACHMAD JAMAL', code: '000585-01', salesperson: 'S102', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'ACOSTA SUPER FOOD, PT', code: '000283', salesperson: 'S143', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'ADHITYA SERAYAKORITA, PT', code: '000903', salesperson: 'S103', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'ADIKARYA GEMILANG', code: '000507', salesperson: 'S140', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AGEL LANGGENG, PT', code: '000581', salesperson: 'S143', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AGILITY INTERNATIONAL, PT', code: '000004', salesperson: 'S118', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AGRINDO MAJU LESTARI, PT', code: '000676', salesperson: 'S142', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AGRO MEGA PERKASA, PT', code: '000839', salesperson: 'S123', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AGUNG KEMUNING WIJAYA, PT', code: '000767', salesperson: 'S123', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AGUS', code: '000212-24', salesperson: 'S111', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AGUS IMAM MAKRUF', code: '000138-01', salesperson: 'S123', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AGUS, BPK', code: '000138-01', salesperson: 'S123', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AGUSTIN WULANDARI', code: '000930-05', salesperson: 'S143', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AGUSTINA INDRAWATI', code: '000701', salesperson: 'S108', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AHMAD SURYADI, BPK', code: '000211-07', salesperson: 'S140', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AKITA RAYA INDONESIA, PT', code: '000701', salesperson: 'S108', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'AKROM KHASANI', code: '000729', salesperson: 'S143', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { name: 'ALAM PANGAN SENTOSA, PT', code: '000648', salesperson: 'S143', ac_type: 'Local', currency: 'IDR', status: 'Active' },
 ]);
 
 const filteredCustomers = computed(() => {
