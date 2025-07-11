@@ -821,11 +821,391 @@
             </div>
         </transition>
 
+        <!-- Master Card Table Modal (Colorful Modern Style for MC Seq#) -->
+        <transition name="fade">
+            <div v-if="showMasterCardTableModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-auto relative animate-fade-in-up transform transition-all duration-300 scale-95 opacity-0" :class="{'scale-100 opacity-100': showMasterCardTableModal}">
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-green-500 via-teal-400 to-green-700 p-6 rounded-t-xl shadow-lg flex items-center justify-between relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full -translate-y-10 translate-x-10"></div>
+                        <div class="flex items-center gap-4">
+                            <span class="inline-flex items-center justify-center w-10 h-10 bg-white/20 rounded-full flex-shrink-0 backdrop-blur-sm">
+                                <i class="fas fa-th-list text-white text-xl"></i>
+                            </span>
+                            <span class="text-white text-xl font-bold z-10">Master Card Table</span>
+                        </div>
+                        <button @click="showMasterCardTableModal = false" class="text-white text-2xl hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-all duration-300 transform hover:rotate-90 z-10">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="p-6 bg-white overflow-hidden">
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-lg mb-6 max-h-80 custom-scrollbar" style="max-height: 45vh;">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gradient-to-r from-green-200 to-teal-200 sticky top-0 z-10">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-green-900 uppercase tracking-wider whitespace-nowrap">M/Card Seq#</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-green-900 uppercase tracking-wider whitespace-nowrap">Model</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-green-900 uppercase tracking-wider whitespace-nowrap">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-100">
+                                    <tr 
+                                        v-for="mc in filteredMasterCardsSeq"
+                                        :key="mc.seq"
+                                        @click="selectMasterCard(mc)"
+                                        class="hover:bg-blue-50 cursor-pointer transition-colors duration-150"
+                                        :class="{'bg-blue-100 border-l-4 border-blue-500': selectedMasterCardSeq?.seq === mc.seq}"
+                                    >
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ mc.seq }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ mc.model }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ mc.status }}</span>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="filteredMasterCardsSeq.length === 0">
+                                        <td colspan="3" class="px-6 py-10 text-center text-gray-500">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <i class="fas fa-box-open text-4xl text-gray-300 mb-3"></i>
+                                                <p>No matching master cards found.</p> 
+                                                <p class="text-sm mt-1 text-gray-400">Try adjusting your search filters.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Modal Footer Buttons -->
+                    <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
+                        <button class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
+                            <i class="fas fa-cogs mr-2"></i> More Options
+                        </button>
+                        <button class="modern-button bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+                            <i class="fas fa-search-plus mr-2"></i> Zoom
+                        </button>
+                        <button @click="selectMasterCardAndClose" class="modern-button bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600">
+                            <i class="fas fa-check-circle mr-2"></i> Select
+                        </button>
+                        <button @click="showMasterCardTableModal = false" class="modern-button bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600">
+                            <i class="fas fa-times mr-2"></i> Exit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- Master Card Table Modal (Colorful Modern Style for MC Model) -->
+        <transition name="fade">
+            <div v-if="showMasterCardModelTableModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-auto relative animate-fade-in-up transform transition-all duration-300 scale-95 opacity-0" :class="{'scale-100 opacity-100': showMasterCardModelTableModal}">
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-green-500 via-teal-400 to-green-700 p-6 rounded-t-xl shadow-lg flex items-center justify-between relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full -translate-y-10 translate-x-10"></div>
+                        <div class="flex items-center gap-4">
+                            <span class="inline-flex items-center justify-center w-10 h-10 bg-white/20 rounded-full flex-shrink-0 backdrop-blur-sm">
+                                <i class="fas fa-th-list text-white text-xl"></i>
+                            </span>
+                            <span class="text-white text-xl font-bold z-10">Master Card Table</span>
+                        </div>
+                        <button @click="showMasterCardModelTableModal = false" class="text-white text-2xl hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-all duration-300 transform hover:rotate-90 z-10">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="p-6 bg-white overflow-hidden">
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-lg mb-6 max-h-80 custom-scrollbar" style="max-height: 45vh;">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gradient-to-r from-blue-200 to-indigo-200 sticky top-0 z-10">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Model</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">M/Card Seq#</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-100">
+                                    <tr 
+                                        v-for="mc in filteredMasterCardsModel"
+                                        :key="mc.seq"
+                                        @click="selectMasterCardModel(mc)"
+                                        class="hover:bg-blue-50 cursor-pointer transition-colors duration-150"
+                                        :class="{'bg-blue-100 border-l-4 border-blue-500': selectedMasterCardModel?.seq === mc.seq}"
+                                    >
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ mc.model }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ mc.seq }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ mc.status }}</span>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="filteredMasterCardsModel.length === 0">
+                                        <td colspan="3" class="px-6 py-10 text-center text-gray-500">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <i class="fas fa-box-open text-4xl text-gray-300 mb-3"></i>
+                                                <p>No matching master cards found.</p> 
+                                                <p class="text-sm mt-1 text-gray-400">Try adjusting your search filters.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Modal Footer Buttons -->
+                    <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
+                        <button class="modern-button bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600">
+                            <i class="fas fa-cogs mr-2"></i> More Options
+                        </button>
+                        <button class="modern-button bg-gradient-to-r from-cyan-500 to-blue-400 hover:from-cyan-600 hover:to-blue-500">
+                            <i class="fas fa-search-plus mr-2"></i> Zoom
+                        </button>
+                        <button @click="selectMasterCardModelAndClose" class="modern-button bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600">
+                            <i class="fas fa-check-circle mr-2"></i> Select
+                        </button>
+                        <button @click="showMasterCardModelTableModal = false" class="modern-button bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600">
+                            <i class="fas fa-times mr-2"></i> Exit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- Master Card Table Modal (Modern Colorful Style for MC PD Part#) -->
+        <transition name="fade">
+            <div v-if="showMasterCardPartTableModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl mx-auto relative animate-fade-in-up border border-gray-200 transform transition-all duration-300 scale-95 opacity-0" :class="{'scale-100 opacity-100': showMasterCardPartTableModal}">
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-green-500 via-teal-400 to-green-700 p-6 rounded-t-xl shadow-lg flex items-center justify-between relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full -translate-y-10 translate-x-10"></div>
+                        <div class="flex items-center gap-4">
+                            <span class="inline-flex items-center justify-center w-10 h-10 bg-white/20 rounded-full flex-shrink-0 backdrop-blur-sm">
+                                <i class="fas fa-th-list text-white text-xl"></i>
+                            </span>
+                            <span class="text-white text-xl font-bold z-10">Master Card Table</span>
+                        </div>
+                        <button @click="showMasterCardPartTableModal = false" class="text-white text-2xl hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-all duration-300 transform hover:rotate-90 z-10">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="p-6 bg-white overflow-hidden">
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-lg mb-6 max-h-56 custom-scrollbar" style="max-height: 220px;">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gradient-to-r from-green-200 to-teal-200 sticky top-0 z-10">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-green-900 uppercase tracking-wider whitespace-nowrap">Part No</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-green-900 uppercase tracking-wider whitespace-nowrap">MC Seq#</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-green-900 uppercase tracking-wider whitespace-nowrap">Comp#</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-green-900 uppercase tracking-wider whitespace-nowrap">P/Design</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-green-900 uppercase tracking-wider whitespace-nowrap">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-100">
+                                    <tr v-for="mc in filteredMasterCardsPart" :key="mc.seq" @click="selectMasterCardPart(mc)" class="hover:bg-blue-50 cursor-pointer transition-colors duration-150" :class="{'bg-blue-100 border-l-4 border-blue-500': selectedMasterCardPart?.seq === mc.seq}">
+                                        <td class="px-3 py-1">{{ mc.part }}</td>
+                                        <td class="px-3 py-1">{{ mc.seq }}</td>
+                                        <td class="px-3 py-1">{{ mc.comp }}</td>
+                                        <td class="px-3 py-1">{{ mc.pdesign }}</td>
+                                        <td class="px-3 py-1">
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ mc.status }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Model & Dimensi -->
+                        <div class="flex flex-col md:flex-row gap-3 items-center mb-3">
+                            <div class="flex-1 flex items-center">
+                                <span class="font-semibold mr-2">Model:</span>
+                                <input type="text" :value="selectedMasterCardPart?.model || ''" readonly class="border border-gray-300 rounded px-2 py-1 w-full bg-gray-50" />
+                            </div>
+                        </div>
+                        <div class="flex flex-col md:flex-row gap-3 items-center mb-3">
+                            <div class="flex-1 flex items-center">
+                                <span class="font-semibold mr-2">Ext. Dim:</span>
+                                <input type="text" :value="selectedMasterCardPart ? selectedMasterCardPart.ext[0] : ''" readonly class="border border-gray-300 rounded px-1 py-1 w-16 text-center bg-gray-50" />
+                                <span class="mx-1">x</span>
+                                <input type="text" :value="selectedMasterCardPart ? selectedMasterCardPart.ext[1] : ''" readonly class="border border-gray-300 rounded px-1 py-1 w-16 text-center bg-gray-50" />
+                                <span class="mx-1">x</span>
+                                <input type="text" :value="selectedMasterCardPart ? selectedMasterCardPart.ext[2] : ''" readonly class="border border-gray-300 rounded px-1 py-1 w-16 text-center bg-gray-50" />
+                            </div>
+                            <div class="flex-1 flex items-center">
+                                <span class="font-semibold mr-2">Int. Dim:</span>
+                                <input type="text" :value="selectedMasterCardPart ? selectedMasterCardPart.int[0] : ''" readonly class="border border-gray-300 rounded px-1 py-1 w-16 text-center bg-gray-50" />
+                                <span class="mx-1">x</span>
+                                <input type="text" :value="selectedMasterCardPart ? selectedMasterCardPart.int[1] : ''" readonly class="border border-gray-300 rounded px-1 py-1 w-16 text-center bg-gray-50" />
+                                <span class="mx-1">x</span>
+                                <input type="text" :value="selectedMasterCardPart ? selectedMasterCardPart.int[2] : ''" readonly class="border border-gray-300 rounded px-1 py-1 w-16 text-center bg-gray-50" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal Footer Buttons -->
+                    <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
+                        <button class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
+                            <i class="fas fa-cogs mr-2"></i> More Options
+                        </button>
+                        <button class="modern-button bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+                            <i class="fas fa-search-plus mr-2"></i> Zoom
+                        </button>
+                        <button @click="selectMasterCardPartAndClose" class="modern-button bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600">
+                            <i class="fas fa-check-circle mr-2"></i> Select
+                        </button>
+                        <button @click="showMasterCardPartTableModal = false" class="modern-button bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600">
+                            <i class="fas fa-times mr-2"></i> Exit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- Master Card Table Modal (Modern Colorful Style for MC PD ED) -->
+        <transition name="fade">
+            <div v-if="showMasterCardEdTableModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl mx-auto relative animate-fade-in-up border border-gray-200 transform transition-all duration-300 scale-95 opacity-0" :class="{'scale-100 opacity-100': showMasterCardEdTableModal}">
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-green-500 via-teal-400 to-green-700 p-6 rounded-t-xl shadow-lg flex items-center justify-between relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full -translate-y-10 translate-x-10"></div>
+                        <div class="flex items-center gap-4">
+                            <span class="inline-flex items-center justify-center w-10 h-10 bg-white/20 rounded-full flex-shrink-0 backdrop-blur-sm">
+                                <i class="fas fa-th-list text-white text-xl"></i>
+                            </span>
+                            <span class="text-white text-xl font-bold z-10">Master Card Table</span>
+                        </div>
+                        <button @click="showMasterCardEdTableModal = false" class="text-white text-2xl hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-all duration-300 transform hover:rotate-90 z-10">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="p-6 bg-white overflow-hidden">
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-lg mb-6 max-h-56 custom-scrollbar" style="max-height: 220px;">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gradient-to-r from-blue-200 to-indigo-200 sticky top-0 z-10">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Ext. Dimension</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">MC Seq#</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Comp#</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">P/Design</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Model</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-100">
+                                    <tr v-for="mc in filteredMasterCardsEd" :key="mc.seq" @click="selectMasterCardEd(mc)" class="hover:bg-blue-50 cursor-pointer transition-colors duration-150" :class="{'bg-blue-100 border-l-4 border-blue-500': selectedMasterCardEd?.seq === mc.seq}">
+                                        <td class="px-3 py-1">{{ mc.ext }}</td>
+                                        <td class="px-3 py-1">{{ mc.seq }}</td>
+                                        <td class="px-3 py-1">{{ mc.comp }}</td>
+                                        <td class="px-3 py-1">{{ mc.pdesign }}</td>
+                                        <td class="px-3 py-1">{{ mc.model }}</td>
+                                        <td class="px-3 py-1">
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ mc.status }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Model -->
+                        <div class="flex flex-col md:flex-row gap-3 items-center mb-3">
+                            <div class="flex-1 flex items-center">
+                                <span class="font-semibold mr-2">Model:</span>
+                                <input type="text" :value="selectedMasterCardEd?.model || ''" readonly class="border border-gray-300 rounded px-2 py-1 w-full bg-gray-50" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal Footer Buttons -->
+                    <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
+                        <button class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
+                            <i class="fas fa-cogs mr-2"></i> More Options
+                        </button>
+                        <button class="modern-button bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+                            <i class="fas fa-search-plus mr-2"></i> Zoom
+                        </button>
+                        <button @click="selectMasterCardEdAndClose" class="modern-button bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600">
+                            <i class="fas fa-check-circle mr-2"></i> Select
+                        </button>
+                        <button @click="showMasterCardEdTableModal = false" class="modern-button bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600">
+                            <i class="fas fa-times mr-2"></i> Exit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- Master Card Table Modal (Modern Colorful Style for MC PD ID) -->
+        <transition name="fade">
+            <div v-if="showMasterCardIdTableModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl mx-auto relative animate-fade-in-up border border-gray-200 transform transition-all duration-300 scale-95 opacity-0" :class="{'scale-100 opacity-100': showMasterCardIdTableModal}">
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-green-500 via-teal-400 to-green-700 p-6 rounded-t-xl shadow-lg flex items-center justify-between relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full -translate-y-10 translate-x-10"></div>
+                        <div class="flex items-center gap-4">
+                            <span class="inline-flex items-center justify-center w-10 h-10 bg-white/20 rounded-full flex-shrink-0 backdrop-blur-sm">
+                                <i class="fas fa-th-list text-white text-xl"></i>
+                            </span>
+                            <span class="text-white text-xl font-bold z-10">Master Card Table</span>
+                        </div>
+                        <button @click="showMasterCardIdTableModal = false" class="text-white text-2xl hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-all duration-300 transform hover:rotate-90 z-10">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="p-6 bg-white overflow-hidden">
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-lg mb-6 max-h-56 custom-scrollbar" style="max-height: 220px;">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gradient-to-r from-blue-200 to-indigo-200 sticky top-0 z-10">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Int. Dimension</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">MC Seq#</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Comp#</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">P/Design</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Model</th>
+                                        <th class="px-3 py-2 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-100">
+                                    <tr v-for="mc in filteredMasterCardsId" :key="mc.seq" @click="selectMasterCardId(mc)" class="hover:bg-blue-50 cursor-pointer transition-colors duration-150" :class="{'bg-blue-100 border-l-4 border-blue-500': selectedMasterCardId?.seq === mc.seq}">
+                                        <td class="px-3 py-1">{{ mc.int }}</td>
+                                        <td class="px-3 py-1">{{ mc.seq }}</td>
+                                        <td class="px-3 py-1">{{ mc.comp }}</td>
+                                        <td class="px-3 py-1">{{ mc.pdesign }}</td>
+                                        <td class="px-3 py-1">{{ mc.model }}</td>
+                                        <td class="px-3 py-1">
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ mc.status }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Model -->
+                        <div class="flex flex-col md:flex-row gap-3 items-center mb-3">
+                            <div class="flex-1 flex items-center">
+                                <span class="font-semibold mr-2">Model:</span>
+                                <input type="text" :value="selectedMasterCardId?.model || ''" readonly class="border border-gray-300 rounded px-2 py-1 w-full bg-gray-50" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal Footer Buttons -->
+                    <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
+                        <button class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
+                            <i class="fas fa-cogs mr-2"></i> More Options
+                        </button>
+                        <button class="modern-button bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+                            <i class="fas fa-search-plus mr-2"></i> Zoom
+                        </button>
+                        <button @click="selectMasterCardIdAndClose" class="modern-button bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600">
+                            <i class="fas fa-check-circle mr-2"></i> Select
+                        </button>
+                        <button @click="showMasterCardIdTableModal = false" class="modern-button bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600">
+                            <i class="fas fa-times mr-2"></i> Exit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
     </AppLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { usePage, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
@@ -1146,6 +1526,163 @@ const selectCustomerAndClose = () => {
     }
     showCustomerAccountModal.value = false;
 };
+
+// Data MC Seq# (dummy) diisi sesuai gambar
+const masterCardSeqList = ref([
+    { seq: '1609138', model: 'BOX BASO 4.5 KG', status: 'Act' },
+    { seq: '1609144', model: 'BOX IKAN HARIMAU 4.5 KG', status: 'Act' },
+    { seq: '1609145', model: 'BOX SRIKAYA 4.5 KG', status: 'Act' },
+    { seq: '1609162', model: 'BIHUN FANIA 5 KG', status: 'Act' },
+    { seq: '1609163', model: 'BIHUN IKAN TUNA 4.5 KG BARU', status: 'Act' },
+    { seq: '1609166', model: 'BIHUN PIRING MAS 5 KG', status: 'Act' },
+    { seq: '1609173', model: 'BOX JAGUNG SRIKAYA 5 KG', status: 'Act' },
+    { seq: '1609181', model: 'BIHUN POHON KOPI 5 KG', status: 'Act' },
+    { seq: '1609185', model: 'POLOS UK 506 X 356 X 407', status: 'Act' },
+    { seq: '1609186', model: 'POLOS 480 X 410 X 401', status: 'Act' },
+]);
+const showMasterCardTableModal = ref(false);
+const selectedMasterCardSeq = ref(null);
+const filteredMasterCardsSeq = computed(() => masterCardSeqList.value); // Bisa ditambah filter jika perlu
+function selectMasterCard(mc) { selectedMasterCardSeq.value = mc; }
+function selectMasterCardAndClose() {
+    if (selectedMasterCardSeq.value) {
+        form.value.mcsFrom = selectedMasterCardSeq.value.seq; // Atau mcsTo, sesuai kebutuhan
+    }
+    showMasterCardTableModal.value = false;
+}
+// Tampilkan modal hanya jika sort by MC Seq# pada MCS#
+watch([showMcsOptions, mcsSortBy], ([show, sortBy]) => {
+    if (!show && sortBy === 'seq') {
+        showMasterCardTableModal.value = true;
+    }
+});
+
+// Data MC Model (dummy) diisi sesuai gambar
+const masterCardModelList = ref([
+    { model: 'BIHUN DELLIS 5 KG', seq: '1609182', status: 'Act' },
+    { model: 'BIHUN FANIA 5 KG', seq: '1609162', status: 'Act' },
+    { model: 'BIHUN IKAN TUNA 4.5 KG BARU', seq: '1609163', status: 'Act' },
+    { model: 'BIHUN IKAN TUNA 5 KG BARU', seq: '1609164', status: 'Act' },
+    { model: 'BIHUN PIRING MAS 5 KG', seq: '1609166', status: 'Act' },
+    { model: 'BIHUN POHON KOPI 5 KG', seq: '1609181', status: 'Act' },
+    { model: 'BOX BASO 4.5 KG', seq: '1609138', status: 'Act' },
+    { model: 'BOX IKAN HARIMAU 4.5 KG', seq: '1609144', status: 'Act' },
+    { model: 'BOX JAGUNG SRIKAYA 5 KG', seq: '1609173', status: 'Act' },
+    { model: 'BOX SRIKAYA 4.5 KG', seq: '1609145', status: 'Act' },
+    { model: 'POLOS 480 X 410 X 401', seq: '1609186', status: 'Act' },
+    { model: 'POLOS UK 506 X 356 X 407', seq: '1609185', status: 'Act' },
+]);
+const showMasterCardModelTableModal = ref(false);
+const selectedMasterCardModel = ref(null);
+const filteredMasterCardsModel = computed(() => masterCardModelList.value); // Bisa ditambah filter jika perlu
+function selectMasterCardModel(mc) { selectedMasterCardModel.value = mc; }
+function selectMasterCardModelAndClose() {
+    if (selectedMasterCardModel.value) {
+        form.value.mcsFrom = selectedMasterCardModel.value.seq; // Atau mcsTo, sesuai kebutuhan
+    }
+    showMasterCardModelTableModal.value = false;
+}
+// Tampilkan modal hanya jika sort by MC Model pada MCS#
+watch([showMcsOptions, mcsSortBy], ([show, sortBy]) => {
+    if (!show && sortBy === 'model') {
+        showMasterCardModelTableModal.value = true;
+    }
+});
+
+// Data MC PD Part# (dummy, sesuai screenshot)
+const masterCardPartList = ref([
+    { part: 'BOX', seq: '1609138', comp: 'Main', pdesign: 'B1', status: 'Active', model: 'BOX BASO 4,5 KG', ext: [396,243,297], int: [393,240,292] },
+    { part: 'BOX', seq: '1609144', comp: 'Main', pdesign: 'B1', status: 'Active', model: 'BOX IKAN HARIMAU 4,5 KG', ext: [396,243,297], int: [393,240,292] },
+    { part: 'BOX', seq: '1609145', comp: 'Main', pdesign: 'B1', status: 'Active', model: 'BOX SRIKAYA 4,5 KG', ext: [396,243,297], int: [393,240,292] },
+    { part: 'BOX', seq: '1609162', comp: 'Main', pdesign: 'B1', status: 'Active', model: 'BIHUN FANIA 5 KG', ext: [396,243,297], int: [393,240,292] },
+    { part: 'BOX', seq: '1609163', comp: 'Main', pdesign: 'B1', status: 'Active', model: 'BIHUN IKAN TUNA 4,5 KG BARU', ext: [396,243,297], int: [393,240,292] },
+    { part: 'BOX', seq: '1609166', comp: 'Main', pdesign: 'B1', status: 'Active', model: 'BIHUN PIRING MAS 5 KG', ext: [396,243,297], int: [393,240,292] },
+    { part: 'BOX', seq: '1609173', comp: 'Main', pdesign: 'B1', status: 'Active', model: 'BOX JAGUNG SRIKAYA 5 KG', ext: [396,243,297], int: [393,240,292] },
+    { part: 'BOX', seq: '1609181', comp: 'Main', pdesign: 'B1', status: 'Active', model: 'BIHUN POHON KOPI 5 KG', ext: [396,243,297], int: [393,240,292] },
+    { part: 'BOX', seq: '1609182', comp: 'Main', pdesign: 'B1', status: 'Active', model: 'BIHUN DELLIS 5 KG', ext: [396,243,297], int: [393,240,292] },
+    { part: 'BOX', seq: '1609185', comp: 'Main', pdesign: 'B1', status: 'Active', model: 'POLOS UK 506 X 356 X 407', ext: [396,243,297], int: [393,240,292] },
+    { part: 'BOX', seq: '1609186', comp: 'Main', pdesign: 'B1', status: 'Active', model: 'POLOS 480 X 410 X 401', ext: [396,243,297], int: [393,240,292] },
+]);
+const showMasterCardPartTableModal = ref(false);
+const selectedMasterCardPart = ref(null);
+const filteredMasterCardsPart = computed(() => masterCardPartList.value); // Bisa difilter jika perlu
+function selectMasterCardPart(mc) { selectedMasterCardPart.value = mc; }
+function selectMasterCardPartAndClose() {
+    if (selectedMasterCardPart.value) {
+        form.value.mcsFrom = selectedMasterCardPart.value.seq;
+    }
+    showMasterCardPartTableModal.value = false;
+}
+// Tampilkan modal hanya jika sort by MC PD Part# pada MCS#
+watch([showMcsOptions, mcsSortBy], ([show, sortBy]) => {
+    if (!show && sortBy === 'part') {
+        showMasterCardPartTableModal.value = true;
+    }
+});
+
+// Data MC PD ED (dummy, sesuai screenshot)
+const masterCardEdList = ref([
+    { ext: '396x243x297', seq: '1609138', comp: 'Main', pdesign: 'B1', model: 'BOX BASO 4,5 KG', status: 'Act' },
+    { ext: '396x243x297', seq: '1609144', comp: 'Main', pdesign: 'B1', model: 'BOX IKAN HARIMAU 4,5 KG', status: 'Act' },
+    { ext: '396x243x297', seq: '1609145', comp: 'Main', pdesign: 'B1', model: 'BOX SRIKAYA 4,5 KG', status: 'Act' },
+    { ext: '396x243x297', seq: '1609163', comp: 'Main', pdesign: 'B1', model: 'BIHUN IKAN TUNA 4,5 KG BARU', status: 'Act' },
+    { ext: '421x243x307', seq: '1609162', comp: 'Main', pdesign: 'B1', model: 'BIHUN FANIA 5 KG', status: 'Act' },
+    { ext: '421x243x307', seq: '1609164', comp: 'Main', pdesign: 'B1', model: 'BIHUN IKAN TUNA 5 KG BARU', status: 'Act' },
+    { ext: '421x243x307', seq: '1609166', comp: 'Main', pdesign: 'B1', model: 'BIHUN PIRING MAS 5 KG', status: 'Act' },
+    { ext: '421x243x307', seq: '1609173', comp: 'Main', pdesign: 'B1', model: 'BOX JAGUNG SRIKAYA 5 KG', status: 'Act' },
+    { ext: '421x243x307', seq: '1609181', comp: 'Main', pdesign: 'B1', model: 'BIHUN POHON KOPI 5 KG', status: 'Act' },
+    { ext: '421x243x307', seq: '1609182', comp: 'Main', pdesign: 'B1', model: 'BIHUN DELLIS 5 KG', status: 'Act' },
+    { ext: '483x413x406', seq: '1609186', comp: 'Main', pdesign: 'B1', model: 'POLOS 480 X 410 X 401', status: 'Act' },
+    { ext: '510x360x414', seq: '1609185', comp: 'Main', pdesign: 'B1', model: 'POLOS UK 506 X 356 X 407', status: 'Act' },
+]);
+const showMasterCardEdTableModal = ref(false);
+const selectedMasterCardEd = ref(null);
+const filteredMasterCardsEd = computed(() => masterCardEdList.value);
+function selectMasterCardEd(mc) { selectedMasterCardEd.value = mc; }
+function selectMasterCardEdAndClose() {
+    if (selectedMasterCardEd.value) {
+        form.value.mcsFrom = selectedMasterCardEd.value.seq;
+    }
+    showMasterCardEdTableModal.value = false;
+}
+// Tampilkan modal hanya jika sort by MC PD ED pada MCS#
+watch([showMcsOptions, mcsSortBy], ([show, sortBy]) => {
+    if (!show && sortBy === 'ed') {
+        showMasterCardEdTableModal.value = true;
+    }
+});
+
+// Data MC PD ID (dummy, sesuai screenshot)
+const masterCardIdList = ref([
+    { int: '393x240x292', seq: '1609138', comp: 'Main', pdesign: 'B1', model: 'BOX BASO 4,5 KG', status: 'Act' },
+    { int: '393x240x292', seq: '1609144', comp: 'Main', pdesign: 'B1', model: 'BOX IKAN HARIMAU 4,5 KG', status: 'Act' },
+    { int: '393x240x292', seq: '1609145', comp: 'Main', pdesign: 'B1', model: 'BOX SRIKAYA 4,5 KG', status: 'Act' },
+    { int: '393x240x292', seq: '1609163', comp: 'Main', pdesign: 'B1', model: 'BIHUN IKAN TUNA 4,5 KG BARU', status: 'Act' },
+    { int: '418x240x302', seq: '1609162', comp: 'Main', pdesign: 'B1', model: 'BIHUN FANIA 5 KG', status: 'Act' },
+    { int: '418x240x302', seq: '1609164', comp: 'Main', pdesign: 'B1', model: 'BIHUN IKAN TUNA 5 KG BARU', status: 'Act' },
+    { int: '418x240x302', seq: '1609166', comp: 'Main', pdesign: 'B1', model: 'BIHUN PIRING MAS 5 KG', status: 'Act' },
+    { int: '418x240x302', seq: '1609173', comp: 'Main', pdesign: 'B1', model: 'BOX JAGUNG SRIKAYA 5 KG', status: 'Act' },
+    { int: '418x240x302', seq: '1609181', comp: 'Main', pdesign: 'B1', model: 'BIHUN POHON KOPI 5 KG', status: 'Act' },
+    { int: '418x240x302', seq: '1609182', comp: 'Main', pdesign: 'B1', model: 'BIHUN DELLIS 5 KG', status: 'Act' },
+    { int: '480x410x401', seq: '1609186', comp: 'Main', pdesign: 'B1', model: 'POLOS 480 X 410 X 401', status: 'Act' },
+    { int: '506x356x407', seq: '1609185', comp: 'Main', pdesign: 'B1', model: 'POLOS UK 506 X 356 X 407', status: 'Act' },
+]);
+const showMasterCardIdTableModal = ref(false);
+const selectedMasterCardId = ref(null);
+const filteredMasterCardsId = computed(() => masterCardIdList.value);
+function selectMasterCardId(mc) { selectedMasterCardId.value = mc; }
+function selectMasterCardIdAndClose() {
+    if (selectedMasterCardId.value) {
+        form.value.mcsFrom = selectedMasterCardId.value.seq;
+    }
+    showMasterCardIdTableModal.value = false;
+}
+// Tampilkan modal hanya jika sort by MC PD ID pada MCS#
+watch([showMcsOptions, mcsSortBy], ([show, sortBy]) => {
+    if (!show && sortBy === 'id') {
+        showMasterCardIdTableModal.value = true;
+    }
+});
 
 </script>
 
