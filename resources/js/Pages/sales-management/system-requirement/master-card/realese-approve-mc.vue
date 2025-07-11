@@ -720,6 +720,107 @@
             </div>
         </transition>
 
+        <!-- Customer Account Table Modal -->
+        <transition name="fade">
+            <div v-if="showCustomerAccountModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl mx-auto relative animate-fade-in-up transform transition-all duration-300 scale-95 opacity-0" :class="{'scale-100 opacity-100': showCustomerAccountModal}">
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 p-6 rounded-t-xl shadow-lg flex items-center justify-between relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-y-16 translate-x-16"></div>
+                        <div class="flex items-center gap-4">
+                            <span class="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-full flex-shrink-0 backdrop-blur-sm">
+                                <i class="fas fa-th-large text-white text-2xl"></i>
+                            </span>
+                            <span class="text-white text-2xl font-bold z-10">Customer Account Table</span>
+                        </div>
+                        <button @click="showCustomerAccountModal = false" class="text-white text-3xl hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-all duration-300 transform hover:rotate-90 z-10">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="p-6 bg-white overflow-hidden">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-blue-50 p-4 rounded-lg border border-blue-100 shadow-sm">
+                            <div class="mb-4 md:mb-0 flex items-center">
+                                <span class="font-bold text-gray-700 mr-2">Filter:</span>
+                                <span class="text-green-600 font-medium text-sm px-3 py-1 bg-green-100 rounded-full shadow-inner">Active Records Only</span>
+                            </div>
+                            <div class="relative w-full md:w-auto flex items-center">
+                                <input type="text" v-model="customerSearchTerm" placeholder="Search customer..." class="w-full md:w-64 pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-md text-gray-700 placeholder-gray-400 focus:shadow-lg">
+                                <button class="absolute right-3 text-gray-500 hover:text-indigo-600 transition-colors duration-200">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Customer Table -->
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-lg mb-6 max-h-96 custom-scrollbar" style="max-height: 50vh;">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gradient-to-r from-blue-200 to-indigo-200 sticky top-0 z-10">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Customer Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Customer Code</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">S/person</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">AC Type</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Currency</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-100">
+                                    <tr 
+                                        v-for="customer in filteredCustomers"
+                                        :key="customer.code"
+                                        @click="selectCustomer(customer)"
+                                        class="hover:bg-blue-50 cursor-pointer transition-colors duration-150"
+                                        :class="{'bg-blue-100 border-l-4 border-blue-500': selectedCustomer?.code === customer.code}"
+                                    >
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ customer.name }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.code }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.salesperson }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.ac_type }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.currency }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span 
+                                                class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                                :class="{'bg-green-100 text-green-800': customer.status === 'Active'}"
+                                            >
+                                                {{ customer.status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="filteredCustomers.length === 0">
+                                        <td colspan="6" class="px-6 py-10 text-center text-gray-500">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <i class="fas fa-box-open text-4xl text-gray-300 mb-3"></i>
+                                                <p>No matching customers found.</p> 
+                                                <p class="text-sm mt-1 text-gray-400">Try adjusting your search filters.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer Buttons -->
+                    <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
+                        <button class="modern-button bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600">
+                            <i class="fas fa-cogs mr-2"></i> More Options
+                        </button>
+                        <button class="modern-button bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+                            <i class="fas fa-search-plus mr-2"></i> Zoom
+                        </button>
+                        <button @click="selectCustomerAndClose" class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
+                            <i class="fas fa-check-circle mr-2"></i> Select
+                        </button>
+                        <button @click="showCustomerAccountModal = false" class="modern-button bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600">
+                            <i class="fas fa-times mr-2"></i> Exit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
     </AppLayout>
 </template>
 
@@ -763,6 +864,7 @@ const form = ref({
 });
 const loading = ref(false);
 const error = ref(null);
+const showCustomerAccountModal = ref(false); // New state for customer account modal
 
 // Notification system
 const notification = ref({
@@ -890,7 +992,7 @@ const confirmRelease = async () => {
             showNotification('Master Card released successfully!');
         } else {
             throw new Error(response.data.message || 'Failed to release master card');
-        }
+        }d
     } catch (error) {
         console.error('Error releasing master card:', error);
         showNotification(error.message || 'An error occurred during release', 'error');
@@ -977,6 +1079,9 @@ function applyOptions() {
     // Terapkan filter/sort sesuai pilihan modal
     // (Implementasi filter bisa disesuaikan kebutuhan)
     showOptions.value = false;
+    if (optionSortBy.value === 'code' || optionSortBy.value === 'name') {
+        showCustomerAccountModal.value = true;
+    }
 }
 
 const showMcsOptions = ref(false);
@@ -987,6 +1092,46 @@ function applyMcsOptions() {
     // Terapkan filter/sort sesuai pilihan modal
     showMcsOptions.value = false;
 }
+
+const customerSearchTerm = ref(''); // New ref for customer search
+const selectedCustomer = ref(null); // New ref for selected customer
+
+// Dummy customer data (replace with actual API fetch later)
+const customerAccounts = ref([
+    { code: '000004', name: 'AGILITY INTERNATIONAL, PT', salesperson: 'S118', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { code: '000211-03', name: 'ABDULLAH, BPK', salesperson: 'S111', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { code: '000283', name: 'ACOSTA SUPER FOOD, PT', salesperson: 'S143', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { code: '000507', name: 'ADISATYA GEMILANG, PT', salesperson: 'S140', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { code: '000585-01', name: 'ACHMAD JAMAL', salesperson: 'S102', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { code: '000676', name: 'AGRINDO MAJU LESTARI, PT', salesperson: 'S142', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+    { code: '000680-06', name: 'ACEP SUNANDAH, BPK', salesperson: 'S140', ac_type: 'Local', currency: 'IDR', status: 'Active' },
+]);
+
+const filteredCustomers = computed(() => {
+    if (!customerSearchTerm.value) {
+        return customerAccounts.value.filter(c => c.status === 'Active');
+    }
+    const search = customerSearchTerm.value.toLowerCase();
+    return customerAccounts.value.filter(customer => 
+        (customer.name.toLowerCase().includes(search) ||
+        customer.code.toLowerCase().includes(search)) &&
+        customer.status === 'Active'
+    );
+});
+
+// Function to handle row click and select customer
+const selectCustomer = (customer) => {
+    selectedCustomer.value = customer;
+};
+
+// Function to handle "Select" button click
+const selectCustomerAndClose = () => {
+    if (selectedCustomer.value) {
+        searchTerm.value = selectedCustomer.value.code; // Populate AC# field
+    }
+    showCustomerAccountModal.value = false;
+};
+
 </script>
 
 <style>
@@ -1033,4 +1178,32 @@ function applyMcsOptions() {
 }
 .animation-delay-300 { animation-delay: 0.3s; }
 .animation-delay-500 { animation-delay: 0.5s; }
+</style>
+
+<style scoped>
+/* Add a custom scrollbar for better aesthetics */
+.custom-scrollbar {
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #a78bfa #e0e7ff; /* thumb and track color for Firefox */
+}
+
+/* For Chrome, Safari, and Opera */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px; /* width of the scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #e0e7ff; /* color of the track */
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #a78bfa; /* color of the scroll thumb */
+    border-radius: 10px; /* roundness of the scroll thumb */
+    border: 2px solid #e0e7ff; /* creates padding around scroll thumb */
+}
+
+.modern-button {
+    @apply text-white font-bold px-6 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-all transform hover:scale-105;
+}
 </style>
