@@ -34,6 +34,8 @@ use App\Http\Controllers\WarehouseLocationController;
 use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\FgDoConfigController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmConfigController;
+use App\Http\Controllers\ISOCurrencyController;
+use App\Http\Controllers\ForeignCurrencyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +47,9 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmConfigController
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::get('/foreign-currencies', [ForeignCurrencyController::class, 'apiIndex']);
+Route::get('/iso-currencies', [ISOCurrencyController::class, 'apiIndex']);
 
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
 Route::get('/products', [ProductController::class, 'getProductsJson']);
