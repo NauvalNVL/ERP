@@ -104,14 +104,14 @@
                 <div class="flex items-center gap-4">
                     <div class="relative flex group">
                         <input type="text" id="mcsFrom" v-model="form.mcsFrom" placeholder="Start MCS#" class="input-field" style="min-width:220px;max-width:340px;width:100%;" />
-                        <button type="button" @click="showMcsOptions = true" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
+                        <button type="button" @click="mcsInputActive = 'from'; showMcsOptions = true" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
                     <span class="text-gray-500 font-medium">TO</span>
                     <div class="relative flex group">
                         <input type="text" id="mcsTo" v-model="form.mcsTo" placeholder="End MCS#" class="input-field" style="min-width:220px;max-width:340px;width:100%;" />
-                        <button type="button" @click="showMcsOptions = true" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
+                        <button type="button" @click="mcsInputActive = 'to'; showMcsOptions = true" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
@@ -757,7 +757,15 @@
                         <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-lg mb-6 max-h-96 custom-scrollbar" style="max-height: 50vh;">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gradient-to-r from-blue-200 to-indigo-200 sticky top-0 z-10">
-                                    <tr>
+                                    <tr v-if="optionSortBy === 'code'">
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Customer Code</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Customer Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">S/person</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">AC Type</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Currency</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Status</th>
+                                    </tr>
+                                    <tr v-else-if="optionSortBy === 'name'">
                                         <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Customer Name</th>
                                         <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">Customer Code</th>
                                         <th class="px-6 py-3 text-left text-xs font-bold text-blue-900 uppercase tracking-wider whitespace-nowrap">S/person</th>
@@ -774,8 +782,14 @@
                                         class="hover:bg-blue-50 cursor-pointer transition-colors duration-150"
                                         :class="{'bg-blue-100 border-l-4 border-blue-500': selectedCustomer?.code === customer.code}"
                                     >
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ customer.name }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.code }}</td>
+                                        <template v-if="optionSortBy === 'code'">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.code }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ customer.name }}</td>
+                                        </template>
+                                        <template v-else-if="optionSortBy === 'name'">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ customer.name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.code }}</td>
+                                        </template>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.salesperson }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.ac_type }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.currency }}</td>
@@ -1546,7 +1560,11 @@ const filteredMasterCardsSeq = computed(() => masterCardSeqList.value); // Bisa 
 function selectMasterCard(mc) { selectedMasterCardSeq.value = mc; }
 function selectMasterCardAndClose() {
     if (selectedMasterCardSeq.value) {
-        form.value.mcsFrom = selectedMasterCardSeq.value.seq; // Atau mcsTo, sesuai kebutuhan
+        if (mcsInputActive.value === 'from') {
+            form.value.mcsFrom = selectedMasterCardSeq.value.seq;
+        } else {
+            form.value.mcsTo = selectedMasterCardSeq.value.seq;
+        }
     }
     showMasterCardTableModal.value = false;
 }
@@ -1578,7 +1596,11 @@ const filteredMasterCardsModel = computed(() => masterCardModelList.value); // B
 function selectMasterCardModel(mc) { selectedMasterCardModel.value = mc; }
 function selectMasterCardModelAndClose() {
     if (selectedMasterCardModel.value) {
-        form.value.mcsFrom = selectedMasterCardModel.value.seq; // Atau mcsTo, sesuai kebutuhan
+        if (mcsInputActive.value === 'from') {
+            form.value.mcsFrom = selectedMasterCardModel.value.seq;
+        } else {
+            form.value.mcsTo = selectedMasterCardModel.value.seq;
+        }
     }
     showMasterCardModelTableModal.value = false;
 }
@@ -1609,7 +1631,11 @@ const filteredMasterCardsPart = computed(() => masterCardPartList.value); // Bis
 function selectMasterCardPart(mc) { selectedMasterCardPart.value = mc; }
 function selectMasterCardPartAndClose() {
     if (selectedMasterCardPart.value) {
-        form.value.mcsFrom = selectedMasterCardPart.value.seq;
+        if (mcsInputActive.value === 'from') {
+            form.value.mcsFrom = selectedMasterCardPart.value.seq;
+        } else {
+            form.value.mcsTo = selectedMasterCardPart.value.seq;
+        }
     }
     showMasterCardPartTableModal.value = false;
 }
@@ -1641,7 +1667,11 @@ const filteredMasterCardsEd = computed(() => masterCardEdList.value);
 function selectMasterCardEd(mc) { selectedMasterCardEd.value = mc; }
 function selectMasterCardEdAndClose() {
     if (selectedMasterCardEd.value) {
-        form.value.mcsFrom = selectedMasterCardEd.value.seq;
+        if (mcsInputActive.value === 'from') {
+            form.value.mcsFrom = selectedMasterCardEd.value.seq;
+        } else {
+            form.value.mcsTo = selectedMasterCardEd.value.seq;
+        }
     }
     showMasterCardEdTableModal.value = false;
 }
@@ -1673,7 +1703,11 @@ const filteredMasterCardsId = computed(() => masterCardIdList.value);
 function selectMasterCardId(mc) { selectedMasterCardId.value = mc; }
 function selectMasterCardIdAndClose() {
     if (selectedMasterCardId.value) {
-        form.value.mcsFrom = selectedMasterCardId.value.seq;
+        if (mcsInputActive.value === 'from') {
+            form.value.mcsFrom = selectedMasterCardId.value.seq;
+        } else {
+            form.value.mcsTo = selectedMasterCardId.value.seq;
+        }
     }
     showMasterCardIdTableModal.value = false;
 }
@@ -1683,6 +1717,9 @@ watch([showMcsOptions, mcsSortBy], ([show, sortBy]) => {
         showMasterCardIdTableModal.value = true;
     }
 });
+
+// Tambahkan state untuk membedakan input MCS# mana yang sedang aktif
+const mcsInputActive = ref('from'); // 'from' atau 'to'
 
 </script>
 
