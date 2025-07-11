@@ -34,6 +34,7 @@ use App\Http\Controllers\WarehouseLocationController;
 use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\FgDoConfigController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmConfigController;
+use App\Http\Controllers\DeliveryOrderFormatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -278,4 +279,12 @@ Route::prefix('material-management/config-data')->group(function () {
     Route::get('locations', [MmLocationController::class, 'getAll']);
     Route::get('source-codes', [MmConfigController::class, 'getSourceCodes']); // Placeholder, assuming it's simple
     Route::get('gl-distributions', [MmConfigController::class, 'getGlDistributions']); // Placeholder
+});
+
+Route::prefix('delivery-order-formats')->group(function () {
+    Route::get('/', [DeliveryOrderFormatController::class, 'getFormatsJson'])->name('delivery-order-formats.index');
+    Route::post('/', [DeliveryOrderFormatController::class, 'store'])->name('delivery-order-formats.store');
+    Route::get('/{code}', [DeliveryOrderFormatController::class, 'show'])->name('delivery-order-formats.show');
+    Route::put('/{code}', [DeliveryOrderFormatController::class, 'update'])->name('delivery-order-formats.update');
+    Route::delete('/{code}', [DeliveryOrderFormatController::class, 'destroy'])->name('delivery-order-formats.destroy');
 });
