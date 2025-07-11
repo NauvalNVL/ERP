@@ -279,3 +279,15 @@ Route::prefix('material-management/config-data')->group(function () {
     Route::get('source-codes', [MmConfigController::class, 'getSourceCodes']); // Placeholder, assuming it's simple
     Route::get('gl-distributions', [MmConfigController::class, 'getGlDistributions']); // Placeholder
 });
+
+// Material Management - Category API routes
+Route::prefix('material-management/categories')->group(function () {
+    Route::get('/', [MmCategoryController::class, 'getCategories']);
+    Route::get('/for-print', [MmCategoryController::class, 'getCategoriesForPrint']);
+    Route::get('/{code}', [MmCategoryController::class, 'show']);
+    Route::post('/', [MmCategoryController::class, 'store']);
+    Route::put('/{code}', [MmCategoryController::class, 'update']);
+    Route::delete('/{code}', [MmCategoryController::class, 'destroy']);
+    Route::patch('/{code}/toggle-active', [MmCategoryController::class, 'toggleActive']);
+    Route::post('/seed', [MmCategoryController::class, 'seedSampleData']);
+});
