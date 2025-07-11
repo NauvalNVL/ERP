@@ -3,10 +3,10 @@
     <button 
       @click="toggleMenu" 
       class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
-      :class="{ 'bg-gray-700': hasActiveChild }"
+      :class="{ 'bg-gray-700': hasActiveChild, 'text-sm': !isTopLevel, 'text-base': isTopLevel }"
     >
       <div class="flex items-center">
-        <i :class="[icon, 'w-5 h-5 mr-3']"></i>
+        <i :class="[icon, 'mr-3', isTopLevel ? 'w-5 h-5' : 'w-4 h-4']"></i>
         <span>{{ title }}</span>
       </div>
       <i 
@@ -23,11 +23,12 @@
       <template v-for="(item, index) in items" :key="index">
         <!-- Item with children (nested dropdown) -->
         <div v-if="item.children" class="relative">
-          <nested-dropdown 
+          <sidebar-dropdown 
             :title="item.title" 
             :icon="item.icon" 
             :items="item.children"
-            :menu-id="menuId + '-' + index"
+            :menu-id="`${menuId}-${index}`"
+            :is-top-level="false"
           />
         </div>
         
@@ -35,10 +36,10 @@
         <Link 
           v-else-if="item.route" 
           :href="item.route" 
+          @click="handleLinkClick"
           class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
           :class="{
             'bg-blue-600 text-white font-medium': isActive(item.route),
-            'text-gray-100': isActiveParent(item.route)
           }"
         >
           <i :class="[item.icon, 'w-4 h-4 mr-3']"></i>
@@ -61,26 +62,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, watch } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import NestedDropdown from './NestedDropdown.vue';
 import sidebarStore from './sidebarStore';
-
-const page = usePage();
-const currentPath = computed(() => page.url);
-
-// Extract the base path from the URL
-const getBasePath = (path) => {
-  if (!path) return '';
-  // Normalize the path and split into segments
-  const normalizedPath = path.toLowerCase().replace(/^\/+|\/+$/g, '');
-  const parts = normalizedPath.split('/');
-  
-  // Return the first N segments for base path comparison
-  // This allows deeper paths to still match their parent routes
-  const segments = Math.min(3, parts.length);
-  return '/' + parts.slice(0, segments).join('/');
-};
 
 const props = defineProps({
   title: {
@@ -98,98 +82,70 @@ const props = defineProps({
   menuId: {
     type: String,
     default: ''
+  },
+  isTopLevel: {
+    type: Boolean,
+    default: true
   }
 });
+
+const page = usePage();
+const currentPath = computed(() => page.url.toLowerCase().replace(/\/+$/, ''));
 
 const menuId = computed(() => props.menuId || props.title.toLowerCase().replace(/\s+/g, '-'));
 
-// If this menu has an active child, we want to open it automatically
-// But we don't want to save this automatic state to localStorage
-const hasActiveChild = computed(() => {
-  // Check direct children for exact matches
-  const directActive = props.items.some(item => item.route && isActive(item.route));
-  if (directActive) return true;
-  
-  // Check direct children for parent matches (same base path)
-  const directParentActive = props.items.some(item => item.route && isActiveParent(item.route));
-  if (directParentActive) return true;
-  
-  // Check nested children
-  return props.items.some(item => {
-    if (!item.children) return false;
-    return item.children.some(child => child.route && (isActive(child.route) || isActiveParent(child.route)));
-  });
-});
-
-// Calculate if the menu should be open based on stored state or active child
-const isMenuOpen = computed(() => {
-  // Check if this menu is manually opened/closed in the store
-  const isStoreOpen = sidebarStore.isOpen(menuId.value);
-  
-  // If this menu has an active child, it should be open regardless of stored state
-  // This ensures the current page's menu hierarchy is visible
-  if (hasActiveChild.value) {
-    // Only save this state if it's not already open
-    if (!isStoreOpen) {
-      // We do this in a setTimeout to avoid modifying state during render
-      setTimeout(() => {
-        sidebarStore.setOpen(menuId.value, true);
-      }, 0);
-    }
-    return true;
-  }
-  
-  // Otherwise, respect the stored state
-  return isStoreOpen;
-});
-
-// Check if the current route matches the given route exactly
 const isActive = (route) => {
   if (!route) return false;
-  
-  // Normalize both paths for comparison (remove trailing slash, lowercase)
-  const normalizedCurrent = currentPath.value.toLowerCase().replace(/\/+$/, '');
   const normalizedRoute = route.toLowerCase().replace(/\/+$/, '');
-  
-  return normalizedCurrent === normalizedRoute;
+  return currentPath.value === normalizedRoute;
 };
 
-// For parent highlighting, check if the current path's base matches the route's base
-const isActiveParent = (route) => {
-  if (!route) return false;
-  
-  // Normalize both paths for comparison
-  const normalizedCurrent = currentPath.value.toLowerCase().replace(/\/+$/, '');
-  const normalizedRoute = route.toLowerCase().replace(/\/+$/, '');
-  
-  // Check if the current path contains the route path for deep nested routes
-  if (normalizedCurrent.includes(normalizedRoute) && normalizedCurrent !== normalizedRoute) {
-    return true;
-  }
-  
-  // Check base path matching
-  const currentBase = getBasePath(normalizedCurrent);
-  const routeBase = getBasePath(normalizedRoute);
-  return currentBase === routeBase && normalizedCurrent !== normalizedRoute;
-};
+const hasActiveChild = computed(() => {
+  const checkItems = (items) => {
+    return items.some(item => {
+      if (item.route && isActive(item.route)) {
+        return true;
+      }
+      if (item.children) {
+        return checkItems(item.children);
+      }
+      return false;
+    });
+  };
+  return checkItems(props.items);
+});
+
+const isMenuOpen = computed(() => sidebarStore.isOpen(menuId.value));
 
 const toggleMenu = () => {
   sidebarStore.toggle(menuId.value);
 };
 
-// On mount, automatically open menus that lead to the current page
-onMounted(() => {
-  if (hasActiveChild.value) {
+const handleLinkClick = () => {
+  // Close mobile sidebar when a link is clicked
+  if (window.innerWidth < 1024) {
+    sidebarStore.closeMobile();
+  }
+};
+
+// Watch for changes in active child status to auto-open the menu
+watch(hasActiveChild, (isActive) => {
+  if (isActive) {
     sidebarStore.setOpen(menuId.value, true);
   }
-});
-</script> 
+}, { immediate: true });
+</script>
+
+<script>
+// For recursive components
+export default {
+  name: 'SidebarDropdown'
+}
+</script>
 
 <style scoped>
 .dropdown-menu {
   overflow: visible;
-  max-height: none;
-  opacity: 1;
   transition: all 0.3s ease-in-out;
 }
 
@@ -201,12 +157,10 @@ onMounted(() => {
   from {
     opacity: 0;
     transform: translateY(-10px);
-    max-height: 0;
   }
   to {
     opacity: 1;
     transform: translateY(0);
-    max-height: none;
   }
 }
 </style> 

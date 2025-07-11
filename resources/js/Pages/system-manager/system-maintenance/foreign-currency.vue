@@ -32,16 +32,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label for="currency_code" class="block text-sm font-medium text-gray-700 mb-1">Currency Code <span class="text-red-500">*</span></label>
+                            <div class="flex items-center">
                             <input
                                 id="currency_code"
                                 v-model="form.currency_code"
                                 type="text"
                                 maxlength="3"
-                                class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 uppercase"
+                                    class="w-full border border-gray-300 rounded-l-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 uppercase"
                                 :class="{'border-red-500': errors.currency_code}"
                                 :disabled="isEditing"
                                 required
                             >
+                                <button @click="openIsoModal" type="button" class="px-3 py-2 bg-gray-200 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-300">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
                             <div v-if="errors.currency_code" class="text-red-500 text-xs mt-1">{{ errors.currency_code }}</div>
                             <div class="text-xs text-gray-500 mt-1">3 characters (e.g. USD, EUR, GBP)</div>
                         </div>
@@ -91,16 +96,16 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label for="exchange_method" class="block text-sm font-medium text-gray-700 mb-1">Exchange Method <span class="text-red-500">*</span></label>
-                            <select
-                                id="exchange_method"
-                                v-model="form.exchange_method"
-                                class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                :class="{'border-red-500': errors.exchange_method}"
-                                required
-                            >
-                                <option value="1">Method 1 - Standard</option>
-                                <option value="2">Method 2 - Special</option>
-                            </select>
+                            <div class="mt-2 space-y-2">
+                               <div class="flex items-center">
+                                   <input id="method_multiply" type="radio" value="1" v-model="form.exchange_method" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                   <label for="method_multiply" class="ml-3 block text-sm font-medium text-gray-700">1 - Multiply to compute Base Value</label>
+                               </div>
+                               <div class="flex items-center">
+                                   <input id="method_divide" type="radio" value="2" v-model="form.exchange_method" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                   <label for="method_divide" class="ml-3 block text-sm font-medium text-gray-700">2 - Divide to compute Base Value</label>
+                               </div>
+                            </div>
                             <div v-if="errors.exchange_method" class="text-red-500 text-xs mt-1">{{ errors.exchange_method }}</div>
                         </div>
                         <div>
@@ -339,17 +344,17 @@
     </div>
 
     <!-- Currency Modal (for lookup) -->
-    <ForeignCurrencyModal 
-        v-if="showModal"
-        @close="showModal = false"
-        @select="selectCurrency"
+    <ISOCurrencyModal 
+        :show="showIsoModal"
+        @close="showIsoModal = false"
+        @select="selectIsoCurrency"
     />
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import ForeignCurrencyModal from '@/Components/ForeignCurrencyModal.vue';
+import ISOCurrencyModal from '@/Components/ISOCurrencyModal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const currencies = ref([]);
@@ -361,7 +366,7 @@ const search = ref('');
 const sortField = ref('currency_code');
 const sortDirection = ref('asc');
 const showDeleteModal = ref(false);
-const showModal = ref(false);
+const showIsoModal = ref(false);
 
 // Initialize form with empty values
 const form = useForm({
@@ -374,6 +379,20 @@ const form = useForm({
     variance_control: '',
     max_tax_adj: ''
 });
+
+const openIsoModal = () => {
+    if (!isEditing.value) {
+        showIsoModal.value = true;
+    }
+};
+
+const selectIsoCurrency = (isoCurrency) => {
+    form.currency_code = isoCurrency.iso_code;
+    form.currency_name = isoCurrency.currency_name;
+    form.country = isoCurrency.country;
+    showIsoModal.value = false;
+};
+
 
 // Fetch currencies
 const fetchCurrencies = async () => {
@@ -537,8 +556,11 @@ const deleteCurrency = () => {
 
 // Submit form
 const submitForm = () => {
+    // Clear previous errors
+    errors.value = {};
     if (isEditing.value) {
         form.put(route('foreign-currency.update', form.id), {
+            preserveScroll: true,
             onSuccess: () => {
                 fetchCurrencies();
                 resetForm();
@@ -549,6 +571,7 @@ const submitForm = () => {
         });
     } else {
         form.post(route('foreign-currency.store'), {
+            preserveScroll: true,
             onSuccess: () => {
                 fetchCurrencies();
                 resetForm();
@@ -561,10 +584,10 @@ const submitForm = () => {
 };
 
 // Select currency from modal
-const selectCurrency = (selectedCurrencyItem) => {
+// This function seems to be for a different modal, keeping it but renaming to avoid confusion
+const selectForeignCurrency = (selectedCurrencyItem) => {
     // Use the selected currency from the modal
     console.log('Selected currency:', selectedCurrencyItem);
-    showModal.value = false;
 };
 
 onMounted(() => {

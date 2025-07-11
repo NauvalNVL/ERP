@@ -1,71 +1,57 @@
 <template>
-  <AppLayout title="Define Category">
-    <div class="bg-white shadow rounded-lg p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800">Define Category</h1>
-        <div class="flex space-x-3">
+  <AppLayout :header="'Define Category'">
+    <div class="py-6">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+          <!-- Top Action Bar -->
+          <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
           <button
-            @click="seedData"
-            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200"
+                @click="openCreateModal"
+                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            Seed Sample Data
+                <i class="fas fa-plus mr-2"></i>
+                New
           </button>
           <button
-            @click="openModal()"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
+                @click="refreshData"
+                class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            <i class="fas fa-plus mr-2"></i>Add New
+                <i class="fas fa-sync-alt mr-2"></i>
+                Refresh
           </button>
         </div>
-      </div>
-      
-      <!-- Search & Filter -->
-      <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <div class="flex items-center space-x-2">
+              <div class="relative">
           <input
-            v-model="search"
             type="text"
-            placeholder="Search by code, name or description"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  v-model="searchTerm"
+                  placeholder="Search..."
+                  class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-search text-gray-400"></i>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-          <select
-            v-model="statusFilter"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
-          <select
-            v-model="sortBy"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              <button
+                @click="seedSampleData"
+                class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            <option value="code">Code</option>
-            <option value="name">Name</option>
-            <option value="updated_at">Last Updated</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
-          <select
-            v-model="sortOrder"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                <i class="fas fa-database mr-2"></i>
+                Seed Data
+              </button>
+              <Link
+                href="/material-management/system-requirement/inventory-setup/category/view-print"
+                class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-          </select>
+                <i class="fas fa-print mr-2"></i>
+                View & Print
+              </Link>
         </div>
       </div>
       
-      <!-- Categories Table -->
-      <div class="shadow overflow-x-auto border-b border-gray-200 rounded-lg">
+          <!-- Category Table -->
+          <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
@@ -81,134 +67,63 @@
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Last Updated
-              </th>
               <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody v-if="filteredCategories.length > 0" class="bg-white divide-y divide-gray-200">
-            <tr v-for="category in paginatedCategories" :key="category.code">
-              <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-800">
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-if="loading" class="animate-pulse">
+                  <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                    Loading categories...
+                  </td>
+                </tr>
+                <tr v-else-if="filteredCategories.length === 0" class="hover:bg-gray-50">
+                  <td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                    No categories found. Click "New" to create one or "Seed Data" to generate sample data.
+                  </td>
+                </tr>
+                <tr v-for="category in filteredCategories" :key="category.code" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ category.code }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-700">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ category.name }}
               </td>
-              <td class="px-6 py-4 text-gray-700 line-clamp-2">
-                {{ category.description || '-' }}
+                  <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                    {{ category.description || 'No description' }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="[
-                  'px-2 py-1 text-xs font-semibold rounded-full', 
-                  category.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                ]">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span
+                      :class="category.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                    >
                   {{ category.is_active ? 'Active' : 'Inactive' }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-700">
-                {{ formatDate(category.updated_at) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button 
-                  @click="toggleStatus(category)" 
-                  :class="[
-                    'px-2 py-1 rounded',
-                    category.is_active ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-green-100 text-green-700 hover:bg-green-200'
-                  ]"
+                      @click="editCategory(category)"
+                      class="text-indigo-600 hover:text-indigo-900 mr-3"
                 >
-                  <span v-if="category.is_active">Deactivate</span>
-                  <span v-else>Activate</span>
+                      <i class="fas fa-edit"></i>
                 </button>
                 <button 
-                  @click="openModal(category)" 
-                  class="px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                      @click="toggleCategoryStatus(category)"
+                      :class="category.is_active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'"
                 >
-                  Edit
+                      <i :class="category.is_active ? 'fas fa-ban' : 'fas fa-check-circle'"></i>
                 </button>
-                <button 
-                  @click="confirmDelete(category)" 
-                  class="px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          </tbody>
-          <tbody v-else class="bg-white">
-            <tr>
-              <td colspan="6" class="px-6 py-4 text-center text-gray-500 italic">
-                No categories found
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-
-      <!-- Pagination -->
-      <div class="mt-6 flex justify-between items-center">
-        <p class="text-sm text-gray-700">
-          Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ filteredCategories.length }} categories
-        </p>
-        <div class="flex space-x-1">
-          <button 
-            @click="currentPage = 1" 
-            :disabled="currentPage === 1"
-            :class="[
-              'px-3 py-1 rounded',
-              currentPage === 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            ]"
-          >
-            First
-          </button>
-          <button 
-            @click="currentPage--" 
-            :disabled="currentPage === 1"
-            :class="[
-              'px-3 py-1 rounded',
-              currentPage === 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            ]"
-          >
-            Prev
-          </button>
-          <button 
-            v-for="page in displayedPages" 
-            :key="page"
-            @click="currentPage = page"
-            :class="[
-              'px-3 py-1 rounded',
-              currentPage === page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            ]"
-          >
-            {{ page }}
-          </button>
-          <button 
-            @click="currentPage++" 
-            :disabled="currentPage === totalPages"
-            :class="[
-              'px-3 py-1 rounded',
-              currentPage === totalPages ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            ]"
-          >
-            Next
-          </button>
-          <button 
-            @click="currentPage = totalPages" 
-            :disabled="currentPage === totalPages"
-            :class="[
-              'px-3 py-1 rounded',
-              currentPage === totalPages ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            ]"
-          >
-            Last
-          </button>
         </div>
       </div>
     </div>
 
-    <!-- Category Modal -->
+    <!-- Create/Edit Modal -->
     <TransitionRoot appear :show="isModalOpen" as="template">
       <Dialog as="div" @close="closeModal" class="relative z-10">
         <TransitionChild
@@ -235,136 +150,80 @@
               leave-to="opacity-0 scale-95"
             >
               <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <DialogTitle as="h3" class="text-lg font-semibold leading-6 text-gray-900 pb-2 border-b">
-                  {{ isEditing ? 'Edit Category' : 'Add New Category' }}
+                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
+                  {{ isEditing ? 'Edit Category' : 'Define New Category' }}
                 </DialogTitle>
 
-                <form @submit.prevent="saveCategory" class="mt-4 space-y-4">
+                <div class="mt-4 space-y-4">
+                  <div v-if="formErrors" class="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Error!</strong>
+                    <ul class="mt-1 list-disc list-inside">
+                      <li v-for="(error, field) in formErrors" :key="field">{{ error[0] }}</li>
+                    </ul>
+                  </div>
+
                   <div>
-                    <label for="code" class="block text-sm font-medium text-gray-700">Code <span class="text-red-600">*</span></label>
+                    <label for="code" class="block text-sm font-medium text-gray-700">Category Code:</label>
                     <input 
+                      type="text"
                       id="code" 
                       v-model="form.code" 
-                      type="text" 
-                      :readOnly="isEditing"
-                      :class="[
-                        'mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
-                        isEditing ? 'bg-gray-100 cursor-not-allowed' : '',
-                        errors.code ? 'border-red-300' : 'border-gray-300'
-                      ]"
-                      placeholder="Enter code"
+                      :disabled="isEditing"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      :class="{ 'bg-gray-100': isEditing }"
+                      placeholder="e.g., RAW, FINISH"
                       maxlength="20"
-                      required
                     />
-                    <p v-if="errors.code" class="mt-1 text-sm text-red-600">{{ errors.code[0] }}</p>
                   </div>
 
                   <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Name <span class="text-red-600">*</span></label>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Category Name:</label>
                     <input 
+                      type="text"
                       id="name" 
                       v-model="form.name" 
-                      type="text" 
-                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      :class="errors.name ? 'border-red-300' : 'border-gray-300'"
-                      placeholder="Enter name"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="e.g., RAW MATERIALS"
                       maxlength="100"
-                      required
                     />
-                    <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name[0] }}</p>
                   </div>
 
                   <div>
-                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <label for="description" class="block text-sm font-medium text-gray-700">Description:</label>
                     <textarea 
                       id="description" 
                       v-model="form.description" 
                       rows="3" 
-                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      :class="errors.description ? 'border-red-300' : 'border-gray-300'"
-                      placeholder="Enter description"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="Optional description"
                     ></textarea>
-                    <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description[0] }}</p>
                   </div>
 
-                  <div class="flex">
-                    <label class="inline-flex items-center">
-                      <input type="checkbox" v-model="form.is_active" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5" />
-                      <span class="ml-2 text-gray-700">Active</span>
-                    </label>
+                  <div class="flex items-center">
+                    <input
+                      id="is_active"
+                      type="checkbox"
+                      v-model="form.is_active"
+                      class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    />
+                    <label for="is_active" class="ml-2 block text-sm text-gray-900">Active</label>
                   </div>
-
-                  <div class="mt-6 flex justify-end space-x-3">
-                    <button 
-                      type="button" 
-                      @click="closeModal" 
-                      class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit" 
-                      class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-                    >
-                      {{ isEditing ? 'Save Changes' : 'Add Category' }}
-                    </button>
-                  </div>
-                </form>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
-
-    <!-- Delete Confirmation Modal -->
-    <TransitionRoot appear :show="isDeleteModalOpen" as="template">
-      <Dialog as="div" @close="isDeleteModalOpen = false" class="relative z-10">
-        <TransitionChild
-          as="template"
-          enter="duration-300 ease-out"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
-          leave="duration-200 ease-in"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
-        >
-          <div class="fixed inset-0 bg-black bg-opacity-25" />
-        </TransitionChild>
-
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4 text-center">
-            <TransitionChild
-              as="template"
-              enter="duration-300 ease-out"
-              enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100"
-              leave="duration-200 ease-in"
-              leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95"
-            >
-              <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <DialogTitle as="h3" class="text-lg font-semibold leading-6 text-gray-900">
-                  Confirm Delete
-                </DialogTitle>
-                <div class="mt-3">
-                  <p class="text-gray-700">
-                    Are you sure you want to delete the category <span class="font-semibold">{{ categoryToDelete?.code }} - {{ categoryToDelete?.name }}</span>? This action cannot be undone.
-                  </p>
                 </div>
+
                 <div class="mt-6 flex justify-end space-x-3">
                   <button 
                     type="button" 
-                    @click="isDeleteModalOpen = false" 
-                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                    @click="closeModal"
+                    class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   >
                     Cancel
                   </button>
                   <button 
-                    @click="deleteCategory" 
-                    class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                    type="button"
+                    @click="saveCategory"
+                    class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   >
-                    Delete
+                    {{ isEditing ? 'Update' : 'Save' }}
                   </button>
                 </div>
               </DialogPanel>
@@ -374,36 +233,53 @@
       </Dialog>
     </TransitionRoot>
 
-    <ToastContainer />
+    <!-- Toast Notification -->
+    <div
+      v-if="toast.show"
+      class="fixed bottom-4 right-4 z-50 flex items-center p-4 mb-4 w-full max-w-xs rounded-lg shadow"
+      :class="toast.type === 'success' ? 'text-green-800 bg-green-50' : 'text-red-800 bg-red-50'"
+      role="alert"
+    >
+      <div class="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 rounded-lg" 
+        :class="toast.type === 'success' ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'">
+        <i :class="toast.type === 'success' ? 'fas fa-check' : 'fas fa-exclamation'"></i>
+      </div>
+      <div class="ml-3 text-sm font-normal">{{ toast.message }}</div>
+      <button
+        @click="toast.show = false"
+        type="button"
+        class="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 inline-flex h-8 w-8"
+        :class="toast.type === 'success' ? 'text-green-500 hover:bg-green-200 focus:ring-green-400' : 'text-red-500 hover:bg-red-200 focus:ring-red-400'"
+      >
+        <span class="sr-only">Close</span>
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
   </AppLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { ref, computed, onMounted } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import ToastContainer from '@/Components/ToastContainer.vue';
-import { useToast } from '@/Composables/useToast.js';
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import axios from 'axios';
 
-// Toast notifications
-const { showToast } = useToast();
-
-// Data
+// State
 const categories = ref([]);
-const search = ref('');
-const statusFilter = ref('all');
-const sortBy = ref('code');
-const sortOrder = ref('asc');
-const currentPage = ref(1);
-const perPage = ref(10);
-const isLoading = ref(true);
+const loading = ref(true);
+const searchTerm = ref('');
 const isModalOpen = ref(false);
 const isEditing = ref(false);
-const isDeleteModalOpen = ref(false);
-const categoryToDelete = ref(null);
-const errors = ref({});
+const formErrors = ref(null);
+const toast = ref({
+  show: false,
+  message: '',
+  type: 'success',
+  timeout: null
+});
 
-// Form
+// Form state
 const form = ref({
   code: '',
   name: '',
@@ -411,124 +287,49 @@ const form = ref({
   is_active: true
 });
 
-// Fetch categories
-const fetchCategories = async () => {
-  isLoading.value = true;
-  try {
-    const response = await fetch('/api/material-management/categories');
-    const data = await response.json();
-    categories.value = data;
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    showToast('Failed to load categories', 'error');
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-// Filtered categories based on search and status
+// Computed properties
 const filteredCategories = computed(() => {
-  let filtered = [...categories.value];
-
-  // Apply search filter
-  if (search.value) {
-    const searchLower = search.value.toLowerCase();
-    filtered = filtered.filter(category => 
-      (category.code && category.code.toLowerCase().includes(searchLower)) ||
-      (category.name && category.name.toLowerCase().includes(searchLower)) ||
-      (category.description && category.description.toLowerCase().includes(searchLower))
-    );
-  }
-
-  // Apply status filter
-  if (statusFilter.value !== 'all') {
-    filtered = filtered.filter(category => 
-      statusFilter.value === 'active' ? category.is_active : !category.is_active
-    );
-  }
-
-  // Apply sorting
-  filtered.sort((a, b) => {
-    let comparison = 0;
-    const fieldA = a[sortBy.value];
-    const fieldB = b[sortBy.value];
-
-    if (fieldA < fieldB) {
-      comparison = -1;
-    } else if (fieldA > fieldB) {
-      comparison = 1;
-    }
-
-    return sortOrder.value === 'desc' ? comparison * -1 : comparison;
-  });
-
-  return filtered;
-});
-
-// Pagination
-const totalPages = computed(() => 
-  Math.max(1, Math.ceil(filteredCategories.value.length / perPage.value))
-);
-
-const startIndex = computed(() => (currentPage.value - 1) * perPage.value);
-
-const endIndex = computed(() => {
-  const end = startIndex.value + perPage.value;
-  return end > filteredCategories.value.length ? filteredCategories.value.length : end;
-});
-
-const paginatedCategories = computed(() => 
-  filteredCategories.value.slice(startIndex.value, endIndex.value)
-);
-
-const displayedPages = computed(() => {
-  const total = totalPages.value;
-  const current = currentPage.value;
-  const pages = [];
-
-  if (total <= 7) {
-    // Less than 7 pages, show all
-    for (let i = 1; i <= total; i++) {
-      pages.push(i);
-    }
-  } else {
-    // More than 7 pages, show current page, 2 before and 2 after if possible
-    pages.push(1); // Always show first page
-    
-    if (current <= 3) {
-      // Near start
-      pages.push(2, 3, 4, '...', total);
-    } else if (current >= total - 2) {
-      // Near end
-      pages.push('...', total - 3, total - 2, total - 1, total);
-    } else {
-      // Middle
-      pages.push('...', current - 1, current, current + 1, '...', total);
-    }
-  }
+  if (!searchTerm.value) return categories.value;
   
-  return pages;
+  const term = searchTerm.value.toLowerCase();
+  return categories.value.filter(category => 
+    category.code.toLowerCase().includes(term) || 
+    category.name.toLowerCase().includes(term) || 
+    (category.description && category.description.toLowerCase().includes(term))
+  );
 });
 
-// Format date
-const formatDate = (dateString) => {
-  if (!dateString) return '-';
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date);
+// Methods
+const fetchCategories = async () => {
+  loading.value = true;
+  try {
+    const response = await axios.get('/api/material-management/categories');
+    categories.value = response.data;
+  } catch (error) {
+    showToast('Failed to load categories', 'error');
+    console.error('Error fetching categories:', error);
+  } finally {
+    loading.value = false;
+  }
 };
 
-// Modal functions
-const openModal = (category = null) => {
-  resetForm();
-  errors.value = {};
-  
-  if (category) {
+const refreshData = () => {
+  fetchCategories();
+};
+
+const openCreateModal = () => {
+  isEditing.value = false;
+  form.value = {
+    code: '',
+    name: '',
+    description: '',
+    is_active: true
+  };
+  formErrors.value = null;
+  isModalOpen.value = true;
+};
+
+const editCategory = (category) => {
     isEditing.value = true;
     form.value = {
       code: category.code,
@@ -536,145 +337,76 @@ const openModal = (category = null) => {
       description: category.description || '',
       is_active: category.is_active
     };
-  } else {
-    isEditing.value = false;
-  }
-  
+  formErrors.value = null;
   isModalOpen.value = true;
 };
 
 const closeModal = () => {
   isModalOpen.value = false;
-  nextTick(() => {
-    resetForm();
-    errors.value = {};
-  });
 };
 
-const resetForm = () => {
-  form.value = {
-    code: '',
-    name: '',
-    description: '',
-    is_active: true
+const saveCategory = async () => {
+  formErrors.value = null;
+  
+  try {
+    if (isEditing.value) {
+      await axios.put(`/api/material-management/categories/${form.value.code}`, form.value);
+      showToast('Category updated successfully', 'success');
+    } else {
+      await axios.post('/api/material-management/categories', form.value);
+      showToast('Category created successfully', 'success');
+    }
+
+    closeModal();
+    fetchCategories();
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.errors) {
+      formErrors.value = error.response.data.errors;
+    } else {
+      showToast(isEditing.value ? 'Failed to update category' : 'Failed to create category', 'error');
+    console.error('Error saving category:', error);
+    }
+  }
+};
+
+const toggleCategoryStatus = async (category) => {
+  try {
+    await axios.patch(`/api/material-management/categories/${category.code}/toggle-active`);
+    showToast(`Category ${category.is_active ? 'deactivated' : 'activated'} successfully`, 'success');
+    fetchCategories();
+  } catch (error) {
+    showToast('Failed to update category status', 'error');
+    console.error('Error toggling category status:', error);
+  }
+};
+
+const seedSampleData = async () => {
+  try {
+    await axios.post('/api/material-management/categories/seed');
+    showToast('Sample categories seeded successfully', 'success');
+    fetchCategories();
+  } catch (error) {
+    showToast('Failed to seed sample data', 'error');
+    console.error('Error seeding data:', error);
+      }
+};
+
+const showToast = (message, type = 'success') => {
+  if (toast.value.timeout) {
+    clearTimeout(toast.value.timeout);
+  }
+  
+  toast.value = {
+    show: true,
+    message,
+    type,
+    timeout: setTimeout(() => {
+      toast.value.show = false;
+    }, 3000)
   };
 };
 
-// Save category (create or update)
-const saveCategory = async () => {
-  const url = `/api/material-management/categories${isEditing.value ? `/${form.value.code}` : ''}`;
-  const method = isEditing.value ? 'PUT' : 'POST';
-
-  try {
-    const response = await fetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      },
-      body: JSON.stringify(form.value)
-    });
-
-    if (response.status === 422) {
-      const data = await response.json();
-      errors.value = data.errors;
-      return;
-    }
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    await fetchCategories();
-    closeModal();
-    showToast(isEditing.value ? 'Category updated successfully' : 'Category created successfully', 'success');
-  } catch (error) {
-    console.error('Error saving category:', error);
-    showToast(isEditing.value ? 'Failed to update category' : 'Failed to create category', 'error');
-  }
-};
-
-// Toggle status
-const toggleStatus = async (category) => {
-  try {
-    const response = await fetch(`/api/material-management/categories/${category.code}/toggle-active`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    await fetchCategories();
-    showToast(`Category ${category.is_active ? 'deactivated' : 'activated'} successfully`, 'success');
-  } catch (error) {
-    console.error('Error toggling status:', error);
-    showToast('Failed to update category status', 'error');
-  }
-};
-
-// Delete category
-const confirmDelete = (category) => {
-  categoryToDelete.value = category;
-  isDeleteModalOpen.value = true;
-};
-
-const deleteCategory = async () => {
-  if (!categoryToDelete.value) return;
-  
-  try {
-    const response = await fetch(`/api/material-management/categories/${categoryToDelete.value.code}`, {
-      method: 'DELETE',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    await fetchCategories();
-    isDeleteModalOpen.value = false;
-    showToast('Category deleted successfully', 'success');
-  } catch (error) {
-    console.error('Error deleting category:', error);
-    showToast('Failed to delete category', 'error');
-  }
-};
-
-// Seed sample data
-const seedData = async () => {
-  try {
-    const response = await fetch('/api/material-management/categories/seed', {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    await fetchCategories();
-    showToast('Sample categories loaded successfully', 'success');
-  } catch (error) {
-    console.error('Error seeding data:', error);
-    showToast('Failed to load sample data', 'error');
-  }
-};
-
-// Watch for changes that should reset pagination
-watch([search, statusFilter, sortBy, sortOrder], () => {
-  currentPage.value = 1;
-});
-
-// Initial fetch
+// Lifecycle hooks
 onMounted(() => {
   fetchCategories();
 });

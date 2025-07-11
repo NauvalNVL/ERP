@@ -34,6 +34,8 @@ use App\Http\Controllers\WarehouseLocationController;
 use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\FgDoConfigController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmConfigController;
+use App\Http\Controllers\ISOCurrencyController;
+use App\Http\Controllers\ForeignCurrencyController;
 use App\Http\Controllers\DeliveryOrderFormatController;
 
 /*
@@ -46,6 +48,9 @@ use App\Http\Controllers\DeliveryOrderFormatController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::get('/foreign-currencies', [ForeignCurrencyController::class, 'apiIndex']);
+Route::get('/iso-currencies', [ISOCurrencyController::class, 'apiIndex']);
 
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
 Route::get('/products', [ProductController::class, 'getProductsJson']);
@@ -279,6 +284,18 @@ Route::prefix('material-management/config-data')->group(function () {
     Route::get('locations', [MmLocationController::class, 'getAll']);
     Route::get('source-codes', [MmConfigController::class, 'getSourceCodes']); // Placeholder, assuming it's simple
     Route::get('gl-distributions', [MmConfigController::class, 'getGlDistributions']); // Placeholder
+});
+
+// Material Management - Category API routes
+Route::prefix('material-management/categories')->group(function () {
+    Route::get('/', [MmCategoryController::class, 'getCategories']);
+    Route::get('/for-print', [MmCategoryController::class, 'getCategoriesForPrint']);
+    Route::get('/{code}', [MmCategoryController::class, 'show']);
+    Route::post('/', [MmCategoryController::class, 'store']);
+    Route::put('/{code}', [MmCategoryController::class, 'update']);
+    Route::delete('/{code}', [MmCategoryController::class, 'destroy']);
+    Route::patch('/{code}/toggle-active', [MmCategoryController::class, 'toggleActive']);
+    Route::post('/seed', [MmCategoryController::class, 'seedSampleData']);
 });
 
 Route::prefix('delivery-order-formats')->group(function () {

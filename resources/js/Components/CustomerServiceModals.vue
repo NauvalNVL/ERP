@@ -1271,7 +1271,14 @@
 </template>
 
 <script setup>
-import { ref, defineExpose } from 'vue';
+import { ref } from 'vue';
+import {
+    Dialog,
+    DialogPanel,
+    DialogTitle,
+    TransitionChild,
+    TransitionRoot,
+} from '@headlessui/vue'
 import axios from 'axios'; // Import axios
 
 const showInitialSalesOrderModal = ref(false); // For the first "Search by Sales Order" modal
