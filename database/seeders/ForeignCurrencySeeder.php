@@ -14,40 +14,51 @@ class ForeignCurrencySeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear the table first
-        DB::table('foreign_currencies')->delete();
+        // Clear the table first to avoid duplicate entries
+        // It's better to use truncate if we want to reset the primary key
+        DB::table('foreign_currencies')->truncate();
 
-        // Insert sample data
-        ForeignCurrency::create([
-            'currency_code' => 'CNY',
-            'country' => 'CHINA',
-            'currency_name' => 'China Yuan',
-            'exchange_rate' => 1961.475000,
-            'exchange_method' => 1, // Multiply
-            'variance_control' => 100.00,
-            'max_tax_adj' => 0.00,
-        ]);
+        $currencies = [
+            [
+                'currency_code' => 'EUR',
+                'country' => 'EROPA',
+                'currency_name' => 'Euro',
+                'exchange_rate' => 16252.000000,
+                'exchange_method' => 1,
+                'variance_control' => 100.00,
+                'max_tax_adj' => 0.00,
+            ],
+            [
+                'currency_code' => 'IDR',
+                'country' => 'INDONESIA',
+                'currency_name' => 'Rupiah',
+                'exchange_rate' => 1.000000,
+                'exchange_method' => 1,
+                'variance_control' => 100.00,
+                'max_tax_adj' => 0.00,
+            ],
+            [
+                'currency_code' => 'USD',
+                'country' => 'UNITED STATES',
+                'currency_name' => 'US Dollar',
+                'exchange_rate' => 14880.000000,
+                'exchange_method' => 1,
+                'variance_control' => 100.00,
+                'max_tax_adj' => 0.00,
+            ],
+            [
+                'currency_code' => 'CNY',
+                'country' => 'CHINA',
+                'currency_name' => 'China Yuan',
+                'exchange_rate' => 1961.475000,
+                'exchange_method' => 1,
+                'variance_control' => 100.00,
+                'max_tax_adj' => 0.00,
+            ],
+        ];
 
-        ForeignCurrency::create([
-            'currency_code' => 'USD',
-            'country' => 'USA',
-            'currency_name' => 'US Dollar',
-            'exchange_rate' => 14500.000000, // Example Rate
-            'exchange_method' => 1, // Multiply
-            'variance_control' => 5.00, // Example Variance
-            'max_tax_adj' => 0.00,
-        ]);
-        
-        ForeignCurrency::create([
-            'currency_code' => 'EUR',
-            'country' => 'EUROPE',
-            'currency_name' => 'Euro',
-            'exchange_rate' => 16000.000000, // Example Rate
-            'exchange_method' => 1, // Multiply
-            'variance_control' => 5.00, // Example Variance
-            'max_tax_adj' => 0.00,
-        ]);
-
-        // Add more currencies as needed
+        foreach ($currencies as $currency) {
+            ForeignCurrency::create($currency);
+        }
     }
 }

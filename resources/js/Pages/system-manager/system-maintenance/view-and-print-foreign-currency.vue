@@ -145,11 +145,9 @@
                     <i class="fas fa-info-circle mr-2"></i> Print Instructions
                 </h3>
                 <ul class="list-disc list-inside text-sm text-blue-700 ml-4 space-y-1">
-                    <li>Click the "Print Currency List" button above or use your browser's print function</li>
-                    <li>The printout will only include the table and header, not the navigation or buttons</li>
-                    <li>For best results, set paper orientation to landscape if printing many columns</li>
-                    <li>You can use the search box to filter results before printing</li>
-                    <li>Sorting will be preserved in the printed output</li>
+                    <li>Click the "Print Currency List" button to generate a PDF of the currency list.</li>
+                    <li>You can use the search box to filter results before printing.</li>
+                    <li>The generated PDF will respect the current sorting of the table.</li>
                 </ul>
             </div>
         </div>
@@ -160,6 +158,8 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const currencies = ref([]);
@@ -291,118 +291,48 @@ const fetchCurrencies = async () => {
     }
 };
 
-// Print function
+// Print function using jsPDF
 const printCurrencies = () => {
-    const printWindow = window.open('', '_blank');
-    
-    if (!printWindow) {
-        alert('Please allow pop-ups to print the currency list.');
-        return;
-    }
-    
-    const printContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Foreign Currencies - ${new Date().toLocaleDateString()}</title>
-            <meta charset="utf-8">
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 0;
-                    padding: 20px;
-                    font-size: 9pt;
-                }
-                h1 {
-                    font-size: 16pt;
-                    margin-bottom: 10px;
-                    color: #2563eb;
-                }
-                .timestamp {
-                    font-size: 8pt;
-                    color: #6b7280;
-                    margin-bottom: 15px;
-                }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    table-layout: fixed;
-                }
-                th, td {
-                    border: 1px solid #e5e7eb;
-                    padding: 6px;
-                    text-align: left;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    word-wrap: break-word;
-                }
-                th {
-                    background-color: #f3f4f6;
-                    font-weight: bold;
-                    font-size: 8pt;
-                    text-transform: uppercase;
-                }
-                tr:nth-child(even) {
-                    background-color: #f9fafb;
-                }
-                .footer {
-                    margin-top: 10px;
-                    font-size: 8pt;
-                    color: #6b7280;
-                    text-align: center;
-                }
-            </style>
-        </head>
-        <body onload="window.print()">
-            <h1>Foreign Currencies Report</h1>
-            <div class="timestamp">Generated on: ${new Date().toLocaleString()}</div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Currency Name</th>
-                        <th>Country</th>
-                        <th>Exchange Rate</th>
-                        <th>Method</th>
-                        <th>Variance Control</th>
-                        <th>Max Tax Adj</th>
-                        <th>Created At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${filteredCurrencies.value.map(currency => `
-                        <tr>
-                            <td>${currency.currency_code || 'N/A'}</td>
-                            <td>${currency.currency_name || 'N/A'}</td>
-                            <td>${currency.country || 'N/A'}</td>
-                            <td>${formatNumber(currency.exchange_rate)}</td>
-                            <td>${currency.exchange_method == 1 ? 'Method 1' : 'Method 2'}</td>
-                            <td>${formatNumber(currency.variance_control)}%</td>
-                            <td>${formatNumber(currency.max_tax_adj)}</td>
-                            <td>${formatDate(currency.created_at)}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="8" style="text-align: right">
-                            Total Currencies: ${filteredCurrencies.value.length}
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-            
-            <div class="footer">
-                <p>ERP System - Foreign Currencies Report</p>
-            </div>
-        </body>
-        </html>
-    `;
-    
-    printWindow.document.open();
-    printWindow.document.write(printContent);
-    printWindow.document.close();
+    const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: 'a4'
+    });
+
+    doc.setFontSize(18);
+    doc.text("Foreign Currencies Report", doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${currentDateTime.value}`, doc.internal.pageSize.getWidth() - 40, 45, { align: 'right' });
+
+    const head = [['Code', 'Currency Name', 'Country', 'Exchange Rate', 'Method', 'Variance Control', 'Max Tax Adj', 'Created At']];
+    const body = filteredCurrencies.value.map(c => [
+        c.currency_code,
+        c.currency_name,
+        c.country,
+        formatNumber(c.exchange_rate),
+        c.exchange_method == 1 ? 'Multiply' : 'Divide',
+        `${formatNumber(c.variance_control)}%`,
+        formatNumber(c.max_tax_adj),
+        formatDate(c.created_at)
+    ]);
+
+    autoTable(doc, {
+        head: head,
+        body: body,
+        startY: 55,
+        theme: 'grid',
+        headStyles: {
+            fillColor: [23, 79, 153], // Dark blue
+            textColor: 255,
+            fontSize: 8,
+        },
+        styles: {
+            fontSize: 8,
+            cellPadding: 2,
+        },
+    });
+
+    doc.save('foreign-currencies.pdf');
 };
 
 onMounted(() => {
@@ -421,24 +351,5 @@ onMounted(() => {
 </script>
 
 <style>
-@media print {
-    body * {
-        visibility: hidden;
-    }
-    
-    #currenciesTable, #currenciesTable * {
-        visibility: visible;
-    }
-    
-    #currenciesTable {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-    }
-    
-    .print\:hidden {
-        display: none !important;
-    }
-}
+/* No longer needed with jsPDF */
 </style> 

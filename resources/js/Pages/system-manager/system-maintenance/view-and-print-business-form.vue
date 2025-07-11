@@ -156,10 +156,8 @@
                         <i class="fas fa-info-circle mr-2"></i> Print Instructions
                     </h3>
                     <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                        <li>Click the "Print List" button above to print this business form list</li>
-                        <li>Use landscape orientation for better results</li>
-                        <li>You can search or filter data before printing to narrow down results</li>
-                        <li>Only the table will be included in the print output</li>
+                        <li>Click the "Print List" button above to generate and download a PDF of the business form list.</li>
+                        <li>You can search or filter data before printing to narrow down the results in the PDF.</li>
                     </ul>
                 </div>
             </div>
@@ -171,6 +169,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const businessForms = ref([]);
 const loading = ref(true);
@@ -304,28 +304,66 @@ const filteredForms = computed(() => {
     return filtered;
 });
 
-// Print function
+// Print function using jsPDF
 const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+    const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: 'a4'
+    });
 
-    newWin.document.write('<html><head><title>Print Business Forms</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('@page { size: landscape; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 4px; text-align: left; font-size: 9pt; }');
-    newWin.document.write('th { background-color: #f2f2f2; font-weight: bold; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
+    const title = "BUSINESS FORM LIST";
+    const generatedDate = `Generated: ${currentDate}`;
     
-    newWin.document.close();
+    // Set title
+    doc.setFontSize(18);
+    doc.text(title, doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+    
+    // Set subtitle/date
+    doc.setFontSize(10);
+    doc.text(generatedDate, doc.internal.pageSize.getWidth() - 40, 45, { align: 'right' });
+
+    // Define table columns
+    const columns = [
+        { header: 'Form Code', dataKey: 'bf_code' },
+        { header: 'Form Name', dataKey: 'bf_name' },
+        { header: 'Group', dataKey: 'bf_group' },
+        { header: 'ISO Reference', dataKey: 'bf_iso' },
+        { header: 'Checked By', dataKey: 'check_by_name' },
+        { header: 'Approved By', dataKey: 'approve_by_name' },
+    ];
+
+    // Map data to table rows
+    const rows = filteredForms.value.map(form => ({
+        bf_code: form.bf_code || 'N/A',
+        bf_name: form.bf_name || 'N/A',
+        bf_group: form.bf_group || 'N/A',
+        bf_iso: form.bf_iso || 'N/A',
+        check_by_name: form.check_by_name || 'N/A',
+        approve_by_name: form.approve_by_name || 'N/A',
+    }));
+
+    autoTable(doc, {
+        columns,
+        body: rows,
+        startY: 55,
+        theme: 'grid',
+        headStyles: {
+            fillColor: [23, 79, 153], // Dark blue
+            textColor: 255,
+            fontSize: 8,
+        },
+        styles: {
+            fontSize: 8,
+            cellPadding: 2,
+        },
+        columnStyles: {
+            bf_name: { cellWidth: 100 },
+        }
+    });
+
+    // Save the PDF
+    doc.save('business-form-list.pdf');
 };
 
 // Fetch data on component mount
@@ -335,18 +373,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-@media print {
-    body * {
-        visibility: hidden;
-    }
-    #printableTable, #printableTable * {
-        visibility: visible;
-    }
-    #printableTable {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-    }
-}
 </style> 
