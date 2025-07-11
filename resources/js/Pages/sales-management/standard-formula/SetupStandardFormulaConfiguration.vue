@@ -78,8 +78,8 @@
                     <span class="ml-2 text-gray-700">No</span>
                   </label>
                 </div>
-                <div v-if="errors.activateStandardFormula" class="text-red-500 text-sm mt-1">
-                  {{ errors.activateStandardFormula }}
+                <div v-if="formErrors.activateStandardFormula" class="text-red-500 text-sm mt-1">
+                  {{ formErrors.activateStandardFormula }}
                 </div>
               </div>
               
@@ -106,8 +106,8 @@
                         <span class="ml-2 text-gray-700">By Highest Corrugate Out</span>
                       </label>
                     </div>
-                    <div v-if="errors.economicRunSize" class="text-red-500 text-sm mt-1">
-                      {{ errors.economicRunSize }}
+                    <div v-if="formErrors.economicRunSize" class="text-red-500 text-sm mt-1">
+                      {{ formErrors.economicRunSize }}
                     </div>
                   </div>
                   
@@ -117,8 +117,8 @@
                       <input type="checkbox" id="check_run_size" v-model="form.checkRunSizeResult" class="form-checkbox h-5 w-5 text-blue-600 rounded">
                       <span class="ml-2 text-gray-700">Checking on Corrugate Run Size Result</span>
                     </label>
-                    <div v-if="errors.checkRunSizeResult" class="text-red-500 text-sm mt-1">
-                      {{ errors.checkRunSizeResult }}
+                    <div v-if="formErrors.checkRunSizeResult" class="text-red-500 text-sm mt-1">
+                      {{ formErrors.checkRunSizeResult }}
                     </div>
                   </div>
                 </div>
@@ -145,8 +145,8 @@
                     <span class="ml-2 text-gray-700">Accept the best only</span>
                   </label>
                 </div>
-                <div v-if="errors.masterCard" class="text-red-500 text-sm mt-1">
-                  {{ errors.masterCard }}
+                <div v-if="formErrors.masterCard" class="text-red-500 text-sm mt-1">
+                  {{ formErrors.masterCard }}
                 </div>
               </div>
               
@@ -168,8 +168,8 @@
                     <span class="ml-2 text-gray-700">Accept the best only</span>
                   </label>
                 </div>
-                <div v-if="errors.salesOrder" class="text-red-500 text-sm mt-1">
-                  {{ errors.salesOrder }}
+                <div v-if="formErrors.salesOrder" class="text-red-500 text-sm mt-1">
+                  {{ formErrors.salesOrder }}
                 </div>
               </div>
               
@@ -191,8 +191,8 @@
                     <span class="ml-2 text-gray-700">Accept the best only</span>
                   </label>
                 </div>
-                <div v-if="errors.workOrder" class="text-red-500 text-sm mt-1">
-                  {{ errors.workOrder }}
+                <div v-if="formErrors.workOrder" class="text-red-500 text-sm mt-1">
+                  {{ formErrors.workOrder }}
                 </div>
               </div>
             </div>
@@ -243,10 +243,6 @@ export default {
   },
   props: {
     configuration: Object,
-    errors: {
-      type: Object,
-      default: () => ({})
-    }
   },
   data() {
     return {
@@ -262,7 +258,7 @@ export default {
         salesOrder: this.configuration?.salesOrder || 'free',
         workOrder: this.configuration?.workOrder || 'free'
       },
-      errors: {}
+      formErrors: {}
     };
   },
   mounted() {
@@ -281,7 +277,7 @@ export default {
     },
     saveConfiguration() {
       this.processing = true;
-      this.errors = {};
+      this.formErrors = {};
       this.successMessage = '';
       this.errorMessage = '';
       
@@ -298,7 +294,7 @@ export default {
         .catch(error => {
           this.processing = false;
           if (error.response && error.response.data && error.response.data.errors) {
-            this.errors = error.response.data.errors;
+            this.formErrors = error.response.data.errors;
           } else {
             console.error('Error saving configuration:', error);
             this.errorMessage = 'Failed to save configuration. Please try again.';
@@ -307,7 +303,7 @@ export default {
     },
     resetForm() {
       this.loadConfiguration();
-      this.errors = {};
+      this.formErrors = {};
       this.successMessage = '';
       this.errorMessage = '';
     },

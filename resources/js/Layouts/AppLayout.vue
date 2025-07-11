@@ -1,57 +1,67 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <!-- Mobile menu button -->
-    <div class="lg:hidden fixed top-0 left-0 z-20 p-4">
-      <button @click="toggleSidebar" class="text-gray-500 hover:text-gray-600 transition-transform duration-300 hover:scale-110">
-        <i class="fas fa-bars text-xl"></i>
-      </button>
+  <div class="h-screen flex overflow-hidden bg-gray-100">
+    <!-- Sidebar -->
+    <div
+      :class="{ 'translate-x-0': sidebarStore.mobileOpen, '-translate-x-full': !sidebarStore.mobileOpen && !isDesktop }"
+      class="fixed inset-y-0 left-0 z-30 w-3/4 sm:w-64 transform transition-transform duration-300 ease-in-out shadow-lg lg:relative lg:translate-x-0 lg:flex-shrink-0 lg:h-screen">
+      <Sidebar />
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 min-w-0 flex flex-col overflow-hidden">
+      <!-- Top Navigation -->
+      <nav class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-between h-16">
+            <div class="flex items-center min-w-0">
+              <button
+                @click="toggleSidebar"
+                class="p-2 -ml-2 mr-2 text-gray-500 rounded-full lg:hidden hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-all duration-300"
+                :class="{ 'rotate-90': sidebarStore.mobileOpen }"
+              >
+                <span class="sr-only">{{ sidebarStore.mobileOpen ? 'Close sidebar' : 'Open sidebar' }}</span>
+                <i class="fas text-xl" :class="sidebarStore.mobileOpen ? 'fa-times' : 'fa-bars'"></i>
+              </button>
+              <h1 class="text-xl font-semibold text-gray-800 truncate">
+                {{ header }}
+              </h1>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Page Content -->
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto" @click="closeSidebarOnMobile">
+          <slot></slot>
+      </main>
     </div>
 
     <!-- Mobile sidebar backdrop -->
-    <div v-show="sidebarStore.mobileOpen" 
-      class="fixed inset-0 z-10 bg-black bg-opacity-50 lg:hidden backdrop-blur-sm transition-opacity duration-300"
+    <div v-show="sidebarStore.mobileOpen"
+      class="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden backdrop-blur-sm transition-opacity duration-300"
       :class="{'opacity-100': sidebarStore.mobileOpen, 'opacity-0': !sidebarStore.mobileOpen}"
-      @click="toggleSidebar"></div>
+      @click="closeSidebar"></div>
 
-    <div class="flex min-h-screen">
-      <!-- Sidebar -->
-      <div :class="{'translate-x-0': sidebarStore.mobileOpen || isDesktop, '-translate-x-full': !sidebarStore.mobileOpen && !isDesktop}"
-        class="fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out bg-gray-800 overflow-y-auto lg:sticky lg:top-0 lg:translate-x-0 h-screen hide-scrollbar shadow-lg">
-        <Sidebar />
-      </div>
+    <!-- Fixed Mobile Close Button -->
+    <button
+      v-if="!isDesktop && sidebarStore.mobileOpen"
+      @click="closeSidebar"
+      class="fixed bottom-4 right-4 z-50 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-200 lg:hidden"
+      aria-label="Close sidebar"
+    >
+      <i class="fas fa-times text-xl"></i>
+    </button>
 
-      <!-- Main Content -->
-      <div class="flex-1 min-w-0 flex flex-col">
-        <!-- Top Navigation -->
-        <div class="bg-white shadow-sm sticky top-0 z-10 slide-in-down">
-          <div class="px-4 py-4 flex items-center">
-            <button @click="toggleSidebar" class="mr-4 text-gray-500 lg:hidden hover:text-gray-700 transition-transform duration-300 hover:scale-110">
-              <i class="fas fa-bars text-xl"></i>
-            </button>
-            <h2 class="text-xl font-semibold">
-              {{ header }}
-            </h2>
-          </div>
-        </div>
-
-        <!-- Page Content -->
-        <div v-page-transition class="flex-grow">
-          <slot></slot>
-        </div>
-      </div>
-    </div>
     <ToastContainer />
   </div>
 </template>
-
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import Sidebar from './Partials/Sidebar.vue';
 import sidebarStore from './Partials/sidebarStore';
 import ToastContainer from '@/Components/ToastContainer.vue';
 
-const props = defineProps({
+defineProps({
   header: {
     type: String,
     default: 'Dashboard'
@@ -59,47 +69,41 @@ const props = defineProps({
 });
 
 const isDesktop = ref(window.innerWidth >= 1024);
-const page = usePage();
-const currentPath = computed(() => page.url);
 
 const toggleSidebar = () => {
   sidebarStore.toggleMobile();
 };
 
+const closeSidebar = () => {
+  sidebarStore.closeMobile();
+};
+
+const closeSidebarOnMobile = () => {
+  if (!isDesktop.value && sidebarStore.mobileOpen) {
+    sidebarStore.closeMobile();
+  }
+};
+
 const handleResize = () => {
   isDesktop.value = window.innerWidth >= 1024;
+  if (isDesktop.value) {
+    sidebarStore.mobileOpen = false;
+  }
 };
+
+watch(() => window.location.pathname, () => {
+  if (!isDesktop.value) {
+    sidebarStore.closeMobile();
+  }
+});
 
 onMounted(() => {
   window.addEventListener('resize', handleResize);
-  
-  // Add entrance animation to the main content
-  const mainContent = document.querySelector('.flex-1');
-  if (mainContent) {
-    mainContent.classList.add('fade-in');
-  }
-  
-  // Auto-open parent menus based on current route
-  const currentRouteUrl = window.location.pathname.toLowerCase();
-  
-  // Handle common deep nested paths
-  if (currentRouteUrl.includes('/sales-management')) {
-    // Ensure Sales Management menu is open
-    sidebarStore.toggle('sales-management');
-    
-    if (currentRouteUrl.includes('/system-requirement')) {
-    // Ensure System Requirement submenu is open
-    sidebarStore.toggle('system-requirement');
-    
-      // Check specific submenus
-      if (currentRouteUrl.includes('/master-card')) {
-    // Ensure Master Card submenu is open
-    sidebarStore.toggle('master-card');
-      } else if (currentRouteUrl.includes('/customer-account')) {
-        sidebarStore.toggle('customer-account');
-      }
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !isDesktop.value && sidebarStore.mobileOpen) {
+      sidebarStore.closeMobile();
     }
-  }
+  });
 });
 
 onUnmounted(() => {
@@ -108,46 +112,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-@media (min-width: 1024px) {
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-}
-
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  #flutesTable,
-  #flutesTable * {
-    visibility: visible;
-  }
-  #flutesTable {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-  }
-}
-
-/* Transition effects */
 .backdrop-blur-sm {
   backdrop-filter: blur(4px);
-}
-
-/* Sidebar animation */
-.sidebar-enter-active,
-.sidebar-leave-active {
-  transition: transform 0.3s ease-in-out;
-}
-
-.sidebar-enter-from,
-.sidebar-leave-to {
-  transform: translateX(-100%);
 }
 </style>

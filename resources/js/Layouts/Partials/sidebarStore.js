@@ -1,72 +1,95 @@
-import { ref, reactive } from 'vue';
+import { reactive, watch } from 'vue';
 
-// Load saved state from localStorage if available
-const loadSavedState = () => {
-  if (typeof window === 'undefined') return {};
-  
+const STATE_KEY = 'sidebarState';
+
+// Load state from localStorage, handling migration from old format
+const loadState = () => {
+  const defaultState = { openMenus: {}, mobileOpen: false };
   try {
-    const savedState = localStorage.getItem('sidebarState');
-    return savedState ? JSON.parse(savedState) : {};
+    const savedStateJSON = localStorage.getItem(STATE_KEY);
+    if (savedStateJSON) {
+      const savedState = JSON.parse(savedStateJSON);
+      
+      // Check for new structure: { openMenus: {}, mobileOpen: boolean }
+      if (savedState && typeof savedState.openMenus === 'object' && savedState.openMenus !== null) {
+        return {
+          openMenus: savedState.openMenus,
+          mobileOpen: savedState.mobileOpen || false,
+        };
+      }
+      
+      // Check for old structure (flat object) and migrate it
+      if (savedState && typeof savedState === 'object' && savedState.openMenus === undefined) {
+        console.warn('Migrating old sidebar state to new format.');
+        return {
+          openMenus: savedState,
+          mobileOpen: false, // mobileOpen was not persisted in old format
+        };
+      }
+    }
   } catch (e) {
-    console.error('Error loading sidebar state from localStorage', e);
-    return {};
+    console.error("Failed to parse or migrate sidebar state from localStorage", e);
+    // If migration fails, clear the invalid state
+    localStorage.removeItem(STATE_KEY);
   }
-};
-
-// Initialize with saved state
-const state = reactive(loadSavedState());
-
-// Mobile sidebar state should always start as false (don't persist this)
-const mobileOpen = ref(false);
-
-const isOpen = (id) => {
-  return state[id] === true;
-};
-
-const toggle = (id) => {
-  state[id] = !isOpen(id);
-  // Save state to localStorage
-  saveState();
-};
-
-const saveState = () => {
-  if (typeof window === 'undefined') return;
   
-  try {
-    localStorage.setItem('sidebarState', JSON.stringify(state));
-  } catch (e) {
-    console.error('Error saving sidebar state to localStorage', e);
+  // Return default state if nothing is saved, parsing fails, or migration fails
+  return defaultState;
+};
+
+const store = reactive({
+  ...loadState(),
+
+  isOpen(menuId) {
+    return !!this.openMenus[menuId];
+  },
+  
+  setOpen(menuId, isOpen) {
+    this.openMenus[menuId] = isOpen;
+  },
+
+  toggle(menuId) {
+    this.openMenus[menuId] = !this.openMenus[menuId];
+  },
+  
+  toggleMobile() {
+    this.mobileOpen = !this.mobileOpen;
+  },
+
+  closeMobile() {
+    this.mobileOpen = false;
+  },
+
+  resetState() {
+    this.openMenus = {};
+    this.mobileOpen = false;
   }
-};
+});
 
-const toggleMobile = () => {
-  mobileOpen.value = !mobileOpen.value;
-};
+// Watch for changes to openMenus and save to localStorage
+watch(() => store.openMenus, (newOpenMenus) => {
+  try {
+    const stateToSave = {
+      openMenus: newOpenMenus,
+      mobileOpen: store.mobileOpen
+    };
+    localStorage.setItem(STATE_KEY, JSON.stringify(stateToSave));
+  } catch (e) {
+    console.error("Failed to save sidebar state to localStorage", e);
+  }
+}, { deep: true });
 
-// Set open state for a specific menu
-const setOpen = (id, isOpen) => {
-  state[id] = isOpen;
-  saveState();
-};
+// Watch for changes to mobileOpen and save to localStorage
+watch(() => store.mobileOpen, (newMobileOpen) => {
+  try {
+    const stateToSave = {
+      openMenus: store.openMenus,
+      mobileOpen: newMobileOpen
+    };
+    localStorage.setItem(STATE_KEY, JSON.stringify(stateToSave));
+  } catch (e) {
+    console.error("Failed to save sidebar mobile state to localStorage", e);
+  }
+});
 
-// Reset all menus to closed state
-const resetState = () => {
-  Object.keys(state).forEach(key => {
-    state[key] = false;
-  });
-  saveState();
-};
-
-// Create singleton instance of the store
-const sidebarStore = {
-  state,
-  mobileOpen,
-  isOpen,
-  toggle,
-  toggleMobile,
-  setOpen,
-  resetState,
-  saveState
-};
-
-export default sidebarStore; 
+export default store; 
