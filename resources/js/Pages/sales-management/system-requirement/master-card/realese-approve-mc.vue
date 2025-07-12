@@ -645,6 +645,56 @@
             </div>
         </div>
 
+        <!-- Options Modal from Customer Account -->
+        <transition name="fade">
+            <div v-if="showOptionsFromCustomer" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto relative animate-fade-in-up">
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-t-xl px-6 py-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex items-center justify-center w-10 h-10 bg-white/20 rounded-full"><i class="fas fa-filter text-white text-2xl"></i></span>
+                            <span class="text-white text-xl font-bold">Options</span>
+                        </div>
+                        <button @click="showOptionsFromCustomer = false" class="text-white text-2xl hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center"><i class="fas fa-times"></i></button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="p-6 space-y-6">
+                        <div class="border rounded-xl p-4 bg-gray-50">
+                            <div class="flex items-center gap-2 mb-2"><i class="fas fa-sort text-indigo-500"></i><span class="font-semibold text-lg">Sort by:</span></div>
+                            <div class="flex flex-col gap-2 mt-2">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="optionSortBy" value="code" class="accent-indigo-500 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">Customer Code</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="optionSortBy" value="name" class="accent-indigo-500 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">Customer Name</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="border rounded-xl p-4 bg-gray-50">
+                            <div class="flex items-center gap-2 mb-2"><i class="fas fa-tag text-blue-500"></i><span class="font-semibold text-lg">Record Status:</span></div>
+                            <div class="flex items-center gap-6 mt-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" v-model="optionStatus" value="active" class="accent-blue-500 h-5 w-5" />
+                                    <span class="text-blue-800 font-medium">Active</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" v-model="optionStatus" value="obsolete" class="accent-blue-500 h-5 w-5" />
+                                    <span class="text-blue-800 font-medium">Obsolete</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal Footer -->
+                    <div class="flex justify-center gap-4 px-6 pb-6">
+                        <button @click="applyOptionsFromCustomer" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold px-8 py-2 rounded-lg shadow hover:from-blue-600 hover:to-purple-600 flex items-center gap-2"><i class="fas fa-check"></i> OK</button>
+                        <button @click="showOptionsFromCustomer = false" class="bg-gray-200 text-gray-700 font-bold px-8 py-2 rounded-lg shadow flex items-center gap-2"><i class="fas fa-times"></i> Exit</button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
         <!-- Modal MCS Options -->
         <transition name="fade">
             <div v-if="showMcsOptions" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
@@ -713,7 +763,7 @@
                     </div>
                     <!-- Modal Footer -->
                     <div class="flex justify-center gap-4 px-6 pb-6">
-                        <button @click="applyMcsOptions" class="bg-blue-600 text-white font-bold px-8 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2"><i class="fas fa-check"></i> OK</button>
+                        <button @click="applyMcsOptions(true)" class="bg-blue-600 text-white font-bold px-8 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2"><i class="fas fa-check"></i> OK</button>
                         <button @click="showMcsOptions = false" class="bg-gray-200 text-gray-700 font-bold px-8 py-2 rounded-lg shadow flex items-center gap-2"><i class="fas fa-times"></i> Exit</button>
                     </div>
                 </div>
@@ -818,7 +868,7 @@
 
                     <!-- Modal Footer Buttons -->
                     <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
-                        <button class="modern-button bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600">
+                        <button @click="showMoreOptionsFromCustomer" class="modern-button bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600">
                             <i class="fas fa-cogs mr-2"></i> More Options
                         </button>
                         <button class="modern-button bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
@@ -892,7 +942,7 @@
                     </div>
                     <!-- Modal Footer Buttons -->
                     <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
-                        <button class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
+                        <button @click="showMoreOptionsFromMcsTable('seq')" class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
                             <i class="fas fa-cogs mr-2"></i> More Options
                         </button>
                         <button class="modern-button bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
@@ -966,7 +1016,7 @@
                     </div>
                     <!-- Modal Footer Buttons -->
                     <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
-                        <button class="modern-button bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600">
+                        <button @click="showMoreOptionsFromMcsTable('model')" class="modern-button bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600">
                             <i class="fas fa-cogs mr-2"></i> More Options
                         </button>
                         <button class="modern-button bg-gradient-to-r from-cyan-500 to-blue-400 hover:from-cyan-600 hover:to-blue-500">
@@ -1054,7 +1104,7 @@
                     </div>
                     <!-- Modal Footer Buttons -->
                     <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
-                        <button class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
+                        <button @click="showMoreOptionsFromMcsTable('part')" class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
                             <i class="fas fa-cogs mr-2"></i> More Options
                         </button>
                         <button class="modern-button bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
@@ -1126,7 +1176,7 @@
                     </div>
                     <!-- Modal Footer Buttons -->
                     <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
-                        <button class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
+                        <button @click="showMoreOptionsFromMcsTable('ed')" class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
                             <i class="fas fa-cogs mr-2"></i> More Options
                         </button>
                         <button class="modern-button bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
@@ -1198,7 +1248,7 @@
                     </div>
                     <!-- Modal Footer Buttons -->
                     <div class="flex justify-center gap-4 px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-200 rounded-b-xl border-t border-gray-300 shadow-inner">
-                        <button class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
+                        <button @click="showMoreOptionsFromMcsTable('id')" class="modern-button bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
                             <i class="fas fa-cogs mr-2"></i> More Options
                         </button>
                         <button class="modern-button bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
@@ -1210,6 +1260,81 @@
                         <button @click="showMasterCardIdTableModal = false" class="modern-button bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600">
                             <i class="fas fa-times mr-2"></i> Exit
                         </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- Master Card Options Modal -->
+        <transition name="fade">
+            <div v-if="showMasterCardOptionsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto relative animate-fade-in-up">
+                    <!-- Modal Header -->
+                    <div class="bg-gradient-to-r from-green-500 to-teal-500 rounded-t-xl px-6 py-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex items-center justify-center w-10 h-10 bg-white/20 rounded-full"><i class="fas fa-filter text-white text-2xl"></i></span>
+                            <span class="text-white text-xl font-bold">Options</span>
+                        </div>
+                        <button @click="showMasterCardOptionsModal = false" class="text-white text-2xl hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center"><i class="fas fa-times"></i></button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="p-6 space-y-6">
+                        <div class="border rounded-xl p-4 bg-gray-50">
+                            <div class="flex items-center gap-2 mb-2"><i class="fas fa-sort text-blue-500"></i><span class="font-semibold text-lg">Sort by:</span></div>
+                            <div class="flex flex-col gap-2 mt-2">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="mcsOptionSortBy" value="seq" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">MC Seq#</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="mcsOptionSortBy" value="model" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">MC Model</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="mcsOptionSortBy" value="part" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">MC PD Part#</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="mcsOptionSortBy" value="ed" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">MC PD ED</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" v-model="mcsOptionSortBy" value="id" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 text-base">MC PD ID</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="border rounded-xl p-4 bg-gray-50">
+                            <div class="flex items-center gap-2 mb-2"><i class="fas fa-arrow-up text-blue-500"></i><span class="font-semibold text-lg">Sort Order:</span></div>
+                            <div class="flex items-center gap-6 mt-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" v-model="mcsOptionSortOrder" value="asc" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 font-medium">Ascending</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" v-model="mcsOptionSortOrder" value="desc" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-gray-700 font-medium">Descending</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="border rounded-xl p-4 bg-gray-50">
+                            <div class="flex items-center gap-2 mb-2"><i class="fas fa-tag text-blue-500"></i><span class="font-semibold text-lg">MC Status:</span></div>
+                            <div class="flex items-center gap-6 mt-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" v-model="mcsOptionStatus" value="active" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-blue-800 font-medium">Active</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" v-model="mcsOptionStatus" value="obsolete" class="accent-blue-600 h-5 w-5" />
+                                    <span class="text-blue-800 font-medium">Obsolete</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal Footer -->
+                    <div class="flex justify-center gap-4 px-6 pb-6">
+                        <button @click="applyOptionsFromMcsTable" class="bg-blue-600 text-white font-bold px-8 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2"><i class="fas fa-check"></i> OK</button>
+                        <button @click="showMasterCardOptionsModal = false" class="bg-gray-200 text-gray-700 font-bold px-8 py-2 rounded-lg shadow flex items-center gap-2"><i class="fas fa-times"></i> Exit</button>
                     </div>
                 </div>
             </div>
@@ -1248,6 +1373,7 @@ onMounted(async () => {
 const sortBy = ref('seq');
 const releaseStatus = ref(['active']);
 const showOptions = ref(false);
+const showOptionsFromCustomer = ref(false); // New state variable for options from customer modal
 const showReleaseModal = ref(false);
 const showUnreleaseModal = ref(false);
 const releaseNotes = ref('');
@@ -1259,6 +1385,11 @@ const form = ref({
 const loading = ref(false);
 const error = ref(null);
 const showCustomerAccountModal = ref(false); // New state for customer account modal
+const showMasterCardOptionsModal = ref(false); // New state for Master Card Options modal
+const mcsOptionSortBy = ref('seq');
+const mcsOptionSortOrder = ref('asc');
+const mcsOptionStatus = ref(['active', 'obsolete']);
+const currentMcsModalType = ref(''); // To store which MC modal called the options
 
 // Notification system
 const notification = ref({
@@ -1484,9 +1615,22 @@ const showMcsOptions = ref(false);
 const mcsSortBy = ref('seq');
 const mcsSortOrder = ref('asc');
 const mcsStatus = ref(['active']);
-function applyMcsOptions() {
-    // Terapkan filter/sort sesuai pilihan modal
+function applyMcsOptions(fromOK = false) {
     showMcsOptions.value = false;
+    if (fromOK) {
+        // Jika dari tombol OK, baru buka modal data sesuai sort by
+        if (mcsSortBy.value === 'seq') {
+            showMasterCardTableModal.value = true;
+        } else if (mcsSortBy.value === 'model') {
+            showMasterCardModelTableModal.value = true;
+        } else if (mcsSortBy.value === 'part') {
+            showMasterCardPartTableModal.value = true;
+        } else if (mcsSortBy.value === 'ed') {
+            showMasterCardEdTableModal.value = true;
+        } else if (mcsSortBy.value === 'id') {
+            showMasterCardIdTableModal.value = true;
+        }
+    }
 }
 
 const customerSearchTerm = ref(''); // New ref for customer search
@@ -1541,6 +1685,18 @@ const selectCustomerAndClose = () => {
     showCustomerAccountModal.value = false;
 };
 
+// Function to handle "More Options" button click in customer account modal
+const showMoreOptionsFromCustomer = () => {
+    showCustomerAccountModal.value = false; // Close customer account modal
+    showOptionsFromCustomer.value = true; // Open options modal
+};
+
+// Function to apply options from customer modal
+const applyOptionsFromCustomer = () => {
+    showOptionsFromCustomer.value = false;
+    showCustomerAccountModal.value = true; // Reopen customer account modal with new options applied
+};
+
 // Data MC Seq# (dummy) diisi sesuai gambar
 const masterCardSeqList = ref([
     { seq: '1609138', model: 'BOX BASO 4.5 KG', status: 'Act' },
@@ -1568,12 +1724,7 @@ function selectMasterCardAndClose() {
     }
     showMasterCardTableModal.value = false;
 }
-// Tampilkan modal hanya jika sort by MC Seq# pada MCS#
-watch([showMcsOptions, mcsSortBy], ([show, sortBy]) => {
-    if (!show && sortBy === 'seq') {
-        showMasterCardTableModal.value = true;
-    }
-});
+// Removed watcher that automatically opens MC Seq# modal
 
 // Data MC Model (dummy) diisi sesuai gambar
 const masterCardModelList = ref([
@@ -1604,12 +1755,7 @@ function selectMasterCardModelAndClose() {
     }
     showMasterCardModelTableModal.value = false;
 }
-// Tampilkan modal hanya jika sort by MC Model pada MCS#
-watch([showMcsOptions, mcsSortBy], ([show, sortBy]) => {
-    if (!show && sortBy === 'model') {
-        showMasterCardModelTableModal.value = true;
-    }
-});
+// Removed watcher that automatically opens MC Model modal
 
 // Data MC PD Part# (dummy, sesuai screenshot)
 const masterCardPartList = ref([
@@ -1639,12 +1785,7 @@ function selectMasterCardPartAndClose() {
     }
     showMasterCardPartTableModal.value = false;
 }
-// Tampilkan modal hanya jika sort by MC PD Part# pada MCS#
-watch([showMcsOptions, mcsSortBy], ([show, sortBy]) => {
-    if (!show && sortBy === 'part') {
-        showMasterCardPartTableModal.value = true;
-    }
-});
+// Removed watcher that automatically opens MC PD Part# modal
 
 // Data MC PD ED (dummy, sesuai screenshot)
 const masterCardEdList = ref([
@@ -1675,12 +1816,7 @@ function selectMasterCardEdAndClose() {
     }
     showMasterCardEdTableModal.value = false;
 }
-// Tampilkan modal hanya jika sort by MC PD ED pada MCS#
-watch([showMcsOptions, mcsSortBy], ([show, sortBy]) => {
-    if (!show && sortBy === 'ed') {
-        showMasterCardEdTableModal.value = true;
-    }
-});
+// Removed watcher that automatically opens MC PD ED modal
 
 // Data MC PD ID (dummy, sesuai screenshot)
 const masterCardIdList = ref([
@@ -1711,15 +1847,42 @@ function selectMasterCardIdAndClose() {
     }
     showMasterCardIdTableModal.value = false;
 }
-// Tampilkan modal hanya jika sort by MC PD ID pada MCS#
-watch([showMcsOptions, mcsSortBy], ([show, sortBy]) => {
-    if (!show && sortBy === 'id') {
-        showMasterCardIdTableModal.value = true;
-    }
-});
+// Removed watcher that automatically opens MC PD ID modal
 
 // Tambahkan state untuk membedakan input MCS# mana yang sedang aktif
 const mcsInputActive = ref('from'); // 'from' atau 'to'
+
+// New function to open Master Card Options modal
+const showMoreOptionsFromMcsTable = (modalType) => {
+    currentMcsModalType.value = modalType;
+    // Close all current MC table modals
+    showMasterCardTableModal.value = false;
+    showMasterCardModelTableModal.value = false;
+    showMasterCardPartTableModal.value = false;
+    showMasterCardEdTableModal.value = false;
+    showMasterCardIdTableModal.value = false;
+    // Open the new options modal
+    showMasterCardOptionsModal.value = true;
+};
+
+// New function to apply options from Master Card Options modal and re-open previous modal
+const applyOptionsFromMcsTable = () => {
+    showMasterCardOptionsModal.value = false;
+    // Here you would apply the sorting and status filters to your data
+    // For now, let's just re-open the correct modal
+    if (currentMcsModalType.value === 'seq') {
+        showMasterCardTableModal.value = true;
+    } else if (currentMcsModalType.value === 'model') {
+        showMasterCardModelTableModal.value = true;
+    } else if (currentMcsModalType.value === 'part') {
+        showMasterCardPartTableModal.value = true;
+    } else if (currentMcsModalType.value === 'ed') {
+        showMasterCardEdTableModal.value = true;
+    } else if (currentMcsModalType.value === 'id') {
+        showMasterCardIdTableModal.value = true;
+    }
+    // You might also want to trigger a data fetch or re-filter here
+};
 
 </script>
 
