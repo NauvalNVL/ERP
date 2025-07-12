@@ -182,9 +182,200 @@
             :title="lookup.title"
             :items="lookup.items"
             :headers="lookup.headers"
+            :headerClass="lookup.headerClass"
+            :headerIconClass="lookup.headerIconClass"
+            :headerIconBgClass="lookup.headerIconBgClass"
+            :filterTag="lookup.filterTag"
+            :showMoreOptionsButton="lookup.showMoreOptionsButton"
+            :showZoomButton="lookup.showZoomButton"
             @close="lookup.show = false"
             @select="handleLookupSelection"
+            @moreOptions="handleCustomerMoreOptions"
+            @zoom="handleCustomerZoom"
         />
+
+        <!-- Customer Account Options Modal -->
+        <div v-if="showCustomerAccountOptionsModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+            <!-- Modal backdrop -->
+            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showCustomerAccountOptionsModal = false"></div>
+            
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow-xl w-96 mx-auto max-w-lg z-10 transform transition-all">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-t-lg relative overflow-hidden">
+                    <div class="absolute -top-8 -left-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                    <div class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                    
+                    <h3 class="text-xl font-semibold flex items-center relative z-10">
+                        <span class="inline-flex items-center justify-center w-8 h-8 bg-white bg-opacity-20 rounded-full mr-3 shadow-inner">
+                            <i class="fas fa-filter text-white"></i>
+                        </span>
+                        Options
+                    </h3>
+                    <button type="button" @click="showCustomerAccountOptionsModal = false" 
+                        class="text-white hover:text-gray-200 focus:outline-none transition-transform hover:scale-110 relative z-10 bg-red-500 bg-opacity-30 hover:bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 space-y-6">
+                    <!-- Sort By Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-sort mr-2 text-blue-500"></i>Sort by:
+                        </h4>
+                        <div class="space-y-2 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="customerOptionSortBy" value="customer_code" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">Customer Code</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="customerOptionSortBy" value="customer_name" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">Customer Name</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Record Status Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-tag mr-2 text-blue-500"></i>Record Status:
+                        </h4>
+                        <div class="flex items-center space-x-6 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="checkbox" v-model="customerOptionRecordStatus.active" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                                <span class="ml-2 text-gray-700">Active</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="checkbox" v-model="customerOptionRecordStatus.obsolete" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                                <span class="ml-2 text-gray-700">Obsolete</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-center space-x-4 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+                    <button 
+                        @click="applyCustomerOptions" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                        <i class="fas fa-check mr-2"></i>OK
+                    </button>
+                    <button 
+                        @click="showCustomerAccountOptionsModal = false" 
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
+                    >
+                        <i class="fas fa-times mr-2"></i>Exit
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCS Options Modal -->
+        <div v-if="showMcsOptionsModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+            <!-- Modal backdrop -->
+            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showMcsOptionsModal = false"></div>
+            
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow-xl w-96 mx-auto max-w-lg z-10 transform transition-all">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-t-lg relative overflow-hidden">
+                    <div class="absolute -top-8 -left-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                    <div class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                    
+                    <h3 class="text-xl font-semibold flex items-center relative z-10">
+                        <span class="inline-flex items-center justify-center w-8 h-8 bg-white bg-opacity-20 rounded-full mr-3 shadow-inner">
+                            <i class="fas fa-filter text-white"></i>
+                        </span>
+                        Options
+                    </h3>
+                    <button type="button" @click="showMcsOptionsModal = false" 
+                        class="text-white hover:text-gray-200 focus:outline-none transition-transform hover:scale-110 relative z-10 bg-red-500 bg-opacity-30 hover:bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 space-y-6">
+                    <!-- Sort By Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-sort mr-2 text-blue-500"></i>Sort by:
+                        </h4>
+                        <div class="space-y-2 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsOptionSortBy" value="mc_seq" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">MC Seq#</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsOptionSortBy" value="mc_model" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">MC Model</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsOptionSortBy" value="pd_part_no" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">MC PD Part#</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsOptionSortBy" value="pd_ed" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">MC PD ED</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsOptionSortBy" value="pd_id" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">MC PD ID</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Sort Order Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-sort-amount-up mr-2 text-blue-500"></i>Sort Order:
+                        </h4>
+                        <div class="space-y-2 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsOptionSortOrder" value="Ascending" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">Ascending</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="mcsOptionSortOrder" value="Descending" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">Descending</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Record Status Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-tag mr-2 text-blue-500"></i>Record Status:
+                        </h4>
+                        <div class="flex items-center space-x-6 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="checkbox" v-model="mcsOptionStatus.active" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                                <span class="ml-2 text-gray-700">Active</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="checkbox" v-model="mcsOptionStatus.obsolete" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                                <span class="ml-2 text-gray-700">Obsolete</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-center space-x-4 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+                    <button 
+                        @click="applyMcsOptions" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                        <i class="fas fa-check mr-2"></i>OK
+                    </button>
+                    <button 
+                        @click="showMcsOptionsModal = false" 
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
+                    >
+                        <i class="fas fa-times mr-2"></i>Exit
+                    </button>
+                </div>
+            </div>
+        </div>
     </AppLayout>
 </template>
 
@@ -192,7 +383,7 @@
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useToast } from '@/Composables/useToast';
-import LookupModal from '@/components/obsolete-reactive-modal.vue';
+import LookupModal from '@/Components/obsolete-reactive-modal.vue';
 import axios from 'axios';
 
 const { showToast } = useToast();
@@ -206,6 +397,14 @@ const form = ref({
     reason: ''
 });
 
+// New state variables for Customer Account Options Modal
+const showCustomerAccountOptionsModal = ref(false);
+const customerOptionSortBy = ref('customer_code'); // Default sort by Customer Code
+const customerOptionRecordStatus = ref({
+    active: true,
+    obsolete: true
+});
+
 // --- Lookup Modal State and Data ---
 const lookup = ref({
     show: false,
@@ -217,54 +416,195 @@ const lookup = ref({
 
 // Dummy data for lookups
 const customers = ref([
-    { id: 1, customer_code: 'CUST-001', customer_name: 'PT. Maju Jaya' },
-    { id: 2, customer_code: 'CUST-002', customer_name: 'CV. Abadi Selalu' },
-    { id: 3, customer_code: 'CUST-003', customer_name: 'Toko Kelontong Berkah' },
+    { id: 1, customer_code: '000211-08', customer_name: 'ABDULLAH, BPK', salesperson: 'S111', acType: 'Local', currency: 'IDR', status: 'Active' },
+    { id: 2, customer_code: '000680-06', customer_name: 'ACEP SUNANDAR, BPK', salesperson: 'S140', acType: 'Local', currency: 'IDR', status: 'Active' },
+    { id: 3, customer_code: '000585-01', customer_name: 'ACHMAD JAMAL', salesperson: 'S102', acType: 'Local', currency: 'IDR', status: 'Active' },
+    { id: 4, customer_code: '000283', customer_name: 'ACOSTA SUPER FOOD, PT', salesperson: 'S143', acType: 'Local', currency: 'IDR', status: 'Active' },
+    { id: 5, customer_code: '000903', customer_name: 'ADHITYA SERAYAKORITA, PT', salesperson: 'S103', acType: 'Local', currency: 'IDR', status: 'Active' },
+    { id: 6, customer_code: '000212-08', customer_name: 'BAMBANG, BPK', salesperson: 'S112', acType: 'Export', currency: 'USD', status: 'Obsolete' },
+    { id: 7, customer_code: '000681-06', customer_name: 'BUDI, BPK', salesperson: 'S141', acType: 'Local', currency: 'IDR', status: 'Active' },
+    { id: 8, customer_code: '000586-01', customer_name: 'CITRA, IBU', salesperson: 'S103', acType: 'Local', currency: 'IDR', status: 'Active' },
+    { id: 9, customer_code: '000284', customer_name: 'DEDI, BPK', salesperson: 'S144', acType: 'Export', currency: 'USD', status: 'Active' },
+    { id: 10, customer_code: '000904', customer_name: 'EKA, IBU', salesperson: 'S104', acType: 'Local', currency: 'IDR', status: 'Obsolete' },
 ]);
 const products = ref([
-    { id: 1, product_code: 'PROD-A1', description: 'Box Karton Standar' },
-    { id: 2, product_code: 'PROD-B2', description: 'Box Pizza' },
-    { id: 3, product_code: 'PROD-C3', description: 'Tray Telur' },
+    { id: 1, product_code: '001', description: 'BOX', group: 'B', category: '1' },
+    { id: 2, product_code: '002', description: 'SHEET BOARD', group: 'S', category: '5' },
+    { id: 3, product_code: '003', description: 'BUTT ROLL', group: 'R', category: '3' },
+    { id: 4, product_code: '004', description: 'PENJUALAN WASTE', group: 'OT', category: 'X' },
+    { id: 5, product_code: '005', description: 'PENJUALAN LAIN LAIN PCS', group: 'OT', category: 'X' },
+    { id: 6, product_code: '006', description: 'CONEST', group: 'R', category: '3' },
+    { id: 7, product_code: '007', description: 'ROLL', group: 'R', category: '3' },
+    { id: 8, product_code: '008', description: 'PENDAPATAN LAIN LAIN', group: 'OT', category: 'X' },
+    { id: 9, product_code: '009', description: 'PENJUALAN LAIN LAIN KG', group: 'OT', category: '3' },
+    { id: 10, product_code: '010', description: 'SINGLE FACER ROLL', group: 'S', category: '2' },
+    { id: 11, product_code: '011', description: 'SINGLE FACER KG', group: 'S', category: '3' },
+    { id: 12, product_code: '012', description: 'SINGLE FACER SHEET', group: 'S', category: '4' },
+    { id: 13, product_code: '013', description: 'PENDAPATAN LAIN - LAIN', group: 'OT', category: 'X' },
+    { id: 14, product_code: '014', description: 'SEWA TRUCK', group: 'OT', category: 'X' },
+    { id: 15, product_code: '015', description: 'CORE PLUG', group: 'OT', category: 'X' },
+    { id: 16, product_code: '016', description: 'PAPER TUBE', group: 'OT', category: 'X' },
+    { id: 17, product_code: '017', description: 'OFFSET', group: 'OF', category: '1' },
+    { id: 18, product_code: '018', description: 'CETAK OFFSET', group: 'OF', category: '1' },
+    { id: 19, product_code: '019', description: 'DIGITAL PRINT', group: 'OF', category: '1' },
+    { id: 20, product_code: '500', description: 'SEWA TRUCK TRAILER', group: 'OT', category: 'X' },
 ]);
 const masterCards = ref([
-    { id: 1, mc_seq: 'MC-2023-001' },
-    { id: 2, mc_seq: 'MC-2023-002' },
-    { id: 3, mc_seq: 'MC-2023-003' },
-    { id: 4, mc_seq: 'MC-2023-004' },
+    { id: 1, mc_seq: 'MC-2023-001', mc_model: 'Model-A', pd_part_no: 'PD-P001', pd_ed: 'PD-E001', pd_id: 'PD-I001', status: 'Active' },
+    { id: 2, mc_seq: 'MC-2023-002', mc_model: 'Model-B', pd_part_no: 'PD-P002', pd_ed: 'PD-E002', pd_id: 'PD-I002', status: 'Active' },
+    { id: 3, mc_seq: 'MC-2023-003', mc_model: 'Model-C', pd_part_no: 'PD-P003', pd_ed: 'PD-E003', pd_id: 'PD-I003', status: 'Obsolete' },
+    { id: 4, mc_seq: 'MC-2023-004', mc_model: 'Model-D', pd_part_no: 'PD-P004', pd_ed: 'PD-E004', pd_id: 'PD-I004', status: 'Active' },
 ]);
+
+// New state variables for MCS Options Modal
+const showMcsOptionsModal = ref(false);
+const mcsOptionSortBy = ref('mc_seq');
+const mcsOptionSortOrder = ref('Ascending');
+const mcsOptionStatus = ref({
+    active: true,
+    obsolete: true
+});
+const currentMcsLookupType = ref(''); // 'mcs_from' or 'mcs_to'
 
 // Functions to open different lookups
 const openCustomerLookup = () => {
+    showCustomerAccountOptionsModal.value = true; // Open options modal first
+};
+
+const applyCustomerOptions = () => {
+    let filteredCustomers = customers.value.filter(customer => {
+        const isActive = customerOptionRecordStatus.value.active && customer.status === 'Active';
+        const isObsolete = customerOptionRecordStatus.value.obsolete && customer.status === 'Obsolete';
+        return isActive || isObsolete;
+    });
+
+    filteredCustomers.sort((a, b) => {
+        if (customerOptionSortBy.value === 'customer_code') {
+            return a.customer_code.localeCompare(b.customer_code);
+        } else {
+            return a.customer_name.localeCompare(b.customer_name);
+        }
+    });
+
+    showCustomerAccountOptionsModal.value = false; // Close options modal
+
     lookup.value = {
         show: true,
-        title: 'Customer Account',
-        items: customers.value,
+        title: 'Customer Account Table',
+        items: filteredCustomers,
         headers: [
             { key: 'customer_code', label: 'Customer Code' },
             { key: 'customer_name', label: 'Customer Name' },
+            { key: 'salesperson', label: 'S/Person' },
+            { key: 'acType', label: 'AC Type' },
+            { key: 'currency', label: 'Currency' },
+            { key: 'status', label: 'Status' },
         ],
-        type: 'customer'
+        type: 'customer',
+        headerClass: 'bg-gradient-to-r from-purple-600 to-indigo-600',
+        headerIconClass: 'fas fa-th',
+        headerIconBgClass: 'bg-white bg-opacity-20',
+        filterTag: customerOptionRecordStatus.value.active && !customerOptionRecordStatus.value.obsolete ? 'Active Records Only' : '',
+        showMoreOptionsButton: true,
+        showZoomButton: true
     };
+};
+
+const handleCustomerMoreOptions = () => {
+    showCustomerAccountOptionsModal.value = true; // Re-open the options modal
+    lookup.value.show = false; // Close the lookup modal
+};
+
+const handleCustomerZoom = () => {
+    // Implement zoom logic if needed
+    showToast('Zoom functionality for Customer Account is not yet implemented.', 'info');
 };
 const openProductLookup = () => {
     lookup.value = {
         show: true,
-        title: 'Product Code',
+        title: 'Product Table',
         items: products.value,
         headers: [
-            { key: 'product_code', label: 'Product Code' },
+            { key: 'product_code', label: 'Code' },
             { key: 'description', label: 'Description' },
+            { key: 'group', label: 'Group#' },
+            { key: 'category', label: 'Category' },
         ],
         type: 'product'
     };
 };
 const openMcsLookup = (target) => {
+    currentMcsLookupType.value = target;
+    showMcsOptionsModal.value = true; // Open MCS options modal first
+};
+
+const applyMcsOptions = () => {
+    let filteredMcs = masterCards.value.filter(mc => {
+        const isActive = mcsOptionStatus.value.active && mc.status === 'Active';
+        const isObsolete = mcsOptionStatus.value.obsolete && mc.status === 'Obsolete';
+        return isActive || isObsolete;
+    });
+
+    filteredMcs.sort((a, b) => {
+        let compareA, compareB;
+
+        switch (mcsOptionSortBy.value) {
+            case 'mc_seq':
+                compareA = a.mc_seq;
+                compareB = b.mc_seq;
+                break;
+            case 'mc_model':
+                compareA = a.mc_model;
+                compareB = b.mc_model;
+                break;
+            case 'pd_part_no':
+                compareA = a.pd_part_no;
+                compareB = b.pd_part_no;
+                break;
+            case 'pd_ed':
+                compareA = a.pd_ed;
+                compareB = b.pd_ed;
+                break;
+            case 'pd_id':
+                compareA = a.pd_id;
+                compareB = b.pd_id;
+                break;
+        }
+
+        if (mcsOptionSortOrder.value === 'Ascending') {
+            return String(compareA).localeCompare(String(compareB));
+        } else {
+            return String(compareB).localeCompare(String(compareA));
+        }
+    });
+
+    showMcsOptionsModal.value = false; // Close MCS options modal
+
+    let headers = [];
+    switch (mcsOptionSortBy.value) {
+        case 'mc_seq':
+            headers = [{ key: 'mc_seq', label: 'MC Seq#' }];
+            break;
+        case 'mc_model':
+            headers = [{ key: 'mc_model', label: 'MC Model' }];
+            break;
+        case 'pd_part_no':
+            headers = [{ key: 'pd_part_no', label: 'MC PD Part#' }];
+            break;
+        case 'pd_ed':
+            headers = [{ key: 'pd_ed', label: 'MC PD ED' }];
+            break;
+        case 'pd_id':
+            headers = [{ key: 'pd_id', label: 'MC PD ID' }];
+            break;
+    }
+
     lookup.value = {
         show: true,
         title: 'Master Card Sequence',
-        items: masterCards.value,
-        headers: [{ key: 'mc_seq', label: 'MCS#' }],
-        type: target === 'from' ? 'mcs_from' : 'mcs_to'
+        items: filteredMcs,
+        headers: headers,
+        type: currentMcsLookupType.value
     };
 };
 
