@@ -488,6 +488,7 @@
                 
                 <div class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl">
                     <button 
+                        @click="showMoreOptionsFromCustomerTable"
                         class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-teal-400 via-blue-500 to-indigo-500 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-cyan-200 before:via-blue-300 before:to-indigo-200 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl"
                     >
                         <span class="relative z-10 flex items-center">
@@ -515,6 +516,85 @@
                         <span class="relative z-10 flex items-center">
                             <i class="fas fa-times mr-2"></i> Exit
                         </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Account Options Modal -->
+        <div v-if="showCustomerAccountOptionsModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+            <!-- Modal backdrop -->
+            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showCustomerAccountOptionsModal = false"></div>
+            
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow-xl w-96 mx-auto max-w-lg z-10 transform transition-all">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-lg relative overflow-hidden">
+                    <div class="absolute -top-8 -left-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                    <div class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
+                    
+                    <h3 class="text-xl font-semibold flex items-center relative z-10">
+                        <span class="inline-flex items-center justify-center w-8 h-8 bg-white bg-opacity-20 rounded-full mr-3 shadow-inner">
+                            <i class="fas fa-filter text-white"></i>
+                        </span>
+                        Options
+                    </h3>
+                    <button type="button" @click="showCustomerAccountOptionsModal = false" 
+                        class="text-white hover:text-gray-200 focus:outline-none transition-transform hover:scale-110 relative z-10 bg-red-500 bg-opacity-30 hover:bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 space-y-6">
+                    <!-- Sort By Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-sort mr-2 text-blue-500"></i>Sort by:
+                        </h4>
+                        <div class="space-y-2 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="customerOptionSortBy" value="code" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">Customer Code</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="radio" v-model="customerOptionSortBy" value="name" class="form-radio h-4 w-4 text-blue-600">
+                                <span class="ml-2 text-gray-700">Customer Name</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Record Status Options -->
+                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
+                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
+                            <i class="fas fa-tag mr-2 text-blue-500"></i>Record Status:
+                        </h4>
+                        <div class="flex items-center space-x-6 ml-2">
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="checkbox" v-model="customerOptionRecordStatus.active" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                                <span class="ml-2 text-gray-700">Active</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
+                                <input type="checkbox" v-model="customerOptionRecordStatus.obsolete" class="form-checkbox h-4 w-4 text-blue-600 rounded">
+                                <span class="ml-2 text-gray-700">Obsolete</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-center space-x-4 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+                    <button 
+                        @click="applyCustomerOptionsFilter" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
+                    >
+                        <i class="fas fa-check mr-2"></i>
+                        OK
+                    </button>
+                    <button 
+                        @click="showCustomerAccountOptionsModal = false" 
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 flex items-center"
+                    >
+                        <i class="fas fa-times mr-2"></i>
+                        Exit
                     </button>
                 </div>
             </div>
@@ -852,7 +932,7 @@
                 </div>
                 </div>
                 <div class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl">
-                    <button @click="showMcsOptionsModal = true" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-lg shadow-md hover:from-blue-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition-all duration-150 ease-in-out">
+                    <button @click="showMoreOptionsFromMcsTable()" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-lg shadow-md hover:from-blue-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition-all duration-150 ease-in-out">
                         More Options
                     </button>
                     <button 
@@ -908,6 +988,14 @@ const recordStatus = ref({
 });
 const tableSearchTerm = ref('');
 const selectedCustomer = ref(null);
+
+// Customer Account Options Modal state
+const showCustomerAccountOptionsModal = ref(false);
+const customerOptionSortBy = ref('code');
+const customerOptionRecordStatus = ref({
+    active: true,
+    obsolete: false
+});
 
 // MCS Modal state
 const showMcsOptionsModal = ref(false);
@@ -1159,6 +1247,15 @@ const selectForView = (customer) => {
 
 // MCS Modal actions
 
+const showMoreOptionsFromMcsTable = () => {
+    showMcsTableModal.value = false;
+    showMcsOptionsModal.value = true;
+    // Initialize options with current table filters
+    // mcsSortOption.value is already bound
+    // mcsSortOrder.value is already bound
+    // mcsRecordStatus.value is already bound
+};
+
 const searchMcsRange = () => {
     // Always show the options modal for MCS range search
     showMcsOptionsModal.value = true;
@@ -1207,6 +1304,21 @@ const clearMcsSelectionDetails = () => {
 const closeMcsTableModal = () => {
     showMcsTableModal.value = false;
     clearMcsSelectionDetails();
+};
+
+const showMoreOptionsFromCustomerTable = () => {
+    showCustomerAccountTable.value = false;
+    showCustomerAccountOptionsModal.value = true;
+    // Initialize options with current table filters
+    customerOptionSortBy.value = sortOption.value;
+    customerOptionRecordStatus.value = { ...recordStatus.value };
+};
+
+const applyCustomerOptionsFilter = () => {
+    sortOption.value = customerOptionSortBy.value;
+    recordStatus.value = { ...customerOptionRecordStatus.value };
+    showCustomerAccountOptionsModal.value = false;
+    showCustomerAccountTable.value = true;
 };
 </script>
 
