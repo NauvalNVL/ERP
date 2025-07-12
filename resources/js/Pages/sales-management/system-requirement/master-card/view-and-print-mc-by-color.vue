@@ -63,7 +63,7 @@
                         class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       />
                       <button 
-                        @click="showAcnSearch" 
+                        @click="showCustomerAccountModal = true" 
                         type="button"
                         class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                       >
@@ -80,7 +80,7 @@
                           class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         />
                         <button 
-                          @click="showAcnSearch" 
+                          @click="showCustomerAccountModal = true" 
                           type="button"
                           class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                         >
@@ -108,7 +108,7 @@
                         class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       />
                       <button 
-                        @click="showMcsSearch" 
+                        @click="showMcsSearch('mcsFrom')" 
                         type="button"
                         class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                       >
@@ -125,7 +125,7 @@
                           class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         />
                         <button 
-                          @click="showMcsSearch" 
+                          @click="showMcsSearch('mcsTo')" 
                           type="button"
                           class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                         >
@@ -248,121 +248,182 @@
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
           <div class="bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-500 px-4 py-3">
             <h2 class="text-lg font-semibold text-white flex items-center">
-              <i class="fas fa-info-circle mr-2"></i>
-              Instructions
+              <i class="fas fa-info-circle mr-3"></i>
+              Information
             </h2>
           </div>
-          <div class="p-6 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <div class="flex items-start">
-              <div class="flex-shrink-0 pt-0.5">
-                <div class="bg-gradient-to-br from-yellow-400 to-amber-500 text-white p-2 rounded-lg shadow-sm">
-                  <i class="fas fa-lightbulb"></i>
-                </div>
-              </div>
-              <div class="ml-4">
-                <h3 class="font-semibold text-indigo-800 mb-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">Using this form</h3>
-                <div class="text-sm text-gray-600">
-                  <p class="mb-2">Use this form to search and print master cards by color:</p>
-                  <ul class="list-disc pl-5 space-y-1">
-                    <li>Enter ACN or MCS# ranges to narrow your search</li>
-                    <li>Select active, obsolete, or both status types</li>
-                    <li>Specify SO period if needed</li>
-                    <li>Click "Select Colors" to choose specific colors to filter by</li>
-                    <li>After selecting colors, you can view or print the results</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+          <div class="p-6 md:p-8">
+            <p class="text-gray-700">Detailed information and results will appear here after search.</p>
+            <!-- Placeholder for results table or message -->
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Customer Account Modal -->
+    <CustomerAccountModal
+        :show="showCustomerAccountModal"
+        @close="showCustomerAccountModal = false"
+    />
+
+    <!-- Master Card Options Modal -->
+    <MasterCardOptionsModal
+      :show="showMcsOptionsModal"
+      :target-field="selectedMcsTargetField"
+      :initial-sort-column="mcsOptions.sortColumn"
+      :initial-sort-direction="mcsOptions.sortDirection"
+      :initial-filter-status="mcsOptions.filterStatus"
+      @close="showMcsOptionsModal = false"
+      @confirm="handleMcsOptionsConfirm"
+    />
+
+    <!-- Master Card Search and Select Modal -->
+    <MasterCardSearchSelectModal
+      :show="showMcsSearchModal"
+      :target-field="selectedMcsTargetField"
+      :initial-sort-column="mcsOptions.sortColumn"
+      :initial-sort-direction="mcsOptions.sortDirection"
+      :initial-filter-status="mcsOptions.filterStatus"
+      @close="showMcsSearchModal = false"
+      @select-mc="handleSelectedMc"
+      @reopen-options="handleReopenOptions"
+      @zoom-mc="handleZoomMc"
+    />
+
+    <!-- Master Card Zoom Modal -->
+    <MasterCardZoomModal
+      :show="showMcsZoomModal"
+      :mc-data="zoomMcData"
+      @close="showMcsZoomModal = false"
+    />
   </AppLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
+import { ref, reactive } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import CustomerAccountModal from '@/Components/CustomerAccountModal.vue';
+import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue'; 
+import MasterCardOptionsModal from '@/Components/MasterCardOptionsModal.vue'; 
+import MasterCardZoomModal from '@/Components/MasterCardZoomModal.vue';
 
-// Search parameters
-const searchParams = ref({
+const searchParams = reactive({
   acnFrom: '',
   acnTo: '',
   mcsFrom: '',
   mcsTo: '',
-  active: true,
-  obsolete: true,
   soPeriodFromYear: '',
   soPeriodFromMonth: '',
   soPeriodToYear: '',
-  soPeriodToMonth: ''
+  soPeriodToMonth: '',
+  active: true,
+  obsolete: false,
 });
 
-// Search functionality
+const showCustomerAccountModal = ref(false);
+const showMcsSearchModal = ref(false); 
+const showMcsOptionsModal = ref(false); 
+const showMcsZoomModal = ref(false); // New reactive state for zoom modal
+const selectedMcsTargetField = ref(''); 
+const mcsOptions = reactive({
+  sortColumn: 'mc_seq',
+  sortDirection: 'asc',
+  filterStatus: { active: true, obsolete: false, pending: false },
+});
+const zoomMcData = ref(null); // New reactive state to hold data for zoom modal
+
 const searchRecords = () => {
-  console.log('Searching with parameters:', searchParams.value);
-};
-
-// Action functions
-const showAcnSearch = () => {
-  console.log('Opening ACN search modal');
-};
-
-const showMcsSearch = () => {
-  console.log('Opening MCS search modal');
+  console.log('Searching with params:', searchParams);
+  // Implement your search logic here
 };
 
 const showColorSelector = () => {
-  console.log('Opening color selector modal');
+  // Logic to show color selector
+  alert('Color selector will be implemented here.');
+};
+
+// Function to open the MC options modal
+const showMcsSearch = (targetField) => {
+  selectedMcsTargetField.value = targetField;
+  showMcsOptionsModal.value = true;
+};
+
+// Function to handle confirmed options from the MC options modal
+const handleMcsOptionsConfirm = (options) => {
+  mcsOptions.sortColumn = options.sortColumn;
+  mcsOptions.sortDirection = options.sortDirection;
+  mcsOptions.filterStatus = { ...options.filterStatus };
+  showMcsOptionsModal.value = false; // Close options modal
+  showMcsSearchModal.value = true;    // Open search and select modal
+};
+
+// Function to handle selected MC from the search and select modal
+const handleSelectedMc = ({ mc, targetField }) => {
+  if (targetField === 'mcsFrom') {
+    searchParams.mcsFrom = mc.mc_seq;
+  } else if (targetField === 'mcsTo') {
+    searchParams.mcsTo = mc.mc_seq;
+  }
+  showMcsSearchModal.value = false; // Close search and select modal after selection
+};
+
+// Function to handle zoom MC event from the search and select modal
+const handleZoomMc = (mc) => {
+  zoomMcData.value = mc; // Set the MC data for the zoom modal
+  showMcsZoomModal.value = true; // Show the zoom modal
+};
+
+// Function to handle reopening the options modal from the search table modal
+const handleReopenOptions = ({ sortColumn, sortDirection, filterStatus, targetField }) => {
+  // Update mcsOptions with the current state from the search modal before reopening options modal
+  mcsOptions.sortColumn = sortColumn;
+  mcsOptions.sortDirection = sortDirection;
+  mcsOptions.filterStatus = { ...filterStatus };
+  selectedMcsTargetField.value = targetField;
+
+  showMcsSearchModal.value = false; // Close the search table modal
+  showMcsOptionsModal.value = true; // Open the options modal
 };
 </script>
 
 <style scoped>
-/* Custom animation for subtle pulse effect on icons */
-@keyframes pulse-light {
-  0% { opacity: 1; }
-  50% { opacity: 0.7; }
-  100% { opacity: 1; }
-}
+/* Add any specific styles for this page here */
 
-.animate-pulse-light {
-  animation: pulse-light 2s infinite ease-in-out;
-}
-
-/* Custom animation for ping effect */
+/* Animations for header elements */
 @keyframes ping-slow {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.5); opacity: 0.5; }
-  100% { transform: scale(1); opacity: 1; }
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+@keyframes pulse-light {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .animate-ping-slow {
-  animation: ping-slow 3s infinite cubic-bezier(0, 0, 0.2, 1);
+  animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-/* Animation delay utility */
+.animate-pulse-light {
+  animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 .animation-delay-500 {
-  animation-delay: 500ms;
+  animation-delay: 0.5s;
 }
 
-/* Custom animation for icon rotation */
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.spin-slow {
-  animation: spin-slow 10s linear infinite;
-}
-
-/* Text shadow for better contrast */
 .text-shadow {
-  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-/* Button hover transition */
-button {
-  transition: all 0.3s ease;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 </style>

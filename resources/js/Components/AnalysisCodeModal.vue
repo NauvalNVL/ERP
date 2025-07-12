@@ -81,7 +81,7 @@ const props = defineProps({
         default: false,
     },
     grouping: {
-        type: String,
+      type: String,
         default: null,
     },
 });
