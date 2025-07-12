@@ -91,7 +91,7 @@
                   class="rounded-l-md flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="From"
                 />
-                <button @click="showAcnSearch" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
+                <button @click="showAcnSearch('acnFrom')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
                   <i class="fas fa-search text-white text-sm"></i>
                 </button>
               </div>
@@ -109,7 +109,7 @@
                   class="rounded-l-md flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="To"
                 />
-                <button @click="showAcnSearch" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
+                <button @click="showAcnSearch('acnTo')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
                   <i class="fas fa-search text-white text-sm"></i>
                 </button>
               </div>
@@ -128,7 +128,7 @@
                   class="rounded-l-md flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="From"
                 />
-                <button @click="showMcsSearch" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
+                <button @click="showMcsSearch('mcsFrom')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
                   <i class="fas fa-search text-white text-sm"></i>
                 </button>
               </div>
@@ -146,7 +146,7 @@
                   class="rounded-l-md flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   placeholder="To"
                 />
-                <button @click="showMcsSearch" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
+                <button @click="showMcsSearch('mcsTo')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
                   <i class="fas fa-search text-white text-sm"></i>
                 </button>
               </div>
@@ -242,7 +242,24 @@
                   type="text"
                   class="rounded-l-md flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
-                <button @click="showSalespersonSearch" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
+                <button @click="showSalespersonSearch('salespersonFrom')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
+                  <i class="fas fa-search text-white text-sm"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex flex-col">
+              <label class="block text-sm font-medium text-gray-700 mb-1">to</label>
+              <div class="relative flex ml-8">
+                <div class="absolute -left-8 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-7 h-7 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full shadow-md z-10">
+                  <i class="fas fa-user-tie text-white text-sm animate-pulse-light"></i>
+                </div>
+                <input
+                  v-model="searchParams.salespersonTo"
+                  type="text"
+                  class="rounded-l-md flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+                <button @click="showSalespersonSearch('salespersonTo')" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
                   <i class="fas fa-search text-white text-sm"></i>
                 </button>
               </div>
@@ -361,6 +378,97 @@
                   />
                   <label for="block-type-2" class="ml-2 text-sm text-gray-700">2-Diecut Block</label>
                 </div>
+              </div>
+            </div>
+
+            <!-- Printing Block -->
+            <div class="md:col-span-2 lg:col-span-3 mt-6">
+              <div class="border border-gray-300 p-4 rounded-lg shadow-sm bg-gray-50">
+                <fieldset>
+                  <legend class="text-sm font-semibold text-gray-900 border-b border-gray-200 pb-2 mb-4">Printing Block</legend>
+                  
+                  <!-- Print Option -->
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                      <div class="mr-2 w-6 h-6 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full shadow-md flex items-center justify-center">
+                        <i class="fas fa-print text-white text-xs animate-pulse-light"></i>
+                      </div>
+                      Print Option:
+                    </label>
+                    <div class="flex flex-wrap gap-4 ml-8">
+                      <div class="flex items-center">
+                        <input
+                          id="print-option-y"
+                          type="radio"
+                          v-model="searchParams.printOption"
+                          value="Y"
+                          class="h-4 w-4 text-teal-600 focus:ring-teal-500"
+                          checked
+                        />
+                        <label for="print-option-y" class="ml-2 text-sm text-gray-700">Y-Print when M/Card has Color or Block#</label>
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="print-option-n"
+                          type="radio"
+                          v-model="searchParams.printOption"
+                          value="N"
+                          class="h-4 w-4 text-teal-600 focus:ring-teal-500"
+                        />
+                        <label for="print-option-n" class="ml-2 text-sm text-gray-700">N-No Check</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Color Range -->
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Color Range:</label>
+                    <div class="relative flex ml-8">
+                      <div class="absolute -left-8 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-7 h-7 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full shadow-md z-10">
+                        <i class="fas fa-palette text-white text-sm animate-pulse-light"></i>
+                      </div>
+                      <input
+                        v-model="searchParams.colorFrom"
+                        type="text"
+                        class="rounded-l-md flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                        placeholder="From"
+                      />
+                      <button @click="showColorSearch('colorFrom')" type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-r-md hover:from-teal-600 hover:to-cyan-700 transition-colors">
+                        <i class="fas fa-search text-white text-sm"></i>
+                      </button>
+                    </div>
+                    <div class="flex items-center ml-8 mt-2">
+                      <span class="mr-2 text-gray-500">to</span>
+                      <input
+                        v-model="searchParams.colorTo"
+                        type="text"
+                        class="rounded-l-md flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                        placeholder="To"
+                      />
+                      <button @click="showColorSearch('colorTo')" type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-r-md hover:from-teal-600 hover:to-cyan-700 transition-colors">
+                        <i class="fas fa-search text-white text-sm"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Ignore Color -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ignore Color:</label>
+                    <div class="relative flex ml-8">
+                      <div class="absolute -left-8 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-7 h-7 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full shadow-md z-10">
+                        <i class="fas fa-palette text-white text-sm animate-pulse-light"></i>
+                      </div>
+                      <input
+                        v-model="searchParams.ignoreColor"
+                        type="text"
+                        class="rounded-l-md flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                      />
+                      <button @click="showColorSearch('ignoreColor')" type="button" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-r-md hover:from-teal-600 hover:to-cyan-700 transition-colors">
+                        <i class="fas fa-search text-white text-sm"></i>
+                      </button>
+                    </div>
+                  </div>
+                </fieldset>
               </div>
             </div>
           </div>
@@ -527,6 +635,54 @@
         </div>
       </div>
     </div>
+    <!-- Customer Account Search Modal -->
+    <CustomerAccountModal 
+      :show="showCustomerAccountModal"
+      @close="showCustomerAccountModal = false"
+      @select="handleSelectedCustomerAccount"
+      :initialSortBy="customerAccountOptions.sortBy"
+      :initialStatusFilter="customerAccountOptions.statusFilter"
+    />
+
+    <!-- Customer Account Options Modal -->
+    <CustomerAccountOptionsModal
+      :show="showCustomerAccountOptionsModal"
+      @close="showCustomerAccountOptionsModal = false"
+      @confirm="handleCustomerAccountOptionsConfirm"
+    />
+
+    <!-- MCS Options Modal -->
+    <MasterCardOptionsModal
+      :show="showMcsOptionsModal"
+      @close="showMcsOptionsModal = false"
+      @confirm="handleMcsOptionsConfirm"
+    />
+
+    <!-- MCS Search Select Modal -->
+    <MasterCardSearchSelectModal
+      :show="showMcsSearchModal"
+      @close="showMcsSearchModal = false"
+      @select="handleSelectedMc"
+      :initialSortColumn="mcsOptions.initialSortColumn"
+      :initialSortDirection="mcsOptions.initialSortDirection"
+      :initialStatusFilter="mcsOptions.initialStatusFilter"
+    />
+
+    <!-- Salesperson Search Modal -->
+    <SalespersonModal
+      :show="showSalespersonModal"
+      @close="showSalespersonModal = false"
+      @select="handleSelectedSalesperson"
+      :initialSortBy="salespersonOptions.sortBy"
+      :initialStatusFilter="salespersonOptions.statusFilter"
+    />
+
+    <!-- Color Search Modal -->
+    <ColorModal
+      :show="showColorModal"
+      @close="showColorModal = false"
+      @select="handleSelectedColor"
+    />
   </AppLayout>
 </template>
 
@@ -534,6 +690,12 @@
 import { ref, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import CustomerAccountModal from '@/Components/customer-account-modal.vue';
+import CustomerAccountOptionsModal from '@/Components/CustomerAccountOptionsModal.vue';
+import MasterCardOptionsModal from '@/Components/MasterCardOptionsModal.vue';
+import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue';
+import SalespersonModal from '@/Components/salesperson-modal.vue';
+import ColorModal from '@/Components/color-modal.vue';
 
 // Search parameters
 const searchParams = ref({
@@ -547,10 +709,43 @@ const searchParams = ref({
   soPeriodToMonth: '',
   soPeriodToYear: '',
   salesperson: '',
-  statusActive: true,
-  statusObsolete: false,
-  sortOption: '1',
-  blockType: '1'
+  salespersonTo: '',
+  salesTeam: '',
+  salesTeamTo: '',
+  customerGroup: '',
+  customerGroupTo: '',
+  industry: '',
+  industryTo: '',
+  geo: '',
+  geoTo: '',
+  productGroup: '',
+  productGroupTo: '',
+  product: '',
+  productTo: '',
+  productDesign: '',
+  productDesignTo: '',
+  paperQuality: '',
+  paperQualityTo: '',
+  paperFlute: '',
+  paperFluteTo: '',
+  paperSize: '',
+  paperSizeTo: '',
+  scoringTool: '',
+  scoringToolTo: '',
+  finishing: '',
+  finishingTo: '',
+  colorGroup: '',
+  colorGroupTo: '',
+  color: '',
+  colorTo: '',
+  soSalesperson: '',
+  soSalespersonTo: '',
+  soCustomerGroup: '',
+  soCustomerGroupTo: '',
+  printOption: 'Y', // 'Y' or 'N'
+  colorFrom: '',
+  colorTo: '',
+  ignoreColor: '',
 });
 
 // UI States
@@ -559,6 +754,32 @@ const showResults = ref(false);
 const tableSearch = ref('');
 const sortColumn = ref('mc_seq');
 const sortDirection = ref('asc');
+const showCustomerAccountModal = ref(false);
+const selectedCustomerAccountField = ref(null);
+const showCustomerAccountOptionsModal = ref(false);
+const customerAccountOptions = ref({
+  sortBy: 'customer_code',
+  statusFilter: ['Active'],
+});
+
+const showMcsOptionsModal = ref(false);
+const mcsOptions = ref({
+  initialSortColumn: 'mc_seq',
+  initialSortDirection: 'asc',
+  initialStatusFilter: ['Active', 'Obsolete'],
+});
+const showMcsSearchModal = ref(false);
+const selectedMcsTargetField = ref(null);
+
+const showSalespersonModal = ref(false);
+const selectedSalespersonTargetField = ref(null); // New state to track target field
+const salespersonOptions = ref({
+  sortBy: 'salesperson_name',
+  statusFilter: ['Active'],
+});
+
+const showColorModal = ref(false);
+const selectedColorTargetField = ref(null);
 
 // Sample data - this would be fetched from API in real implementation
 const blockListings = ref([
@@ -619,20 +840,82 @@ const filteredBlockListings = computed(() => {
 });
 
 // Functions for search modal popups
-const showAcnSearch = () => {
-  // Implement customer search modal
-  console.log('Open ACN search modal');
+const showAcnSearch = (targetField) => {
+  selectedCustomerAccountField.value = targetField;
+  showCustomerAccountOptionsModal.value = true; // First, show the options modal
+  console.log(`Open ACN options modal for ${targetField}`);
 };
 
-const showMcsSearch = () => {
-  // Implement master card search modal
-  console.log('Open MCS search modal');
+const handleCustomerAccountOptionsConfirm = (options) => {
+  customerAccountOptions.value = options;
+  showCustomerAccountOptionsModal.value = false; // Hide options modal
+  showCustomerAccountModal.value = true; // Then, show the customer account modal
 };
 
-const showSalespersonSearch = () => {
-  // Implement salesperson search modal
-  console.log('Open salesperson search modal');
+const handleSelectedCustomerAccount = (customer) => {
+  if (selectedCustomerAccountField.value === 'acnFrom') {
+    searchParams.value.acnFrom = customer.customer_code;
+  } else if (selectedCustomerAccountField.value === 'acnTo') {
+    searchParams.value.acnTo = customer.customer_code;
+  }
+  showCustomerAccountModal.value = false;
 };
+
+const showMcsSearch = (targetField) => {
+  selectedMcsTargetField.value = targetField;
+  showMcsOptionsModal.value = true; // Show options modal first
+  console.log(`Open MCS options modal for ${targetField}`);
+};
+
+const handleMcsOptionsConfirm = (options) => {
+  mcsOptions.value = options;
+  showMcsOptionsModal.value = false; // Hide options modal
+  showMcsSearchModal.value = true; // Show search modal
+  console.log('MCS Options confirmed:', options);
+};
+
+// Function to handle the selection from MCS search modal
+const handleSelectedMc = (mc) => {
+  if (selectedMcsTargetField.value === 'mcsFrom') {
+    searchParams.value.mcsFrom = mc.mc_seq;
+  } else if (selectedMcsTargetField.value === 'mcsTo') {
+    searchParams.value.mcsTo = mc.mc_seq;
+  }
+  showMcsSearchModal.value = false;
+};
+
+const showSalespersonSearch = (targetField) => {
+  selectedSalespersonTargetField.value = targetField;
+  showSalespersonModal.value = true;
+  console.log(`Open Salesperson search modal for ${targetField}`);
+};
+
+const handleSelectedSalesperson = (salesperson) => {
+  if (selectedSalespersonTargetField.value === 'salespersonFrom') {
+    searchParams.value.salesperson = salesperson.salesperson_code;
+  } else if (selectedSalespersonTargetField.value === 'salespersonTo') {
+    searchParams.value.salespersonTo = salesperson.salesperson_code;
+  }
+  showSalespersonModal.value = false;
+};
+
+const showColorSearch = (targetField) => {
+  selectedColorTargetField.value = targetField;
+  showColorModal.value = true;
+  console.log(`Open Color search modal for ${targetField}`);
+};
+
+const handleSelectedColor = (color) => {
+  if (selectedColorTargetField.value === 'colorFrom') {
+    searchParams.value.colorFrom = color.color_code;
+  } else if (selectedColorTargetField.value === 'colorTo') {
+    searchParams.value.colorTo = color.color_code;
+  } else if (selectedColorTargetField.value === 'ignoreColor') {
+    searchParams.value.ignoreColor = color.color_code;
+  }
+  showColorModal.value = false;
+};
+
 
 // Utility function to capitalize strings
 const capitalize = (str) => {
@@ -653,10 +936,15 @@ const resetAllFilters = () => {
     soPeriodToMonth: '',
     soPeriodToYear: '',
     salesperson: '',
+    salespersonTo: '',
     statusActive: true,
     statusObsolete: false,
     sortOption: '1',
-    blockType: '1'
+    blockType: '1',
+    printOption: 'Y',
+    colorFrom: '',
+    colorTo: '',
+    ignoreColor: '',
   };
   tableSearch.value = '';
   showResults.value = false;
@@ -683,16 +971,13 @@ const proceedSearch = () => {
   loading.value = true;
   
   // Implement search functionality
-  console.log('Searching with parameters:', searchParams.value);
+  console.log('Processing with parameters:', searchParams.value);
   
   // Simulate API call delay
   setTimeout(() => {
-    // For this demo, we're just showing the sample results
-    showResults.value = true;
     loading.value = false;
-    
-    // In a real implementation, you'd make an API call here
-    // and populate the blockListings with the response data
+    // In real implementation, this would redirect to a report view or generate
+    // the report directly
   }, 1000);
 };
 </script>

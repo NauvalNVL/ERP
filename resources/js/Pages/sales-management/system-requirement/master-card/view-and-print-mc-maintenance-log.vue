@@ -168,7 +168,7 @@
                                             </div>
                                         </div>
                                         <button 
-                                            @click="showUserLookup = true" 
+                                            @click="openUserLookup" 
                                             type="button" 
                                             class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-3 rounded-r-md hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm"
                                         >
@@ -200,7 +200,7 @@
                                             </div>
                                         </div>
                                         <button 
-                                            @click="showAccountLookup = true" 
+                                            @click="showCustomerAccountModal = true" 
                                             type="button" 
                                             class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-3 rounded-r-md hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm"
                                         >
@@ -232,7 +232,7 @@
                                             </div>
                                         </div>
                                         <button 
-                                            @click="showMcLookup = true" 
+                                            @click="showMcsOptionsModal = true" 
                                             type="button" 
                                             class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-3 rounded-r-md hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm"
                                         >
@@ -402,13 +402,41 @@
                 </div>
             </div>
         </div>
-    </AppLayout>
+    <!-- User Lookup Modal -->
+    <UserLookupModal
+      :show="showUserLookupModal"
+      @close="showUserLookupModal = false"
+      @select="handleSelectedUser"
+    />
+    <!-- Customer Account Modal -->
+    <CustomerAccountModal
+      :show="showCustomerAccountModal"
+      @close="showCustomerAccountModal = false"
+      @select="handleSelectedCustomerAccount"
+    />
+    <!-- Master Card Options Modal -->
+    <MasterCardOptionsModal
+      :show="showMcsOptionsModal"
+      @close="showMcsOptionsModal = false"
+      @confirm="handleMcsOptionsConfirm"
+    />
+    <!-- Master Card Search Select Modal -->
+    <MasterCardSearchSelectModal
+      :show="showMcsSearchModal"
+      @close="showMcsSearchModal = false"
+      @select="handleSelectedMc"
+    />
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import UserLookupModal from '@/Components/UserLookupModal.vue';
+import CustomerAccountModal from '@/Components/customer-account-modal.vue';
+import MasterCardOptionsModal from '@/Components/MasterCardOptionsModal.vue';
+import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue';
 
 // Form data
 const startDate = ref(formattedDate(new Date()));
@@ -427,13 +455,46 @@ const mcSequence = ref('');
 const showUserLookup = ref(false);
 const showAccountLookup = ref(false);
 const showMcLookup = ref(false);
-const loading = ref(false);
 const showResults = ref(false);
 const hasSearched = ref(false);
 const tableSearch = ref('');
 const actionFilter = ref('all');
 const sortColumn = ref('created_at');
 const sortDirection = ref('desc');
+
+// UI States
+const showUserLookupModal = ref(false);
+const showCustomerAccountModal = ref(false);
+const showMcsOptionsModal = ref(false);
+const showMcsSearchModal = ref(false);
+const selectedUser = ref(null);
+
+// Function to open User Lookup Modal
+const openUserLookup = () => {
+  showUserLookupModal.value = true;
+};
+
+// Function to handle selected user from modal
+const handleSelectedUser = (user) => {
+  userId.value = user.user_id; // Assuming user_id is the property you want
+  showUserLookupModal.value = false;
+};
+
+const handleSelectedCustomerAccount = (customer) => {
+  accountCode.value = customer.customer_code; // Adjust property name as needed
+  showCustomerAccountModal.value = false;
+};
+
+const handleMcsOptionsConfirm = (options) => {
+  console.log('Master Card options confirmed:', options);
+  showMcsOptionsModal.value = false;
+  showMcsSearchModal.value = true;
+};
+
+const handleSelectedMc = (mc) => {
+  mcSequence.value = mc.mc_seq; // Assuming mc_seq is the property for Master Card sequence
+  showMcsSearchModal.value = false;
+};
 
 // Sample data (replace with API call)
 const maintenanceLogs = ref([
@@ -584,14 +645,11 @@ function resetAllFilters() {
 }
 
 function searchLogs() {
-    loading.value = true;
     showResults.value = true;
     hasSearched.value = true;
     
     // Simulate API call
     setTimeout(() => {
-        loading.value = false;
-        
         // Here you would filter the logs based on the search criteria
         // For now, we're just using the sample data
     }, 1000);

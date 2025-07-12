@@ -62,7 +62,7 @@
                       class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                     />
                     <button 
-                      @click="showMachineCodeSearch" 
+                      @click="openMachineLookup" 
                       type="button"
                       class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                     >
@@ -88,7 +88,7 @@
                         class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       />
                       <button 
-                        @click="showAcnSearch" 
+                        @click="openCustomerAccountLookup('from')" 
                         type="button"
                         class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                       >
@@ -105,7 +105,7 @@
                           class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         />
                         <button 
-                          @click="showAcnSearch" 
+                          @click="openCustomerAccountLookup('to')" 
                           type="button"
                           class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                         >
@@ -133,7 +133,7 @@
                         class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       />
                       <button 
-                        @click="showMcsSearch" 
+                        @click="openMcsLookup('from')" 
                         type="button"
                         class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                       >
@@ -150,7 +150,7 @@
                           class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         />
                         <button 
-                          @click="showMcsSearch" 
+                          @click="openMcsLookup('to')" 
                           type="button"
                           class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                         >
@@ -302,6 +302,26 @@
         </div>
       </div>
     </div>
+    <MachineModal
+      :show="showMachineModal"
+      @close="showMachineModal = false"
+      @select="handleSelectedMachine"
+    />
+    <CustomerAccountModal
+      :show="showCustomerAccountModal"
+      @close="showCustomerAccountModal = false"
+      @select="handleSelectedCustomerAccount"
+    />
+    <MasterCardOptionsModal
+      :show="showMcsOptionsModal"
+      @close="showMcsOptionsModal = false"
+      @confirm="handleMcsOptionsConfirm"
+    />
+    <MasterCardSearchSelectModal
+      :show="showMcsSearchModal"
+      @close="showMcsSearchModal = false"
+      @select="handleSelectedMc"
+    />
   </AppLayout>
 </template>
 
@@ -309,6 +329,10 @@
 import { ref } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import MachineModal from '@/Components/MachineModal.vue';
+import CustomerAccountModal from '@/Components/customer-account-modal.vue';
+import MasterCardOptionsModal from '@/Components/MasterCardOptionsModal.vue';
+import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue';
 
 // Search parameters
 const searchParams = ref({
@@ -325,26 +349,67 @@ const searchParams = ref({
   soPeriodToMonth: ''
 });
 
+// UI States for Modals
+const showMachineModal = ref(false);
+const showCustomerAccountModal = ref(false);
+const selectedCustomerAccountTargetField = ref(null);
+const showMcsOptionsModal = ref(false);
+const showMcsSearchModal = ref(false);
+const selectedMcsTargetField = ref(null);
+
 // Search functionality
 const searchRecords = () => {
   console.log('Searching with parameters:', searchParams.value);
+  // Implement actual search logic here
 };
 
 // Action functions
-const showMachineCodeSearch = () => {
-  console.log('Opening machine code search modal');
+const openMachineLookup = () => {
+  showMachineModal.value = true;
 };
 
-const showAcnSearch = () => {
-  console.log('Opening ACN search modal');
+const handleSelectedMachine = (machine) => {
+  searchParams.value.machineCode = machine.code;
+  showMachineModal.value = false;
 };
 
-const showMcsSearch = () => {
-  console.log('Opening MCS search modal');
+const openCustomerAccountLookup = (targetField) => {
+  selectedCustomerAccountTargetField.value = targetField;
+  showCustomerAccountModal.value = true;
+};
+
+const handleSelectedCustomerAccount = (customer) => {
+  if (selectedCustomerAccountTargetField.value === 'from') {
+    searchParams.value.acnFrom = customer.customer_code;
+  } else if (selectedCustomerAccountTargetField.value === 'to') {
+    searchParams.value.acnTo = customer.customer_code;
+  }
+  showCustomerAccountModal.value = false;
+};
+
+const openMcsLookup = (targetField) => {
+  selectedMcsTargetField.value = targetField;
+  showMcsOptionsModal.value = true;
+};
+
+const handleMcsOptionsConfirm = (options) => {
+  console.log('Master Card options confirmed:', options);
+  showMcsOptionsModal.value = false;
+  showMcsSearchModal.value = true;
+};
+
+const handleSelectedMc = (mc) => {
+  if (selectedMcsTargetField.value === 'from') {
+    searchParams.value.mcsFrom = mc.mc_seq;
+  } else if (selectedMcsTargetField.value === 'to') {
+    searchParams.value.mcsTo = mc.mc_seq;
+  }
+  showMcsSearchModal.value = false;
 };
 
 const proceedSearch = () => {
   console.log('Proceeding with search:', searchParams.value);
+  // Implement actual proceed logic here
 };
 </script>
 

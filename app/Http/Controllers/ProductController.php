@@ -198,7 +198,8 @@ class ProductController extends Controller
                     'product_code',
                     'description',
                     'category',
-                    'product_group_id'
+                    'product_group_id',
+                    'is_active'
                 )
                 ->orderBy('product_code')
                 ->get();

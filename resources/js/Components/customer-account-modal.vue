@@ -108,6 +108,14 @@ export default {
     customerAccounts: {
       type: Array,
       default: () => []
+    },
+    initialSortBy: {
+      type: String,
+      default: 'customer_code'
+    },
+    initialStatusFilter: {
+      type: Array,
+      default: () => ['Active']
     }
   },
   emits: ['close', 'select', 'sort'],
@@ -116,8 +124,8 @@ export default {
     const selectedAccount = ref(null)
     const loading = ref(false)
     const error = ref(null)
-    const sortBy = ref('customer_code')
-    const statusFilter = ref('active')
+    const sortBy = ref(props.initialSortBy)
+    const statusFilter = ref(props.initialStatusFilter.includes('Active') ? 'active' : (props.initialStatusFilter.includes('Obsolete') ? 'obsolete' : 'all'))
 
     const fetchCustomerAccounts = async () => {
       if (props.customerAccounts && props.customerAccounts.length > 0) {

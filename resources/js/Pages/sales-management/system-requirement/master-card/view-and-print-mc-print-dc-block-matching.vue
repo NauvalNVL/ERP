@@ -85,7 +85,7 @@
                       v-model="searchParams.acnFrom"
                       class="rounded-l-md flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
-                    <button @click="showAcnSearch" class="absolute inset-y-0 right-0 inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
+                    <button @click="showAcnSearch('acnFrom')" class="absolute inset-y-0 right-0 inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
                       <i class="fas fa-search text-white text-sm"></i>
                     </button>
                   </div>
@@ -96,7 +96,7 @@
                       v-model="searchParams.acnTo"
                       class="rounded-l-md flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
-                    <button @click="showAcnSearch" class="absolute inset-y-0 right-0 inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
+                    <button @click="showAcnSearch('acnTo')" class="absolute inset-y-0 right-0 inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700 transition-colors">
                       <i class="fas fa-search text-white text-sm"></i>
                     </button>
                   </div>
@@ -203,6 +203,47 @@
           <p class="mt-4 text-indigo-600 font-medium">Loading results...</p>
         </div>
 
+        <!-- Results Table -->
+        <div v-if="!loading && searchResults.length > 0" class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 mb-6">
+          <div class="p-6">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">AC#</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">MCS#</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">PD</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">Pcs DC Block#</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">Corr</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Share Status</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-for="(result, index) in searchResults" :key="index">
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 border-r border-gray-300">{{ result.ac }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 border-r border-gray-300">{{ result.mcs }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 border-r border-gray-300">{{ result.pd }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 border-r border-gray-300">{{ result.pcs_dc_block }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 border-r border-gray-300">{{ result.corr }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ result.share_status }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="flex items-center">
+                <label class="w-24 text-sm font-medium text-gray-700">AC Name:</label>
+                <input type="text" v-model="acName" class="flex-grow border border-gray-300 rounded-md px-3 py-2 bg-gray-100" readonly />
+              </div>
+              <div class="flex items-center">
+                <label class="w-24 text-sm font-medium text-gray-700">Model:</label>
+                <input type="text" v-model="model" class="flex-grow border border-gray-300 rounded-md px-3 py-2 bg-gray-100" readonly />
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Help Section -->
         <div class="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-100 shadow-sm">
           <h3 class="font-semibold text-indigo-800 mb-2 flex items-center">
@@ -221,6 +262,13 @@
         </div>
       </div>
     </div>
+
+    <!-- Customer Account Search Modal -->
+    <CustomerAccountModal 
+      :show="showCustomerAccountModal"
+      @close="showCustomerAccountModal = false"
+      @select="handleSelectedCustomerAccount"
+    />
   </AppLayout>
 </template>
 
@@ -228,6 +276,7 @@
 import { ref, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import CustomerAccountModal from '@/Components/customer-account-modal.vue';
 
 // Search parameters
 const searchParams = ref({
@@ -242,11 +291,26 @@ const searchParams = ref({
 
 // UI States
 const loading = ref(false);
+const showCustomerAccountModal = ref(false);
+const selectedCustomerAccountField = ref(null);
+const searchResults = ref([]);
+const acName = ref('');
+const model = ref('');
 
 // Function for search modal popup
-const showAcnSearch = () => {
-  // Implement customer search modal
-  console.log('Open ACN search modal');
+const showAcnSearch = (targetField) => {
+  selectedCustomerAccountField.value = targetField;
+  showCustomerAccountModal.value = true;
+  console.log(`Open ACN search modal for ${targetField}`);
+};
+
+const handleSelectedCustomerAccount = (customer) => {
+  if (selectedCustomerAccountField.value === 'acnFrom') {
+    searchParams.value.acnFrom = customer.customer_code;
+  } else if (selectedCustomerAccountField.value === 'acnTo') {
+    searchParams.value.acnTo = customer.customer_code;
+  }
+  showCustomerAccountModal.value = false;
 };
 
 // Search function
@@ -260,8 +324,16 @@ const proceedSearch = () => {
   // Simulate API call delay
   setTimeout(() => {
     loading.value = false;
-    // In real implementation, this would redirect to a report view or generate
-    // the report directly
+    // Mock data for demonstration
+    searchResults.value = [
+      { ac: '000211-08', mcs: '12345', pd: 'PD-001', pcs_dc_block: 'DCB-001', corr: 'A', share_status: 'Shared' },
+      { ac: '000211-08', mcs: '12346', pd: 'PD-002', pcs_dc_block: 'DCB-001', corr: 'B', share_status: 'Not Shared' },
+      { ac: '000211-08', mcs: '12347', pd: 'PD-003', pcs_dc_block: 'DCB-002', corr: 'C', share_status: 'Error' },
+      { ac: '000211-08', mcs: '12348', pd: 'PD-004', pcs_dc_block: 'DCB-003', corr: 'D', share_status: 'No D/Cut' },
+    ];
+    acName.value = 'ABDULLAH, BPK';
+    model.value = 'BOX BASO 4,5 KG';
+
   }, 1000);
 };
 </script>

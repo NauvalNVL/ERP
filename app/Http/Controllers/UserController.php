@@ -244,18 +244,15 @@ class UserController extends Controller
     public function searchUsers(Request $request)
     {
         $search = $request->query('search');
-        
-        if (empty($search)) {
-            return response()->json([]);
+
+        $users = User::query();
+
+        if (!empty($search)) {
+            $users->where('user_id', 'like', '%' . $search . '%')
+                  ->orWhere('name', 'like', '%' . $search . '%');
         }
-        
-        $users = User::where('user_id', 'LIKE', "%{$search}%")
-            ->orWhere('username', 'LIKE', "%{$search}%")
-            ->orWhere('official_name', 'LIKE', "%{$search}%")
-            ->limit(10)
-            ->get();
-            
-        return response()->json($users);
+
+        return response()->json($users->get());
     }
 
     public function getUserPermissions(User $user)

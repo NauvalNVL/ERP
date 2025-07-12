@@ -63,7 +63,7 @@
                         class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       />
                       <button 
-                        @click="showAcnSearch" 
+                        @click="showAcnSearch('from')" 
                         type="button"
                         class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                       >
@@ -80,7 +80,7 @@
                           class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         />
                         <button 
-                          @click="showAcnSearch" 
+                          @click="showAcnSearch('to')" 
                           type="button"
                           class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                         >
@@ -108,7 +108,7 @@
                         class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       />
                       <button 
-                        @click="showMcsSearch" 
+                        @click="showMcsSearch('from')" 
                         type="button"
                         class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                       >
@@ -125,7 +125,7 @@
                           class="rounded-l-md w-full px-3 py-2 border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         />
                         <button 
-                          @click="showMcsSearch" 
+                          @click="showMcsSearch('to')" 
                           type="button"
                           class="inline-flex items-center px-2 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-r-md hover:from-indigo-600 hover:to-purple-700"
                         >
@@ -263,7 +263,7 @@
               <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
                 <button
                   type="button"
-                  @click="selectPaperSize"
+                  @click="selectPaperSize('from')"
                   class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium rounded-md shadow-md transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
                 >
                   <i class="fas fa-ruler-combined mr-2"></i>
@@ -271,7 +271,7 @@
                 </button>
                 <button
                   type="button"
-                  @click="selectPaperQuality"
+                  @click="selectPaperQuality('from')"
                   class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-md shadow-md transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
                 >
                   <i class="fas fa-clipboard-check mr-2"></i>
@@ -306,9 +306,6 @@
                     <li>Select active, obsolete, or both status types</li>
                     <li>Specify SO period if needed</li>
                     <li>Choose whether to include SO P/Quality and/or W/O P/Quality</li>
-                    <li>Click "Select P/Size" to choose paper sizes to filter by</li>
-                    <li>Click "Select P/Quality" to choose paper qualities to filter by</li>
-                    <li>After selecting paper size and quality, you can view or print the results</li>
                   </ul>
                 </div>
               </div>
@@ -317,13 +314,31 @@
         </div>
       </div>
     </div>
+    <CustomerAccountModal
+      :show="showCustomerAccountModal"
+      @close="showCustomerAccountModal = false"
+      @select="handleSelectedCustomerAccount"
+    />
+    <MasterCardOptionsModal
+      :show="showMcsOptionsModal"
+      @close="showMcsOptionsModal = false"
+      @confirm="handleMcsOptionsConfirm"
+    />
+    <MasterCardSearchSelectModal
+      :show="showMcsSearchModal"
+      @close="showMcsSearchModal = false"
+      @select="handleSelectedMc"
+    />
   </AppLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import CustomerAccountModal from '@/Components/customer-account-modal.vue';
+import MasterCardOptionsModal from '@/Components/MasterCardOptionsModal.vue';
+import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue';
 
 // Search parameters
 const searchParams = ref({
@@ -338,8 +353,15 @@ const searchParams = ref({
   soPeriodToYear: '',
   soPeriodToMonth: '',
   soQuality: true,
-  woQuality: true
+  woQuality: true,
 });
+
+// UI States for Modals
+const showCustomerAccountModal = ref(false);
+const selectedCustomerAccountTargetField = ref(null);
+const showMcsOptionsModal = ref(false);
+const showMcsSearchModal = ref(false);
+const selectedMcsTargetField = ref(null);
 
 // Search functionality
 const searchRecords = () => {
@@ -347,21 +369,87 @@ const searchRecords = () => {
 };
 
 // Action functions
-const showAcnSearch = () => {
-  console.log('Opening ACN search modal');
+const openCustomerAccountLookup = (targetField) => {
+  selectedCustomerAccountTargetField.value = targetField;
+  showCustomerAccountModal.value = true;
 };
 
-const showMcsSearch = () => {
-  console.log('Opening MCS search modal');
+const handleSelectedCustomerAccount = (customer) => {
+  if (selectedCustomerAccountTargetField.value === 'from') {
+    searchParams.value.acnFrom = customer.customer_code;
+  } else if (selectedCustomerAccountTargetField.value === 'to') {
+    searchParams.value.acnTo = customer.customer_code;
+  }
+  showCustomerAccountModal.value = false;
 };
 
-const selectPaperSize = () => {
-  console.log('Opening paper size selection modal');
+const openMcsLookup = (targetField) => {
+  selectedMcsTargetField.value = targetField;
+  showMcsOptionsModal.value = true;
 };
 
-const selectPaperQuality = () => {
-  console.log('Opening paper quality selection modal');
+const handleMcsOptionsConfirm = (options) => {
+  console.log('Master Card options confirmed:', options);
+  showMcsOptionsModal.value = false;
+  showMcsSearchModal.value = true;
 };
+
+const handleSelectedMc = (mc) => {
+  if (selectedMcsTargetField.value === 'from') {
+    searchParams.value.mcsFrom = mc.mc_seq;
+  } else if (selectedMcsTargetField.value === 'to') {
+    searchParams.value.mcsTo = mc.mc_seq;
+  }
+  showMcsSearchModal.value = false;
+};
+
+const showAcnSearch = (targetField) => {
+  openCustomerAccountLookup(targetField);
+};
+
+const showMcsSearch = (targetField) => {
+  openMcsLookup(targetField);
+};
+
+const selectPaperSize = (targetField) => {
+  openPaperSizeLookup(targetField);
+};
+
+const selectPaperQuality = (targetField) => {
+  openPaperQualityLookup(targetField);
+};
+
+// Fetch data on component mount
+onMounted(async () => {
+  try {
+    const csrfToken = window.getCsrfToken();
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': csrfToken,
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    };
+
+    const [paperSizeResponse, paperQualityResponse] = await Promise.all([
+      fetch('/api/paper-sizes', { headers }),
+      fetch('/api/paper-qualities', { headers })
+    ]);
+
+    if (paperSizeResponse.ok) {
+      paperSizes.value = await paperSizeResponse.json();
+    } else {
+      console.error('Failed to fetch paper sizes:', paperSizeResponse.statusText);
+    }
+
+    if (paperQualityResponse.ok) {
+      paperQualities.value = await paperQualityResponse.json();
+    } else {
+      console.error('Failed to fetch paper qualities:', paperQualityResponse.statusText);
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+});
 </script>
 
 <style scoped>

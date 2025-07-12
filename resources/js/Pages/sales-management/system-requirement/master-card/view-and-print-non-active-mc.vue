@@ -101,8 +101,8 @@
                   </label>
                   <div class="flex space-x-2 ml-10">
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
+                      <input type="text" v-model="salesPersonCodeFrom" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-l-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button @click="openSalespersonLookup('from')" type="button" class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors rounded-r-md">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -110,8 +110,8 @@
                       to
                     </div>
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
+                      <input type="text" v-model="salesPersonCodeTo" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-l-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button @click="openSalespersonLookup('to')" type="button" class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors rounded-r-md">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -128,8 +128,8 @@
                   </label>
                   <div class="flex space-x-2 ml-10">
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
+                      <input type="text" v-model="acFrom" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-l-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button @click="openCustomerAccountLookup('from')" type="button" class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors rounded-r-md">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -137,8 +137,8 @@
                       to
                     </div>
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
+                      <input type="text" v-model="acTo" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-l-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button @click="openCustomerAccountLookup('to')" type="button" class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors rounded-r-md">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -155,8 +155,8 @@
                   </label>
                   <div class="flex space-x-2 ml-10">
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
+                      <input type="text" v-model="mcsFrom" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-l-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button @click="openMcsLookup('from')" type="button" class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors rounded-r-md">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -164,8 +164,8 @@
                       to
                     </div>
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
+                      <input type="text" v-model="mcsTo" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-l-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button @click="openMcsLookup('to')" type="button" class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors rounded-r-md">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -260,8 +260,8 @@
                   </label>
                   <div class="flex space-x-2 ml-10">
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
+                      <input type="text" v-model="productFrom" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-l-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button @click="openProductLookup('from')" type="button" class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors rounded-r-md">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -269,8 +269,8 @@
                       to
                     </div>
                     <div class="relative flex-grow">
-                      <input type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
-                      <button class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors">
+                      <input type="text" v-model="productTo" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-l-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" />
+                      <button @click="openProductLookup('to')" type="button" class="absolute inset-y-0 right-0 px-3 text-indigo-600 hover:text-indigo-800 transition-colors rounded-r-md">
                         <i class="fas fa-search"></i>
                       </button>
                     </div>
@@ -340,19 +340,51 @@
         </div>
       </div>
     </div>
+    <SalespersonModal
+      :show="showSalespersonModal"
+      @close="showSalespersonModal = false"
+      @select="handleSelectedSalesperson"
+    />
+    <CustomerAccountModal
+      :show="showCustomerAccountModal"
+      @close="showCustomerAccountModal = false"
+      @select="handleSelectedCustomerAccount"
+    />
+    <MasterCardOptionsModal
+      :show="showMcsOptionsModal"
+      @close="showMcsOptionsModal = false"
+      @confirm="handleMcsOptionsConfirm"
+    />
+    <MasterCardSearchSelectModal
+      :show="showMcsSearchModal"
+      @close="showMcsSearchModal = false"
+      @select="handleSelectedMc"
+    />
+    <ProductModal
+      :show="showProductModal"
+      @close="showProductModal = false"
+      @select="handleSelectedProduct"
+      :products="products"
+      :loading="loadingProducts"
+    />
   </AppLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import SalespersonModal from '@/Components/salesperson-modal.vue';
+import CustomerAccountModal from '@/Components/customer-account-modal.vue';
+import MasterCardOptionsModal from '@/Components/MasterCardOptionsModal.vue';
+import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue';
+import ProductModal from '@/Components/product-modal.vue';
 
-// Form state variables
+// Form data
 const salesPeriodMonth = ref(6);
 const salesPeriodYear = ref(2025);
-const salespersonFrom = ref('');
-const salespersonTo = ref('');
+const salesPersonCodeFrom = ref('');
+const salesPersonCodeTo = ref('');
 const acFrom = ref('');
 const acTo = ref('');
 const mcsFrom = ref('');
@@ -364,12 +396,120 @@ const inactiveMonths = ref(0);
 const productFrom = ref('');
 const productTo = ref('');
 
+// UI States
+const showSalespersonModal = ref(false);
+const selectedSalespersonTargetField = ref(null);
+const showCustomerAccountModal = ref(false);
+const selectedCustomerAccountTargetField = ref(null);
+const showMcsOptionsModal = ref(false);
+const showMcsSearchModal = ref(false);
+const selectedMcsTargetField = ref(null);
+const showProductModal = ref(false);
+const selectedProductTargetField = ref(null);
+const showResults = ref(false);
+const products = ref([]);
+const loadingProducts = ref(false);
+
 // Action handlers
 const proceedAction = () => {
   // In a real implementation, this would navigate to a results page
   // or perform a search with the specified criteria
   alert('Searching for non-active master cards with the specified criteria');
 };
+
+const handleSelectedSalesperson = (salesperson) => {
+  if (selectedSalespersonTargetField.value === 'from') {
+    salesPersonCodeFrom.value = salesperson.salesperson_code;
+  } else if (selectedSalespersonTargetField.value === 'to') {
+    salesPersonCodeTo.value = salesperson.salesperson_code;
+  }
+  showSalespersonModal.value = false;
+};
+
+const openSalespersonLookup = (targetField) => {
+  selectedSalespersonTargetField.value = targetField;
+  showSalespersonModal.value = true;
+};
+
+const handleSelectedCustomerAccount = (customer) => {
+  if (selectedCustomerAccountTargetField.value === 'from') {
+    acFrom.value = customer.customer_code;
+  } else if (selectedCustomerAccountTargetField.value === 'to') {
+    acTo.value = customer.customer_code;
+  }
+  showCustomerAccountModal.value = false;
+};
+
+const openCustomerAccountLookup = (targetField) => {
+  selectedCustomerAccountTargetField.value = targetField;
+  showCustomerAccountModal.value = true;
+};
+
+const handleMcsOptionsConfirm = (options) => {
+  console.log('Master Card options confirmed:', options);
+  showMcsOptionsModal.value = false;
+  showMcsSearchModal.value = true;
+};
+
+const handleSelectedMc = (mc) => {
+  if (selectedMcsTargetField.value === 'from') {
+    mcsFrom.value = mc.mc_seq;
+  } else if (selectedMcsTargetField.value === 'to') {
+    mcsTo.value = mc.mc_seq;
+  }
+  showMcsSearchModal.value = false;
+};
+
+const openMcsLookup = (targetField) => {
+  selectedMcsTargetField.value = targetField;
+  showMcsOptionsModal.value = true;
+};
+
+const handleSelectedProduct = (product) => {
+  if (selectedProductTargetField.value === 'from') {
+    productFrom.value = product.product_code; // Assuming 'product_code' is the property
+  } else if (selectedProductTargetField.value === 'to') {
+    productTo.value = product.product_code;
+  }
+  showProductModal.value = false;
+};
+
+const openProductLookup = (targetField) => {
+  selectedProductTargetField.value = targetField;
+  showProductModal.value = true;
+};
+
+// Function to fetch products
+const fetchProducts = async () => {
+  loadingProducts.value = true;
+  try {
+    const csrfToken = window.getCsrfToken();
+    const response = await fetch('/api/products', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken,
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    products.value = data;
+    console.log('Products loaded:', products.value.length);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    alert('Failed to load products. Please try again later.');
+  } finally {
+    loadingProducts.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchProducts();
+});
 </script>
 
 <style scoped>
