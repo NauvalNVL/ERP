@@ -148,10 +148,6 @@ Route::middleware('auth')->group(function () {
              return Inertia::render('system-manager/system-maintenance/view-and-print-foreign-currency');
          })->name('vue.foreign-currency.view-print');
          
-        Route::post('/foreign-currency', [ForeignCurrencyController::class, 'store'])->name('foreign-currency.store');
-        Route::put('/foreign-currency/{foreign_currency}', [ForeignCurrencyController::class, 'update'])->name('foreign-currency.update');
-        Route::delete('/foreign-currency/{foreign_currency}', [ForeignCurrencyController::class, 'destroy'])->name('foreign-currency.destroy');
-
          Route::get('/business-form', function() {
              return Inertia::render('system-manager/system-maintenance/business-form', [
                  'header' => 'Define Business Form'

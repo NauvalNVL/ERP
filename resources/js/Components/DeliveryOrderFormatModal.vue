@@ -85,7 +85,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, watch, computed } from 'vue';
+import { ref, watch, computed } from 'vue';
 import debounce from 'lodash/debounce';
 
 const props = defineProps({

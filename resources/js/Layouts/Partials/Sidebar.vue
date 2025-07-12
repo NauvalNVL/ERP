@@ -1,33 +1,21 @@
 <template>
-  <div class="flex flex-col h-full bg-gray-800 text-white w-full">
-    <!-- Header -->
-    <div class="px-4 py-3 border-b border-gray-700 flex-shrink-0">
-      <div class="flex items-center justify-between">
+  <div class="flex flex-col h-screen bg-gray-800 text-white animate-fadeIn overflow-hidden">
+    <!-- Header with animation -->
+    <div class="px-4 py-3 border-b border-gray-700 relative z-10">
       <div class="flex items-center">
         <div class="w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-full mr-3 pulse">
           <i class="fas fa-building text-xl"></i>
         </div>
         <h1 class="text-xl font-bold slide-in-right">ERP System</h1>
-        </div>
-        <!-- Mobile Close Button -->
-        <button
-          @click="closeMobileSidebar"
-          class="p-2 text-gray-300 hover:text-white rounded-full lg:hidden hover:bg-gray-700 transition-colors"
-          title="Close sidebar"
-        >
-          <i class="fas fa-times text-xl"></i>
-        </button>
       </div>
     </div>
 
-    <!-- Scrollable Navigation Menu - Fixed max-height with overflow -->
-    <div class="flex-1 overflow-y-auto custom-scrollbar">
-      <nav class="px-2 py-4 space-y-2">
+    <!-- Navigation Menu -->
+    <nav class="flex-grow px-2 py-4 space-y-2 overflow-y-auto sidebar-content">
       <!-- Dashboard -->
       <div class="relative group">
         <Link 
           href="/dashboard" 
-            @click="closeMobileSidebar"
           class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
           :class="{ 'bg-blue-600 text-white font-medium': currentPath === '/dashboard' }"
         >
@@ -41,7 +29,6 @@
         title="System Manager" 
         icon="fas fa-cogs"
         :items="systemManagerItems"
-          menu-id="system-manager"
       />
 
       <!-- Sales Management -->
@@ -49,7 +36,6 @@
         title="Sales Management" 
         icon="fas fa-chart-line"
         :items="salesManagementItems"
-          menu-id="sales-management"
       />
 
       <!-- Material Management -->
@@ -57,7 +43,6 @@
         title="Material Management" 
         icon="fas fa-boxes"
         :items="materialManagementItems"
-          menu-id="material-management"
       />
 
       <!-- Production Management -->
@@ -65,7 +50,6 @@
         title="Production Management" 
         icon="fas fa-industry"
         :items="productionManagementItems"
-          menu-id="production-management"
       />
 
       <!-- Warehouse Management -->
@@ -73,14 +57,12 @@
         title="Warehouse Management" 
         icon="fas fa-warehouse"
         :items="warehouseManagementItems"
-          menu-id="warehouse-management"
       />
 
       <!-- Data Mining -->
       <div class="relative group">
         <Link 
           href="/data-mining" 
-            @click="closeMobileSidebar"
           class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
           :class="{ 'bg-blue-600 text-white font-medium': currentPath === '/data-mining' }"
         >
@@ -89,10 +71,9 @@
         </Link>
       </div>
     </nav>
-    </div>
 
-    <!-- Footer -->
-    <div class="border-t border-gray-700 p-4 bg-gray-800 flex-shrink-0">
+    <!-- User Profile & Logout -->
+    <div class="border-t border-gray-700 p-4 sticky bottom-0 bg-gray-800 z-10 slide-in-up">
       <div class="flex items-center justify-between">
         <div class="flex items-center">
           <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
@@ -129,8 +110,9 @@
     </div>
   </div>
 </template>
+
 <script setup>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { usePage, Link, router } from '@inertiajs/vue3';
 import SidebarDropdown from './SidebarDropdown.vue';
 import sidebarStore from './sidebarStore';
@@ -140,20 +122,35 @@ const user = computed(() => page.props.auth?.user);
 const userInitial = computed(() => user.value?.username ? user.value.username.charAt(0).toUpperCase() : 'G');
 const currentPath = computed(() => page.url);
 
+// Extract the base path from the URL (e.g., '/foreign-currency/view-print' -> '/foreign-currency')
+const getBasePath = (path) => {
+  if (!path) return '';
+  const parts = path.split('/').filter(Boolean);
+  return parts.length > 0 ? `/${parts[0]}` : '';
+};
+
+// Check if the current route matches the given route exactly
+const isActive = (route) => {
+  if (!route) return false;
+  return currentPath.value === route;
+};
+
 const logout = () => {
+  // Use Inertia router for logout
   router.post('/logout', {}, {
+    preserveScroll: true,
     onSuccess: () => {
       window.location.href = '/login';
     },
+    onError: () => {
+      console.error('Logout failed');
+    }
   });
 };
 
+// Reset all dropdown menus to their closed state
 const resetMenus = () => {
   sidebarStore.resetState();
-};
-
-const closeMobileSidebar = () => {
-  sidebarStore.closeMobile();
 };
 
 // System Manager Items
@@ -265,12 +262,16 @@ const salesManagementItems = [
           { title: 'Approve MC', icon: 'fas fa-check', route: '/sales-management/system-requirement/master-card/approve-mc' },
           { title: 'Release Approved MC', icon: 'fas fa-unlock', route: '/sales-management/system-requirement/master-card/realese-approve-mc' },
           { title: 'Obsolete & Reactive MC', icon: 'fas fa-ban', route: '/sales-management/system-requirement/master-card/obsolete-reactive-mc' },
-          { title: 'Initialized MC Maintenance Log', icon: 'fas fa-history', route: '/sales-management/system-requirement/master-card/initialized-mc-maintenance-log' },
-          { title: 'View & Print Update MC', icon: 'fas fa-print', route: '/sales-management/system-requirement/master-card/view-print-update-mc' },
-          { title: 'View & Print Approved MC', icon: 'fas fa-print', route: '/sales-management/system-requirement/master-card/view-print-approved-mc' },
-          { title: 'View & Print Released MC', icon: 'fas fa-print', route: '/sales-management/system-requirement/master-card/view-print-released-mc' },
-          { title: 'View & Print Obsolete & Reactive MC', icon: 'fas fa-print', route: '/sales-management/system-requirement/master-card/view-print-obsolete-reactive-mc' },
-          { title: 'View & Print MC Maintenance Log', icon: 'fas fa-print', route: '/sales-management/system-requirement/master-card/view-print-mc-maintenance-log' }
+          { title: 'View & Print MC', icon: 'fas fa-print', route: '/sales-management/system-requirement/master-card/view-and-print-MC' },
+          { title: 'View & Print MC Maintenance Log', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log' },
+          { title: 'View & Print MC Approval Log', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/view-and-print-mc-approval-log' },
+          { title: 'View & Print Non-Active MC', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/view-and-print-non-active-mc' },
+          { title: 'Initialized MC Maintenance Log', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/initialized-mc-maintenance-log' },
+          { title: 'View & Print MC Print/DC Block Listing', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/view-and-print-mc-print-dc-block-listing' },
+          { title: 'View & Print MC DC Block Matching', icon: 'fas fa-project-diagram', route: '/sales-management/system-requirement/master-card/view-and-print-mc-print-dc-block-matching' },
+          { title: 'View & Print MC by Color', icon: 'fas fa-palette', route: '/sales-management/system-requirement/master-card/view-and-print-mc-by-color' },
+          { title: 'View & Print MC by P/Size P/Quality', icon: 'fas fa-ruler-combined', route: '/sales-management/system-requirement/master-card/view-and-print-mc-by-psize-pquality' },
+          { title: 'View & Print MC by Machine', icon: 'fas fa-cogs', route: '/sales-management/system-requirement/master-card/view-and-print-mc-by-machine' }
         ]
       },
       {
@@ -399,239 +400,343 @@ const salesManagementItems = [
 const materialManagementItems = [
   { 
     title: 'System Requirement', 
-    icon: 'fas fa-sitemap',
+    icon: 'fas fa-clipboard-list', 
     children: [
       { 
         title: 'Standard Setup', 
-        icon: 'fas fa-tools',
+        icon: 'fas fa-cogs',
         children: [
-          { title: 'Configuration', icon: 'fas fa-cogs', route: '/material-management/system-requirement/standard-setup/configuration' },
-          { title: 'Control Period', icon: 'fas fa-calendar-alt', route: '/material-management/system-requirement/standard-setup/control-period' },
-          { title: 'Analysis Code', icon: 'fas fa-chart-pie', route: '/material-management/system-requirement/standard-setup/analysis-code' },
-          { title: 'Receive Destination', icon: 'fas fa-map-marker-alt', route: '/material-management/system-requirement/standard-setup/receive-destination' },
-          { title: 'Transaction Type', icon: 'fas fa-exchange-alt', route: '/material-management/system-requirement/standard-setup/transaction-type' },
-          { title: 'Tax Type', icon: 'fas fa-percent', route: '/material-management/system-requirement/standard-setup/tax-type' },
-          { title: 'Tax Group', icon: 'fas fa-layer-group', route: '/material-management/system-requirement/standard-setup/tax-group' },
-          // View & Print
+          { title: 'Define Configuration', icon: 'fas fa-sliders-h', route: '/material-management/system-requirement/standard-setup/configuration' },
+          { title: 'Define Control Period', icon: 'fas fa-calendar-alt', route: '/material-management/system-requirement/standard-setup/control-period' },
+          { title: 'Define Transaction Type', icon: 'fas fa-exchange-alt', route: '/material-management/system-requirement/standard-setup/transaction-type' },
+          { title: 'Define Tax Type', icon: 'fas fa-percentage', route: '/material-management/system-requirement/standard-setup/tax-type' },
+          { title: 'Define Tax Group', icon: 'fas fa-layer-group', route: '/material-management/system-requirement/standard-setup/tax-group' },
+          { title: 'Define Receive Destination', icon: 'fas fa-map-marker-alt', route: '/material-management/system-requirement/standard-setup/receive-destination' },
+          { title: 'Define Analysis Code', icon: 'fas fa-tags', route: '/material-management/system-requirement/standard-setup/analysis-code' },
           { title: 'View & Print Control Period', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/control-period/view-print' },
-          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/analysis-code/view-print' },
-          { title: 'View & Print Receive Destination', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/receive-destination/view-print' },
           { title: 'View & Print Transaction Type', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/transaction-type/view-print' },
           { title: 'View & Print Tax Type', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/tax-type/view-print' },
           { title: 'View & Print Tax Group', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/tax-group/view-print' },
-        ],
+          { title: 'View & Print Receive Destination', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/receive-destination/view-print' },
+          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/analysis-code/view-print' }
+        ]
       },
       {
         title: 'Inventory Setup',
-        icon: 'fas fa-dolly-flatbed',
+        icon: 'fas fa-inventory',
         children: [
-          { title: 'Category', icon: 'fas fa-tags', route: '/material-management/system-requirement/inventory-setup/category' },
-          { title: 'Location', icon: 'fas fa-map-marked-alt', route: '/material-management/system-requirement/inventory-setup/location' },
-          { title: 'SKU', icon: 'fas fa-barcode', route: '/material-management/system-requirement/inventory-setup/sku' },
-          // View & Print
-          { title: 'View & Print Category', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/category/view-print' },
-          { title: 'View & Print Location', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/location/view-print' },
-          { title: 'View & Print SKU', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/sku/view-print' },
+          { title: 'Define Category', icon: 'fas fa-bookmark', route: '/material-management/system-requirement/inventory-setup/category' },
+          { title: 'Define Location', icon: 'fas fa-map-marker-alt', route: '/material-management/system-requirement/inventory-setup/location' },
+          { title: 'Define SKU', icon: 'fas fa-tags', route: '/material-management/system-requirement/inventory-setup/sku' },
+          { title: 'Define SKU Alternate', icon: 'fas fa-random', route: null },
+          { title: 'Define SKU User Cross-Ref', icon: 'fas fa-user-tag', route: null },
+          { title: 'Define Daily Alert', icon: 'fas fa-bell', route: '/material-management/inventory-setup/daily-alert' },
+          { title: 'Define Supplier', icon: 'fas fa-truck', route: '/material-management/inventory-setup/supplier' },
+          { title: 'View & Print Category', icon: 'fas fa-print', route: '/material-management/inventory-setup/category/view-print' },
+          { title: 'View & Print Location', icon: 'fas fa-print', route: '/material-management/inventory-setup/location/view-print' },
+          { title: 'View & Print SKU', icon: 'fas fa-print', route: '/material-management/inventory-setup/sku/view-print' },
+          { title: 'View & Print Daily Alert', icon: 'fas fa-print', route: '/material-management/inventory-setup/daily-alert/view-print' },
+          { title: 'View & Print Supplier', icon: 'fas fa-print', route: '/material-management/inventory-setup/supplier/view-print' }
         ]
       },
       { 
         title: 'Purchase Order Setup', 
-        icon: 'fas fa-file-invoice-dollar',
+        icon: 'fas fa-shopping-cart', 
         children: [
-          // Add items here
-        ],
-      },
-    ],
+          { title: 'Define Purchaser', icon: 'fas fa-user-tie', route: '/material-management/purchase-order-setup/purchaser' },
+          { title: 'Define Approver', icon: 'fas fa-user-check', route: '/material-management/purchase-order-setup/approver' },
+          { title: 'Define Purchase Sub-Control', icon: 'fas fa-sliders-h', route: '/material-management/purchase-order-setup/sub-control' },
+          { title: 'Define SKU Item Note Analysis Group', icon: 'fas fa-layer-group', route: '/material-management/purchase-order-setup/sku-note-group' },
+          { title: 'Define SKU Item Note Analysis Code', icon: 'fas fa-tags', route: '/material-management/purchase-order-setup/sku-note-code' },
+          { title: 'View & Print Purchaser', icon: 'fas fa-print', route: '/material-management/purchase-order-setup/purchaser/view-print' },
+          { title: 'View & Print Approver', icon: 'fas fa-print', route: '/material-management/purchase-order-setup/approver/view-print' },
+          { title: 'View & Print Purchase Sub-Control', icon: 'fas fa-print', route: '/material-management/purchase-order-setup/sub-control/view-print' },
+          { title: 'View & Print SKU Item Note Analysis Group', icon: 'fas fa-print', route: '/material-management/purchase-order-setup/sku-note-group/view-print' },
+          { title: 'View & Print SKU Item Note Analysis Code', icon: 'fas fa-print', route: '/material-management/purchase-order-setup/sku-note-code/view-print' }
+        ]
+      }
+    ]
   },
   { 
     title: 'Purchase Order', 
-    icon: 'fas fa-shopping-basket',
+    icon: 'fas fa-shopping-cart',
     children: [
       { 
-        title: 'P/R & P/O',
-        icon: 'fas fa-file-signature',
+        title: 'PR/PO', 
+        icon: 'fas fa-file-invoice', 
         children: [
-          // Add items here
-        ],
+          { title: 'Purchase Requisition Entry', icon: 'fas fa-file-alt', route: '/material-management/pr-po/purchase-requisition' },
+          { title: 'Purchase Order Entry', icon: 'fas fa-file-signature', route: '/material-management/pr-po/purchase-order' },
+          { title: 'Approve PR/PO', icon: 'fas fa-check-double', route: '/material-management/pr-po/approve' },
+          { title: 'Cancel PR/PO', icon: 'fas fa-times-circle', route: '/material-management/pr-po/cancel' },
+          { title: 'Close PR/PO', icon: 'fas fa-window-close', route: '/material-management/pr-po/close' }
+        ]
       },
-       {
-        title: 'P/R & P/O Reports',
-        icon: 'fas fa-chart-line',
+      { 
+        title: 'PR/PO Reports', 
+        icon: 'fas fa-chart-bar', 
         children: [
-          // Add items here
-        ],
+          { title: 'Print PR/PO', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-pr-po' },
+          { title: 'Print PR/PO Cancel Report', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-cancel-report' },
+          { title: 'Print PR/PO Status Report', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-status-report' },
+          { title: 'Print PR/PO Delivery Schedule Report', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-delivery-schedule' },
+          { title: 'Print PR/PO Analysis Report', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-analysis-report' },
+          { title: 'Print Supplier Performance Report', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-supplier-performance' }
+        ]
       },
       {
-        title: 'P/R & P/O Period End Closing',
+        title: 'PR/PO Period End Closing',
         icon: 'fas fa-calendar-check', 
         children: [
-          // Add items here
-        ],
-      },
-    ],
+          { title: 'Purge Closed PR/PO', icon: 'fas fa-trash-alt', route: '/material-management/pr-po-period-end/purge-closed' },
+          { title: 'Purge Cancelled PR/PO', icon: 'fas fa-trash-alt', route: '/material-management/pr-po-period-end/purge-cancelled' }
+        ]
+      }
+    ]
   },
   { 
     title: 'Inventory Control', 
-    icon: 'fas fa-tasks',
+    icon: 'fas fa-boxes',
     children: [
-      {
-        title: 'R/C & R/T',
-        icon: 'fas fa-truck-loading',
-        children: [
-          // Add items here
-        ],
-      },
-       {
-        title: 'I/S, M/I, M/O, L/T',
+      { 
+        title: 'RC/RT', 
         icon: 'fas fa-exchange-alt',
         children: [
-          // Add items here
-        ],
+          { title: 'Receive Note Entry', icon: 'fas fa-file-import', route: '/material-management/inventory-control/rc-rt/receive-note' },
+          { title: 'Return Note Entry', icon: 'fas fa-file-export', route: '/material-management/inventory-control/rc-rt/return-note' },
+          { title: 'Cancel RC/RT', icon: 'fas fa-times-circle', route: '/material-management/inventory-control/rc-rt/cancel' }
+        ]
       },
-       {
-        title: 'D/R & C/N',
-        icon: 'fas fa-file-invoice',
+      {
+        title: 'IS/MI/MO/LT',
+        icon: 'fas fa-arrows-alt-h',
         children: [
-          // Add items here
-        ],
+          { title: 'Issue Note Entry', icon: 'fas fa-file-upload', route: '/material-management/inventory-control/is-mi-mo-lt/issue-note' },
+          { title: 'Stock-In Entry', icon: 'fas fa-dolly-flatbed', route: '/material-management/inventory-control/is-mi-mo-lt/stock-in' },
+          { title: 'Stock-Out Entry', icon: 'fas fa-dolly', route: '/material-management/inventory-control/is-mi-mo-lt/stock-out' },
+          { title: 'Location Transfer Entry', icon: 'fas fa-people-carry', route: '/material-management/inventory-control/is-mi-mo-lt/location-transfer' },
+          { title: 'Cancel IS/MI/MO/LT', icon: 'fas fa-ban', route: '/material-management/inventory-control/is-mi-mo-lt/cancel' }
+        ]
+      },
+      {
+        title: 'DR/CN',
+        icon: 'fas fa-file-invoice-dollar',
+        children: [
+          { title: 'Debit Note Entry', icon: 'fas fa-file-medical', route: '/material-management/inventory-control/dr-cn/debit-note' },
+          { title: 'Credit Note Entry', icon: 'fas fa-file-prescription', route: '/material-management/inventory-control/dr-cn/credit-note' },
+          { title: 'Cancel DR/CN', icon: 'fas fa-times', route: '/material-management/inventory-control/dr-cn/cancel' }
+        ]
+      },
+      { 
+        title: 'Inventory Reports', 
+        icon: 'fas fa-chart-pie',
+        children: [
+          { title: 'Print RC/RT', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-rc-rt' },
+          { title: 'Print IS/MI/MO/LT', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-is-mi-mo-lt' },
+          { title: 'Print DR/CN', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-dr-cn' },
+          { title: 'Print Stock Card Report', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-stock-card' },
+          { title: 'Print Stock Balance Report', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-stock-balance' },
+          { title: 'Print Stock Aging Report', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-stock-aging' },
+          { title: 'Print Re-Order Advice Report', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-reorder-advice' },
+          { title: 'Print Slow Moving Item Report', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-slow-moving' }
+        ]
       },
       {
         title: 'Inventory Stock Take',
         icon: 'fas fa-clipboard-check',
         children: [
-          // Add items here
-        ],
-      },
-       {
-        title: 'Inventory Reports',
-        icon: 'fas fa-chart-bar',
-        children: [
-          // Add items here
-        ],
+          { title: 'Initialize Stock Take', icon: 'fas fa-play-circle', route: '/material-management/inventory-control/stock-take/initialize' },
+          { title: 'Print Stock Take Sheet', icon: 'fas fa-print', route: '/material-management/inventory-control/stock-take/print-sheet' },
+          { title: 'Update Stock Take Variance', icon: 'fas fa-edit', route: '/material-management/inventory-control/stock-take/update-variance' },
+          { title: 'Print Stock Take Variance Report', icon: 'fas fa-print', route: '/material-management/inventory-control/stock-take/print-variance-report' },
+          { title: 'Post Stock Take Variance', icon: 'fas fa-paper-plane', route: '/material-management/inventory-control/stock-take/post-variance' }
+        ]
       },
       {
         title: 'Inventory Period End Closing',
-        icon: 'fas fa-lock',
+        icon: 'fas fa-calendar-alt',
         children: [
-          // Add items here
-        ],
-      },
-    ],
+          { title: 'Purge Closed Transaction', icon: 'fas fa-trash', route: '/material-management/inventory-control/period-end/purge-closed' },
+          { title: 'Purge Cancelled Transaction', icon: 'fas fa-trash', route: '/material-management/inventory-control/period-end/purge-cancelled' }
+        ]
+      }
+    ]
   },
-  {
-    title: 'Accounts',
-    icon: 'fas fa-university',
+  { 
+    title: 'Account', 
+    icon: 'fas fa-book',
     children: [
-      // Add items here
-    ],
-  },
-];
-
-// Production Management Items
-const productionManagementItems = [
-  // Add items here
-];
-
-// Warehouse Management Items
-const warehouseManagementItems = [
-  {
-    title: 'Finished Goods',
-    icon: 'fas fa-box-open',
-    children: [
-      {
-        title: 'Setup & Maintenance',
-        icon: 'fas fa-cogs',
+      { 
+        title: 'Setup Account',
+        icon: 'fas fa-user-cog',
         children: [
-          { title: 'Define Configuration', icon: 'fas fa-sliders-h', route: '/warehouse-management/finished-goods/setup-maintenance/define-configuration' },
-          { title: 'Define Control Period', icon: 'fas fa-calendar', route: '/warehouse-management/finished-goods/setup-maintenance/define-control-period' },
-          { title: 'Define Analysis Code', icon: 'fas fa-chart-pie', route: '/warehouse-management/finished-goods/setup-maintenance/define-analysis-code' },
-          { title: 'Define Transaction Type', icon: 'fas fa-exchange-alt', route: '/warehouse-management/finished-goods/setup-maintenance/define-transaction-type' },
-          { title: 'Define Warehouse Location', icon: 'fas fa-warehouse', route: '/warehouse-management/finished-goods/setup-maintenance/define-warehouse-location' },
-          { title: 'Define Customer Warehouse Location', icon: 'fas fa-map-marker-alt', route: '/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-location' },
-          { title: 'Define DO Entry Dates', icon: 'fas fa-calendar-plus', route: '/warehouse-management/finished-goods/setup-maintenance/define-do-entry-dates' },
+          { title: 'Define Chart of Account', icon: 'fas fa-sitemap', route: '/material-management/account/setup/chart-of-account' },
+          { title: 'Define Account Type', icon: 'fas fa-tags', route: '/material-management/account/setup/account-type' },
+          { title: 'Define Account Sub-Type', icon: 'fas fa-tag', route: '/material-management/account/setup/account-sub-type' },
+          { title: 'Define Department', icon: 'fas fa-building', route: '/material-management/account/setup/department' },
+          { title: 'View & Print Chart of Account', icon: 'fas fa-print', route: '/material-management/account/setup/chart-of-account/view-print' },
+          { title: 'View & Print Account Type', icon: 'fas fa-print', route: '/material-management/account/setup/account-type/view-print' },
+          { title: 'View & Print Account Sub-Type', icon: 'fas fa-print', route: '/material-management/account/setup/account-sub-type/view-print' },
+          { title: 'View & Print Department', icon: 'fas fa-print', route: '/material-management/account/setup/department/view-print' }
         ]
       },
-      { title: 'Finished Goods Stock Entry (Stock-In)', icon: 'fas fa-dolly', route: '/warehouse-management/finished-goods/stock-entry' },
-      { title: 'Delivery Order Entry', icon: 'fas fa-truck', route: '/warehouse-management/finished-goods/delivery-order-entry' },
-      { title: 'Finished Goods Stock Balance Adjustment', icon: 'fas fa-sliders-h', route: '/warehouse-management/finished-goods/balance-adjustment' },
-      { title: 'Finished Goods Monthly Closing', icon: 'fas fa-calendar-check', route: '/warehouse-management/finished-goods/monthly-closing' },
-      {
-        title: 'Reports',
-        icon: 'fas fa-file-alt',
+      { 
+        title: 'Posting to Accounts', 
+        icon: 'fas fa-file-import',
         children: [
-          // report items here
+          { title: 'Post RC', icon: 'fas fa-share-square', route: '/material-management/account/posting/post-rc' },
+          { title: 'Post RT', icon: 'fas fa-reply', route: '/material-management/account/posting/post-rt' },
+          { title: 'Post DN', icon: 'fas fa-arrow-up', route: '/material-management/account/posting/post-dn' },
+          { title: 'Post CN', icon: 'fas fa-arrow-down', route: '/material-management/account/posting/post-cn' },
+          { title: 'Post IS', icon: 'fas fa-arrow-right', route: '/material-management/account/posting/post-is' },
+          { title: 'Post MI', icon: 'fas fa-arrow-left', route: '/material-management/account/posting/post-mi' },
+          { title: 'Post MO', icon: 'fas fa-minus-circle', route: '/material-management/account/posting/post-mo' }
         ]
       }
     ]
   }
 ];
 
+// Production Management Items
+const productionManagementItems = [
+  {
+    title: 'System Requirement',
+    icon: 'fas fa-cogs',
+    children: [
+      { title: 'Define Corrugator Machine', icon: 'fas fa-server', route: null },
+      { title: 'Define Converting Machine', icon: 'fas fa-sync-alt', route: null },
+      { title: 'Define Process', icon: 'fas fa-project-diagram', route: null },
+      { title: 'Define Machine Process', icon: 'fas fa-cogs', route: null },
+      { title: 'Define Unplanned Activities', icon: 'fas fa-tasks', route: null },
+      { title: 'Define Corrugator Downtime', icon: 'fas fa-clock', route: null },
+      { title: 'Define Converting Downtime', icon: 'fas fa-clock', route: null }
+    ]
+  },
+  {
+    title: 'Production Planning',
+    icon: 'fas fa-calendar-alt',
+    children: [
+      { title: 'Rough Cut Capacity Planning', icon: 'fas fa-chart-pie', route: null },
+      { title: 'Production Scheduling', icon: 'fas fa-calendar-check', route: null }
+    ]
+  },
+  {
+    title: 'Production Monitoring Board',
+    icon: 'fas fa-desktop',
+    route: '/production-monitoring-board',
+  },
+  {
+    title: 'Production Data Entry',
+    icon: 'fas fa-keyboard',
+    children: [
+      { title: 'Corrugator Production Entry', icon: 'fas fa-file-alt', route: null },
+      { title: 'Converting Production Entry', icon: 'fas fa-file-alt', route: null }
+    ]
+  },
+  {
+    title: 'Production Reports',
+    icon: 'fas fa-chart-bar',
+    children: [
+      { title: 'Print Rough Cut Report', icon: 'fas fa-print', route: null },
+      { title: 'Print Production Schedule', icon: 'fas fa-print', route: null },
+      { title: 'Print Corrugator Production Report', icon: 'fas fa-print', route: null },
+      { title: 'Print Converting Production Report', icon: 'fas fa-print', route: null }
+    ]
+  }
+];
+
+// Warehouse Management Items
+const warehouseManagementItems = [
+  {
+    title: 'Finished Goods',
+    icon: 'fas fa-boxes',
+    children: [
+      {
+        title: 'Setup Maintenance',
+        icon: 'fas fa-cogs',
+        children: [
+          { title: 'Setup F/Goods & D/Order Configuration', icon: 'fas fa-cogs', route: '/warehouse-management/finished-goods/setup-maintenance/fg-do-configuration' },
+          { title: 'Define Control Period', icon: 'fas fa-calendar-alt', route: '/warehouse-management/finished-goods/setup-maintenance/define-control-period' },
+          { title: 'Define Warehouse Location', icon: 'fas fa-map-marker-alt', route: '/warehouse-management/finished-goods/setup-maintenance/define-warehouse-location' },
+          { title: 'Define Customer Warehouse Location', icon: 'fas fa-users-cog', route: '/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-location' },
+          { title: 'Define Delivery Order Format', icon: 'fas fa-file-invoice', route: '/warehouse-management/finished-goods/setup-maintenance/define-delivery-order-format' },
+          { title: 'Define Customer Warehouse Requirement', icon: 'fas fa-tasks', route: '/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-requirement' },
+          { title: 'Define Analysis Code', icon: 'fas fa-tags', route: '/warehouse-management/finished-goods/setup-maintenance/define-analysis-code' },
+          { title: 'View & Print Control Period', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-control-period' },
+          { title: 'View & Print Warehouse Location', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-warehouse-location' },
+          { title: 'View & Print Customer Warehouse Location', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-customer-warehouse-location' },
+          { title: 'View & Print Delivery Order Format', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-delivery-order-format' },
+          { title: 'View & Print Customer Warehouse Requirement', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-customer-warehouse-requirement' },
+          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-analysis-code' },
+        ]
+      },
+      { title: 'FG Normal', icon: 'fas fa-box-open', route: '/warehouse-management/finished-goods/fg-normal' },
+      { title: 'FG Excess', icon: 'fas fa-box', route: '/warehouse-management/finished-goods/fg-excess' },
+      { title: 'Period-End Closing', icon: 'fas fa-calendar-alt', route: '/warehouse-management/finished-goods/period-end-closing' },
+      { title: 'Finished Goods Stock-Take V2', icon: 'fas fa-clipboard-check', route: '/warehouse-management/finished-goods/stock-take-v2' },
+      { title: 'FG Stock-Take V3 (GRX and Non-GRX)', icon: 'fas fa-clipboard-check', route: '/warehouse-management/finished-goods/stock-take-v3' }
+    ]
+  },
+  { title: 'Delivery Order', icon: 'fas fa-truck', route: '/warehouse-management/delivery-order' },
+  { title: 'Invoice', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice' },
+  { title: 'Debit/Credit Note', icon: 'fas fa-exchange-alt', route: '/warehouse-management/debit-credit-note' },
+  { title: 'Warehouse Analysis', icon: 'fas fa-chart-bar', route: '/warehouse-management/warehouse-analysis' },
+  { title: 'Custom Indonesia', icon: 'fas fa-flag', route: '/warehouse-management/custom-indonesia' },
+  { title: 'Accounts', icon: 'fas fa-cash-register', route: '/warehouse-management/accounts' },
+];
 </script>
 
 <style scoped>
-/* Custom Scrollbar Styles */
-.custom-scrollbar::-webkit-scrollbar {
+/* Custom scrollbar for webkit browsers */
+.sidebar-content::-webkit-scrollbar {
   width: 8px;
 }
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background-color: #1f2937; /* bg-gray-800 */
+.sidebar-content::-webkit-scrollbar-track {
+  background: #2d3748; /* bg-gray-800 */
+}
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: #4a5568; /* bg-gray-600 */
+  border-radius: 4px;
+}
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: #718096; /* bg-gray-500 */
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #4b5563; /* bg-gray-600 */
-  border-radius: 10px;
-  border: 2px solid #1f2937; /* bg-gray-800 */
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #6b7280; /* bg-gray-500 */
-}
-
-/* Ensure proper scrolling for nested menus */
-.dropdown-menu {
-  max-height: none !important;
-  overflow: visible !important;
-}
-
+/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+  }
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-@keyframes slide-in-right {
-  from { transform: translateX(-15px); opacity: 0; }
+@keyframes slideInRight {
+  from { transform: translateX(-20px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
+.slide-in-right {
+  animation: slideInRight 0.5s ease-in-out forwards;
+}
 
-@keyframes slide-in-up {
-  from { transform: translateY(15px); opacity: 0; }
+@keyframes slideInUp {
+  from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+.slide-in-up {
+  animation: slideInUp 0.5s ease-in-out forwards;
 }
 
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 0 10px 5px rgba(59, 130, 246, 0);
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
   }
 }
-
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-.slide-in-right {
-  animation: slide-in-right 0.5s ease-in-out forwards;
-}
-
-.slide-in-up {
-  animation: slide-in-up 0.5s ease-in-out forwards;
-}
-
 .pulse {
   animation: pulse 2s infinite;
 }
