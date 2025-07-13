@@ -195,187 +195,43 @@
         />
 
         <!-- Customer Account Options Modal -->
-        <div v-if="showCustomerAccountOptionsModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
-            <!-- Modal backdrop -->
-            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showCustomerAccountOptionsModal = false"></div>
-            
-            <!-- Modal content -->
-            <div class="relative bg-white rounded-lg shadow-xl w-96 mx-auto max-w-lg z-10 transform transition-all">
-                <!-- Modal header -->
-                <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-t-lg relative overflow-hidden">
-                    <div class="absolute -top-8 -left-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
-                    <div class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
-                    
-                    <h3 class="text-xl font-semibold flex items-center relative z-10">
-                        <span class="inline-flex items-center justify-center w-8 h-8 bg-white bg-opacity-20 rounded-full mr-3 shadow-inner">
-                            <i class="fas fa-filter text-white"></i>
-                        </span>
-                        Options
-                    </h3>
-                    <button type="button" @click="showCustomerAccountOptionsModal = false" 
-                        class="text-white hover:text-gray-200 focus:outline-none transition-transform hover:scale-110 relative z-10 bg-red-500 bg-opacity-30 hover:bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="p-6 space-y-6">
-                    <!-- Sort By Options -->
-                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
-                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
-                            <i class="fas fa-sort mr-2 text-blue-500"></i>Sort by:
-                        </h4>
-                        <div class="space-y-2 ml-2">
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="radio" v-model="customerOptionSortBy" value="customer_code" class="form-radio h-4 w-4 text-blue-600">
-                                <span class="ml-2 text-gray-700">Customer Code</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="radio" v-model="customerOptionSortBy" value="customer_name" class="form-radio h-4 w-4 text-blue-600">
-                                <span class="ml-2 text-gray-700">Customer Name</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <!-- Record Status Options -->
-                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
-                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
-                            <i class="fas fa-tag mr-2 text-blue-500"></i>Record Status:
-                        </h4>
-                        <div class="flex items-center space-x-6 ml-2">
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="checkbox" v-model="customerOptionRecordStatus.active" class="form-checkbox h-4 w-4 text-blue-600 rounded">
-                                <span class="ml-2 text-gray-700">Active</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="checkbox" v-model="customerOptionRecordStatus.obsolete" class="form-checkbox h-4 w-4 text-blue-600 rounded">
-                                <span class="ml-2 text-gray-700">Obsolete</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-center space-x-4 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-                    <button 
-                        @click="applyCustomerOptions" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    >
-                        <i class="fas fa-check mr-2"></i>OK
-                    </button>
-                    <button 
-                        @click="showCustomerAccountOptionsModal = false" 
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
-                    >
-                        <i class="fas fa-times mr-2"></i>Exit
-                    </button>
-                </div>
-            </div>
-        </div>
+        <CustomerAccountOptionsModal
+            :show="showCustomerAccountOptionsModal"
+            @close="showCustomerAccountOptionsModal = false"
+            @confirm="applyCustomerOptions"
+            :initialSortBy="customerOptionSortBy"
+            :initialStatusFilter="customerOptionRecordStatus"
+        />
 
         <!-- MCS Options Modal -->
-        <div v-if="showMcsOptionsModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
-            <!-- Modal backdrop -->
-            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showMcsOptionsModal = false"></div>
-            
-            <!-- Modal content -->
-            <div class="relative bg-white rounded-lg shadow-xl w-96 mx-auto max-w-lg z-10 transform transition-all">
-                <!-- Modal header -->
-                <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-t-lg relative overflow-hidden">
-                    <div class="absolute -top-8 -left-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
-                    <div class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"></div>
-                    
-                    <h3 class="text-xl font-semibold flex items-center relative z-10">
-                        <span class="inline-flex items-center justify-center w-8 h-8 bg-white bg-opacity-20 rounded-full mr-3 shadow-inner">
-                            <i class="fas fa-filter text-white"></i>
-                        </span>
-                        Options
-                    </h3>
-                    <button type="button" @click="showMcsOptionsModal = false" 
-                        class="text-white hover:text-gray-200 focus:outline-none transition-transform hover:scale-110 relative z-10 bg-red-500 bg-opacity-30 hover:bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="p-6 space-y-6">
-                    <!-- Sort By Options -->
-                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
-                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
-                            <i class="fas fa-sort mr-2 text-blue-500"></i>Sort by:
-                        </h4>
-                        <div class="space-y-2 ml-2">
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="radio" v-model="mcsOptionSortBy" value="mc_seq" class="form-radio h-4 w-4 text-blue-600">
-                                <span class="ml-2 text-gray-700">MC Seq#</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="radio" v-model="mcsOptionSortBy" value="mc_model" class="form-radio h-4 w-4 text-blue-600">
-                                <span class="ml-2 text-gray-700">MC Model</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="radio" v-model="mcsOptionSortBy" value="pd_part_no" class="form-radio h-4 w-4 text-blue-600">
-                                <span class="ml-2 text-gray-700">MC PD Part#</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="radio" v-model="mcsOptionSortBy" value="pd_ed" class="form-radio h-4 w-4 text-blue-600">
-                                <span class="ml-2 text-gray-700">MC PD ED</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="radio" v-model="mcsOptionSortBy" value="pd_id" class="form-radio h-4 w-4 text-blue-600">
-                                <span class="ml-2 text-gray-700">MC PD ID</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <!-- Sort Order Options -->
-                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
-                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
-                            <i class="fas fa-sort-amount-up mr-2 text-blue-500"></i>Sort Order:
-                        </h4>
-                        <div class="space-y-2 ml-2">
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="radio" v-model="mcsOptionSortOrder" value="Ascending" class="form-radio h-4 w-4 text-blue-600">
-                                <span class="ml-2 text-gray-700">Ascending</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="radio" v-model="mcsOptionSortOrder" value="Descending" class="form-radio h-4 w-4 text-blue-600">
-                                <span class="ml-2 text-gray-700">Descending</span>
-                            </label>
-                        </div>
-                    </div>
+        <MasterCardOptionsModal
+            :show="showMcsOptionsModal"
+            @close="showMcsOptionsModal = false"
+            @confirm="applyMcsOptions"
+            :initialSortBy="mcsOptionSortBy"
+            :initialSortOrder="mcsOptionSortOrder"
+            :initialStatusFilter="mcsOptionStatus"
+        />
+        
+        <!-- MCS Search/Select Modal -->
+        <MasterCardSearchSelectModal
+            :show="showMcsSearchSelectModal"
+            @close="showMcsSearchSelectModal = false"
+            @select="handleSelectedMc"
+            @zoom-mc="handleZoomMc"
+            :initialMcsList="masterCards"
+            :initialSortBy="mcsOptionSortBy"
+            :initialSortOrder="mcsOptionSortOrder"
+            :initialStatusFilter="mcsOptionStatus"
+        />
 
-                    <!-- Record Status Options -->
-                    <div class="bg-white border border-gray-300 rounded-md shadow-sm p-4">
-                        <h4 class="font-semibold mb-3 text-gray-700 flex items-center">
-                            <i class="fas fa-tag mr-2 text-blue-500"></i>Record Status:
-                        </h4>
-                        <div class="flex items-center space-x-6 ml-2">
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="checkbox" v-model="mcsOptionStatus.active" class="form-checkbox h-4 w-4 text-blue-600 rounded">
-                                <span class="ml-2 text-gray-700">Active</span>
-                            </label>
-                            <label class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md">
-                                <input type="checkbox" v-model="mcsOptionStatus.obsolete" class="form-checkbox h-4 w-4 text-blue-600 rounded">
-                                <span class="ml-2 text-gray-700">Obsolete</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center justify-center space-x-4 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-                    <button 
-                        @click="applyMcsOptions" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    >
-                        <i class="fas fa-check mr-2"></i>OK
-                    </button>
-                    <button 
-                        @click="showMcsOptionsModal = false" 
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
-                    >
-                        <i class="fas fa-times mr-2"></i>Exit
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- MCS Zoom Modal -->
+        <MasterCardZoomModal
+            :show="showMcsZoomModal"
+            :mc="zoomedMasterCard"
+            @close="closeMcsZoomModal"
+        />
+
     </AppLayout>
 </template>
 
@@ -384,6 +240,10 @@ import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useToast } from '@/Composables/useToast';
 import LookupModal from '@/Components/obsolete-reactive-modal.vue';
+import CustomerAccountOptionsModal from '@/Components/CustomerAccountOptionsModal.vue';
+import MasterCardOptionsModal from '@/Components/MasterCardOptionsModal.vue';
+import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue';
+import MasterCardZoomModal from '@/Components/MasterCardZoomModal.vue';
 import axios from 'axios';
 
 const { showToast } = useToast();
@@ -465,6 +325,9 @@ const mcsOptionStatus = ref({
     obsolete: true
 });
 const currentMcsLookupType = ref(''); // 'mcs_from' or 'mcs_to'
+const showMcsSearchSelectModal = ref(false);
+const showMcsZoomModal = ref(false);
+const zoomedMasterCard = ref(null);
 
 // Functions to open different lookups
 const openCustomerLookup = () => {
@@ -498,232 +361,186 @@ const applyCustomerOptions = () => {
             { key: 'salesperson', label: 'S/Person' },
             { key: 'acType', label: 'AC Type' },
             { key: 'currency', label: 'Currency' },
-            { key: 'status', label: 'Status' },
         ],
-        type: 'customer',
-        headerClass: 'bg-gradient-to-r from-purple-600 to-indigo-600',
-        headerIconClass: 'fas fa-th',
-        headerIconBgClass: 'bg-white bg-opacity-20',
-        filterTag: customerOptionRecordStatus.value.active && !customerOptionRecordStatus.value.obsolete ? 'Active Records Only' : '',
+        headerClass: 'from-blue-600 to-blue-700',
+        headerIconClass: 'fas fa-user-circle',
+        headerIconBgClass: 'bg-white bg-opacity-30',
+        filterTag: 'customer',
         showMoreOptionsButton: true,
         showZoomButton: true
     };
 };
 
-const handleCustomerMoreOptions = () => {
-    showCustomerAccountOptionsModal.value = true; // Re-open the options modal
-    lookup.value.show = false; // Close the lookup modal
-};
-
-const handleCustomerZoom = () => {
-    // Implement zoom logic if needed
-    showToast('Zoom functionality for Customer Account is not yet implemented.', 'info');
-};
 const openProductLookup = () => {
     lookup.value = {
         show: true,
         title: 'Product Table',
         items: products.value,
         headers: [
-            { key: 'product_code', label: 'Code' },
+            { key: 'product_code', label: 'Product Code' },
             { key: 'description', label: 'Description' },
-            { key: 'group', label: 'Group#' },
+            { key: 'group', label: 'Group' },
             { key: 'category', label: 'Category' },
         ],
-        type: 'product'
+        headerClass: 'from-blue-500 to-cyan-500',
+        headerIconClass: 'fas fa-box',
+        headerIconBgClass: 'bg-white bg-opacity-30',
+        filterTag: 'product',
+        showMoreOptionsButton: false,
+        showZoomButton: false
     };
 };
-const openMcsLookup = (target) => {
-    currentMcsLookupType.value = target;
-    showMcsOptionsModal.value = true; // Open MCS options modal first
+
+const openMcsLookup = (type) => {
+    currentMcsLookupType.value = type; // Store whether it's 'from' or 'to'
+    showMcsOptionsModal.value = true; // Open options modal first
 };
 
 const applyMcsOptions = () => {
-    let filteredMcs = masterCards.value.filter(mc => {
-        const isActive = mcsOptionStatus.value.active && mc.status === 'Active';
-        const isObsolete = mcsOptionStatus.value.obsolete && mc.status === 'Obsolete';
-        return isActive || isObsolete;
-    });
-
-    filteredMcs.sort((a, b) => {
-        let compareA, compareB;
-
-        switch (mcsOptionSortBy.value) {
-            case 'mc_seq':
-                compareA = a.mc_seq;
-                compareB = b.mc_seq;
-                break;
-            case 'mc_model':
-                compareA = a.mc_model;
-                compareB = b.mc_model;
-                break;
-            case 'pd_part_no':
-                compareA = a.pd_part_no;
-                compareB = b.pd_part_no;
-                break;
-            case 'pd_ed':
-                compareA = a.pd_ed;
-                compareB = b.pd_ed;
-                break;
-            case 'pd_id':
-                compareA = a.pd_id;
-                compareB = b.pd_id;
-                break;
-        }
-
-        if (mcsOptionSortOrder.value === 'Ascending') {
-            return String(compareA).localeCompare(String(compareB));
-        } else {
-            return String(compareB).localeCompare(String(compareA));
-        }
-    });
-
-    showMcsOptionsModal.value = false; // Close MCS options modal
-
-    let headers = [];
-    switch (mcsOptionSortBy.value) {
-        case 'mc_seq':
-            headers = [{ key: 'mc_seq', label: 'MC Seq#' }];
-            break;
-        case 'mc_model':
-            headers = [{ key: 'mc_model', label: 'MC Model' }];
-            break;
-        case 'pd_part_no':
-            headers = [{ key: 'pd_part_no', label: 'MC PD Part#' }];
-            break;
-        case 'pd_ed':
-            headers = [{ key: 'pd_ed', label: 'MC PD ED' }];
-            break;
-        case 'pd_id':
-            headers = [{ key: 'pd_id', label: 'MC PD ID' }];
-            break;
-    }
-
-    lookup.value = {
-        show: true,
-        title: 'Master Card Sequence',
-        items: filteredMcs,
-        headers: headers,
-        type: currentMcsLookupType.value
-    };
+    showMcsOptionsModal.value = false; // Close options modal
+    showMcsSearchSelectModal.value = true; // Open the search/select modal
 };
 
-// Function to handle selection from modal
-const handleLookupSelection = (selectedItem) => {
-    switch (lookup.value.type) {
-        case 'customer':
-            form.value.ac = selectedItem.customer_code;
-            break;
-        case 'product':
-            form.value.product_code = selectedItem.product_code;
-            break;
-        case 'mcs_from':
-            form.value.mcs_from = selectedItem.mc_seq;
-            break;
-        case 'mcs_to':
-            form.value.mcs_to = selectedItem.mc_seq;
-            break;
+const handleSelectedMc = (mc) => {
+    if (currentMcsLookupType.value === 'from') {
+        form.value.mcs_from = mc.mc_seq;
+    } else if (currentMcsLookupType.value === 'to') {
+        form.value.mcs_to = mc.mc_seq;
+    }
+    showMcsSearchSelectModal.value = false;
+};
+
+const handleZoomMc = (mc) => {
+    zoomedMasterCard.value = mc;
+    showMcsZoomModal.value = true;
+};
+
+const closeMcsZoomModal = () => {
+    showMcsZoomModal.value = false;
+    zoomedMasterCard.value = null;
+};
+
+const handleLookupSelection = (item) => {
+    if (lookup.value.type === 'customer') {
+        form.value.ac = item.customer_code;
+    } else if (lookup.value.type === 'product') {
+        form.value.product_code = item.product_code;
     }
     lookup.value.show = false;
 };
-// --- End Lookup Modal ---
+
+const handleCustomerMoreOptions = (customer) => {
+    console.log('More options for customer:', customer);
+    showToast('info', `More options for ${customer.customer_name}`);
+    // Implement navigation or another modal for more options
+};
+
+const handleCustomerZoom = (customer) => {
+    console.log('Zooming into customer:', customer);
+    showToast('info', `Zooming into ${customer.customer_name}`);
+    // Implement navigation or another modal for zooming
+};
 
 const processSelections = async () => {
-    if (!form.value.reason || form.value.reason.trim() === '') {
-        showToast('Reason is required.', 'error');
-        const reasonEl = document.getElementById('reason');
-        if (reasonEl) {
-            reasonEl.classList.add('border-red-500', 'ring-2', 'ring-red-200');
-            setTimeout(() => {
-                reasonEl.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
-            }, 2500);
-        }
+    if (!form.value.reason) {
+        showToast('error', 'Reason is mandatory for processing.');
         return;
     }
 
     const endpoint = form.value.action === 'obsolete' 
-        ? '/api/obsolate-reactive-mc/bulk-obsolete' 
-        : '/api/obsolate-reactive-mc/bulk-reactive';
+        ? '/api/obsolate-reactive-mc/obsolate/' 
+        : '/api/obsolate-reactive-mc/reactive/';
 
     try {
-        const response = await axios.post(endpoint, form.value);
-        showToast(response.data.message || 'Process completed successfully!', 'success');
-        // Reset the form after successful submission
-        form.value.ac = '';
-        form.value.mcs_from = '';
-        form.value.mcs_to = '';
-        form.value.product_code = '';
-        form.value.reason = '';
+        const response = await axios.post(endpoint, {
+            ac: form.value.ac,
+            mcs_from: form.value.mcs_from,
+            mcs_to: form.value.mcs_to,
+            product_code: form.value.product_code,
+            reason: form.value.reason,
+        });
 
+        if (response.data.success) {
+            showToast('success', response.data.message);
+            // Optionally, clear form or update UI after success
+            form.value.ac = '';
+            form.value.mcs_from = '';
+            form.value.mcs_to = '';
+            form.value.product_code = '';
+            form.value.reason = '';
+        } else {
+            showToast('error', response.data.message);
+        }
     } catch (error) {
-        const errorMessage = error.response?.data?.message || 'An error occurred during bulk processing.';
-        console.error(`Error during bulk ${form.value.action}:`, error);
-        showToast(errorMessage, 'error');
+        console.error('Error processing selection:', error);
+        showToast('error', 'Failed to process selections.');
     }
 };
 </script>
 
-<style>
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
-
-.text-shadow {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
+<style scoped>
+/* Base input field styling */
 .input-field {
-    @apply flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 group-hover:border-indigo-400 shadow-sm focus:shadow-md;
+    @apply w-full px-4 py-2 border border-gray-300 rounded-l-md shadow-sm
+           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+           transition-all duration-200 text-sm;
 }
+
+/* Styling for action radio buttons */
 .action-radio {
-    @apply flex-1 p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 bg-white flex items-center gap-4 hover:border-gray-400;
+    @apply flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer
+           transition-all duration-300 shadow-sm;
 }
+
+.action-radio:hover {
+    @apply shadow-md transform -translate-y-0.5;
+}
+
 .action-radio-obsolete-active {
-    @apply border-red-400 bg-red-50 shadow-lg scale-105;
+    @apply bg-red-50 border-red-400 ring-2 ring-red-500;
 }
+
 .action-radio-reactivate-active {
-    @apply border-green-400 bg-green-50 shadow-lg scale-105;
+    @apply bg-green-50 border-green-400 ring-2 ring-green-500;
 }
+
+/* Process button styling */
 .process-button {
-    @apply w-full md:w-auto bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold py-3 px-12 rounded-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center mx-auto relative overflow-hidden;
+    @apply relative overflow-hidden inline-flex items-center justify-center
+           px-8 py-3 bg-gradient-to-r from-teal-500 to-green-500 text-white font-semibold
+           rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105
+           hover:from-teal-600 hover:to-green-600 focus:outline-none focus:ring-2
+           focus:ring-teal-500 focus:ring-offset-2 w-full sm:w-auto;
 }
 
-.form-radio {
-  @apply appearance-none w-5 h-5 border-2 border-gray-300 rounded-full transition-all duration-200;
-}
-.action-card:hover .form-radio { @apply border-current; }
-.form-radio:checked { @apply border-8 border-current; }
-
-/* Animations */
-@keyframes fade-in-up {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-.animate-fade-in-up {
-    animation: fade-in-up 0.6s ease-out forwards;
-}
-
-@keyframes pulse-slow {
-    0%, 100% { transform: scale(1); opacity: 0.05; }
-    50% { transform: scale(1.1); opacity: 0.08; }
-}
-.animate-pulse-slow {
-    animation: pulse-slow 5s infinite;
-}
-.animation-delay-300 { animation-delay: 0.3s; }
-.animation-delay-500 { animation-delay: 0.5s; }
-
+/* Shimmer effect for buttons */
 .shimmer-effect {
-    @apply absolute top-0 -left-[150%] h-full w-[50%] skew-x-[-25deg] bg-white/20;
-    animation: shimmer 2.5s infinite;
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent
+           opacity-20 transition-transform duration-1000 transform -skew-x-12 translate-x-[-100%];
 }
-@keyframes shimmer {
-    100% {
-        left: 150%;
-    }
+
+.process-button:hover .shimmer-effect {
+    @apply translate-x-[100%];
 }
+
+/* Text shadow for headings */
+.text-shadow {
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Ping animation for header icons */
+@keyframes pulse-slow {
+    0% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 0.5; }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 3s ease-in-out infinite;
+}
+
+.animation-delay-500 {
+    animation-delay: 0.5s;
+}
+
 </style>

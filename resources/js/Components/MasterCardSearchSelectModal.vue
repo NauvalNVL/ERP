@@ -256,26 +256,18 @@ const selectRow = (mc) => {
 
 const selectMasterCard = () => {
   if (selectedRowMc.value) {
-    emit('select-mc', { mc: selectedRowMc.value, targetField: props.targetField });
+    emit('select-mc', selectedRowMc.value);
   }
 };
 
 const reopenOptionsModal = () => {
-  emit('reopen-options', { 
-    sortColumn: sortColumn.value, 
-    sortDirection: sortDirection.value, 
-    filterStatus: filterStatus.value,
-    targetField: props.targetField,
-  });
+  emit('reopen-options');
   closeModal();
 };
 
 const zoomSelectedMc = () => {
   if (selectedRowMc.value) {
-    emit('zoom-mc', selectedRowMc.value); // Emit selected MC data
-    closeModal();
-  } else {
-    alert('Please select a Master Card to zoom.');
+    emit('zoom-mc', selectedRowMc.value);
   }
 };
 
