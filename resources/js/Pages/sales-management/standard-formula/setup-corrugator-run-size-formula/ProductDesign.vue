@@ -232,267 +232,12 @@
     <ProductDesignModal
       :show="showModal"
       :designs="designs"
+      :products="products"
+      :is-creating="isCreating"
+      :design-to-edit="designToEdit"
+      @data-changed="refreshData"
       @close="showModal = false"
-      @select="onModalSelect"
     />
-
-    <!-- Design Form Modal -->
-    <div v-if="showFormModal" class="fixed inset-0 flex items-center justify-center z-50">
-      <div class="absolute inset-0 bg-black opacity-50" @click="showFormModal = false"></div>
-      <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl z-10 relative transform transition-all duration-300 ease-in-out">
-        <!-- Modal Header -->
-        <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-800 rounded-t-xl">
-          <div class="flex items-center">
-            <div class="bg-white/20 p-2 rounded-lg mr-3">
-              <i class="fas fa-drafting-compass text-white text-xl"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-white">{{ isEditing ? 'Edit' : 'New' }} Product Design</h3>
-          </div>
-          <button @click="showFormModal = false" class="bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg transition-all duration-200">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        
-        <!-- Form Content -->
-        <div class="p-6 max-h-[70vh] overflow-y-auto">
-          <form @submit.prevent="saveDesign">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <!-- Design Code -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-hashtag text-blue-500 mr-2"></i>
-                  Design Code<span class="text-red-500">*</span>
-                </label>
-                <input type="text" v-model="formDesign.pd_code" required :disabled="isEditing"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                  placeholder="Enter design code">
-                <p class="text-xs text-gray-500 mt-2 italic">Code must be unique and cannot be changed later</p>
-              </div>
-              
-              <!-- Design Name -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-tag text-blue-500 mr-2"></i>
-                  Design Name<span class="text-red-500">*</span>
-                </label>
-                <input type="text" v-model="formDesign.pd_name" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                  placeholder="Enter design name">
-              </div>
-              
-              <!-- Design Type -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-cube text-blue-500 mr-2"></i>
-                  Design Type<span class="text-red-500">*</span>
-                </label>
-                <select v-model="formDesign.pd_design_type" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none bg-white bg-no-repeat bg-right pr-10"
-                  style="background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23666%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>'); background-size: 16px;">
-                  <option value="">Select design type</option>
-                  <option value="M-Manufacture">M-Manufacture</option>
-                  <option value="T-Trading">T-Trading</option>
-                </select>
-              </div>
-              
-              <!-- IDC -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-barcode text-blue-500 mr-2"></i>
-                  IDC
-                </label>
-                <input type="text" v-model="formDesign.idc"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                  placeholder="Enter IDC">
-              </div>
-              
-              <!-- Product -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-box text-blue-500 mr-2"></i>
-                  Product<span class="text-red-500">*</span>
-                </label>
-                <select v-model="formDesign.product" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none bg-white bg-no-repeat bg-right pr-10"
-                  style="background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23666%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>'); background-size: 16px;">
-                  <option value="">Select product</option>
-                  <option value="001">001</option>
-                  <option value="002">002</option>
-                  <option value="003">003</option>
-                  <option value="005">005</option>
-                  <option value="006">006</option>
-                  <option value="013">013</option>
-                  <option value="015">015</option>
-                </select>
-              </div>
-              
-              <!-- Joint -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-link text-blue-500 mr-2"></i>
-                  Joint
-                </label>
-                <div class="flex gap-4">
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.joint" value="Yes" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">Yes</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.joint" value="No" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">No</span>
-                  </label>
-                </div>
-              </div>
-              
-              <!-- Joint to Print -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-print text-blue-500 mr-2"></i>
-                  Joint to Print
-                </label>
-                <div class="flex gap-4">
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.joint_to_print" value="Yes" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">Yes</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.joint_to_print" value="No" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">No</span>
-                  </label>
-                </div>
-              </div>
-              
-              <!-- PCS to Joint -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-puzzle-piece text-blue-500 mr-2"></i>
-                  PCS to Joint
-                </label>
-                <input type="text" v-model="formDesign.pcs_to_joint"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                  placeholder="Enter PCS to Joint">
-              </div>
-              
-              <!-- Score -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-chart-line text-blue-500 mr-2"></i>
-                  Score
-                </label>
-                <div class="flex gap-4">
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.score" value="Yes" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">Yes</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.score" value="No" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">No</span>
-                  </label>
-                </div>
-              </div>
-              
-              <!-- Slot -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-columns text-blue-500 mr-2"></i>
-                  Slot
-                </label>
-                <div class="flex gap-4">
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.slot" value="Yes" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">Yes</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.slot" value="No" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">No</span>
-                  </label>
-                </div>
-              </div>
-              
-              <!-- Flute Style -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-layer-group text-blue-500 mr-2"></i>
-                  Flute Style
-                </label>
-                <select v-model="formDesign.flute_style"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none bg-white bg-no-repeat bg-right pr-10"
-                  style="background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23666%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>'); background-size: 16px;">
-                  <option value="Normal">Normal</option>
-                  <option value="Reverse">Reverse</option>
-                  <option value="N/A">N/A</option>
-                </select>
-              </div>
-              
-              <!-- Print Flute -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-print text-blue-500 mr-2"></i>
-                  Print Flute
-                </label>
-                <div class="flex gap-4">
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.print_flute" value="Yes" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">Yes</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.print_flute" value="No" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">No</span>
-                  </label>
-                </div>
-              </div>
-              
-              <!-- Input Weight -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-weight text-blue-500 mr-2"></i>
-                  Input Weight
-                </label>
-                <div class="flex gap-4">
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.input_weight" value="Yes" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">Yes</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.input_weight" value="No" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">No</span>
-                  </label>
-                </div>
-              </div>
-              
-              <!-- Compute -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-calculator text-blue-500 mr-2"></i>
-                  Compute
-                </label>
-                <div class="flex gap-4">
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.compute" :value="true" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">Yes</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input type="radio" v-model="formDesign.compute" :value="false" class="w-4 h-4 text-blue-600 focus:ring-blue-500">
-                    <span class="ml-2 text-sm text-gray-700">No</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Form Footer with Buttons -->
-            <div class="flex justify-end space-x-3 border-t border-gray-200 pt-5 mt-4">
-              <button type="button" @click="showFormModal = false" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition-all duration-200 flex items-center">
-                <i class="fas fa-times mr-2"></i> Cancel
-              </button>
-              <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition-all duration-200 flex items-center" :disabled="loading">
-                <i class="fas fa-save mr-2"></i> {{ isEditing ? 'Update' : 'Create' }}
-                <span v-if="loading" class="ml-2 animate-spin"><i class="fas fa-spinner"></i></span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
 
     <!-- Confirmation Modal -->
     <div v-if="showConfirmation" class="fixed inset-0 flex items-center justify-center z-50">
@@ -530,14 +275,16 @@ import { useToast } from '@/Composables/useToast';
 
 // State variables
 const designs = ref([]);
+const products = ref([]);
 const selectedDesign = ref(null);
 const loading = ref(false);
 const searchQuery = ref('');
 const showModal = ref(false);
-const showFormModal = ref(false);
 const showConfirmation = ref(false);
 const designToDelete = ref(null);
-const isEditing = ref(false);
+const designToEdit = ref(null);
+const isCreating = ref(false);
+
 const sortOrder = ref({
   field: 'pd_code',
   direction: 'asc'
@@ -545,45 +292,6 @@ const sortOrder = ref({
 const toast = useToast();
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
-
-// Form for creating/editing design
-const formDesign = ref({
-  pd_code: '',
-  pd_name: '',
-  pd_design_type: '',
-  idc: '',
-  product: '',
-  joint: 'No',
-  joint_to_print: 'No',
-  pcs_to_joint: '0',
-  score: 'Yes',
-  slot: 'No',
-  flute_style: 'Normal',
-  print_flute: 'No',
-  input_weight: 'No',
-  compute: false
-});
-
-// Reset form to default values
-const resetForm = () => {
-  formDesign.value = {
-    pd_code: '',
-    pd_name: '',
-    pd_design_type: '',
-    idc: '',
-    product: '',
-    joint: 'No',
-    joint_to_print: 'No',
-    pcs_to_joint: '0',
-    score: 'Yes',
-    slot: 'No',
-    flute_style: 'Normal',
-    print_flute: 'No',
-    input_weight: 'No',
-    compute: false
-  };
-  isEditing.value = false;
-};
 
 // Computed properties
 const filteredDesigns = computed(() => {
@@ -653,6 +361,16 @@ const fetchDesigns = async () => {
   }
 };
 
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get('/api/products');
+    products.value = response.data;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    toast.error('Failed to load products.');
+  }
+};
+
 // Function to refresh data
 const refreshData = () => {
   selectedDesign.value = null;
@@ -664,65 +382,24 @@ const selectDesign = (design) => {
   selectedDesign.value = design;
 };
 
-// Function to handle design selection from modal
-const onModalSelect = (design) => {
-  selectedDesign.value = design;
-  showModal.value = false;
-};
-
 // Function to open the new design form modal
 const newDesign = () => {
-  resetForm();
-  showFormModal.value = true;
+  isCreating.value = true;
+  designToEdit.value = null;
+  showModal.value = true;
 };
 
 // Function to open the edit design form modal
 const editDesign = (design) => {
-  isEditing.value = true;
-  formDesign.value = { ...design };
-  showFormModal.value = true;
+  isCreating.value = false;
+  designToEdit.value = { ...design };
+  showModal.value = true;
 };
 
 // Function to confirm deletion of a design
 const confirmDelete = (design) => {
   designToDelete.value = design;
   showConfirmation.value = true;
-};
-
-// Function to save design (create or update)
-const saveDesign = async () => {
-  loading.value = true;
-  try {
-    let response;
-    
-    if (isEditing.value) {
-      // Update existing design
-      response = await axios.put(`/api/product-designs/${formDesign.value.pd_code}`, formDesign.value);
-      toast.success('Design updated successfully');
-      
-      // Update design in the local array
-      const index = designs.value.findIndex(d => d.pd_code === formDesign.value.pd_code);
-      if (index !== -1) {
-        designs.value[index] = response.data.data;
-        selectedDesign.value = response.data.data;
-      }
-    } else {
-      // Create new design
-      response = await axios.post('/api/product-designs', formDesign.value);
-      toast.success('Design created successfully');
-      
-      // Add new design to the local array
-      designs.value.push(response.data.data);
-      selectedDesign.value = response.data.data;
-    }
-    
-    showFormModal.value = false;
-  } catch (error) {
-    console.error('Error saving design:', error);
-    toast.error(error.response?.data?.message || 'Failed to save product design');
-  } finally {
-    loading.value = false;
-  }
 };
 
 // Function to delete a design
@@ -818,7 +495,10 @@ const printDesigns = () => {
 };
 
 // Load data when component is mounted
-onMounted(fetchDesigns);
+onMounted(() => {
+  fetchDesigns();
+  fetchProducts();
+});
 </script>
 
 <style scoped>
