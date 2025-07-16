@@ -15,23 +15,26 @@ class CustomerAlternateAddress extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'customer_name',
         'customer_code',
-        'salesperson_type',
-        'currency',
-        'currency_code',
-        'status',
-        'address',
-        'city',
-        'postal_code',
-        'phone',
+        'delivery_code',
+        'country',
+        'state',
+        'town',
+        'town_section',
+        'bill_to_name',
+        'bill_to_address',
+        'ship_to_name',
+        'ship_to_address',
+        'contact_person',
+        'tel_no',
+        'fax_no',
         'email',
     ];
 
     /**
      * Get the customer that owns the alternate address.
      */
-    public function customer()
+    public function customerAccount()
     {
         return $this->belongsTo(UpdateCustomerAccount::class, 'customer_code', 'customer_code');
     }

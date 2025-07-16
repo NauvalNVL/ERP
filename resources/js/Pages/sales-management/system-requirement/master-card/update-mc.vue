@@ -496,6 +496,7 @@
                         </span>
                     </button>
                     <button 
+                        @click="showZoomOptionsModal = true"
                         class="bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-500 hover:to-cyan-600 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow transition-all group relative overflow-hidden flex items-center"
                     >
                         <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
@@ -936,6 +937,7 @@
                         More Options
                     </button>
                     <button 
+                        @click="showZoomOptionsModal = true"
                         class="bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-500 hover:to-cyan-600 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow transition-all group relative overflow-hidden flex items-center"
                     >
                         <span class="absolute inset-0 w-full h-full bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
@@ -960,6 +962,65 @@
                 </div>
             </div>
         </div>
+
+        <div v-if="showZoomOptionsModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
+          <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="showZoomOptionsModal = false"></div>
+          <div class="relative w-full max-w-md mx-auto z-10 p-0">
+            <div class="rounded-2xl shadow-2xl border-4 border-blue-300 bg-gradient-to-br from-blue-50 via-purple-50 to-cyan-100 overflow-hidden animate-fadeIn">
+              <!-- Header -->
+              <div class="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 text-white shadow-md relative">
+                <div class="flex items-center gap-3">
+                  <span class="inline-flex items-center justify-center w-10 h-10 bg-white bg-opacity-20 rounded-full shadow-inner">
+                    <i class="fas fa-search-plus text-2xl text-white"></i>
+                  </span>
+                  <h3 class="text-xl font-bold tracking-wide drop-shadow">Zoom Options</h3>
+                </div>
+                <button @click="showZoomOptionsModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-red-500 bg-opacity-30 hover:bg-opacity-60 transition-colors focus:outline-none">
+                  <i class="fas fa-times text-lg"></i>
+                </button>
+              </div>
+              <!-- Body -->
+              <div class="px-8 py-8 space-y-6 bg-gradient-to-br from-white via-blue-50 to-purple-50">
+                <div class="space-y-4">
+                  <label class="flex items-center cursor-pointer group">
+                    <input type="radio" v-model="zoomOption" value="specification" class="form-radio accent-indigo-500 w-5 h-5 transition-all group-hover:scale-110" />
+                    <span class="ml-3 text-base font-semibold text-indigo-700 group-hover:text-indigo-900 transition-colors">M/Card Specification</span>
+                  </label>
+                  <label class="flex items-center cursor-pointer group">
+                    <input type="radio" v-model="zoomOption" value="current" class="form-radio accent-green-500 w-5 h-5 transition-all group-hover:scale-110" />
+                    <span class="ml-3 text-base font-semibold text-green-700 group-hover:text-green-900 transition-colors">Current Price</span>
+                  </label>
+                  <label class="flex items-center cursor-pointer group">
+                    <input type="radio" v-model="zoomOption" value="standby" class="form-radio accent-amber-500 w-5 h-5 transition-all group-hover:scale-110" />
+                    <span class="ml-3 text-base font-semibold text-amber-700 group-hover:text-amber-900 transition-colors">Standby Price</span>
+                  </label>
+                </div>
+              </div>
+              <!-- Footer -->
+              <div class="flex justify-end gap-4 px-8 py-5 bg-gradient-to-r from-blue-100 via-purple-100 to-cyan-100 border-t border-blue-200">
+                <button @click="handleZoomOk" class="px-7 py-2 rounded-lg font-bold text-white bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-500 shadow-md hover:from-indigo-600 hover:to-cyan-600 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                  OK
+                </button>
+                <button @click="showZoomOptionsModal = false" class="px-7 py-2 rounded-lg font-bold text-gray-800 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-400 shadow-md hover:from-gray-300 hover:to-gray-500 transition-all focus:outline-none focus:ring-2 focus:ring-gray-300">
+                  Exit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <MasterCardZoomModal
+          v-if="showMasterCardZoomModal"
+          :show="showMasterCardZoomModal"
+          :mcData="zoomedMcData"
+          @close="showMasterCardZoomModal = false"
+        />
+        <MasterCardCurrentPriceModal
+          v-if="showMasterCardCurrentPriceModal"
+          :show="showMasterCardCurrentPriceModal"
+          :mcData="currentPriceMcData"
+          @close="showMasterCardCurrentPriceModal = false"
+        />
     </AppLayout>
 </template>
 
@@ -967,6 +1028,8 @@
 import { ref, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import MasterCardZoomModal from '@/Components/MasterCardZoomModal.vue';
+import MasterCardCurrentPriceModal from '@/Components/MasterCardCurrentPriceModal.vue';
 
 // Form data
 const form = ref({
@@ -1015,6 +1078,18 @@ const selectedMcsIntDim1 = ref('');
 const selectedMcsIntDim2 = ref('');
 const selectedMcsIntDim3 = ref('');
 const mcsSearchTerm = ref('');
+
+// Zoom Options Modal state
+const showZoomOptionsModal = ref(false);
+const zoomOption = ref('specification'); // default: M/Card Specification
+
+// State for MasterCardZoomModal
+const showMasterCardZoomModal = ref(false);
+const zoomedMcData = ref(null);
+
+// State for MasterCardCurrentPriceModal
+const showMasterCardCurrentPriceModal = ref(false);
+const currentPriceMcData = ref(null);
 
 // Sample customer data with additional fields to match screenshot
 const customers = ref([
@@ -1320,6 +1395,104 @@ const applyCustomerOptionsFilter = () => {
     showCustomerAccountOptionsModal.value = false;
     showCustomerAccountTable.value = true;
 };
+
+const handleZoomOk = () => {
+  if (zoomOption.value === 'specification' && selectedMcs.value) {
+    zoomedMcData.value = mapMcsToZoomModal(selectedMcs.value);
+    showZoomOptionsModal.value = false;
+    showMasterCardZoomModal.value = true;
+  } else if (zoomOption.value === 'current' && selectedMcs.value) {
+    currentPriceMcData.value = mapMcsToCurrentPriceModal(selectedMcs.value);
+    showZoomOptionsModal.value = false;
+    showMasterCardCurrentPriceModal.value = true;
+  } else {
+    showZoomOptionsModal.value = false;
+  }
+};
+
+function mapMcsToZoomModal(mcs) {
+  // Mapping data dari selectedMcs ke format yang dibutuhkan MasterCardZoomModal
+  return {
+    ac_number: form.value.ac,
+    customer_name: form.value.customer_name,
+    mc_seq: mcs.seq,
+    mc_model: mcs.model,
+    status: form.value.status,
+    user_id: 'mc01', // Ganti sesuai kebutuhan
+    date: '',
+    note: '',
+    approved: 'Yes',
+    p_design: mcs.p_design,
+    flute: '',
+    part: mcs.part,
+    description: mcs.model,
+    sys_gross_area: '',
+    sys_gross_weight: '',
+    input_gross_area: '',
+    input_net_weight: '',
+    input_net_area: '',
+    b_quality: '',
+    l1_quality: '',
+    ace_quality: '',
+    l2_quality: '',
+    so_data: '',
+    wo_data: '',
+    id_data: `${mcs.int_dim_1 || ''} ${mcs.int_dim_2 || ''} ${mcs.int_dim_3 || ''}`.trim(),
+    ed_data: `${mcs.ext_dim_1 || ''} ${mcs.ext_dim_2 || ''} ${mcs.ext_dim_3 || ''}`.trim(),
+    score_l_1: '',
+    score_l_2: '',
+    score_l_3: '',
+    score_l_4: '',
+    score_l_total: '',
+    sheet_length: '',
+    score_w_1: '',
+    score_w_2: '',
+    score_w_3: '',
+    score_w_total: '',
+    sheet_width: '',
+    p_size: '',
+    corr_out: '',
+    conv_out_1x2: '',
+    pcs_to_joint: '',
+    crease: '',
+    chem_coat: '',
+    rf_tape: '',
+    print_color_1: '',
+    print_color_2: '',
+    print_color_3: '',
+    pit_block_no: '',
+    hand_hole: false,
+    print_area_1: '',
+    print_area_2: '',
+    print_area_3: '',
+    glueing: false,
+    rotary_d_cut: false,
+    d_cut_sheet: false,
+    wrapping: false,
+    full_block_print: false,
+    d_cut_block_no: '',
+    bdl_pallet: '',
+    d_cut_mould: false,
+    peel_off_percent: '',
+    finishing_1: '',
+    finishing_2: '',
+    bdle_string_pcs_1: '',
+    bdle_string_pcs_2: '',
+    item_remark: '',
+  };
+}
+
+function mapMcsToCurrentPriceModal(mcs) {
+  // Mapping data dari selectedMcs ke format yang dibutuhkan MasterCardCurrentPriceModal
+  return {
+    effective_date: '15/04/2021',
+    currency: 'IDR',
+    reference: '',
+    remark: '',
+    set: '0.0000',
+    // Tambahkan field lain jika diperlukan
+  };
+}
 </script>
 
 <style scoped>
@@ -1389,5 +1562,13 @@ table {
 }
 .animate-spin-slow {
   animation: spin-slow 2.5s linear infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out;
 }
 </style>

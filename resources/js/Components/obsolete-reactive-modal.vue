@@ -3,8 +3,8 @@
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-black bg-opacity-60 transition-opacity" aria-hidden="true" @click="closeModal"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full animate-modalScaleIn">
-                <div :class="headerClass" class="px-6 py-4 relative">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full animate-modalScaleIn flex flex-col h-full isolate">
+                <div :class="headerClass" class="px-6 py-4 relative flex-shrink-0">
                     <div class="flex items-center">
                         <div :class="headerIconBgClass" class="p-2 rounded-full mr-4">
                             <i :class="headerIconClass" class="text-white text-xl"></i>
@@ -16,7 +16,7 @@
                     </button>
                 </div>
 
-                <div class="bg-white px-6 pt-6 pb-4">
+                <div class="bg-white px-6 pt-6 pb-4 flex-shrink-0">
                     <div v-if="filterTag" class="mb-4">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                             Filter: {{ filterTag }}
@@ -30,16 +30,16 @@
                     >
                 </div>
 
-                <div class="px-6 pb-6" style="max-height: 50vh; overflow-y: auto;">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gradient-to-r from-purple-600 to-indigo-600 sticky top-0 shadow-md">
+                <div class="px-6 flex-grow overflow-y-auto" style="max-height: 40vh;">
+                    <table class="min-w-full divide-y divide-gray-200 relative" style="table-layout: fixed; width: 100%;">
+                        <thead class="bg-gradient-to-r from-purple-600 to-indigo-600 sticky top-0 shadow-md z-20" style="display: table-header-group; width: 100%;">
                             <tr>
                                 <th v-for="header in headers" :key="header.key" scope="col" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                     {{ header.label }}
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="bg-white divide-y divide-gray-200" style="display: table-row-group; width: 100%;">
                             <tr v-if="filteredItems.length === 0">
                                 <td :colspan="headers.length" class="text-center py-10 text-gray-500">
                                     No results found.
@@ -60,7 +60,7 @@
                                         {{ item[header.key] }}
                                     </span>
                                     <span v-else>
-                                        {{ item[header.key] }}
+                                    {{ item[header.key] }}
                                     </span>
                                 </td>
                             </tr>
@@ -68,7 +68,7 @@
                     </table>
                 </div>
 
-                <div class="bg-gray-100 px-6 py-4 flex justify-end space-x-3">
+                <div class="bg-gray-100 px-6 py-4 flex justify-end space-x-3 flex-shrink-0">
                     <button 
                         v-if="showMoreOptionsButton"
                         @click="emit('moreOptions')" 
