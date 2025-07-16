@@ -262,7 +262,7 @@ const notification = ref({ show: false, message: '', type: 'success' });
 const fetchCustomerGroups = async () => {
   loading.value = true;
   try {
-    const response = await axios.get(route('api.customer-groups.index'));
+    const response = await axios.get('/api/customer-groups');
     const data = response.data;
     if (data && Array.isArray(data.data)) {
       customerGroups.value = data.data;
@@ -334,9 +334,9 @@ const saveCustomerGroupChanges = async () => {
     };
 
     if (isCreating.value) {
-      response = await axios.post(route('api.customer-groups.store'), payload);
+      response = await axios.post('/api/customer-groups', payload);
     } else {
-      response = await axios.put(route('api.customer-groups.update', { group_code: editForm.value.group_code }), payload);
+      response = await axios.put(`/api/customer-groups/${editForm.value.group_code}`, payload);
     }
     
     const result = response.data;
@@ -363,7 +363,7 @@ const deleteCustomerGroup = async (groupCode) => {
   
   saving.value = true;
   try {
-    const response = await axios.delete(route('api.customer-groups.destroy', { group_code: groupCode }));
+    const response = await axios.delete(`/api/customer-groups/${groupCode}`);
     const result = response.data;
     if (result.success) {
       await fetchCustomerGroups();
@@ -388,7 +388,7 @@ const deleteCustomerGroup = async (groupCode) => {
 const loadSeedData = async () => {
   saving.value = true;
   try {
-    const response = await axios.post(route('api.customer-groups.seed'));
+    const response = await axios.post('/api/customer-groups/seed');
     const result = response.data;
     if (result.success) {
       showNotification('Customer group data seeded successfully!', 'success');
