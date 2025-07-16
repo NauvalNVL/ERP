@@ -755,17 +755,17 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-indigo-100">
-                            <tr v-for="(customer, idx) in displayedCustomers" :key="customer.code"
+                    <tr v-for="(customer, idx) in displayedCustomers" :key="customer.code"
                                 class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
-                                :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedCustomer && selectedCustomer.code === customer.code }"
-                                @click="selectedCustomer = customer">
+                        :class="{ 'bg-gradient-to-r from-blue-100 to-cyan-100': selectedCustomer && selectedCustomer.code === customer.code }"
+                        @click="selectedCustomer = customer">
                                 <template v-if="sortOption === 'code'">
                                     <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ customer.code }}</td>
                                     <td class="px-4 py-2 border-b border-indigo-100">{{ customer.name }}</td>
                                 </template>
                                 <template v-else-if="sortOption === 'name'">
-                                    <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ customer.name }}</td>
-                                    <td class="px-4 py-2 border-b border-indigo-100">{{ customer.code }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100 font-semibold">{{ customer.name }}</td>
+                                <td class="px-4 py-2 border-b border-indigo-100">{{ customer.code }}</td>
                                 </template>
                                 <td class="px-4 py-2 border-b border-indigo-100">{{ customer.salesperson }}</td>
                                 <td class="px-4 py-2 border-b border-indigo-100">{{ customer.acType }}</td>
@@ -2122,7 +2122,7 @@ const openMcsModal = () => {
 const showMcsOptionsFromTableModal = (modalType) => {
     if (modalType === 'from') {
         showMcsTableModal.value = false;
-        showMcsOptionsModal.value = true;
+    showMcsOptionsModal.value = true;
     } else if (modalType === 'to') {
         showMcsTableModalTo.value = false;
         showMcsOptionsModalTo.value = true;

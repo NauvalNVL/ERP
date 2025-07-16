@@ -463,11 +463,11 @@ const processSelections = async () => {
         if (response.data.success) {
             showToast('success', response.data.message);
             // Optionally, clear form or update UI after success
-            form.value.ac = '';
-            form.value.mcs_from = '';
-            form.value.mcs_to = '';
-            form.value.product_code = '';
-            form.value.reason = '';
+        form.value.ac = '';
+        form.value.mcs_from = '';
+        form.value.mcs_to = '';
+        form.value.product_code = '';
+        form.value.reason = '';
         } else {
             showToast('error', response.data.message);
         }
