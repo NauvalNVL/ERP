@@ -130,28 +130,63 @@ class UpdateCustomerAccountController extends Controller
 
     public function apiStore(Request $request)
     {
-        $validated = $request->validate([
-            'customer_code' => 'required|string|max:20',
-            'customer_name' => 'required|string|max:100',
-            'short_name' => 'nullable|string|max:50',
-            'address' => 'nullable|string',
-            'contact_person' => 'nullable|string|max:100',
-            'telephone_no' => 'nullable|string|max:30',
-            'fax_no' => 'nullable|string|max:30',
-            'co_email' => 'nullable|email|max:100',
-            'credit_limit' => 'nullable|numeric',
-            'credit_terms' => 'nullable|integer',
-            'ac_type' => 'required|string|in:Y-Foreign,N-Local',
-            'currency_code' => 'nullable|string|max:10',
-            'salesperson_code' => 'nullable|string|max:20',
-            'industrial_code' => 'nullable|string|max:20',
-            'geographical' => 'nullable|string|max:20',
-            'grouping_code' => 'nullable|string|max:20',
-            'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
-        ]);
+        try {
+            Log::info('API Store Customer Account Request:', ['data' => $request->all()]);
+            
+            $validated = $request->validate([
+                'customer_code' => 'required|string|max:20',
+                'customer_name' => 'required|string|max:100',
+                'short_name' => 'nullable|string|max:50',
+                'address' => 'nullable|string',
+                'contact_person' => 'nullable|string|max:100',
+                'telephone_no' => 'nullable|string|max:30',
+                'fax_no' => 'nullable|string|max:30',
+                'co_email' => 'nullable|email|max:100',
+                'credit_limit' => 'nullable|numeric',
+                'credit_terms' => 'nullable|integer',
+                'ac_type' => 'required|string|in:Y-Foreign,N-Local',
+                'currency_code' => 'nullable|string|max:10',
+                'salesperson_code' => 'nullable|string|max:20',
+                'industrial_code' => 'nullable|string|max:20',
+                'geographical' => 'nullable|string|max:20',
+                'grouping_code' => 'nullable|string|max:20',
+                'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
+            ]);
+            
+            Log::info('Validated data:', $validated);
 
-        $account = UpdateCustomerAccount::create($validated);
-        return response()->json($account, 201);
+            // Check if customer with this code already exists
+            $existingAccount = UpdateCustomerAccount::where('customer_code', $validated['customer_code'])->first();
+            
+            if ($existingAccount) {
+                // Update existing account
+                Log::info('Updating existing account:', ['id' => $existingAccount->id, 'code' => $existingAccount->customer_code]);
+                $existingAccount->update($validated);
+                return response()->json([
+                    'message' => 'Customer account updated successfully',
+                    'data' => $existingAccount
+                ]);
+            } else {
+                // Create new account
+                Log::info('Creating new account:', ['code' => $validated['customer_code']]);
+                $newAccount = UpdateCustomerAccount::create($validated);
+                return response()->json([
+                    'message' => 'Customer account created successfully',
+                    'data' => $newAccount
+                ], 201);
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error:', ['errors' => $e->errors()]);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error saving customer account:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'message' => 'Failed to save customer account: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function apiUpdate(Request $request, $id)
@@ -180,6 +215,31 @@ class UpdateCustomerAccountController extends Controller
 
         $account->update($validated);
         return response()->json($account);
+    }
+
+    /**
+     * Get a single customer account by ID
+     */
+    public function apiShow($id)
+    {
+        try {
+            Log::info('Fetching single customer account', ['id' => $id]);
+            $account = UpdateCustomerAccount::findOrFail($id);
+            
+            Log::info('Found customer account', ['customer_code' => $account->customer_code]);
+            
+            return response()->json($account);
+        } catch (\Exception $e) {
+            Log::error('Error fetching customer account', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'message' => 'Customer account not found: ' . $e->getMessage()
+            ], 404);
+        }
     }
 
     public function apiIndexAcAutoWoCustomers()

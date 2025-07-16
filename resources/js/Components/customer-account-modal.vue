@@ -63,14 +63,14 @@
                 @click="selectAccount(account)">
               <td class="px-2 py-1 border border-gray-300">{{ account.customer_code }}</td>
               <td class="px-2 py-1 border border-gray-300">{{ account.customer_name }}</td>
-              <td class="px-2 py-1 border border-gray-300">{{ account.salesperson }}</td>
-              <td class="px-2 py-1 border border-gray-300">{{ account.ac_type }}</td>
-              <td class="px-2 py-1 border border-gray-300">{{ account.currency }}</td>
+              <td class="px-2 py-1 border border-gray-300">{{ account.salesperson_code }}</td>
+              <td class="px-2 py-1 border border-gray-300">{{ account.account_type || account.ac_type }}</td>
+              <td class="px-2 py-1 border border-gray-300">{{ account.currency_code }}</td>
               <td class="px-2 py-1 border border-gray-300">
                 <span 
-                  :class="account.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                  :class="(account.status === 'Active' || !account.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                   class="px-2 py-0.5 rounded-full text-xs">
-                  {{ account.status }}
+                  {{ account.status || 'Active' }}
                 </span>
               </td>
             </tr>
@@ -140,37 +140,21 @@ export default {
       try {
         console.log('Fetching customer accounts from API...')
         
-        // Use fetch instead of axios for better debugging
-        const response = await fetch('/api/customer-accounts', {
-          headers: { 
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-          },
-          credentials: 'same-origin'
-        })
+        const response = await axios.get('/api/customer-accounts')
+        const data = response.data
         
-        console.log('Response status:', response.status)
-        
-        if (!response.ok) {
-          throw new Error(`Server returned ${response.status}: ${response.statusText}`)
+        if (data.error) {
+          throw new Error(data.error)
         }
         
-        const rawData = await response.json()
-        console.log('Raw API response:', typeof rawData, Array.isArray(rawData) ? rawData.length : 'not array')
-        
-        if (rawData.error) {
-          throw new Error(rawData.error)
-        }
-        
-        if (Array.isArray(rawData)) {
-          allAccounts.value = rawData
-          console.log(`Loaded ${rawData.length} accounts`)
-        } else if (rawData.data && Array.isArray(rawData.data)) {
-          allAccounts.value = rawData.data
-          console.log(`Loaded ${rawData.data.length} accounts from data property`)
+        if (Array.isArray(data)) {
+          allAccounts.value = data
+          console.log(`Loaded ${data.length} accounts`)
+        } else if (data.data && Array.isArray(data.data)) {
+          allAccounts.value = data.data
+          console.log(`Loaded ${data.data.length} accounts from data property`)
         } else {
-          console.error('Unexpected data format:', rawData)
+          console.error('Unexpected data format:', data)
           throw new Error('Invalid data format returned from server')
         }
         
@@ -189,13 +173,12 @@ export default {
 
     const filteredAccounts = computed(() => {
       let filtered = [...allAccounts.value]
-      console.log(`Filtering ${filtered.length} accounts`)
       
       // Filter based on status
       if (statusFilter.value === 'active') {
         filtered = filtered.filter(account => account.status === 'Active' || account.status === undefined)
       } else if (statusFilter.value === 'obsolete') {
-        filtered = filtered.filter(account => account.status === 'Inactive')
+        filtered = filtered.filter(account => account.status === 'Inactive' || account.status === 'Obsolete')
       }
       
       // Sort based on selected field
@@ -205,7 +188,6 @@ export default {
         return fieldA.localeCompare(fieldB)
       })
       
-      console.log(`Filtered to ${filtered.length} accounts`)
       return filtered
     })
 

@@ -71,6 +71,7 @@ Route::get('/so-rough-cut-capacity', [SOConfigController::class, 'apiIndexRoughC
 Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
 Route::post('/customer-accounts', [UpdateCustomerAccountController::class, 'apiStore']);
 Route::put('/customer-accounts/{id}', [UpdateCustomerAccountController::class, 'apiUpdate']);
+Route::get('/customer-accounts/{id}', [UpdateCustomerAccountController::class, 'apiShow']);
 Route::get('/customers-with-status', [UpdateCustomerAccountController::class, 'apiIndex']);
 Route::get('/ac-auto-wo-customers', [UpdateCustomerAccountController::class, 'apiIndexAcAutoWoCustomers']);
 
@@ -289,9 +290,19 @@ Route::prefix('delivery-order-formats')->group(function () {
     Route::delete('/{code}', [DeliveryOrderFormatController::class, 'destroy'])->name('delivery-order-formats.destroy');
 });
 
+// Industry, Geo, and Salesperson API routes
+Route::get('/industries', [App\Http\Controllers\IndustryController::class, 'apiIndex']);
+Route::get('/geos', [App\Http\Controllers\GeoController::class, 'apiIndex']);
+Route::get('/salespersons', [App\Http\Controllers\SalespersonController::class, 'apiIndex']);
+Route::get('/customer-groups', [App\Http\Controllers\CustomerGroupController::class, 'apiIndex']);
+
 // Customer Group API routes
 Route::get('/customer-groups', [App\Http\Controllers\CustomerGroupController::class, 'apiIndex'])->name('api.customer-groups.index');
 Route::post('/customer-groups', [App\Http\Controllers\CustomerGroupController::class, 'apiStore'])->name('api.customer-groups.store');
 Route::put('/customer-groups/{group_code}', [App\Http\Controllers\CustomerGroupController::class, 'apiUpdate'])->name('api.customer-groups.update');
 Route::delete('/customer-groups/{group_code}', [App\Http\Controllers\CustomerGroupController::class, 'apiDestroy'])->name('api.customer-groups.destroy');
 Route::post('/customer-groups/seed', [App\Http\Controllers\CustomerGroupController::class, 'seed'])->name('api.customer-groups.seed');
+
+// Update Customer Account API route
+Route::post('/update-customer-account', [App\Http\Controllers\UpdateCustomerAccountController::class, 'apiStore']);
+Route::put('/update-customer-account/{id}', [App\Http\Controllers\UpdateCustomerAccountController::class, 'apiUpdate']);

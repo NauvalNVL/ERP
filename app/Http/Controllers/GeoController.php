@@ -165,4 +165,20 @@ class GeoController extends Controller
             return response()->json(['error' => 'Failed to load geo data for printing'], 500);
         }
     }
+
+    /**
+     * API endpoint to get geos in JSON format.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $geos = Geo::orderBy('country')->orderBy('state')->get();
+            return response()->json($geos);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in GeoController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load geo data'], 500);
+        }
+    }
 }

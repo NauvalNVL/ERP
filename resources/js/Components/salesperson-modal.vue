@@ -1,6 +1,10 @@
 <template>
-  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl">
+  <div v-if="show" class="fixed inset-0 z-100 flex items-center justify-center overflow-y-auto">
+    <!-- Background overlay -->
+    <div class="fixed inset-0 bg-black bg-opacity-50" @click="$emit('close')"></div>
+    
+    <!-- Modal content -->
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl z-110 relative">
       <!-- Modal Header -->
       <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
         <div class="flex items-center">
@@ -187,3 +191,14 @@ watch(() => props.show, (val) => {
   }
 });
 </script>
+
+<style scoped>
+/* Add custom z-index classes */
+.z-100 {
+  z-index: 100;
+}
+
+.z-110 {
+  z-index: 110;
+}
+</style>
