@@ -1,9 +1,3 @@
-<!-- TEST EDIT -->
-<!-- 
-  Obsolete and Reactive Master Card Component
-  This component handles bulk obsoleting and reactivating master cards in the system.
-  Final polished version with enhanced UI, colors, responsiveness, and animations.
--->
 <template>
     <AppLayout :header="'Obsolete & Reactive MC'">
         <!-- Header Section -->
@@ -177,23 +171,6 @@
             </div>
         </div>
 
-        <LookupModal 
-            :show="lookup.show"
-            :title="lookup.title"
-            :items="lookup.items"
-            :headers="lookup.headers"
-            :headerClass="lookup.headerClass"
-            :headerIconClass="lookup.headerIconClass"
-            :headerIconBgClass="lookup.headerIconBgClass"
-            :filterTag="lookup.filterTag"
-            :showMoreOptionsButton="lookup.showMoreOptionsButton"
-            :showZoomButton="lookup.showZoomButton"
-            @close="lookup.show = false"
-            @select="handleLookupSelection"
-            @moreOptions="handleCustomerMoreOptions"
-            @zoom="handleCustomerZoom"
-        />
-
         <!-- Customer Account Options Modal -->
         <CustomerAccountOptionsModal
             :show="showCustomerAccountOptionsModal"
@@ -203,6 +180,20 @@
             :initialStatusFilter="customerOptionRecordStatus"
         />
 
+        <!-- New Customer Account Modal -->
+        <CustomerAccountModal
+            :show="showCustomerAccountModal"
+            @close="showCustomerAccountModal = false"
+            @select="handleCustomerSelect"
+        />
+
+        <!-- New Product Modal -->
+        <ProductModal
+            :show="showProductModal"
+            @close="showProductModal = false"
+            @select="handleProductSelect"
+        />
+        
         <!-- MCS Options Modal -->
         <MasterCardOptionsModal
             :show="showMcsOptionsModal"
@@ -239,173 +230,94 @@
 import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useToast } from '@/Composables/useToast';
-import LookupModal from '@/Components/obsolete-reactive-modal.vue';
+// import LookupModal from '@/Components/obsolete-reactive-modal.vue'; // Removed, replaced by specific modals
 import CustomerAccountOptionsModal from '@/Components/CustomerAccountOptionsModal.vue';
 import MasterCardOptionsModal from '@/Components/MasterCardOptionsModal.vue';
 import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue';
 import MasterCardZoomModal from '@/Components/MasterCardZoomModal.vue';
+import CustomerAccountModal from '@/Components/customer-account-modal.vue'; // New Import
+import ProductModal from '@/Components/product-modal.vue'; // New Import
 import axios from 'axios';
 
 const { showToast } = useToast();
 
 const form = ref({
     ac: '',
+    product_code: '',
     mcs_from: '',
     mcs_to: '',
-    product_code: '',
-    action: 'obsolete', // Default action
-    reason: ''
+    action: 'obsolete',
+    reason: '',
 });
 
-// New state variables for Customer Account Options Modal
+// Removed the generic 'lookup' ref as it's no longer needed
+// const lookup = ref({
+//     show: false,
+//     title: '',
+//     items: [],
+//     headers: [],
+//     headerClass: '',
+//     headerIconClass: '',
+//     headerIconBgClass: '',
+//     filterTag: '',
+//     showMoreOptionsButton: false,
+//     showZoomButton: false,
+// });
+
 const showCustomerAccountOptionsModal = ref(false);
-const customerOptionSortBy = ref('customer_code'); // Default sort by Customer Code
-const customerOptionRecordStatus = ref({
-    active: true,
-    obsolete: true
-});
+const customerOptionSortBy = ref('customer_code');
+const customerOptionRecordStatus = ref(['Active']);
 
-// --- Lookup Modal State and Data ---
-const lookup = ref({
-    show: false,
-    title: '',
-    items: [],
-    headers: [],
-    type: '' // 'customer', 'product', 'mcs_from', 'mcs_to'
-});
-
-// Dummy data for lookups
-const customers = ref([
-    { id: 1, customer_code: '000211-08', customer_name: 'ABDULLAH, BPK', salesperson: 'S111', acType: 'Local', currency: 'IDR', status: 'Active' },
-    { id: 2, customer_code: '000680-06', customer_name: 'ACEP SUNANDAR, BPK', salesperson: 'S140', acType: 'Local', currency: 'IDR', status: 'Active' },
-    { id: 3, customer_code: '000585-01', customer_name: 'ACHMAD JAMAL', salesperson: 'S102', acType: 'Local', currency: 'IDR', status: 'Active' },
-    { id: 4, customer_code: '000283', customer_name: 'ACOSTA SUPER FOOD, PT', salesperson: 'S143', acType: 'Local', currency: 'IDR', status: 'Active' },
-    { id: 5, customer_code: '000903', customer_name: 'ADHITYA SERAYAKORITA, PT', salesperson: 'S103', acType: 'Local', currency: 'IDR', status: 'Active' },
-    { id: 6, customer_code: '000212-08', customer_name: 'BAMBANG, BPK', salesperson: 'S112', acType: 'Export', currency: 'USD', status: 'Obsolete' },
-    { id: 7, customer_code: '000681-06', customer_name: 'BUDI, BPK', salesperson: 'S141', acType: 'Local', currency: 'IDR', status: 'Active' },
-    { id: 8, customer_code: '000586-01', customer_name: 'CITRA, IBU', salesperson: 'S103', acType: 'Local', currency: 'IDR', status: 'Active' },
-    { id: 9, customer_code: '000284', customer_name: 'DEDI, BPK', salesperson: 'S144', acType: 'Export', currency: 'USD', status: 'Active' },
-    { id: 10, customer_code: '000904', customer_name: 'EKA, IBU', salesperson: 'S104', acType: 'Local', currency: 'IDR', status: 'Obsolete' },
-]);
-const products = ref([
-    { id: 1, product_code: '001', description: 'BOX', group: 'B', category: '1' },
-    { id: 2, product_code: '002', description: 'SHEET BOARD', group: 'S', category: '5' },
-    { id: 3, product_code: '003', description: 'BUTT ROLL', group: 'R', category: '3' },
-    { id: 4, product_code: '004', description: 'PENJUALAN WASTE', group: 'OT', category: 'X' },
-    { id: 5, product_code: '005', description: 'PENJUALAN LAIN LAIN PCS', group: 'OT', category: 'X' },
-    { id: 6, product_code: '006', description: 'CONEST', group: 'R', category: '3' },
-    { id: 7, product_code: '007', description: 'ROLL', group: 'R', category: '3' },
-    { id: 8, product_code: '008', description: 'PENDAPATAN LAIN LAIN', group: 'OT', category: 'X' },
-    { id: 9, product_code: '009', description: 'PENJUALAN LAIN LAIN KG', group: 'OT', category: '3' },
-    { id: 10, product_code: '010', description: 'SINGLE FACER ROLL', group: 'S', category: '2' },
-    { id: 11, product_code: '011', description: 'SINGLE FACER KG', group: 'S', category: '3' },
-    { id: 12, product_code: '012', description: 'SINGLE FACER SHEET', group: 'S', category: '4' },
-    { id: 13, product_code: '013', description: 'PENDAPATAN LAIN - LAIN', group: 'OT', category: 'X' },
-    { id: 14, product_code: '014', description: 'SEWA TRUCK', group: 'OT', category: 'X' },
-    { id: 15, product_code: '015', description: 'CORE PLUG', group: 'OT', category: 'X' },
-    { id: 16, product_code: '016', description: 'PAPER TUBE', group: 'OT', category: 'X' },
-    { id: 17, product_code: '017', description: 'OFFSET', group: 'OF', category: '1' },
-    { id: 18, product_code: '018', description: 'CETAK OFFSET', group: 'OF', category: '1' },
-    { id: 19, product_code: '019', description: 'DIGITAL PRINT', group: 'OF', category: '1' },
-    { id: 20, product_code: '500', description: 'SEWA TRUCK TRAILER', group: 'OT', category: 'X' },
-]);
-const masterCards = ref([
-    { id: 1, mc_seq: 'MC-2023-001', mc_model: 'Model-A', pd_part_no: 'PD-P001', pd_ed: 'PD-E001', pd_id: 'PD-I001', status: 'Active' },
-    { id: 2, mc_seq: 'MC-2023-002', mc_model: 'Model-B', pd_part_no: 'PD-P002', pd_ed: 'PD-E002', pd_id: 'PD-I002', status: 'Active' },
-    { id: 3, mc_seq: 'MC-2023-003', mc_model: 'Model-C', pd_part_no: 'PD-P003', pd_ed: 'PD-E003', pd_id: 'PD-I003', status: 'Obsolete' },
-    { id: 4, mc_seq: 'MC-2023-004', mc_model: 'Model-D', pd_part_no: 'PD-P004', pd_ed: 'PD-E004', pd_id: 'PD-I004', status: 'Active' },
-]);
-
-// New state variables for MCS Options Modal
 const showMcsOptionsModal = ref(false);
-const mcsOptionSortBy = ref('mc_seq');
-const mcsOptionSortOrder = ref('Ascending');
-const mcsOptionStatus = ref({
-    active: true,
-    obsolete: true
-});
-const currentMcsLookupType = ref(''); // 'mcs_from' or 'mcs_to'
-const showMcsSearchSelectModal = ref(false);
-const showMcsZoomModal = ref(false);
-const zoomedMasterCard = ref(null);
+const mcsOptionSortBy = ref('mc_sequence');
+const mcsOptionSortOrder = ref('asc');
+const mcsOptionStatus = ref(['Active']);
 
-// Functions to open different lookups
+const showMcsSearchSelectModal = ref(false);
+const masterCards = ref([]); // This will hold the list of master cards for the modal
+const zoomedMasterCard = ref(null);
+const showMcsZoomModal = ref(false);
+
+const currentMcsField = ref(''); // To track which MCS field is being edited ('from' or 'to')
+
+// New refs for CustomerAccountModal and ProductModal
+const showCustomerAccountModal = ref(false);
+const showProductModal = ref(false);
+const selectedCustomerAccount = ref(null);
+const selectedProduct = ref(null);
+
 const openCustomerLookup = () => {
-    showCustomerAccountOptionsModal.value = true; // Open options modal first
+    showCustomerAccountModal.value = true;
 };
 
-const applyCustomerOptions = () => {
-    let filteredCustomers = customers.value.filter(customer => {
-        const isActive = customerOptionRecordStatus.value.active && customer.status === 'Active';
-        const isObsolete = customerOptionRecordStatus.value.obsolete && customer.status === 'Obsolete';
-        return isActive || isObsolete;
-    });
-
-    filteredCustomers.sort((a, b) => {
-        if (customerOptionSortBy.value === 'customer_code') {
-            return a.customer_code.localeCompare(b.customer_code);
-        } else {
-            return a.customer_name.localeCompare(b.customer_name);
-        }
-    });
-
-    showCustomerAccountOptionsModal.value = false; // Close options modal
-
-    lookup.value = {
-        show: true,
-        title: 'Customer Account Table',
-        items: filteredCustomers,
-        headers: [
-            { key: 'customer_code', label: 'Customer Code' },
-            { key: 'customer_name', label: 'Customer Name' },
-            { key: 'salesperson', label: 'S/Person' },
-            { key: 'acType', label: 'AC Type' },
-            { key: 'currency', label: 'Currency' },
-        ],
-        headerClass: 'from-blue-600 to-blue-700',
-        headerIconClass: 'fas fa-user-circle',
-        headerIconBgClass: 'bg-white bg-opacity-30',
-        filterTag: 'customer',
-        showMoreOptionsButton: true,
-        showZoomButton: true
-    };
+const handleCustomerSelect = (customer) => {
+    selectedCustomerAccount.value = customer;
+    form.value.ac = customer.customer_code;
+    showCustomerAccountModal.value = false;
 };
 
 const openProductLookup = () => {
-    lookup.value = {
-        show: true,
-        title: 'Product Table',
-        items: products.value,
-        headers: [
-            { key: 'product_code', label: 'Product Code' },
-            { key: 'description', label: 'Description' },
-            { key: 'group', label: 'Group' },
-            { key: 'category', label: 'Category' },
-        ],
-        headerClass: 'from-blue-500 to-cyan-500',
-        headerIconClass: 'fas fa-box',
-        headerIconBgClass: 'bg-white bg-opacity-30',
-        filterTag: 'product',
-        showMoreOptionsButton: false,
-        showZoomButton: false
-    };
+    showProductModal.value = true;
 };
 
-const openMcsLookup = (type) => {
-    currentMcsLookupType.value = type; // Store whether it's 'from' or 'to'
-    showMcsOptionsModal.value = true; // Open options modal first
+const handleProductSelect = (product) => {
+    selectedProduct.value = product;
+    form.value.product_code = product.product_code;
+    showProductModal.value = false;
 };
 
-const applyMcsOptions = () => {
-    showMcsOptionsModal.value = false; // Close options modal
-    showMcsSearchSelectModal.value = true; // Open the search/select modal
+const openMcsLookup = (field) => {
+    currentMcsField.value = field;
+    showMcsSearchSelectModal.value = true;
+    // Potentially fetch master cards based on current AC# and Product Code
+    fetchMasterCards(); 
 };
 
 const handleSelectedMc = (mc) => {
-    if (currentMcsLookupType.value === 'from') {
-        form.value.mcs_from = mc.mc_seq;
-    } else if (currentMcsLookupType.value === 'to') {
-        form.value.mcs_to = mc.mc_seq;
+    if (currentMcsField.value === 'from') {
+        form.value.mcs_from = mc.mc_sequence;
+    } else if (currentMcsField.value === 'to') {
+        form.value.mcs_to = mc.mc_sequence;
     }
     showMcsSearchSelectModal.value = false;
 };
@@ -420,127 +332,126 @@ const closeMcsZoomModal = () => {
     zoomedMasterCard.value = null;
 };
 
-const handleLookupSelection = (item) => {
-    if (lookup.value.type === 'customer') {
-        form.value.ac = item.customer_code;
-    } else if (lookup.value.type === 'product') {
-        form.value.product_code = item.product_code;
+const fetchMasterCards = async () => {
+    // In a real application, you might fetch based on form.value.ac and form.value.product_code
+    try {
+        const response = await axios.get('/api/approve-mc'); // Assuming this endpoint returns a list of master cards
+        masterCards.value = response.data;
+    } catch (error) {
+        showToast('Error', 'Failed to fetch master cards.', 'error');
+        console.error('Error fetching master cards:', error);
     }
-    lookup.value.show = false;
-};
-
-const handleCustomerMoreOptions = (customer) => {
-    console.log('More options for customer:', customer);
-    showToast('info', `More options for ${customer.customer_name}`);
-    // Implement navigation or another modal for more options
-};
-
-const handleCustomerZoom = (customer) => {
-    console.log('Zooming into customer:', customer);
-    showToast('info', `Zooming into ${customer.customer_name}`);
-    // Implement navigation or another modal for zooming
 };
 
 const processSelections = async () => {
     if (!form.value.reason) {
-        showToast('error', 'Reason is mandatory for processing.');
+        showToast('Validation Error', 'Reason is mandatory for processing.', 'error');
         return;
     }
 
-    const endpoint = form.value.action === 'obsolete' 
-        ? '/api/obsolate-reactive-mc/obsolate/' 
-        : '/api/obsolate-reactive-mc/reactive/';
+    const payload = {
+        ac: form.value.ac,
+        product_code: form.value.product_code,
+        mcs_from: form.value.mcs_from,
+        mcs_to: form.value.mcs_to,
+        action: form.value.action,
+        reason: form.value.reason,
+    };
 
     try {
-        const response = await axios.post(endpoint, {
-            ac: form.value.ac,
-            mcs_from: form.value.mcs_from,
-            mcs_to: form.value.mcs_to,
-            product_code: form.value.product_code,
-            reason: form.value.reason,
-        });
-
+        const response = await axios.post('/api/obsolate-reactive-mc', payload);
         if (response.data.success) {
-            showToast('success', response.data.message);
-            // Optionally, clear form or update UI after success
-        form.value.ac = '';
-        form.value.mcs_from = '';
-        form.value.mcs_to = '';
-        form.value.product_code = '';
-        form.value.reason = '';
+            showToast('Success', response.data.message, 'success');
+            // Optionally clear form or refresh data
+            form.value.ac = '';
+            form.value.product_code = '';
+            form.value.mcs_from = '';
+            form.value.mcs_to = '';
+            form.value.reason = '';
+            selectedCustomerAccount.value = null;
+            selectedProduct.value = null;
         } else {
-            showToast('error', response.data.message);
+            showToast('Error', response.data.message, 'error');
         }
     } catch (error) {
-        console.error('Error processing selection:', error);
-        showToast('error', 'Failed to process selections.');
+        showToast('Error', error.response?.data?.message || 'An unexpected error occurred.', 'error');
+        console.error('Processing error:', error);
     }
 };
+
+// If you had a generic handleLookupSelection function, it would be removed or refactored:
+// const handleLookupSelection = (selectedItem) => {
+//     // This function is no longer needed if we have specific handlers for each modal
+// };
+
+// Customer Account Options Modal logic
+const applyCustomerOptions = (options) => {
+    customerOptionSortBy.value = options.sortBy;
+    customerOptionRecordStatus.value = options.status;
+    showCustomerAccountOptionsModal.value = false;
+    // You might want to re-fetch or re-filter data for the customer account modal if it was open
+};
+
+// Master Card Options Modal logic
+const applyMcsOptions = (options) => {
+    mcsOptionSortBy.value = options.sortBy;
+    mcsOptionSortOrder.value = options.sortOrder;
+    mcsOptionStatus.value = options.status;
+    showMcsOptionsModal.value = false;
+    // Re-fetch master cards with new options if necessary
+    fetchMasterCards();
+};
+
 </script>
 
 <style scoped>
-/* Base input field styling */
+/* Utility classes for form styling */
 .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-l-md shadow-sm
-           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-           transition-all duration-200 text-sm;
+    @apply flex-1 block w-full px-4 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-shadow duration-200;
 }
 
-/* Styling for action radio buttons */
 .action-radio {
-    @apply flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer
-           transition-all duration-300 shadow-sm;
+    @apply flex items-center justify-center p-4 border border-gray-300 rounded-lg cursor-pointer transition-all duration-300 ease-in-out flex-1 text-center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    background-color: #f9fafb;
 }
 
 .action-radio:hover {
-    @apply shadow-md transform -translate-y-0.5;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
 }
 
 .action-radio-obsolete-active {
-    @apply bg-red-50 border-red-400 ring-2 ring-red-500;
+    @apply border-red-500 bg-red-50;
+    box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
 }
 
 .action-radio-reactivate-active {
-    @apply bg-green-50 border-green-400 ring-2 ring-green-500;
+    @apply border-green-500 bg-green-50;
+    box-shadow: 0 4px 6px rgba(34, 197, 94, 0.2);
 }
 
-/* Process button styling */
 .process-button {
-    @apply relative overflow-hidden inline-flex items-center justify-center
-           px-8 py-3 bg-gradient-to-r from-teal-500 to-green-500 text-white font-semibold
-           rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105
-           hover:from-teal-600 hover:to-green-600 focus:outline-none focus:ring-2
-           focus:ring-teal-500 focus:ring-offset-2 w-full sm:w-auto;
+    @apply relative overflow-hidden px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-lg shadow-lg text-lg tracking-wide transition-all duration-300 ease-out transform hover:scale-105 hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-4 focus:ring-blue-300;
 }
 
-/* Shimmer effect for buttons */
-.shimmer-effect {
-    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent
-           opacity-20 transition-transform duration-1000 transform -skew-x-12 translate-x-[-100%];
+.process-button .shimmer-effect {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: skewX(-20deg);
+    animation: shimmer 2s infinite;
 }
 
-.process-button:hover .shimmer-effect {
-    @apply translate-x-[100%];
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
 }
-
-/* Text shadow for headings */
-.text-shadow {
-    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-/* Ping animation for header icons */
-@keyframes pulse-slow {
-    0% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-    100% { transform: scale(1); opacity: 0.5; }
-}
-
-.animate-pulse-slow {
-    animation: pulse-slow 3s ease-in-out infinite;
-}
-
-.animation-delay-500 {
-    animation-delay: 0.5s;
-}
-
 </style>
