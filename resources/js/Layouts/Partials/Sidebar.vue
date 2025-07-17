@@ -787,15 +787,72 @@ const warehouseManagementItems = [
     title: 'Invoice',
     icon: 'fas fa-file-invoice',
     children: [
-      { title: 'Setup', icon: 'fas fa-cogs', route: '/warehouse-management/invoice/setup' },
-      { title: 'IV Processing', icon: 'fas fa-tasks', route: '/warehouse-management/invoice/iv-processing' },
-      { title: 'IV Special Processing', icon: 'fas fa-tasks', route: '/warehouse-management/invoice/iv-special-processing' },
-      { title: 'Manual IV Processing', icon: 'fas fa-edit', route: '/warehouse-management/invoice/manual-iv-processing' },
-      { title: 'Banker Acceptance', icon: 'fas fa-money-check-alt', route: '/warehouse-management/invoice/banker-acceptance' },
+      {
+        title: 'Setup',
+        icon: 'fas fa-cogs',
+        children: [
+          { title: 'Define Control Period', icon: 'fas fa-calendar-alt', route: '/warehouse-management/invoice/setup/define-control-period' },
+          { title: 'Setup Invoice Configuration', icon: 'fas fa-cog', route: '/warehouse-management/invoice/setup/invoice-configuration' },
+          { title: 'Define Tax Type', icon: 'fas fa-percent', route: '/warehouse-management/invoice/setup/define-tax-type' },
+          { title: 'Define Tax Group', icon: 'fas fa-layer-group', route: '/warehouse-management/invoice/setup/define-tax-group' },
+          { title: 'Define Custom Tariff Code', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice/setup/define-custom-tariff-code' },
+          { title: 'Define Invoice Group', icon: 'fas fa-object-group', route: '/warehouse-management/invoice/setup/define-invoice-group' },
+          { title: 'Define User\'s Invoice Group', icon: 'fas fa-users-cog', route: '/warehouse-management/invoice/setup/define-users-invoice-group' },
+          { title: 'Define Customer Sales Tax Index', icon: 'fas fa-tags', route: '/warehouse-management/invoice/setup/define-customer-sales-tax-index' },
+          { title: 'Define Customer Invoice Requirement', icon: 'fas fa-clipboard-list', route: '/warehouse-management/invoice/setup/define-customer-invoice-requirement' },
+          { title: 'View & Print Control Period', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/view-print-control-period' },
+          { title: 'View & Print Tax Type', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/view-print-tax-type' },
+          { title: 'View & Print Tax Group', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/view-print-tax-group' },
+          { title: 'View & Print Custom Tariff Code', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/view-print-custom-tariff-code' },
+          { title: 'View & Print Invoice Group', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/view-print-invoice-group' },
+          { title: 'View & Print User\'s Invoice Group', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/view-print-users-invoice-group' },
+          { title: 'View & Print Customer Sales Tax Index', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/view-print-customer-sales-tax-index' },
+          { title: 'View & Print Customer Invoice Requirement', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/view-print-customer-invoice-requirement' },
+        ]
+      },
+      {
+        title: 'IV Processing',
+        icon: 'fas fa-tasks',
+        children: [
+          { title: 'Prepare Invoice by D/Order (Current Period)', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice/iv-processing/prepare-do-current' },
+          { title: 'Prepare Invoice by D/Order (Open Period)', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice/iv-processing/prepare-do-open' },
+          { title: 'Prepare Invoice by S/Order (Current Period)', icon: 'fas fa-file-invoice-dollar', route: '/warehouse-management/invoice/iv-processing/prepare-so-current' },
+          { title: 'Prepare Invoice by S/Order (Open Period)', icon: 'fas fa-file-invoice-dollar', route: '/warehouse-management/invoice/iv-processing/prepare-so-open' },
+          { title: 'Prepare Invoice by M/Card (Current Period)', icon: 'fas fa-id-card', route: '/warehouse-management/invoice/iv-processing/prepare-mc-current' },
+          { title: 'Print Invoice', icon: 'fas fa-print', route: '/warehouse-management/invoice/iv-processing/print-invoice' },
+          { title: 'Print Invoice Supporting D/Order by M/Cards', icon: 'fas fa-print', route: '/warehouse-management/invoice/iv-processing/print-supporting-do-mc' },
+          { title: 'Amend Invoice', icon: 'fas fa-edit', route: '/warehouse-management/invoice/iv-processing/amend-invoice' },
+          { title: 'Amend Invoice Quantity', icon: 'fas fa-sort-numeric-up', route: '/warehouse-management/invoice/iv-processing/amend-invoice-quantity' },
+          { title: 'Amend Invoice Unit Price', icon: 'fas fa-dollar-sign', route: '/warehouse-management/invoice/iv-processing/amend-invoice-unit-price' },
+          { title: 'Cancel Active Invoice', icon: 'fas fa-times-circle', route: '/warehouse-management/invoice/iv-processing/cancel-active-invoice' },
+          { title: 'View & Print Invoice Log', icon: 'fas fa-history', route: '/warehouse-management/invoice/iv-processing/view-print-invoice-log' },
+        ]
+      },
+      {
+        title: 'IV Special Processing',
+        icon: 'fas fa-tasks',
+        children: [
+          { title: 'Cancel Posted Invoice [XPIV]', icon: 'fas fa-times', route: '/warehouse-management/invoice/iv-special-processing/cancel-posted-invoice' },
+        ]
+      },
+      {
+        title: 'Manual IV Processing',
+        icon: 'fas fa-edit',
+        children: [
+          { title: 'Activate Manual Configuration', icon: 'fas fa-cogs', route: '/warehouse-management/invoice/manual-iv-processing/activate-manual-configuration' },
+          { title: 'Register Manual Numbers', icon: 'fas fa-clipboard-list', route: '/warehouse-management/invoice/manual-iv-processing/register-manual-numbers' },
+          { title: 'View & Print Registered Manual Numbers Log', icon: 'fas fa-history', route: '/warehouse-management/invoice/manual-iv-processing/view-print-registered-manual-numbers-log' },
+        ]
+      },
+      {
+        title: 'Banker Acceptance',
+        icon: 'fas fa-money-check-alt',
+        children: [
+          { title: 'Print Invoice for Banker Acceptance', icon: 'fas fa-print', route: '/warehouse-management/invoice/banker-acceptance/print-invoice' },
+        ]
+      },
     ]
   },
-  { title: 'Debit/Credit Note', icon: 'fas fa-exchange-alt', route: '/warehouse-management/debit-credit-note' },
-  { title: 'Warehouse Analysis', icon: 'fas fa-chart-bar', route: '/warehouse-management/warehouse-analysis' },
   {
     title: 'Custom Indonesia',
     icon: 'fas fa-flag',

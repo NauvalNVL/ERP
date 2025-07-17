@@ -88,6 +88,6 @@ class DeliveryOrderFormatController extends Controller
             $query->orderBy($sortBy);
         }
 
-        return response()->json($query->get());
+        return response()->json($query->orderBy('code')->get());
     }
 } 

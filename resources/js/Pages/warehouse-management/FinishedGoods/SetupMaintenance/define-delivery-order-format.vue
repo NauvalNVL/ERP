@@ -23,7 +23,7 @@
         <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-indigo-50">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Left Column - Main Content (adapted from Update MC) -->
-                <div class="lg:col-span-2">
+                <div class="lg:col-span-3">
                     <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-indigo-500 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden">
                         <div class="absolute -top-20 -right-20 w-40 h-40 bg-indigo-50 rounded-full opacity-20"></div>
                         <div class="absolute -bottom-8 -left-8 w-24 h-24 bg-purple-50 rounded-full opacity-20"></div>
@@ -32,34 +32,53 @@
                             <div class="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg mr-3 shadow-md">
                                 <i class="fas fa-file-invoice text-white"></i>
                             </div>
-                            <h3 class="text-xl font-semibold text-gray-800">Delivery Order Format Details</h3>
+                            <h3 class="text-xl font-semibold text-gray-800">Delivery Order Format Management</h3>
                         </div>
 
                         <!-- Form Content -->
                         <form @submit.prevent="saveFormat" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="format_code" class="block text-sm font-medium text-gray-700 mb-1">Format Code:</label>
-                                <div class="relative flex group">
+                                    <div class="relative flex-1 group">
                                     <input 
                                         type="text" 
                                         id="format_code" 
                                         v-model="form.code" 
+                                            @input="debouncedCheckCode"
                                         :readonly="isEditMode" 
-                                        class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
+                                            :class="{'border-red-500': codeExists && !isEditMode, 'border-green-500': !codeExists && form.code && !isEditMode}"
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 disabled:bg-gray-100"
+                                            placeholder="Enter Format Code"
                                     />
                                     <button type="button" @click="openFormatModal" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm">
                                         <span class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"></span>
                                         <i class="fas fa-search relative z-10"></i>
-                                    </button>
-                                    <div class="absolute right-0 top-0 mt-2 mr-3">
-                                        <button type="button" @click="fetchFormat(form.code)" class="ml-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-colors duration-200">
-                                            Record: {{ isEditMode ? 'Review' : 'Select' }}
                                         </button>
                                     </div>
+                                    <p class="mt-1 text-sm text-gray-500">Single Item: 1-9 Multiple Items: A-Z</p>
+                                    <p v-if="codeExists && !isEditMode && form.code" class="mt-1 text-sm text-red-600">Code already exists. Press 'Record: Select' to load.</p>
                                 </div>
-                                <p class="mt-1 text-sm text-gray-500">Single Item: 1-9 Multiple Items: A-Z</p>
+
+                                <div class="flex items-end">
+                                    <button 
+                                        type="button" 
+                                        @click="handleRecordAction"
+                                        :disabled="!form.code"
+                                        class="inline-flex items-center justify-center px-6 py-2 border border-transparent text-base font-medium rounded-lg shadow-sm text-white transition-all duration-300 ease-in-out transform active:scale-95"
+                                        :class="{
+                                            'bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600': !isEditMode,
+                                            'bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600': isEditMode,
+                                            'opacity-50 cursor-not-allowed': !form.code
+                                        }"
+                                    >
+                                        <i :class="isEditMode ? 'fas fa-pencil-alt' : 'fas fa-plus-circle'" class="mr-2"></i>
+                                        <span>Record: {{ isEditMode ? 'Edit' : 'Add' }}</span>
+                                    </button>
+                                </div>
                             </div>
 
+                            <div v-if="isFormVisible" class="space-y-6 transition-all duration-500 ease-in-out">
                             <div>
                                 <label for="format_name" class="block text-sm font-medium text-gray-700 mb-1">Format Name:</label>
                                 <input type="text" id="format_name" v-model="form.name" class="mt-1 block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
@@ -70,11 +89,11 @@
                                 <div class="mt-2 space-y-2">
                                     <div class="flex items-center space-x-4">
                                         <label class="inline-flex items-center">
-                                            <input type="radio" class="form-radio" name="format_type" value="S-Single Item" v-model="form.type">
+                                                <input type="radio" class="form-radio text-indigo-600 focus:ring-indigo-500" name="format_type" value="S-Single Item" v-model="form.type">
                                             <span class="ml-2 text-gray-700">S-Single Item</span>
                                         </label>
                                         <label class="inline-flex items-center">
-                                            <input type="radio" class="form-radio" name="format_type" value="M-Multiple Items" v-model="form.type">
+                                                <input type="radio" class="form-radio text-indigo-600 focus:ring-indigo-500" name="format_type" value="M-Multiple Items" v-model="form.type">
                                             <span class="ml-2 text-gray-700">M-Multiple Items</span>
                                         </label>
                                     </div>
@@ -93,74 +112,20 @@
                                 </button>
                                 <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-md flex items-center space-x-2 transition-all duration-300 transform active:scale-95">
                                     <i class="fas fa-save"></i>
-                                    <span>{{ isEditMode ? 'Update' : 'Save' }}</span>
+                                        <span>Save</span>
                                 </button>
                                 <button type="button" @click="deleteFormat" v-if="isEditMode" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-md flex items-center space-x-2 transition-all duration-300 transform active:scale-95">
                                     <i class="fas fa-trash"></i>
                                     <span>Delete</span>
                                 </button>
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
 
                 <!-- Right Column - Quick Info (adapted from Update MC) -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden">
-                        <div class="absolute -top-16 -right-16 w-32 h-32 bg-teal-50 rounded-full opacity-20"></div>
-                        <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-green-50 rounded-full opacity-20"></div>
-                        
-                        <div class="flex items-center mb-4 pb-2 border-b border-gray-200 relative z-10">
-                            <div class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-3 shadow-md">
-                                <i class="fas fa-lightbulb text-white"></i>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-800">Quick Tips</h3>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div class="p-4 bg-teal-50 rounded-lg">
-                                <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2 flex items-center">
-                                    <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
-                                        <i class="fas fa-question text-white text-xs"></i>
-                                    </span>
-                                    How to Use
-                                </h4>
-                                <ul class="text-sm text-gray-600 space-y-2">
-                                    <li class="flex items-start">
-                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
-                                            <i class="fas fa-check text-white text-xs"></i>
-                                        </span>
-                                        Enter a new format code or select an existing one using the search button.
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
-                                            <i class="fas fa-check text-white text-xs"></i>
-                                        </span>
-                                        Fill in the format name, type (Single/Multiple Items), and default printer.
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
-                                            <i class="fas fa-check text-white text-xs"></i>
-                                        </span>
-                                        Click 'Save' to add a new format or 'Update' to modify an existing one.
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
-                                            <i class="fas fa-check text-white text-xs"></i>
-                                        </span>
-                                        Use the 'New' button to clear the form and create a new entry.
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
-                                            <i class="fas fa-check text-white text-xs"></i>
-                                        </span>
-                                        The 'Delete' button is available for existing records.
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Removed this section as per user request to match provided image. -->
             </div>
         </div>
 
@@ -175,9 +140,10 @@
 
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, reactive, onMounted, watch } from 'vue';
+import { ref, reactive, onMounted, watch, computed } from 'vue';
 import DeliveryOrderFormatModal from '@/Components/DeliveryOrderFormatModal.vue';
 import axios from 'axios';
+import debounce from 'lodash/debounce';
 
 const form = reactive({
     code: '',
@@ -189,6 +155,47 @@ const form = reactive({
 const isEditMode = ref(false);
 const showDeliveryOrderFormatModal = ref(false);
 const allFormats = ref([]);
+const codeExists = ref(false);
+
+const isFormVisible = computed(() => {
+    return form.code && (isEditMode.value || !codeExists.value);
+});
+
+// Function to check if a code exists in the database
+const checkCodeExistence = async () => {
+    if (!form.code) {
+        codeExists.value = false;
+        isEditMode.value = false; // Ensure edit mode is off if code is empty
+        return;
+    }
+    try {
+        const response = await axios.get(route('delivery-order-formats.show', form.code));
+        codeExists.value = !!response.data; // true if data exists, false otherwise
+        if (codeExists.value) {
+            isEditMode.value = true; // Automatically go into edit mode if code exists
+            Object.assign(form, response.data); // Populate form with existing data
+        } else {
+            isEditMode.value = false; // Stay in add mode if code does not exist
+            form.name = ''; // Clear name, type, printer for new entry
+            form.type = 'S-Single Item';
+            form.printer = '';
+        }
+    } catch (error) {
+        if (error.response && error.response.status === 404) {
+            codeExists.value = false;
+            isEditMode.value = false; // Ensure edit mode is off if 404
+            form.name = ''; // Clear name, type, printer for new entry
+            form.type = 'S-Single Item';
+            form.printer = '';
+        } else {
+            console.error('Error checking code existence:', error);
+            // Optionally, handle other errors or keep current state
+        }
+    }
+};
+
+// Debounced version of checkCodeExistence to prevent excessive API calls
+const debouncedCheckCode = debounce(checkCodeExistence, 300);
 
 const fetchAllFormats = async () => {
     try {
@@ -201,7 +208,7 @@ const fetchAllFormats = async () => {
 
 const fetchFormat = async (code) => {
     if (!code) {
-        newFormat();
+        newFormat(); // If no code, treat as new
         return;
     }
     try {
@@ -213,6 +220,7 @@ const fetchFormat = async (code) => {
             form.type = format.type;
             form.printer = format.printer;
             isEditMode.value = true;
+            codeExists.value = true;
         } else {
             newFormat();
             alert('Format not found.');
@@ -262,10 +270,11 @@ const newFormat = () => {
     form.type = 'S-Single Item';
     form.printer = '';
     isEditMode.value = false;
+    codeExists.value = false;
 };
 
 const openFormatModal = async () => {
-    await fetchAllFormats();
+    await fetchAllFormats(); // Ensure modal has latest data
     showDeliveryOrderFormatModal.value = true;
 };
 
@@ -273,30 +282,48 @@ const closeFormatModal = () => {
     showDeliveryOrderFormatModal.value = false;
 };
 
-const handleFormatSelected = (format) => {
-    form.code = format.code;
-    form.name = format.name;
-    form.type = format.type;
-    form.printer = format.printer;
-    isEditMode.value = true;
-    closeFormatModal();
+const handleFormatSelected = (selectedFormat) => {
+    if (selectedFormat) {
+        form.code = selectedFormat.code;
+        fetchFormat(selectedFormat.code);
+    }
 };
 
-// Watch for changes in form.code to trigger fetchFormat
-watch(() => form.code, (newCode) => {
-    if (!showDeliveryOrderFormatModal.value && newCode && newCode !== currentFormatCodeOnLoad) {
-        // Only fetch if not opening from modal and code has changed from initial load
-        // This prevents re-fetching immediately after selecting from modal
-        fetchFormat(newCode);
+const handleRecordAction = () => {
+    if (!form.code) {
+        alert('Please enter a Format Code.');
+        return;
+    }
+    if (isEditMode.value) {
+        // If in edit mode, and user clicks "Record: Edit", it means they want to re-load/confirm edit.
+        // The data is already loaded due to checkCodeExistence, so no explicit fetch needed.
+        // This is primarily for visual feedback and consistency with "Record: Add"
+        console.log('Currently in edit mode for code:', form.code);
+    } else {
+        // If in add mode (code does not exist), and user clicks "Record: Add"
+        // The form fields will automatically appear due to `isFormVisible` computed property.
+        console.log('Ready to add new format with code:', form.code);
+    }
+};
+
+onMounted(() => {
+    fetchAllFormats();
+    // No initial checkCodeExistence needed on mount for an empty form.
+    // The check will happen when the user types in form.code or selects from modal.
+});
+
+watch(() => form.code, (newCode, oldCode) => {
+    if (newCode !== oldCode) {
+        debouncedCheckCode();
     }
 });
 
-let currentFormatCodeOnLoad = '';
-onMounted(() => {
-    newFormat(); // Initialize form
-    // Capture initial state to prevent immediate fetch on mount due to watch
-    currentFormatCodeOnLoad = form.code;
-});
+// No longer need to watch isEditMode explicitly, as checkCodeExistence handles it.
+// watch(isEditMode, (newVal) => {
+//     if (newVal === false && form.code) {
+//         checkCodeExistence();
+//     }
+// });
 </script>
 
 <style scoped>

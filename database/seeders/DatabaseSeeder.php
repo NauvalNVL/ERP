@@ -53,6 +53,7 @@ class DatabaseSeeder extends Seeder
             RollSizeSeeder::class,
             SideTrimByProductDesignSeeder::class,
             ComputationMethodSeeder::class,
+            DeliveryOrderFormatSeeder::class,
         ]);
 
         $this->call(MmControlPeriodSeeder::class);
