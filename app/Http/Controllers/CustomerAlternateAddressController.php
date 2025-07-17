@@ -38,12 +38,27 @@ class CustomerAlternateAddressController extends Controller
     public function apiIndex()
     {
         try {
-            $customers = UpdateCustomerAccount::orderBy('customer_name')->get();
-            Log::info('Fetched customer data for API');
-            return response()->json($customers);
+            $addresses = CustomerAlternateAddress::with('customerAccount')->orderBy('customer_code')->get();
+            
+            // Map data to include customer_name and status from related CustomerAccount
+            $formattedAddresses = $addresses->map(function ($address) {
+                return [
+                    'id' => $address->id,
+                    'customer_code' => $address->customer_code,
+                    'delivery_code' => $address->delivery_code,
+                    'customer_name' => $address->customerAccount ? $address->customerAccount->customer_name : 'N/A',
+                    'address' => $address->ship_to_address,
+                    'city' => $address->town,
+                    'phone' => $address->tel_no,
+                    'status' => $address->customerAccount ? $address->customerAccount->status : 'N/A',
+                ];
+            });
+
+            Log::info('Fetched all alternate addresses for API');
+            return response()->json($formattedAddresses);
         } catch (\Exception $e) {
-            Log::error('Error fetching customer data: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch customer data'], 500);
+            Log::error('Error fetching all alternate addresses: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch alternate addresses'], 500);
         }
     }
 
@@ -66,35 +81,24 @@ class CustomerAlternateAddressController extends Controller
     {
         $request->validate([
             'customer_code' => 'required|string|max:20',
-            'address' => 'required|string|max:255',
-            'city' => 'required|string|max:100',
-            'postal_code' => 'required|string|max:20',
-            'phone' => 'required|string|max:20',
-            'email' => 'required|email|max:100',
+            'delivery_code' => 'required|string|max:255',
+            'country' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'town' => 'nullable|string|max:100',
+            'town_section' => 'nullable|string|max:100',
+            'bill_to_name' => 'nullable|string|max:255',
+            'bill_to_address' => 'nullable|string',
+            'ship_to_name' => 'nullable|string|max:255',
+            'ship_to_address' => 'nullable|string',
+            'contact_person' => 'nullable|string|max:255',
+            'tel_no' => 'nullable|string|max:20',
+            'fax_no' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:100',
         ]);
 
         DB::beginTransaction();
         try {
-            // Get customer details
-            $customer = UpdateCustomerAccount::where('customer_code', $request->customer_code)->first();
-            
-            if (!$customer) {
-                return response()->json(['error' => 'Customer not found'], 404);
-            }
-
-            $address = CustomerAlternateAddress::create([
-                'customer_name' => $customer->customer_name,
-                'customer_code' => $request->customer_code,
-                'salesperson_type' => $customer->salesperson_code ?? 'S000',
-                'currency' => $customer->currency ?? 'Local',
-                'currency_code' => $customer->currency_code ?? 'IDR',
-                'status' => $customer->status ?? 'Active',
-                'address' => $request->address,
-                'city' => $request->city,
-                'postal_code' => $request->postal_code,
-                'phone' => $request->phone,
-                'email' => $request->email,
-            ]);
+            $address = CustomerAlternateAddress::create($request->all());
 
             DB::commit();
             return response()->json([
@@ -115,24 +119,27 @@ class CustomerAlternateAddressController extends Controller
     public function apiUpdate(Request $request, $id)
     {
         $request->validate([
-            'address' => 'required|string|max:255',
-            'city' => 'required|string|max:100',
-            'postal_code' => 'required|string|max:20',
-            'phone' => 'required|string|max:20',
-            'email' => 'required|email|max:100',
+            'customer_code' => 'required|string|max:20',
+            'delivery_code' => 'required|string|max:255',
+            'country' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'town' => 'nullable|string|max:100',
+            'town_section' => 'nullable|string|max:100',
+            'bill_to_name' => 'nullable|string|max:255',
+            'bill_to_address' => 'nullable|string',
+            'ship_to_name' => 'nullable|string|max:255',
+            'ship_to_address' => 'nullable|string',
+            'contact_person' => 'nullable|string|max:255',
+            'tel_no' => 'nullable|string|max:20',
+            'fax_no' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:100',
         ]);
 
         DB::beginTransaction();
         try {
             $address = CustomerAlternateAddress::findOrFail($id);
             
-            $address->update([
-                'address' => $request->address,
-                'city' => $request->city,
-                'postal_code' => $request->postal_code,
-                'phone' => $request->phone,
-                'email' => $request->email,
-            ]);
+            $address->update($request->all());
 
             DB::commit();
             return response()->json([

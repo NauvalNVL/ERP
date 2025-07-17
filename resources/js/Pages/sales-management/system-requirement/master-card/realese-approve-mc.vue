@@ -1340,6 +1340,17 @@
             </div>
         </transition>
 
+        <!-- ReleaseApprovedMCModal -->
+        <ReleaseApprovedMCModal
+          :show="showReleaseApprovedMCModal"
+          :masterCards="masterCards"
+          :customerCode="searchTerm"
+          :customerName="selectedCustomer ? selectedCustomer.name : ''"
+          :mcsFrom="form.mcsFrom"
+          :mcsTo="form.mcsTo"
+          @close="showReleaseApprovedMCModal = false"
+        />
+
     </AppLayout>
 </template>
 
@@ -1348,6 +1359,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { usePage, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import ReleaseApprovedMCModal from '@/Components/ReleaseApprovedMCModal.vue';
 
 // Debug information
 console.log("Component loaded");
@@ -1386,6 +1398,7 @@ const loading = ref(false);
 const error = ref(null);
 const showCustomerAccountModal = ref(false); // New state for customer account modal
 const showMasterCardOptionsModal = ref(false); // New state for Master Card Options modal
+const showReleaseApprovedMCModal = ref(false); // New state for Release Approved MC Modal
 const mcsOptionSortBy = ref('seq');
 const mcsOptionSortOrder = ref('asc');
 const mcsOptionStatus = ref(['active', 'obsolete']);
@@ -1478,6 +1491,11 @@ const formatDate = (dateString) => {
 const handleOK = () => {
     // Handle OK button 
     console.log('Proceed clicked.');
+    if (searchTerm.value && form.value.mcsFrom && form.value.mcsTo) {
+      showReleaseApprovedMCModal.value = true;
+    } else {
+      showNotification('Please fill in Customer AC#, MCS# From, and MCS# To.', 'error');
+    }
 };
 
 const handleExit = () => {
@@ -1517,7 +1535,7 @@ const confirmRelease = async () => {
             showNotification('Master Card released successfully!');
         } else {
             throw new Error(response.data.message || 'Failed to release master card');
-        }d
+        }
     } catch (error) {
         console.error('Error releasing master card:', error);
         showNotification(error.message || 'An error occurred during release', 'error');
