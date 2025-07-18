@@ -1,13 +1,14 @@
 <template>
-  <AppLayout title="Define Product Design">
-    <template #header>
-      <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-lg shadow-md">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-          <i class="fas fa-drafting-compass mr-3"></i> Define Product Design
+  <AppLayout :header="'Define Product Design'">
+    <Head title="Define Product Design" />
+    
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-lg shadow-md">
+      <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-drafting-compass mr-3"></i> Define Product Design
       </h2>
-        <p class="text-blue-100">Manage product designs for manufacturing processes</p>
-      </div>
-    </template>
+      <p class="text-blue-100">Manage product designs for manufacturing processes</p>
+    </div>
 
     <div class="bg-white rounded-b-lg shadow-md p-6 mb-6">
       <div class="flex flex-col md:flex-row gap-6">
@@ -151,20 +152,24 @@
             </h3>
             <div class="space-y-3">
               <div class="flex justify-between border-b border-gray-200 pb-2">
-                <span class="text-gray-600">Product Design:</span>
+                <span class="text-gray-600">Design Code:</span>
                 <span class="font-medium text-gray-900">{{ selectedDesign.pd_code || '-' }}</span>
               </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
-                <span class="text-gray-600">Name:</span>
+                <span class="text-gray-600">Design Name:</span>
                 <span class="font-medium text-gray-900">{{ selectedDesign.pd_name || '-' }}</span>
               </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Product:</span>
-                <span class="font-medium text-gray-900">{{ selectedDesign.product || '-' }}</span>
+                <span class="font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">{{ selectedDesign.product || '-' }}</span>
               </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Design Type:</span>
                 <span class="font-medium text-gray-900">{{ selectedDesign.pd_design_type || '-' }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">IDC:</span>
+                <span class="font-medium text-gray-900">{{ selectedDesign.idc || '-' }}</span>
               </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Compute:</span>
@@ -174,24 +179,48 @@
               </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Joint:</span>
-                <span class="font-medium text-gray-900">{{ selectedDesign.joint || 'No' }}</span>
+                <span class="font-medium" :class="{'text-green-600': selectedDesign.joint === 'Yes', 'text-red-600': selectedDesign.joint !== 'Yes'}">
+                  {{ selectedDesign.joint || 'No' }}
+                </span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Joint to Print:</span>
+                <span class="font-medium" :class="{'text-green-600': selectedDesign.joint_to_print === 'Yes', 'text-red-600': selectedDesign.joint_to_print !== 'Yes'}">
+                  {{ selectedDesign.joint_to_print || 'No' }}
+                </span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">PCS to Joint:</span>
+                <span class="font-medium text-gray-900">{{ selectedDesign.pcs_to_joint || '-' }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Score:</span>
+                <span class="font-medium" :class="{'text-green-600': selectedDesign.score === 'Yes', 'text-red-600': selectedDesign.score !== 'Yes'}">
+                  {{ selectedDesign.score || 'No' }}
+                </span>
               </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Slot:</span>
-                <span class="font-medium text-gray-900">{{ selectedDesign.slot || 'No' }}</span>
+                <span class="font-medium" :class="{'text-green-600': selectedDesign.slot === 'Yes', 'text-red-600': selectedDesign.slot !== 'Yes'}">
+                  {{ selectedDesign.slot || 'No' }}
+                </span>
               </div>
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Flute Style:</span>
-                <span class="font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">{{ selectedDesign.flute_style || '-' }}</span>
+                <span class="font-medium text-gray-900">{{ selectedDesign.flute_style || '-' }}</span>
               </div>
-            </div>
-            <div class="mt-6 flex space-x-2">
-              <button @click="editSelected" class="flex-1 btn-blue">
-                <i class="fas fa-edit mr-1"></i> Edit
-              </button>
-              <button @click="confirmDelete" class="flex-1 btn-danger">
-                <i class="fas fa-trash-alt mr-1"></i> Delete
-              </button>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Print Flute:</span>
+                <span class="font-medium" :class="{'text-green-600': selectedDesign.print_flute === 'Yes', 'text-red-600': selectedDesign.print_flute !== 'Yes'}">
+                  {{ selectedDesign.print_flute || 'No' }}
+                </span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Input Weight:</span>
+                <span class="font-medium" :class="{'text-green-600': selectedDesign.input_weight === 'Yes', 'text-red-600': selectedDesign.input_weight !== 'Yes'}">
+                  {{ selectedDesign.input_weight || 'No' }}
+                </span>
+              </div>
             </div>
           </div>
           <div v-else class="flex flex-col items-center justify-center h-64 text-center">
@@ -405,6 +434,7 @@
 
 <script setup>
 import { ref, onMounted, reactive, computed, watch } from 'vue';
+import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
 import { useToast } from '@/Composables/useToast';
