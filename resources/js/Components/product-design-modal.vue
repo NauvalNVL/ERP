@@ -67,7 +67,7 @@
                 <tr v-for="design in filteredDesigns" :key="design.pd_code"
                   :class="['hover:bg-blue-50 cursor-pointer group', selectedDesign && selectedDesign.pd_code === design.pd_code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
                   @click="selectRow(design)"
-                  @dblclick="editDesign(design)"
+                  @dblclick="handleDoubleClick(design)"
                   title="Double-click to edit this design">
                   <td class="px-3 py-3 whitespace-nowrap font-medium text-gray-900 relative">
                     {{ design.pd_code }}
@@ -444,6 +444,10 @@ const props = defineProps({
     type: Object,
     default: null,
   },
+  doubleClickAction: {
+    type: String,
+    default: 'edit' // 'edit' or 'select'
+  }
 });
 
 const emit = defineEmits(['close', 'select', 'data-changed']);
@@ -522,6 +526,14 @@ function selectAndClose(design) {
   if (design) {
     emit('select', design);
     emit('close');
+  }
+}
+
+function handleDoubleClick(design) {
+  if (props.doubleClickAction === 'select') {
+    selectAndClose(design);
+  } else {
+    editDesign(design);
   }
 }
 
