@@ -13,15 +13,35 @@
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
       <!-- Action Buttons -->
       <div class="flex mb-6 space-x-2">
-        <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow flex items-center" @click="printFormula">
-          <i class="fas fa-print mr-2"></i> Print
-        </button>
+        <div class="relative" ref="printDropdownContainer">
+          <button @click="printDropdownOpen = !printDropdownOpen" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow flex items-center">
+            <i class="fas fa-print mr-2"></i> Print
+            <i class="fas fa-chevron-down ml-2 transition-transform" :class="{'rotate-180': printDropdownOpen}"></i>
+          </button>
+          <transition
+            enter-active-class="transition ease-out duration-200"
+            enter-from-class="transform opacity-0 scale-95"
+            enter-to-class="transform opacity-100 scale-100"
+            leave-active-class="transition ease-in duration-75"
+            leave-from-class="transform opacity-100 scale-100"
+            leave-to-class="transform opacity-0 scale-95"
+          >
+            <div v-if="printDropdownOpen" class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
+              <a @click.prevent="exportAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
+              </a>
+              <a @click.prevent="printBrowser" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                <i class="fas fa-print mr-2 text-blue-500"></i> Browser Print
+              </a>
+            </div>
+          </transition>
+        </div>
         <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded shadow flex items-center" @click="fetchFormulaData">
           <i class="fas fa-sync-alt mr-2"></i> Refresh
         </button>
-        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow flex items-center" @click="seedData">
-          <i class="fas fa-database mr-2"></i> Seed Data
-        </button>
+        <Link :href="defineRoute" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow flex items-center">
+          <i class="fas fa-arrow-left mr-2"></i> Back to Define
+        </Link>
       </div>
 
       <!-- Loading indicator -->
@@ -48,6 +68,32 @@
           </div>
         </div>
 
+        <!-- Search and Filter -->
+        <div class="bg-white p-4 border border-gray-300 mb-4">
+          <div class="flex flex-wrap gap-4">
+            <div class="flex-grow">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Search:</label>
+              <input 
+                type="text" 
+                v-model="search" 
+                placeholder="Search by product design or flute code..."
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div class="w-48">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Status:</label>
+              <select 
+                v-model="statusFilter"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         <!-- Formula Content -->
         <div class="bg-white border border-gray-300 rounded-b-lg p-4">
           <!-- Tables Layout (2 columns) -->
@@ -61,18 +107,25 @@
                     <tr>
                       <th class="text-left py-1 px-2">Product Design</th>
                       <th class="text-left py-1 px-2">Paper Flute</th>
+                      <th class="text-left py-1 px-2">Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-if="formulas.length === 0">
-                      <td colspan="2" class="py-4 text-center text-gray-500">No formulas found</td>
+                    <tr v-if="filteredFormulas.length === 0">
+                      <td colspan="3" class="py-4 text-center text-gray-500">No formulas found</td>
                     </tr>
-                    <tr v-for="formula in formulas" :key="formula.id" 
+                    <tr v-for="formula in filteredFormulas" :key="formula.id" 
                         class="hover:bg-blue-100 cursor-pointer"
                         :class="{ 'bg-blue-100': selectedFormula && selectedFormula.id === formula.id }"
                         @click="selectFormula(formula)">
                       <td class="py-1 px-2 border-b">{{ formula.product_design?.pd_code || 'N/A' }}</td>
                       <td class="py-1 px-2 border-b">{{ formula.paper_flute?.code || 'N/A' }}</td>
+                      <td class="py-1 px-2 border-b">
+                        <span :class="formula.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" 
+                              class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium">
+                          {{ formula.is_active ? 'Active' : 'Inactive' }}
+                        </span>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -92,10 +145,10 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-if="!selectedFormula.scoring_length_formula || selectedFormula.scoring_length_formula.length === 0">
+                    <tr v-if="!parsedLengthFormula || parsedLengthFormula.length === 0">
                       <td colspan="2" class="py-4 text-center text-gray-500">No length formula data</td>
                     </tr>
-                    <tr v-for="(item, index) in selectedFormula.scoring_length_formula" :key="index" class="hover:bg-blue-100">
+                    <tr v-for="(item, index) in parsedLengthFormula" :key="index" class="hover:bg-blue-100">
                       <td class="py-1 px-2 border-b text-center">{{ item.index }}</td>
                       <td class="py-1 px-2 border-b">{{ item.value || '' }}</td>
                     </tr>
@@ -114,10 +167,10 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-if="!selectedFormula.scoring_width_formula || selectedFormula.scoring_width_formula.length === 0">
+                    <tr v-if="!parsedWidthFormula || parsedWidthFormula.length === 0">
                       <td colspan="2" class="py-4 text-center text-gray-500">No width formula data</td>
                     </tr>
-                    <tr v-for="(item, index) in selectedFormula.scoring_width_formula" :key="index" class="hover:bg-blue-100">
+                    <tr v-for="(item, index) in parsedWidthFormula" :key="index" class="hover:bg-blue-100">
                       <td class="py-1 px-2 border-b text-center">{{ item.index }}</td>
                       <td class="py-1 px-2 border-b">{{ item.value || '' }}</td>
                     </tr>
@@ -176,6 +229,12 @@
               </div>
             </div>
           </div>
+          
+          <!-- Created/Updated Info -->
+          <div v-if="selectedFormula" class="mt-6 text-xs text-gray-500 text-right">
+            <p v-if="selectedFormula.created_at">Created: {{ formatDate(selectedFormula.created_at) }}</p>
+            <p v-if="selectedFormula.updated_at">Last Updated: {{ formatDate(selectedFormula.updated_at) }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -214,43 +273,133 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 
 // State variables
 const loading = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 const formulas = ref([]);
 const selectedFormula = ref(null);
+const printDropdownOpen = ref(false);
+const printDropdownContainer = ref(null);
+const search = ref('');
+const statusFilter = ref('all');
+const defineRoute = '/sales-management/standard-formula/setup-scoring-formula/scoring-formula';
+
+// Computed properties
+const filteredFormulas = computed(() => {
+  let result = formulas.value;
+  
+  // Apply search filter
+  if (search.value.trim() !== '') {
+    const searchLower = search.value.toLowerCase();
+    result = result.filter(formula => 
+      (formula.product_design?.pd_code?.toLowerCase().includes(searchLower)) || 
+      (formula.paper_flute?.code?.toLowerCase().includes(searchLower))
+    );
+  }
+  
+  // Apply status filter
+  if (statusFilter.value !== 'all') {
+    const isActive = statusFilter.value === 'active';
+    result = result.filter(formula => formula.is_active === isActive);
+  }
+  
+  return result;
+});
+
+const parsedLengthFormula = computed(() => {
+  if (!selectedFormula.value || !selectedFormula.value.scoring_length_formula) return [];
+  
+  try {
+    // Handle if it's already an array or if it's a JSON string
+    if (Array.isArray(selectedFormula.value.scoring_length_formula)) {
+      return selectedFormula.value.scoring_length_formula;
+    } else {
+      return JSON.parse(selectedFormula.value.scoring_length_formula);
+    }
+  } catch (e) {
+    console.error('Error parsing scoring_length_formula:', e);
+    return [];
+  }
+});
+
+const parsedWidthFormula = computed(() => {
+  if (!selectedFormula.value || !selectedFormula.value.scoring_width_formula) return [];
+  
+  try {
+    // Handle if it's already an array or if it's a JSON string
+    if (Array.isArray(selectedFormula.value.scoring_width_formula)) {
+      return selectedFormula.value.scoring_width_formula;
+    } else {
+      return JSON.parse(selectedFormula.value.scoring_width_formula);
+    }
+  } catch (e) {
+    console.error('Error parsing scoring_width_formula:', e);
+    return [];
+  }
+});
+
+// Format date helper
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date);
+};
+
+// Formatted current date
+const formattedDate = () => {
+  const now = new Date();
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(now);
+};
 
 // Fetch formula data from API
 const fetchFormulaData = async () => {
   loading.value = true;
   try {
-    console.log('Fetching scoring formula data...');
     const response = await axios.get('/api/scoring-formulas');
     
     console.log('API Response:', response.data);
     
-    if (Array.isArray(response.data)) {
+    if (response.data && response.data.status === 'success') {
+      // Handle if the API returns { status: 'success', data: [...] }
+      formulas.value = response.data.data;
+    } else if (Array.isArray(response.data)) {
+      // Handle if the API directly returns an array
       formulas.value = response.data;
-      
-      // If we have formulas, select the first one by default
-      if (formulas.value.length > 0) {
-        selectFormula(formulas.value[0]);
-      } else {
-        selectedFormula.value = null;
-      }
-      
-      showNotification('Formula data loaded successfully', 'success');
     } else {
       console.error('Unexpected data format:', response.data);
       formulas.value = [];
-      selectedFormula.value = null;
       showNotification('Error loading formula data: Invalid data format', 'error');
+      return;
     }
+    
+    // If we have formulas, select the first one by default
+    if (formulas.value.length > 0) {
+      selectFormula(formulas.value[0]);
+    } else {
+      selectedFormula.value = null;
+    }
+    
+    showNotification('Formula data loaded successfully', 'success');
   } catch (error) {
     console.error('Error fetching formula data:', error);
     formulas.value = [];
@@ -275,29 +424,10 @@ const fetchFormulaData = async () => {
 const selectFormula = (formula) => {
   console.log('Selected formula:', formula);
   selectedFormula.value = formula;
-  
-  // Ensure scoring_length_formula and scoring_width_formula are arrays
-  if (typeof selectedFormula.value.scoring_length_formula === 'string') {
-    try {
-      selectedFormula.value.scoring_length_formula = JSON.parse(selectedFormula.value.scoring_length_formula);
-    } catch (e) {
-      console.error('Error parsing scoring_length_formula:', e);
-      selectedFormula.value.scoring_length_formula = [];
-    }
-  }
-  
-  if (typeof selectedFormula.value.scoring_width_formula === 'string') {
-    try {
-      selectedFormula.value.scoring_width_formula = JSON.parse(selectedFormula.value.scoring_width_formula);
-    } catch (e) {
-      console.error('Error parsing scoring_width_formula:', e);
-      selectedFormula.value.scoring_width_formula = [];
-    }
-  }
 };
 
-// Print formula handler
-const printFormula = () => {
+// Original browser print functionality
+const printBrowser = () => {
   if (!selectedFormula.value) {
     showNotification('Please select a formula to print', 'warning');
     return;
@@ -320,6 +450,155 @@ const printFormula = () => {
   location.reload();
 };
 
+// New PDF export functionality
+const exportAsPdf = () => {
+  if (!selectedFormula.value) {
+    showNotification('Please select a formula to print', 'warning');
+    return;
+  }
+  
+  try {
+    const doc = new jsPDF();
+    
+    // Add document title and date
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Scoring Formula Report', 15, 22);
+    
+    doc.setFontSize(14);
+    doc.text(`${selectedFormula.value.product_design?.pd_code || 'N/A'} - ${selectedFormula.value.paper_flute?.code || 'N/A'}`, 15, 30);
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generated on: ${formattedDate()}`, 15, 38);
+    
+    // Scoring Length Formula Table
+    if (parsedLengthFormula.value && parsedLengthFormula.value.length > 0) {
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Scoring Length Formula', 15, 48);
+      
+      const lengthData = parsedLengthFormula.value.map(item => [
+        item.index !== null && item.index !== undefined ? item.index.toString() : '-',
+        item.value !== null && item.value !== undefined ? item.value.toString() : '-'
+      ]);
+      
+      autoTable(doc, {
+        head: [['#', 'Value']],
+        body: lengthData,
+        startY: 50,
+        theme: 'grid',
+        styles: {
+          fontSize: 10,
+          cellPadding: 3,
+        },
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          fontStyle: 'bold',
+        },
+        columnStyles: {
+          0: { cellWidth: 20, halign: 'center' },
+          1: { cellWidth: 'auto' },
+        }
+      });
+    }
+    
+    // Scoring Width Formula Table
+    if (parsedWidthFormula.value && parsedWidthFormula.value.length > 0) {
+      const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 50;
+      
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Scoring Width Formula', 15, finalY);
+      
+      const widthData = parsedWidthFormula.value.map(item => [
+        item.index !== null && item.index !== undefined ? item.index.toString() : '-',
+        item.value !== null && item.value !== undefined ? item.value.toString() : '-'
+      ]);
+      
+      autoTable(doc, {
+        head: [['#', 'Value']],
+        body: widthData,
+        startY: finalY + 2,
+        theme: 'grid',
+        styles: {
+          fontSize: 10,
+          cellPadding: 3,
+        },
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          fontStyle: 'bold',
+        },
+        columnStyles: {
+          0: { cellWidth: 20, halign: 'center' },
+          1: { cellWidth: 'auto' },
+        }
+      });
+    }
+    
+    // Dimension Conversion Table
+    const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 15 : 120;
+    
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Dimension Conversion Formula', 15, finalY);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('To convert from ordered to internal dimensions or vice-versa', 15, finalY + 6);
+    
+    const conversionData = [
+      ['Length', `${selectedFormula.value.length_conversion || 0} mm`],
+      ['Width', `${selectedFormula.value.width_conversion || 0} mm`],
+      ['Height', `${selectedFormula.value.height_conversion || 0} mm`],
+    ];
+    
+    autoTable(doc, {
+      head: [['Dimension', 'Conversion']],
+      body: conversionData,
+      startY: finalY + 8,
+      theme: 'grid',
+      styles: {
+        fontSize: 10,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+      columnStyles: {
+        0: { cellWidth: 40 },
+        1: { cellWidth: 'auto' },
+      }
+    });
+    
+    // Notes section
+    if (selectedFormula.value.notes) {
+      const notesY = doc.lastAutoTable.finalY + 15;
+      
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Notes:', 15, notesY);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const splitNotes = doc.splitTextToSize(selectedFormula.value.notes, 180);
+      doc.text(splitNotes, 15, notesY + 6);
+    }
+    
+    // Open PDF in a new tab
+    doc.output('dataurlnewwindow');
+    showNotification('PDF generated successfully', 'success');
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    showNotification('Failed to generate PDF: ' + error.message, 'error');
+  } finally {
+    printDropdownOpen.value = false;
+  }
+};
+
 // Show notification toast
 const showNotification = (message, type = 'success') => {
   notification.value = {
@@ -333,36 +612,26 @@ const showNotification = (message, type = 'success') => {
   }, 3000);
 };
 
-// Add this new function
-const seedData = async () => {
-  if (!confirm('Are you sure you want to seed the database with scoring formula data? This may create duplicate entries if data already exists.')) {
-    return;
-  }
-  
-  loading.value = true;
-  try {
-    const response = await axios.post('/api/scoring-formulas/seed');
-    if (response.data.success) {
-      showNotification('Data seeded successfully. Refreshing list...', 'success');
-      fetchFormulaData(); // Refresh the data after seeding
-    } else {
-      showNotification(response.data.message || 'Error seeding data.', 'error');
-    }
-  } catch (error) {
-    console.error('Error seeding data:', error);
-    showNotification('An error occurred while seeding data: ' + (error.response?.data?.message || error.message), 'error');
-  } finally {
-    loading.value = false;
+const handleClickOutside = (event) => {
+  if (printDropdownContainer.value && !printDropdownContainer.value.contains(event.target)) {
+    printDropdownOpen.value = false;
   }
 };
 
 // Load data on component mount
 onMounted(() => {
   fetchFormulaData();
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
 });
 </script>
 
 <style scoped>
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
 @media print {
   body {
     margin: 0;

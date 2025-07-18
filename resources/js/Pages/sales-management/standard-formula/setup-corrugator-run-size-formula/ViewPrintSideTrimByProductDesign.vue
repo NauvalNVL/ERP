@@ -31,8 +31,8 @@
                     <a @click.prevent="printAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                       <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
                     </a>
-                    <a @click.prevent="printAsExcel" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                      <i class="fas fa-file-excel mr-2 text-green-500"></i> Export as Excel
+                    <a @click.prevent="printAsCsv" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-csv mr-2 text-green-500"></i> Export as CSV
                     </a>
                   </div>
                 </transition>
@@ -401,12 +401,11 @@ export default defineComponent({
       filteredSideTrims.value = [...sideTrims.value];
     };
 
-    const exportToExcel = () => {
+    const exportToCsv = () => {
       try {
-        showNotification('Preparing Excel export...');
+        showNotification('Preparing CSV export...');
         
-        // Since backend export is not implemented, we'll create the Excel file on the frontend
-        // We'll use a simple CSV format that Excel can open
+        // Since backend export is not implemented, we'll create the CSV file on the frontend
         const headers = ['Product Design', 'Product', 'Flute', 'Compute', 'Length Less (mm)', 'Length Add (mm)'];
         
         // Convert data to CSV format
@@ -434,15 +433,15 @@ export default defineComponent({
         link.click();
         link.remove();
         
-        showNotification('Excel export completed successfully');
+        showNotification('CSV export completed successfully');
       } catch (error) {
-        console.error('Error exporting to Excel:', error);
-        showNotification('Failed to export data to Excel', 'error');
+        console.error('Error exporting to CSV:', error);
+        showNotification('Failed to export data to CSV', 'error');
       }
     };
     
-    const printAsExcel = () => {
-      exportToExcel();
+    const printAsCsv = () => {
+      exportToCsv();
       printDropdownOpen.value = false;
     };
     
@@ -575,10 +574,10 @@ export default defineComponent({
       formattedDate,
       filterData,
       resetFilters,
-      printAsExcel,
+      printAsCsv,
       printAsPdf,
       generatePdf,
-      exportToExcel
+      exportToCsv
     };
   }
 });

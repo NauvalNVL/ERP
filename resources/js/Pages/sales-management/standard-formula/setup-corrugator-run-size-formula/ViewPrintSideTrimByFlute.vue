@@ -31,8 +31,8 @@
                     <a @click.prevent="printAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                       <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
                     </a>
-                    <a @click.prevent="printAsExcel" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                      <i class="fas fa-file-excel mr-2 text-green-500"></i> Export as Excel
+                    <a @click.prevent="printAsCsv" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-csv mr-2 text-green-500"></i> Export as CSV
                     </a>
                   </div>
                 </transition>
@@ -333,17 +333,17 @@ export default defineComponent({
       filteredSideTrims.value = [...sideTrims.value];
     };
 
-    const printAsExcel = () => {
+    const printAsCsv = () => {
       showNotification('Exporting data...');
       
       // Call the export API endpoint
       axios.get('/api/side-trims-by-flute/export', { responseType: 'blob' })
         .then(response => {
           // Create a download link for the exported file
-          const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          const blob = new Blob([response.data], { type: 'text/csv' });
           const link = document.createElement('a');
           link.href = window.URL.createObjectURL(blob);
-          link.download = `side_trims_by_flute_${new Date().toISOString().split('T')[0]}.xlsx`;
+          link.download = `side_trims_by_flute_${new Date().toISOString().split('T')[0]}.csv`;
           link.click();
           
           showNotification('Data exported successfully');
@@ -434,7 +434,7 @@ export default defineComponent({
       filterData,
       resetFilters,
       printAsPdf,
-      printAsExcel,
+      printAsCsv,
       showNotification
     };
   }

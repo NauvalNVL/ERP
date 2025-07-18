@@ -30,8 +30,8 @@
                       <a @click.prevent="printAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                           <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
                       </a>
-                      <a @click.prevent="printAsExcel" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                          <i class="fas fa-file-excel mr-2 text-green-500"></i> Export as Excel
+                      <a @click.prevent="printAsCsv" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                          <i class="fas fa-file-csv mr-2 text-green-500"></i> Export as CSV
                       </a>
                   </div>
               </transition>
@@ -291,18 +291,39 @@ export default defineComponent({
       filteredProducts.value = filtered;
     };
 
-    const exportToExcel = async () => {
-      showNotification('Exporting to Excel...');
+    const exportToCsv = () => {
       try {
-        const response = await axios.get('/api/corrugator-specs-by-product/export', { responseType: 'blob' });
-        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        showNotification('Exporting to CSV...');
+        
+        // Create CSV headers
+        const headers = ['Product Code', 'Product Name', 'To Compute', 'Min Sheet Length', 'Max Sheet Length', 'Min Sheet Width', 'Max Sheet Width'];
+        
+        // Convert data to CSV format
+        const csvContent = [
+          headers.join(','),
+          ...filteredProducts.value.map(product => [
+            product.product_code || '',
+            product.product_name || '',
+            product.compute ? 'Yes' : 'No',
+            product.min_sheet_length,
+            product.max_sheet_length,
+            product.min_sheet_width,
+            product.max_sheet_width
+          ].join(','))
+        ].join('\n');
+        
+        // Create a blob and download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = `corrugator_specs_${new Date().toISOString().split('T')[0]}.xlsx`;
+        link.href = URL.createObjectURL(blob);
+        link.download = `corrugator_specs_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
         link.click();
-        showNotification('Data exported to Excel successfully.', 'success');
+        document.body.removeChild(link);
+        
+        showNotification('Data exported to CSV successfully.', 'success');
       } catch (error) {
-        console.error('Error exporting data:', error);
+        console.error('Error exporting data to CSV:', error);
         showNotification('Failed to export data. Please check the console for details.', 'error');
       }
     };
@@ -335,8 +356,8 @@ export default defineComponent({
       printDropdownOpen.value = false;
     };
 
-    const printAsExcel = () => {
-      exportToExcel();
+    const printAsCsv = () => {
+      exportToCsv();
       printDropdownOpen.value = false;
     };
 
@@ -370,7 +391,7 @@ export default defineComponent({
       printDropdownContainer,
       filterProducts,
       printAsPdf,
-      printAsExcel,
+      printAsCsv,
       togglePrintDropdown,
       showNotification
     };

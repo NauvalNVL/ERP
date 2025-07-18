@@ -23,8 +23,8 @@
                 <a @click.prevent="printAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                   <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
                 </a>
-                <a @click.prevent="printAsExcel" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                  <i class="fas fa-file-excel mr-2 text-green-500"></i> Export as Excel
+                <a @click.prevent="printAsCsv" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                  <i class="fas fa-file-csv mr-2 text-green-500"></i> Export as CSV
                 </a>
               </div>
             </transition>
@@ -361,38 +361,38 @@ const printAsPdf = () => {
   printDropdownOpen.value = false;
 };
 
-const printAsExcel = () => {
-  exportToExcel();
+const printAsCsv = () => {
+  exportToCsv();
   printDropdownOpen.value = false;
 };
 
-// Function to export data to Excel
-const exportToExcel = async () => {
+// Function to export data to CSV
+const exportToCsv = () => {
   try {
-    const response = await axios.get('/api/product-designs/export', { responseType: 'blob' });
-    const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    // Create CSV headers
+    const headers = ['Product Design', 'Product Design Name', 'To Compute'];
+    
+    // Convert data to CSV format
+    const csvContent = [
+      headers.join(','),
+      ...filteredDesigns.value.map(design => [
+        design.pd_code || '',
+        design.pd_name || '',
+        design.compute ? 'Yes' : 'No'
+      ].join(','))
+    ].join('\n');
+    
+    // Create a blob and download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = `product_designs_${new Date().toISOString().split('T')[0]}.xlsx`;
+    link.href = URL.createObjectURL(blob);
+    link.download = `product_designs_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   } catch (error) {
-    if (error.response && error.response.data) {
-      const reader = new FileReader();
-      reader.onload = function() {
-        try {
-          const errorData = JSON.parse(this.result);
-          alert(`Failed to export designs: ${errorData.message}`);
-          console.error('Export failed:', errorData.message);
-        } catch (e) {
-          alert('An unknown error occurred during export.');
-          console.error('Error exporting designs and parsing error response:', error);
-        }
-      };
-      reader.readAsText(error.response.data);
-    } else {
-      alert('Failed to export product designs due to a network or server error.');
-    console.error('Error exporting designs:', error);
-    }
+    alert('Failed to export product designs to CSV.');
+    console.error('Error exporting designs to CSV:', error);
   }
 };
 

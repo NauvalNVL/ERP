@@ -31,8 +31,8 @@
                     <a @click.prevent="printAsPdf" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                       <i class="fas fa-file-pdf mr-2 text-red-500"></i> Export as PDF
                     </a>
-                    <a @click.prevent="printAsExcel" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                      <i class="fas fa-file-excel mr-2 text-green-500"></i> Export as Excel
+                    <a @click.prevent="printAsCsv" href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                      <i class="fas fa-file-csv mr-2 text-green-500"></i> Export as CSV
                     </a>
                   </div>
                 </transition>
@@ -317,7 +317,7 @@ export default defineComponent({
       };
     };
 
-    const exportToExcel = () => {
+    const exportToCsv = () => {
       try {
         axios({
           url: '/api/roll-trim-by-corrugator/export',
@@ -327,7 +327,7 @@ export default defineComponent({
           const url = window.URL.createObjectURL(new Blob([response.data]));
           const link = document.createElement('a');
           link.href = url;
-          link.setAttribute('download', 'roll_trim_by_corrugator.xlsx');
+          link.setAttribute('download', 'roll_trim_by_corrugator.csv');
           document.body.appendChild(link);
           link.click();
           link.remove();
@@ -389,8 +389,8 @@ export default defineComponent({
       printDropdownOpen.value = false;
     };
 
-    const printAsExcel = () => {
-      exportToExcel();
+    const printAsCsv = () => {
+      exportToCsv();
       printDropdownOpen.value = false;
     };
 
@@ -426,7 +426,7 @@ export default defineComponent({
       applyFilters,
       resetFilters,
       printAsPdf,
-      printAsExcel,
+      printAsCsv,
     };
   }
 });
