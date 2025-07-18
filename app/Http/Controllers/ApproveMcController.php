@@ -327,61 +327,66 @@ class ApproveMcController extends Controller
      */
     public function reject(Request $request, $id)
     {
+        $approveMc = ApproveMC::findOrFail($id);
+
+        if ($approveMc->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only pending master cards can be rejected.'
+            ], 400);
+        }
+        
         $validator = Validator::make($request->all(), [
-            'rejection_reason' => 'required|string|min:3'
+            'rejection_reason' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed: A rejection reason is required',
+                'message' => 'Rejection reason is required.',
                 'errors' => $validator->errors()
             ], 422);
         }
-        
-        try {
-            $approveMc = ApproveMC::findOrFail($id);
-            
-            // Set rejection fields
-            $approveMc->status = 'obsolete';
-            $approveMc->rejected_by = Auth::user() ? Auth::user()->user_id : 'SYSTEM';
-            $approveMc->rejected_date = now();
-            $approveMc->rejection_reason = $request->rejection_reason;
-            $approveMc->save();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Master card rejected successfully',
-                'rejected_by' => $approveMc->rejected_by,
-                'rejected_date' => $approveMc->rejected_date,
-                'data' => $approveMc
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to reject master card: ' . $e->getMessage()
-            ], 500);
-        }
+
+        $approveMc->status = 'obsolete';
+        $approveMc->rejected_by = Auth::user()->user_id;
+        $approveMc->rejected_date = now();
+        $approveMc->rejection_reason = $request->rejection_reason;
+        $approveMc->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Master card has been rejected and marked as obsolete.',
+            'data' => $approveMc
+        ]);
     }
-    
+
     /**
      * Get master cards by customer
      */
     public function getByCustomer($customerId)
     {
         try {
+            // Validate that the customerId exists
+            if (!UpdateCustomerAccount::where('customer_code', $customerId)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Customer with code {$customerId} not found."
+                ], 404);
+            }
+            
+            // Fetch master cards for the given customer, ordered by a valid column
             $masterCards = ApproveMC::where('customer_code', $customerId)
-                ->orderBy('mc_seq')
+                ->orderBy('mc_seq', 'asc')
+                ->take(50)
                 ->get();
-                
-            return response()->json([
-                'success' => true,
-                'data' => $masterCards
-            ]);
+            
+            return response()->json($masterCards);
         } catch (\Exception $e) {
+            Log::error("Failed to get master cards for customer {$customerId}: " . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to fetch master cards: ' . $e->getMessage()
+                'message' => 'An error occurred while fetching master cards.'
             ], 500);
         }
     }

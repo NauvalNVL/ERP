@@ -26,9 +26,6 @@
               </div>
             </div>
             <div class="flex gap-2 w-full md:w-auto">
-              <button @click="newDesign" class="btn-primary flex-1 md:flex-none">
-                <i class="fas fa-plus-circle mr-2"></i> New Design
-              </button>
               <button @click="refreshData" class="btn-secondary flex-1 md:flex-none">
                 <i class="fas fa-sync-alt mr-2"></i> Refresh
               </button>
@@ -72,15 +69,19 @@
                   </tr>
                   <tr v-else-if="paginatedDesigns.length === 0" class="hover:bg-gray-50">
                     <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
-                      No product designs found. Try adjusting your search or create a new design.
+                      No product designs found. Try adjusting your search.
                     </td>
                   </tr>
                   <tr v-for="design in paginatedDesigns" :key="design.pd_code" 
                       @click="selectDesign(design)" 
                       :class="{'bg-blue-50': selectedDesign && selectedDesign.pd_code === design.pd_code}"
                       class="hover:bg-gray-50 cursor-pointer">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ design.pd_code }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ design.pd_name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900">{{ design.pd_code }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">{{ design.pd_name }}</div>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 cursor-pointer hover:bg-blue-100 active:bg-blue-200 transition-all duration-150 transform hover:scale-105 border border-transparent hover:border-blue-300 rounded-md" 
                       @click.stop="toggleCompute(design)"
                       title="Click to toggle Compute status"
@@ -205,14 +206,6 @@
                 </span>
               </div>
             </div>
-            <div class="mt-6 flex space-x-2">
-              <button @click="editDesign(selectedDesign)" class="flex-1 btn-blue">
-                <i class="fas fa-edit mr-1"></i> Edit
-              </button>
-              <button @click="confirmDelete(selectedDesign)" class="flex-1 btn-danger">
-                <i class="fas fa-trash-alt mr-1"></i> Delete
-              </button>
-            </div>
           </div>
           <div v-else class="flex flex-col items-center justify-center h-64 text-center">
             <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
@@ -220,44 +213,6 @@
             </div>
             <h3 class="text-lg font-medium text-gray-900 mb-1">No Design Selected</h3>
             <p class="text-gray-500 mb-4">Select a design from the table to view details</p>
-            <button @click="newDesign" class="btn-primary">
-              <i class="fas fa-plus-circle mr-1"></i> Create New Design
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Product Design Modal -->
-    <ProductDesignModal
-      :show="showModal"
-      :designs="designs"
-      :products="products"
-      :is-creating="isCreating"
-      :design-to-edit="designToEdit"
-      @data-changed="refreshData"
-      @close="showModal = false"
-    />
-
-    <!-- Confirmation Modal -->
-    <div v-if="showConfirmation" class="fixed inset-0 flex items-center justify-center z-50">
-      <div class="absolute inset-0 bg-black opacity-50" @click="showConfirmation = false"></div>
-      <div class="bg-white rounded-lg shadow-lg max-w-md z-10 w-full">
-        <div class="p-6">
-          <div class="flex items-center mb-4">
-            <div class="bg-red-100 rounded-full p-2 mr-3">
-              <i class="fas fa-exclamation-triangle text-red-600"></i>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900">Confirm Delete</h3>
-          </div>
-          <p class="mb-4 text-gray-600">Are you sure you want to delete the product design <span class="font-semibold">{{ designToDelete?.pd_code }}</span>? This action cannot be undone.</p>
-          <div class="flex justify-end space-x-3">
-            <button @click="showConfirmation = false" class="px-4 py-2 text-gray-700 border border-gray-300 rounded hover:bg-gray-50">
-              <i class="fas fa-times mr-1"></i> Cancel
-            </button>
-            <button @click="deleteDesign" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" :disabled="loading">
-              <i class="fas fa-trash-alt mr-1"></i> Delete
-            </button>
           </div>
         </div>
       </div>
@@ -270,7 +225,6 @@ import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import ProductDesignModal from '@/Components/product-design-modal.vue';
 import { useToast } from '@/Composables/useToast';
 
 // State variables
@@ -279,12 +233,6 @@ const products = ref([]);
 const selectedDesign = ref(null);
 const loading = ref(false);
 const searchQuery = ref('');
-const showModal = ref(false);
-const showConfirmation = ref(false);
-const designToDelete = ref(null);
-const designToEdit = ref(null);
-const isCreating = ref(false);
-
 const sortOrder = ref({
   field: 'pd_code',
   direction: 'asc'
@@ -292,6 +240,8 @@ const sortOrder = ref({
 const toast = useToast();
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+const toggleLoading = ref({});
+const savingStatus = ref({});
 
 // Computed properties
 const filteredDesigns = computed(() => {
@@ -382,56 +332,39 @@ const selectDesign = (design) => {
   selectedDesign.value = design;
 };
 
-// Function to open the new design form modal
-const newDesign = () => {
-  isCreating.value = true;
-  designToEdit.value = null;
-  showModal.value = true;
-};
+// Helper function to save a design
+async function _saveDesign(designData) {
+  const { pd_code, ...payload } = designData;
+  return axios.put(`/api/product-designs/${pd_code}`, payload);
+}
 
-// Function to open the edit design form modal
-const editDesign = (design) => {
-  isCreating.value = false;
-  designToEdit.value = { ...design };
-  showModal.value = true;
-};
+const updateDesign = async (design, field) => {
+  const statusKey = `${design.pd_code}-${field}`;
+  if (savingStatus.value[statusKey]) return;
 
-// Function to confirm deletion of a design
-const confirmDelete = (design) => {
-  designToDelete.value = design;
-  showConfirmation.value = true;
-};
+  savingStatus.value[statusKey] = true;
 
-// Function to delete a design
-const deleteDesign = async () => {
-  if (!designToDelete.value) return;
-  
-  loading.value = true;
   try {
-    await axios.delete(`/api/product-designs/${designToDelete.value.pd_code}`);
-    
-    toast.success('Design deleted successfully');
-    
-    // Remove design from the local array
-    designs.value = designs.value.filter(d => d.pd_code !== designToDelete.value.pd_code);
-    
-    // Clear selection if the deleted design was selected
-    if (selectedDesign.value?.pd_code === designToDelete.value.pd_code) {
-      selectedDesign.value = null;
+    const response = await _saveDesign(design);
+    const updatedResult = response.data;
+
+    const index = designs.value.findIndex(d => d.pd_code === design.pd_code);
+    if (index !== -1) {
+      designs.value[index] = { ...designs.value[index], ...updatedResult };
+      if (selectedDesign.value && selectedDesign.value.pd_code === design.pd_code) {
+        selectedDesign.value = { ...selectedDesign.value, ...updatedResult };
+      }
     }
     
-    showConfirmation.value = false;
-    designToDelete.value = null;
+    toast.success(`${design.pd_code} ${field.replace(/_/g, ' ')} updated.`);
   } catch (error) {
-    console.error('Error deleting design:', error);
-    toast.error('Failed to delete product design');
+    console.error(`Error updating ${field}:`, error);
+    toast.error(error.response?.data?.message || `Failed to update ${field}.`);
+    await fetchDesigns(); // Re-fetch to get original data
   } finally {
-    loading.value = false;
+    savingStatus.value[statusKey] = false;
   }
 };
-
-// State for tracking which design is being toggled
-const toggleLoading = ref({});
 
 // Function to toggle compute status directly from the table
 const toggleCompute = async (design) => {
@@ -440,37 +373,39 @@ const toggleCompute = async (design) => {
   
   // Set loading state for this specific design
   toggleLoading.value[design.pd_code] = true;
+  const originalComputeState = design.compute;
   const newComputeValue = !design.compute;
   
+  // Optimistically update UI
+  const designIndex = designs.value.findIndex(d => d.pd_code === design.pd_code);
+  if (designIndex !== -1) {
+    designs.value[designIndex].compute = newComputeValue;
+    if (selectedDesign.value && selectedDesign.value.pd_code === design.pd_code) {
+      selectedDesign.value.compute = newComputeValue;
+    }
+  }
+  
   try {
-    // Create a copy of the design object with only the required fields for the update
     const designUpdate = {
       ...design,
       compute: newComputeValue
     };
     
-    const response = await axios.put(`/api/product-designs/${design.pd_code}`, designUpdate);
+    await _saveDesign(designUpdate);
     
-    if (response.data.success) {
-      // Update the design in the local array
-      const updatedDesignFromServer = response.data.data;
-      const index = designs.value.findIndex(d => d.pd_code === design.pd_code);
-      if (index !== -1) {
-        designs.value[index].compute = !!updatedDesignFromServer.compute;
-        
-        // Also update selected design if it's the same one
-        if (selectedDesign.value?.pd_code === design.pd_code) {
-          selectedDesign.value.compute = !!updatedDesignFromServer.compute;
-        }
-      }
-      
-      toast.success(`Compute value updated to ${newComputeValue ? 'Yes' : 'No'}`);
-    } else {
-      throw new Error(response.data.message || 'Unknown error');
-    }
+    toast.success(`Compute value for ${design.pd_code} updated.`);
+    
   } catch (error) {
     console.error('Error updating compute status:', error);
     toast.error(error.response?.data?.message || 'Failed to update compute status');
+
+    // Revert on failure
+    if (designIndex !== -1) {
+      designs.value[designIndex].compute = originalComputeState;
+      if (selectedDesign.value && selectedDesign.value.pd_code === design.pd_code) {
+        selectedDesign.value.compute = originalComputeState;
+      }
+    }
   } finally {
     // Clear loading state
     toggleLoading.value[design.pd_code] = false;

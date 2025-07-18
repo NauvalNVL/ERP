@@ -380,10 +380,10 @@ class ProductDesignController extends Controller
     public function apiUpdate(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'pd_code' => 'required|string|max:10',
-            'pd_name' => 'required|string|max:255',
-            'pd_design_type' => 'required|string|max:255',
-            'product' => 'required|string|max:255',
+            'pd_code' => 'sometimes|string|max:10',
+            'pd_name' => 'sometimes|string|max:255',
+            'pd_design_type' => 'sometimes|string|max:255',
+            'product' => 'sometimes|string|max:255',
             'idc' => 'nullable|string|max:100',
             'joint' => 'nullable|string|max:100',
             'joint_to_print' => 'nullable|string|max:100',
