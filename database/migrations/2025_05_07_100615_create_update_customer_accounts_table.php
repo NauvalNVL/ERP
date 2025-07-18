@@ -33,6 +33,8 @@ return new class extends Migration
             $table->string('salesperson', 20)->nullable();
             $table->string('currency', 10)->nullable();
             $table->string('status', 20)->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->timestamps();
         });
     }

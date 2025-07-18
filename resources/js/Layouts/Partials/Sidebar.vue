@@ -153,6 +153,16 @@ const resetMenus = () => {
   sidebarStore.resetState();
 };
 
+// Function to check if a menu is expanded
+const isExpanded = (menuId) => {
+  return sidebarStore.isOpen(menuId);
+};
+
+// Function to toggle menu expansion
+const toggleExpanded = (menuId) => {
+  sidebarStore.toggle(menuId);
+};
+
 // System Manager Items
 const systemManagerItems = [
   {
@@ -423,22 +433,20 @@ const materialManagementItems = [
       },
       {
         title: 'Inventory Setup',
-        icon: 'fas fa-inventory',
+        icon: 'fas fa-boxes-stacked',
         children: [
-          { title: 'Define Category', icon: 'fas fa-bookmark', route: '/material-management/system-requirement/inventory-setup/category' },
+          { title: 'Define Category', icon: 'fas fa-tags', route: '/material-management/system-requirement/inventory-setup/category' },
           { title: 'Define Location', icon: 'fas fa-map-marker-alt', route: '/material-management/system-requirement/inventory-setup/location' },
+          { title: 'Define Report Group', icon: 'fas fa-layer-group', route: '/material-management/system-requirement/inventory-setup/report-group' },
+          { title: 'Define MM GL Distribution', icon: 'fas fa-money-bill-wave', route: '/material-management/system-requirement/inventory-setup/gl-distribution' },
           { title: 'Define Unit', icon: 'fas fa-ruler-combined', route: '/material-management/system-requirement/inventory-setup/unit' },
-          { title: 'Define SKU', icon: 'fas fa-tags', route: '/material-management/system-requirement/inventory-setup/sku' },
-          { title: 'Define SKU Alternate', icon: 'fas fa-random', route: null },
-          { title: 'Define SKU User Cross-Ref', icon: 'fas fa-user-tag', route: null },
-          { title: 'Define Daily Alert', icon: 'fas fa-bell', route: '/material-management/inventory-setup/daily-alert' },
-          { title: 'Define Supplier', icon: 'fas fa-truck', route: '/material-management/inventory-setup/supplier' },
-          { title: 'View & Print Category', icon: 'fas fa-print', route: '/material-management/inventory-setup/category/view-print' },
-          { title: 'View & Print Location', icon: 'fas fa-print', route: '/material-management/inventory-setup/location/view-print' },
+          { title: 'Define SKU', icon: 'fas fa-box', route: '/material-management/system-requirement/inventory-setup/sku' },
+          { title: 'View & Print Category', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/category/view-print' },
+          { title: 'View & Print Location', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/location/view-print' },
+          { title: 'View & Print MM GL Distribution', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/gl-distribution/view-print' },
+          { title: 'View & Print Report Group', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/report-group/view-print' },
           { title: 'View & Print Unit', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/unit/view-print' },
-          { title: 'View & Print SKU', icon: 'fas fa-print', route: '/material-management/inventory-setup/sku/view-print' },
-          { title: 'View & Print Daily Alert', icon: 'fas fa-print', route: '/material-management/inventory-setup/daily-alert/view-print' },
-          { title: 'View & Print Supplier', icon: 'fas fa-print', route: '/material-management/inventory-setup/supplier/view-print' }
+          { title: 'View & Print SKU', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/sku/view-print' }
         ]
       },
       { 

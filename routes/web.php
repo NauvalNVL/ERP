@@ -58,6 +58,8 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeCont
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmLocationController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReportGroupController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -591,6 +593,20 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+// Report Group Routes
+Route::prefix('material-management/system-requirement')->group(function () {
+    Route::get('/report-groups', [MmReportGroupController::class, 'index'])->name('report-groups.index');
+    Route::get('/report-groups/list', [MmReportGroupController::class, 'getReportGroups'])->name('report-groups.list');
+    Route::post('/report-groups', [MmReportGroupController::class, 'store'])->name('report-groups.store');
+    Route::get('/report-groups/{id}', [MmReportGroupController::class, 'show'])->name('report-groups.show');
+    Route::put('/report-groups/{id}', [MmReportGroupController::class, 'update'])->name('report-groups.update');
+    Route::delete('/report-groups/{id}', [MmReportGroupController::class, 'destroy'])->name('report-groups.destroy');
+});
+
+// Add a direct route for the inventory-setup folder structure
+Route::get('/material-management/system-requirement/inventory-setup/report-group', [MmReportGroupController::class, 'index'])->name('inventory-setup.report-group');
+Route::get('/material-management/system-requirement/inventory-setup/report-group/view-print', [MmReportGroupController::class, 'viewPrint'])->name('inventory-setup.report-group.view-print');
+
 // API Routes for Vue components
 Route::prefix('api')->group(function () {
     // User API routes
@@ -933,9 +949,37 @@ Route::get('/material-management/system-requirement/standard-setup/transaction-t
 Route::get('/material-management/system-requirement/standard-setup/tax-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController::class, 'viewPrint'])->name('mm.tax-type.view-print');
 
 // Material Management - System Requirement - Inventory Setup
-Route::get('/material-management/system-requirement/inventory-setup/location', [MmLocationController::class, 'indexView'])->name('material-management.system-requirement.inventory-setup.location');
-Route::get('/material-management/system-requirement/inventory-setup/unit', [MmUnitController::class, 'index'])->name('material-management.system-requirement.inventory-setup.unit');
-Route::get('/material-management/system-requirement/inventory-setup/unit/view-print', [MmUnitController::class, 'viewPrint'])->name('material-management.system-requirement.inventory-setup.unit.view-print');
+Route::prefix('material-management/system-requirement/inventory-setup')->name('inventory-setup.')->middleware(['auth'])->group(function () {
+    Route::get('category', [MmCategoryController::class, 'index'])->name('category.index');
+    Route::get('category/view-print', [MmCategoryController::class, 'viewPrint'])->name('category.vp');
+    Route::get('location', [MmLocationController::class, 'indexView'])->name('location.index');
+    Route::get('location/view-print', [MmLocationController::class, 'viewPrint'])->name('location.vp');
+    Route::get('unit', [MmUnitController::class, 'index'])->name('unit.index');
+    Route::get('unit/view-print', [MmUnitController::class, 'viewPrint'])->name('unit.vp');
+    
+    // GL Distribution
+    Route::get('/gl-distribution', [MmGlDistributionController::class, 'index'])->name('gl-distribution');
+    Route::get('/gl-distribution/list', [MmGlDistributionController::class, 'getGlDistributions'])->name('gl-distributions.list');
+    Route::post('/gl-distribution', [MmGlDistributionController::class, 'store'])->name('gl-distributions.store');
+    Route::get('/gl-distribution/{id}', [MmGlDistributionController::class, 'show'])->name('gl-distributions.show');
+    Route::put('/gl-distribution/{id}', [MmGlDistributionController::class, 'update'])->name('gl-distributions.update');
+    Route::delete('/gl-distribution/{id}', [MmGlDistributionController::class, 'destroy'])->name('gl-distributions.destroy');
+    Route::get('/gl-distribution/view-print', [MmGlDistributionController::class, 'viewPrint'])->name('gl-distribution.view-print');
+});
+
+// GL Distribution Routes
+Route::prefix('material-management/system-requirement')->group(function () {
+    Route::get('/gl-distributions', [MmGlDistributionController::class, 'index'])->name('gl-distributions.index');
+    Route::get('/gl-distributions/list', [MmGlDistributionController::class, 'getGlDistributions'])->name('gl-distributions.list');
+    Route::post('/gl-distributions', [MmGlDistributionController::class, 'store'])->name('gl-distributions.store');
+    Route::get('/gl-distributions/{id}', [MmGlDistributionController::class, 'show'])->name('gl-distributions.show');
+    Route::put('/gl-distributions/{id}', [MmGlDistributionController::class, 'update'])->name('gl-distributions.update');
+    Route::delete('/gl-distributions/{id}', [MmGlDistributionController::class, 'destroy'])->name('gl-distributions.destroy');
+});
+
+// Add direct route for the inventory-setup folder structure
+Route::get('/material-management/system-requirement/inventory-setup/gl-distribution', [MmGlDistributionController::class, 'index'])->name('material-management.system-requirement.inventory-setup.gl-distribution');
+Route::get('/material-management/system-requirement/inventory-setup/gl-distribution/view-print', [MmGlDistributionController::class, 'viewPrint'])->name('material-management.system-requirement.inventory-setup.gl-distribution.view-print');
 
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');

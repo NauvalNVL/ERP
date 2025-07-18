@@ -27,6 +27,8 @@ class CustomerSalesTypeSeeder extends Seeder
                 'customer_code' => 'CUST001',
                 'customer_name' => 'Default Customer',
                 'address' => 'Default Address',
+                'ac_type' => 'Default', // Add a default value for ac_type
+                'print_ar_aging' => 'Yes', // Add default value
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
