@@ -21,6 +21,7 @@ use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportContr
 use App\Http\Controllers\SalesManagement\CustomerService\CustomerServiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaperFluteController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmConfigController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController;
@@ -29,11 +30,11 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinati
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmLocationController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController;
 use App\Http\Controllers\WarehouseLocationController;
 use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\FgDoConfigController;
-use App\Http\Controllers\MaterialManagement\SystemRequirement\MmConfigController;
 use App\Http\Controllers\DeliveryOrderFormatController;
 
 /*
@@ -200,6 +201,28 @@ Route::post('/material-management/transaction-types', [MmTransactionTypeControll
 Route::get('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'show']);
 Route::put('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'update']);
 Route::delete('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'destroy']); 
+
+// Add Category API routes
+Route::prefix('material-management/categories')->group(function () {
+    Route::get('/', [MmCategoryController::class, 'getCategories']);
+    Route::post('/', [MmCategoryController::class, 'store']);
+    Route::get('/{code}', [MmCategoryController::class, 'show']);
+    Route::put('/{code}', [MmCategoryController::class, 'update']);
+    Route::delete('/{code}', [MmCategoryController::class, 'destroy']);
+    Route::patch('/{code}/toggle-active', [MmCategoryController::class, 'toggleActive']);
+    Route::post('/seed', [MmCategoryController::class, 'seedSampleData']);
+});
+
+// Add Unit API routes
+Route::prefix('material-management/units')->group(function () {
+    Route::get('/', [MmUnitController::class, 'getUnits']);
+    Route::post('/', [MmUnitController::class, 'store']);
+    Route::get('/{code}', [MmUnitController::class, 'show']);
+    Route::put('/{code}', [MmUnitController::class, 'update']);
+    Route::delete('/{code}', [MmUnitController::class, 'destroy']);
+    Route::patch('/{code}/toggle-active', [MmUnitController::class, 'toggleActive']);
+    Route::post('/seed', [MmUnitController::class, 'seedSampleData']);
+});
 
 // Add Tax Type API routes
 Route::get('/material-management/tax-types', [MmTaxTypeController::class, 'getTaxTypes']);

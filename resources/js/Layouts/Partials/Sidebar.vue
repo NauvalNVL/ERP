@@ -427,6 +427,7 @@ const materialManagementItems = [
         children: [
           { title: 'Define Category', icon: 'fas fa-bookmark', route: '/material-management/system-requirement/inventory-setup/category' },
           { title: 'Define Location', icon: 'fas fa-map-marker-alt', route: '/material-management/system-requirement/inventory-setup/location' },
+          { title: 'Define Unit', icon: 'fas fa-ruler-combined', route: '/material-management/system-requirement/inventory-setup/unit' },
           { title: 'Define SKU', icon: 'fas fa-tags', route: '/material-management/system-requirement/inventory-setup/sku' },
           { title: 'Define SKU Alternate', icon: 'fas fa-random', route: null },
           { title: 'Define SKU User Cross-Ref', icon: 'fas fa-user-tag', route: null },
@@ -434,6 +435,7 @@ const materialManagementItems = [
           { title: 'Define Supplier', icon: 'fas fa-truck', route: '/material-management/inventory-setup/supplier' },
           { title: 'View & Print Category', icon: 'fas fa-print', route: '/material-management/inventory-setup/category/view-print' },
           { title: 'View & Print Location', icon: 'fas fa-print', route: '/material-management/inventory-setup/location/view-print' },
+          { title: 'View & Print Unit', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/unit/view-print' },
           { title: 'View & Print SKU', icon: 'fas fa-print', route: '/material-management/inventory-setup/sku/view-print' },
           { title: 'View & Print Daily Alert', icon: 'fas fa-print', route: '/material-management/inventory-setup/daily-alert/view-print' },
           { title: 'View & Print Supplier', icon: 'fas fa-print', route: '/material-management/inventory-setup/supplier/view-print' }

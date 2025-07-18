@@ -57,6 +57,7 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinati
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmLocationController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -581,10 +582,12 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('material-management/system-requirement/inventory-setup')->name('mm.sr.is.')->group(function () {
-        Route::get('category', [MmCategoryController::class, 'indexView'])->name('category.index');
+        Route::get('category', [MmCategoryController::class, 'index'])->name('category.index');
         Route::get('category/view-print', [MmCategoryController::class, 'viewPrint'])->name('category.vp');
         Route::get('location', [MmLocationController::class, 'indexView'])->name('location.index');
         Route::get('location/view-print', [MmLocationController::class, 'viewPrint'])->name('location.vp');
+        Route::get('unit', [MmUnitController::class, 'index'])->name('unit.index');
+        Route::get('unit/view-print', [MmUnitController::class, 'viewPrint'])->name('unit.vp');
     });
 });
 
@@ -931,6 +934,8 @@ Route::get('/material-management/system-requirement/standard-setup/tax-type/view
 
 // Material Management - System Requirement - Inventory Setup
 Route::get('/material-management/system-requirement/inventory-setup/location', [MmLocationController::class, 'indexView'])->name('material-management.system-requirement.inventory-setup.location');
+Route::get('/material-management/system-requirement/inventory-setup/unit', [MmUnitController::class, 'index'])->name('material-management.system-requirement.inventory-setup.unit');
+Route::get('/material-management/system-requirement/inventory-setup/unit/view-print', [MmUnitController::class, 'viewPrint'])->name('material-management.system-requirement.inventory-setup.unit.view-print');
 
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');

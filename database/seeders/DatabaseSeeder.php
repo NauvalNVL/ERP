@@ -3,57 +3,61 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Database\Seeders\MmUnitSeeder;
 
 class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
+     *
+     * @return void
      */
     public function run(): void
     {
         $this->call([
             MmConfigSeeder::class,
-            SalesTeamSeeder::class,
-            SalespersonSeeder::class,
-            SalespersonTeamSeeder::class,
-            ProductGroupSeeder::class,
-            GeoSeeder::class,
-            PaperSizeSeeder::class,
-            PaperFluteSeeder::class,
-            PaperQualitySeeder::class,
-            ScoringToolSeeder::class,
-            UserSeeder::class,
-            // ColorSeeder::class, // Temporarily commented out due to syntax error
-            ColorGroupSeeder::class,
-            ProductSeeder::class,
-            FinishingSeeder::class,
-            BusinessFormSeeder::class,
-            ProductDesignSeeder::class,
-            IndustrySeeder::class,
-            CustomerGroupSeeder::class,
-            UpdateCustomerAccountSeeder::class,
-            CustomerAlternateAddressSeeder::class,
             ApproveMCSeeder::class,
-            ObsolateReactiveMCSeeder::class,
-            StandardFormulaSeeder::class,
-            ScoringFormulaSeeder::class,
-            CustomerSalesTypeSeeder::class,
+            BusinessFormSeeder::class,
+            BundlingComputationMethodSeeder::class,
+            ColorGroupSeeder::class,
+            ColorSeeder::class,
+            ComputationFormulaSeeder::class,
+            ComputationMethodSeeder::class,
             CorrugatorConfigSeeder::class,
             CorrugatorSpecByProductSeeder::class,
-            BundlingComputationMethodSeeder::class,
-            MmReceiveDestinationSeeder::class,
+            FinishingSeeder::class,
+            ForeignCurrencySeeder::class,
+            GeoSeeder::class,
+            IndustrySeeder::class,
             MmAnalysisCodeSeeder::class,
-            MmLocationSeeder::class,
-            WarehouseLocationSeeder::class,
             MmCategorySeeder::class,
+            MmLocationSeeder::class,
+            MmReceiveDestinationSeeder::class,
             MmSkuSeeder::class,
-            SideTrimByFluteSeeder::class,
+            MmTaxGroupSeeder::class,
+            MmTaxTypeSeeder::class,
+            MmTransactionTypeSeeder::class,
+            MmUnitSeeder::class,
+            ObsolateReactiveMCSeeder::class,
+            PaperFluteSeeder::class,
+            PaperQualitySeeder::class,
+            PaperSizeSeeder::class,
+            ProductDesignSeeder::class,
+            ProductGroupSeeder::class,
+            ProductSeeder::class,
+            RollSizeSeeder::class,
             RollTrimByCorrugatorSeeder::class,
             RollTrimByProductDesignSeeder::class,
-            RollSizeSeeder::class,
+            SalespersonSeeder::class,
+            SalespersonTeamSeeder::class,
+            SalesTeamSeeder::class,
+            ScoringFormulaSeeder::class,
+            ScoringToolSeeder::class,
+            SideTrimByFluteSeeder::class,
             SideTrimByProductDesignSeeder::class,
-            ComputationMethodSeeder::class,
-            DeliveryOrderFormatSeeder::class,
+            StandardFormulaSeeder::class,
+            UserSeeder::class,
+            WarehouseLocationSeeder::class
         ]);
 
         $this->call(MmControlPeriodSeeder::class);

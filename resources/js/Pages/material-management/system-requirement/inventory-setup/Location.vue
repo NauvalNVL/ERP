@@ -8,7 +8,7 @@
         <i class="fas fa-map-marker-alt mr-3"></i> Define Location
       </h2>
       <p class="text-blue-100">Manage inventory and warehouse locations</p>
-              </div>
+    </div>
 
     <div class="bg-white rounded-b-lg shadow-md p-6 mb-6">
       <div class="flex flex-col md:flex-row gap-6">
@@ -21,7 +21,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                   <i class="fas fa-search"></i>
                 </span>
-                <input type="text" v-model="searchQuery" placeholder="Search by code, name, or description..."
+                <input type="text" v-model="searchQuery" placeholder="Search by code or name..."
                   class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
               </div>
             </div>
@@ -54,16 +54,11 @@
                         Name <i class="fas fa-sort ml-1"></i>
                       </div>
                           </th>
-                    <th @click="sortBy('is_active')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                      <div class="flex items-center">
-                        Status <i class="fas fa-sort ml-1"></i>
-                      </div>
-                          </th>
                         </tr>
                       </thead>
                       <tbody class="bg-white divide-y divide-gray-200">
                   <tr v-if="loading" class="animate-pulse">
-                    <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                    <td colspan="2" class="px-6 py-4 text-center text-sm text-gray-500">
                       <div class="flex justify-center items-center space-x-2">
                         <i class="fas fa-spinner fa-spin"></i>
                         <span>Loading locations...</span>
@@ -71,7 +66,7 @@
                           </td>
                         </tr>
                   <tr v-else-if="paginatedLocations.length === 0" class="hover:bg-gray-50">
-                    <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                    <td colspan="2" class="px-6 py-4 text-center text-sm text-gray-500">
                       No locations found. Try adjusting your search.
                           </td>
                         </tr>
@@ -81,11 +76,6 @@
                       class="hover:bg-gray-50 cursor-pointer">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ location.code }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ location.name }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                       <span :class="location.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                              {{ location.is_active ? 'Active' : 'Inactive' }}
-                            </span>
-                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -129,16 +119,6 @@
               <div class="flex justify-between border-b border-gray-200 pb-2">
                 <span class="text-gray-600">Name:</span>
                 <span class="font-medium text-gray-900 text-right">{{ selectedLocation.name }}</span>
-              </div>
-               <div class="border-b border-gray-200 pb-2">
-                <span class="text-gray-600">Description:</span>
-                <p class="font-medium text-gray-900 mt-1">{{ selectedLocation.description || '—' }}</p>
-                </div>
-              <div class="flex justify-between items-center border-b border-gray-200 pb-2">
-                <span class="text-gray-600">Status:</span>
-                <span :class="selectedLocation.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                    {{ selectedLocation.is_active ? 'Active' : 'Inactive' }}
-                </span>
               </div>
             </div>
             <div class="mt-6 flex space-x-2">
@@ -212,39 +192,6 @@
                   placeholder="Enter location name">
                   <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
               </div>
-
-              <!-- Description -->
-              <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-                <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <i class="fas fa-align-left text-blue-500 mr-2"></i>
-                  Description
-                </label>
-                <textarea v-model="formLocation.description"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                  placeholder="Enter a description"
-                  rows="3"
-                ></textarea>
-                <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</p>
-                  </div>
-
-               <!-- Active Status -->
-                <div class="bg-gray-50 p-4 rounded-lg shadow-sm flex items-center justify-between">
-                    <label class="text-sm font-semibold text-gray-700 flex items-center">
-                        <i class="fas fa-toggle-on text-blue-500 mr-2"></i>
-                        Active Status
-                    </label>
-                    <Switch
-                        v-model="formLocation.is_active"
-                        :class="formLocation.is_active ? 'bg-blue-600' : 'bg-gray-200'"
-                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                      >
-                        <span
-                          :class="formLocation.is_active ? 'translate-x-6' : 'translate-x-1'"
-                          class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-                        />
-                      </Switch>
-                </div>
-
             </div>
             
             <!-- Form Footer with Buttons -->
@@ -292,7 +239,6 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { Head, router } from '@inertiajs/vue3';
-import { Switch } from '@headlessui/vue'
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useToast } from '@/Composables/useToast';
 
@@ -318,7 +264,6 @@ const errors = ref({});
 const formLocation = ref({
   code: '', 
   name: '',
-  description: '',
   is_active: true,
 });
 
@@ -327,7 +272,6 @@ const resetForm = () => {
   formLocation.value = {
     code: '',
     name: '',
-    description: '',
     is_active: true,
   };
   isEditing.value = false;
@@ -342,8 +286,7 @@ const filteredLocations = computed(() => {
     const query = searchQuery.value.toLowerCase();
     result = result.filter(loc =>
       (loc.code && loc.code.toLowerCase().includes(query)) ||
-      (loc.name && loc.name.toLowerCase().includes(query)) ||
-      (loc.description && loc.description.toLowerCase().includes(query))
+      (loc.name && loc.name.toLowerCase().includes(query))
     );
   }
   
@@ -353,10 +296,6 @@ const filteredLocations = computed(() => {
     
     const valA = a[field];
     const valB = b[field];
-
-    if (typeof valA === 'boolean') {
-        return (valA === valB) ? 0 : valA ? -1 * direction : 1 * direction;
-    }
 
     if ((valA || '') < (valB || '')) return -1 * direction;
     if ((valA || '') > (valB || '')) return 1 * direction;
