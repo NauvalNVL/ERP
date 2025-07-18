@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('chart_of_accounts', function (Blueprint $table) {
             $table->id();
+            $table->string('account_number')->unique();
+            $table->string('dept')->nullable();
+            $table->string('sub_dept')->nullable();
+            $table->string('name');
+            $table->string('status');
+            $table->string('control_ac');
             $table->timestamps();
         });
     }

@@ -949,6 +949,14 @@ Route::get('/material-management/system-requirement/standard-setup/transaction-t
 Route::get('/material-management/system-requirement/standard-setup/tax-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController::class, 'viewPrint'])->name('mm.tax-type.view-print');
 
 // Material Management - System Requirement - Inventory Setup
+Route::get('mm-gl-distribution', [MmGlDistributionController::class, 'index'])->name('mm-gl-distribution.index');
+Route::get('mm-gl-distribution/list', [MmGlDistributionController::class, 'getGlDistributions'])->name('mm-gl-distribution.list');
+Route::post('mm-gl-distribution', [MmGlDistributionController::class, 'store'])->name('mm-gl-distribution.store');
+Route::get('mm-gl-distribution/{id}', [MmGlDistributionController::class, 'show'])->name('mm-gl-distribution.show');
+Route::put('mm-gl-distribution/{id}', [MmGlDistributionController::class, 'update'])->name('mm-gl-distribution.update');
+Route::delete('mm-gl-distribution/{id}', [MmGlDistributionController::class, 'destroy'])->name('mm-gl-distribution.destroy');
+Route::get('mm-gl-distribution/view-print', [MmGlDistributionController::class, 'viewPrint'])->name('mm-gl-distribution.view-print');
+
 Route::prefix('material-management/system-requirement/inventory-setup')->name('inventory-setup.')->middleware(['auth'])->group(function () {
     Route::get('category', [MmCategoryController::class, 'index'])->name('category.index');
     Route::get('category/view-print', [MmCategoryController::class, 'viewPrint'])->name('category.vp');
@@ -958,13 +966,13 @@ Route::prefix('material-management/system-requirement/inventory-setup')->name('i
     Route::get('unit/view-print', [MmUnitController::class, 'viewPrint'])->name('unit.vp');
     
     // GL Distribution
-    Route::get('/gl-distribution', [MmGlDistributionController::class, 'index'])->name('gl-distribution');
-    Route::get('/gl-distribution/list', [MmGlDistributionController::class, 'getGlDistributions'])->name('gl-distributions.list');
-    Route::post('/gl-distribution', [MmGlDistributionController::class, 'store'])->name('gl-distributions.store');
-    Route::get('/gl-distribution/{id}', [MmGlDistributionController::class, 'show'])->name('gl-distributions.show');
-    Route::put('/gl-distribution/{id}', [MmGlDistributionController::class, 'update'])->name('gl-distributions.update');
-    Route::delete('/gl-distribution/{id}', [MmGlDistributionController::class, 'destroy'])->name('gl-distributions.destroy');
-    Route::get('/gl-distribution/view-print', [MmGlDistributionController::class, 'viewPrint'])->name('gl-distribution.view-print');
+    // Route::get('gl-distribution', [MmGlDistributionController::class, 'index'])->name('gl-distribution.index');
+    // Route::get('gl-distribution/list', [MmGlDistributionController::class, 'getGlDistributions'])->name('gl-distribution.list');
+    // Route::post('gl-distribution', [MmGlDistributionController::class, 'store'])->name('gl-distribution.store');
+    // Route::get('gl-distribution/{id}', [MmGlDistributionController::class, 'show'])->name('gl-distribution.show');
+    // Route::put('gl-distribution/{id}', [MmGlDistributionController::class, 'update'])->name('gl-distribution.update');
+    // Route::delete('gl-distribution/{id}', [MmGlDistributionController::class, 'destroy'])->name('gl-distribution.destroy');
+    // Route::get('gl-distribution/view-print', [MmGlDistributionController::class, 'viewPrint'])->name('gl-distribution.view-print');
 });
 
 // GL Distribution Routes

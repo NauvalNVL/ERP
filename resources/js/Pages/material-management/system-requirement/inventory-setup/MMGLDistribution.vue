@@ -110,7 +110,8 @@
                   class="bg-blue-600 text-white rounded-md py-1 px-3 hover:bg-blue-700 text-sm"
                   :disabled="submitting"
                 >
-                  <i class="fas fa-save mr-1"></i> Save
+                  <i v-if="submitting" class="fas fa-spinner fa-spin mr-1"></i>
+                  <i v-else class="fas fa-save mr-1"></i> Save
                 </button>
                 
                 <button 
@@ -129,7 +130,7 @@
                 </button>
                 
                 <Link
-                  :href="'/material-management/system-requirement/inventory-setup/gl-distribution/view-print'"
+                  :href="'/mm-gl-distribution/view-print'"
                   class="bg-green-600 text-white rounded-md py-1 px-3 hover:bg-green-700 text-sm text-center"
                 >
                   <i class="fas fa-print mr-1"></i> Print
@@ -142,18 +143,58 @@
 
       <!-- GL Distribution Table -->
       <div v-if="showGlDistTable" class="border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
-        <div class="bg-blue-50 border-b border-blue-300 p-2">
+        <div class="bg-blue-50 border-b border-blue-300 p-2 flex justify-between items-center">
           <h3 class="text-md font-medium text-blue-900">Material G/L Distribution Table</h3>
+          <div class="flex items-center">
+            <input
+              v-model="search"
+              type="text"
+              placeholder="Search..."
+              class="border border-gray-300 rounded-md shadow-sm py-1 px-3 text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
         </div>
         
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GL DIST#</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GL Dist Name</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GL Account#</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link to GL</th>
+                <th 
+                  @click="sortBy('gl_dist_code')" 
+                  class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                >
+                  GL DIST#
+                  <span v-if="sortColumn === 'gl_dist_code'" class="ml-1">
+                    <i :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                  </span>
+                </th>
+                <th 
+                  @click="sortBy('gl_dist_name')" 
+                  class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                >
+                  GL Dist Name
+                  <span v-if="sortColumn === 'gl_dist_name'" class="ml-1">
+                    <i :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                  </span>
+                </th>
+                <th 
+                  @click="sortBy('gl_account')" 
+                  class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                >
+                  GL Account#
+                  <span v-if="sortColumn === 'gl_account'" class="ml-1">
+                    <i :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                  </span>
+                </th>
+                <th 
+                  @click="sortBy('is_linked')" 
+                  class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                >
+                  Link to GL
+                  <span v-if="sortColumn === 'is_linked'" class="ml-1">
+                    <i :class="sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -301,11 +342,11 @@
       <div class="mt-4">
         <div class="flex items-center space-x-2 text-blue-600">
           <i class="fas fa-unlock text-green-500"></i>
-          <a href="#" class="text-green-500 hover:underline">Unlock SKU Utility</a>
+          <Link :href="'/mm-sku/unlock-utility'" class="text-green-500 hover:underline">Unlock SKU Utility</Link>
         </div>
         <div class="flex items-center space-x-2 text-blue-600">
           <i class="fas fa-print text-green-500"></i>
-          <a href="#" class="text-green-500 hover:underline">View & Print Category</a>
+          <Link :href="'/mm-category/view-print'" class="text-green-500 hover:underline">View & Print Category</Link>
         </div>
       </div>
     </div>
@@ -314,17 +355,19 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Modal from '@/Components/Modal.vue';
 import { useToast } from '@/Composables/useToast';
+import axios from 'axios';
 
 const props = defineProps({
   glDistributions: Array,
+  glAccounts: Array,
 });
 
 // Toast notifications
-const { showToast } = useToast();
+const toast = useToast();
 
 // Table columns
 const columns = [
@@ -350,8 +393,9 @@ const deleting = ref(false);
 const loading = ref(false);
 const currentMode = ref('review'); // 'review' or 'select'
 const selectedGlAccount = ref(null);
-const errors = ref({});
-const form = ref({
+
+const form = useForm({
+  id: null,
   gl_dist_code: '',
   gl_dist_name: '',
   gl_account: '',
@@ -363,71 +407,25 @@ const form = ref({
 });
 
 // Sample data for GL accounts
-const glAccounts = ref([
-  { 
-    id: 1, 
-    account_number: '111101-00-00-00', 
-    dept: '00', 
-    sub_dept: '00', 
-    name: 'KAS RUPIAH',
-    status: 'A-Act',
-    control_ac: 'B-Balance Sheet'
-  },
-  { 
-    id: 2, 
-    account_number: '111102-00-00-00', 
-    dept: '00', 
-    sub_dept: '00', 
-    name: 'KAS USD',
-    status: 'A-Act',
-    control_ac: 'B-Balance Sheet'
-  },
-  { 
-    id: 3, 
-    account_number: '114000-04-00-00', 
-    dept: '00', 
-    sub_dept: '00', 
-    name: 'INVENTORY',
-    status: 'A-Act',
-    control_ac: 'B-Balance Sheet'
-  },
-  {
-    id: 4,
-    account_number: '111201-00-00-00',
-    dept: '00',
-    sub_dept: '00',
-    name: 'BANK BCA NO.1083003786',
-    status: 'A-Act',
-    control_ac: 'B-Balance Sheet'
-  },
-  {
-    id: 5,
-    account_number: '111201-00-00-01',
-    dept: '00',
-    sub_dept: '00',
-    name: 'BANK PERMATA NO.0250780088',
-    status: 'A-Act',
-    control_ac: 'B-Balance Sheet'
-  },
-]);
+const glAccounts = ref(props.glAccounts || []);
 
 // Navigation computed properties
 const hasPrevious = computed(() => currentRecordIndex.value > 0);
 const hasNext = computed(() => currentRecordIndex.value < filteredGlDistributions.value.length - 1);
 
 // Watch for changes to account segments and update the full account
-watch([() => form.value.gl_account_segment1, () => form.value.gl_account_segment2, () => form.value.gl_account_segment3], 
+watch([() => form.gl_account_segment1, () => form.gl_account_segment2, () => form.gl_account_segment3], 
   ([segment1, segment2, segment3]) => {
     if (segment1 && segment2 && segment3) {
-      form.value.gl_account = `${segment1}-${segment2}-${segment3}`;
+      form.gl_account = `${segment1}-${segment2}-${segment3}`;
       // Attempt to find a matching account name
-      const matchingAccount = glAccounts.value.find(acc => 
-        acc.account_number.startsWith(segment1) && 
-        acc.account_number.includes(segment2) && 
-        acc.account_number.includes(segment3)
-      );
+      const matchingAccount = glAccounts.value.find(acc => acc.account_number === form.gl_account);
       if (matchingAccount) {
-        form.value.gl_account_name = matchingAccount.name;
+        form.gl_account_name = matchingAccount.name;
+        form.is_linked = true;
+      } else {
+        form.gl_account_name = '* N/F *';
+        form.is_linked = false;
       }
     }
   }
@@ -436,34 +434,14 @@ watch([() => form.value.gl_account_segment1, () => form.value.gl_account_segment
 // Get all GL distributions
 const fetchGlDistributions = async () => {
   loading.value = true;
-  
-  // For demo purposes, we'll populate with sample data
   try {
-    // In a real app, this would be an actual API call
-    // const response = await fetch('/material-management/system-requirement/inventory-setup/gl-distribution/list');
-    // const data = await response.json();
-    
-    // For demo, we'll simulate the response
-    setTimeout(() => {
-      glDistributionsList.value = [
-        {
-          id: 1,
-          gl_dist_code: 'INV',
-          gl_dist_name: 'INVENTORY',
-          gl_account: '114000-04-00-00',
-          gl_account_segment1: '114000',
-          gl_account_segment2: '04',
-          gl_account_segment3: '00',
-          gl_account_name: 'INVENTORY',
-          is_linked: false
-        }
-      ];
-      loading.value = false;
-    }, 500);
-    
+    // Use direct URL instead of route helper
+    const response = await axios.get('/mm-gl-distribution/list');
+    glDistributionsList.value = response.data.data;
   } catch (error) {
     console.error('Error fetching GL distributions:', error);
-    showToast('Error loading GL distributions', 'error');
+    toast.error('Error loading GL distributions');
+  } finally {
     loading.value = false;
   }
 };
@@ -506,6 +484,7 @@ const filteredGlDistributions = computed(() => {
 const openGlDistSelector = () => {
   showGlDistTable.value = true;
   currentMode.value = 'select';
+  fetchGlDistributions();
 };
 
 // Close GL Distribution table
@@ -523,31 +502,27 @@ const selectGlDistribution = (item) => {
     return;
   }
   
-  isEditing.value = true;
-  
-  // Update form with selected item
-  form.value = {
-    id: item.id,
-    gl_dist_code: item.gl_dist_code,
-    gl_dist_name: item.gl_dist_name,
-    gl_account: item.gl_account,
-    gl_account_segment1: item.gl_account_segment1 || '',
-    gl_account_segment2: item.gl_account_segment2 || '',
-    gl_account_segment3: item.gl_account_segment3 || '',
-    gl_account_name: item.gl_account_name || '* N/F *',
-    is_linked: item.is_linked,
-  };
-  
-  // If in select mode, close the table after selection
-  if (currentMode.value === 'select') {
-    closeGlDistTable();
-  }
+  setCurrentRecordToForm(item);
 };
+
+const setCurrentRecordToForm = (item) => {
+    isEditing.value = true;
+    const segments = item.gl_account.split('-');
+    form.id = item.id;
+    form.gl_dist_code = item.gl_dist_code;
+    form.gl_dist_name = item.gl_dist_name;
+    form.gl_account = item.gl_account;
+    form.gl_account_segment1 = segments[0] || '';
+    form.gl_account_segment2 = segments[1] || '';
+    form.gl_account_segment3 = segments[2] || '';
+    form.gl_account_name = item.gl_account_name || '* N/F *';
+    form.is_linked = item.is_linked;
+}
 
 // Select current record from GL Distribution table
 const selectCurrentRecord = () => {
   if (selectedGlDistribution.value) {
-    selectGlDistribution(selectedGlDistribution.value);
+    setCurrentRecordToForm(selectedGlDistribution.value);
     closeGlDistTable();
   }
 };
@@ -562,85 +537,65 @@ const previewCurrentRecord = () => {
 const resetForm = () => {
   isEditing.value = false;
   selectedGlDistribution.value = null;
-  form.value = {
-    gl_dist_code: '',
-    gl_dist_name: '',
-    gl_account: '',
-    gl_account_segment1: '',
-    gl_account_segment2: '',
-    gl_account_segment3: '',
-    gl_account_name: '* N/F *',
-    is_linked: false,
-  };
-  errors.value = {};
+  form.reset();
+  form.gl_account_name = '* N/F *';
+  form.is_linked = false;
 };
 
 // Save GL Distribution
-const saveGlDistribution = async () => {
-  submitting.value = true;
-  errors.value = {};
-  
-  try {
-    // Update full GL account from segments if needed
-    if (form.value.gl_account_segment1 && form.value.gl_account_segment2 && form.value.gl_account_segment3) {
-      form.value.gl_account = `${form.value.gl_account_segment1}-${form.value.gl_account_segment2}-${form.value.gl_account_segment3}`;
-    }
-    
-    // For demo purposes, we'll just log the data
-    console.log("Saving GL Distribution:", form.value);
-    
-    // In a real app, this would be an actual API call
-    /*
-    const url = isEditing.value 
-      ? `/material-management/system-requirement/inventory-setup/gl-distribution/${form.value.id}`
-      : '/material-management/system-requirement/inventory-setup/gl-distribution';
-    
-    const method = isEditing.value ? 'PUT' : 'POST';
-    
-    const response = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-      },
-      body: JSON.stringify(form.value),
-    });
-    
-    const data = await response.json();
-    */
-    
-    // Simulate successful response
-    setTimeout(() => {
-      showToast(
-        isEditing.value 
-          ? 'GL Distribution updated successfully' 
-          : 'GL Distribution created successfully',
-        'success'
-      );
-      
-      // Update local data for demo purposes
-      if (isEditing.value) {
-        const index = glDistributionsList.value.findIndex(item => item.id === form.value.id);
-        if (index !== -1) {
-          glDistributionsList.value[index] = { ...form.value };
-        }
-      } else {
-        const newId = Math.max(0, ...glDistributionsList.value.map(item => item.id)) + 1;
-        glDistributionsList.value.push({
-          ...form.value,
-          id: newId
-        });
-      }
-      
-      resetForm();
-      submitting.value = false;
-    }, 500);
-    
-  } catch (error) {
-    console.error('Error submitting form:', error);
-    showToast('An error occurred while saving', 'error');
-    submitting.value = false;
+const saveGlDistribution = () => {
+  // Validate required fields
+  if (!form.gl_dist_code) {
+    toast.error('GL Distribution Code is required');
+    return;
   }
+  
+  if (!form.gl_dist_name) {
+    toast.error('GL Distribution Name is required');
+    return;
+  }
+  
+  if (!form.gl_account_segment1 || !form.gl_account_segment2 || !form.gl_account_segment3) {
+    toast.error('All GL Account segments are required');
+    return;
+  }
+
+  // Update full GL account from segments if needed
+  if (form.gl_account_segment1 && form.gl_account_segment2 && form.gl_account_segment3) {
+    form.gl_account = `${form.gl_account_segment1}-${form.gl_account_segment2}-${form.gl_account_segment3}`;
+  }
+
+  const url = isEditing.value 
+    ? `/mm-gl-distribution/${form.id}`
+    : '/mm-gl-distribution';
+  
+  const method = isEditing.value ? 'put' : 'post';
+  
+  submitting.value = true;
+
+  form.submit(method, url, {
+    onSuccess: () => {
+        toast.success(
+            isEditing.value
+            ? 'GL Distribution updated successfully'
+            : 'GL Distribution created successfully'
+        );
+        resetForm();
+        fetchGlDistributions();
+        submitting.value = false;
+    },
+    onError: (errors) => {
+        console.error('Error submitting form:', errors);
+        if (errors && Object.keys(errors).length > 0) {
+          // Display first error message
+          const firstError = Object.values(errors)[0];
+          toast.error(firstError);
+        } else {
+          toast.error('An error occurred while saving');
+        }
+        submitting.value = false;
+    },
+  });
 };
 
 // Open GL Account selector modal
@@ -663,11 +618,12 @@ const selectGlAccount = (account) => {
 const selectCurrentGlAccount = () => {
   if (selectedGlAccount.value) {
     const segments = selectedGlAccount.value.account_number.split('-');
-    form.value.gl_account_segment1 = segments[0];
-    form.value.gl_account_segment2 = segments[1];
-    form.value.gl_account_segment3 = segments[2];
-    form.value.gl_account = selectedGlAccount.value.account_number;
-    form.value.gl_account_name = selectedGlAccount.value.name;
+    form.gl_account_segment1 = segments[0];
+    form.gl_account_segment2 = segments[1];
+    form.gl_account_segment3 = segments[2];
+    form.gl_account = selectedGlAccount.value.account_number;
+    form.gl_account_name = selectedGlAccount.value.name;
+    form.is_linked = true;
     closeGlAccountModal();
   }
 };
@@ -684,52 +640,32 @@ const closeDeleteModal = () => {
 };
 
 // Confirm delete
-const confirmDelete = async () => {
-  if (!form.value.id) return;
+const confirmDelete = () => {
+  if (!form.id) return;
+  
+  const url = `/mm-gl-distribution/${form.id}`;
   
   deleting.value = true;
-  
-  try {
-    // For demo purposes, we'll just log the deletion
-    console.log("Deleting GL Distribution:", form.value.id);
-    
-    // In a real app, this would be an actual API call
-    /*
-    const response = await fetch(`/material-management/system-requirement/inventory-setup/gl-distribution/${form.value.id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-      },
-    });
-    
-    const data = await response.json();
-    */
-    
-    // Simulate successful deletion
-    setTimeout(() => {
-      showToast('GL Distribution deleted successfully', 'success');
-      
-      // Update local data for demo purposes
-      glDistributionsList.value = glDistributionsList.value.filter(item => item.id !== form.value.id);
-      
+
+  form.delete(url, {
+    onSuccess: () => {
+      toast.success('GL Distribution deleted successfully');
       resetForm();
-      deleting.value = false;
+      fetchGlDistributions();
       closeDeleteModal();
-    }, 500);
-    
-  } catch (error) {
-    console.error('Error deleting item:', error);
-    showToast('An error occurred while deleting', 'error');
-    deleting.value = false;
-    closeDeleteModal();
-  }
+      deleting.value = false;
+    },
+    onError: (errors) => {
+      console.error('Error deleting item:', errors);
+      toast.error('An error occurred while deleting');
+      closeDeleteModal();
+      deleting.value = false;
+    },
+  });
 };
 
 // Fetch data on mount
 onMounted(() => {
-  if (!props.glDistributions || props.glDistributions.length === 0) {
     fetchGlDistributions();
-  }
 });
 </script>

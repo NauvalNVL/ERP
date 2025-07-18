@@ -4,6 +4,7 @@ namespace App\Http\Controllers\MaterialManagement\SystemRequirement;
 
 use App\Http\Controllers\Controller;
 use App\Models\MmGlDistribution;
+use App\Models\ChartOfAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -16,9 +17,11 @@ class MmGlDistributionController extends Controller
     public function index()
     {
         $glDistributions = MmGlDistribution::all();
+        $glAccounts = ChartOfAccount::all();
         
         return Inertia::render('material-management/system-requirement/inventory-setup/MMGLDistribution', [
             'glDistributions' => $glDistributions,
+            'glAccounts' => $glAccounts,
         ]);
     }
 
