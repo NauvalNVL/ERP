@@ -14,4 +14,9 @@ class ChartOfAccount extends Model
         'status',
         'control_ac',
     ];
+
+    public function glDistributions()
+    {
+        return $this->hasMany(MmGlDistribution::class, 'gl_account', 'account_number');
+    }
 }

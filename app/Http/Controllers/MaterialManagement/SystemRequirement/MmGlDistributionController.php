@@ -6,125 +6,81 @@ use App\Http\Controllers\Controller;
 use App\Models\MmGlDistribution;
 use App\Models\ChartOfAccount;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class MmGlDistributionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $glDistributions = MmGlDistribution::all();
-        $glAccounts = ChartOfAccount::all();
-        
         return Inertia::render('material-management/system-requirement/inventory-setup/MMGLDistribution', [
-            'glDistributions' => $glDistributions,
-            'glAccounts' => $glAccounts,
+            'glDistributions' => MmGlDistribution::with('chartOfAccount')->get(),
+            'chartOfAccounts' => ChartOfAccount::all()
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), MmGlDistribution::rules());
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        $glDistribution = MmGlDistribution::create($request->all());
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'GL Distribution created successfully',
-            'data' => $glDistribution,
-        ]);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $glDistribution = MmGlDistribution::findOrFail($id);
-        
-        return response()->json([
-            'status' => 'success',
-            'data' => $glDistribution,
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $glDistribution = MmGlDistribution::findOrFail($id);
-        
-        $validator = Validator::make($request->all(), MmGlDistribution::rules($id));
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        $glDistribution->update($request->all());
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'GL Distribution updated successfully',
-            'data' => $glDistribution,
-        ]);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $glDistribution = MmGlDistribution::findOrFail($id);
-        
-        $glDistribution->delete();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'GL Distribution deleted successfully',
-        ]);
-    }
-
-    /**
-     * Get a list of all GL distributions.
-     */
     public function getGlDistributions()
     {
-        $glDistributions = MmGlDistribution::all();
-        
-        return response()->json([
-            'status' => 'success',
-            'data' => $glDistributions,
-        ]);
+        try {
+            $glDistributions = MmGlDistribution::with('chartOfAccount')->get();
+            return response()->json($glDistributions);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch GL distributions'], 500);
+        }
     }
 
-    /**
-     * Display the view & print page for GL distributions.
-     */
-    public function viewPrint()
+    public function store(Request $request)
     {
-        $glDistributions = MmGlDistribution::all();
-        
-        return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintGLDistribution', [
-            'glDistributions' => $glDistributions,
+        $validated = $request->validate([
+            'gl_dist_code' => 'required|string|max:10|unique:mm_gl_distributions,gl_dist_code',
+            'gl_dist_name' => 'required|string|max:100',
+            'gl_account' => 'required|string|max:20',
+            'gl_account_name' => 'nullable|string|max:100',
+            'is_linked' => 'boolean',
+            'is_active' => 'boolean'
+        ]);
+
+        $glDistribution = MmGlDistribution::create($validated);
+
+        return response()->json($glDistribution);
+    }
+
+    public function update(Request $request, MmGlDistribution $glDistribution)
+    {
+        $validated = $request->validate([
+            'gl_dist_name' => 'required|string|max:100',
+            'gl_account' => 'required|string|max:20',
+            'gl_account_name' => 'nullable|string|max:100',
+            'is_linked' => 'boolean',
+            'is_active' => 'boolean'
+        ]);
+
+        $glDistribution->update($validated);
+
+        return response()->json($glDistribution);
+    }
+
+    public function destroy(MmGlDistribution $glDistribution)
+    {
+        $glDistribution->delete();
+        return response()->json(['message' => 'GL Distribution deleted successfully']);
+    }
+
+    public function getChartOfAccounts()
+    {
+        try {
+            $accounts = ChartOfAccount::all();
+            return response()->json($accounts);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch chart of accounts'], 500);
+        }
+    }
+
+    public function print()
+    {
+        $glDistributions = MmGlDistribution::with('chartOfAccount')->get();
+        return Inertia::render('material-management/system-requirement/inventory-setup/MMGLDistributionPrint', [
+            'glDistributions' => $glDistributions
         ]);
     }
 } 
