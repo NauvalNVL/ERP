@@ -166,6 +166,9 @@ Route::post('/finishings/seed', [FinishingController::class, 'seed']);
 Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);
 Route::get('/mc-auto-wo-not-releasing', [ApproveMcController::class, 'apiIndexMcAutoWoNotReleasing']);
 
+// Add API route for Update MC Master Cards
+Route::get('/update-mc/master-cards', [App\Http\Controllers\UpdateMcController::class, 'apiIndex']);
+
 // Sales Order Report API routes
 Route::get('/report-formats', [SalesOrderReportController::class, 'apiIndexReportFormats']);
 Route::post('/so-report', [SalesOrderReportController::class, 'apiGenerateSoReport']);
