@@ -1,642 +1,520 @@
 <template>
-  <AppLayout title="Define SKU">
-    <div class="py-6">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-semibold text-gray-800">Define SKU</h1>
-        <p class="mt-1 text-sm text-gray-600">Manage Stock Keeping Units (SKU) for inventory management</p>
-        
-        <div class="mt-4 flex justify-end">
-          <button 
-            @click="showAddModal = true" 
-            class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150"
-          >
-            <i class="fas fa-plus mr-2"></i> Add New SKU
-          </button>
-        </div>
-        
-        <!-- Search and filter section -->
-        <div class="mt-4 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <div class="flex flex-wrap gap-4">
-            <div class="w-full sm:w-64">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+  <AppLayout :header="'Define SKU'">
+    <Head title="Define SKU" />
+
+    <!-- Toast Container -->
+    <ToastContainer />
+
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-lg shadow-md">
+      <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-boxes mr-3"></i> Define SKU
+      </h2>
+      <p class="text-blue-100">Manage Stock Keeping Units (SKUs) for inventory</p>
+    </div>
+
+    <div class="bg-white rounded-b-lg shadow-md p-6 mb-6">
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Main Content Area -->
+        <div class="flex-1">
+          <!-- Action Bar -->
+          <div class="mb-6 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+            <div class="flex-1 w-full">
               <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <i class="fas fa-search text-gray-400"></i>
-                </div>
-                <input 
-                  v-model="filters.search" 
-                  @input="debouncedFetch"
-                  type="text" 
-                  class="form-input block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
-                  placeholder="Search SKU or name"
-                />
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <i class="fas fa-search"></i>
+                </span>
+                <input type="text" v-model="searchQuery" placeholder="Search by SKU, name, or category..."
+                  class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
               </div>
             </div>
-            
-            <div class="w-full sm:w-64">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-              <select 
-                v-model="filters.category_code" 
-                @change="fetchSkus"
-                class="form-select mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              >
-                <option value="">All Categories</option>
-                <option v-for="category in categories" :key="category.code" :value="category.code">
-                  {{ category.name }}
-                </option>
-              </select>
-            </div>
-            
-            <div class="w-full sm:w-64">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-              <select 
-                v-model="filters.type" 
-                @change="fetchSkus"
-                class="form-select mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              >
-                <option value="">All Types</option>
-                <option v-for="type in types" :key="type" :value="type">
-                  {{ type }}
-                </option>
-              </select>
-            </div>
-            
-            <div class="w-full sm:w-auto flex items-end">
-              <button 
-                @click="resetFilters"
-                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <i class="fas fa-redo-alt mr-2"></i> Reset Filters
+            <div class="flex gap-2 w-full md:w-auto">
+              <button @click="newSku" class="btn-primary flex-1 md:flex-none">
+                <i class="fas fa-plus-circle mr-2"></i> New SKU
+              </button>
+              <button @click="refreshData" class="btn-secondary flex-1 md:flex-none">
+                <i class="fas fa-sync-alt mr-2"></i> Refresh
+              </button>
+              <button @click="printSkus" class="btn-info flex-1 md:flex-none">
+                <i class="fas fa-print mr-2"></i> Print
               </button>
             </div>
           </div>
-        </div>
-        
-        <!-- Main content section -->
-        <div class="mt-4">
-          <!-- Loading indicator -->
-          <div v-if="loading" class="flex justify-center items-center py-8">
-            <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-          
-          <!-- Error message -->
-          <div v-else-if="error" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
-            <p class="font-bold">Error</p>
-            <p>{{ error }}</p>
-          </div>
-          
-          <!-- SKU Table -->
-          <div v-else-if="skus.data && skus.data.length > 0" class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
+
+          <!-- Table Section -->
+          <div class="bg-white rounded-lg overflow-hidden border border-gray-200">
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      SKU#
+                    <th @click="sortBy('sku')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        SKU <i class="fas fa-sort ml-1"></i>
+                      </div>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
+                    <th @click="sortBy('sku_name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Name <i class="fas fa-sort ml-1"></i>
+                      </div>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      SKU Name
+                    <th @click="sortBy('category_code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Category <i class="fas fa-sort ml-1"></i>
+                      </div>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Category
+                    <th @click="sortBy('type')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        Type <i class="fas fa-sort ml-1"></i>
+                      </div>
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      UOM
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      BOH
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                    <th @click="sortBy('uom')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                      <div class="flex items-center">
+                        UOM <i class="fas fa-sort ml-1"></i>
+                      </div>
                     </th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="sku in skus.data" :key="sku.sku" class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {{ sku.sku }}
+                  <tr v-if="loading" class="animate-pulse">
+                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                      <div class="flex justify-center items-center space-x-2">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading SKUs...</span>
+                      </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                      <span 
-                        :class="{
-                          'px-2 inline-flex text-xs leading-5 font-semibold rounded-full': true,
-                          'bg-green-100 text-green-800': sku.is_active,
-                          'bg-red-100 text-red-800': !sku.is_active
-                        }"
-                      >
-                        {{ sku.is_active ? 'Active' : 'Inactive' }}
-                      </span>
+                  </tr>
+                  <tr v-else-if="paginatedSkus.length === 0" class="hover:bg-gray-50">
+                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                      No SKUs found. Try adjusting your search.
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {{ sku.sku_name }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {{ sku.category ? sku.category.name : 'N/A' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {{ sku.type || 'N/A' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {{ sku.uom || 'N/A' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {{ formatNumber(sku.boh) }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button 
-                        @click="editSku(sku)" 
-                        class="text-indigo-600 hover:text-indigo-900 mr-4"
-                      >
-                        <i class="fas fa-edit"></i> Edit
-                      </button>
-                      <button 
-                        @click="confirmDelete(sku)" 
-                        class="text-red-600 hover:text-red-900 mr-4"
-                      >
-                        <i class="fas fa-trash"></i> Delete
-                      </button>
-                      <button 
-                        @click="toggleActive(sku)" 
-                        :class="{
-                          'hover:text-indigo-900 mr-4': true,
-                          'text-red-600': sku.is_active,
-                          'text-green-600': !sku.is_active
-                        }"
-                      >
-                        <i :class="sku.is_active ? 'fas fa-ban' : 'fas fa-check'"></i>
-                        {{ sku.is_active ? 'Disable' : 'Enable' }}
-                      </button>
-                    </td>
+                  </tr>
+                  <tr v-for="sku in paginatedSkus" :key="sku.sku" 
+                      @click="selectSku(sku)" 
+                      :class="{'bg-blue-50': selectedSku && selectedSku.sku === sku.sku}"
+                      class="hover:bg-gray-50 cursor-pointer">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ sku.sku }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ sku.sku_name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ sku.category_code }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ sku.type }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ sku.uom }}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            
-            <!-- Pagination -->
-            <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-              <div class="flex justify-between">
-                <div class="text-sm text-gray-700">
-                  Showing {{ skus.from }} to {{ skus.to }} of {{ skus.total }} results
-                </div>
-                <div>
-                  <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                    <button
-                      @click="changePage(skus.current_page - 1)"
-                      :disabled="skus.current_page === 1"
-                      :class="{
-                        'relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium': true,
-                        'text-gray-300 cursor-not-allowed': skus.current_page === 1,
-                        'text-gray-500 hover:bg-gray-50': skus.current_page !== 1
-                      }"
-                    >
-                      <span class="sr-only">Previous</span>
-                      <i class="fas fa-chevron-left"></i>
-                    </button>
-                    
-                    <div v-for="page in pageRange" :key="page">
-                      <button
-                        v-if="page !== '...'"
-                        @click="changePage(page)"
-                        :class="{
-                          'relative inline-flex items-center px-4 py-2 border text-sm font-medium': true,
-                          'bg-blue-50 border-blue-500 text-blue-600 z-10': page === skus.current_page,
-                          'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': page !== skus.current_page
-                        }"
-                      >
-                        {{ page }}
-                      </button>
-                      <span
-                        v-else
-                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
-                      >
-                        ...
-                      </span>
-                    </div>
-                    
-                    <button
-                      @click="changePage(skus.current_page + 1)"
-                      :disabled="skus.current_page === skus.last_page"
-                      :class="{
-                        'relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium': true,
-                        'text-gray-300 cursor-not-allowed': skus.current_page === skus.last_page,
-                        'text-gray-500 hover:bg-gray-50': skus.current_page !== skus.last_page
-                      }"
-                    >
-                      <span class="sr-only">Next</span>
-                      <i class="fas fa-chevron-right"></i>
-                    </button>
-                  </nav>
-                </div>
-              </div>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div class="mt-4 flex justify-between items-center text-sm text-gray-600">
+            <div>
+              <span>Showing {{ paginatedSkus.length }} of {{ filteredSkus.length }} SKUs</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <select v-model="itemsPerPage" class="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option :value="10">10 per page</option>
+                <option :value="20">20 per page</option>
+                <option :value="50">50 per page</option>
+                <option :value="100">100 per page</option>
+              </select>
+              <button :disabled="currentPage === 1" @click="currentPage--" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <span class="px-4">{{ currentPage }} / {{ totalPages }}</span>
+              <button :disabled="currentPage === totalPages || totalPages === 0" @click="currentPage++" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">
+                <i class="fas fa-chevron-right"></i>
+              </button>
             </div>
           </div>
-          
-          <!-- Empty state -->
-          <div v-else class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 p-6">
-            <div class="text-center">
-              <i class="fas fa-box-open text-4xl text-gray-400 mb-3"></i>
-              <h3 class="text-lg leading-6 font-medium text-gray-900">No SKUs found</h3>
-              <p class="mt-1 text-sm text-gray-500">
-                Get started by creating a new SKU or try a different search.
-              </p>
-              <div class="mt-6">
-                <button 
-                  @click="showAddModal = true" 
-                  class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  <i class="fas fa-plus mr-2"></i> Add New SKU
-                </button>
-                <button 
-                  @click="seedSampleData"
-                  class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  <i class="fas fa-seedling mr-2"></i> Seed Sample Data
-                </button>
+        </div>
+
+        <!-- Side Panel with Details -->
+        <div class="w-full md:w-96 bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div v-if="selectedSku" class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+              <i class="fas fa-info-circle mr-2 text-blue-500"></i> SKU Details
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">SKU:</span>
+                <span class="font-medium text-gray-900">{{ selectedSku.sku }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Name:</span>
+                <span class="font-medium text-gray-900 text-right">{{ selectedSku.sku_name }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Category:</span>
+                <span class="font-medium text-gray-900">{{ selectedSku.category_code }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Type:</span>
+                <span class="font-medium text-gray-900">{{ selectedSku.type }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">UOM:</span>
+                <span class="font-medium text-gray-900">{{ selectedSku.uom }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">BOH:</span>
+                <span class="font-medium text-gray-900">{{ selectedSku.boh }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">FPO:</span>
+                <span class="font-medium text-gray-900">{{ selectedSku.fpo }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">ROL:</span>
+                <span class="font-medium text-gray-900">{{ selectedSku.rol }}</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-200 pb-2">
+                <span class="text-gray-600">Status:</span>
+                <span class="font-medium" :class="selectedSku.is_active ? 'text-green-600' : 'text-red-600'">
+                  {{ selectedSku.is_active ? 'Active' : 'Inactive' }}
+                </span>
               </div>
             </div>
+            <div class="mt-6 flex space-x-2">
+              <button @click="editSku(selectedSku)" class="flex-1 btn-blue">
+                <i class="fas fa-edit mr-1"></i> Edit
+              </button>
+              <button @click="confirmDelete(selectedSku)" class="flex-1 btn-danger">
+                <i class="fas fa-trash-alt mr-1"></i> Delete
+              </button>
+            </div>
+          </div>
+          <div v-else class="flex flex-col items-center justify-center h-64 text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-boxes text-blue-500 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No SKU Selected</h3>
+            <p class="text-gray-500 mb-4">Select a SKU from the table to view details</p>
+            <button @click="newSku" class="btn-primary">
+              <i class="fas fa-plus-circle mr-1"></i> Create New SKU
+            </button>
           </div>
         </div>
       </div>
     </div>
-    
-    <!-- Add/Edit SKU Modal -->
-    <TransitionRoot appear :show="showAddModal || showEditModal" as="template">
-      <Dialog as="div" @close="showAddModal ? (showAddModal = false) : (showEditModal = false)" class="relative z-10">
-        <TransitionChild
-          as="template"
-          enter="duration-300 ease-out"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
-          leave="duration-200 ease-in"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
-        >
-          <div class="fixed inset-0 bg-black bg-opacity-25" />
-        </TransitionChild>
 
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4 text-center">
-            <TransitionChild
-              as="template"
-              enter="duration-300 ease-out"
-              enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100"
-              leave="duration-200 ease-in"
-              leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95"
-            >
-              <DialogPanel class="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                  {{ showAddModal ? 'Add New SKU' : 'Edit SKU' }}
-                </DialogTitle>
-                
-                <!-- Form -->
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <!-- Left Column -->
-                  <div class="space-y-4">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">SKU #</label>
-                      <input 
-                        type="text" 
-                        v-model="form.sku" 
-                        :disabled="showEditModal"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.sku }"
-                      />
-                      <p v-if="formErrors.sku" class="mt-1 text-sm text-red-600">{{ formErrors.sku[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Status</label>
-                      <select 
-                        v-model="form.sts"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                        :class="{ 'border-red-500': formErrors.sts }"
-                      >
-                        <option value="ACT">Active</option>
-                        <option value="OBS">Obsolete</option>
-                      </select>
-                      <p v-if="formErrors.sts" class="mt-1 text-sm text-red-600">{{ formErrors.sts[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Category</label>
-                      <select 
-                        v-model="form.category_code"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                        :class="{ 'border-red-500': formErrors.category_code }"
-                      >
-                        <option v-for="category in categories" :key="category.code" :value="category.code">
-                          {{ category.name }}
-                        </option>
-                      </select>
-                      <p v-if="formErrors.category_code" class="mt-1 text-sm text-red-600">{{ formErrors.category_code[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Type</label>
-                      <input 
-                        type="text" 
-                        v-model="form.type" 
-                        list="sku-types"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.type }"
-                      />
-                      <datalist id="sku-types">
-                        <option v-for="type in types" :key="type" :value="type">{{ type }}</option>
-                      </datalist>
-                      <p v-if="formErrors.type" class="mt-1 text-sm text-red-600">{{ formErrors.type[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">UOM (Unit of Measure)</label>
-                      <input 
-                        type="text" 
-                        v-model="form.uom" 
-                        list="sku-uoms"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.uom }"
-                      />
-                      <datalist id="sku-uoms">
-                        <option v-for="uom in uoms" :key="uom" :value="uom">{{ uom }}</option>
-                      </datalist>
-                      <p v-if="formErrors.uom" class="mt-1 text-sm text-red-600">{{ formErrors.uom[0] }}</p>
-                    </div>
-                  </div>
-                  
-                  <!-- Middle Column -->
-                  <div class="space-y-4">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">SKU Name</label>
-                      <input 
-                        type="text" 
-                        v-model="form.sku_name" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.sku_name }"
-                      />
-                      <p v-if="formErrors.sku_name" class="mt-1 text-sm text-red-600">{{ formErrors.sku_name[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Additional Name</label>
-                      <textarea 
-                        v-model="form.additional_name" 
-                        rows="3"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.additional_name }"
-                      ></textarea>
-                      <p v-if="formErrors.additional_name" class="mt-1 text-sm text-red-600">{{ formErrors.additional_name[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">BOH (Balance on Hand)</label>
-                      <input 
-                        type="number" 
-                        step="0.001"
-                        v-model="form.boh" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.boh }"
-                      />
-                      <p v-if="formErrors.boh" class="mt-1 text-sm text-red-600">{{ formErrors.boh[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">FPO (Future Purchase Orders)</label>
-                      <input 
-                        type="number" 
-                        step="0.001"
-                        v-model="form.fpo" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.fpo }"
-                      />
-                      <p v-if="formErrors.fpo" class="mt-1 text-sm text-red-600">{{ formErrors.fpo[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">ROL (Reorder Level)</label>
-                      <input 
-                        type="number" 
-                        step="0.001"
-                        v-model="form.rol" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.rol }"
-                      />
-                      <p v-if="formErrors.rol" class="mt-1 text-sm text-red-600">{{ formErrors.rol[0] }}</p>
-                    </div>
-                  </div>
-                  
-                  <!-- Right Column -->
-                  <div class="space-y-4">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Total Part</label>
-                      <input 
-                        type="number"
-                        v-model="form.total_part" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.total_part }"
-                      />
-                      <p v-if="formErrors.total_part" class="mt-1 text-sm text-red-600">{{ formErrors.total_part[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Min Qty</label>
-                      <input 
-                        type="number" 
-                        step="0.01"
-                        v-model="form.min_qty" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.min_qty }"
-                      />
-                      <p v-if="formErrors.min_qty" class="mt-1 text-sm text-red-600">{{ formErrors.min_qty[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Max Qty</label>
-                      <input 
-                        type="number" 
-                        step="0.01"
-                        v-model="form.max_qty" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.max_qty }"
-                      />
-                      <p v-if="formErrors.max_qty" class="mt-1 text-sm text-red-600">{{ formErrors.max_qty[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Part Number 1</label>
-                      <input 
-                        type="text" 
-                        v-model="form.part_number1" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.part_number1 }"
-                      />
-                      <p v-if="formErrors.part_number1" class="mt-1 text-sm text-red-600">{{ formErrors.part_number1[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Part Number 2</label>
-                      <input 
-                        type="text" 
-                        v-model="form.part_number2" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.part_number2 }"
-                      />
-                      <p v-if="formErrors.part_number2" class="mt-1 text-sm text-red-600">{{ formErrors.part_number2[0] }}</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700">Part Number 3</label>
-                      <input 
-                        type="text" 
-                        v-model="form.part_number3" 
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
-                        :class="{ 'border-red-500': formErrors.part_number3 }"
-                      />
-                      <p v-if="formErrors.part_number3" class="mt-1 text-sm text-red-600">{{ formErrors.part_number3[0] }}</p>
-                    </div>
-                  </div>
+    <!-- Form Modal -->
+    <div v-if="showFormModal" class="modal-container">
+      <div class="modal-overlay" @click="showFormModal = false"></div>
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <div class="flex items-center">
+            <div class="bg-white/20 p-2 rounded-lg mr-3">
+              <i class="fas fa-boxes text-white text-xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-white">{{ isEditing ? 'Edit' : 'New' }} SKU</h3>
+          </div>
+          <button @click="showFormModal = false" class="bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg transition-all duration-200">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <!-- Form Content -->
+        <div class="modal-body">
+          <form @submit.prevent="saveSku">
+            <div class="space-y-6">
+              <!-- SKU Code -->
+              <div class="form-field">
+                <label class="form-label">
+                  <i class="fas fa-hashtag text-blue-500 mr-2"></i>
+                  SKU Code<span class="text-red-500">*</span>
+                </label>
+                <input type="text" v-model="formSku.sku" required :disabled="isEditing"
+                  maxlength="20"
+                  @input="formSku.sku = formSku.sku.toUpperCase()"
+                  class="form-input"
+                  placeholder="Enter SKU code">
+                <p class="text-xs text-gray-500 mt-2 italic">Code must be unique (max 20 chars) and cannot be changed later.</p>
+                <p v-if="errors.sku" class="form-error">{{ errors.sku }}</p>
+              </div>
+              
+              <!-- SKU Name -->
+              <div class="form-field">
+                <label class="form-label">
+                  <i class="fas fa-tag text-blue-500 mr-2"></i>
+                  SKU Name<span class="text-red-500">*</span>
+                </label>
+                <input type="text" v-model="formSku.sku_name" required
+                  maxlength="150"
+                  class="form-input"
+                  placeholder="Enter SKU name">
+                <p v-if="errors.sku_name" class="form-error">{{ errors.sku_name }}</p>
+              </div>
+
+              <!-- Category -->
+              <div class="form-field">
+                <label class="form-label">
+                  <i class="fas fa-folder text-blue-500 mr-2"></i>
+                  Category<span class="text-red-500">*</span>
+                </label>
+                <select v-model="formSku.category_code" required
+                  class="form-input"
+                >
+                  <option value="">Select a category</option>
+                  <option v-for="category in categories" :key="category.code" :value="category.code">
+                    {{ category.name }}
+                  </option>
+                </select>
+                <p v-if="errors.category_code" class="form-error">{{ errors.category_code }}</p>
+              </div>
+
+              <!-- Type -->
+              <div class="form-field">
+                <label class="form-label">
+                  <i class="fas fa-cube text-blue-500 mr-2"></i>
+                  Type
+                </label>
+                <select v-model="formSku.type"
+                  class="form-input"
+                >
+                  <option value="">Select a type</option>
+                  <option v-for="type in types" :key="type" :value="type">
+                    {{ type }}
+                  </option>
+                </select>
+                <p v-if="errors.type" class="form-error">{{ errors.type }}</p>
+              </div>
+
+              <!-- UOM -->
+              <div class="form-field">
+                <label class="form-label">
+                  <i class="fas fa-ruler text-blue-500 mr-2"></i>
+                  Unit of Measure
+                </label>
+                <select v-model="formSku.uom"
+                  class="form-input"
+                >
+                  <option value="">Select a unit</option>
+                  <option v-for="unit in units" :key="unit.code" :value="unit.code">
+                    {{ unit.name }}
+                  </option>
+                </select>
+                <p v-if="errors.uom" class="form-error">{{ errors.uom }}</p>
+              </div>
+
+              <!-- Quantities -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-field">
+                  <label class="form-label">
+                    <i class="fas fa-boxes text-blue-500 mr-2"></i>
+                    BOH
+                  </label>
+                  <input type="number" v-model="formSku.boh"
+                    step="0.001"
+                    class="form-input"
+                    placeholder="0.000">
+                  <p v-if="errors.boh" class="form-error">{{ errors.boh }}</p>
                 </div>
 
-                <!-- Active Status Toggle -->
-                <div class="mt-4">
-                  <div class="flex items-center">
-                    <input 
-                      id="is_active" 
-                      type="checkbox" 
-                      v-model="form.is_active" 
-                      class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <label for="is_active" class="ml-2 block text-sm text-gray-900">Active</label>
-                  </div>
+                <div class="form-field">
+                  <label class="form-label">
+                    <i class="fas fa-dolly text-blue-500 mr-2"></i>
+                    FPO
+                  </label>
+                  <input type="number" v-model="formSku.fpo"
+                    step="0.001"
+                    class="form-input"
+                    placeholder="0.000">
+                  <p v-if="errors.fpo" class="form-error">{{ errors.fpo }}</p>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="mt-6 flex justify-end space-x-3">
-                  <button 
-                    type="button" 
-                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                    @click="showAddModal ? (showAddModal = false) : (showEditModal = false)"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="button" 
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                    @click="showAddModal ? createSku() : updateSku()"
-                  >
-                    {{ showAddModal ? 'Create' : 'Update' }}
-                  </button>
+                <div class="form-field">
+                  <label class="form-label">
+                    <i class="fas fa-level-down-alt text-blue-500 mr-2"></i>
+                    ROL
+                  </label>
+                  <input type="number" v-model="formSku.rol"
+                    step="0.001"
+                    class="form-input"
+                    placeholder="0.000">
+                  <p v-if="errors.rol" class="form-error">{{ errors.rol }}</p>
                 </div>
-              </DialogPanel>
-            </TransitionChild>
+
+                <div class="form-field">
+                  <label class="form-label">
+                    <i class="fas fa-puzzle-piece text-blue-500 mr-2"></i>
+                    Total Parts
+                  </label>
+                  <input type="number" v-model="formSku.total_part"
+                    step="1"
+                    class="form-input"
+                    placeholder="0">
+                  <p v-if="errors.total_part" class="form-error">{{ errors.total_part }}</p>
+                </div>
+              </div>
+
+              <!-- Min/Max Quantities -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-field">
+                  <label class="form-label">
+                    <i class="fas fa-arrow-down text-blue-500 mr-2"></i>
+                    Min Quantity
+                  </label>
+                  <input type="number" v-model="formSku.min_qty"
+                    step="0.01"
+                    class="form-input"
+                    placeholder="0.00">
+                  <p v-if="errors.min_qty" class="form-error">{{ errors.min_qty }}</p>
+                </div>
+
+                <div class="form-field">
+                  <label class="form-label">
+                    <i class="fas fa-arrow-up text-blue-500 mr-2"></i>
+                    Max Quantity
+                  </label>
+                  <input type="number" v-model="formSku.max_qty"
+                    step="0.01"
+                    class="form-input"
+                    placeholder="0.00">
+                  <p v-if="errors.max_qty" class="form-error">{{ errors.max_qty }}</p>
+                </div>
+              </div>
+
+              <!-- Additional Information -->
+              <div class="form-field">
+                <label class="form-label">
+                  <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                  Additional Name
+                </label>
+                <input type="text" v-model="formSku.additional_name"
+                  maxlength="200"
+                  class="form-input"
+                  placeholder="Enter additional name">
+                <p v-if="errors.additional_name" class="form-error">{{ errors.additional_name }}</p>
+              </div>
+
+              <!-- Part Numbers -->
+              <div class="space-y-4">
+                <div class="form-field">
+                  <label class="form-label">
+                    <i class="fas fa-barcode text-blue-500 mr-2"></i>
+                    Part Number 1
+                  </label>
+                  <input type="text" v-model="formSku.part_number1"
+                    maxlength="100"
+                    class="form-input"
+                    placeholder="Enter part number 1">
+                  <p v-if="errors.part_number1" class="form-error">{{ errors.part_number1 }}</p>
+                </div>
+
+                <div class="form-field">
+                  <label class="form-label">
+                    <i class="fas fa-barcode text-blue-500 mr-2"></i>
+                    Part Number 2
+                  </label>
+                  <input type="text" v-model="formSku.part_number2"
+                    maxlength="100"
+                    class="form-input"
+                    placeholder="Enter part number 2">
+                  <p v-if="errors.part_number2" class="form-error">{{ errors.part_number2 }}</p>
+                </div>
+
+                <div class="form-field">
+                  <label class="form-label">
+                    <i class="fas fa-barcode text-blue-500 mr-2"></i>
+                    Part Number 3
+                  </label>
+                  <input type="text" v-model="formSku.part_number3"
+                    maxlength="100"
+                    class="form-input"
+                    placeholder="Enter part number 3">
+                  <p v-if="errors.part_number3" class="form-error">{{ errors.part_number3 }}</p>
+                </div>
+              </div>
+
+              <!-- Status -->
+              <div class="form-field">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" v-model="formSku.is_active" class="form-checkbox h-5 w-5 text-blue-600">
+                  <span class="text-gray-700">Active</span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Form Footer with Buttons -->
+            <div class="modal-footer">
+              <button type="button" @click="showFormModal = false" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition-all duration-200 flex items-center">
+                <i class="fas fa-times mr-2"></i> Cancel
+              </button>
+              <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition-all duration-200 flex items-center" :disabled="loading">
+                <i class="fas fa-save mr-2"></i> {{ isEditing ? 'Update' : 'Create' }}
+                <span v-if="loading" class="ml-2 animate-spin"><i class="fas fa-spinner"></i></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div v-if="showConfirmation" class="fixed inset-0 flex items-center justify-center z-50">
+      <div class="absolute inset-0 bg-black opacity-50" @click="showConfirmation = false"></div>
+      <div class="bg-white rounded-lg shadow-lg max-w-md z-10 w-full">
+        <div class="p-6">
+          <div class="flex items-center mb-4">
+            <div class="bg-red-100 rounded-full p-2 mr-3">
+              <i class="fas fa-exclamation-triangle text-red-600"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900">Confirm Delete</h3>
+          </div>
+          <p class="mb-4 text-gray-600">Are you sure you want to delete SKU <span class="font-semibold">{{ skuToDelete?.sku }}</span>? This action cannot be undone.</p>
+          <div class="flex justify-end space-x-3">
+            <button @click="showConfirmation = false" class="px-4 py-2 text-gray-700 border border-gray-300 rounded hover:bg-gray-50">
+              <i class="fas fa-times mr-1"></i> Cancel
+            </button>
+            <button @click="deleteSku" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" :disabled="loading">
+              <i class="fas fa-trash-alt mr-1"></i> Delete
+            </button>
           </div>
         </div>
-      </Dialog>
-    </TransitionRoot>
-
-    <!-- Delete Confirmation Modal -->
-    <TransitionRoot appear :show="showDeleteModal" as="template">
-      <Dialog as="div" @close="showDeleteModal = false" class="relative z-10">
-        <TransitionChild
-          as="template"
-          enter="duration-300 ease-out"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
-          leave="duration-200 ease-in"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
-        >
-          <div class="fixed inset-0 bg-black bg-opacity-25" />
-        </TransitionChild>
-
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4 text-center">
-            <TransitionChild
-              as="template"
-              enter="duration-300 ease-out"
-              enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100"
-              leave="duration-200 ease-in"
-              leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95"
-            >
-              <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                  Confirm Deletion
-                </DialogTitle>
-                
-                <div class="mt-2">
-                  <p class="text-sm text-gray-500">
-                    Are you sure you want to delete the SKU "{{ currentSku?.sku_name }}" ({{ currentSku?.sku }})?
-                    This action cannot be undone.
-                  </p>
-                </div>
-                
-                <div class="mt-6 flex justify-end space-x-3">
-                  <button 
-                    type="button" 
-                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                    @click="showDeleteModal = false"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="button" 
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-                    @click="deleteSku"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
+      </div>
+    </div>
   </AppLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue';
-import { Head } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
-import debounce from 'lodash/debounce';
+import { Head, router } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import { useToast } from '@/Composables/useToast';
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import ToastContainer from '@/Components/ToastContainer.vue';
 
-// Toast notification
-const { showToast } = useToast();
-
-// Data
-const skus = ref({ data: [] });
+// State variables
+const skus = ref([]);
 const categories = ref([]);
+const units = ref([]);
 const types = ref([]);
-const uoms = ref([]);
-
-// UI state
+const selectedSku = ref(null);
 const loading = ref(false);
-const error = ref(null);
-const showAddModal = ref(false);
-const showEditModal = ref(false);
-const showDeleteModal = ref(false);
-const currentSku = ref(null);
+const searchQuery = ref('');
+const showFormModal = ref(false);
+const showConfirmation = ref(false);
+const skuToDelete = ref(null);
+const isEditing = ref(false);
+const sortOrder = ref({
+  field: 'sku',
+  direction: 'asc'
+});
 
-// Form data
-const form = ref({
+// Initialize toast
+const toast = useToast();
+
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+const errors = ref({});
+
+// Form for creating/editing SKU
+const formSku = ref({
   sku: '',
+  sts: '',
   sku_name: '',
   category_code: '',
   type: '',
   uom: '',
-  sts: 'ACT',
   boh: 0,
   fpo: 0,
   rol: 0,
@@ -647,229 +525,18 @@ const form = ref({
   part_number1: '',
   part_number2: '',
   part_number3: '',
-  is_active: true
+  is_active: true,
 });
 
-// Form errors
-const formErrors = ref({});
-
-// Filters
-const filters = ref({
-  search: '',
-  category_code: '',
-  type: ''
-});
-
-// Create debounced function for search input
-const debouncedFetch = debounce(() => {
-  fetchSkus();
-}, 500);
-
-// Pagination helpers
-const pageRange = computed(() => {
-  if (!skus.value || !skus.value.last_page) return [];
-  
-  const totalPages = skus.value.last_page;
-  const currentPage = skus.value.current_page;
-  
-  let range = [];
-  
-  if (totalPages <= 7) {
-    // Show all pages if 7 or fewer
-    range = Array.from({ length: totalPages }, (_, i) => i + 1);
-  } else {
-    // Always include first page, last page, and pages around current
-    range.push(1);
-    
-    if (currentPage > 3) {
-      range.push('...');
-    }
-    
-    // Pages around current
-    const start = Math.max(2, currentPage - 1);
-    const end = Math.min(totalPages - 1, currentPage + 1);
-    
-    for (let i = start; i <= end; i++) {
-      range.push(i);
-    }
-    
-    if (currentPage < totalPages - 2) {
-      range.push('...');
-    }
-    
-    range.push(totalPages);
-  }
-  
-  return range;
-});
-
-// Methods
-const fetchSkus = async () => {
-  try {
-    loading.value = true;
-    error.value = null;
-    
-    const params = {
-      page: skus.value.current_page || 1,
-      ...filters.value
-    };
-    
-    const response = await axios.get('/api/material-management/system-requirement/inventory-setup/sku', { params });
-    skus.value = response.data;
-  } catch (err) {
-    console.error('Error fetching SKUs:', err);
-    error.value = 'Failed to load SKUs. Please try again.';
-  } finally {
-    loading.value = false;
-  }
-};
-
-const fetchCategories = async () => {
-  try {
-    const response = await axios.get('/api/material-management/system-requirement/inventory-setup/category');
-    categories.value = response.data;
-  } catch (err) {
-    console.error('Error fetching categories:', err);
-    showToast('Failed to load categories', 'error');
-  }
-};
-
-const fetchTypes = async () => {
-  try {
-    const response = await axios.get('/api/material-management/system-requirement/inventory-setup/sku-types');
-    types.value = response.data;
-  } catch (err) {
-    console.error('Error fetching SKU types:', err);
-  }
-};
-
-const fetchUoms = async () => {
-  try {
-    const response = await axios.get('/api/material-management/system-requirement/inventory-setup/units');
-    uoms.value = response.data;
-  } catch (err) {
-    console.error('Error fetching UOMs:', err);
-  }
-};
-
-const resetFilters = () => {
-  filters.value = {
-    search: '',
-    category_code: '',
-    type: ''
-  };
-  fetchSkus();
-};
-
-const formatNumber = (value) => {
-  if (value === null || value === undefined) return '0.000';
-  return parseFloat(value).toFixed(3);
-};
-
-const createSku = async () => {
-  try {
-    formErrors.value = {};
-    
-    const response = await axios.post('/api/material-management/system-requirement/inventory-setup/sku', form.value);
-    
-    showToast('SKU created successfully', 'success');
-    resetForm();
-    showAddModal.value = false;
-    fetchSkus();
-  } catch (err) {
-    console.error('Error creating SKU:', err);
-    
-    if (err.response && err.response.data && err.response.data.errors) {
-      formErrors.value = err.response.data.errors;
-    } else {
-      showToast('Failed to create SKU', 'error');
-    }
-  }
-};
-
-const editSku = (sku) => {
-  currentSku.value = sku;
-  form.value = { ...sku };
-  showEditModal.value = true;
-};
-
-const updateSku = async () => {
-  try {
-    formErrors.value = {};
-    
-    const response = await axios.put(`/api/material-management/system-requirement/inventory-setup/sku/${currentSku.value.sku}`, form.value);
-    
-    showToast('SKU updated successfully', 'success');
-    showEditModal.value = false;
-    fetchSkus();
-  } catch (err) {
-    console.error('Error updating SKU:', err);
-    
-    if (err.response && err.response.data && err.response.data.errors) {
-      formErrors.value = err.response.data.errors;
-    } else {
-      showToast('Failed to update SKU', 'error');
-    }
-  }
-};
-
-const confirmDelete = (sku) => {
-  currentSku.value = sku;
-  showDeleteModal.value = true;
-};
-
-const deleteSku = async () => {
-  try {
-    await axios.delete(`/api/material-management/system-requirement/inventory-setup/sku/${currentSku.value.sku}`);
-    
-    showToast('SKU deleted successfully', 'success');
-    showDeleteModal.value = false;
-    fetchSkus();
-  } catch (err) {
-    console.error('Error deleting SKU:', err);
-    showToast('Failed to delete SKU', 'error');
-  }
-};
-
-const toggleActive = async (sku) => {
-  try {
-    await axios.patch(`/api/material-management/system-requirement/inventory-setup/sku/${sku.sku}/toggle-active`);
-    
-    const status = sku.is_active ? 'disabled' : 'enabled';
-    showToast(`SKU ${status} successfully`, 'success');
-    
-    // Update the SKU in the data
-    sku.is_active = !sku.is_active;
-  } catch (err) {
-    console.error('Error toggling SKU status:', err);
-    showToast('Failed to update SKU status', 'error');
-  }
-};
-
-const seedSampleData = async () => {
-  try {
-    loading.value = true;
-    
-    await axios.post('/api/material-management/system-requirement/inventory-setup/sku/seed');
-    showToast('Sample SKUs seeded successfully', 'success');
-    
-    fetchSkus();
-  } catch (err) {
-    console.error('Error seeding sample data:', err);
-    showToast('Failed to seed sample data', 'error');
-  } finally {
-    loading.value = false;
-  }
-};
-
+// Reset form to default values
 const resetForm = () => {
-  form.value = {
+  formSku.value = {
     sku: '',
+    sts: '',
     sku_name: '',
     category_code: '',
     type: '',
     uom: '',
-    sts: 'ACT',
     boh: 0,
     fpo: 0,
     rol: 0,
@@ -880,43 +547,309 @@ const resetForm = () => {
     part_number1: '',
     part_number2: '',
     part_number3: '',
-    is_active: true
+    is_active: true,
   };
-  formErrors.value = {};
+  isEditing.value = false;
+  errors.value = {};
 };
 
-const changePage = (page) => {
-  if (page < 1 || page > skus.value.last_page) return;
+// Computed properties
+const filteredSkus = computed(() => {
+  let result = skus.value;
   
-  // If it's a valid page number, update the current page and fetch SKUs
-  skus.value.current_page = page;
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    result = result.filter(sku =>
+      (sku.sku && sku.sku.toLowerCase().includes(query)) ||
+      (sku.sku_name && sku.sku_name.toLowerCase().includes(query)) ||
+      (sku.category_code && sku.category_code.toLowerCase().includes(query))
+    );
+  }
+  
+  result = [...result].sort((a, b) => {
+    const field = sortOrder.value.field;
+    const direction = sortOrder.value.direction === 'asc' ? 1 : -1;
+    
+    const valA = a[field];
+    const valB = b[field];
+
+    if ((valA || '') < (valB || '')) return -1 * direction;
+    if ((valA || '') > (valB || '')) return 1 * direction;
+    return 0;
+  });
+
+  return result;
+});
+
+const paginatedSkus = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return filteredSkus.value.slice(start, end);
+});
+
+const totalPages = computed(() => {
+  const total = filteredSkus.value.length;
+  if (total === 0) return 1;
+  return Math.ceil(total / itemsPerPage.value);
+});
+
+watch(filteredSkus, () => {
+  if (currentPage.value > totalPages.value) {
+    currentPage.value = totalPages.value || 1;
+  }
+});
+
+watch(itemsPerPage, () => {
+  currentPage.value = 1;
+});
+
+const fetchSkus = async () => {
+  loading.value = true;
+  try {
+    const response = await axios.get('/api/material-management/skus');
+    skus.value = response.data;
+  } catch (error) {
+    console.error('Error fetching SKUs:', error);
+    toast.error('Failed to load SKUs');
+  } finally {
+    loading.value = false;
+  }
+};
+
+const fetchCategories = async () => {
+  try {
+    const response = await axios.get('/api/material-management/skus/categories');
+    categories.value = response.data;
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    toast.error('Failed to load categories');
+  }
+};
+
+const fetchUnits = async () => {
+  try {
+    const response = await axios.get('/api/material-management/skus/units');
+    units.value = response.data;
+  } catch (error) {
+    console.error('Error fetching units:', error);
+    toast.error('Failed to load units');
+  }
+};
+
+const fetchTypes = async () => {
+  try {
+    const response = await axios.get('/api/material-management/skus/types');
+    types.value = response.data;
+  } catch (error) {
+    console.error('Error fetching types:', error);
+    toast.error('Failed to load types');
+  }
+};
+
+const refreshData = () => {
+  selectedSku.value = null;
+  searchQuery.value = '';
   fetchSkus();
 };
 
-// Lifecycle hooks
-onMounted(async () => {
+const selectSku = (sku) => {
+  selectedSku.value = sku;
+};
+
+const newSku = () => {
+  resetForm();
+  showFormModal.value = true;
+};
+
+const editSku = (sku) => {
+  isEditing.value = true;
+  formSku.value = { ...sku };
+  showFormModal.value = true;
+  errors.value = {};
+};
+
+const confirmDelete = (sku) => {
+  skuToDelete.value = sku;
+  showConfirmation.value = true;
+};
+
+const saveSku = async () => {
+  loading.value = true;
+  errors.value = {};
   try {
-    await Promise.all([
-      fetchSkus(),
-      fetchCategories(),
-      fetchTypes(),
-      fetchUoms()
-    ]);
-  } catch (err) {
-    console.error('Error during initial data loading:', err);
+    let response;
+    
+    if (isEditing.value) {
+      response = await axios.put(`/api/material-management/skus/${formSku.value.sku}`, formSku.value);
+      toast.success('SKU updated successfully');
+      
+      const index = skus.value.findIndex(d => d.sku === formSku.value.sku);
+      if (index !== -1) {
+        skus.value[index] = response.data;
+        selectedSku.value = response.data;
+      }
+    } else {
+      response = await axios.post('/api/material-management/skus', formSku.value);
+      toast.success('SKU created successfully');
+      skus.value.push(response.data);
+      selectedSku.value = response.data;
+    }
+    
+    showFormModal.value = false;
+  } catch (error) {
+    console.error('Error saving SKU:', error);
+    if (error.response?.data?.errors) {
+      errors.value = error.response.data.errors;
+    }
+    toast.error(error.response?.data?.message || 'Failed to save SKU');
+  } finally {
+    loading.value = false;
   }
+};
+
+const deleteSku = async () => {
+  if (!skuToDelete.value) return;
+  
+  loading.value = true;
+  try {
+    await axios.delete(`/api/material-management/skus/${skuToDelete.value.sku}`);
+    toast.success('SKU deleted successfully');
+    
+    skus.value = skus.value.filter(d => d.sku !== skuToDelete.value.sku);
+    
+    if (selectedSku.value?.sku === skuToDelete.value.sku) {
+      selectedSku.value = null;
+    }
+    
+    showConfirmation.value = false;
+    skuToDelete.value = null;
+  } catch (error) {
+    console.error('Error deleting SKU:', error);
+    toast.error(error.response?.data?.message || 'Failed to delete SKU');
+  } finally {
+    loading.value = false;
+  }
+};
+
+const sortBy = (field) => {
+  if (sortOrder.value.field === field) {
+    sortOrder.value.direction = sortOrder.value.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortOrder.value.field = field;
+    sortOrder.value.direction = 'asc';
+  }
+};
+
+const printSkus = () => {
+  router.get('/material-management/system-requirement/inventory-setup/sku/view-print');
+};
+
+onMounted(async () => {
+  await Promise.all([
+    fetchSkus(),
+    fetchCategories(),
+    fetchUnits(),
+    fetchTypes()
+  ]);
 });
 </script>
 
 <style scoped>
-/* Optional: Add any specific styling you need */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
+/* Button styles */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
 }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+.btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+.btn-info {
+  @apply bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+.btn-blue {
+  @apply bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition
+    flex items-center justify-center whitespace-nowrap;
+}
+
+/* Table hover animation */
+tbody tr {
+  transition: all 0.2s;
+}
+
+tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar styling */
+.overflow-x-auto, .overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar, .overflow-y-auto::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track, .overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb, .overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
+}
+
+/* Form field styles */
+.form-field {
+  @apply bg-gray-50 p-4 rounded-lg shadow-sm;
+}
+
+.form-label {
+  @apply text-sm font-semibold text-gray-700 mb-2 flex items-center;
+}
+
+.form-input {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200;
+}
+
+.form-error {
+  @apply mt-1 text-sm text-red-600;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50;
+}
+
+.modal-container {
+  @apply fixed inset-0 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-xl shadow-2xl w-full max-w-lg z-10 relative transform transition-all duration-300 ease-in-out;
+}
+
+.modal-header {
+  @apply flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-800 rounded-t-xl;
+}
+
+.modal-body {
+  @apply p-6 max-h-[70vh] overflow-y-auto;
+}
+
+.modal-footer {
+  @apply flex justify-end space-x-3 border-t border-gray-200 pt-5 mt-4;
 }
 </style>

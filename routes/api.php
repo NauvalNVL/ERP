@@ -36,6 +36,7 @@ use App\Http\Controllers\WarehouseLocationController;
 use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\FgDoConfigController;
 use App\Http\Controllers\DeliveryOrderFormatController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -345,4 +346,24 @@ Route::prefix('material-management/system-requirement/inventory-setup')->group(f
     Route::get('/category', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController::class, 'apiIndex']);
     Route::get('/sku-types', [MmSkuController::class, 'getTypes']);
     Route::get('/units', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController::class, 'apiIndex']);
+});
+
+// Material Management API Routes
+Route::prefix('material-management')->group(function () {
+    // SKU Routes
+    Route::get('/skus', [MmSkuController::class, 'index']);
+    Route::post('/skus', [MmSkuController::class, 'store']);
+    Route::put('/skus/{sku}', [MmSkuController::class, 'update']);
+    Route::delete('/skus/{sku}', [MmSkuController::class, 'destroy']);
+    Route::get('/skus/categories', [MmSkuController::class, 'getCategories']);
+    Route::get('/skus/units', [MmSkuController::class, 'getUnits']);
+    Route::get('/skus/types', [MmSkuController::class, 'getTypes']);
+
+    // GL Distribution Routes
+    Route::get('/gl-distributions/list', [MmGlDistributionController::class, 'getGlDistributions']);
+    Route::get('/gl-distributions', [MmGlDistributionController::class, 'getGlDistributions']);
+    Route::post('/gl-distributions', [MmGlDistributionController::class, 'store']);
+    Route::put('/gl-distributions/{glDistribution}', [MmGlDistributionController::class, 'update']);
+    Route::delete('/gl-distributions/{glDistribution}', [MmGlDistributionController::class, 'destroy']);
+    Route::get('/chart-of-accounts', [MmGlDistributionController::class, 'getChartOfAccounts']);
 });

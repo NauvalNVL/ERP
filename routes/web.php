@@ -60,6 +60,7 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryControll
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReportGroupController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -947,6 +948,17 @@ Route::get('/material-management/system-requirement/standard-setup/analysis-code
 Route::get('/material-management/system-requirement/standard-setup/control-period/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'viewPrint'])->name('mm.control-period.view-print');
 Route::get('/material-management/system-requirement/standard-setup/transaction-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController::class, 'viewPrint'])->name('mm.transaction-type.view-print');
 Route::get('/material-management/system-requirement/standard-setup/tax-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController::class, 'viewPrint'])->name('mm.tax-type.view-print');
+
+// Material Management Routes
+Route::prefix('material-management')->group(function () {
+    Route::prefix('system-requirement')->group(function () {
+        Route::prefix('inventory-setup')->group(function () {
+            // GL Distribution Routes
+            Route::get('/mm-gl-distribution', [MmGlDistributionController::class, 'index'])->name('mm-gl-distribution.index');
+            Route::get('/mm-gl-distribution/print', [MmGlDistributionController::class, 'print'])->name('mm-gl-distribution.print');
+        });
+    });
+});
 
 // Material Management - System Requirement - Inventory Setup
 Route::get('mm-gl-distribution', [MmGlDistributionController::class, 'index'])->name('mm-gl-distribution.index');
