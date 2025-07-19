@@ -130,7 +130,7 @@
                                     </button>
                                 </div>
                             </div>
-
+                            
                             <!-- Customer Name, Product Code, Status -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
@@ -144,13 +144,13 @@
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <i class="fas fa-user-circle text-gray-400"></i>
                                         </div>
-                                        <input 
-                                            type="text" 
-                                            id="customer_name" 
-                                            v-model="form.customer_name" 
-                                            readonly
+                                    <input 
+                                        type="text" 
+                                        id="customer_name" 
+                                        v-model="form.customer_name" 
+                                        readonly
                                             class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 bg-gray-50"
-                                        />
+                                    />
                                     </div>
                                 </div>
                                 <div>
@@ -164,12 +164,12 @@
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <i class="fas fa-box text-gray-400"></i>
                                         </div>
-                                        <input 
-                                            type="text" 
-                                            id="product_code" 
-                                            v-model="form.product_code" 
+                                    <input 
+                                        type="text" 
+                                        id="product_code" 
+                                        v-model="form.product_code" 
                                             class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:ring-amber-500 focus:border-amber-500"
-                                        />
+                                    />
                                     </div>
                                 </div>
                                 <div>
@@ -183,20 +183,20 @@
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <i class="fas fa-tag text-gray-400"></i>
                                         </div>
-                                        <select 
-                                            id="status" 
-                                            v-model="form.status" 
+                                    <select 
+                                        id="status" 
+                                        v-model="form.status" 
                                             class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500"
-                                        >
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
-                                            <option value="pending">Pending</option>
-                                        </select>
+                                    >
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                        <option value="pending">Pending</option>
+                                    </select>
                                     </div>
                                 </div>
                             </div>
                         </form>
-                    </div>
+                            </div>
 
                     <!-- Detailed MC Info Section -->
                     <div v-if="showDetailedMcInfo" class="mt-6 bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden">
@@ -206,16 +206,16 @@
                         <div class="flex items-center mb-6 pb-2 border-b border-gray-200 relative z-10">
                             <div class="p-2 bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg mr-3 shadow-md">
                                 <i class="fas fa-info-circle text-white"></i>
-                            </div>
+                                    </div>
                             <h3 class="text-xl font-semibold text-gray-800">Detailed Master Card Information</h3>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div class="space-y-2">
-                                <div>
+                                    <div>
                                     <label class="block text-gray-600">AC Name:</label>
                                     <input type="text" :value="mcDetails.ac_name" readonly class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2" />
-                                </div>
+                                    </div>
                                 <div>
                                     <label class="block text-gray-600">MC Model:</label>
                                     <input type="text" :value="mcDetails.mc_model" readonly class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2" />
@@ -223,7 +223,7 @@
                                 <div>
                                     <label class="block text-gray-600">MC Short Model:</label>
                                     <input type="text" :value="mcDetails.mc_short_model" readonly class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2" />
-                                </div>
+                            </div>
                             </div>
                             <div class="space-y-2">
                                 <div>
@@ -248,7 +248,7 @@
                         </div>
 
                         <div class="mt-6 flex flex-wrap gap-4 justify-between">
-                            <button type="button" class="px-4 py-2 bg-indigo-500 text-white rounded-md shadow-md hover:bg-indigo-600 transition-colors">Maintenance Log</button>
+                            <button type="button" @click="showMaintenanceLogModal = true" class="px-4 py-2 bg-indigo-500 text-white rounded-md shadow-md hover:bg-indigo-600 transition-colors">Maintenance Log</button>
                             <button type="button" class="px-4 py-2 bg-purple-500 text-white rounded-md shadow-md hover:bg-purple-600 transition-colors">Status Log</button>
                             <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 transition-colors">Approval Log</button>
                             <button type="button" class="ml-auto px-4 py-2 bg-green-500 text-white rounded-md shadow-md hover:bg-green-600 transition-colors">Next Setup</button>
@@ -514,6 +514,12 @@
                 </div>
             </div>
         </div>
+
+        <!-- Maintenance Log Modal -->
+        <MasterCardMaintenanceLogModal 
+            :show="showMaintenanceLogModal"
+            @close="showMaintenanceLogModal = false"
+        />
     </AppLayout>
 </template>
 
@@ -523,6 +529,7 @@ import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
 import CustomerAccountModal from '@/Components/CustomerAccountModal.vue';
+import MasterCardMaintenanceLogModal from '@/Components/MasterCardMaintenanceLogModal.vue';
 // import MasterCardZoomModal from '@/Components/MasterCardZoomModal.vue';
 // import MasterCardCurrentPriceModal from '@/Components/MasterCardCurrentPriceModal.vue';
 
@@ -562,6 +569,9 @@ const mcsError = ref(null);
 const mcsCurrentPage = ref(1);
 const mcsLastPage = ref(1);
 const mcsStatusFilter = ref('active'); // New state for status filter
+
+// New state for Maintenance Log Modal
+const showMaintenanceLogModal = ref(false);
 
 // Computed property for filtered and sorted MCS data (now fetched from API)
 const filteredMcsData = computed(() => mcsMasterCards.value); // Data is now filtered/sorted by API
@@ -733,7 +743,7 @@ const handleMcsProceed = () => {
         showDetailedMcInfo.value = true; // Show the detailed section
         showMcsTableModal.value = false; // Hide the MCS table modal
         recordSelected.value = true;
-    } else {
+  } else {
         alert('Please fill in both AC# and MCS# to proceed.');
     }
 };
