@@ -989,5 +989,13 @@ Route::prefix('material-management/system-requirement')->group(function () {
 Route::get('/material-management/system-requirement/inventory-setup/gl-distribution', [MmGlDistributionController::class, 'index'])->name('material-management.system-requirement.inventory-setup.gl-distribution');
 Route::get('/material-management/system-requirement/inventory-setup/gl-distribution/view-print', [MmGlDistributionController::class, 'viewPrint'])->name('material-management.system-requirement.inventory-setup.gl-distribution.view-print');
 
+// Add SKU routes
+Route::get('/material-management/system-requirement/inventory-setup/sku', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/Sku');
+})->name('material-management.system-requirement.inventory-setup.sku');
+Route::get('/material-management/system-requirement/inventory-setup/sku/view-print', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintSku');
+})->name('material-management.system-requirement.inventory-setup.sku.view-print');
+
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');

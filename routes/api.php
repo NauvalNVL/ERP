@@ -329,3 +329,20 @@ Route::post('/customer-groups/seed', [App\Http\Controllers\CustomerGroupControll
 // Update Customer Account API route
 Route::post('/update-customer-account', [App\Http\Controllers\UpdateCustomerAccountController::class, 'apiStore']);
 Route::put('/update-customer-account/{id}', [App\Http\Controllers\UpdateCustomerAccountController::class, 'apiUpdate']);
+
+// Material Management - System Requirement - Inventory Setup - SKU routes
+Route::prefix('material-management/system-requirement/inventory-setup')->group(function () {
+    // SKU routes
+    Route::get('/sku', [MmSkuController::class, 'index']);
+    Route::post('/sku', [MmSkuController::class, 'store']);
+    Route::get('/sku/{sku}', [MmSkuController::class, 'show']);
+    Route::put('/sku/{sku}', [MmSkuController::class, 'update']);
+    Route::delete('/sku/{sku}', [MmSkuController::class, 'destroy']);
+    Route::patch('/sku/{sku}/toggle-active', [MmSkuController::class, 'toggleActive']);
+    Route::post('/sku/seed', [MmSkuController::class, 'seed']);
+    
+    // Supporting endpoints for SKU component
+    Route::get('/category', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController::class, 'apiIndex']);
+    Route::get('/sku-types', [MmSkuController::class, 'getTypes']);
+    Route::get('/units', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController::class, 'apiIndex']);
+});

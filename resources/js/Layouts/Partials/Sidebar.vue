@@ -437,9 +437,9 @@ const materialManagementItems = [
         children: [
           { title: 'Define Category', icon: 'fas fa-tags', route: '/material-management/system-requirement/inventory-setup/category' },
           { title: 'Define Location', icon: 'fas fa-map-marker-alt', route: '/material-management/system-requirement/inventory-setup/location' },
+          { title: 'Define Unit', icon: 'fas fa-ruler-combined', route: '/material-management/system-requirement/inventory-setup/unit' },
           { title: 'Define Report Group', icon: 'fas fa-layer-group', route: '/material-management/system-requirement/inventory-setup/report-group' },
           { title: 'Define MM GL Distribution', icon: 'fas fa-money-bill-wave', route: '/material-management/system-requirement/inventory-setup/gl-distribution' },
-          { title: 'Define Unit', icon: 'fas fa-ruler-combined', route: '/material-management/system-requirement/inventory-setup/unit' },
           { title: 'Define SKU', icon: 'fas fa-box', route: '/material-management/system-requirement/inventory-setup/sku' },
           { title: 'View & Print Category', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/category/view-print' },
           { title: 'View & Print Location', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/location/view-print' },

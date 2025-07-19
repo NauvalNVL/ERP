@@ -714,7 +714,7 @@ const fetchSkus = async () => {
       ...filters.value
     };
     
-    const response = await axios.get('/api/skus', { params });
+    const response = await axios.get('/api/material-management/system-requirement/inventory-setup/sku', { params });
     skus.value = response.data;
   } catch (err) {
     console.error('Error fetching SKUs:', err);
@@ -726,7 +726,7 @@ const fetchSkus = async () => {
 
 const fetchCategories = async () => {
   try {
-    const response = await axios.get('/api/categories');
+    const response = await axios.get('/api/material-management/system-requirement/inventory-setup/category');
     categories.value = response.data;
   } catch (err) {
     console.error('Error fetching categories:', err);
@@ -736,7 +736,7 @@ const fetchCategories = async () => {
 
 const fetchTypes = async () => {
   try {
-    const response = await axios.get('/api/sku-types');
+    const response = await axios.get('/api/material-management/system-requirement/inventory-setup/sku-types');
     types.value = response.data;
   } catch (err) {
     console.error('Error fetching SKU types:', err);
@@ -745,7 +745,7 @@ const fetchTypes = async () => {
 
 const fetchUoms = async () => {
   try {
-    const response = await axios.get('/api/sku-uoms');
+    const response = await axios.get('/api/material-management/system-requirement/inventory-setup/units');
     uoms.value = response.data;
   } catch (err) {
     console.error('Error fetching UOMs:', err);
@@ -770,7 +770,7 @@ const createSku = async () => {
   try {
     formErrors.value = {};
     
-    const response = await axios.post('/api/skus', form.value);
+    const response = await axios.post('/api/material-management/system-requirement/inventory-setup/sku', form.value);
     
     showToast('SKU created successfully', 'success');
     resetForm();
@@ -797,7 +797,7 @@ const updateSku = async () => {
   try {
     formErrors.value = {};
     
-    const response = await axios.put(`/api/skus/${currentSku.value.sku}`, form.value);
+    const response = await axios.put(`/api/material-management/system-requirement/inventory-setup/sku/${currentSku.value.sku}`, form.value);
     
     showToast('SKU updated successfully', 'success');
     showEditModal.value = false;
@@ -820,7 +820,7 @@ const confirmDelete = (sku) => {
 
 const deleteSku = async () => {
   try {
-    await axios.delete(`/api/skus/${currentSku.value.sku}`);
+    await axios.delete(`/api/material-management/system-requirement/inventory-setup/sku/${currentSku.value.sku}`);
     
     showToast('SKU deleted successfully', 'success');
     showDeleteModal.value = false;
@@ -833,7 +833,7 @@ const deleteSku = async () => {
 
 const toggleActive = async (sku) => {
   try {
-    await axios.patch(`/api/skus/${sku.sku}/toggle-active`);
+    await axios.patch(`/api/material-management/system-requirement/inventory-setup/sku/${sku.sku}/toggle-active`);
     
     const status = sku.is_active ? 'disabled' : 'enabled';
     showToast(`SKU ${status} successfully`, 'success');
@@ -850,7 +850,7 @@ const seedSampleData = async () => {
   try {
     loading.value = true;
     
-    await axios.post('/api/skus/seed');
+    await axios.post('/api/material-management/system-requirement/inventory-setup/sku/seed');
     showToast('Sample SKUs seeded successfully', 'success');
     
     fetchSkus();
