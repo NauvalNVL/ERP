@@ -1009,5 +1009,21 @@ Route::get('/material-management/system-requirement/inventory-setup/sku/view-pri
     return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintSku');
 })->name('material-management.system-requirement.inventory-setup.sku.view-print');
 
+Route::get('/material-management/system-requirement/inventory-setup/sku-price', [
+    \App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'index'
+])->name('sku-price.index');
+
+Route::put('/material-management/system-requirement/inventory-setup/sku-price/{sku}', [
+    \App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'update'
+])->name('sku-price.update');
+
+Route::get('/material-management/system-requirement/inventory-setup/sku-price/view-print', [
+    \App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'viewPrint'
+])->name('sku-price.view-print');
+
+Route::get('/api/sku-price/search', [
+    \App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'search'
+])->name('sku-price.search');
+
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');

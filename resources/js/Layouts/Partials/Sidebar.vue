@@ -14,8 +14,8 @@
     <nav class="flex-grow px-2 py-4 space-y-2 overflow-y-auto sidebar-content">
       <!-- Dashboard -->
       <div class="relative group">
-        <Link 
-          href="/dashboard" 
+        <Link
+          href="/dashboard"
           class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
           :class="{ 'bg-blue-600 text-white font-medium': currentPath === '/dashboard' }"
         >
@@ -23,46 +23,46 @@
           <span>Dashboard</span>
         </Link>
       </div>
-      
+
       <!-- System Manager -->
-      <SidebarDropdown 
-        title="System Manager" 
+      <SidebarDropdown
+        title="System Manager"
         icon="fas fa-cogs"
         :items="systemManagerItems"
       />
 
       <!-- Sales Management -->
-      <SidebarDropdown 
-        title="Sales Management" 
+      <SidebarDropdown
+        title="Sales Management"
         icon="fas fa-chart-line"
         :items="salesManagementItems"
       />
 
       <!-- Material Management -->
-      <SidebarDropdown 
-        title="Material Management" 
+      <SidebarDropdown
+        title="Material Management"
         icon="fas fa-boxes"
         :items="materialManagementItems"
       />
 
       <!-- Production Management -->
-      <SidebarDropdown 
-        title="Production Management" 
+      <SidebarDropdown
+        title="Production Management"
         icon="fas fa-industry"
         :items="productionManagementItems"
       />
 
       <!-- Warehouse Management -->
-      <SidebarDropdown 
-        title="Warehouse Management" 
+      <SidebarDropdown
+        title="Warehouse Management"
         icon="fas fa-warehouse"
         :items="warehouseManagementItems"
       />
 
       <!-- Data Mining -->
       <div class="relative group">
-        <Link 
-          href="/data-mining" 
+        <Link
+          href="/data-mining"
           class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
           :class="{ 'bg-blue-600 text-white font-medium': currentPath === '/data-mining' }"
         >
@@ -92,9 +92,9 @@
           </div>
         </div>
         <div class="flex items-center space-x-3">
-          <button 
-            @click="resetMenus" 
-            class="text-gray-300 hover:text-blue-400 transition-colors" 
+          <button
+            @click="resetMenus"
+            class="text-gray-300 hover:text-blue-400 transition-colors"
             title="Reset menu state"
           >
             <i class="fas fa-redo-alt text-sm"></i>
@@ -300,14 +300,14 @@ const salesManagementItems = [
       }
     ]
   },
-  { 
-    title: 'Standard Formula', 
-    icon: 'fas fa-flask', 
+  {
+    title: 'Standard Formula',
+    icon: 'fas fa-flask',
     children: [
       { title: 'Setup Standard Formula Configuration', icon: 'fas fa-cogs', route: '/standard-formula-configuration' },
-      { 
-        title: 'Setup Scoring Formula', 
-        icon: 'fas fa-cut', 
+      {
+        title: 'Setup Scoring Formula',
+        icon: 'fas fa-cut',
         children: [
           { title: 'Define Scoring Formula', icon: 'fas fa-pen-fancy', route: '/scoring-formula' },
           { title: 'View & Print Scoring Formula', icon: 'fas fa-print', route: '/scoring-formula/view-print' }
@@ -408,72 +408,58 @@ const salesManagementItems = [
 
 // Material Management Items
 const materialManagementItems = [
-  { 
-    title: 'System Requirement', 
-    icon: 'fas fa-clipboard-list', 
+  {
+    title: 'System Requirement',
+    icon: 'fas fa-cogs',
     children: [
-      { 
-        title: 'Standard Setup', 
-        icon: 'fas fa-cogs',
+      {
+        title: 'Standard Setup',
+        icon: 'fas fa-sliders-h',
         children: [
-          { title: 'Define Configuration', icon: 'fas fa-sliders-h', route: '/material-management/system-requirement/standard-setup/configuration' },
+          { title: 'Define Configuration', icon: 'fas fa-tools', route: '/material-management/system-requirement/standard-setup/configuration' },
           { title: 'Define Control Period', icon: 'fas fa-calendar-alt', route: '/material-management/system-requirement/standard-setup/control-period' },
           { title: 'Define Transaction Type', icon: 'fas fa-exchange-alt', route: '/material-management/system-requirement/standard-setup/transaction-type' },
-          { title: 'Define Tax Type', icon: 'fas fa-percentage', route: '/material-management/system-requirement/standard-setup/tax-type' },
+          { title: 'Define Tax Type', icon: 'fas fa-percent', route: '/material-management/system-requirement/standard-setup/tax-type' },
           { title: 'Define Tax Group', icon: 'fas fa-layer-group', route: '/material-management/system-requirement/standard-setup/tax-group' },
           { title: 'Define Receive Destination', icon: 'fas fa-map-marker-alt', route: '/material-management/system-requirement/standard-setup/receive-destination' },
-          { title: 'Define Analysis Code', icon: 'fas fa-tags', route: '/material-management/system-requirement/standard-setup/analysis-code' },
+          { title: 'Define Analysis Code', icon: 'fas fa-barcode', route: '/material-management/system-requirement/standard-setup/analysis-code' },
+          // View & Print
           { title: 'View & Print Control Period', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/control-period/view-print' },
           { title: 'View & Print Transaction Type', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/transaction-type/view-print' },
           { title: 'View & Print Tax Type', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/tax-type/view-print' },
           { title: 'View & Print Tax Group', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/tax-group/view-print' },
           { title: 'View & Print Receive Destination', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/receive-destination/view-print' },
-          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/analysis-code/view-print' }
+          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/analysis-code/view-print' },
         ]
       },
       {
         title: 'Inventory Setup',
-        icon: 'fas fa-boxes-stacked',
+        icon: 'fas fa-dolly-flatbed',
         children: [
           { title: 'Define Category', icon: 'fas fa-tags', route: '/material-management/system-requirement/inventory-setup/category' },
-          { title: 'Define Location', icon: 'fas fa-map-marker-alt', route: '/material-management/system-requirement/inventory-setup/location' },
-          { title: 'Define Unit', icon: 'fas fa-ruler-combined', route: '/material-management/system-requirement/inventory-setup/unit' },
-          { title: 'Define Report Group', icon: 'fas fa-layer-group', route: '/material-management/system-requirement/inventory-setup/report-group' },
-          { title: 'Define MM GL Distribution', icon: 'fas fa-money-bill-wave', route: '/material-management/system-requirement/inventory-setup/gl-distribution' },
-          { title: 'Define SKU', icon: 'fas fa-box', route: '/material-management/system-requirement/inventory-setup/sku' },
+          { title: 'Define Location', icon: 'fas fa-map-marked-alt', route: '/material-management/system-requirement/inventory-setup/location' },
+          { title: 'Define Unit', icon: 'fas fa-balance-scale', route: '/material-management/system-requirement/inventory-setup/unit' },
+          { title: 'Define Report Group', icon: 'fas fa-file-alt', route: '/material-management/system-requirement/inventory-setup/report-group' },
+          { title: 'Define GL Distribution', icon: 'fas fa-sitemap', route: '/material-management/system-requirement/inventory-setup/gl-distribution' },
+          { title: 'Define SKU', icon: 'fas fa-box-open', route: '/material-management/system-requirement/inventory-setup/sku' },
+          { title: 'Define SKU Price', icon: 'fas fa-dollar-sign', route: '/material-management/system-requirement/inventory-setup/sku-price' },
+          // View & Print
           { title: 'View & Print Category', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/category/view-print' },
           { title: 'View & Print Location', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/location/view-print' },
-          { title: 'View & Print MM GL Distribution', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/gl-distribution/view-print' },
           { title: 'View & Print Report Group', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/report-group/view-print' },
           { title: 'View & Print Unit', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/unit/view-print' },
           { title: 'View & Print SKU', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/sku/view-print' }
         ]
-      },
-      { 
-        title: 'Purchase Order Setup', 
-        icon: 'fas fa-shopping-cart', 
-        children: [
-          { title: 'Define Purchaser', icon: 'fas fa-user-tie', route: '/material-management/purchase-order-setup/purchaser' },
-          { title: 'Define Approver', icon: 'fas fa-user-check', route: '/material-management/purchase-order-setup/approver' },
-          { title: 'Define Purchase Sub-Control', icon: 'fas fa-sliders-h', route: '/material-management/purchase-order-setup/sub-control' },
-          { title: 'Define SKU Item Note Analysis Group', icon: 'fas fa-layer-group', route: '/material-management/purchase-order-setup/sku-note-group' },
-          { title: 'Define SKU Item Note Analysis Code', icon: 'fas fa-tags', route: '/material-management/purchase-order-setup/sku-note-code' },
-          { title: 'View & Print Purchaser', icon: 'fas fa-print', route: '/material-management/purchase-order-setup/purchaser/view-print' },
-          { title: 'View & Print Approver', icon: 'fas fa-print', route: '/material-management/purchase-order-setup/approver/view-print' },
-          { title: 'View & Print Purchase Sub-Control', icon: 'fas fa-print', route: '/material-management/purchase-order-setup/sub-control/view-print' },
-          { title: 'View & Print SKU Item Note Analysis Group', icon: 'fas fa-print', route: '/material-management/purchase-order-setup/sku-note-group/view-print' },
-          { title: 'View & Print SKU Item Note Analysis Code', icon: 'fas fa-print', route: '/material-management/purchase-order-setup/sku-note-code/view-print' }
-        ]
       }
     ]
   },
-  { 
-    title: 'Purchase Order', 
+  {
+    title: 'Purchase Order',
     icon: 'fas fa-shopping-cart',
     children: [
-      { 
-        title: 'PR/PO', 
-        icon: 'fas fa-file-invoice', 
+      {
+        title: 'PR/PO',
+        icon: 'fas fa-file-invoice',
         children: [
           { title: 'Purchase Requisition Entry', icon: 'fas fa-file-alt', route: '/material-management/pr-po/purchase-requisition' },
           { title: 'Purchase Order Entry', icon: 'fas fa-file-signature', route: '/material-management/pr-po/purchase-order' },
@@ -482,9 +468,9 @@ const materialManagementItems = [
           { title: 'Close PR/PO', icon: 'fas fa-window-close', route: '/material-management/pr-po/close' }
         ]
       },
-      { 
-        title: 'PR/PO Reports', 
-        icon: 'fas fa-chart-bar', 
+      {
+        title: 'PR/PO Reports',
+        icon: 'fas fa-chart-bar',
         children: [
           { title: 'Print PR/PO', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-pr-po' },
           { title: 'Print PR/PO Cancel Report', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-cancel-report' },
@@ -496,7 +482,7 @@ const materialManagementItems = [
       },
       {
         title: 'PR/PO Period End Closing',
-        icon: 'fas fa-calendar-check', 
+        icon: 'fas fa-calendar-check',
         children: [
           { title: 'Purge Closed PR/PO', icon: 'fas fa-trash-alt', route: '/material-management/pr-po-period-end/purge-closed' },
           { title: 'Purge Cancelled PR/PO', icon: 'fas fa-trash-alt', route: '/material-management/pr-po-period-end/purge-cancelled' }
@@ -504,12 +490,12 @@ const materialManagementItems = [
       }
     ]
   },
-  { 
-    title: 'Inventory Control', 
+  {
+    title: 'Inventory Control',
     icon: 'fas fa-boxes',
     children: [
-      { 
-        title: 'RC/RT', 
+      {
+        title: 'RC/RT',
         icon: 'fas fa-exchange-alt',
         children: [
           { title: 'Receive Note Entry', icon: 'fas fa-file-import', route: '/material-management/inventory-control/rc-rt/receive-note' },
@@ -537,8 +523,8 @@ const materialManagementItems = [
           { title: 'Cancel DR/CN', icon: 'fas fa-times', route: '/material-management/inventory-control/dr-cn/cancel' }
         ]
       },
-      { 
-        title: 'Inventory Reports', 
+      {
+        title: 'Inventory Reports',
         icon: 'fas fa-chart-pie',
         children: [
           { title: 'Print RC/RT', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-rc-rt' },
@@ -572,11 +558,11 @@ const materialManagementItems = [
       }
     ]
   },
-  { 
-    title: 'Account', 
+  {
+    title: 'Account',
     icon: 'fas fa-book',
     children: [
-      { 
+      {
         title: 'Setup Account',
         icon: 'fas fa-user-cog',
         children: [
@@ -590,8 +576,8 @@ const materialManagementItems = [
           { title: 'View & Print Department', icon: 'fas fa-print', route: '/material-management/account/setup/department/view-print' }
         ]
       },
-      { 
-        title: 'Posting to Accounts', 
+      {
+        title: 'Posting to Accounts',
         icon: 'fas fa-file-import',
         children: [
           { title: 'Post RC', icon: 'fas fa-share-square', route: '/material-management/account/posting/post-rc' },

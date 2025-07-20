@@ -2,14 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MmSku extends Model
 {
-    use HasFactory;
-
-    protected $table = 'mm_skus';
     protected $primaryKey = 'sku';
     public $incrementing = false;
     protected $keyType = 'string';
@@ -24,6 +20,7 @@ class MmSku extends Model
         'boh',
         'fpo',
         'rol',
+        'price',
         'total_part',
         'min_qty',
         'max_qty',
@@ -38,6 +35,7 @@ class MmSku extends Model
         'boh' => 'decimal:3',
         'fpo' => 'decimal:3',
         'rol' => 'decimal:3',
+        'price' => 'decimal:2',
         'min_qty' => 'decimal:2',
         'max_qty' => 'decimal:2',
         'is_active' => 'boolean',
