@@ -13,6 +13,9 @@ return new class extends Migration
             $table->string('gl_dist_code', 10)->unique();
             $table->string('gl_dist_name', 100);
             $table->string('gl_account', 20);
+            $table->string('gl_account_segment1', 20)->nullable();
+            $table->string('gl_account_segment2', 20)->nullable();
+            $table->string('gl_account_segment3', 20)->nullable();
             $table->string('gl_account_name', 100)->nullable();
             $table->boolean('is_linked')->default(false);
             $table->boolean('is_active')->default(true);
