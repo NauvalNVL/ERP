@@ -440,7 +440,7 @@ const materialManagementItems = [
           { title: 'Define Location', icon: 'fas fa-map-marked-alt', route: '/material-management/system-requirement/inventory-setup/location' },
           { title: 'Define Unit', icon: 'fas fa-balance-scale', route: '/material-management/system-requirement/inventory-setup/unit' },
           { title: 'Define Report Group', icon: 'fas fa-file-alt', route: '/material-management/system-requirement/inventory-setup/report-group' },
-          { title: 'Define GL Distribution', icon: 'fas fa-sitemap', route: '/material-management/system-requirement/inventory-setup/gl-distribution' },
+          { title: 'Define MM GL Distribution', icon: 'fas fa-sitemap', route: '/material-management/system-requirement/inventory-setup/gl-distribution' },
           { title: 'Define SKU', icon: 'fas fa-box-open', route: '/material-management/system-requirement/inventory-setup/sku' },
           { title: 'Define SKU Price', icon: 'fas fa-dollar-sign', route: '/material-management/system-requirement/inventory-setup/sku-price' },
           { title: 'Amend SKU Type', icon: 'fas fa-edit', route: '/material-management/system-requirement/inventory-setup/amend-sku-type' },
