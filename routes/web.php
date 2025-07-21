@@ -1029,5 +1029,13 @@ Route::get('/api/sku-price/search', [
     \App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'search'
 ])->name('sku-price.search');
 
+Route::get('/material-management/system-requirement/inventory-setup/sku-price/view-print', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintSkuPrice');
+})->name('material-management.system-requirement.inventory-setup.sku-price.view-print');
+
+Route::get('/material-management/system-requirement/inventory-setup/amend-sku', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/AmendSku');
+})->name('material-management.system-requirement.inventory-setup.amend-sku');
+
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');

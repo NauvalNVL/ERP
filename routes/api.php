@@ -359,6 +359,7 @@ Route::prefix('material-management')->group(function () {
     Route::get('/skus/{sku}', [MmSkuController::class, 'show']);
     Route::put('/skus/{sku}', [MmSkuController::class, 'update']);
     Route::delete('/skus/{sku}', [MmSkuController::class, 'destroy']);
+    Route::post('/skus/{sku}/change-code', [MmSkuController::class, 'changeSkuCode']);
     Route::get('/skus/categories', [MmSkuController::class, 'getCategories']);
     Route::get('/skus/units', [MmSkuController::class, 'getUnits']);
     Route::get('/skus/types', [MmSkuController::class, 'getTypes']);
