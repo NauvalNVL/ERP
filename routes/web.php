@@ -1009,6 +1009,10 @@ Route::get('/material-management/system-requirement/inventory-setup/sku/view-pri
     return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintSku');
 })->name('material-management.system-requirement.inventory-setup.sku.view-print');
 
+Route::get('/material-management/system-requirement/inventory-setup/amend-sku-type', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/AmendSkuType');
+})->name('material-management.system-requirement.inventory-setup.amend-sku-type');
+
 Route::get('/material-management/system-requirement/inventory-setup/sku-price', [
     \App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'index'
 ])->name('sku-price.index');

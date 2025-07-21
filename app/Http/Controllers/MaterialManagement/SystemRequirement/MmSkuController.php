@@ -77,6 +77,12 @@ class MmSkuController extends Controller
         return response()->json(['message' => 'SKU deleted successfully']);
     }
 
+    public function show($sku)
+    {
+        $skuModel = MmSku::with('category')->findOrFail($sku);
+        return response()->json($skuModel);
+    }
+
     public function getCategories()
     {
         $categories = MmCategory::all();
