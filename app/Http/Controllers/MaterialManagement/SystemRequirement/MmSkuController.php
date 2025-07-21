@@ -214,9 +214,27 @@ class MmSkuController extends Controller
                 'message' => $message,
                 'sku' => $newSkuModel
             ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            
+            // Check for foreign key constraint violations
+            if ($e->getCode() == 23000) {
+                return response()->json([
+                    'message' => 'Cannot change SKU code because it is referenced by other records in the system. Please remove all references first.',
+                    'error' => $e->getMessage()
+                ], 422);
+            }
+            
+            return response()->json([
+                'message' => 'Database error while changing SKU code: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Failed to change SKU code: ' . $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Failed to change SKU code: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
     
