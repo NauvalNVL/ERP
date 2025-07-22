@@ -598,49 +598,35 @@ const materialManagementItems = [
 // Production Management Items
 const productionManagementItems = [
   {
-    title: 'System Requirement',
+    title: 'Production Configuration',
     icon: 'fas fa-cogs',
     children: [
-      { title: 'Define Corrugator Machine', icon: 'fas fa-server', route: null },
-      { title: 'Define Converting Machine', icon: 'fas fa-sync-alt', route: null },
-      { title: 'Define Process', icon: 'fas fa-project-diagram', route: null },
-      { title: 'Define Machine Process', icon: 'fas fa-cogs', route: null },
-      { title: 'Define Unplanned Activities', icon: 'fas fa-tasks', route: null },
-      { title: 'Define Corrugator Downtime', icon: 'fas fa-clock', route: null },
-      { title: 'Define Converting Downtime', icon: 'fas fa-clock', route: null }
+      { title: 'System Configuration', icon: 'fas fa-cog', route: null },
+      { title: 'Standard Specifications', icon: 'fas fa-list-alt', route: null },
+      { title: 'Machine Specifications', icon: 'fas fa-cogs', route: null },
+      { title: 'Customer Specifications', icon: 'fas fa-users', route: null },
+      { title: 'Plant Specifications', icon: 'fas fa-industry', route: null },
+      { title: 'Analysis Specifications', icon: 'fas fa-chart-bar', route: null }
     ]
   },
   {
-    title: 'Production Planning',
-    icon: 'fas fa-calendar-alt',
+    title: 'Production Work Order',
+    icon: 'fas fa-clipboard-list',
     children: [
-      { title: 'Rough Cut Capacity Planning', icon: 'fas fa-chart-pie', route: null },
-      { title: 'Production Scheduling', icon: 'fas fa-calendar-check', route: null }
+      { title: 'Work Order', icon: 'fas fa-file-alt', route: null },
     ]
   },
   {
-    title: 'Production Monitoring Board',
+    title: 'Production Floor Tracking',
     icon: 'fas fa-desktop',
-    route: '/production-monitoring-board',
-  },
-  {
-    title: 'Production Data Entry',
-    icon: 'fas fa-keyboard',
     children: [
-      { title: 'Corrugator Production Entry', icon: 'fas fa-file-alt', route: null },
-      { title: 'Converting Production Entry', icon: 'fas fa-file-alt', route: null }
+      { title: 'Setup Maintenance', icon: 'fas fa-tools', route: null },
+      { title: 'Job Tracking', icon: 'fas fa-tasks', route: null },
+      { title: 'Timesheet Tracking', icon: 'fas fa-clock', route: null },
+      { title: 'Corrugator Wet-End Tracking', icon: 'fas fa-tint', route: null },
+      { title: 'WIP Stock-Take', icon: 'fas fa-boxes', route: null },
     ]
   },
-  {
-    title: 'Production Reports',
-    icon: 'fas fa-chart-bar',
-    children: [
-      { title: 'Print Rough Cut Report', icon: 'fas fa-print', route: null },
-      { title: 'Print Production Schedule', icon: 'fas fa-print', route: null },
-      { title: 'Print Corrugator Production Report', icon: 'fas fa-print', route: null },
-      { title: 'Print Converting Production Report', icon: 'fas fa-print', route: null }
-    ]
-  }
 ];
 
 // Warehouse Management Items

@@ -52,22 +52,24 @@ class UpdateMcController extends Controller
     {
         // Dummy data, replace with actual database query
         $masterCards = [
-            ['seq' => '1609138', 'model' => 'BOX BASO 4.5 KG', 'part' => 'BOX', 'comp' => 'Main', 'p_design' => 'B1', 'ext_dim' => '396x243x297', 'int_dim' => '393x240x292', 'status' => 'Active'],
-            ['seq' => '1609144', 'model' => 'BOX IKAN HARIMAU 4.5 KG', 'part' => 'BOX', 'comp' => 'Main', 'p_design' => 'B1', 'ext_dim' => '396x243x297', 'int_dim' => '393x240x292', 'status' => 'Active'],
-            ['seq' => '1609145', 'model' => 'BOX SRIKAYA 4.5 KG', 'part' => 'BOX', 'comp' => 'Main', 'p_design' => 'B1', 'ext_dim' => '396x243x297', 'int_dim' => '393x240x292', 'status' => 'Active'],
-            ['seq' => '1609162', 'model' => 'BIHUN FANIA 5 KG', 'part' => 'BOX', 'comp' => 'Main', 'p_design' => 'B1', 'ext_dim' => '421x243x307', 'int_dim' => '418x240x302', 'status' => 'Active'],
-            ['seq' => '1609163', 'model' => 'BIHUN IKAN TUNA 4.5 KG BARU', 'part' => 'BOX', 'comp' => 'Main', 'p_design' => 'B1', 'ext_dim' => '396x243x297', 'int_dim' => '393x240x292', 'status' => 'Active'],
-            ['seq' => '1609166', 'model' => 'BIHUN PIRING MAS 5 KG', 'part' => 'BOX', 'comp' => 'Main', 'p_design' => 'B1', 'ext_dim' => '421x243x307', 'int_dim' => '418x240x302', 'status' => 'Active'],
-            ['seq' => '1609173', 'model' => 'BOX JAGUNG SRIKAYA 5 KG', 'part' => 'BOX', 'comp' => 'Main', 'p_design' => 'B1', 'ext_dim' => '421x243x307', 'int_dim' => '418x240x302', 'status' => 'Active'],
-            ['seq' => '1609181', 'model' => 'BIHUN POHON KOPI 5 KG', 'part' => 'BOX', 'comp' => 'Main', 'p_design' => 'B1', 'ext_dim' => '421x243x307', 'int_dim' => '418x240x302', 'status' => 'Active'],
-            ['seq' => '1609185', 'model' => 'POLOS UK 506 X 356 X 407', 'part' => 'BOX', 'comp' => 'Main', 'p_design' => 'B1', 'ext_dim' => '510x360x414', 'int_dim' => '506x356x407', 'status' => 'Active'],
-            ['seq' => '1609186', 'model' => 'POLOS 480 X 410 X 401', 'part' => 'BOX', 'comp' => 'Main', 'p_design' => 'B1', 'ext_dim' => '483x413x406', 'int_dim' => '480x410x401', 'status' => 'Active'],
+            ['seq' => '1609182', 'model' => 'BIHUN DELLIS 5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
+            ['seq' => '1609162', 'model' => 'BIHUN FANIA 5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
+            ['seq' => '1609163', 'model' => 'BIHUN IKAN TUNA 4.5 KG BARU', 'part' => '', 'comp' => '', 'status' => 'Act'],
+            ['seq' => '1609164', 'model' => 'BIHUN IKAN TUNA 5 KG BARU', 'part' => '', 'comp' => '', 'status' => 'Act'],
+            ['seq' => '1609166', 'model' => 'BIHUN PIRING MAS 5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
+            ['seq' => '1609181', 'model' => 'BIHUN POHON KOPI 5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
+            ['seq' => '1609138', 'model' => 'BOX BASO 4.5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
+            ['seq' => '1609144', 'model' => 'BOX IKAN HARIMAU 4.5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
+            ['seq' => '1609173', 'model' => 'BOX JAGUNG SRIKAYA 5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
+            ['seq' => '1609145', 'model' => 'BOX SRIKAYA 4.5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
+            ['seq' => '1609186', 'model' => 'POLOS 480 X 410 X 401', 'part' => '', 'comp' => '', 'status' => 'Act'],
+            ['seq' => '1609185', 'model' => 'POLOS UK 506 X 356 X 407', 'part' => '', 'comp' => '', 'status' => 'Act'],
         ];
 
         $query = $request->input('query');
         $sortBy = $request->input('sortBy', 'seq');
         $sortOrder = $request->input('sortOrder', 'asc');
-        $status = $request->input('status', ['Active']);
+        $status = $request->input('status', ['Act']);
 
         $filteredMasterCards = collect($masterCards)->filter(function ($mc) use ($query, $status) {
             $matchesQuery = true;
@@ -75,9 +77,7 @@ class UpdateMcController extends Controller
                 $queryLower = strtolower($query);
                 $matchesQuery = str_contains(strtolower($mc['seq']), $queryLower) ||
                                 str_contains(strtolower($mc['model']), $queryLower) ||
-                                str_contains(strtolower($mc['part']), $queryLower) ||
-                                str_contains(strtolower($mc['ext_dim']), $queryLower) ||
-                                str_contains(strtolower($mc['int_dim']), $queryLower);
+                                str_contains(strtolower($mc['part']), $queryLower);
             }
             $matchesStatus = in_array($mc['status'], $status);
             return $matchesQuery && $matchesStatus;
