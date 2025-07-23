@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DeliveryOrderFormat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class DeliveryOrderFormatController extends Controller
@@ -86,8 +87,15 @@ class DeliveryOrderFormatController extends Controller
         if ($request->has('sort_by')) {
             $sortBy = $request->input('sort_by');
             $query->orderBy($sortBy);
+        } else {
+            $query->orderBy('code'); // Default sort by code
         }
 
-        return response()->json($query->orderBy('code')->get());
+        $formats = $query->get();
+        
+        // Log the number of formats being returned for debugging
+        Log::info('Returning ' . $formats->count() . ' delivery order formats');
+        
+        return response()->json($formats);
     }
 } 

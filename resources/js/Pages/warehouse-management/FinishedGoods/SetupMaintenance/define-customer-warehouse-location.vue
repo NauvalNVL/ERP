@@ -194,8 +194,9 @@
         <!-- Customer Account Modal -->
         <CustomerAccountModal 
             :show="showCustomerAccountModal" 
+            :customer-accounts="customerAccounts"
             @close="closeCustomerAccountModal" 
-            @customer-selected="handleCustomerSelected" 
+            @select="handleCustomerSelected" 
             @sort-by-code="fetchCustomers(true)"
             @sort-by-name="fetchCustomers(false)"
         />
@@ -220,13 +221,29 @@ const form = reactive({
 const isEditMode = ref(false);
 const customerCodeExists = ref(false);
 const showCustomerAccountModal = ref(false);
+const customerAccounts = ref([]);
 const customerAccountSortBy = ref('code'); // Default sort by code
 const customerAccountRecordStatus = reactive({
     active: true,
     obsolete: false
 });
 
-const openCustomerAccountModal = () => {
+const fetchCustomers = async (sortByCode = true) => {
+    try {
+        const response = await axios.get('/api/customers-with-status');
+        if (response.data && Array.isArray(response.data)) {
+            customerAccounts.value = response.data;
+        } else if (response.data && Array.isArray(response.data.data)) {
+            customerAccounts.value = response.data.data;
+        }
+        console.log(`Loaded ${customerAccounts.value.length} customers`);
+    } catch (error) {
+        console.error('Error fetching customers:', error);
+    }
+};
+
+const openCustomerAccountModal = async () => {
+    await fetchCustomers();
     showCustomerAccountModal.value = true;
 };
 
@@ -235,10 +252,15 @@ const closeCustomerAccountModal = () => {
 };
 
 const handleCustomerSelected = (customer) => {
-    form.customer_code = customer.customer_code;
-    form.customer_name = customer.customer_name;
-    closeCustomerAccountModal();
-    checkCustomerCodeExists(); // Re-check after selection to update form state
+    console.log('Selected customer in parent component:', customer);
+    if (customer && customer.customer_code) {
+        form.customer_code = customer.customer_code;
+        form.customer_name = customer.customer_name;
+        closeCustomerAccountModal();
+        checkCustomerCodeExists(); // Re-check after selection to update form state
+    } else {
+        console.error('Invalid customer data received:', customer);
+    }
 };
 
 const fetchCustomerWarehouseLocation = async () => {

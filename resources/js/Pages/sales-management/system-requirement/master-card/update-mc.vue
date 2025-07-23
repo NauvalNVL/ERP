@@ -402,7 +402,7 @@
                                 <option value="ed">MC PD ED</option>
                                 <option value="id">MC PD ID</option>
                             </select>
-                        </div>
+                </div>
                         <div class="text-white text-sm">
                             <span class="mr-2">Order:</span>
                             <select v-model="mcsSortOrder" @change="fetchMcsData()" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
@@ -417,13 +417,13 @@
                                 <option value="obsolete">Obsolete</option>
                                 <option value="all">All</option>
                             </select>
-                        </div>
+                    </div>
                         <button type="button" @click="showMcsTableModal = false" class="text-white hover:text-gray-200 focus:outline-none">
                             <i class="fas fa-times text-xl"></i>
-                        </button>
-                    </div>
-                </div>
-                
+                    </button>
+            </div>
+        </div>
+
                 <!-- Modal Body -->
                 <div class="p-2 overflow-y-auto flex-grow" style="max-height: 60vh;">
                     <div class="mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -442,20 +442,20 @@
                     <div v-if="mcsLoading" class="flex justify-center items-center p-4">
                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                         <span class="ml-2 text-gray-600">Loading data...</span>
-                    </div>
-                    
+                </div>
+                
                     <div v-else-if="mcsError" class="p-4 text-red-500 bg-red-50 rounded border border-red-200">
                         <div class="font-bold mb-1">Error:</div>
                         <div>{{ mcsError }}</div>
                         <button @click="fetchMcsData()" class="mt-2 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">
                             Try Again
-                        </button>
-                    </div>
+                    </button>
+        </div>
 
                     <div v-else-if="mcsMasterCards.length === 0" class="p-4 text-amber-700 bg-amber-50 rounded border border-amber-200">
                         No master card records found. Please adjust your filter criteria.
-                    </div>
-
+                </div>
+                
                     <table v-else class="min-w-full text-xs border border-gray-300">
                         <thead class="bg-gray-200 sticky top-0">
                             <tr>
@@ -463,9 +463,6 @@
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comp#</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ext. Dim</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Int. Dim</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
@@ -479,9 +476,6 @@
                                 <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
                                 <td class="px-2 py-1 border border-gray-300">{{ mcs.part }}</td>
                                 <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.p_design }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.ext_dim }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.int_dim }}</td>
                                 <td class="px-2 py-1 border border-gray-300">
                                     <span 
                                         :class="(mcs.status === 'Active' || !mcs.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
@@ -498,7 +492,7 @@
                 <div class="flex items-center justify-end gap-2 p-2 border-t border-gray-200 bg-gray-100 rounded-b-lg flex-shrink-0">
                     <div class="text-xs text-gray-500 mr-auto" v-if="mcsMasterCards.length > 0">
                         {{ mcsMasterCards.length }} accounts found
-                    </div>
+                                </div>
                     <!-- Pagination -->
                     <button @click="goToMcsPage(mcsCurrentPage - 1)" :disabled="mcsCurrentPage === 1" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed"><i class="fas fa-chevron-left"></i> Previous</button>
                     <span class="text-gray-600 text-xs">Page {{ mcsCurrentPage }} of {{ mcsLastPage }}</span>

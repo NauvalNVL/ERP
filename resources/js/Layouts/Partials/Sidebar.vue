@@ -599,49 +599,205 @@ const materialManagementItems = [
 // Production Management Items
 const productionManagementItems = [
   {
-    title: 'System Requirement',
+    title: 'Production Configuration',
     icon: 'fas fa-cogs',
     children: [
-      { title: 'Define Corrugator Machine', icon: 'fas fa-server', route: null },
-      { title: 'Define Converting Machine', icon: 'fas fa-sync-alt', route: null },
+      {
+        title: 'System Configuration',
+        icon: 'fas fa-cog',
+        children: [
+          { title: 'Define Production Configuration', icon: 'fas fa-cogs', route: null },
+        ]
+      },
+      {
+        title: 'Standard Specifications',
+        icon: 'fas fa-list-alt',
+        children: [
+          { title: 'Define W/Order & Schedule Control Period', icon: 'fas fa-calendar-alt', route: null },
       { title: 'Define Process', icon: 'fas fa-project-diagram', route: null },
-      { title: 'Define Machine Process', icon: 'fas fa-cogs', route: null },
-      { title: 'Define Unplanned Activities', icon: 'fas fa-tasks', route: null },
-      { title: 'Define Corrugator Downtime', icon: 'fas fa-clock', route: null },
-      { title: 'Define Converting Downtime', icon: 'fas fa-clock', route: null }
-    ]
-  },
-  {
-    title: 'Production Planning',
-    icon: 'fas fa-calendar-alt',
+          { title: 'Define Sub-Process', icon: 'fas fa-sitemap', route: null },
+          { title: 'Define Lead Time', icon: 'fas fa-hourglass-half', route: null },
+          { title: 'Define Machine', icon: 'fas fa-cogs', route: null },
+          { title: 'Define Production Allowance by Product', icon: 'fas fa-percent', route: null },
+          { title: 'Define Production Allowance by Flute', icon: 'fas fa-layer-group', route: null },
+          { title: 'Define Production Allowance by MSP', icon: 'fas fa-cube', route: null },
+          { title: 'Define Production Allowance by Customer', icon: 'fas fa-user-friends', route: null },
+          { title: 'Define Production Allowance by M/Card', icon: 'fas fa-id-card', route: null },
+          { title: 'Define Color Priority', icon: 'fas fa-palette', route: null },
+          { title: 'Define Order Priority', icon: 'fas fa-sort-numeric-up', route: null },
+          { title: 'Define Analysis Code', icon: 'fas fa-barcode', route: null },
+          { title: 'Setup Sales and Roll Link-Up', icon: 'fas fa-link', route: null },
+          { title: 'View & Print W/Order & Schedule Control Period', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Process', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Sub-Process', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Machine', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Production Allowance by Product', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Production Allowance by Flute', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Production Allowance by MSP', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Production Allowance by Customer', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Production Allowance by M/Card', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Color Priority', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Order Priority', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Sales and Roll Link-Up', icon: 'fas fa-print', route: null }
+        ]
+      },
+      {
+        title: 'Machine Specifications',
+        icon: 'fas fa-cogs',
     children: [
-      { title: 'Rough Cut Capacity Planning', icon: 'fas fa-chart-pie', route: null },
-      { title: 'Production Scheduling', icon: 'fas fa-calendar-check', route: null }
+          { title: 'Define Corrugator Specifications', icon: 'fas fa-cogs', route: null },
+          { title: 'Define Printer Specifications', icon: 'fas fa-print', route: null },
+          { title: 'Define Diecutter Specifications', icon: 'fas fa-cut', route: null },
+          { title: 'Define Finisher Specifications', icon: 'fas fa-paint-roller', route: null },
+          { title: 'Define Flute Layer Position', icon: 'fas fa-layer-group', route: null },
+          { title: 'View & Print Corrugator Specifications', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Printer Specifications', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Diecutter Specifications', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Finisher Specifications', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Flute Layer Position', icon: 'fas fa-print', route: null }
     ]
   },
   {
-    title: 'Production Monitoring Board',
-    icon: 'fas fa-desktop',
-    route: '/production-monitoring-board',
-  },
-  {
-    title: 'Production Data Entry',
-    icon: 'fas fa-keyboard',
+        title: 'Customer Specifications',
+        icon: 'fas fa-users',
+        children: [
+          { title: 'Define MSP Choice', icon: 'fas fa-check-square', route: null },
+          { title: 'Define Customer Requirement', icon: 'fas fa-clipboard-check', route: null },
+          { title: 'Define M/Card MSP', icon: 'fas fa-credit-card', route: null },
+          { title: 'Define M/Card W/Order B/Quality', icon: 'fas fa-industry', route: null },
+          { title: 'Customize M/Card IDC Drawing', icon: 'fas fa-pencil-ruler', route: null },
+          { title: 'View & Print MSP Choice', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Customer Requirement', icon: 'fas fa-print', route: null },
+          { title: 'View & Print M/Card MSP', icon: 'fas fa-print', route: null },
+        ]
+      },
+      {
+        title: 'Plant Specifications',
+        icon: 'fas fa-industry',
     children: [
-      { title: 'Corrugator Production Entry', icon: 'fas fa-file-alt', route: null },
-      { title: 'Converting Production Entry', icon: 'fas fa-file-alt', route: null }
+          { title: 'Define Run Unit', icon: 'fas fa-running', route: null },
+          { title: 'Define Run Calendar', icon: 'fas fa-calendar-alt', route: null },
+          { title: 'Define Shift', icon: 'fas fa-users', route: null },
+          { title: 'View & Print Run Unit', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Run Calendar', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Shift', icon: 'fas fa-print', route: null },
     ]
   },
   {
-    title: 'Production Reports',
+        title: 'Analysis Specifications',
     icon: 'fas fa-chart-bar',
     children: [
-      { title: 'Print Rough Cut Report', icon: 'fas fa-print', route: null },
-      { title: 'Print Production Schedule', icon: 'fas fa-print', route: null },
-      { title: 'Print Corrugator Production Report', icon: 'fas fa-print', route: null },
-      { title: 'Print Converting Production Report', icon: 'fas fa-print', route: null }
+          { title: 'Define Wastage', icon: 'fas fa-trash-alt', route: null },
+          { title: 'Define Production Time', icon: 'fas fa-hourglass', route: null },
+          { title: 'Define PMB Machine', icon: 'fas fa-cogs', route: null },
+          { title: 'Define PMB Delay Column', icon: 'fas fa-clock', route: null },
+          { title: 'View & Print Wastage', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Production Time', icon: 'fas fa-print', route: null },
+          { title: 'View & Print OMB Machine', icon: 'fas fa-print', route: null },
+          { title: 'View & Print PMB Delay Column', icon: 'fas fa-print', route: null },
+        ]
+      }
     ]
-  }
+  },
+  {
+    title: 'Production Work Order',
+    icon: 'fas fa-clipboard-list',
+    children: [
+      {
+        title: 'Work Order',
+        icon: 'fas fa-file-alt',
+        children: [
+          { title: 'Release Work Order by Sales Order', icon: 'fas fa-file-invoice', route: null },
+          { title: 'Release Work Order by Product Design', icon: 'fas fa-file-invoice-dollar', route: null },
+          { title: 'Issue Combined COCR Run Work Order', icon: 'fas fa-file-signature', route: null },
+          { title: 'Print Work Order', icon: 'fas fa-print', route: null },
+          { title: 'Print WO FG Book Excess Memo', icon: 'fas fa-print', route: null },
+          { title: 'Amend Work Order', icon: 'fas fa-edit', route: null },
+          { title: 'Cancel Work Order', icon: 'fas fa-times-circle', route: null },
+          { title: 'Close Work Order', icon: 'fas fa-check-circle', route: null },
+          { title: 'Close Work Order by Period', icon: 'fas fa-calendar-times', route: null },
+          { title: 'Unlock W/Order & Schedule - Utility', icon: 'fas fa-unlock', route: null },
+          { title: 'View & Print Late Work Order', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Work Order Log', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Unreleased Sales Order', icon: 'fas fa-print', route: null },
+          { title: 'Print Rerun Work Order Analysis', icon: 'fas fa-print', route: null },
+        ]
+      },
+    ]
+  },
+  {
+    title: 'Production Floor Tracking',
+    icon: 'fas fa-desktop',
+    children: [
+      {
+        title: 'Setup Maintenance',
+        icon: 'fas fa-tools',
+        children: [
+          { title: 'Setup Floor Tracking Configuration', icon: 'fas fa-cogs', route: null },
+          { title: 'Define Floor Track Control Period', icon: 'fas fa-calendar-alt', route: null },
+          { title: 'Define Pallet Type', icon: 'fas fa-pallet', route: null },
+          { title: 'View & Print Floor Track Control Period', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Pallet Type', icon: 'fas fa-print', route: null },
+        ]
+      },
+      {
+        title: 'Job Tracking',
+        icon: 'fas fa-tasks',
+        children: [
+          { title: 'Amend Convertor Machine Before Floor Track', icon: 'fas fa-edit', route: null },
+          { title: 'Insert Active Job to Converting Schedule', icon: 'fas fa-plus-square', route: null },
+          { title: 'Enter & Update CORR FT by Cut', icon: 'fas fa-cut', route: null },
+          { title: 'Enter & Update CORR FT by Sheet', icon: 'fas fa-file', route: null },
+          { title: 'Enter & Update CORR FT by In & Out', icon: 'fas fa-exchange-alt', route: null },
+          { title: 'Enter & Update PRINTER FT by Pressed Qty', icon: 'fas fa-print', route: null },
+          { title: 'Enter & Update DC FT by Pressed Qty', icon: 'fas fa-cogs', route: null },
+          { title: 'Enter & Update DC FT by Produced Qty', icon: 'fas fa-industry', route: null },
+          { title: 'Enter & Update FINISHING FT by Produced Qty', icon: 'fas fa-paint-roller', route: null },
+          { title: 'FT Printer by Press Qty', icon: 'fas fa-print', route: null },
+          { title: 'FT Die Cutter by Press Qty', icon: 'fas fa-cut', route: null },
+          { title: 'FT Die Cutter by Produce Qty', icon: 'fas fa-industry', route: null },
+          { title: 'FT Finisher by Produce Qty', icon: 'fas fa-paint-roller', route: null },
+          { title: 'Amend Floor Track', icon: 'fas fa-edit', route: null },
+          { title: 'Cancel Floor Track', icon: 'fas fa-times-circle', route: null },
+          { title: 'View & Print Floor Track Log', icon: 'fas fa-print', route: null },
+          { title: 'Print Dry-End Pallet Label', icon: 'fas fa-print', route: null },
+          { title: 'Print Dry-End Pallet Label + No Control', icon: 'fas fa-print', route: null },
+          { title: 'Print FG Pallet Label', icon: 'fas fa-print', route: null },
+          { title: 'Print FG Pallet Label + No Control', icon: 'fas fa-print', route: null },
+          { title: 'View & Print Floor Track Status', icon: 'fas fa-print', route: null },
+          { title: 'Floor Track Status with Value', icon: 'fas fa-chart-bar', route: null },
+        ]
+      },
+      {
+        title: 'Timesheet Tracking',
+        icon: 'fas fa-clock',
+        children: [
+          { title: 'Enter & Update Machine Time Sheet', icon: 'fas fa-edit', route: null },
+          { title: 'View & Print Machine Time Sheet', icon: 'fas fa-print', route: null },
+        ]
+      },
+      {
+        title: 'Corrugator Wet-End Tracking',
+        icon: 'fas fa-tint',
+        children: [
+          { title: 'Enter & Update Corrugator Wet-End Waste', icon: 'fas fa-recycle', route: null },
+          { title: 'View & Print Corrugator Wet-End Waste', icon: 'fas fa-print', route: null },
+        ]
+      },
+      {
+        title: 'WIP Stock-Take',
+        icon: 'fas fa-boxes',
+        children: [
+          { title: 'Print Machine Barcode', icon: 'fas fa-barcode', route: null },
+          { title: 'Commence WIP Stock-Take', icon: 'fas fa-play-circle', route: null },
+          { title: 'Input WIP Stock-Take', icon: 'fas fa-keyboard', route: null },
+          { title: 'View & Print WIP Stock-Take', icon: 'fas fa-print', route: null },
+          { title: 'Print WIP Stock-Take Result', icon: 'fas fa-print', route: null },
+        ]
+      },
+    ]
+  },
 ];
 
 // Warehouse Management Items
