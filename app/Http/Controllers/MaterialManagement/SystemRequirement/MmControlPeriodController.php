@@ -65,7 +65,10 @@ class MmControlPeriodController extends Controller
                         'controlDate' => '1',
                         'yAllowAfterPeriod' => true,
                     ]
-                ]);
+                ])
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Methods', 'GET')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization');
             }
             
             // Format the response data
@@ -103,9 +106,15 @@ class MmControlPeriodController extends Controller
                 ]
             ];
             
-            return response()->json($responseData);
+            return response()->json($responseData)
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Methods', 'GET')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization');
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to fetch control period settings: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to fetch control period settings: ' . $e->getMessage()], 500)
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Methods', 'GET')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization');
         }
     }
 
@@ -118,7 +127,62 @@ class MmControlPeriodController extends Controller
     public function updateControlPeriod(Request $request)
     {
         try {
-            // Validate incoming request data
+            // Check if the request has the nested objects
+            $hasNestedObjects = isset($request->prRequisition) && 
+                               isset($request->pOrder) && 
+                               isset($request->inventory) && 
+                               isset($request->costing);
+            
+            // If the nested objects are missing, only validate the top-level fields
+            if (!$hasNestedObjects) {
+                $validator = Validator::make($request->all(), [
+                    'current_period' => 'required|string|regex:/^\\d{2}\\/{1}\\d{4}$/',
+                    'fg_entry_date' => 'required|string',
+                    'do_entry_date' => 'required|string',
+                    'do_rejection_entry_date' => 'required|string',
+                ]);
+                
+                if ($validator->fails()) {
+                    return response()->json(['errors' => $validator->errors()], 422)
+                        ->header('Access-Control-Allow-Origin', '*')
+                        ->header('Access-Control-Allow-Methods', 'POST')
+                        ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization');
+                }
+                
+                // Begin transaction
+                DB::beginTransaction();
+                
+                $controlPeriod = MmControlPeriod::first();
+                
+                if (!$controlPeriod) {
+                    $controlPeriod = new MmControlPeriod();
+                }
+                
+                // Update control period data - only the top-level fields
+                $currentPeriodParts = explode('/', $request->input('current_period'));
+                $controlPeriod->po_current_period_month = (int)$currentPeriodParts[0];
+                $controlPeriod->po_current_period_year = (int)$currentPeriodParts[1];
+                
+                $controlPeriod->fg_entry_date = $request->input('fg_entry_date');
+                $controlPeriod->do_entry_date = $request->input('do_entry_date');
+                $controlPeriod->do_rejection_entry_date = $request->input('do_rejection_entry_date');
+                
+                $controlPeriod->save();
+                
+                // Commit transaction
+                DB::commit();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Control period settings saved successfully',
+                    'data' => $controlPeriod
+                ])
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Methods', 'POST')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization');
+            }
+            
+            // If we have the nested objects, proceed with the full validation
             $validator = Validator::make($request->all(), [
                 'current_period' => 'required|string|regex:/^\\d{2}\\/{1}\\d{4}$/',
                 'fg_entry_date' => 'required|string',
@@ -145,7 +209,10 @@ class MmControlPeriodController extends Controller
             ]);
             
             if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
+                return response()->json(['errors' => $validator->errors()], 422)
+                    ->header('Access-Control-Allow-Origin', '*')
+                    ->header('Access-Control-Allow-Methods', 'POST')
+                    ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization');
             }
             
             // Begin transaction
@@ -197,11 +264,17 @@ class MmControlPeriodController extends Controller
                 'success' => true,
                 'message' => 'Control period settings saved successfully',
                 'data' => $controlPeriod
-            ]);
+            ])
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'POST')
+            ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization');
         } catch (\Exception $e) {
             // Rollback transaction in case of error
             DB::rollBack();
-            return response()->json(['error' => 'Failed to save control period settings: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to save control period settings: ' . $e->getMessage()], 500)
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Methods', 'POST')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization');
         }
     }
 

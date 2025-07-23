@@ -118,7 +118,7 @@ export default {
       default: () => ['Active']
     }
   },
-  emits: ['close', 'select', 'sort'],
+  emits: ['close', 'select', 'sort-by-code', 'sort-by-name'],
   setup(props, { emit }) {
     const allAccounts = ref([])
     const selectedAccount = ref(null)
@@ -140,7 +140,8 @@ export default {
       try {
         console.log('Fetching customer accounts from API...')
         
-        const response = await axios.get('/api/customer-accounts')
+        // Use the correct API endpoint for customer accounts
+        const response = await axios.get('/api/customers-with-status')
         const data = response.data
         
         if (data.error) {
@@ -157,6 +158,8 @@ export default {
           console.error('Unexpected data format:', data)
           throw new Error('Invalid data format returned from server')
         }
+        
+        console.log('Customer accounts loaded:', allAccounts.value)
         
         // If we have accounts but none are selected, select the first one by default
         if (allAccounts.value.length > 0 && !selectedAccount.value) {
@@ -192,6 +195,7 @@ export default {
     })
 
     const selectAccount = (account) => {
+      console.log('Selecting account:', account)
       selectedAccount.value = account
     }
 
@@ -208,10 +212,17 @@ export default {
     
     // Watch for changes in sort options and emit sort event
     watch([sortBy, statusFilter], () => {
-      emit('sort', {
-        sortBy: sortBy.value,
-        status: statusFilter.value
-      })
+      if (sortBy.value === 'customer_code') {
+        emit('sort-by-code', {
+          sortBy: sortBy.value,
+          status: statusFilter.value
+        })
+      } else if (sortBy.value === 'customer_name') {
+        emit('sort-by-name', {
+          sortBy: sortBy.value,
+          status: statusFilter.value
+        })
+      }
     })
     
     // Watch for changes in the show prop to fetch data when modal is shown

@@ -304,6 +304,7 @@
 import { ref, onMounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { useToast } from '@/Composables/useToast';
+import axios from 'axios'; // Added axios import
 
 const toast = useToast();
 const loading = ref(true);
@@ -349,24 +350,20 @@ const fetchSettings = async () => {
   errorMessage.value = '';
   
   try {
-    const response = await fetch('/api/material-management/control-period');
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to fetch control period settings');
-    }
-    
-    const data = await response.json();
+    const response = await axios.get('/api/material-management/control-period');
     
     // Directly update form data with API response
-    formData.value = data;
+    formData.value = {
+      ...formData.value,
+      ...response.data,
+    };
     
     // Update the initialFormData backup after fetching
-    initialFormData.value = JSON.parse(JSON.stringify(data));
+    initialFormData.value = JSON.parse(JSON.stringify(formData.value));
     
   } catch (error) {
     console.error('Error fetching control period settings:', error);
-    errorMessage.value = `Error loading settings: ${error.message}`;
+    errorMessage.value = `Failed to fetch configuration: ${error.response?.data?.error || error.message}`;
     toast.error('Error loading settings. Please try again.');
   } finally {
     loading.value = false;
@@ -380,28 +377,9 @@ const saveSettings = async () => {
   successMessage.value = '';
   
   try {
-    const response = await fetch('/api/material-management/control-period', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify(formData.value)
-    });
+    const response = await axios.post('/api/material-management/control-period', formData.value);
     
-    const data = await response.json();
-
-    if (!response.ok) {
-      if (data.errors) {
-        // Handle validation errors
-        const firstError = Object.values(data.errors)[0][0];
-        throw new Error(firstError);
-      }
-      throw new Error(data.error || 'Failed to save settings');
-    }
-    
-    successMessage.value = data.message || 'Control period settings saved successfully!';
+    successMessage.value = response.data.message || 'Control period settings saved successfully!';
     toast.success(successMessage.value);
     
     // Update the initialFormData backup
@@ -409,7 +387,13 @@ const saveSettings = async () => {
 
   } catch (error) {
     console.error('Error saving control period settings:', error);
-    errorMessage.value = `Error saving settings: ${error.message}`;
+    if (error.response?.data?.errors) {
+      // Handle validation errors
+      const firstError = Object.values(error.response.data.errors)[0][0];
+      errorMessage.value = `Error saving settings: ${firstError}`;
+    } else {
+      errorMessage.value = `Error saving settings: ${error.response?.data?.error || error.message}`;
+    }
     toast.error(errorMessage.value);
   } finally {
     loading.value = false;

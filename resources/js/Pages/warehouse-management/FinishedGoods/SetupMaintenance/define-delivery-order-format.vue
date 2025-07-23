@@ -169,7 +169,7 @@ const checkCodeExistence = async () => {
         return;
     }
     try {
-        const response = await axios.get(route('delivery-order-formats.show', form.code));
+        const response = await axios.get(`/api/delivery-order-formats/${form.code}`);
         codeExists.value = !!response.data; // true if data exists, false otherwise
         if (codeExists.value) {
             isEditMode.value = true; // Automatically go into edit mode if code exists
@@ -199,7 +199,7 @@ const debouncedCheckCode = debounce(checkCodeExistence, 300);
 
 const fetchAllFormats = async () => {
     try {
-        const response = await axios.get(route('delivery-order-formats.index'));
+        const response = await axios.get('/api/delivery-order-formats');
         allFormats.value = response.data;
     } catch (error) {
         console.error('Error fetching all delivery order formats:', error);
@@ -212,7 +212,7 @@ const fetchFormat = async (code) => {
         return;
     }
     try {
-        const response = await axios.get(route('delivery-order-formats.show', code));
+        const response = await axios.get(`/api/delivery-order-formats/${code}`);
         const format = response.data;
         if (format) {
             form.code = format.code;
@@ -235,10 +235,10 @@ const fetchFormat = async (code) => {
 const saveFormat = async () => {
     try {
         if (isEditMode.value) {
-            await axios.put(route('delivery-order-formats.update', form.code), form);
+            await axios.put(`/api/delivery-order-formats/${form.code}`, form);
             alert('Format updated successfully!');
         } else {
-            await axios.post(route('delivery-order-formats.store'), form);
+            await axios.post('/api/delivery-order-formats', form);
             alert('Format saved successfully!');
         }
         newFormat(); // Clear form after save/update
@@ -254,7 +254,7 @@ const deleteFormat = async () => {
         return;
     }
     try {
-        await axios.delete(route('delivery-order-formats.destroy', form.code));
+        await axios.delete(`/api/delivery-order-formats/${form.code}`);
         alert('Format deleted successfully!');
         newFormat(); // Clear form after delete
         fetchAllFormats(); // Refresh list in modal

@@ -200,6 +200,12 @@ Route::get('/area-groups', function() {
 // Add to the end of the file
 Route::get('/material-management/control-period', [MmControlPeriodController::class, 'getControlPeriod'])->name('mm.control-period.get');
 Route::post('/material-management/control-period', [MmControlPeriodController::class, 'updateControlPeriod'])->name('mm.control-period.update');
+Route::options('/material-management/control-period', function () {
+    return response()->json([], 200)
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, X-Auth-Token, Origin, Authorization');
+});
 Route::get('/material-management/transaction-types', [MmTransactionTypeController::class, 'getTransactionTypes']);
 Route::post('/material-management/transaction-types', [MmTransactionTypeController::class, 'store']);
 Route::get('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'show']);
@@ -371,4 +377,14 @@ Route::prefix('material-management')->group(function () {
     Route::put('/gl-distributions/{glDistribution}', [MmGlDistributionController::class, 'update']);
     Route::delete('/gl-distributions/{glDistribution}', [MmGlDistributionController::class, 'destroy']);
     Route::get('/chart-of-accounts', [MmGlDistributionController::class, 'getChartOfAccounts']);
+});
+
+// Customer Warehouse Location API routes
+Route::prefix('customer-warehouse-locations')->group(function () {
+    Route::get('/', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'index'])->name('customer-warehouse-locations.index');
+    Route::post('/', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'store'])->name('customer-warehouse-locations.store');
+    Route::get('/check/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'check'])->name('customer-warehouse-locations.check');
+    Route::get('/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'show'])->name('customer-warehouse-locations.show');
+    Route::put('/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'update'])->name('customer-warehouse-locations.update');
+    Route::delete('/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'destroy'])->name('customer-warehouse-locations.destroy');
 });

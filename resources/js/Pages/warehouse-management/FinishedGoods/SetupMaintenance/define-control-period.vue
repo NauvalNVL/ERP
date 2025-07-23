@@ -37,7 +37,13 @@
 
                         <!-- Form content -->
                         <form @submit.prevent="saveConfig" class="space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Loading indicator -->
+                            <div v-if="loading" class="flex justify-center items-center py-6">
+                                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                                <span class="ml-3 text-gray-600">Loading...</span>
+                            </div>
+
+                            <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label for="current_period" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mr-2 shadow-sm">
@@ -66,7 +72,7 @@
                                 </div>
                             </div>
 
-                            <div class="space-y-4">
+                            <div v-if="!loading" class="space-y-4">
                                 <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
                                     <h4 class="text-sm font-semibold text-blue-800 mb-3">F/Goods Entry Date:</h4>
                                     <div class="flex flex-wrap gap-4">
@@ -135,10 +141,14 @@
                             </div>
                             
                             <div class="flex justify-end mt-6">
-                                <button type="submit" class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-2 rounded-lg shadow-md flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 relative overflow-hidden group">
+                                <button 
+                                    type="submit" 
+                                    class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-2 rounded-lg shadow-md flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 relative overflow-hidden group"
+                                    :disabled="loading"
+                                >
                                     <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
-                                    <i class="fas fa-save relative z-10"></i>
-                                    <span class="relative z-10">Save Configuration</span>
+                                    <i class="fas" :class="loading ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+                                    <span class="relative z-10">{{ loading ? 'Saving...' : 'Save Configuration' }}</span>
                                 </button>
                             </div>
                         </form>
@@ -209,18 +219,48 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, reactive, onMounted } from 'vue';
 import axios from 'axios';
+import { useToast } from '@/Composables/useToast';
 import ControlPeriodModal from '@/Components/ControlPeriodModal.vue'; // Import the new modal component
 
+const toast = useToast();
 const form = reactive({
     current_period: '',
     fg_entry_date: '',
     do_entry_date: '',
     do_rejection_entry_date: '',
+    prRequisition: {
+        currentPeriod: 'Same as P/Order Period',
+        forwardPeriod: '0',
+        controlDate: '1',
+    },
+    pOrder: {
+        currentPeriodMonth: new Date().getMonth() + 1,
+        currentPeriodYear: new Date().getFullYear(),
+        forwardPeriod: '1',
+        controlDate: '1',
+        minAllowPercentage: 0.00,
+        maxAllowPercentage: 0.00,
+        zeroPO: 'N',
+    },
+    inventory: {
+        currentPeriodMonth: new Date().getMonth() + 1,
+        currentPeriodYear: new Date().getFullYear(),
+        backwardPeriod: '0',
+        controlDate: '1',
+        zeroTran: 'Y',
+    },
+    costing: {
+        currentPeriodMonth: new Date().getMonth() + 1,
+        currentPeriodYear: new Date().getFullYear(),
+        controlDate: '1',
+        yAllowAfterPeriod: true,
+    }
 });
 
 const showPeriodModal = ref(false);
 const selectedMonth = ref(null);
 const selectedYear = ref(null);
+const loading = ref(false);
 
 const openPeriodModal = () => {
     showPeriodModal.value = true;
@@ -236,28 +276,54 @@ const handlePeriodSelected = ({ month, year }) => {
 };
 
 const fetchConfig = async () => {
+    loading.value = true;
     try {
-        const response = await axios.get(route('mm.control-period.get'));
+        const response = await axios.get('/api/material-management/control-period');
         const config = response.data;
         if (config) {
             form.current_period = config.current_period || '';
             form.fg_entry_date = config.fg_entry_date || '';
             form.do_entry_date = config.do_entry_date || '';
             form.do_rejection_entry_date = config.do_rejection_entry_date || '';
+            
+            // Update nested objects if they exist in the response
+            if (config.prRequisition) {
+                form.prRequisition = config.prRequisition;
+            }
+            
+            if (config.pOrder) {
+                form.pOrder = config.pOrder;
+            }
+            
+            if (config.inventory) {
+                form.inventory = config.inventory;
+            }
+            
+            if (config.costing) {
+                form.costing = config.costing;
+            }
         }
     } catch (error) {
         console.error('Error fetching control period config:', error);
-        alert('Failed to fetch configuration.');
+        toast.error('Failed to fetch configuration. Please try again later.');
+    } finally {
+        loading.value = false;
     }
 };
 
 const saveConfig = async () => {
+    loading.value = true;
     try {
-        await axios.post(route('mm.control-period.update'), form);
-        alert('Control period configuration saved successfully!');
+        console.log('Sending data:', form);
+        const response = await axios.post('/api/material-management/control-period', form);
+        console.log('Response:', response.data);
+        toast.success('Control period configuration saved successfully!');
     } catch (error) {
         console.error('Error saving control period config:', error);
-        alert('Failed to save configuration.');
+        console.log('Error response:', error.response?.data);
+        toast.error('Failed to save configuration. Please try again later.');
+    } finally {
+        loading.value = false;
     }
 };
 
