@@ -14,9 +14,46 @@ use Illuminate\Validation\Rule;
 
 class MmSkuController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $skus = MmSku::with('category')->get();
+        $query = MmSku::with('category');
+        
+        // Apply filters
+        if ($request->has('sku')) {
+            $query->where('sku', 'like', '%' . $request->sku . '%');
+        }
+        
+        if ($request->has('category_code')) {
+            $query->where('category_code', $request->category_code);
+        }
+        
+        if ($request->has('is_active')) {
+            $query->where('is_active', $request->is_active);
+        }
+        
+        if ($request->has('type')) {
+            $query->where('type', $request->type);
+        }
+        
+        // Apply sorting
+        $sortBy = $request->input('sort_by', 'sku');
+        $sortDir = $request->input('sort_dir', 'asc');
+        
+        // Validate sort field to prevent SQL injection
+        $allowedSortFields = ['sku', 'sku_name', 'category_code', 'type', 'uom', 'boh', 'fpo', 'rol', 'is_active'];
+        if (!in_array($sortBy, $allowedSortFields)) {
+            $sortBy = 'sku'; // Default sort field
+        }
+        
+        // Special case for category + sku sorting (common in desktop app)
+        if ($sortBy === 'cat_sku') {
+            $query->orderBy('category_code', $sortDir)
+                  ->orderBy('sku', $sortDir);
+        } else {
+            $query->orderBy($sortBy, $sortDir);
+        }
+        
+        $skus = $query->get();
         return response()->json($skus);
     }
 
@@ -106,6 +143,18 @@ class MmSkuController extends Controller
     public function print()
     {
         $skus = MmSku::with('category')->get();
+        return view('material-management.system-requirement.inventory-setup.sku.print', compact('skus'));
+    }
+    
+    public function printSelected(Request $request)
+    {
+        $ids = $request->query('ids', '');
+        $skuIds = explode(',', $ids);
+        
+        $skus = MmSku::with('category')
+            ->whereIn('sku', $skuIds)
+            ->get();
+            
         return view('material-management.system-requirement.inventory-setup.sku.print', compact('skus'));
     }
     
@@ -239,6 +288,107 @@ class MmSkuController extends Controller
     }
     
     /**
+     * Toggle SKU active status (Obsolete/Reactivate functionality)
+     */
+    public function toggleActive(Request $request, $sku)
+    {
+        $validated = $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+
+        $skuModel = MmSku::findOrFail($sku);
+        $currentStatus = $skuModel->is_active;
+        $newStatus = !$currentStatus;
+        
+        try {
+            DB::beginTransaction();
+            
+            $skuModel->is_active = $newStatus;
+            // Update status field for display purposes
+            $skuModel->sts = $newStatus ? 'ACT' : 'OBS';
+            $skuModel->save();
+            
+            // Log the status change
+            Log::info('SKU status changed', [
+                'sku' => $sku,
+                'from_status' => $currentStatus ? 'Active' : 'Obsolete',
+                'to_status' => $newStatus ? 'Active' : 'Obsolete',
+                'reason' => $validated['reason'],
+                'user_id' => Auth::id() ?? 'system',
+                'timestamp' => now(),
+            ]);
+            
+            DB::commit();
+            
+            $statusText = $newStatus ? 'reactivated' : 'marked as obsolete';
+            return response()->json([
+                'message' => "SKU $sku has been successfully $statusText",
+                'sku' => $skuModel
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to change SKU status: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Bulk toggle SKU active status (for multiple SKUs at once)
+     */
+    public function bulkToggleActive(Request $request)
+    {
+        $validated = $request->validate([
+            'skus' => 'required|array',
+            'skus.*' => 'required|string|exists:mm_skus,sku',
+            'set_active' => 'required|boolean',
+            'reason' => 'required|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            
+            $status = $validated['set_active'];
+            $statusText = $status ? 'ACT' : 'OBS';
+            $skus = $validated['skus'];
+            
+            // Update all the selected SKUs
+            MmSku::whereIn('sku', $skus)
+                ->update([
+                    'is_active' => $status,
+                    'sts' => $statusText
+                ]);
+                
+            // Log the bulk status change
+            foreach ($skus as $sku) {
+                Log::info('SKU status changed (bulk)', [
+                    'sku' => $sku,
+                    'to_status' => $status ? 'Active' : 'Obsolete',
+                    'reason' => $validated['reason'],
+                    'user_id' => Auth::id() ?? 'system',
+                    'timestamp' => now(),
+                    'bulk_operation' => true
+                ]);
+            }
+            
+            DB::commit();
+            
+            $actionText = $status ? 'reactivated' : 'marked as obsolete';
+            return response()->json([
+                'message' => count($skus) . " SKUs have been $actionText successfully",
+                'count' => count($skus)
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to change SKU status: ' . $e->getMessage(),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
      * Log SKU code change for audit purposes
      */
     private function logSkuChange($oldSku, $newSku, $reason, $notes, $mergeFrom = null)
@@ -254,5 +404,33 @@ class MmSkuController extends Controller
             'user_id' => Auth::id() ?? 'system',
             'timestamp' => now(),
         ]);
+    }
+
+    /**
+     * Get SKU Balance by SKU ID.
+     *
+     * @param  string  $skuId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getSkuBalance($skuId)
+    {
+        // In a real application, you would fetch data from your database,
+        // e.g., from a mm_sku_balances table.
+        // For now, return mock data.
+        $balanceData = [
+            ['note' => 'REC-001', 'refDate' => '2023-01-01', 'refNo' => 'PO-123', 'status' => 'IN', 'balanceQty' => 100.000, 'location' => 'WH1'],
+            ['note' => 'ISS-002', 'refDate' => '2023-01-15', 'refNo' => 'SO-456', 'status' => 'OUT', 'balanceQty' => -50.000, 'location' => 'WH1'],
+            ['note' => 'TRF-003', 'refDate' => '2023-02-01', 'refNo' => 'LOC-789', 'status' => 'IN', 'balanceQty' => 20.000, 'location' => 'WH2'],
+        ];
+
+        // You would typically filter this by $skuId and fetch dynamic data
+        // Example: 
+        // $skuBalance = DB::table('mm_sku_balances')
+        //                  ->where('sku_id', $skuId)
+        //                  ->orderBy('ref_date', 'asc')
+        //                  ->get();
+        // return response()->json($skuBalance);
+
+        return response()->json($balanceData);
     }
 } 

@@ -1005,6 +1005,9 @@ Route::get('/material-management/system-requirement/inventory-setup/gl-distribut
 Route::get('/material-management/system-requirement/inventory-setup/sku', function() {
     return Inertia::render('material-management/system-requirement/inventory-setup/Sku');
 })->name('material-management.system-requirement.inventory-setup.sku');
+
+Route::get('/material-management/system-requirement/inventory-setup/sku/print', [MmSkuController::class, 'printSelected'])->name('material-management.system-requirement.inventory-setup.sku.print');
+
 Route::get('/material-management/system-requirement/inventory-setup/sku/view-print', function() {
     return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintSku');
 })->name('material-management.system-requirement.inventory-setup.sku.view-print');
@@ -1036,6 +1039,10 @@ Route::get('/material-management/system-requirement/inventory-setup/sku-price/vi
 Route::get('/material-management/system-requirement/inventory-setup/amend-sku', function() {
     return Inertia::render('material-management/system-requirement/inventory-setup/AmendSku');
 })->name('material-management.system-requirement.inventory-setup.amend-sku');
+
+Route::get('/material-management/system-requirement/inventory-setup/obsolete-reactive-sku', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/ObsoleteReactiveSku');
+})->name('material-management.system-requirement.inventory-setup.obsolete-reactive-sku');
 
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');

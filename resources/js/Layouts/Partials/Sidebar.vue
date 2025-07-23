@@ -445,6 +445,7 @@ const materialManagementItems = [
           { title: 'Define SKU Price', icon: 'fas fa-dollar-sign', route: '/material-management/system-requirement/inventory-setup/sku-price' },
           { title: 'Amend SKU Type', icon: 'fas fa-edit', route: '/material-management/system-requirement/inventory-setup/amend-sku-type' },
           { title: 'Amend SKU#', icon: 'fas fa-tag', route: '/material-management/system-requirement/inventory-setup/amend-sku' },
+          { title: 'Obsolete/Reactive SKU', icon: 'fas fa-toggle-on', route: '/material-management/system-requirement/inventory-setup/obsolete-reactive-sku' },
           // View & Print
           { title: 'View & Print Category', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/category/view-print' },
           { title: 'View & Print Location', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/location/view-print' },

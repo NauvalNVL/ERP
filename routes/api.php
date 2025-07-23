@@ -49,6 +49,11 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionCo
 |
 */
 
+// Direct route for ObsoleteReactiveSku.vue component
+Route::get('/material-management/skus/categories', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'getCategories']);
+Route::get('/material-management/skus', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'index']);
+Route::post('/material-management/skus/bulk-toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'bulkToggleActive']);
+
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
 Route::get('/products', [ProductController::class, 'getProductsJson']);
 
@@ -360,9 +365,12 @@ Route::prefix('material-management')->group(function () {
     Route::put('/skus/{sku}', [MmSkuController::class, 'update']);
     Route::delete('/skus/{sku}', [MmSkuController::class, 'destroy']);
     Route::post('/skus/{sku}/change-code', [MmSkuController::class, 'changeSkuCode']);
+    Route::patch('/skus/{sku}/toggle-active', [MmSkuController::class, 'toggleActive']);
+    Route::post('/skus/bulk-toggle-active', [MmSkuController::class, 'bulkToggleActive']);
     Route::get('/skus/categories', [MmSkuController::class, 'getCategories']);
     Route::get('/skus/units', [MmSkuController::class, 'getUnits']);
     Route::get('/skus/types', [MmSkuController::class, 'getTypes']);
+    Route::get('/skus/{sku_id}/balance', [MmSkuController::class, 'getSkuBalance']);
 
     // GL Distribution Routes
     Route::get('/gl-distributions/list', [MmGlDistributionController::class, 'getGlDistributions']);
