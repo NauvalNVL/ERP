@@ -458,7 +458,12 @@
                 
                     <table v-else class="min-w-full text-xs border border-gray-300">
                         <thead class="bg-gray-200 sticky top-0">
-                            <tr>
+                            <tr v-if="mcsSortOption === 'model'">
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">M/Card Seq#</th>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                            <tr v-else>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part</th>
@@ -472,17 +477,30 @@
                                 :class="{ 'bg-blue-200': selectedMcs?.seq === mcs.seq }"
                                 @click="selectedMcs = mcs"
                                 @dblclick="selectMcs(mcs)">
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.part }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
-                                <td class="px-2 py-1 border border-gray-300">
-                                    <span 
-                                        :class="(mcs.status === 'Active' || !mcs.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                                        class="px-2 py-0.5 rounded-full text-xs">
-                                        {{ mcs.status || 'Active' }}
-                                    </span>
-                                </td>
+                                <template v-if="mcsSortOption === 'model'">
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">
+                                        <span
+                                            :class="(mcs.status === 'Active' || mcs.status === 'Act' || !mcs.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                            class="px-2 py-0.5 rounded-full text-xs">
+                                            {{ mcs.status === 'Active' ? 'Act' : mcs.status }}
+                                        </span>
+                                    </td>
+                                </template>
+                                <template v-else>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.part }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">
+                                        <span
+                                            :class="(mcs.status === 'Active' || !mcs.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                            class="px-2 py-0.5 rounded-full text-xs">
+                                            {{ mcs.status || 'Active' }}
+                                        </span>
+                                    </td>
+                                </template>
                             </tr>
                         </tbody>
                     </table>
