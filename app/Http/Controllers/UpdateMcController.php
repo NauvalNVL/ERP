@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\MasterCard; // Assuming you have a MasterCard model
+use App\Models\UpdateMC; // Correctly use the UpdateMC model
+use Illuminate\Support\Facades\Log;
 
 class UpdateMcController extends Controller
 {
@@ -50,58 +51,52 @@ class UpdateMcController extends Controller
      */
     public function apiIndex(Request $request)
     {
-        // Dummy data, replace with actual database query
-        $masterCards = [
-            ['seq' => '1609182', 'model' => 'BIHUN DELLIS 5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
-            ['seq' => '1609162', 'model' => 'BIHUN FANIA 5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
-            ['seq' => '1609163', 'model' => 'BIHUN IKAN TUNA 4.5 KG BARU', 'part' => '', 'comp' => '', 'status' => 'Act'],
-            ['seq' => '1609164', 'model' => 'BIHUN IKAN TUNA 5 KG BARU', 'part' => '', 'comp' => '', 'status' => 'Act'],
-            ['seq' => '1609166', 'model' => 'BIHUN PIRING MAS 5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
-            ['seq' => '1609181', 'model' => 'BIHUN POHON KOPI 5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
-            ['seq' => '1609138', 'model' => 'BOX BASO 4.5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
-            ['seq' => '1609144', 'model' => 'BOX IKAN HARIMAU 4.5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
-            ['seq' => '1609173', 'model' => 'BOX JAGUNG SRIKAYA 5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
-            ['seq' => '1609145', 'model' => 'BOX SRIKAYA 4.5 KG', 'part' => '', 'comp' => '', 'status' => 'Act'],
-            ['seq' => '1609186', 'model' => 'POLOS 480 X 410 X 401', 'part' => '', 'comp' => '', 'status' => 'Act'],
-            ['seq' => '1609185', 'model' => 'POLOS UK 506 X 356 X 407', 'part' => '', 'comp' => '', 'status' => 'Act'],
-        ];
+        Log::info('apiIndex request', $request->all());
 
         $query = $request->input('query');
-        $sortBy = $request->input('sortBy', 'seq');
-        $sortOrder = $request->input('sortOrder', 'asc');
-        $status = $request->input('status', ['Act']);
+        $sortBy = $request->input('sortBy', 'seq'); // Default sort by 'seq'
+        $sortOrder = $request->input('sortOrder', 'asc'); // Default sort order 'asc'
+        $statuses = $request->input('status', ['Active']); // Default to 'Active' status
+        $perPage = $request->input('per_page', 10); // Items per page
 
-        $filteredMasterCards = collect($masterCards)->filter(function ($mc) use ($query, $status) {
-            $matchesQuery = true;
-            if ($query) {
-                $queryLower = strtolower($query);
-                $matchesQuery = str_contains(strtolower($mc['seq']), $queryLower) ||
-                                str_contains(strtolower($mc['model']), $queryLower) ||
-                                str_contains(strtolower($mc['part']), $queryLower);
-            }
-            $matchesStatus = in_array($mc['status'], $status);
-            return $matchesQuery && $matchesStatus;
-        });
+        // Build the query using Eloquent
+        $masterCards = UpdateMC::query();
 
-        $sortedMasterCards = $filteredMasterCards->sortBy(function ($mc) use ($sortBy) {
-            return strtolower($mc[$sortBy]);
-        }, SORT_NATURAL | SORT_FLAG_CASE);
-
-        if ($sortOrder === 'desc') {
-            $sortedMasterCards = $sortedMasterCards->reverse();
+        // Apply search query if provided
+        if ($query) {
+            $masterCards->where(function ($q) use ($query) {
+                $q->where('seq', 'like', '%' . $query . '%')
+                  ->orWhere('model', 'like', '%' . $query . '%');
+                  // Add more fields here if needed for search, e.g., ->orWhere('part', 'like', '%' . $query . '%');
+            });
         }
 
-        // Paginate results (example for dummy data, adjust for real DB query)
-        $perPage = 10; // Or from request input
-        $page = $request->input('page', 1);
-        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
-            $sortedMasterCards->forPage($page, $perPage),
-            $sortedMasterCards->count(),
-            $perPage,
-            $page,
-            ['path' => $request->url()]
-        );
+        // Apply status filter
+        // Ensure status values from frontend match database values (e.g., 'Active' instead of 'Act')
+        $validStatuses = ['Active', 'Obsolete']; // Define expected database status values
+        $filteredStatuses = array_intersect($statuses, $validStatuses); // Use only valid statuses
 
-        return response()->json($paginated);
+        if (!empty($filteredStatuses)) {
+            $masterCards->whereIn('status', $filteredStatuses);
+        } else {
+            // If no valid status is provided, or if an empty array is sent, default to active
+            $masterCards->where('status', 'Active');
+        }
+
+        // Apply sorting
+        // Ensure $sortBy is a valid column to prevent SQL injection
+        $validSortColumns = ['seq', 'model', 'part', 'comp', 'status']; // Add all sortable columns
+        if (!in_array($sortBy, $validSortColumns)) {
+            $sortBy = 'seq'; // Fallback to a safe default
+        }
+        
+        $masterCards->orderBy($sortBy, $sortOrder);
+
+        // Paginate the results
+        $paginatedMasterCards = $masterCards->paginate($perPage);
+
+        Log::info('Master Card Query Results:', ['count' => $paginatedMasterCards->total(), 'data' => $paginatedMasterCards->items()]);
+
+        return response()->json($paginatedMasterCards);
     }
 }
