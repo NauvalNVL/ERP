@@ -255,40 +255,75 @@ const handleCustomerSelected = (customer) => {
     console.log('Selected customer in parent component:', customer);
     if (customer && customer.customer_code) {
         form.customer_code = customer.customer_code;
-        form.customer_name = customer.customer_name;
+        form.customer_name = customer.customer_name || '';
         closeCustomerAccountModal();
-        checkCustomerCodeExists(); // Re-check after selection to update form state
+        // Don't call checkCustomerCodeExists here as it might overwrite the customer name
+        // Instead, directly check if it exists in warehouse locations
+        checkExistenceWithoutChangingName();
     } else {
         console.error('Invalid customer data received:', customer);
     }
 };
 
-const fetchCustomerWarehouseLocation = async () => {
+// New function to check existence without changing customer name
+const checkExistenceWithoutChangingName = async () => {
     if (!form.customer_code) return;
+    
+    try {
+        const response = await axios.get(route('customer-warehouse-locations.check', form.customer_code));
+        customerCodeExists.value = response.data.exists;
+        
+        // Don't update customer_name here, preserve what was selected
+        
+        if (response.data.exists) {
+            // If exists, fetch full data but preserve customer name
+            fetchCustomerWarehouseLocationPreserveName();
+        } else {
+            isEditMode.value = false;
+            form.id = null;
+            form.lock_customer_location = false; // Default
+        }
+    } catch (error) {
+        console.error('Error checking customer code existence:', error);
+        customerCodeExists.value = false;
+        isEditMode.value = false;
+        form.id = null;
+        form.lock_customer_location = false;
+    }
+};
+
+// New function to fetch warehouse location but preserve customer name
+const fetchCustomerWarehouseLocationPreserveName = async () => {
+    if (!form.customer_code) return;
+    
+    // Store current customer name
+    const currentCustomerName = form.customer_name;
+    
     try {
         const response = await axios.get(route('customer-warehouse-locations.show', form.customer_code));
         const data = response.data.data;
         if (data) {
             form.id = data.id;
-            form.customer_name = data.customer_name;
+            // Keep current customer name instead of overwriting
             form.lock_customer_location = data.lock_customer_location;
             isEditMode.value = true;
             customerCodeExists.value = true;
         } else {
             form.id = null;
-            form.customer_name = ''; // Clear customer name if not found
-            form.lock_customer_location = false; // Default
+            form.lock_customer_location = false;
             isEditMode.value = false;
             customerCodeExists.value = false;
         }
     } catch (error) {
         console.error('Error fetching customer warehouse location:', error);
         form.id = null;
-        form.customer_name = '';
         form.lock_customer_location = false;
         isEditMode.value = false;
         customerCodeExists.value = false;
     }
+    
+    // Restore customer name after the operation
+    form.customer_name = currentCustomerName;
 };
 
 const checkCustomerCodeExists = debounce(async () => {
@@ -300,27 +335,65 @@ const checkCustomerCodeExists = debounce(async () => {
         form.lock_customer_location = false;
         return;
     }
+    
     try {
         const response = await axios.get(route('customer-warehouse-locations.check', form.customer_code));
         customerCodeExists.value = response.data.exists;
+        
+        // Update the customer name only if it's currently empty
+        if (!form.customer_name && response.data.customer_name) {
+            form.customer_name = response.data.customer_name;
+        }
+        
         if (response.data.exists) {
             // If exists, fetch full data
             fetchCustomerWarehouseLocation();
         } else {
             isEditMode.value = false;
             form.id = null;
-            form.customer_name = response.data.customer_name || ''; // Keep customer name if available from check
-            form.lock_customer_location = false; // Default
+            form.lock_customer_location = false;
         }
     } catch (error) {
         console.error('Error checking customer code existence:', error);
         customerCodeExists.value = false;
         isEditMode.value = false;
         form.id = null;
-        form.customer_name = '';
         form.lock_customer_location = false;
     }
 }, 500);
+
+const fetchCustomerWarehouseLocation = async () => {
+    if (!form.customer_code) return;
+    
+    // Store current customer name
+    const currentCustomerName = form.customer_name;
+    
+    try {
+        const response = await axios.get(route('customer-warehouse-locations.show', form.customer_code));
+        const data = response.data.data;
+        if (data) {
+            form.id = data.id;
+            // Don't overwrite customer_name if we already have it
+            if (!currentCustomerName && data.customer_name) {
+                form.customer_name = data.customer_name;
+            }
+            form.lock_customer_location = data.lock_customer_location;
+            isEditMode.value = true;
+            customerCodeExists.value = true;
+        } else {
+            form.id = null;
+            form.lock_customer_location = false;
+            isEditMode.value = false;
+            customerCodeExists.value = false;
+        }
+    } catch (error) {
+        console.error('Error fetching customer warehouse location:', error);
+        form.id = null;
+        form.lock_customer_location = false;
+        isEditMode.value = false;
+        customerCodeExists.value = false;
+    }
+};
 
 const handleRecordAction = async () => {
     if (isEditMode.value) {
@@ -334,6 +407,9 @@ const handleRecordAction = async () => {
 
 const saveCustomerWarehouseLocation = async () => {
     try {
+        // Store current customer name
+        const currentCustomerName = form.customer_name;
+        
         let response;
         if (form.id) {
             // Update existing
@@ -343,8 +419,13 @@ const saveCustomerWarehouseLocation = async () => {
             response = await axios.post(route('customer-warehouse-locations.store'), form);
         }
         alert(response.data.message);
+        
         // After saving, re-fetch to ensure latest data and correct mode
-        checkCustomerCodeExists(); 
+        // But preserve customer name
+        await checkExistenceWithoutChangingName();
+        
+        // Make sure customer name is preserved
+        form.customer_name = currentCustomerName;
     } catch (error) {
         console.error('Error saving customer warehouse location:', error);
         alert('Failed to save customer warehouse location.');
@@ -356,10 +437,11 @@ const deleteCustomerWarehouseLocation = async () => {
         try {
             const response = await axios.delete(route('customer-warehouse-locations.destroy', form.customer_code));
             alert(response.data.message);
+            
             // Clear form and reset state
             form.id = null;
             form.customer_code = '';
-            form.customer_name = '';
+            form.customer_name = ''; // Explicitly clear customer name
             form.lock_customer_location = false;
             isEditMode.value = false;
             customerCodeExists.value = false;
@@ -372,7 +454,13 @@ const deleteCustomerWarehouseLocation = async () => {
 
 watch(() => form.customer_code, (newCode) => {
     if (newCode) {
-        checkCustomerCodeExists();
+        // Only update customer name if it's empty
+        if (!form.customer_name) {
+            checkCustomerCodeExists();
+        } else {
+            // If we already have a customer name, use the method that preserves it
+            checkExistenceWithoutChangingName();
+        }
     }
 });
 

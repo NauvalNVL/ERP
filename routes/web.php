@@ -61,6 +61,7 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReportGroupController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController;
+use App\Http\Controllers\CustomerWarehouseRequirementController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -440,6 +441,47 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehouse-management/finished-goods/fg-normal', function () {
         return Inertia::render('warehouse-management/FinishedGoods/FGNormal');
     })->name('vue.warehouse-management.finished-goods.fg-normal');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/check-fg-balance', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/CheckFGBalance');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.check-fg-balance');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/clear-fg-mc-lock', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/ClearFGMCLock');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.clear-fg-mc-lock');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/print-fg-stock-in-log', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/PrintFGStockInLog');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.print-fg-stock-in-log');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/print-fg-stock-out-log', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/PrintFGStockOutLog');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.print-fg-stock-out-log');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-location-transfer', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGLocationTransfer');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-location-transfer');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-barcode', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGStockInByBarcode');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-stock-in-by-barcode');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-so', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGStockInBySO');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-stock-in-by-so');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-wo', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGStockInByWO');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-stock-in-by-wo');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-stock-out-by-batch', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGStockOutByBatch');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-stock-out-by-batch');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-stock-out-by-mc', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGStockOutByMC');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-stock-out-by-mc');
+
     Route::get('/warehouse-management/finished-goods/setup-maintenance/fg-do-configuration', function () {
         return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/fg-do-configuration');
     })->name('vue.warehouse-management.finished-goods.setup-maintenance.fg-do-configuration');
@@ -1046,3 +1088,6 @@ Route::get('/material-management/system-requirement/inventory-setup/obsolete-rea
 
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');
+
+// Add route for CustomerWarehouseRequirement
+Route::get('/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-requirement', [CustomerWarehouseRequirementController::class, 'index'])->name('vue.warehouse-management.finished-goods.setup-maintenance.define-customer-warehouse-requirement');

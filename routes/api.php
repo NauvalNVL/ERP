@@ -37,6 +37,7 @@ use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\FgDoConfigController;
 use App\Http\Controllers\DeliveryOrderFormatController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
+use App\Http\Controllers\CustomerWarehouseRequirementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -396,3 +397,13 @@ Route::prefix('customer-warehouse-locations')->group(function () {
     Route::put('/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'update'])->name('customer-warehouse-locations.update');
     Route::delete('/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'destroy'])->name('customer-warehouse-locations.destroy');
 });
+
+// Customer Warehouse Requirement API routes
+Route::get('/customer-warehouse-requirements', [CustomerWarehouseRequirementController::class, 'getAllRequirements']);
+Route::get('/customer-warehouse-requirements/{customerCode}', [CustomerWarehouseRequirementController::class, 'getByCustomerCode']);
+Route::post('/customer-warehouse-requirements', [CustomerWarehouseRequirementController::class, 'store']);
+Route::put('/customer-warehouse-requirements/{customerCode}', [CustomerWarehouseRequirementController::class, 'update']);
+Route::delete('/customer-warehouse-requirements/{customerCode}', [CustomerWarehouseRequirementController::class, 'destroy']);
+Route::get('/warehouse-requirements/customers', [CustomerWarehouseRequirementController::class, 'getCustomers']);
+Route::get('/warehouse-requirements/warehouse-locations', [CustomerWarehouseRequirementController::class, 'getWarehouseLocations']);
+Route::get('/warehouse-requirements/delivery-order-formats', [CustomerWarehouseRequirementController::class, 'getDeliveryOrderFormats']);
