@@ -396,13 +396,13 @@
                         <div class="text-white text-sm mr-2">
                             <span class="mr-2">Sort:</span>
                             <select v-model="mcsSortOption" @change="fetchMcsData()" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
-                                <option value="seq">MC Seq#</option>
-                                <option value="model">MC Model</option>
-                                <option value="part">MC PD Part#</option>
-                                <option value="ed">MC PD ED</option>
-                                <option value="id">MC PD ID</option>
+                                <option value="mc_seq">MC Seq#</option>
+                                <option value="mc_model">MC Model</option>
+                                <option value="part_no">MC PD Part#</option>
+                                <option value="comp_no">MC PD ED</option>
+                                <option value="p_design">MC PD ID</option>
                             </select>
-                </div>
+                        </div>
                         <div class="text-white text-sm">
                             <span class="mr-2">Order:</span>
                             <select v-model="mcsSortOrder" @change="fetchMcsData()" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
@@ -413,16 +413,16 @@
                         <div class="text-white text-sm">
                             <span class="mr-2">Status:</span>
                             <select @change="fetchMcsData()" v-model="mcsStatusFilter" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
-                                <option value="active">Active</option>
-                                <option value="obsolete">Obsolete</option>
+                                <option value="Act">Active</option>
+                                <option value="Obsolete">Obsolete</option>
                                 <option value="all">All</option>
                             </select>
-                    </div>
+                        </div>
                         <button type="button" @click="showMcsTableModal = false" class="text-white hover:text-gray-200 focus:outline-none">
                             <i class="fas fa-times text-xl"></i>
-                    </button>
-            </div>
-        </div>
+                        </button>
+                    </div>
+                </div>
 
                 <!-- Modal Body -->
                 <div class="p-2 overflow-y-auto flex-grow" style="max-height: 60vh;">
@@ -442,29 +442,36 @@
                     <div v-if="mcsLoading" class="flex justify-center items-center p-4">
                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                         <span class="ml-2 text-gray-600">Loading data...</span>
-                </div>
+                    </div>
                 
                     <div v-else-if="mcsError" class="p-4 text-red-500 bg-red-50 rounded border border-red-200">
                         <div class="font-bold mb-1">Error:</div>
                         <div>{{ mcsError }}</div>
                         <button @click="fetchMcsData()" class="mt-2 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">
                             Try Again
-                    </button>
-        </div>
+                        </button>
+                    </div>
 
                     <div v-else-if="mcsMasterCards.length === 0" class="p-4 text-amber-700 bg-amber-50 rounded border border-amber-200">
                         No master card records found. Please adjust your filter criteria.
-                </div>
+                    </div>
                 
                     <table v-else class="min-w-full text-xs border border-gray-300">
                         <thead class="bg-gray-200 sticky top-0">
-                            <tr v-if="mcsSortOption === 'model'">
+                            <tr v-if="mcsSortOption === 'mc_model'">
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">M/Card Seq#</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             </tr>
-                            <tr v-else>
+                            <tr v-else-if="mcsSortOption === 'part_no'">
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part No</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comp#</th>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design</th>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                            <tr v-else>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">M/Card Seq#</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comp#</th>
@@ -477,14 +484,27 @@
                                 :class="{ 'bg-blue-200': selectedMcs?.seq === mcs.seq }"
                                 @click="selectedMcs = mcs"
                                 @dblclick="selectMcs(mcs)">
-                                <template v-if="mcsSortOption === 'model'">
+                                <template v-if="mcsSortOption === 'mc_model'">
                                     <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
                                     <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
                                     <td class="px-2 py-1 border border-gray-300">
                                         <span
-                                            :class="(mcs.status === 'Active' || mcs.status === 'Act' || !mcs.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                            :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                                             class="px-2 py-0.5 rounded-full text-xs">
-                                            {{ mcs.status === 'Active' ? 'Act' : mcs.status }}
+                                            {{ mcs.status }}
+                                        </span>
+                                    </td>
+                                </template>
+                                <template v-else-if="mcsSortOption === 'part_no'">
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.part }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.p_design }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">
+                                        <span
+                                            :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                            class="px-2 py-0.5 rounded-full text-xs">
+                                            {{ mcs.status }}
                                         </span>
                                     </td>
                                 </template>
@@ -495,9 +515,9 @@
                                     <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
                                     <td class="px-2 py-1 border border-gray-300">
                                         <span
-                                            :class="(mcs.status === 'Active' || !mcs.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                            :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                                             class="px-2 py-0.5 rounded-full text-xs">
-                                            {{ mcs.status || 'Active' }}
+                                            {{ mcs.status }}
                                         </span>
                                     </td>
                                 </template>
@@ -509,8 +529,8 @@
                 <!-- Modal Footer -->
                 <div class="flex items-center justify-end gap-2 p-2 border-t border-gray-200 bg-gray-100 rounded-b-lg flex-shrink-0">
                     <div class="text-xs text-gray-500 mr-auto" v-if="mcsMasterCards.length > 0">
-                        {{ mcsMasterCards.length }} accounts found
-                                </div>
+                        {{ mcsMasterCards.length }} records found
+                    </div>
                     <!-- Pagination -->
                     <button @click="goToMcsPage(mcsCurrentPage - 1)" :disabled="mcsCurrentPage === 1" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed"><i class="fas fa-chevron-left"></i> Previous</button>
                     <span class="text-gray-600 text-xs">Page {{ mcsCurrentPage }} of {{ mcsLastPage }}</span>
@@ -567,7 +587,7 @@ const selectedCustomer = ref(null);
 
 // MCS Modal state
 const showMcsTableModal = ref(false);
-const mcsSortOption = ref('seq');
+const mcsSortOption = ref('mc_seq');
 const mcsSortOrder = ref('asc');
 const mcsRecordStatus = ref({
     active: true,
@@ -580,7 +600,7 @@ const mcsLoading = ref(false);
 const mcsError = ref(null);
 const mcsCurrentPage = ref(1);
 const mcsLastPage = ref(1);
-const mcsStatusFilter = ref('active'); // New state for status filter
+const mcsStatusFilter = ref('Act'); // Updated to use 'Act' instead of 'active'
 
 // New state for Maintenance Log Modal
 const showMaintenanceLogModal = ref(false);
@@ -598,6 +618,12 @@ const mcDetails = ref({
     mc_approval: 'No',
     last_mcs: '',
     last_updated_seq: '',
+    ext_dim_1: '',
+    ext_dim_2: '',
+    ext_dim_3: '',
+    int_dim_1: '',
+    int_dim_2: '',
+    int_dim_3: '',
 });
 
 const searchAc = async () => {
@@ -701,6 +727,21 @@ const selectMcs = (mcs) => {
     // Populate the mcs field
     form.value.mcs = mcs.seq;
     
+    // Populate mcDetails with data from selected MCS
+    mcDetails.value.ac_name = mcs.customer_name || ''; // Assuming customer_name is available
+    mcDetails.value.mc_model = mcs.model || '';
+    mcDetails.value.mc_short_model = mcs.short_model || '';
+    mcDetails.value.mc_status = mcs.status || 'Active';
+    mcDetails.value.mc_approval = mcs.approval || 'No';
+    mcDetails.value.last_mcs = mcs.last_mcs || '';
+    mcDetails.value.last_updated_seq = mcs.last_updated_seq || '';
+    mcDetails.value.ext_dim_1 = mcs.ext_dim_1 || '';
+    mcDetails.value.ext_dim_2 = mcs.ext_dim_2 || '';
+    mcDetails.value.ext_dim_3 = mcs.ext_dim_3 || '';
+    mcDetails.value.int_dim_1 = mcs.int_dim_1 || '';
+    mcDetails.value.int_dim_2 = mcs.int_dim_2 || '';
+    mcDetails.value.int_dim_3 = mcs.int_dim_3 || '';
+
     recordSelected.value = true;
     showMcsTableModal.value = false;
 };
@@ -710,9 +751,9 @@ const fetchMcsData = async (page = 1) => {
     mcsError.value = null;
     try {
         let statusQuery = '';
-        if (mcsStatusFilter.value === 'active') {
-            statusQuery = '&status[]=Active';
-        } else if (mcsStatusFilter.value === 'obsolete') {
+        if (mcsStatusFilter.value === 'Act') {
+            statusQuery = '&status[]=Act';
+        } else if (mcsStatusFilter.value === 'Obsolete') {
             statusQuery = '&status[]=Obsolete';
         }
 
@@ -738,14 +779,39 @@ const handleMcsProceed = () => {
     console.log('Proceed button clicked');
     // Logic to proceed with the selected MCS record
     if (form.value.ac && form.value.mcs) {
-        // Populate mcDetails with dummy data for now, replace with actual API data later
-        mcDetails.value.ac_name = 'BAHAGIA IDKHO MANDIRI, PT'; // Example data
-        mcDetails.value.mc_model = 'CARTON BOX BK TIN 48 X 60 GRAM';
-        mcDetails.value.mc_short_model = 'CARTON BOX BK TIN 48';
-        mcDetails.value.mc_status = 'Active';
-        mcDetails.value.mc_approval = 'No';
-        mcDetails.value.last_mcs = '042597'; // Example data
-        mcDetails.value.last_updated_seq = '042597'; // Example data
+        // Populate mcDetails with data from selected MCS. If not selected, it uses dummy data.
+        const selectedRecord = selectedMcs.value; // Use the actual selected record
+
+        if (selectedRecord) {
+            mcDetails.value.ac_name = selectedRecord.customer_name || 'BAHAGIA IDKHO MANDIRI, PT'; // Use actual customer_name if available
+            mcDetails.value.mc_model = selectedRecord.model;
+            mcDetails.value.mc_short_model = selectedRecord.short_model || '';
+            mcDetails.value.mc_status = selectedRecord.status || 'Active';
+            mcDetails.value.mc_approval = selectedRecord.approval || 'No';
+            mcDetails.value.last_mcs = selectedRecord.last_mcs || '';
+            mcDetails.value.last_updated_seq = selectedRecord.last_updated_seq || '';
+            mcDetails.value.ext_dim_1 = selectedRecord.ext_dim_1 || '';
+            mcDetails.value.ext_dim_2 = selectedRecord.ext_dim_2 || '';
+            mcDetails.value.ext_dim_3 = selectedRecord.ext_dim_3 || '';
+            mcDetails.value.int_dim_1 = selectedRecord.int_dim_1 || '';
+            mcDetails.value.int_dim_2 = selectedRecord.int_dim_2 || '';
+            mcDetails.value.int_dim_3 = selectedRecord.int_dim_3 || '';
+        } else {
+            // Fallback to dummy data if no record is selected (though selectMcs should handle this)
+            mcDetails.value.ac_name = 'BAHAGIA IDKHO MANDIRI, PT';
+            mcDetails.value.mc_model = 'CARTON BOX BK TIN 48 X 60 GRAM';
+            mcDetails.value.mc_short_model = 'CARTON BOX BK TIN 48';
+            mcDetails.value.mc_status = 'Active';
+            mcDetails.value.mc_approval = 'No';
+            mcDetails.value.last_mcs = '042597';
+            mcDetails.value.last_updated_seq = '042597';
+            mcDetails.value.ext_dim_1 = '396';
+            mcDetails.value.ext_dim_2 = '243';
+            mcDetails.value.ext_dim_3 = '297';
+            mcDetails.value.int_dim_1 = '393';
+            mcDetails.value.int_dim_2 = '240';
+            mcDetails.value.int_dim_3 = '292';
+        }
         
         // Also populate the form fields that are displayed on the main page
         form.value.customer_name = mcDetails.value.ac_name;
@@ -755,7 +821,7 @@ const handleMcsProceed = () => {
         showDetailedMcInfo.value = true; // Show the detailed section
         showMcsTableModal.value = false; // Hide the MCS table modal
         recordSelected.value = true;
-  } else {
+    } else {
         alert('Please fill in both AC# and MCS# to proceed.');
     }
 };

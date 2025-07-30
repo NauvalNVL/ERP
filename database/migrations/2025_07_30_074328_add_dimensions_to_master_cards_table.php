@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('master_cards', function (Blueprint $table) {
-            $table->id();
-            $table->string('seq')->unique();
-            $table->string('model');
-            $table->string('status');
-            $table->timestamps();
+        Schema::table('master_cards', function (Blueprint $table) {
+            //
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('master_cards');
+        Schema::table('master_cards', function (Blueprint $table) {
+            //
+        });
     }
 };

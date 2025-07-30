@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\UpdateMC; // Correctly use the UpdateMC model
+use App\Models\MasterCard;
 use Illuminate\Support\Facades\Log;
 
 class UpdateMcController extends Controller
@@ -54,40 +54,37 @@ class UpdateMcController extends Controller
         Log::info('apiIndex request', $request->all());
 
         $query = $request->input('query');
-        $sortBy = $request->input('sortBy', 'seq'); // Default sort by 'seq'
+        $sortBy = $request->input('sortBy', 'mc_seq'); // Default sort by 'mc_seq'
         $sortOrder = $request->input('sortOrder', 'asc'); // Default sort order 'asc'
-        $statuses = $request->input('status', ['Active']); // Default to 'Active' status
+        $statuses = $request->input('status', ['Act']); // Default to 'Act' status
         $perPage = $request->input('per_page', 10); // Items per page
 
         // Build the query using Eloquent
-        $masterCards = UpdateMC::query();
+        $masterCards = MasterCard::query();
 
         // Apply search query if provided
         if ($query) {
             $masterCards->where(function ($q) use ($query) {
-                $q->where('seq', 'like', '%' . $query . '%')
-                  ->orWhere('model', 'like', '%' . $query . '%');
-                  // Add more fields here if needed for search, e.g., ->orWhere('part', 'like', '%' . $query . '%');
+                $q->where('mc_seq', 'like', '%' . $query . '%')
+                  ->orWhere('mc_model', 'like', '%' . $query . '%');
             });
         }
 
         // Apply status filter
-        // Ensure status values from frontend match database values (e.g., 'Active' instead of 'Act')
-        $validStatuses = ['Active', 'Obsolete']; // Define expected database status values
-        $filteredStatuses = array_intersect($statuses, $validStatuses); // Use only valid statuses
+        $validStatuses = ['Act', 'Obsolete']; // Define expected database status values
+        $filteredStatuses = array_intersect($statuses, $validStatuses);
 
         if (!empty($filteredStatuses)) {
             $masterCards->whereIn('status', $filteredStatuses);
         } else {
-            // If no valid status is provided, or if an empty array is sent, default to active
-            $masterCards->where('status', 'Active');
+            // If no valid status is provided, default to active
+            $masterCards->where('status', 'Act');
         }
 
         // Apply sorting
-        // Ensure $sortBy is a valid column to prevent SQL injection
-        $validSortColumns = ['seq', 'model', 'part', 'comp', 'status']; // Add all sortable columns
+        $validSortColumns = ['mc_seq', 'mc_model', 'part_no', 'comp_no', 'status'];
         if (!in_array($sortBy, $validSortColumns)) {
-            $sortBy = 'seq'; // Fallback to a safe default
+            $sortBy = 'mc_seq'; // Fallback to a safe default
         }
         
         $masterCards->orderBy($sortBy, $sortOrder);
@@ -95,8 +92,27 @@ class UpdateMcController extends Controller
         // Paginate the results
         $paginatedMasterCards = $masterCards->paginate($perPage);
 
-        Log::info('Master Card Query Results:', ['count' => $paginatedMasterCards->total(), 'data' => $paginatedMasterCards->items()]);
+        // Transform the data to match the frontend expectations
+        $transformedData = $paginatedMasterCards->getCollection()->map(function ($item) {
+            return [
+                'seq' => $item->mc_seq,
+                'model' => $item->mc_model,
+                'part' => $item->part_no,
+                'comp' => $item->comp_no,
+                'status' => $item->status,
+            ];
+        });
 
-        return response()->json($paginatedMasterCards);
+        $result = [
+            'current_page' => $paginatedMasterCards->currentPage(),
+            'last_page' => $paginatedMasterCards->lastPage(),
+            'per_page' => $paginatedMasterCards->perPage(),
+            'total' => $paginatedMasterCards->total(),
+            'data' => $transformedData,
+        ];
+
+        Log::info('Master Card Query Results:', ['count' => $result['total'], 'data' => $result['data']]);
+
+        return response()->json($result);
     }
 }
