@@ -82,7 +82,7 @@ class UpdateMcController extends Controller
         }
 
         // Apply sorting
-        $validSortColumns = ['mc_seq', 'mc_model', 'part_no', 'comp_no', 'status'];
+        $validSortColumns = ['mc_seq', 'mc_model', 'part_no', 'comp_no', 'status', 'ext_dim_1', 'int_dim_1'];
         if (!in_array($sortBy, $validSortColumns)) {
             $sortBy = 'mc_seq'; // Fallback to a safe default
         }
@@ -100,6 +100,13 @@ class UpdateMcController extends Controller
                 'part' => $item->part_no,
                 'comp' => $item->comp_no,
                 'status' => $item->status,
+                'p_design' => $item->p_design,
+                'ext_dim_1' => $item->ext_dim_1,
+                'ext_dim_2' => $item->ext_dim_2,
+                'ext_dim_3' => $item->ext_dim_3,
+                'int_dim_1' => $item->int_dim_1,
+                'int_dim_2' => $item->int_dim_2,
+                'int_dim_3' => $item->int_dim_3,
             ];
         });
 

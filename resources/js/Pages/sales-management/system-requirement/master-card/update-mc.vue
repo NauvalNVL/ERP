@@ -251,7 +251,7 @@
                             <button type="button" @click="showMaintenanceLogModal = true" class="px-4 py-2 bg-indigo-500 text-white rounded-md shadow-md hover:bg-indigo-600 transition-colors">Maintenance Log</button>
                             <button type="button" class="px-4 py-2 bg-purple-500 text-white rounded-md shadow-md hover:bg-purple-600 transition-colors">Status Log</button>
                             <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 transition-colors">Approval Log</button>
-                            <button type="button" class="ml-auto px-4 py-2 bg-green-500 text-white rounded-md shadow-md hover:bg-green-600 transition-colors">Next Setup</button>
+                            <button type="button" @click="showSecondPasswordAccessModal = true" class="ml-auto px-4 py-2 bg-green-500 text-white rounded-md shadow-md hover:bg-green-600 transition-colors">Next Setup</button>
                         </div>
                     </div>
 
@@ -394,13 +394,21 @@
                     </h3>
                     <div class="flex space-x-3 items-center">
                         <div class="text-white text-sm mr-2">
+                            <span class="mr-2">Zoom:</span>
+                            <select v-model="zoomOption" @change="handleZoomChange" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
+                                <option value="mc_specification">M/card specification</option>
+                                <option value="current_price">Current price</option>
+                                <option value="stand_by_price">Stand by price</option>
+                            </select>
+                        </div>
+                        <div class="text-white text-sm mr-2">
                             <span class="mr-2">Sort:</span>
                             <select v-model="mcsSortOption" @change="fetchMcsData()" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
                                 <option value="mc_seq">MC Seq#</option>
                                 <option value="mc_model">MC Model</option>
                                 <option value="part_no">MC PD Part#</option>
-                                <option value="comp_no">MC PD ED</option>
-                                <option value="p_design">MC PD ID</option>
+                                <option value="ext_dim_1">MC PD ED</option>
+                                <option value="int_dim_1">MC PD ID</option>
                             </select>
                         </div>
                         <div class="text-white text-sm">
@@ -470,6 +478,18 @@
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             </tr>
+                            <tr v-else-if="mcsSortOption === 'ext_dim_1'">
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ext. Dimension</th>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                            <tr v-else-if="mcsSortOption === 'int_dim_1'">
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Int. Dimension</th>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
+                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
                             <tr v-else>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">M/Card Seq#</th>
                                 <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
@@ -500,6 +520,30 @@
                                     <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
                                     <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
                                     <td class="px-2 py-1 border border-gray-300">{{ mcs.p_design }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">
+                                        <span
+                                            :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                            class="px-2 py-0.5 rounded-full text-xs">
+                                            {{ mcs.status }}
+                                        </span>
+                                    </td>
+                                </template>
+                                <template v-else-if="mcsSortOption === 'ext_dim_1'">
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.ext_dim_1 }}x{{ mcs.ext_dim_2 }}x{{ mcs.ext_dim_3 }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">
+                                        <span
+                                            :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                            class="px-2 py-0.5 rounded-full text-xs">
+                                            {{ mcs.status }}
+                                        </span>
+                                    </td>
+                                </template>
+                                <template v-else-if="mcsSortOption === 'int_dim_1'">
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.int_dim_1 }}x{{ mcs.int_dim_2 }}x{{ mcs.int_dim_3 }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
+                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
                                     <td class="px-2 py-1 border border-gray-300">
                                         <span
                                             :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
@@ -552,6 +596,33 @@
             :show="showMaintenanceLogModal"
             @close="showMaintenanceLogModal = false"
         />
+
+        <!-- Zoom Modals (for dropdown selection) -->
+        <MasterCardZoomModal
+            :show="showMasterCardSpecModal"
+            @close="showMasterCardSpecModal = false"
+            :masterCardData="selectedMcs"
+        />
+
+        <MasterCardCurrentPriceModal
+            :show="showMasterCardCurrentPriceModal"
+            @close="showMasterCardCurrentPriceModal = false"
+            :masterCardData="selectedMcs"
+        />
+
+        <MasterCardStandByPriceModal
+            :show="showMasterCardStandByPriceModal"
+            @close="showMasterCardStandByPriceModal = false"
+            :masterCardData="selectedMcs"
+        />
+
+        <!-- Second Password Access Modal -->
+        <SecondPasswordAccessModal
+            :show="showSecondPasswordAccessModal"
+            @close="showSecondPasswordAccessModal = false"
+            @select="handleSecondPasswordSelect"
+        />
+
     </AppLayout>
 </template>
 
@@ -562,8 +633,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
 import CustomerAccountModal from '@/Components/CustomerAccountModal.vue';
 import MasterCardMaintenanceLogModal from '@/Components/MasterCardMaintenanceLogModal.vue';
-// import MasterCardZoomModal from '@/Components/MasterCardZoomModal.vue';
-// import MasterCardCurrentPriceModal from '@/Components/MasterCardCurrentPriceModal.vue';
+import MasterCardZoomModal from '@/Components/MasterCardZoomModal.vue';
+import MasterCardCurrentPriceModal from '@/Components/MasterCardCurrentPriceModal.vue';
+import MasterCardStandByPriceModal from '@/Components/MasterCardStandByPriceModal.vue'; // Assuming this component exists or will be created
+import SecondPasswordAccessModal from '@/Components/SecondPasswordAccessModal.vue';
 
 // Form data
 const form = ref({
@@ -604,6 +677,15 @@ const mcsStatusFilter = ref('Act'); // Updated to use 'Act' instead of 'active'
 
 // New state for Maintenance Log Modal
 const showMaintenanceLogModal = ref(false);
+
+// New states for Zoom Dropdown
+const zoomOption = ref(''); // To hold the selected zoom option
+const showMasterCardSpecModal = ref(false);
+const showMasterCardCurrentPriceModal = ref(false);
+const showMasterCardStandByPriceModal = ref(false);
+
+// New state for Second Password Access Modal
+const showSecondPasswordAccessModal = ref(false);
 
 // Computed property for filtered and sorted MCS data (now fetched from API)
 const filteredMcsData = computed(() => mcsMasterCards.value); // Data is now filtered/sorted by API
@@ -824,6 +906,34 @@ const handleMcsProceed = () => {
     } else {
         alert('Please fill in both AC# and MCS# to proceed.');
     }
+};
+
+const handleZoomChange = () => {
+  if (!selectedMcs.value) {
+    alert('Please select a Master Card first.');
+    zoomOption.value = ''; // Reset dropdown
+    return;
+  }
+  switch (zoomOption.value) {
+    case 'mc_specification':
+      showMasterCardSpecModal.value = true;
+      break;
+    case 'current_price':
+      showMasterCardCurrentPriceModal.value = true;
+      break;
+    case 'stand_by_price':
+      showMasterCardStandByPriceModal.value = true;
+      break;
+  }
+  zoomOption.value = ''; // Reset dropdown after action
+};
+
+const handleSecondPasswordSelect = ({ userId, password }) => {
+  console.log('Second password access granted for:', userId);
+  // Implement logic after second password is provided, e.g., proceed with the "Next Setup" action
+  // For now, simply log and close.
+  showSecondPasswordAccessModal.value = false;
+  alert(`Access granted for User ID: ${userId}`);
 };
 </script>
 
