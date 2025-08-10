@@ -52,13 +52,13 @@
                                     Sales Order#:
                                 </label>
                                 <div class="relative flex group">
-                                    <input 
-                                        type="text" 
-                                        id="so_number" 
+                                    <input
+                                        type="text"
+                                        id="so_number"
                                         v-model="form.so_number"
                                         class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-all group-hover:border-blue-300"
                                     />
-                                    <button 
+                                    <button
                                         type="button"
                                         @click="openSalesOrderModal"
                                         class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
@@ -100,54 +100,54 @@
                                 <div class="flex items-center mb-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">M/Card Seq#:</label>
                                     <input type="text" class="form-input bg-gray-100 border border-gray-300 rounded px-2 py-1 text-sm w-full" :value="detail.mcard_seq" readonly />
-                                </div>
+                            </div>
                                 <div class="flex items-center mb-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">Product:</label>
                                     <input type="text" class="form-input bg-gray-100 border border-gray-300 rounded px-2 py-1 text-sm w-20" :value="detail.product" readonly />
                                     <input type="text" class="form-input bg-gray-100 border border-gray-300 rounded px-2 py-1 text-sm ml-2 w-full" :value="detail.product_desc" readonly />
-                                </div>
+                        </div>
                                 <div class="flex items-center mb-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">Model:</label>
                                     <input type="text" class="form-input bg-gray-100 border border-gray-300 rounded px-2 py-1 text-sm w-full" :value="detail.model" readonly />
-                                </div>
+                            </div>
                                 <div class="flex items-center mb-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">Order Status:</label>
                                     <input type="text" class="form-input bg-gray-100 border border-gray-300 rounded px-2 py-1 text-sm w-full" :value="detail.order_status" readonly />
-                                </div>
+                            </div>
                                 <div class="flex items-center mb-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">Analysis Code:</label>
                                     <input type="text" class="form-input border border-gray-300 rounded px-2 py-1 text-sm w-24" v-model="detail.analysis_code" />
                                     <button class="ml-2 text-blue-600"><i class="fas fa-table"></i></button>
-                                </div>
+                            </div>
                                 <div class="flex items-center mb-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">Entry Date:</label>
                                     <input type="date" class="form-input border border-gray-300 rounded px-2 py-1 text-sm w-40" v-model="detail.entry_date" />
                                     <button class="ml-2 text-blue-600"><i class="fas fa-calendar"></i></button>
                                     <span class="ml-2 text-xs text-gray-500">Mon</span>
-                                </div>
+                            </div>
                                 <div class="flex items-center mb-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">Entry Reference:</label>
                                     <input type="text" class="form-input border border-gray-300 rounded px-2 py-1 text-sm w-full" v-model="detail.entry_ref" />
-                                </div>
+                            </div>
                                 <div class="flex items-center mb-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">Set Quantity:</label>
                                     <input type="text" class="form-input border border-gray-300 rounded px-2 py-1 text-sm w-32" v-model="detail.set_qty" />
                                     <span class="ml-2 text-xs text-gray-500">Leave blank for Loose Item Stocking</span>
-                                </div>
+                    </div>
                                 <div class="flex items-center mb-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">Whse Location:</label>
                                     <input type="text" class="form-input border border-gray-300 rounded px-2 py-1 text-sm w-32" v-model="detail.whse_location" readonly />
                                     <button class="ml-2 text-blue-600" @click="openWarehouseLocationModal"><i class="fas fa-table"></i></button>
-                                </div>
+                </div>
                                 <div class="flex items-center mb-2 md:col-span-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">Remark:</label>
                                     <input type="text" class="form-input border border-gray-300 rounded px-2 py-1 text-sm flex-1" v-model="detail.remark" />
                                 </div>
                             </div>
                         </div>
-                    </div>
+                                            </div>
 
-                </div>
+                                            </div>
                 <!-- Quick Tips -->
                 <div class="lg:col-span-1">
                     <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden">
@@ -156,7 +156,7 @@
                         <div class="flex items-center mb-4 pb-2 border-b border-gray-200 relative z-10">
                             <div class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-3 shadow-md">
                                 <i class="fas fa-lightbulb text-white"></i>
-                            </div>
+                                            </div>
                             <h3 class="text-lg font-semibold text-gray-800">Quick Tips</h3>
                         </div>
                         <div class="space-y-4 relative z-10">

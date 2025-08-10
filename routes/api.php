@@ -407,3 +407,14 @@ Route::delete('/customer-warehouse-requirements/{customerCode}', [CustomerWareho
 Route::get('/warehouse-requirements/customers', [CustomerWarehouseRequirementController::class, 'getCustomers']);
 Route::get('/warehouse-requirements/warehouse-locations', [CustomerWarehouseRequirementController::class, 'getWarehouseLocations']);
 Route::get('/warehouse-requirements/delivery-order-formats', [CustomerWarehouseRequirementController::class, 'getDeliveryOrderFormats']);
+
+// FG Stock-In by WO API routes
+Route::prefix('fg-stock-in-wo')->group(function () {
+    Route::get('/work-orders', [App\Http\Controllers\Api\FgStockInByWoController::class, 'getWorkOrders']);
+    Route::get('/work-orders/{woNumber}/details', [App\Http\Controllers\Api\FgStockInByWoController::class, 'getWorkOrderDetails']);
+    Route::post('/', [App\Http\Controllers\Api\FgStockInByWoController::class, 'store']);
+    Route::get('/', [App\Http\Controllers\Api\FgStockInByWoController::class, 'index']);
+});
+
+// Work Orders API routes
+Route::get('/work-orders', [App\Http\Controllers\Api\FgStockInByWoController::class, 'getWorkOrders']);
