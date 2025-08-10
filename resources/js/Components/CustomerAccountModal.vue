@@ -83,6 +83,8 @@
         <div class="text-xs text-gray-500 mr-auto" v-if="filteredAccounts.length > 0">
           {{ filteredAccounts.length }} accounts found
         </div>
+        <button type="button" @click="openCustomerAccountOptionsModal" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">More Options</button>
+        <button type="button" @click="openCustomerAccountZoomModal" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">Zoom</button>
         <button 
           @click="handleSelect" 
           :disabled="!selectedAccount"
@@ -93,11 +95,26 @@
       </div>
     </div>
   </div>
+
+  <!-- Customer Account Options Modal -->
+  <CustomerAccountOptionsModal
+    :show="showCustomerAccountOptionsModal"
+    @close="showCustomerAccountOptionsModal = false"
+  />
+
+  <!-- Customer Account Zoom Modal -->
+  <CustomerAccountZoomModal
+    :show="showCustomerAccountZoomModal"
+    @close="showCustomerAccountZoomModal = false"
+    :customerAccountData="selectedAccount"
+  />
 </template>
 
 <script>
 import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
+import CustomerAccountOptionsModal from '@/Components/CustomerAccountOptionsModal.vue'
+import CustomerAccountZoomModal from '@/Components/CustomerAccountZoomModal.vue'
 
 export default {
   props: {
@@ -126,6 +143,12 @@ export default {
     const error = ref(null)
     const sortBy = ref(props.initialSortBy)
     const statusFilter = ref(props.initialStatusFilter.includes('Active') ? 'active' : (props.initialStatusFilter.includes('Obsolete') ? 'obsolete' : 'all'))
+
+    // New state for Customer Account Options Modal
+    const showCustomerAccountOptionsModal = ref(false);
+
+    // New state for Customer Account Zoom Modal
+    const showCustomerAccountZoomModal = ref(false);
 
     const fetchCustomerAccounts = async () => {
       if (props.customerAccounts && props.customerAccounts.length > 0) {
@@ -210,6 +233,16 @@ export default {
       }
     }
     
+    // Functions to open new modals
+    const openCustomerAccountOptionsModal = () => {
+      showCustomerAccountOptionsModal.value = true;
+    };
+
+    const openCustomerAccountZoomModal = () => {
+      showCustomerAccountZoomModal.value = true;
+    };
+
+    
     // Watch for changes in sort options and emit sort event
     watch([sortBy, statusFilter], () => {
       if (sortBy.value === 'customer_code') {
@@ -250,7 +283,12 @@ export default {
       statusFilter,
       selectAccount,
       handleSelect,
-      fetchCustomerAccounts
+      fetchCustomerAccounts,
+      // Expose new modal states and functions
+      showCustomerAccountOptionsModal,
+      showCustomerAccountZoomModal,
+      openCustomerAccountOptionsModal,
+      openCustomerAccountZoomModal,
     }
   }
 }

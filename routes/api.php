@@ -38,6 +38,7 @@ use App\Http\Controllers\FgDoConfigController;
 use App\Http\Controllers\DeliveryOrderFormatController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
 use App\Http\Controllers\CustomerWarehouseRequirementController;
+use App\Http\Controllers\UpdateMcController;
 
 /*
 |--------------------------------------------------------------------------
@@ -407,6 +408,13 @@ Route::delete('/customer-warehouse-requirements/{customerCode}', [CustomerWareho
 Route::get('/warehouse-requirements/customers', [CustomerWarehouseRequirementController::class, 'getCustomers']);
 Route::get('/warehouse-requirements/warehouse-locations', [CustomerWarehouseRequirementController::class, 'getWarehouseLocations']);
 Route::get('/warehouse-requirements/delivery-order-formats', [CustomerWarehouseRequirementController::class, 'getDeliveryOrderFormats']);
+
+// Update MC API Routes
+Route::prefix('update-mc')->group(function () {
+    Route::post('/search-ac', [UpdateMcController::class, 'searchAc']);
+    Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs']);
+    Route::get('/master-cards', [UpdateMcController::class, 'apiIndex']);
+});
 
 // FG Stock-In by WO API routes
 Route::prefix('fg-stock-in-wo')->group(function () {

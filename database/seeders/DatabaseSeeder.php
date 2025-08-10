@@ -64,6 +64,7 @@ class DatabaseSeeder extends Seeder
             StandardFormulaSeeder::class,
             UpdateCustomerAccountSeeder::class,
             WarehouseLocationSeeder::class,
+            UpdateMcSeeder::class,
         ]);
     }
 }

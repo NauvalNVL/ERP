@@ -1091,3 +1091,11 @@ Route::get('/material-management/system-requirement/inventory-setup/obsolete-rea
 
 // Add route for CustomerWarehouseRequirement
 Route::get('/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-requirement', [CustomerWarehouseRequirementController::class, 'index'])->name('vue.warehouse-management.finished-goods.setup-maintenance.define-customer-warehouse-requirement');
+
+// Update MC Routes
+Route::prefix('update-mc')->group(function () {
+    Route::get('/', [UpdateMcController::class, 'index'])->name('update-mc.index');
+    Route::post('/search-ac', [UpdateMcController::class, 'searchAc'])->name('update-mc.search-ac');
+    Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs'])->name('update-mc.search-mcs');
+    Route::get('/master-cards', [UpdateMcController::class, 'apiIndex'])->name('update-mc.master-cards');
+});
