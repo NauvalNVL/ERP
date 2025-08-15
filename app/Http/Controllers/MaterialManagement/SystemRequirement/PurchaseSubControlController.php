@@ -111,6 +111,48 @@ class PurchaseSubControlController extends Controller
         ]);
     }
 
+    /**
+     * Get purchase sub controls for print
+     */
+    public function getForPrint(Request $request)
+    {
+        $query = PurchaseSubControl::query();
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $query->search($request->search);
+        }
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->byCategory($request->category);
+        }
+
+        // Sorting
+        $sortBy = $request->get('sort_by', 'psc_code');
+        $sortDirection = $request->get('sort_direction', 'asc');
+        $query->orderBy($sortBy, $sortDirection);
+
+        $purchaseSubControls = $query->get();
+
+        return response()->json($purchaseSubControls);
+    }
+
+    /**
+     * Toggle active status of purchase sub control
+     */
+    public function toggleActive($id)
+    {
+        $purchaseSubControl = PurchaseSubControl::findOrFail($id);
+        $purchaseSubControl->is_active = !$purchaseSubControl->is_active;
+        $purchaseSubControl->save();
+
+        return response()->json([
+            'message' => 'Purchase Sub-Control status updated successfully',
+            'data' => $purchaseSubControl
+        ]);
+    }
+
 
 
     /**

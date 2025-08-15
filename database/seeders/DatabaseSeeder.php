@@ -63,8 +63,6 @@ class DatabaseSeeder extends Seeder
             CorrugatorConfigSeeder::class,
             ScoringFormulaSeeder::class,
             StandardFormulaSeeder::class,
-            UpdateCustomerAccountSeeder::class,
-            WarehouseLocationSeeder::class,
             UpdateMcSeeder::class,
         ]);
     }

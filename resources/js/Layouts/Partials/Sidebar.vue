@@ -436,13 +436,13 @@ const materialManagementItems = [
         title: 'Purchase Order Setup',
         icon: 'fas fa-shopping-cart',
         children: [
-          { title: 'Define Purchaser', icon: 'fas fa-user-tie', route: '/material-management/system-requirement/purchase-order-setup/purchaser' },
-          { title: 'Define Approver', icon: 'fas fa-user-check', route: '/material-management/system-requirement/purchase-order-setup/approver' },
+          { title: 'Define Purchaser', icon: 'fas fa-user-tie', route: '/material-management/system-requirement/purchase-order-setup/define-purchaser' },
+          { title: 'Define Approver', icon: 'fas fa-user-check', route: '/material-management/system-requirement/purchase-order-setup/define-approver' },
           { title: 'Define Purchase Sub-Control', icon: 'fas fa-user-cog', route: '/material-management/system-requirement/purchase-order-setup/define-purchase-sub-control' },
           { title: 'Define SKU Item Note Analysis Group', icon: 'fas fa-tags', route: '/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-group' },
           { title: 'Define SKU Item Note Analysis Code', icon: 'fas fa-code', route: '/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-code' },
-          { title: 'View & Print Purchaser', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/purchaser/view-print' },
-          { title: 'View & Print Approver', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/approver/view-print' },
+          { title: 'View & Print Purchaser', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/define-purchaser/view-print' },
+          { title: 'View & Print Approver', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/define-approver/view-print' },
           { title: 'View & Print Purchase Sub-Control', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/define-purchase-sub-control/view-print' },
           { title: 'View & Print SKU Item Note Analysis Group', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-group/view-print' },
           { title: 'View & Print SKU Item Note Analysis Code', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-code/view-print' }

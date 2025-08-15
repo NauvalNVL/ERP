@@ -84,6 +84,44 @@ Route::post('/purchasers/{id}/test-email-flow', [App\Http\Controllers\MaterialMa
 Route::get('/search-approvers', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'searchApprovers']);
 Route::post('/validate-email', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'validateEmail']);
 
+// Approver API routes
+Route::get('/approvers', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'index']);
+Route::post('/approvers', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'store']);
+Route::get('/approvers/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'getForPrint']);
+Route::get('/approvers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'show']);
+Route::put('/approvers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'update']);
+Route::delete('/approvers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'destroy']);
+Route::patch('/approvers/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'toggleActive']);
+
+// Purchase Sub Control API routes
+Route::get('/purchase-sub-controls', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'index']);
+Route::post('/purchase-sub-controls', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'store']);
+Route::get('/purchase-sub-controls/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'getForPrint']);
+Route::get('/purchase-sub-controls/categories', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'getCategories']);
+Route::get('/purchase-sub-controls/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'show']);
+Route::put('/purchase-sub-controls/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'update']);
+Route::patch('/purchase-sub-controls/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'toggleActive']);
+
+// SKU Item Note Analysis Group API routes
+Route::get('/sku-item-note-analysis-groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'index']);
+Route::post('/sku-item-note-analysis-groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'store']);
+Route::get('/sku-item-note-analysis-groups/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'getForPrint']);
+Route::get('/sku-item-note-analysis-groups/categories', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'getCategories']);
+Route::get('/sku-item-note-analysis-groups/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'show']);
+Route::put('/sku-item-note-analysis-groups/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'update']);
+Route::delete('/sku-item-note-analysis-groups/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'destroy']);
+Route::patch('/sku-item-note-analysis-groups/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'toggleActive']);
+
+// SKU Item Note Analysis Code API routes
+Route::get('/sku-item-note-analysis-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'index']);
+Route::post('/sku-item-note-analysis-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'store']);
+Route::get('/sku-item-note-analysis-codes/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'getForPrint']);
+Route::get('/sku-item-note-analysis-codes/groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'getGroups']);
+Route::get('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'show']);
+Route::put('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'update']);
+Route::delete('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'destroy']);
+Route::patch('/sku-item-note-analysis-codes/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'toggleActive']);
+
 // SKU Price API routes
 Route::get('/sku-prices', [App\Http\Controllers\SkuPriceController::class, 'index']);
 Route::get('/sku-prices/for-print', [App\Http\Controllers\SkuPriceController::class, 'getSkuPricesForPrint']);

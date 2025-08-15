@@ -634,6 +634,39 @@ Route::middleware('auth')->group(function () {
         Route::get('unit', [MmUnitController::class, 'index'])->name('unit.index');
         Route::get('unit/view-print', [MmUnitController::class, 'viewPrint'])->name('unit.vp');
     });
+
+    Route::prefix('material-management/system-requirement/purchase-order-setup')->name('mm.sr.pos.')->group(function () {
+        Route::get('define-purchase-sub-control', function () {
+            return Inertia::render('material-management/system-requirement/purchase-order-setup/PurchaseSubControl');
+        })->name('psc.index');
+        Route::get('define-purchase-sub-control/view-print', function () {
+            return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintPurchaseSubControl');
+        })->name('psc.vp');
+        Route::get('define-approver', function () {
+            return Inertia::render('material-management/system-requirement/purchase-order-setup/Approver');
+        })->name('approver.index');
+        Route::get('define-approver/view-print', function () {
+            return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintApprover');
+        })->name('approver.vp');
+        Route::get('define-purchaser', function () {
+            return Inertia::render('material-management/system-requirement/purchase-order-setup/Purchaser');
+        })->name('purchaser.index');
+        Route::get('define-purchaser/view-print', function () {
+            return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintPurchaser');
+        })->name('purchaser.vp');
+        Route::get('sku-item-note-analysis-group', function () {
+            return Inertia::render('material-management/system-requirement/purchase-order-setup/SkuItemNoteAnalysisGroup');
+        })->name('sknag.index');
+        Route::get('sku-item-note-analysis-group/view-print', function () {
+            return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintSkuItemNoteAnalysisGroup');
+        })->name('sknag.vp');
+        Route::get('sku-item-note-analysis-code', function () {
+            return Inertia::render('material-management/system-requirement/purchase-order-setup/SkuItemNoteAnalysisCode');
+        })->name('sknac.index');
+        Route::get('sku-item-note-analysis-code/view-print', function () {
+            return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintSkuItemNoteAnalysisCode');
+        })->name('sknac.vp');
+    });
 });
 
 // Report Group Routes
@@ -1134,7 +1167,7 @@ Route::get('/material-management/system-requirement/inventory-setup/dr-cr-note/v
     return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintDrCrNote');
 })->name('material-management.system-requirement.inventory-setup.dr-cr-note.view-print');
 
-Route::get('/material-management/system-requirement/inventory-setup/unlock-sku-utility', [UnlockSkuUtilityController::class, 'index'])
+Route::get('/material-management/system-requirement/inventory-setup/unlock-sku-utility', [App\Http\Controllers\MaterialManagement\SystemRequirement\UnlockSkuUtilityController::class, 'index'])
     ->name('material-management.system-requirement.inventory-setup.unlock-sku-utility');
 
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
