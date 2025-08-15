@@ -7,6 +7,7 @@ use App\Models\UpdateCustomerAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CustomerWarehouseLocationController extends Controller
 {
@@ -162,7 +163,14 @@ class CustomerWarehouseLocationController extends Controller
     {
         $existsInWarehouseLocation = CustomerWarehouseLocation::where('customer_code', $customer_code)->exists();
         $customerAccount = UpdateCustomerAccount::where('customer_code', $customer_code)->first();
-
+        
+        Log::debug('Customer check:', [
+            'customer_code' => $customer_code,
+            'exists_in_warehouse' => $existsInWarehouseLocation,
+            'customer_account_found' => $customerAccount ? true : false,
+            'customer_name' => $customerAccount ? $customerAccount->customer_name : null
+        ]);
+        
         return response()->json([
             'exists' => $existsInWarehouseLocation,
             'customer_name' => $customerAccount ? $customerAccount->customer_name : '',

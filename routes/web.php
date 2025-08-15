@@ -61,9 +61,7 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReportGroupController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController;
-use App\Http\Controllers\MaterialManagement\SystemRequirement\UnlockSkuUtilityController;
-use App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController;
-use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController;
+use App\Http\Controllers\CustomerWarehouseRequirementController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -443,6 +441,47 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehouse-management/finished-goods/fg-normal', function () {
         return Inertia::render('warehouse-management/FinishedGoods/FGNormal');
     })->name('vue.warehouse-management.finished-goods.fg-normal');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/check-fg-balance', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/CheckFGBalance');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.check-fg-balance');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/clear-fg-mc-lock', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/ClearFGMCLock');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.clear-fg-mc-lock');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/print-fg-stock-in-log', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/PrintFGStockInLog');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.print-fg-stock-in-log');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/print-fg-stock-out-log', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/PrintFGStockOutLog');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.print-fg-stock-out-log');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-location-transfer', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGLocationTransfer');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-location-transfer');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-barcode', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGStockInByBarcode');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-stock-in-by-barcode');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-so', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGStockInBySO');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-stock-in-by-so');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-wo', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGStockInByWO');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-stock-in-by-wo');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-stock-out-by-batch', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGStockOutByBatch');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-stock-out-by-batch');
+
+    Route::get('/warehouse-management/finished-goods/fg-normal/update-fg-stock-out-by-mc', function () {
+        return Inertia::render('warehouse-management/FinishedGoods/FGNormal/UpdateFGStockOutByMC');
+    })->name('vue.warehouse-management.finished-goods.fg-normal.update-fg-stock-out-by-mc');
+
     Route::get('/warehouse-management/finished-goods/setup-maintenance/fg-do-configuration', function () {
         return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/fg-do-configuration');
     })->name('vue.warehouse-management.finished-goods.setup-maintenance.fg-do-configuration');
@@ -1101,63 +1140,13 @@ Route::get('/material-management/system-requirement/inventory-setup/unlock-sku-u
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');
 
-Route::get('/material-management/system-requirement/inventory-setup/custom-tariff-code/view-print', function() {
-    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintCustomTariffCode');
-})->name('material-management.system-requirement.inventory-setup.custom-tariff-code.view-print');
+// Add route for CustomerWarehouseRequirement
+Route::get('/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-requirement', [CustomerWarehouseRequirementController::class, 'index'])->name('vue.warehouse-management.finished-goods.setup-maintenance.define-customer-warehouse-requirement');
 
-Route::get('/material-management/system-requirement/inventory-setup/sku-custom-tariff-code', function() {
-    return Inertia::render('material-management/system-requirement/inventory-setup/SkuCustomTariffCode');
-})->name('material-management.system-requirement.inventory-setup.sku-custom-tariff-code');
-
-Route::get('/material-management/system-requirement/inventory-setup/dr-cr-note', function() {
-    return Inertia::render('material-management/system-requirement/inventory-setup/DrCrNote');
-})->name('material-management.system-requirement.inventory-setup.dr-cr-note');
-
-Route::get('/material-management/system-requirement/inventory-setup/custom-tariff-code/view-print', function() {
-    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintCustomTariffCode');
-})->name('material-management.system-requirement.inventory-setup.custom-tariff-code.view-print');
-
-Route::get('/material-management/system-requirement/inventory-setup/sku-tariff-code/view-print', function() {
-    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintSkuTariffCode');
-})->name('material-management.system-requirement.inventory-setup.sku-tariff-code.view-print');
-
-Route::get('/material-management/system-requirement/inventory-setup/dr-cr-note', function() {
-    return Inertia::render('material-management/system-requirement/inventory-setup/DrCrNote');
-})->name('material-management.system-requirement.inventory-setup.dr-cr-note');
-
-Route::get('/material-management/system-requirement/inventory-setup/report-group/view-print', [MmReportGroupController::class, 'viewPrint'])->name('inventory-setup.report-group.view-print');
-
-// Purchase Order Setup Routes
-Route::get('/material-management/system-requirement/purchase-order-setup/purchaser', function() {
-    return Inertia::render('material-management/system-requirement/purchase-order-setup/Purchaser');
-})->name('material-management.system-requirement.purchase-order-setup.purchaser');
-
-Route::get('/material-management/system-requirement/purchase-order-setup/purchaser/view-print', function() {
-    return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintPurchaser');
-})->name('material-management.system-requirement.purchase-order-setup.purchaser.view-print');
-
-Route::get('/material-management/system-requirement/purchase-order-setup/approver', function() {
-    return Inertia::render('material-management/system-requirement/purchase-order-setup/Approver');
-})->name('material-management.system-requirement.purchase-order-setup.approver');
-
-Route::get('/material-management/system-requirement/purchase-order-setup/approver/view-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'viewPrint'])->name('material-management.system-requirement.purchase-order-setup.approver.view-print');
-
-Route::get('/material-management/system-requirement/purchase-order-setup/define-purchase-sub-control', function() {
-    return Inertia::render('material-management/system-requirement/purchase-order-setup/PurchaseSubControl');
-})->name('material-management.system-requirement.purchase-order-setup.define-purchase-sub-control');
-
-Route::get('/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-group', function() {
-    return Inertia::render('material-management/system-requirement/purchase-order-setup/SkuItemNoteAnalysisGroup');
-})->name('material-management.system-requirement.purchase-order-setup.sku-item-note-analysis-group');
-
-Route::get('/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-group/view-print', function() {
-    return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintSkuItemNoteAnalysisGroup');
-})->name('material-management.system-requirement.purchase-order-setup.sku-item-note-analysis-group.view-print');
-
-Route::get('/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-code', function() {
-    return Inertia::render('material-management/system-requirement/purchase-order-setup/SkuItemNoteAnalysisCode');
-})->name('material-management.system-requirement.purchase-order-setup.sku-item-note-analysis-code');
-
-Route::get('/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-code/view-print', function() {
-    return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintSkuItemNoteAnalysisCode');
-})->name('material-management.system-requirement.purchase-order-setup.sku-item-note-analysis-code.view-print');
+// Update MC Routes
+Route::prefix('update-mc')->group(function () {
+    Route::get('/', [UpdateMcController::class, 'index'])->name('update-mc.index');
+    Route::post('/search-ac', [UpdateMcController::class, 'searchAc'])->name('update-mc.search-ac');
+    Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs'])->name('update-mc.search-mcs');
+    Route::get('/master-cards', [UpdateMcController::class, 'apiIndex'])->name('update-mc.master-cards');
+});

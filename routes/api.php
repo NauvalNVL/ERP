@@ -38,6 +38,8 @@ use App\Http\Controllers\CustomerSalesTypeController;
 use App\Http\Controllers\FgDoConfigController;
 use App\Http\Controllers\DeliveryOrderFormatController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
+use App\Http\Controllers\CustomerWarehouseRequirementController;
+use App\Http\Controllers\UpdateMcController;
 
 /*
 |--------------------------------------------------------------------------
@@ -696,56 +698,52 @@ Route::get('test-sku-reorder-level-controller', function() {
 
 // GL Distribution API routes
 Route::prefix('material-management')->group(function () {
-    Route::get('/gl-distributions/list', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController::class, 'getGlDistributions']);
-    Route::get('/gl-distributions', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController::class, 'getGlDistributions']);
-    Route::post('/gl-distributions', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController::class, 'store']);
-    Route::put('/gl-distributions/{glDistribution}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController::class, 'update']);
-    Route::delete('/gl-distributions/{glDistribution}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController::class, 'destroy']);
-    Route::get('/gl-distributions/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController::class, 'getGlDistributionsForPrint']);
-    Route::get('/chart-of-accounts', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController::class, 'getChartOfAccounts']);
+    // SKU Routes
+    Route::get('/skus', [MmSkuController::class, 'index']);
+    Route::post('/skus', [MmSkuController::class, 'store']);
+    Route::get('/skus/{sku}', [MmSkuController::class, 'show']);
+    Route::put('/skus/{sku}', [MmSkuController::class, 'update']);
+    Route::delete('/skus/{sku}', [MmSkuController::class, 'destroy']);
+    Route::post('/skus/{sku}/change-code', [MmSkuController::class, 'changeSkuCode']);
+    Route::patch('/skus/{sku}/toggle-active', [MmSkuController::class, 'toggleActive']);
+    Route::post('/skus/bulk-toggle-active', [MmSkuController::class, 'bulkToggleActive']);
+    Route::get('/skus/categories', [MmSkuController::class, 'getCategories']);
+    Route::get('/skus/units', [MmSkuController::class, 'getUnits']);
+    Route::get('/skus/types', [MmSkuController::class, 'getTypes']);
+    Route::get('/skus/{sku_id}/balance', [MmSkuController::class, 'getSkuBalance']);
+
+    // GL Distribution Routes
+    Route::get('/gl-distributions/list', [MmGlDistributionController::class, 'getGlDistributions']);
+    Route::get('/gl-distributions', [MmGlDistributionController::class, 'getGlDistributions']);
+    Route::post('/gl-distributions', [MmGlDistributionController::class, 'store']);
+    Route::put('/gl-distributions/{glDistribution}', [MmGlDistributionController::class, 'update']);
+    Route::delete('/gl-distributions/{glDistribution}', [MmGlDistributionController::class, 'destroy']);
+    Route::get('/chart-of-accounts', [MmGlDistributionController::class, 'getChartOfAccounts']);
 });
 
-// Approver API routes
-Route::get('/approvers', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'index']);
-Route::post('/approvers', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'store']);
-Route::get('/approvers/users', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'getUsers']);
-Route::get('/approvers/pr-authorized', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'getPrAuthorizedApprovers']);
-Route::get('/approvers/po-authorized', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'getPoAuthorizedApprovers']);
-Route::post('/approvers/validate-email', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'validateEmail']);
-Route::get('/approvers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'show']);
-Route::put('/approvers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'update']);
-Route::delete('/approvers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'destroy']);
-Route::patch('/approvers/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'toggleActive']);
+// Customer Warehouse Location API routes
+Route::prefix('customer-warehouse-locations')->group(function () {
+    Route::get('/', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'index'])->name('customer-warehouse-locations.index');
+    Route::post('/', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'store'])->name('customer-warehouse-locations.store');
+    Route::get('/check/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'check'])->name('customer-warehouse-locations.check');
+    Route::get('/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'show'])->name('customer-warehouse-locations.show');
+    Route::put('/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'update'])->name('customer-warehouse-locations.update');
+    Route::delete('/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'destroy'])->name('customer-warehouse-locations.destroy');
+});
 
-// Purchase Sub Control API routes
-Route::get('/purchase-sub-controls', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'index']);
-Route::post('/purchase-sub-controls', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'store']);
-Route::get('/purchase-sub-controls/categories', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'getCategories']);
-Route::post('/purchase-sub-controls/validate-code', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'validateCode']);
-Route::get('/purchase-sub-controls/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'show']);
-Route::put('/purchase-sub-controls/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'update']);
-Route::delete('/purchase-sub-controls/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'destroy']);
+// Customer Warehouse Requirement API routes
+Route::get('/customer-warehouse-requirements', [CustomerWarehouseRequirementController::class, 'getAllRequirements']);
+Route::get('/customer-warehouse-requirements/{customerCode}', [CustomerWarehouseRequirementController::class, 'getByCustomerCode']);
+Route::post('/customer-warehouse-requirements', [CustomerWarehouseRequirementController::class, 'store']);
+Route::put('/customer-warehouse-requirements/{customerCode}', [CustomerWarehouseRequirementController::class, 'update']);
+Route::delete('/customer-warehouse-requirements/{customerCode}', [CustomerWarehouseRequirementController::class, 'destroy']);
+Route::get('/warehouse-requirements/customers', [CustomerWarehouseRequirementController::class, 'getCustomers']);
+Route::get('/warehouse-requirements/warehouse-locations', [CustomerWarehouseRequirementController::class, 'getWarehouseLocations']);
+Route::get('/warehouse-requirements/delivery-order-formats', [CustomerWarehouseRequirementController::class, 'getDeliveryOrderFormats']);
 
-
-// SKU Item Note Analysis Group API routes
-Route::get('/sku-item-note-analysis-groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'index']);
-Route::post('/sku-item-note-analysis-groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'store']);
-Route::get('/sku-item-note-analysis-groups/categories', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'getCategories']);
-Route::post('/sku-item-note-analysis-groups/validate-code', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'validateCode']);
-Route::get('/sku-item-note-analysis-groups/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'getForPrint']);
-Route::get('/sku-item-note-analysis-groups/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'show']);
-Route::put('/sku-item-note-analysis-groups/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'update']);
-Route::delete('/sku-item-note-analysis-groups/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'destroy']);
-Route::patch('/sku-item-note-analysis-groups/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'toggleActive']);
-
-// SKU Item Note Analysis Code API routes
-Route::get('/sku-item-note-analysis-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'index']);
-Route::post('/sku-item-note-analysis-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'store']);
-Route::get('/sku-item-note-analysis-codes/groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'getAnalysisGroups']);
-Route::post('/sku-item-note-analysis-codes/validate-code', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'validateCode']);
-Route::get('/sku-item-note-analysis-codes/by-group/{groupId}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'getByGroup']);
-Route::get('/sku-item-note-analysis-codes/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'getForPrint']);
-Route::get('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'show']);
-Route::put('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'update']);
-Route::delete('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'destroy']);
-Route::patch('/sku-item-note-analysis-codes/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'toggleActive']);
+// Update MC API Routes
+Route::prefix('update-mc')->group(function () {
+    Route::post('/search-ac', [UpdateMcController::class, 'searchAc']);
+    Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs']);
+    Route::get('/master-cards', [UpdateMcController::class, 'apiIndex']);
+});

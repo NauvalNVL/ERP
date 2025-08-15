@@ -860,15 +860,15 @@ const warehouseManagementItems = [
         icon: 'fas fa-box-open',
         children: [
           { title: 'Check FG Balance', icon: 'fas fa-balance-scale', route: '/warehouse-management/finished-goods/fg-normal/check-fg-balance' },
-          { title: 'Update FG Stock-In by SO', icon: 'fas fa-file-import', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-so' },
-          { title: 'Update FG Stock-In by WO', icon: 'fas fa-file-import', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-wo' },
-          { title: 'Update FG Stock-In by Barcode', icon: 'fas fa-barcode', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-barcode' },
-          { title: 'Update FG Stock-Out by MC', icon: 'fas fa-file-export', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-out-mc' },
+          { title: 'Update FG Stock-In by SO', icon: 'fas fa-file-import', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-so' },
+          { title: 'Update FG Stock-In by WO', icon: 'fas fa-file-import', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-wo' },
+          { title: 'Update FG Stock-In by Barcode', icon: 'fas fa-barcode', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-barcode' },
+          { title: 'Update FG Stock-Out by MC', icon: 'fas fa-file-export', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-out-by-mc' },
           { title: 'Update FG Location Transfer', icon: 'fas fa-exchange-alt', route: '/warehouse-management/finished-goods/fg-normal/update-fg-location-transfer' },
-          { title: 'Update FG Stock-Out by Batch', icon: 'fas fa-boxes', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-out-batch' },
+          { title: 'Update FG Stock-Out by Batch', icon: 'fas fa-boxes', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-out-by-batch' },
           { title: 'Print FG Stock-In Log', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/fg-normal/print-fg-stock-in-log' },
           { title: 'Print FG Stock-Out Log', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/fg-normal/print-fg-stock-out-log' },
-          { title: 'Clear FGMC Lock', icon: 'fas fa-lock-open', route: '/warehouse-management/finished-goods/fg-normal/clear-fgmc-lock' },
+          { title: 'Clear FGMC Lock', icon: 'fas fa-lock-open', route: '/warehouse-management/finished-goods/fg-normal/clear-fg-mc-lock' },
         ]
       },
       {
