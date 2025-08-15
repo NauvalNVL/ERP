@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mm_units', function (Blueprint $table) {
-            $table->string('code', 20)->primary();
-            $table->string('short_name', 50);
-            $table->string('full_name', 150);
+        Schema::create('uoms', function (Blueprint $table) {
+            $table->string('code')->primary();
+            $table->string('short_name')->nullable();
+            $table->string('full_name')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mm_units');
+        Schema::dropIfExists('uoms');
     }
-}; 
+};

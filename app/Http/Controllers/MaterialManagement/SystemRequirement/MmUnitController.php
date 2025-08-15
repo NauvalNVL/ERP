@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Database\Seeders\MmUnitSeeder;
+use Illuminate\Support\Facades\Log;
 
 class MmUnitController extends Controller
 {
@@ -36,7 +37,9 @@ class MmUnitController extends Controller
      */
     public function getUnits()
     {
+        Log::info('Attempting to fetch units from MmUnitController.');
         $units = MmUnit::orderBy('code')->get();
+        Log::info('Units fetched: ' . $units->toJson());
         return response()->json($units);
     }
     

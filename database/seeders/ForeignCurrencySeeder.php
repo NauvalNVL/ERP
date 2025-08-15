@@ -14,10 +14,6 @@ class ForeignCurrencySeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear the table first to avoid duplicate entries
-        // It's better to use truncate if we want to reset the primary key
-        DB::table('foreign_currencies')->truncate();
-
         $currencies = [
             [
                 'currency_code' => 'EUR',
@@ -58,7 +54,10 @@ class ForeignCurrencySeeder extends Seeder
         ];
 
         foreach ($currencies as $currency) {
-            ForeignCurrency::create($currency);
+            ForeignCurrency::updateOrCreate(
+                ['currency_code' => $currency['currency_code']],
+                $currency
+            );
         }
     }
 }

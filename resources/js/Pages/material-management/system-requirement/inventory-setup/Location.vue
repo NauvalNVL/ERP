@@ -121,12 +121,9 @@
                 <span class="font-medium text-gray-900 text-right">{{ selectedLocation.name }}</span>
               </div>
             </div>
-            <div class="mt-6 flex space-x-2">
-              <button @click="editLocation(selectedLocation)" class="flex-1 btn-blue">
+            <div class="mt-6">
+              <button @click="editLocation(selectedLocation)" class="w-full btn-blue">
                 <i class="fas fa-edit mr-1"></i> Edit
-              </button>
-              <button @click="confirmDelete(selectedLocation)" class="flex-1 btn-danger">
-                <i class="fas fa-trash-alt mr-1"></i> Delete
               </button>
             </div>
           </div>
@@ -208,30 +205,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Confirmation Modal -->
-    <div v-if="showConfirmation" class="fixed inset-0 flex items-center justify-center z-50">
-      <div class="absolute inset-0 bg-black opacity-50" @click="showConfirmation = false"></div>
-      <div class="bg-white rounded-lg shadow-lg max-w-md z-10 w-full">
-        <div class="p-6">
-          <div class="flex items-center mb-4">
-            <div class="bg-red-100 rounded-full p-2 mr-3">
-              <i class="fas fa-exclamation-triangle text-red-600"></i>
-        </div>
-            <h3 class="text-lg font-medium text-gray-900">Confirm Delete</h3>
-        </div>
-          <p class="mb-4 text-gray-600">Are you sure you want to delete location <span class="font-semibold">{{ locationToDelete?.code }}</span>? This action cannot be undone.</p>
-          <div class="flex justify-end space-x-3">
-            <button @click="showConfirmation = false" class="px-4 py-2 text-gray-700 border border-gray-300 rounded hover:bg-gray-50">
-              <i class="fas fa-times mr-1"></i> Cancel
-            </button>
-            <button @click="deleteLocation" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" :disabled="loading">
-              <i class="fas fa-trash-alt mr-1"></i> Delete
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   </AppLayout>
 </template>
 
@@ -248,8 +221,6 @@ const selectedLocation = ref(null);
 const loading = ref(false);
 const searchQuery = ref('');
 const showFormModal = ref(false);
-const showConfirmation = ref(false);
-const locationToDelete = ref(null);
 const isEditing = ref(false);
 const sortOrder = ref({
   field: 'code',
@@ -362,11 +333,6 @@ const editLocation = (location) => {
   errors.value = {};
 };
 
-const confirmDelete = (location) => {
-  locationToDelete.value = location;
-  showConfirmation.value = true;
-};
-
 const saveLocation = async () => {
   loading.value = true;
   errors.value = {};
@@ -396,30 +362,6 @@ const saveLocation = async () => {
       errors.value = error.response.data.errors;
     }
     toast.error(error.response?.data?.message || 'Failed to save location');
-  } finally {
-    loading.value = false;
-  }
-};
-
-const deleteLocation = async () => {
-  if (!locationToDelete.value) return;
-  
-  loading.value = true;
-  try {
-    await axios.delete(`/api/material-management/locations/${locationToDelete.value.code}`);
-    toast.success('Location deleted successfully');
-    
-    locations.value = locations.value.filter(d => d.code !== locationToDelete.value.code);
-    
-    if (selectedLocation.value?.code === locationToDelete.value.code) {
-      selectedLocation.value = null;
-    }
-    
-    showConfirmation.value = false;
-    locationToDelete.value = null;
-  } catch (error) {
-    console.error('Error deleting location:', error);
-    toast.error(error.response?.data?.message || 'Failed to delete location');
   } finally {
     loading.value = false;
   }

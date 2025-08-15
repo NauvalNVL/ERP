@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('mm_skus', function (Blueprint $table) {
-            $table->decimal('price', 15, 2)->default(0.00)->after('rol');
+        Schema::create('sku_types', function (Blueprint $table) {
+            $table->string('code', 20)->primary();
+            $table->string('name', 100);
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('mm_skus', function (Blueprint $table) {
-            $table->dropColumn('price');
-        });
+        Schema::dropIfExists('sku_types');
     }
 };

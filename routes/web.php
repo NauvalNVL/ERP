@@ -61,6 +61,9 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReportGroupController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\UnlockSkuUtilityController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController;
+use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -852,6 +855,20 @@ Route::prefix('api')->group(function () {
     Route::put('/diecut-computation-formulas/{id}', [ComputationFormulaController::class, 'apiUpdate']);
     Route::delete('/diecut-computation-formulas/{id}', [ComputationFormulaController::class, 'apiDestroy']);
     Route::post('/diecut-computation-formulas/seed', [ComputationFormulaController::class, 'apiSeed']);
+
+    // Material Management SKU API routes
+    Route::get('/material-management/skus', [MmSkuController::class, 'index']);
+    Route::get('/material-management/skus/{sku}', [MmSkuController::class, 'show']);
+    Route::post('/material-management/skus', [MmSkuController::class, 'store']);
+    Route::put('/material-management/skus/{sku}', [MmSkuController::class, 'update']);
+    // SKU delete route removed for security
+    Route::post('/material-management/skus/{sku}/change-code', [MmSkuController::class, 'changeSkuCode']);
+    Route::post('/material-management/skus/{sku}/toggle-active', [MmSkuController::class, 'toggleActive']);
+    Route::post('/material-management/skus/bulk-toggle-active', [MmSkuController::class, 'bulkToggleActive']);
+    Route::get('/material-management/skus/{sku}/balance', [MmSkuController::class, 'getSkuBalance']);
+    Route::get('/material-management/skus/categories', [MmSkuController::class, 'getCategories']);
+    Route::get('/material-management/skus/units', [MmSkuController::class, 'getUnits']);
+    Route::get('/material-management/skus/types', [MmSkuController::class, 'getTypes']);
 });
 
 // Roll Size Route
@@ -999,7 +1016,13 @@ Route::prefix('material-management/system-requirement')->group(function () {
 
 // Add direct route for the inventory-setup folder structure
 Route::get('/material-management/system-requirement/inventory-setup/gl-distribution', [MmGlDistributionController::class, 'index'])->name('material-management.system-requirement.inventory-setup.gl-distribution');
-Route::get('/material-management/system-requirement/inventory-setup/gl-distribution/view-print', [MmGlDistributionController::class, 'viewPrint'])->name('material-management.system-requirement.inventory-setup.gl-distribution.view-print');
+Route::get('/material-management/system-requirement/inventory-setup/gl-distribution/view-print', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintGLDistribution');
+})->name('material-management.system-requirement.inventory-setup.gl-distribution.view-print');
+
+// Add MM GL Distribution route
+Route::get('/material-management/system-requirement/inventory-setup/mm-gl-distribution', [MmGlDistributionController::class, 'index'])->name('material-management.system-requirement.inventory-setup.mm-gl-distribution');
+Route::get('/material-management/system-requirement/inventory-setup/mm-gl-distribution/print', [MmGlDistributionController::class, 'print'])->name('material-management.system-requirement.inventory-setup.mm-gl-distribution.print');
 
 // Add SKU routes
 Route::get('/material-management/system-requirement/inventory-setup/sku', function() {
@@ -1018,23 +1041,15 @@ Route::get('/material-management/system-requirement/inventory-setup/amend-sku-ty
 
 Route::get('/material-management/system-requirement/inventory-setup/sku-price', [
     \App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'index'
-])->name('sku-price.index');
+])->name('material-management.system-requirement.inventory-setup.sku-price.index');
 
 Route::put('/material-management/system-requirement/inventory-setup/sku-price/{sku}', [
     \App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'update'
-])->name('sku-price.update');
+])->name('material-management.system-requirement.inventory-setup.sku-price.update');
 
 Route::get('/material-management/system-requirement/inventory-setup/sku-price/view-print', [
     \App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'viewPrint'
-])->name('sku-price.view-print');
-
-Route::get('/api/sku-price/search', [
-    \App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'search'
-])->name('sku-price.search');
-
-Route::get('/material-management/system-requirement/inventory-setup/sku-price/view-print', function() {
-    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintSkuPrice');
-})->name('material-management.system-requirement.inventory-setup.sku-price.view-print');
+])->name('material-management.system-requirement.inventory-setup.sku-price.view-print');
 
 Route::get('/material-management/system-requirement/inventory-setup/amend-sku', function() {
     return Inertia::render('material-management/system-requirement/inventory-setup/AmendSku');
@@ -1044,5 +1059,105 @@ Route::get('/material-management/system-requirement/inventory-setup/obsolete-rea
     return Inertia::render('material-management/system-requirement/inventory-setup/ObsoleteReactiveSku');
 })->name('material-management.system-requirement.inventory-setup.obsolete-reactive-sku');
 
+Route::get('/material-management/system-requirement/inventory-setup/sku-reorder-level', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/SkuReorderLevel');
+})->name('material-management.system-requirement.inventory-setup.sku-reorder-level');
+
+Route::get('/material-management/system-requirement/inventory-setup/sku-reorder-level/view-print', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintSkuReorderLevel');
+})->name('material-management.system-requirement.inventory-setup.sku-reorder-level.view-print');
+
+Route::get('/material-management/system-requirement/inventory-setup/copy-paste-sku-reorder-level', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/CopyPasteSkuReorderLevel');
+})->name('material-management.system-requirement.inventory-setup.copy-paste-sku-reorder-level');
+
+Route::get('/material-management/system-requirement/inventory-setup/sku-consumption-budget', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/SkuConsumptionBudget');
+})->name('material-management.system-requirement.inventory-setup.sku-consumption-budget');
+
+Route::get('/material-management/system-requirement/inventory-setup/sku-consumption-budget/view-print', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintSkuConsumptionBudget');
+})->name('material-management.system-requirement.inventory-setup.sku-consumption-budget.view-print');
+
+Route::get('/material-management/system-requirement/inventory-setup/custom-tariff-code', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/CustomTariffCode');
+})->name('material-management.system-requirement.inventory-setup.custom-tariff-code');
+
+Route::get('/material-management/system-requirement/inventory-setup/custom-tariff-code/view-print', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintCustomTariffCode');
+})->name('material-management.system-requirement.inventory-setup.custom-tariff-code.view-print');
+
+Route::get('/material-management/system-requirement/inventory-setup/dr-cr-note', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/DrCrNote');
+})->name('material-management.system-requirement.inventory-setup.dr-cr-note');
+
+Route::get('/material-management/system-requirement/inventory-setup/dr-cr-note/view-print', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintDrCrNote');
+})->name('material-management.system-requirement.inventory-setup.dr-cr-note.view-print');
+
+Route::get('/material-management/system-requirement/inventory-setup/unlock-sku-utility', [UnlockSkuUtilityController::class, 'index'])
+    ->name('material-management.system-requirement.inventory-setup.unlock-sku-utility');
+
 // Route::get('colors-export', [ColorController::class, 'export'])->name('colors.export');
 // Route::get('color-groups-export', [ColorGroupController::class, 'export'])->name('color-groups.export');
+
+Route::get('/material-management/system-requirement/inventory-setup/custom-tariff-code/view-print', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintCustomTariffCode');
+})->name('material-management.system-requirement.inventory-setup.custom-tariff-code.view-print');
+
+Route::get('/material-management/system-requirement/inventory-setup/sku-custom-tariff-code', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/SkuCustomTariffCode');
+})->name('material-management.system-requirement.inventory-setup.sku-custom-tariff-code');
+
+Route::get('/material-management/system-requirement/inventory-setup/dr-cr-note', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/DrCrNote');
+})->name('material-management.system-requirement.inventory-setup.dr-cr-note');
+
+Route::get('/material-management/system-requirement/inventory-setup/custom-tariff-code/view-print', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintCustomTariffCode');
+})->name('material-management.system-requirement.inventory-setup.custom-tariff-code.view-print');
+
+Route::get('/material-management/system-requirement/inventory-setup/sku-tariff-code/view-print', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/ViewPrintSkuTariffCode');
+})->name('material-management.system-requirement.inventory-setup.sku-tariff-code.view-print');
+
+Route::get('/material-management/system-requirement/inventory-setup/dr-cr-note', function() {
+    return Inertia::render('material-management/system-requirement/inventory-setup/DrCrNote');
+})->name('material-management.system-requirement.inventory-setup.dr-cr-note');
+
+Route::get('/material-management/system-requirement/inventory-setup/report-group/view-print', [MmReportGroupController::class, 'viewPrint'])->name('inventory-setup.report-group.view-print');
+
+// Purchase Order Setup Routes
+Route::get('/material-management/system-requirement/purchase-order-setup/purchaser', function() {
+    return Inertia::render('material-management/system-requirement/purchase-order-setup/Purchaser');
+})->name('material-management.system-requirement.purchase-order-setup.purchaser');
+
+Route::get('/material-management/system-requirement/purchase-order-setup/purchaser/view-print', function() {
+    return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintPurchaser');
+})->name('material-management.system-requirement.purchase-order-setup.purchaser.view-print');
+
+Route::get('/material-management/system-requirement/purchase-order-setup/approver', function() {
+    return Inertia::render('material-management/system-requirement/purchase-order-setup/Approver');
+})->name('material-management.system-requirement.purchase-order-setup.approver');
+
+Route::get('/material-management/system-requirement/purchase-order-setup/approver/view-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'viewPrint'])->name('material-management.system-requirement.purchase-order-setup.approver.view-print');
+
+Route::get('/material-management/system-requirement/purchase-order-setup/define-purchase-sub-control', function() {
+    return Inertia::render('material-management/system-requirement/purchase-order-setup/PurchaseSubControl');
+})->name('material-management.system-requirement.purchase-order-setup.define-purchase-sub-control');
+
+Route::get('/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-group', function() {
+    return Inertia::render('material-management/system-requirement/purchase-order-setup/SkuItemNoteAnalysisGroup');
+})->name('material-management.system-requirement.purchase-order-setup.sku-item-note-analysis-group');
+
+Route::get('/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-group/view-print', function() {
+    return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintSkuItemNoteAnalysisGroup');
+})->name('material-management.system-requirement.purchase-order-setup.sku-item-note-analysis-group.view-print');
+
+Route::get('/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-code', function() {
+    return Inertia::render('material-management/system-requirement/purchase-order-setup/SkuItemNoteAnalysisCode');
+})->name('material-management.system-requirement.purchase-order-setup.sku-item-note-analysis-code');
+
+Route::get('/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-code/view-print', function() {
+    return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintSkuItemNoteAnalysisCode');
+})->name('material-management.system-requirement.purchase-order-setup.sku-item-note-analysis-code.view-print');

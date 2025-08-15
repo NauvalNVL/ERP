@@ -155,12 +155,9 @@
                 </span>
               </div>
             </div>
-            <div class="mt-6 flex space-x-2">
-              <button @click="editGlDist(selectedGlDist)" class="flex-1 btn-blue">
+            <div class="mt-6">
+              <button @click="editGlDist(selectedGlDist)" class="w-full btn-blue">
                 <i class="fas fa-edit mr-1"></i> Edit
-              </button>
-              <button @click="confirmDelete(selectedGlDist)" class="flex-1 btn-danger">
-                <i class="fas fa-trash-alt mr-1"></i> Delete
               </button>
             </div>
           </div>
@@ -298,35 +295,6 @@
         </div>
       </div>
     </Modal>
-
-    <!-- Delete Confirmation Modal -->
-    <Modal :show="showDeleteModal" @close="closeDeleteModal">
-      <div class="p-6">
-        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
-          <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
-        </div>
-        
-        <h3 class="text-center text-lg font-bold text-gray-900 mb-2">Confirm Deletion</h3>
-        
-        <p class="text-center text-gray-600 mb-6">
-          Are you sure you want to delete this GL distribution?<br>
-          <span class="font-medium">{{ glDistToDelete?.gl_dist_code }} - {{ glDistToDelete?.gl_dist_name }}</span>
-        </p>
-
-        <div class="flex justify-center space-x-3">
-          <button @click="closeDeleteModal"
-                  class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
-            Cancel
-          </button>
-          <button @click="confirmDelete"
-                  class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none"
-                  :disabled="deleting">
-            <i v-if="deleting" class="fas fa-spinner fa-spin mr-2"></i>
-            Delete
-          </button>
-        </div>
-      </div>
-    </Modal>
   </AppLayout>
 </template>
 
@@ -349,14 +317,11 @@ const glDistList = ref(props.glDistributions || []);
 const chartOfAccounts = ref(props.chartOfAccounts || []);
 const selectedGlDist = ref(null);
 const selectedAccount = ref(null);
-const glDistToDelete = ref(null);
 const loading = ref(false);
 const submitting = ref(false);
-const deleting = ref(false);
 const searchQuery = ref('');
 const showFormModal = ref(false);
 const showGlAccountModal = ref(false);
-const showDeleteModal = ref(false);
 const isEditing = ref(false);
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
@@ -556,39 +521,6 @@ const confirmGlAccountSelection = () => {
     form.value.gl_account_name = selectedAccount.value.name;
     form.value.is_linked = true;
     closeGlAccountModal();
-  }
-};
-
-const confirmDelete = (item) => {
-  glDistToDelete.value = item;
-  showDeleteModal.value = true;
-};
-
-const closeDeleteModal = () => {
-  showDeleteModal.value = false;
-  glDistToDelete.value = null;
-};
-
-const deleteGlDist = async () => {
-  if (!glDistToDelete.value) return;
-  
-  deleting.value = true;
-  try {
-    await axios.delete(`/api/material-management/gl-distributions/${glDistToDelete.value.id}`);
-    toast.success('GL Distribution deleted successfully');
-    
-    glDistList.value = glDistList.value.filter(d => d.id !== glDistToDelete.value.id);
-    
-    if (selectedGlDist.value?.id === glDistToDelete.value.id) {
-      selectedGlDist.value = null;
-    }
-    
-    closeDeleteModal();
-  } catch (error) {
-    console.error('Error deleting GL distribution:', error);
-    toast.error(error.response?.data?.message || 'Failed to delete GL distribution');
-  } finally {
-    deleting.value = false;
   }
 };
 

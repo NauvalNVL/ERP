@@ -429,7 +429,23 @@ const materialManagementItems = [
           { title: 'View & Print Tax Type', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/tax-type/view-print' },
           { title: 'View & Print Tax Group', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/tax-group/view-print' },
           { title: 'View & Print Receive Destination', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/receive-destination/view-print' },
-          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/analysis-code/view-print' },
+          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/material-management/system-requirement/standard-setup/analysis-code/view-print' }
+        ]
+      },
+      {
+        title: 'Purchase Order Setup',
+        icon: 'fas fa-shopping-cart',
+        children: [
+          { title: 'Define Purchaser', icon: 'fas fa-user-tie', route: '/material-management/system-requirement/purchase-order-setup/purchaser' },
+          { title: 'Define Approver', icon: 'fas fa-user-check', route: '/material-management/system-requirement/purchase-order-setup/approver' },
+          { title: 'Define Purchase Sub-Control', icon: 'fas fa-user-cog', route: '/material-management/system-requirement/purchase-order-setup/define-purchase-sub-control' },
+          { title: 'Define SKU Item Note Analysis Group', icon: 'fas fa-tags', route: '/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-group' },
+          { title: 'Define SKU Item Note Analysis Code', icon: 'fas fa-code', route: '/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-code' },
+          { title: 'View & Print Purchaser', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/purchaser/view-print' },
+          { title: 'View & Print Approver', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/approver/view-print' },
+          { title: 'View & Print Purchase Sub-Control', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/define-purchase-sub-control/view-print' },
+          { title: 'View & Print SKU Item Note Analysis Group', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-group/view-print' },
+          { title: 'View & Print SKU Item Note Analysis Code', icon: 'fas fa-print', route: '/material-management/system-requirement/purchase-order-setup/sku-item-note-analysis-code/view-print' }
         ]
       },
       {
@@ -445,13 +461,27 @@ const materialManagementItems = [
           { title: 'Define SKU Price', icon: 'fas fa-dollar-sign', route: '/material-management/system-requirement/inventory-setup/sku-price' },
           { title: 'Amend SKU Type', icon: 'fas fa-edit', route: '/material-management/system-requirement/inventory-setup/amend-sku-type' },
           { title: 'Amend SKU#', icon: 'fas fa-tag', route: '/material-management/system-requirement/inventory-setup/amend-sku' },
-          { title: 'Obsolete/Reactive SKU', icon: 'fas fa-toggle-on', route: '/material-management/system-requirement/inventory-setup/obsolete-reactive-sku' },
+          { title: 'Obsolete/Reactive SKU Status', icon: 'fas fa-toggle-on', route: '/material-management/system-requirement/inventory-setup/obsolete-reactive-sku' },
+          { title: 'Define SKU Reorder Level', icon: 'fas fa-level-down-alt', route: '/material-management/system-requirement/inventory-setup/sku-reorder-level' },
+          { title: 'Copy & Paste SKU Reorder Level', icon: 'fas fa-copy', route: '/material-management/system-requirement/inventory-setup/copy-paste-sku-reorder-level' },
+          { title: 'Define SKU Consumption Budget', icon: 'fas fa-chart-line', route: '/material-management/system-requirement/inventory-setup/sku-consumption-budget' },
+          { title: 'Define Custom Tariff Code', icon: 'fas fa-file-invoice-dollar', route: '/material-management/system-requirement/inventory-setup/custom-tariff-code' },
+          { title: 'Define SKU Custom Tariff Code', icon: 'fas fa-link', route: '/material-management/system-requirement/inventory-setup/sku-custom-tariff-code' },
+          { title: 'Define DR or CR Note', icon: 'fas fa-sticky-note', route: '/material-management/system-requirement/inventory-setup/dr-cr-note' },
+          { title: 'Unlock SKU Utility', icon: 'fas fa-unlock-alt', route: '/material-management/system-requirement/inventory-setup/unlock-sku-utility' },
           // View & Print
           { title: 'View & Print Category', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/category/view-print' },
           { title: 'View & Print Location', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/location/view-print' },
-          { title: 'View & Print Report Group', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/report-group/view-print' },
           { title: 'View & Print Unit', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/unit/view-print' },
-          { title: 'View & Print SKU', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/sku/view-print' }
+          { title: 'View & Print Report Group', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/report-group/view-print' },
+          { title: 'View & Print MM GL Distribution', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/gl-distribution/view-print' },
+          { title: 'View & Print SKU', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/sku/view-print' },
+          { title: 'View & Print SKU Price', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/sku-price/view-print' },
+          { title: 'View & Print SKU Reorder Level', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/sku-reorder-level/view-print' },
+          { title: 'View & Print SKU Consumption Budget', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/sku-consumption-budget/view-print' },
+          { title: 'View & Print Custom Tariff Code', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/custom-tariff-code/view-print' },
+          { title: 'View & Print SKU Tariff Code', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/sku-tariff-code/view-print' },
+          { title: 'View & Print DR or CR Note', icon: 'fas fa-print', route: '/material-management/system-requirement/inventory-setup/dr-cr-note/view-print' }
         ]
       }
     ]

@@ -121,12 +121,9 @@
                 <span class="font-medium text-gray-900 text-right">{{ selectedCategory.name }}</span>
               </div>
             </div>
-            <div class="mt-6 flex space-x-2">
-              <button @click="editCategory(selectedCategory)" class="flex-1 btn-blue">
+            <div class="mt-6">
+              <button @click="editCategory(selectedCategory)" class="w-full btn-blue">
                 <i class="fas fa-edit mr-1"></i> Edit
-              </button>
-              <button @click="deleteCategory(selectedCategory)" class="flex-1 btn-danger">
-                <i class="fas fa-trash-alt mr-1"></i> Delete
               </button>
             </div>
           </div>
@@ -138,13 +135,6 @@
             <p class="text-gray-500 mb-4">Select a category from the table to view details</p>
             <button @click="openCreateModal" class="btn-primary">
               <i class="fas fa-plus-circle mr-1"></i> Create New Category
-            </button>
-          </div>
-          
-          <!-- Sample Data Button -->
-          <div class="mt-4">
-            <button @click="seedSampleData" class="w-full btn-secondary">
-              <i class="fas fa-database mr-2"></i> Seed Sample Data
             </button>
           </div>
         </div>
@@ -242,68 +232,6 @@
       </Dialog>
     </TransitionRoot>
 
-    <!-- Confirm Delete Modal -->
-    <TransitionRoot appear :show="isDeleteConfirmOpen" as="template">
-      <Dialog as="div" @close="isDeleteConfirmOpen = false" class="relative z-10">
-        <TransitionChild
-          as="template"
-          enter="duration-300 ease-out"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
-          leave="duration-200 ease-in"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
-        >
-          <div class="fixed inset-0 bg-black bg-opacity-25" />
-        </TransitionChild>
-
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4 text-center">
-            <TransitionChild
-              as="template"
-              enter="duration-300 ease-out"
-              enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100"
-              leave="duration-200 ease-in"
-              leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95"
-            >
-              <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900 flex items-center">
-                  <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
-                  Confirm Delete
-                </DialogTitle>
-
-                <div class="mt-3">
-                  <p class="text-sm text-gray-500">
-                    Are you sure you want to delete category <span class="font-semibold">{{ categoryToDelete?.code }}</span>?
-                    This action cannot be undone.
-                  </p>
-                </div>
-
-                <div class="mt-6 flex justify-end space-x-3">
-                  <button 
-                    type="button" 
-                    @click="isDeleteConfirmOpen = false"
-                    class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="button"
-                    @click="confirmDelete"
-                    class="inline-flex justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
-
     <!-- Toast Notification -->
     <div
       v-if="toast.show"
@@ -339,11 +267,9 @@ import axios from 'axios';
 // State variables
 const categories = ref([]);
 const selectedCategory = ref(null);
-const categoryToDelete = ref(null);
 const loading = ref(false);
 const searchTerm = ref('');
 const isModalOpen = ref(false);
-const isDeleteConfirmOpen = ref(false);
 const isEditing = ref(false);
 const formErrors = ref(null);
 const currentPage = ref(1);
@@ -479,41 +405,6 @@ const saveCategory = async () => {
       showToast(isEditing.value ? 'Failed to update category' : 'Failed to create category', 'error');
     }
     console.error('Error saving category:', error);
-  }
-};
-
-const deleteCategory = (category) => {
-  categoryToDelete.value = category;
-  isDeleteConfirmOpen.value = true;
-};
-
-const confirmDelete = async () => {
-  try {
-    await axios.delete(`/api/material-management/categories/${categoryToDelete.value.code}`);
-    showToast('Category deleted successfully', 'success');
-    
-    if (selectedCategory.value && selectedCategory.value.code === categoryToDelete.value.code) {
-      selectedCategory.value = null;
-    }
-    
-    fetchCategories();
-  } catch (error) {
-    showToast('Failed to delete category', 'error');
-    console.error('Error deleting category:', error);
-  } finally {
-    isDeleteConfirmOpen.value = false;
-    categoryToDelete.value = null;
-  }
-};
-
-const seedSampleData = async () => {
-  try {
-    await axios.post('/api/material-management/categories/seed');
-    showToast('Sample categories seeded successfully', 'success');
-    fetchCategories();
-  } catch (error) {
-    showToast('Failed to seed sample data', 'error');
-    console.error('Error seeding data:', error);
   }
 };
 

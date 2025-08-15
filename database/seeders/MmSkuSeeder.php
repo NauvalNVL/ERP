@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\MmSku;
 use App\Models\MmCategory;
+use Illuminate\Support\Facades\DB; // Added this import for DB facade
 
 class MmSkuSeeder extends Seeder
 {
@@ -273,6 +274,33 @@ class MmSkuSeeder extends Seeder
                 ['sku' => $skuData['sku']],
                 $skuData
             );
+        }
+
+        // Add a test SKU for Amend SKU testing
+        try {
+            DB::table('mm_skus')->insert([
+                'sku' => 'TES-233114',
+                'sts' => 'ACT',
+                'sku_name' => 'Test SKU for Amend',
+                'category_code' => 'CAT-001',
+                'type' => 'FG',
+                'uom' => 'PCS',
+                'boh' => 100,
+                'fpo' => 0,
+                'rol' => 10,
+                'total_part' => 1,
+                'min_qty' => 1,
+                'max_qty' => 1000,
+                'additional_name' => 'Test SKU',
+                'part_number1' => null,
+                'part_number2' => null,
+                'part_number3' => null,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Exception $e) {
+            // Ignore duplicate entry error
         }
     }
 } 

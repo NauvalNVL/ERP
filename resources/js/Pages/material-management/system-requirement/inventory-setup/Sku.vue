@@ -176,9 +176,7 @@
               <button @click="editSku(selectedSku)" class="flex-1 btn-blue">
                 <i class="fas fa-edit mr-1"></i> Edit
               </button>
-              <button @click="confirmDelete(selectedSku)" class="flex-1 btn-danger">
-                <i class="fas fa-trash-alt mr-1"></i> Delete
-              </button>
+              <!-- Delete button removed -->
             </div>
           </div>
           <div v-else class="flex flex-col items-center justify-center h-64 text-center">
@@ -289,7 +287,7 @@
                 >
                   <option value="">Select a unit</option>
                   <option v-for="unit in units" :key="unit.code" :value="unit.code">
-                    {{ unit.name }}
+                    {{ unit.short_name }}
                   </option>
                 </select>
                 <p v-if="errors.uom" class="form-error">{{ errors.uom }}</p>
@@ -426,12 +424,15 @@
               </div>
 
               <!-- Status -->
+              <!-- This section is removed as SKU status should only be managed in Obsolete/Reactive SKU Status menu -->
+              <!--
               <div class="form-field">
                 <label class="flex items-center space-x-2 cursor-pointer">
                   <input type="checkbox" v-model="formSku.is_active" class="form-checkbox h-5 w-5 text-blue-600">
                   <span class="text-gray-700">Active</span>
                 </label>
               </div>
+              -->
             </div>
             
             <!-- Form Footer with Buttons -->
@@ -445,30 +446,6 @@
               </button>
             </div>
           </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div v-if="showConfirmation" class="fixed inset-0 flex items-center justify-center z-50">
-      <div class="absolute inset-0 bg-black opacity-50" @click="showConfirmation = false"></div>
-      <div class="bg-white rounded-lg shadow-lg max-w-md z-10 w-full">
-        <div class="p-6">
-          <div class="flex items-center mb-4">
-            <div class="bg-red-100 rounded-full p-2 mr-3">
-              <i class="fas fa-exclamation-triangle text-red-600"></i>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900">Confirm Delete</h3>
-          </div>
-          <p class="mb-4 text-gray-600">Are you sure you want to delete SKU <span class="font-semibold">{{ skuToDelete?.sku }}</span>? This action cannot be undone.</p>
-          <div class="flex justify-end space-x-3">
-            <button @click="showConfirmation = false" class="px-4 py-2 text-gray-700 border border-gray-300 rounded hover:bg-gray-50">
-              <i class="fas fa-times mr-1"></i> Cancel
-            </button>
-            <button @click="deleteSku" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" :disabled="loading">
-              <i class="fas fa-trash-alt mr-1"></i> Delete
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -492,8 +469,6 @@ const selectedSku = ref(null);
 const loading = ref(false);
 const searchQuery = ref('');
 const showFormModal = ref(false);
-const showConfirmation = ref(false);
-const skuToDelete = ref(null);
 const isEditing = ref(false);
 const sortOrder = ref({
   field: 'sku',
@@ -525,7 +500,7 @@ const formSku = ref({
   part_number1: '',
   part_number2: '',
   part_number3: '',
-  is_active: true,
+  is_active: true, // Default to true as status is managed externally
 });
 
 // Reset form to default values
@@ -547,7 +522,7 @@ const resetForm = () => {
     part_number1: '',
     part_number2: '',
     part_number3: '',
-    is_active: true,
+    is_active: true, // Ensure new SKUs are active by default
   };
   isEditing.value = false;
   errors.value = {};
@@ -628,7 +603,7 @@ const fetchCategories = async () => {
 
 const fetchUnits = async () => {
   try {
-    const response = await axios.get('/api/material-management/skus/units');
+    const response = await axios.get('/api/material-management/units');
     units.value = response.data;
   } catch (error) {
     console.error('Error fetching units:', error);
@@ -638,7 +613,7 @@ const fetchUnits = async () => {
 
 const fetchTypes = async () => {
   try {
-    const response = await axios.get('/api/material-management/skus/types');
+    const response = await axios.get('/api/material-management/types');
     types.value = response.data;
   } catch (error) {
     console.error('Error fetching types:', error);
@@ -666,11 +641,6 @@ const editSku = (sku) => {
   formSku.value = { ...sku };
   showFormModal.value = true;
   errors.value = {};
-};
-
-const confirmDelete = (sku) => {
-  skuToDelete.value = sku;
-  showConfirmation.value = true;
 };
 
 const saveSku = async () => {
@@ -702,30 +672,6 @@ const saveSku = async () => {
       errors.value = error.response.data.errors;
     }
     toast.error(error.response?.data?.message || 'Failed to save SKU');
-  } finally {
-    loading.value = false;
-  }
-};
-
-const deleteSku = async () => {
-  if (!skuToDelete.value) return;
-  
-  loading.value = true;
-  try {
-    await axios.delete(`/api/material-management/skus/${skuToDelete.value.sku}`);
-    toast.success('SKU deleted successfully');
-    
-    skus.value = skus.value.filter(d => d.sku !== skuToDelete.value.sku);
-    
-    if (selectedSku.value?.sku === skuToDelete.value.sku) {
-      selectedSku.value = null;
-    }
-    
-    showConfirmation.value = false;
-    skuToDelete.value = null;
-  } catch (error) {
-    console.error('Error deleting SKU:', error);
-    toast.error(error.response?.data?.message || 'Failed to delete SKU');
   } finally {
     loading.value = false;
   }
@@ -768,11 +714,6 @@ onMounted(async () => {
 
 .btn-info {
   @apply bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg shadow transition
-    flex items-center justify-center whitespace-nowrap;
-}
-
-.btn-danger {
-  @apply bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow transition
     flex items-center justify-center whitespace-nowrap;
 }
 
