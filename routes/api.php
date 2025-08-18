@@ -1,7 +1,8 @@
-<?php
+﻿<?php
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\StandardFormulaController;
 use App\Http\Controllers\SOConfigController;
 use App\Http\Controllers\UpdateCustomerAccountController;
@@ -53,8 +54,98 @@ use App\Http\Controllers\UpdateMcController;
 
 // Direct route for ObsoleteReactiveSku.vue component
 Route::get('/material-management/skus/categories', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'getCategories']);
+Route::get('/material-management/skus/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'getSkusForPrint']);
 Route::get('/material-management/skus', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'index']);
 Route::post('/material-management/skus/bulk-toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'bulkToggleActive']);
+Route::get('/material-management/skus/{sku}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'show']);
+Route::put('/material-management/skus/{sku}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'update']);
+Route::patch('/material-management/skus/{sku}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'toggleActive']);
+Route::post('/material-management/skus/{sku}/change-code', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'changeSkuCode']);
+Route::get('/material-management/skus/{sku_id}/balance', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'getSkuBalance']);
+Route::post('/material-management/skus', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'store']);
+Route::get('/material-management/types', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'getTypes']);
+
+// Purchaser API routes
+Route::get('/purchasers', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'index']);
+Route::post('/purchasers', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'store']);
+Route::get('/purchasers/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'getForPrint']);
+Route::get('/purchasers-by-type', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'getByType']);
+Route::get('/purchasers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'show']);
+Route::put('/purchasers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'update']);
+Route::delete('/purchasers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'destroy']);
+Route::patch('/purchasers/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'toggleActive']);
+
+// Approval flow routes
+Route::post('/purchasers/{id}/setup-approval-flow', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'setupApprovalFlow']);
+Route::get('/purchasers/{id}/approval-flow', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'getApprovalFlow']);
+Route::post('/purchasers/{id}/test-email-flow', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'testEmailFlow']);
+
+// Utility routes
+Route::get('/search-approvers', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'searchApprovers']);
+Route::post('/validate-email', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'validateEmail']);
+
+// Approver API routes
+Route::get('/approvers', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'index']);
+Route::post('/approvers', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'store']);
+Route::get('/approvers/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'getForPrint']);
+Route::get('/approvers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'show']);
+Route::put('/approvers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'update']);
+Route::delete('/approvers/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'destroy']);
+Route::patch('/approvers/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\ApproverController::class, 'toggleActive']);
+
+// Purchase Sub Control API routes
+Route::get('/purchase-sub-controls', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'index']);
+Route::post('/purchase-sub-controls', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'store']);
+Route::get('/purchase-sub-controls/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'getForPrint']);
+Route::get('/purchase-sub-controls/categories', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'getCategories']);
+Route::get('/purchase-sub-controls/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'show']);
+Route::put('/purchase-sub-controls/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'update']);
+Route::patch('/purchase-sub-controls/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaseSubControlController::class, 'toggleActive']);
+
+// SKU Item Note Analysis Group API routes
+Route::get('/sku-item-note-analysis-groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'index']);
+Route::post('/sku-item-note-analysis-groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'store']);
+Route::get('/sku-item-note-analysis-groups/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'getForPrint']);
+Route::get('/sku-item-note-analysis-groups/categories', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'getCategories']);
+Route::get('/sku-item-note-analysis-groups/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'show']);
+Route::put('/sku-item-note-analysis-groups/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'update']);
+Route::delete('/sku-item-note-analysis-groups/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'destroy']);
+Route::patch('/sku-item-note-analysis-groups/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisGroupController::class, 'toggleActive']);
+
+// SKU Item Note Analysis Code API routes
+Route::get('/sku-item-note-analysis-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'index']);
+Route::post('/sku-item-note-analysis-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'store']);
+Route::get('/sku-item-note-analysis-codes/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'getForPrint']);
+Route::get('/sku-item-note-analysis-codes/groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'getGroups']);
+Route::get('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'show']);
+Route::put('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'update']);
+Route::delete('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'destroy']);
+Route::patch('/sku-item-note-analysis-codes/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'toggleActive']);
+
+// SKU Price API routes
+Route::get('/sku-prices', [App\Http\Controllers\SkuPriceController::class, 'index']);
+Route::get('/sku-prices/for-print', [App\Http\Controllers\SkuPriceController::class, 'getSkuPricesForPrint']);
+Route::post('/sku-prices', [App\Http\Controllers\SkuPriceController::class, 'store']);
+Route::get('/sku-prices/{id}', [App\Http\Controllers\SkuPriceController::class, 'show']);
+Route::put('/sku-prices/{id}', [App\Http\Controllers\SkuPriceController::class, 'update']);
+Route::delete('/sku-prices/{id}', [App\Http\Controllers\SkuPriceController::class, 'destroy']);
+Route::get('/sku-prices/current/{skuCode}', [App\Http\Controllers\SkuPriceController::class, 'getCurrentPrice']);
+
+// Material Management SKU Price API routes
+Route::get('/material-management/sku-prices', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'search']);
+Route::get('/material-management/sku-prices/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'getSkuPricesForPrint']);
+Route::post('/material-management/sku-prices', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'store']);
+Route::put('/material-management/sku-prices/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'update']);
+Route::delete('/material-management/sku-prices/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'destroy']);
+Route::get('/material-management/sku-prices/current/{skuCode}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'getCurrentPrice']);
+Route::post('/material-management/sku-prices/validate-sku', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuPriceController::class, 'validateSku']);
+
+// Foreign Currency API routes
+Route::get('/foreign-currencies', [App\Http\Controllers\ForeignCurrencyController::class, 'apiIndex']);
+Route::post('/foreign-currencies', [App\Http\Controllers\ForeignCurrencyController::class, 'apiStore']);
+Route::get('/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyController::class, 'apiShow']);
+Route::put('/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyController::class, 'apiUpdate']);
+Route::delete('/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyController::class, 'apiDestroy']);
 
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
 Route::get('/products', [ProductController::class, 'getProductsJson']);
@@ -222,6 +313,7 @@ Route::delete('/material-management/transaction-types/{code}', [MmTransactionTyp
 // Add Category API routes
 Route::prefix('material-management/categories')->group(function () {
     Route::get('/', [MmCategoryController::class, 'getCategories']);
+    Route::get('/for-print', [MmCategoryController::class, 'getCategoriesForPrint']);
     Route::post('/', [MmCategoryController::class, 'store']);
     Route::get('/{code}', [MmCategoryController::class, 'show']);
     Route::put('/{code}', [MmCategoryController::class, 'update']);
@@ -349,22 +441,300 @@ Route::put('/update-customer-account/{id}', [App\Http\Controllers\UpdateCustomer
 
 // Material Management - System Requirement - Inventory Setup - SKU routes
 Route::prefix('material-management/system-requirement/inventory-setup')->group(function () {
-    // SKU routes
-    Route::get('/sku', [MmSkuController::class, 'index']);
-    Route::post('/sku', [MmSkuController::class, 'store']);
-    Route::get('/sku/{sku}', [MmSkuController::class, 'show']);
-    Route::put('/sku/{sku}', [MmSkuController::class, 'update']);
-    Route::delete('/sku/{sku}', [MmSkuController::class, 'destroy']);
-    Route::patch('/sku/{sku}/toggle-active', [MmSkuController::class, 'toggleActive']);
-    Route::post('/sku/seed', [MmSkuController::class, 'seed']);
+    // SKU routes - REMOVED DUPLICATES - using main material-management/skus routes instead
+    // Route::get('/sku', [MmSkuController::class, 'index']);
+    // Route::post('/sku', [MmSkuController::class, 'store']);
+    // Route::get('/sku/{sku}', [MmSkuController::class, 'show']);
+    // Route::put('/sku/{sku}', [MmSkuController::class, 'update']);
+    // Route::delete('/sku/{sku}', [MmSkuController::class, 'destroy']);
+    // Route::patch('/sku/{sku}/toggle-active', [MmSkuController::class, 'toggleActive']);
+    // Route::post('/sku/seed', [MmSkuController::class, 'seed']);
     
-    // Supporting endpoints for SKU component
-    Route::get('/category', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController::class, 'apiIndex']);
-    Route::get('/sku-types', [MmSkuController::class, 'getTypes']);
-    Route::get('/units', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController::class, 'apiIndex']);
+    // Supporting endpoints for SKU component (these are duplicates and should be removed or moved)
+    // Route::get('/category', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController::class, 'apiIndex']);
+    // Route::get('/sku-types', [MmSkuController::class, 'getTypes']);
+    // Route::get('/units', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController::class, 'apiIndex']);
+    
+    // SKU Reorder Level View & Print with detailed data - MUST BE BEFORE apiResource
+    Route::get('sku-reorder-levels/view-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'getViewPrint']);
+    
+    Route::apiResource('sku-reorder-levels', App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class);
+    Route::get('sku-reorder-levels/by-sku/{skuId}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'getBySku']);
+    
+    // Copy & Paste functionality routes
+    Route::post('sku-reorder-levels/copy', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'copyReorderLevels']);
+    Route::post('sku-reorder-levels/copy-to-periods', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'copyToMultiplePeriods']);
+    Route::post('sku-reorder-levels/copy-to-skus', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'copyToMultipleSkus']);
+    Route::get('sku-reorder-levels/sku-suggestions', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'getSkuSuggestions']);
 });
 
-// Material Management API Routes
+// Move available-periods route outside the prefix group
+Route::get('material-management/system-requirement/inventory-setup/sku-reorder-levels/available-periods', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'getAvailablePeriods']);
+
+// SKU Reorder Level for View & Print
+Route::get('material-management/system-requirement/inventory-setup/sku-reorder-levels', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'getForPrint']);
+
+// Test connection route
+Route::get('material-management/system-requirement/inventory-setup/sku-reorder-levels/test-connection', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'testConnection']);
+
+// Test simple route
+Route::get('material-management/system-requirement/inventory-setup/sku-reorder-levels/test-simple', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'testSimple']);
+
+// Test basic route
+Route::get('material-management/system-requirement/inventory-setup/sku-reorder-levels/test-basic', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'testBasic']);
+
+// Simple test route
+Route::get('test-sku-reorder', function() {
+    return response()->json(['message' => 'Route working']);
+});
+
+// Test minimal route
+Route::get('material-management/system-requirement/inventory-setup/sku-reorder-levels/test-minimal', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'testMinimal']);
+
+// Test controller route with closure
+Route::get('test-controller', function() {
+    try {
+        return response()->json([
+            'success' => true,
+            'message' => 'Controller test successful',
+            'data' => [
+                'controller_working' => true,
+                'timestamp' => now()->toISOString()
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => 'Controller test failed: ' . $e->getMessage()
+        ], 500);
+    }
+});
+
+// Test view-print with closure
+Route::get('test-view-print', function() {
+    try {
+        $result = [
+            [
+                'sku' => 'TEST001',
+                'sku_name' => 'Test SKU 1',
+                'category_code' => 'CAT001',
+                'type' => 'S',
+                'uom' => 'PCS',
+                'boh' => 100.00,
+                'is_active' => true,
+                'min_level' => 10.00,
+                'max_level' => 50.00,
+                'reorder_level' => 25.00,
+            ],
+            [
+                'sku' => 'TEST002',
+                'sku_name' => 'Test SKU 2',
+                'category_code' => 'CAT002',
+                'type' => 'NS',
+                'uom' => 'KG',
+                'boh' => 50.00,
+                'is_active' => true,
+                'min_level' => 5.00,
+                'max_level' => 25.00,
+                'reorder_level' => 15.00,
+            ]
+        ];
+
+        return response()->json($result);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => 'View print test failed: ' . $e->getMessage()
+        ], 500);
+    }
+});
+
+// Simple fallback route for available periods
+Route::get('available-periods-fallback', function() {
+    try {
+        $periods = \App\Models\SkuReorderLevel::select('period')
+            ->distinct()
+            ->orderBy('period')
+            ->pluck('period');
+        
+        // If no periods exist in database, generate default periods for the next 12 months
+        if ($periods->isEmpty()) {
+            $periods = collect();
+            $now = now();
+            for ($i = 0; $i < 12; $i++) {
+                $periods->push($now->copy()->addMonths($i)->format('m/Y'));
+            }
+        }
+        
+        return response()->json($periods);
+    } catch (\Exception $e) {
+        // Fallback: generate default periods if database query fails
+        $periods = collect();
+        $now = now();
+        for ($i = 0; $i < 12; $i++) {
+            $periods->push($now->copy()->addMonths($i)->format('m/Y'));
+        }
+        return response()->json($periods);
+    }
+});
+
+Route::get('sku-suggestions-fallback', function(\Illuminate\Http\Request $request) {
+    try {
+        $search = $request->query('search', '');
+        
+        $skus = \App\Models\MmSku::where('is_active', true)
+            ->where(function($query) use ($search) {
+                $query->where('sku', 'like', "%{$search}%")
+                      ->orWhere('sku_name', 'like', "%{$search}%");
+            })
+            ->select('sku', 'sku_name', 'category_code')
+            ->limit(20)
+            ->get();
+        
+        return response()->json($skus);
+    } catch (\Exception $e) {
+        return response()->json([]);
+    }
+});
+
+Route::post('copy-reorder-levels-fallback', function(\Illuminate\Http\Request $request) {
+    try {
+        $request->validate([
+            'source_sku_id' => 'required|exists:mm_skus,sku',
+            'target_sku_id' => 'required|exists:mm_skus,sku',
+            'source_period' => 'required|string|max:7',
+            'target_period' => 'required|string|max:7',
+        ]);
+
+        \Illuminate\Support\Facades\DB::beginTransaction();
+
+        // Get source reorder level
+        $sourceLevel = \App\Models\SkuReorderLevel::where('sku_id', $request->source_sku_id)
+            ->where('period', $request->source_period)
+            ->first();
+
+        if (!$sourceLevel) {
+            return response()->json(['error' => 'Source reorder level not found'], 404);
+        }
+
+        // Create or update target reorder level
+        $targetLevel = \App\Models\SkuReorderLevel::updateOrCreate([
+            'sku_id' => $request->target_sku_id,
+            'period' => $request->target_period,
+        ], [
+            'min_level' => $sourceLevel->min_level,
+            'max_level' => $sourceLevel->max_level,
+            'reorder_level' => $sourceLevel->reorder_level,
+        ]);
+
+        \Illuminate\Support\Facades\DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Reorder levels copied successfully',
+            'data' => $targetLevel
+        ]);
+
+    } catch (\Exception $e) {
+        \Illuminate\Support\Facades\DB::rollBack();
+        return response()->json(['error' => 'Failed to copy reorder levels: ' . $e->getMessage()], 500);
+    }
+});
+
+// SKU Consumption Budget API routes
+Route::prefix('material-management/system-requirement/inventory-setup')->group(function () {
+    // SKU Consumption Budget View & Print - MUST BE BEFORE other routes
+    Route::get('/sku-consumption-budgets/view-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'getViewPrint']);
+    
+    Route::get('/sku-consumption-budgets', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'index']);
+    Route::get('/sku-consumption-budgets/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'show']);
+    Route::post('/sku-consumption-budgets', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'store']);
+    Route::put('/sku-consumption-budgets/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'update']);
+    Route::delete('/sku-consumption-budgets/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'destroy']);
+    Route::get('/sku-consumption-budgets/by-sku/{skuId}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'getBySku']);
+    Route::get('/sku-consumption-budgets/by-month/{effectiveMonth}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'getByEffectiveMonth']);
+    Route::get('/sku-consumption-budgets/sku-suggestions', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'getSkuSuggestions']);
+    Route::get('/sku-consumption-budgets/available-months', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'getAvailableMonths']);
+    Route::post('/sku-consumption-budgets/bulk-store', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'bulkStore']);
+    Route::get('/sku-consumption-budgets/summary', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'getSummary']);
+});
+
+// Custom Tariff Code API routes
+Route::prefix('material-management/system-requirement/inventory-setup')->group(function () {
+    // Custom Tariff Code View & Print - MUST BE BEFORE other routes
+    Route::get('/custom-tariff-codes/view-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'getViewPrint']);
+    
+    Route::get('/custom-tariff-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'index']);
+    Route::get('/custom-tariff-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'show']);
+    Route::post('/custom-tariff-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'store']);
+    Route::put('/custom-tariff-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'update']);
+    Route::delete('/custom-tariff-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'destroy']);
+    Route::get('/custom-tariff-codes/suggestions', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'getSuggestions']);
+    Route::get('/custom-tariff-codes/categories', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'getCategories']);
+    Route::post('/custom-tariff-codes/calculate', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'calculateCustoms']);
+    Route::post('/custom-tariff-codes/bulk-store', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'bulkStore']);
+    Route::patch('/custom-tariff-codes/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'toggleActive']);
+    Route::get('/custom-tariff-codes/summary', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'getSummary']);
+    Route::get('/custom-tariff-codes/export', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'export']);
+});
+
+// SKU Custom Tariff Code API routes
+Route::prefix('material-management/system-requirement/inventory-setup')->group(function () {
+    Route::get('/sku-custom-tariff-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'index']);
+    Route::get('/sku-custom-tariff-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'show']);
+    Route::post('/sku-custom-tariff-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'store']);
+    Route::put('/sku-custom-tariff-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'update']);
+    Route::delete('/sku-custom-tariff-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'destroy']);
+    Route::get('/sku-custom-tariff-codes/sku-suggestions', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'getSkuSuggestions']);
+    Route::get('/sku-custom-tariff-codes/tariff-code-suggestions', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'getTariffCodeSuggestions']);
+    Route::get('/sku-custom-tariff-codes/by-sku/{skuId}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'getBySkuId']);
+    Route::post('/sku-custom-tariff-codes/calculate', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'calculateCustoms']);
+    Route::post('/sku-custom-tariff-codes/bulk-store', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'bulkStore']);
+    Route::patch('/sku-custom-tariff-codes/{id}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'toggleActive']);
+    Route::get('/sku-custom-tariff-codes/summary', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'getSummary']);
+    Route::get('/sku-custom-tariff-codes/export', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'export']);
+    Route::get('/sku-custom-tariff-codes/skus-without-tariff-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuCustomTariffCodeController::class, 'getSkusWithoutTariffCodes']);
+});
+
+// DR/CR Note API routes
+Route::prefix('dr-cr-notes')->group(function () {
+    Route::get('/', [App\Http\Controllers\DrCrNoteController::class, 'index']);
+    Route::post('/', [App\Http\Controllers\DrCrNoteController::class, 'store']);
+    Route::get('/customer-suggestions', [App\Http\Controllers\DrCrNoteController::class, 'getCustomerSuggestions']);
+    Route::get('/summary', [App\Http\Controllers\DrCrNoteController::class, 'getSummary']);
+    Route::get('/{id}', [App\Http\Controllers\DrCrNoteController::class, 'show']);
+    Route::put('/{id}', [App\Http\Controllers\DrCrNoteController::class, 'update']);
+    Route::delete('/{id}', [App\Http\Controllers\DrCrNoteController::class, 'destroy']);
+    Route::post('/{id}/approve', [App\Http\Controllers\DrCrNoteController::class, 'approve']);
+    Route::post('/{id}/reject', [App\Http\Controllers\DrCrNoteController::class, 'reject']);
+    Route::post('/{id}/post', [App\Http\Controllers\DrCrNoteController::class, 'post']);
+});
+
+// Unlock SKU Utility API routes
+Route::prefix('material-management/unlock-sku-utility')->group(function () {
+    Route::get('/locked-skus', [App\Http\Controllers\MaterialManagement\SystemRequirement\UnlockSkuUtilityController::class, 'getLockedSkus']);
+    Route::post('/unlock/{sku}', [App\Http\Controllers\MaterialManagement\SystemRequirement\UnlockSkuUtilityController::class, 'unlockSku']);
+    Route::post('/bulk-unlock', [App\Http\Controllers\MaterialManagement\SystemRequirement\UnlockSkuUtilityController::class, 'bulkUnlock']);
+    Route::post('/unlock-stale', [App\Http\Controllers\MaterialManagement\SystemRequirement\UnlockSkuUtilityController::class, 'unlockStaleLocks']);
+    Route::get('/statistics', [App\Http\Controllers\MaterialManagement\SystemRequirement\UnlockSkuUtilityController::class, 'getLockStatistics']);
+});
+
+// Test SKU reorder level controller
+Route::get('test-sku-reorder-level-controller', function() {
+    try {
+        $controller = new App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController();
+        $request = new Illuminate\Http\Request();
+        $response = $controller->getViewPrint($request);
+        return $response;
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => 'Controller test failed: ' . $e->getMessage()
+        ], 500);
+    }
+});
+
+// GL Distribution API routes
 Route::prefix('material-management')->group(function () {
     // SKU Routes
     Route::get('/skus', [MmSkuController::class, 'index']);

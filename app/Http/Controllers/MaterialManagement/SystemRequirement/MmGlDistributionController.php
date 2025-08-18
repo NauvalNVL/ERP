@@ -29,6 +29,16 @@ class MmGlDistributionController extends Controller
         }
     }
 
+    public function getGlDistributionsForPrint()
+    {
+        try {
+            $glDistributions = MmGlDistribution::with('chartOfAccount')->get();
+            return response()->json($glDistributions);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch GL distributions for print'], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

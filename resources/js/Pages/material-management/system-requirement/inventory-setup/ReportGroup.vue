@@ -121,12 +121,9 @@
                 <span class="font-medium text-gray-900 text-right">{{ selectedGroup.name }}</span>
               </div>
             </div>
-            <div class="mt-6 flex space-x-2">
-              <button @click="editReportGroup(selectedGroup)" class="flex-1 btn-blue">
+            <div class="mt-6">
+              <button @click="editReportGroup(selectedGroup)" class="w-full btn-blue">
                 <i class="fas fa-edit mr-1"></i> Edit
-              </button>
-              <button @click="confirmDelete(selectedGroup)" class="flex-1 btn-danger">
-                <i class="fas fa-trash-alt mr-1"></i> Delete
               </button>
             </div>
           </div>
@@ -208,30 +205,6 @@
       </div>
     </div>
 
-    <!-- Confirmation Modal -->
-    <div v-if="showDeleteModal" class="fixed inset-0 flex items-center justify-center z-50">
-      <div class="absolute inset-0 bg-black opacity-50" @click="closeDeleteModal"></div>
-      <div class="bg-white rounded-lg shadow-lg max-w-md z-10 w-full">
-        <div class="p-6">
-          <div class="flex items-center mb-4">
-            <div class="bg-red-100 rounded-full p-2 mr-3">
-              <i class="fas fa-exclamation-triangle text-red-600"></i>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900">Confirm Delete</h3>
-          </div>
-          <p class="mb-4 text-gray-600">Are you sure you want to delete report group <span class="font-semibold">{{ selectedGroup?.code }}</span>? This action cannot be undone.</p>
-          <div class="flex justify-end space-x-3">
-            <button @click="closeDeleteModal" class="px-4 py-2 text-gray-700 border border-gray-300 rounded hover:bg-gray-50">
-              <i class="fas fa-times mr-1"></i> Cancel
-            </button>
-            <button @click="deleteReportGroup" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" :disabled="loading">
-              <i class="fas fa-trash-alt mr-1"></i> Delete
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Toast Notifications -->
     <div class="fixed right-0 bottom-0 p-4 w-full max-w-xs">
       <div v-if="notification.show" :class="`transform transition-all p-4 rounded-lg shadow-lg ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`">
@@ -270,7 +243,6 @@ export default {
     // State variables
     const loading = ref(false);
     const showModal = ref(false);
-    const showDeleteModal = ref(false);
     const isEditing = ref(false);
     const search = ref('');
     const reportGroupsData = ref(props.reportGroups || []);
@@ -379,11 +351,6 @@ export default {
       showModal.value = true;
     };
 
-    const confirmDelete = (group) => {
-      selectedGroup.value = group;
-      showDeleteModal.value = true;
-    };
-
     const saveReportGroup = async () => {
       errors.value = {};
 
@@ -437,40 +404,6 @@ export default {
       }
     };
 
-    const deleteReportGroup = async () => {
-      if (!selectedGroup.value) return;
-
-      loading.value = true;
-      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-      try {
-        const response = await fetch(`/material-management/system-requirement/report-groups/${selectedGroup.value.id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json',
-          }
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          showNotification('Report group deleted successfully', 'success');
-          closeDeleteModal();
-          fetchReportGroups();
-          selectedGroup.value = null;
-        } else {
-          showNotification(result.message || 'Failed to delete report group', 'error');
-        }
-      } catch (error) {
-        showNotification('An error occurred while deleting', 'error');
-        console.error('Error deleting report group:', error);
-      } finally {
-        loading.value = false;
-      }
-    };
-
     const resetForm = () => {
       form.value = {
         id: null,
@@ -484,10 +417,6 @@ export default {
     const closeModal = () => {
       showModal.value = false;
       resetForm();
-    };
-
-    const closeDeleteModal = () => {
-      showDeleteModal.value = false;
     };
 
     const refresh = () => {
@@ -537,7 +466,7 @@ export default {
 
     return {
       showModal,
-      showDeleteModal,
+      // showDeleteModal, // This line is removed
       loading,
       isEditing,
       search,
@@ -553,11 +482,8 @@ export default {
       totalPages,
       showAddModal,
       editReportGroup,
-      confirmDelete,
       saveReportGroup,
-      deleteReportGroup,
       closeModal,
-      closeDeleteModal,
       refresh,
       selectGroup,
       sortTable,

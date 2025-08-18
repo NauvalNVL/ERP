@@ -50,4 +50,6 @@ class MmUnit extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    protected $table = 'uoms';
 } 

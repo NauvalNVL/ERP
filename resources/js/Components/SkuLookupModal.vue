@@ -110,7 +110,7 @@ export default {
   props: {
     show: Boolean,
   },
-  emits: ['close', 'skuSelected'],
+  emits: ['close', 'sku-selected'],
   data() {
     return {
       skus: [],
@@ -122,11 +122,12 @@ export default {
   },
   computed: {
     filteredSkus() {
-      let filtered = this.skus;
+      // Ensure skus is an array before filtering
+      let filtered = Array.isArray(this.skus) ? this.skus : [];
       
       // Apply search query filter
-      if (this.searchQuery) {
-        const query = this.searchQuery.toLowerCase();
+      if (this.searchQuery && this.searchQuery.trim()) {
+        const query = this.searchQuery.toLowerCase().trim();
         filtered = filtered.filter(
           (sku) =>
             (sku.sku && sku.sku.toLowerCase().includes(query)) ||
@@ -156,15 +157,30 @@ export default {
     async fetchData() {
       this.loading = true;
       try {
-        // Load categories first
-        const categoryResponse = await axios.get('/api/material-management/categories');
+        // Load categories first - fixed API endpoint with material-management prefix
+        const categoryResponse = await axios.get('/api/material-management/skus/categories', {
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
         this.categories = categoryResponse.data;
         
-        // Then load SKUs
-        const skuResponse = await axios.get('/api/material-management/skus');
+        // Then load SKUs - fixed API endpoint with material-management prefix
+        const skuResponse = await axios.get('/api/material-management/skus', {
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
         this.skus = skuResponse.data;
       } catch (error) {
         console.error('Error fetching data for SKU lookup:', error);
+        console.error('Error details:', {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data
+        });
       } finally {
         this.loading = false;
       }
@@ -173,7 +189,7 @@ export default {
       // Debounce could be added here if needed
     },
     selectSku(sku) {
-      this.$emit('skuSelected', sku);
+      this.$emit('sku-selected', sku);
       this.$emit('close');
     },
   },
@@ -200,7 +216,54 @@ export default {
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 1rem;
+  height: 100%;
+}
+
+.modal-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: 2rem;
+  width: 100%;
+  max-width: 768px;
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal-default-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.modal-enter-active, .modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-from, .modal-leave-to {
+  opacity: 0;
 }
 
 .modal-container {

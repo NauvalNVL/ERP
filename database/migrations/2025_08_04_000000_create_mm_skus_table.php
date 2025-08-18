@@ -30,6 +30,11 @@ return new class extends Migration
             $table->string('part_number2', 100)->nullable();
             $table->string('part_number3', 100)->nullable();
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_locked')->default(false);
+            $table->string('locked_by', 50)->nullable();
+            $table->timestamp('locked_at')->nullable();
+            $table->string('lock_reason', 255)->nullable();
+            $table->string('lock_session_id', 100)->nullable();
             $table->timestamps();
         });
     }
