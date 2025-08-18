@@ -784,6 +784,7 @@ Route::prefix('update-mc')->group(function () {
     Route::post('/search-ac', [UpdateMcController::class, 'searchAc']);
     Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs']);
     Route::get('/master-cards', [UpdateMcController::class, 'apiIndex']);
+    Route::get('/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs']);
 });
 
 // FG Stock-In by WO API routes
