@@ -56,7 +56,10 @@ class ChartOfAccountSeeder extends Seeder
         ];
 
         foreach ($accounts as $account) {
-            ChartOfAccount::create($account);
+            ChartOfAccount::updateOrCreate(
+                ['account_number' => $account['account_number']], // kondisi pencarian
+                $account // data yang akan diupdate atau dibuat
+            );
         }
     }
 }

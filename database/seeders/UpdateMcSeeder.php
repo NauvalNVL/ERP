@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\MasterCard;
-use Illuminate\Support\Facades\DB;
 
 class UpdateMcSeeder extends Seeder
 {
@@ -15,9 +14,6 @@ class UpdateMcSeeder extends Seeder
      */
     public function run()
     {
-        // Clear existing data first
-        DB::table('master_cards')->truncate();
-
         $data = [
             // Data sesuai dengan gambar Master Card Table
             ['mc_seq' => '1609138', 'mc_model' => 'BOX BASO 4,5 KG', 'part_no' => 'BOX', 'comp_no' => 'Main', 'p_design' => 'B1', 'status' => 'Act', 'ext_dim_1' => '396', 'ext_dim_2' => '243', 'ext_dim_3' => '297', 'int_dim_1' => '393', 'int_dim_2' => '240', 'int_dim_3' => '292'],
@@ -36,7 +32,10 @@ class UpdateMcSeeder extends Seeder
 
         foreach ($data as $item) {
             try {
-                MasterCard::create($item);
+                MasterCard::updateOrCreate(
+                    ['mc_seq' => $item['mc_seq']], // kondisi pencarian
+                    $item // data yang akan diupdate atau dibuat
+                );
             } catch (\Exception $e) {
                 $this->command->error("Error inserting record {$item['mc_seq']}: " . $e->getMessage());
             }
