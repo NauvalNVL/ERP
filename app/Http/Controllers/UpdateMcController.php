@@ -122,4 +122,51 @@ class UpdateMcController extends Controller
 
         return response()->json($result);
     }
+
+    /**
+     * Check if MCS number exists in database.
+     *
+     * @param  string  $mcsNumber
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkMcs($mcsNumber)
+    {
+        try {
+            $masterCard = MasterCard::where('mc_seq', $mcsNumber)->first();
+            
+            if ($masterCard) {
+                return response()->json([
+                    'exists' => true,
+                    'data' => [
+                        'mc_seq' => $masterCard->mc_seq,
+                        'mc_model' => $masterCard->mc_model,
+                        'mc_short_model' => $masterCard->mc_short_model ?? '',
+                        'status' => $masterCard->status,
+                        'part_no' => $masterCard->part_no,
+                        'comp_no' => $masterCard->comp_no,
+                        'p_design' => $masterCard->p_design,
+                        'ext_dim_1' => $masterCard->ext_dim_1,
+                        'ext_dim_2' => $masterCard->ext_dim_2,
+                        'ext_dim_3' => $masterCard->ext_dim_3,
+                        'int_dim_1' => $masterCard->int_dim_1,
+                        'int_dim_2' => $masterCard->int_dim_2,
+                        'int_dim_3' => $masterCard->int_dim_3,
+                        'created_at' => $masterCard->created_at,
+                        'updated_at' => $masterCard->updated_at,
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'exists' => false,
+                    'data' => null
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error checking MCS: ' . $e->getMessage());
+            return response()->json([
+                'exists' => false,
+                'error' => 'Database error occurred'
+            ], 500);
+        }
+    }
 }

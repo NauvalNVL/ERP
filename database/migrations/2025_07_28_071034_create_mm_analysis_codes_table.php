@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mm_analysis_codes', function (Blueprint $table) {
-            $table->string('code', 10)->primary();
-            $table->string('name', 100);
-            $table->string('group', 10);
-            $table->string('group2', 10);
+            $table->string('code')->primary(); // Set code as primary key
+            $table->string('name');
+            $table->string('group'); // Changed from 'grouping'
+            $table->string('group2'); // Added group2
             $table->timestamps();
         });
     }
@@ -27,4 +27,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('mm_analysis_codes');
     }
-}; 
+};

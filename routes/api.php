@@ -784,6 +784,19 @@ Route::prefix('update-mc')->group(function () {
     Route::post('/search-ac', [UpdateMcController::class, 'searchAc']);
     Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs']);
     Route::get('/master-cards', [UpdateMcController::class, 'apiIndex']);
+    Route::get('/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs']);
+});
+
+// FG Stock-In by WO API routes
+Route::prefix('fg-stock-in-wo')->group(function () {
+    Route::get('/work-orders', [App\Http\Controllers\Api\FgStockInByWoController::class, 'getWorkOrders']);
+    Route::get('/work-orders/{woNumber}/details', [App\Http\Controllers\Api\FgStockInByWoController::class, 'getWorkOrderDetails']);
+    Route::post('/', [App\Http\Controllers\Api\FgStockInByWoController::class, 'store']);
+    Route::get('/', [App\Http\Controllers\Api\FgStockInByWoController::class, 'index']);
+});
+
+// Work Orders API routes
+Route::get('/work-orders', [App\Http\Controllers\Api\FgStockInByWoController::class, 'getWorkOrders']);
 });
 
 // Purchase Requisition API Routes

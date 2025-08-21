@@ -2,13 +2,13 @@
   <AppLayout :header="'Prepare Purchase Requisition'">
     <Head title="Prepare Purchase Requisition" />
 
-    <!-- Header Section -->
+      <!-- Header Section -->
     <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-lg shadow-md">
       <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
         <i class="fas fa-file-plus mr-3"></i> Prepare Purchase Requisition
-      </h2>
+          </h2>
       <p class="text-blue-100">Create new purchase requisition requests</p>
-    </div>
+        </div>
 
     <div class="bg-white rounded-b-lg shadow-md p-6 mb-6">
       <div class="flex flex-col lg:flex-row gap-6">
@@ -36,7 +36,7 @@
                 <i class="fas fa-download mr-2"></i> Export
               </button>
             </div>
-          </div>
+              </div>
               
           <!-- Table Section -->
           <div class="bg-white rounded-lg overflow-hidden border border-gray-200">
@@ -101,12 +101,12 @@
                   </tr>
                 </tbody>
               </table>
-            </div>
-          </div>
-                  
+                </div>
+              </div>
+
           <!-- Pagination Controls -->
           <div class="mt-4 flex justify-between items-center text-sm text-gray-600">
-            <div>
+              <div>
               <span>Showing {{ paginatedPRs.length }} of {{ filteredPRs.length }} purchase requisitions</span>
             </div>
             <div class="flex items-center space-x-2">
@@ -122,10 +122,10 @@
               <span class="px-4">{{ currentPage }} / {{ totalPages }}</span>
               <button :disabled="currentPage === totalPages || totalPages === 0" @click="currentPage++" class="px-2 py-1 border rounded hover:bg-gray-200 disabled:opacity-50">
                 <i class="fas fa-chevron-right"></i>
-              </button>
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
         <!-- Side Panel with Details -->
         <div class="w-full lg:w-96 bg-gray-50 rounded-lg p-4 border border-gray-200">
@@ -203,13 +203,13 @@
             <!-- PR Header Information -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <!-- Basic Info -->
-              <div class="space-y-4">
+            <div class="space-y-4">
                 <h3 class="text-lg font-medium text-gray-900 border-b pb-2">Basic Information</h3>
                 
-                <div>
+              <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">PR Number</label>
-                  <input
-                    type="text"
+                  <input 
+                    type="text" 
                     :value="formPR.pr_number || 'Auto Generated'"
                     readonly
                     class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
@@ -238,35 +238,35 @@
                       <option value="">Select Year</option>
                       <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
                     </select>
-                  </div>
                 </div>
+              </div>
 
-                <div>
+              <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Request Date</label>
-                  <input
-                    type="date"
+                <input 
+                  type="date" 
                     v-model="formPR.date_request"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
-                </div>
+              </div>
 
-                <div>
+              <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Required Date</label>
-                  <input
-                    type="date"
+                <input 
+                  type="date" 
                     v-model="formPR.date_required"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
-                </div>
               </div>
+            </div>
 
               <!-- Department Info -->
-              <div class="space-y-4">
+            <div class="space-y-4">
                 <h3 class="text-lg font-medium text-gray-900 border-b pb-2">Department Information</h3>
                 
-                <div>
+              <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
                   <input
                     type="text"
@@ -275,9 +275,9 @@
                     placeholder="Enter department"
                     required
                   />
-                </div>
+              </div>
 
-                <div>
+              <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Project/Cost Center</label>
                   <input
                     type="text"
@@ -285,28 +285,28 @@
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter project or cost center"
                   />
-                </div>
+              </div>
 
-                <div>
+              <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Requestor</label>
                   <div class="relative">
-                    <input
-                      type="text"
+                  <input 
+                    type="text" 
                       v-model="formPR.requestor"
                       @click="showUserModal = true"
                       readonly
                       class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Click to select requestor"
                     />
-                    <button
+                  <button 
                       type="button"
                       @click="showUserModal = true"
                       class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-gray-700"
-                    >
-                      <i class="fas fa-search"></i>
-                    </button>
-                  </div>
+                  >
+                    <i class="fas fa-search"></i>
+                  </button>
                 </div>
+              </div>
 
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Purpose</label>
@@ -316,8 +316,8 @@
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter purpose of requisition"
                   ></textarea>
-                </div>
-              </div>
+            </div>
+          </div>
 
               <!-- Approval Info -->
               <div class="space-y-4">
@@ -348,33 +348,33 @@
 
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                  <textarea
+            <textarea 
                     v-model="formPR.notes"
                     rows="4"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Additional notes or comments"
-                  ></textarea>
-                </div>
-              </div>
-            </div>
+            ></textarea>
+          </div>
+        </div>
+      </div>
 
-            <!-- PR Items Section -->
+      <!-- PR Items Section -->
             <div class="mb-8">
               <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-gray-900">PR Items</h3>
-                <button
+            <button 
                   type="button"
                   @click="addItem"
-                  class="btn-primary"
-                >
+              class="btn-primary"
+            >
                   <i class="fas fa-plus mr-2"></i> Add Item
-                </button>
-              </div>
+            </button>
+        </div>
 
-              <div class="overflow-x-auto">
+        <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
-                  <thead class="bg-gray-50">
-                    <tr>
+            <thead class="bg-gray-50">
+              <tr>
                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
@@ -382,86 +382,86 @@
                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-if="formPR.items.length === 0">
                       <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
                         No items added. Click "Add Item" to start.
-                      </td>
-                    </tr>
+                </td>
+              </tr>
                     <tr v-for="(item, index) in formPR.items" :key="index">
                       <td class="px-6 py-4 whitespace-nowrap">
                         <div class="relative">
-                          <input
-                            type="text"
+                    <input 
+                      type="text" 
                             v-model="item.sku"
                             @click="openSkuModal(index)"
                             readonly
                             class="w-32 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Select SKU"
                           />
-                          <button
+                    <button 
                             type="button"
                             @click="openSkuModal(index)"
                             class="absolute inset-y-0 right-0 px-2 flex items-center text-gray-500 hover:text-gray-700"
-                          >
-                            <i class="fas fa-search text-xs"></i>
-                          </button>
-                        </div>
-                      </td>
+                    >
+                      <i class="fas fa-search text-xs"></i>
+                    </button>
+                  </div>
+                </td>
                       <td class="px-6 py-4">
-                        <input
-                          type="text"
-                          v-model="item.description"
+                  <input 
+                    type="text" 
+                    v-model="item.description" 
                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="Item description"
+                    placeholder="Item description"
                         />
-                      </td>
+                </td>
                       <td class="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="number"
+                  <input 
+                    type="number" 
                           v-model.number="item.quantity"
                           @input="calculateItemTotal(index)"
                           class="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          min="0"
+                    min="0"
                           step="0.01"
                         />
-                      </td>
+                </td>
                       <td class="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="text"
-                          v-model="item.unit"
+                  <input 
+                    type="text" 
+                    v-model="item.unit" 
                           class="w-16 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="Unit"
+                    placeholder="Unit"
                         />
-                      </td>
+                </td>
                       <td class="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="number"
+                  <input 
+                    type="number" 
                           v-model.number="item.unit_price"
                           @input="calculateItemTotal(index)"
                           class="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          min="0"
-                          step="0.01"
+                    min="0"
+                    step="0.01"
                         />
-                      </td>
+                </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {{ formatCurrency(item.total_price) }}
-                      </td>
+                  {{ formatCurrency(item.total_price) }}
+                </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
+                  <button 
                           type="button"
-                          @click="removeItem(index)"
+                    @click="removeItem(index)"
                           class="text-red-600 hover:text-red-900"
-                        >
+                  >
                           <i class="fas fa-trash"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
               <!-- Total Section -->
               <div class="mt-4 bg-gray-50 p-4 rounded-lg">
@@ -469,24 +469,24 @@
                   <div class="text-right">
                     <div class="text-lg font-semibold text-gray-900">
                       Total Amount: {{ formatCurrency(totalAmount) }}
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
-            
+            </div>
+          </div>
+        </div>
+      </div>
+
             <!-- Form Footer with Buttons -->
             <div class="flex justify-end space-x-3 border-t border-gray-200 pt-5">
               <button type="button" @click="showFormModal = false" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg shadow transition-all duration-200 flex items-center">
                 <i class="fas fa-times mr-2"></i> Cancel
-              </button>
+        </button>
               <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition-all duration-200 flex items-center" :disabled="loading">
                 <i class="fas fa-save mr-2"></i> {{ isEditing ? 'Update' : 'Save' }}
                 <span v-if="loading" class="ml-2 animate-spin"><i class="fas fa-spinner"></i></span>
-              </button>
+        </button>
               <button v-if="!isEditing || formPR.status === 'Draft'" type="button" @click="savePRAndSubmit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow transition-all duration-200 flex items-center" :disabled="loading">
                 <i class="fas fa-paper-plane mr-2"></i> Save & Submit
-              </button>
+        </button>
             </div>
           </form>
         </div>
@@ -494,14 +494,14 @@
     </div>
 
     <!-- SKU Lookup Modal -->
-    <SkuLookupModal
+    <SkuLookupModal 
       :show="showSkuModal"
       @close="showSkuModal = false"
       @select="handleSkuSelect"
     />
 
     <!-- User Lookup Modal -->
-    <UserLookupModal
+    <UserLookupModal 
       :show="showUserModal"
       @close="showUserModal = false"
       @select="handleUserSelect"

@@ -15,8 +15,8 @@
                         <span class="block outline-none focus:outline-none transform hover:rotate-90 transition-transform duration-300">
                             ×
                         </span>
-          </button>
-        </div>
+                    </button>
+                </div>
                 <!-- Modal body -->
                 <div class="relative p-6 flex-auto max-h-[70vh] overflow-y-auto custom-scrollbar">
                     <div class="mb-6">
@@ -31,14 +31,14 @@
                     <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-blue-50">
-              <tr>
+                                <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Code</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Grouping</th>
                                     <th scope="col" class="relative px-6 py-3"><span class="sr-only">Select</span></th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
                                 <tr v-for="code in filteredAnalysisCodes" :key="code.code" @click="selectAnalysisCode(code)" class="hover:bg-blue-50 cursor-pointer transition-colors duration-150">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ code.code }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.name }}</td>
@@ -49,23 +49,23 @@
                                 </tr>
                                 <tr v-if="filteredAnalysisCodes.length === 0">
                                     <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No analysis codes found.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <!-- Modal footer -->
                 <div class="flex items-center justify-end p-6 bg-gray-50 border-t border-solid border-gray-200 rounded-b-xl">
-          <button 
+                    <button 
                         class="text-gray-700 bg-gray-200 hover:bg-gray-300 font-bold uppercase px-6 py-2 text-sm rounded-lg shadow hover:shadow-md outline-none focus:outline-none mr-3 transition-all duration-150"
                         type="button"
                         @click="$emit('close')"
-          >
-            Exit
-          </button>
+                    >
+                        Exit
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
     </div>
     <div v-if="show" class="fixed inset-0 z-40 bg-black opacity-50 transition-opacity duration-300"></div>
 </template>
@@ -81,7 +81,7 @@ const props = defineProps({
         default: false,
     },
     grouping: {
-      type: String,
+        type: String,
         default: null,
     },
 });
@@ -89,16 +89,22 @@ const props = defineProps({
 const emits = defineEmits(['close', 'select-analysis-code']);
 
 const searchQuery = ref('');
-const analysisCodes = ref([]);
+const analysisCodes = ref([]); // Data yang fetched dari API
+const rawAnalysisCodes = ref([]); // Menyimpan data asli yang belum difilter
 
 const fetchAnalysisCodes = async (grouping = null) => {
     try {
-        const response = await axios.get(route('api.material-management.analysis-codes'), {
-            params: { grouping: grouping }
-        });
-        analysisCodes.value = response.data;
+        let url = '/api/material-management/analysis-codes';
+        if (grouping) {
+            url += `?grouping=${grouping}`;
+        }
+        const response = await axios.get(url);
+        rawAnalysisCodes.value = response.data; // Simpan data asli
+        analysisCodes.value = response.data; // Awalnya, data yang ditampilkan sama dengan data asli
     } catch (error) {
         console.error('Error fetching analysis codes:', error);
+        rawAnalysisCodes.value = [];
+        analysisCodes.value = [];
     }
 };
 
@@ -118,9 +124,19 @@ const selectAnalysisCode = (code) => {
     emits('close');
 };
 
-const debouncedSearch = debounce(() => {
-    // Re-filter the already fetched data
-}, 300);
+const applySearchFilter = () => {
+    if (!searchQuery.value) {
+        analysisCodes.value = rawAnalysisCodes.value; // Reset ke data asli jika search kosong
+    } else {
+        const query = searchQuery.value.toLowerCase();
+        analysisCodes.value = rawAnalysisCodes.value.filter(code => 
+            code.code.toLowerCase().includes(query) || 
+            code.name.toLowerCase().includes(query)
+        );
+    }
+};
+
+const debouncedSearch = debounce(applySearchFilter, 300); // Debounce search by 300ms
 
 watch(() => props.show, (newValue) => {
     if (newValue) {

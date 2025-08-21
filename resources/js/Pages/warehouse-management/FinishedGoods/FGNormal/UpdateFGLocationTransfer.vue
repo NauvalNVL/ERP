@@ -350,9 +350,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
 
 // State
@@ -586,6 +585,11 @@ const saveTransfer = async () => {
     }
 };
 
+// Watch for warehouse changes to fetch available stock
+watch(() => transfer.from_warehouse, () => {
+    fetchSourceInventory();
+});
+
 // Lifecycle hooks
 onMounted(() => {
     // Any initialization code
@@ -595,5 +599,20 @@ onMounted(() => {
 <style scoped>
 .text-shadow {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.animate-ping-slow {
+    animation: ping 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animation-delay-500 {
+    animation-delay: 500ms;
+}
+
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
 }
 </style> 

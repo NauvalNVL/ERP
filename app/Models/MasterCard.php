@@ -20,6 +20,7 @@ class MasterCard extends Model
     protected $fillable = [
         'mc_seq',
         'mc_model',
+        'mc_short_model',
         'part_no',
         'comp_no',
         'p_design',

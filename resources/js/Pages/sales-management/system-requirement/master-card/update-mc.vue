@@ -66,10 +66,10 @@
                                     </div>
                                 </div>
 
-                                <div class="flex items-end">
+                                <div class="flex items-end" v-if="!showDetailedMcInfo">
                                     <button 
                                         type="button"
-                                        @click="selectRecord"
+                                        @click="addNewRecord"
                                         class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
                                     >
                                         <span class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></span>
@@ -81,9 +81,11 @@
                                 </div>
                             </div>
 
-                            <div class="absolute top-6 right-6">
-                                <button type="button" class="bg-orange-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-orange-600 transition-colors text-sm font-semibold">
-                                    Record: Review
+                            <div class="absolute top-6 right-6" v-if="showDetailedMcInfo">
+                                <button type="button" 
+                                    :class="recordMode === 'existing' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-blue-500 hover:bg-blue-600'"
+                                    class="text-white px-4 py-2 rounded-lg shadow-md transition-colors text-sm font-semibold">
+                                    Record: {{ recordMode === 'existing' ? 'Review' : 'Add' }}
                                 </button>
                             </div>
 
@@ -103,6 +105,7 @@
                                             type="text" 
                                             id="mcs" 
                                             v-model="form.mcs"
+                                            @input="handleMcsInput"
                                             class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
                                         />
                                         <button 
@@ -131,14 +134,14 @@
                                 </div>
                             </div>
                             
-                            <!-- Customer Name, Product Code, Status -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Fields yang hanya muncul setelah proceed -->
+                            <div v-if="showDetailedMcInfo" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mr-2 shadow-sm">
                                             <i class="fas fa-user text-white text-xs"></i>
                                         </span>
-                                        Customer Name:
+                                        AC Name:
                                     </label>
                                     <div class="relative">
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -154,11 +157,11 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="product_code" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                    <label for="mc_model" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full mr-2 shadow-sm">
                                             <i class="fas fa-box text-white text-xs"></i>
                                         </span>
-                                        Product Code:
+                                        MC Model:
                                     </label>
                                     <div class="relative">
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -166,32 +169,88 @@
                                         </div>
                                     <input 
                                         type="text" 
-                                        id="product_code" 
-                                        v-model="form.product_code" 
+                                        id="mc_model" 
+                                        v-model="form.mc_model" 
+                                        :readonly="recordMode === 'existing'"
+                                        :class="recordMode === 'existing' ? 'bg-gray-50' : 'bg-white'"
                                             class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:ring-amber-500 focus:border-amber-500"
                                     />
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                    <label for="mc_short_model" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mr-2 shadow-sm">
-                                            <i class="fas fa-toggle-on text-white text-xs"></i>
+                                            <i class="fas fa-tag text-white text-xs"></i>
                                         </span>
-                                        Status:
+                                        MC Short Model:
                                     </label>
                                     <div class="relative">
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <i class="fas fa-tag text-gray-400"></i>
                                         </div>
-                                    <select 
-                                        id="status" 
-                                        v-model="form.status" 
+                                    <input 
+                                        type="text" 
+                                        id="mc_short_model" 
+                                        v-model="form.mc_short_model" 
+                                        :readonly="recordMode === 'existing'"
+                                        :class="recordMode === 'existing' ? 'bg-gray-50' : 'bg-white'"
                                             class="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500"
-                                    >
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
-                                        <option value="pending">Pending</option>
-                                    </select>
+                                    />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status fields yang hanya muncul setelah proceed -->
+                            <div v-if="showDetailedMcInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="mc_status" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mr-2 shadow-sm">
+                                            <i class="fas fa-toggle-on text-white text-xs"></i>
+                                        </span>
+                                        MC Status:
+                                    </label>
+                                    <div class="relative flex group">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <i class="fas fa-info-circle text-gray-400"></i>
+                                        </div>
+                                        <input 
+                                            type="text" 
+                                            id="mc_status" 
+                                            v-model="form.mc_status" 
+                                            readonly
+                                            class="flex-1 min-w-0 block w-full pl-10 pr-3 py-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-50"
+                                        />
+                                        <button 
+                                            type="button" 
+                                            class="inline-flex items-center px-3 py-2 border border-gray-300 bg-purple-500 text-white rounded-r-md shadow-md hover:bg-purple-600 transition-colors text-sm">
+                                            Status Log
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="mc_approval" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mr-2 shadow-sm">
+                                            <i class="fas fa-check-circle text-white text-xs"></i>
+                                        </span>
+                                        MC Approval:
+                                    </label>
+                                    <div class="relative flex group">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <i class="fas fa-check text-gray-400"></i>
+                                        </div>
+                                        <input 
+                                            type="text" 
+                                            id="mc_approval" 
+                                            v-model="form.mc_approval" 
+                                            readonly
+                                            :class="form.mc_approval === 'Yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                            class="flex-1 min-w-0 block w-full pl-10 pr-3 py-2 rounded-l-md border border-r-0 border-gray-300 font-semibold"
+                                        />
+                                        <button 
+                                            type="button" 
+                                            class="inline-flex items-center px-3 py-2 border border-gray-300 bg-blue-500 text-white rounded-r-md shadow-md hover:bg-blue-600 transition-colors text-sm">
+                                            Approval Log
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -212,28 +271,6 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div class="space-y-2">
-                                    <div>
-                                    <label class="block text-gray-600">AC Name:</label>
-                                    <input type="text" :value="mcDetails.ac_name" readonly class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2" />
-                                    </div>
-                                <div>
-                                    <label class="block text-gray-600">MC Model:</label>
-                                    <input type="text" :value="mcDetails.mc_model" readonly class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2" />
-                                </div>
-                                <div>
-                                    <label class="block text-gray-600">MC Short Model:</label>
-                                    <input type="text" :value="mcDetails.mc_short_model" readonly class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2" />
-                            </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div>
-                                    <label class="block text-gray-600">MC Status:</label>
-                                    <input type="text" :value="mcDetails.mc_status" readonly class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2" />
-                                </div>
-                                <div>
-                                    <label class="block text-gray-600">MC Approval:</label>
-                                    <input type="text" :value="mcDetails.mc_approval" readonly class="block w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2" />
-                                </div>
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
                                         <label class="block text-gray-600">Last MCS#:</label>
@@ -249,9 +286,7 @@
 
                         <div class="mt-6 flex flex-wrap gap-4 justify-between">
                             <button type="button" @click="showMaintenanceLogModal = true" class="px-4 py-2 bg-indigo-500 text-white rounded-md shadow-md hover:bg-indigo-600 transition-colors">Maintenance Log</button>
-                            <button type="button" class="px-4 py-2 bg-purple-500 text-white rounded-md shadow-md hover:bg-purple-600 transition-colors">Status Log</button>
-                            <button type="button" class="px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 transition-colors">Approval Log</button>
-                            <button type="button" @click="showSecondPasswordAccessModal = true" class="ml-auto px-4 py-2 bg-green-500 text-white rounded-md shadow-md hover:bg-green-600 transition-colors">Next Setup</button>
+                            <button type="button" @click="handleNextSetup" class="ml-auto px-4 py-2 bg-green-500 text-white rounded-md shadow-md hover:bg-green-600 transition-colors">Next Setup</button>
                         </div>
                     </div>
 
@@ -289,31 +324,31 @@
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
                                             <i class="fas fa-search text-white text-xs"></i>
                                         </span>
-                                        <span>Enter AC# or MCS# to search for existing records</span>
+                                        <span>Select customer account first (AC#)</span>
                                     </li>
                                     <li class="flex items-start">
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mr-2 shadow-sm mt-0.5">
                                             <i class="fas fa-mouse-pointer text-white text-xs"></i>
                                         </span>
-                                        <span>Click "Record: Select" to load the record details</span>
-                                    </li>
-                                    <li class="flex items-start">
-                                        <span class="inline-flex items-center justify-circuit w-5 h-5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full mr-2 shadow-sm mt-0.5">
-                                            <i class="fas fa-edit text-white text-xs"></i>
-                                        </span>
-                                        <span>Update information as needed</span>
+                                        <span>Enter existing MCS# or new number</span>
                                     </li>
                                     <li class="flex items-start">
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mr-2 shadow-sm mt-0.5">
-                                            <i class="fas fa-save text-white text-xs"></i>
+                                            <i class="fas fa-play text-white text-xs"></i>
                                         </span>
-                                        <span>Save changes with the save button</span>
+                                        <span>Click "Proceed" to continue</span>
                                     </li>
-                                    <li class="flex items-start">
-                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-red-400 to-rose-400 rounded-full mr-2 shadow-sm mt-0.5">
-                                            <i class="fas fa-times text-white text-xs"></i>
+                                    <li v-if="showDetailedMcInfo" class="flex items-start">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                            <i class="fas fa-edit text-white text-xs"></i>
                                         </span>
-                                        <span>Red button will close the form without saving</span>
+                                        <span>Fill MC Model for new records</span>
+                                    </li>
+                                    <li v-if="showDetailedMcInfo" class="flex items-start">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-red-400 to-rose-400 rounded-full mr-2 shadow-sm mt-0.5">
+                                            <i class="fas fa-cogs text-white text-xs"></i>
+                                        </span>
+                                        <span>Use Next Setup to configure components</span>
                                     </li>
                                 </ul>
                             </div>
@@ -321,9 +356,9 @@
                             <div class="p-4 bg-blue-50 rounded-lg">
                                 <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2 flex items-center">
                                     <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mr-2 shadow-sm">
-                                        <i class="fas fa-clock text-white text-xs"></i>
+                                        <i class="fas fa-info-circle text-white text-xs"></i>
                                     </span>
-                                    Recent Activity
+                                    Status
                                 </h4>
                                 <div class="space-y-3">
                                     <div class="flex items-start">
@@ -331,8 +366,10 @@
                                             <i class="fas fa-info-circle text-white text-xs"></i>
                                         </span>
                                         <div>
-                                    <p class="text-xs text-gray-600">No recent activity found</p>
-                                            <p class="text-xs text-gray-400 mt-1">All updates will appear here</p>
+                                            <p v-if="!showDetailedMcInfo" class="text-xs text-gray-600">Ready to start</p>
+                                            <p v-else class="text-xs text-gray-600">{{ recordMode === 'existing' ? 'Existing MC - Approved' : 'New MC - Pending Approval' }}</p>
+                                            <p v-if="!showDetailedMcInfo" class="text-xs text-gray-400 mt-1">Enter AC# and MCS# to proceed</p>
+                                            <p v-else class="text-xs text-gray-400 mt-1">{{ recordMode === 'existing' ? 'Ready for modifications' : 'Requires approval workflow' }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -383,213 +420,39 @@
             @select="selectCustomer"
         />
 
-        <!-- MCS Table Modal (after selecting options) -->
-        <div v-if="showMcsTableModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-            <!-- Modal content -->
-            <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-3/4 max-w-4xl mx-auto flex flex-col max-h-[90vh]">
-                <!-- Modal header -->
-                <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-                    <h3 class="text-xl font-semibold flex items-center">
-                        <i class="fas fa-id-card mr-3"></i>Master Card Table
-                    </h3>
-                    <div class="flex space-x-3 items-center">
-                        <div class="text-white text-sm mr-2">
-                            <span class="mr-2">Zoom:</span>
-                            <select v-model="zoomOption" @change="handleZoomChange" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
-                                <option value="mc_specification">M/card specification</option>
-                                <option value="current_price">Current price</option>
-                                <option value="stand_by_price">Stand by price</option>
-                            </select>
-                        </div>
-                        <div class="text-white text-sm mr-2">
-                            <span class="mr-2">Sort:</span>
-                            <select v-model="mcsSortOption" @change="fetchMcsData()" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
-                                <option value="mc_seq">MC Seq#</option>
-                                <option value="mc_model">MC Model</option>
-                                <option value="part_no">MC PD Part#</option>
-                                <option value="ext_dim_1">MC PD ED</option>
-                                <option value="int_dim_1">MC PD ID</option>
-                            </select>
-                        </div>
-                        <div class="text-white text-sm">
-                            <span class="mr-2">Order:</span>
-                            <select v-model="mcsSortOrder" @change="fetchMcsData()" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
-                                <option value="asc">Asc</option>
-                                <option value="desc">Desc</option>
-                            </select>
-                        </div>
-                        <div class="text-white text-sm">
-                            <span class="mr-2">Status:</span>
-                            <select @change="fetchMcsData()" v-model="mcsStatusFilter" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
-                                <option value="Act">Active</option>
-                                <option value="Obsolete">Obsolete</option>
-                                <option value="all">All</option>
-                            </select>
-                        </div>
-                        <button type="button" @click="showMcsTableModal = false" class="text-white hover:text-gray-200 focus:outline-none">
-                            <i class="fas fa-times text-xl"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="p-2 overflow-y-auto flex-grow" style="max-height: 60vh;">
-                    <div class="mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="relative w-full md:w-64">
-                            <input 
-                                type="text" 
-                                v-model="mcsSearchTerm" 
-                                placeholder="Search..." 
-                                @keyup.enter="fetchMcsData()"
-                                class="border border-gray-300 rounded-md py-1 px-2 text-xs focus:ring-blue-500 focus:border-blue-500 w-full shadow-sm"
-                            />
-                            <i class="fas fa-search absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        </div>
-                    </div>
-                    
-                    <div v-if="mcsLoading" class="flex justify-center items-center p-4">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                        <span class="ml-2 text-gray-600">Loading data...</span>
-                    </div>
-                
-                    <div v-else-if="mcsError" class="p-4 text-red-500 bg-red-50 rounded border border-red-200">
-                        <div class="font-bold mb-1">Error:</div>
-                        <div>{{ mcsError }}</div>
-                        <button @click="fetchMcsData()" class="mt-2 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">
-                            Try Again
-                        </button>
-                    </div>
-
-                    <div v-else-if="mcsMasterCards.length === 0" class="p-4 text-amber-700 bg-amber-50 rounded border border-amber-200">
-                        No master card records found. Please adjust your filter criteria.
-                    </div>
-                
-                    <table v-else class="min-w-full text-xs border border-gray-300">
-                        <thead class="bg-gray-200 sticky top-0">
-                            <tr v-if="mcsSortOption === 'mc_model'">
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">M/Card Seq#</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            </tr>
-                            <tr v-else-if="mcsSortOption === 'part_no'">
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part No</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comp#</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            </tr>
-                            <tr v-else-if="mcsSortOption === 'ext_dim_1'">
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ext. Dimension</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            </tr>
-                            <tr v-else-if="mcsSortOption === 'int_dim_1'">
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Int. Dimension</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            </tr>
-                            <tr v-else>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">M/Card Seq#</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comp#</th>
-                                <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="mcs in mcsMasterCards" :key="mcs.seq" 
-                                class="hover:bg-blue-100 cursor-pointer"
-                                :class="{ 'bg-blue-200': selectedMcs?.seq === mcs.seq }"
-                                @click="selectedMcs = mcs"
-                                @dblclick="selectMcs(mcs)">
-                                <template v-if="mcsSortOption === 'mc_model'">
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">
-                                        <span
-                                            :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                                            class="px-2 py-0.5 rounded-full text-xs">
-                                            {{ mcs.status }}
-                                        </span>
-                                    </td>
-                                </template>
-                                <template v-else-if="mcsSortOption === 'part_no'">
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.part }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.p_design }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">
-                                        <span
-                                            :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                                            class="px-2 py-0.5 rounded-full text-xs">
-                                            {{ mcs.status }}
-                                        </span>
-                                    </td>
-                                </template>
-                                <template v-else-if="mcsSortOption === 'ext_dim_1'">
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.ext_dim_1 }}x{{ mcs.ext_dim_2 }}x{{ mcs.ext_dim_3 }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">
-                                        <span
-                                            :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                                            class="px-2 py-0.5 rounded-full text-xs">
-                                            {{ mcs.status }}
-                                        </span>
-                                    </td>
-                                </template>
-                                <template v-else-if="mcsSortOption === 'int_dim_1'">
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.int_dim_1 }}x{{ mcs.int_dim_2 }}x{{ mcs.int_dim_3 }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">
-                                        <span
-                                            :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                                            class="px-2 py-0.5 rounded-full text-xs">
-                                            {{ mcs.status }}
-                                        </span>
-                                    </td>
-                                </template>
-                                <template v-else>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.part }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
-                                    <td class="px-2 py-1 border border-gray-300">
-                                        <span
-                                            :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                                            class="px-2 py-0.5 rounded-full text-xs">
-                                            {{ mcs.status }}
-                                        </span>
-                                    </td>
-                                </template>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="flex items-center justify-end gap-2 p-2 border-t border-gray-200 bg-gray-100 rounded-b-lg flex-shrink-0">
-                    <div class="text-xs text-gray-500 mr-auto" v-if="mcsMasterCards.length > 0">
-                        {{ mcsMasterCards.length }} records found
-                    </div>
-                    <!-- Pagination -->
-                    <button @click="goToMcsPage(mcsCurrentPage - 1)" :disabled="mcsCurrentPage === 1" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed"><i class="fas fa-chevron-left"></i> Previous</button>
-                    <span class="text-gray-600 text-xs">Page {{ mcsCurrentPage }} of {{ mcsLastPage }}</span>
-                    <button @click="goToMcsPage(mcsCurrentPage + 1)" :disabled="mcsCurrentPage === mcsLastPage" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed">Next <i class="fas fa-chevron-right"></i></button>
-                    
-                    <button 
-                        @click="selectMcs(selectedMcs)" 
-                        :disabled="!selectedMcs"
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed">
-                        Select
-                    </button>
-                    <button type="button" @click="showMcsTableModal = false" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">Exit</button>
-                </div>
-            </div>
-        </div>
+        <!-- Update MC Modals -->
+        <UpdateMcModal
+            :showErrorModal="showErrorModal"
+            :showSetupMcModal="showSetupMcModal"
+            :showSetupPdModal="showSetupPdModal"
+            :showMcsTableModal="showMcsTableModal"
+            :formData="form"
+            :mcComponents="mcComponents"
+            :zoomOption="zoomOption"
+            :mcsSortOption="mcsSortOption"
+            :mcsSortOrder="mcsSortOrder"
+            :mcsStatusFilter="mcsStatusFilter"
+            :mcsSearchTerm="mcsSearchTerm"
+            :mcsLoading="mcsLoading"
+            :mcsError="mcsError"
+            :mcsMasterCards="mcsMasterCards"
+            :selectedMcs="selectedMcs"
+            :mcsCurrentPage="mcsCurrentPage"
+            :mcsLastPage="mcsLastPage"
+            @closeErrorModal="showErrorModal = false"
+            @closeSetupMcModal="showSetupMcModal = false"
+            @closeSetupPdModal="showSetupPdModal = false"
+            @closeMcsTableModal="showMcsTableModal = false"
+            @selectComponent="selectComponent"
+            @setupPD="setupPD"
+            @setupOthers="setupOthers"
+            @handleZoomChange="handleZoomChange"
+            @fetchMcsData="fetchMcsData"
+            @selectMcsItem="selectedMcs = $event"
+            @selectMcs="selectMcs"
+            @goToMcsPage="goToMcsPage"
+            @updateSearchTerm="mcsSearchTerm = $event"
+        />
 
         <!-- Maintenance Log Modal -->
         <MasterCardMaintenanceLogModal 
@@ -632,10 +495,11 @@ import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
 import CustomerAccountModal from '@/Components/CustomerAccountModal.vue';
+import UpdateMcModal from '@/Components/UpdateMcModal.vue';
 import MasterCardMaintenanceLogModal from '@/Components/MasterCardMaintenanceLogModal.vue';
 import MasterCardZoomModal from '@/Components/MasterCardZoomModal.vue';
 import MasterCardCurrentPriceModal from '@/Components/MasterCardCurrentPriceModal.vue';
-import MasterCardStandByPriceModal from '@/Components/MasterCardStandByPriceModal.vue'; // Assuming this component exists or will be created
+import MasterCardStandByPriceModal from '@/Components/MasterCardStandByPriceModal.vue';
 import SecondPasswordAccessModal from '@/Components/SecondPasswordAccessModal.vue';
 
 // Form data
@@ -643,8 +507,10 @@ const form = ref({
     ac: '',
     mcs: '',
     customer_name: '',
-    product_code: '',
-    status: 'active',
+    mc_model: '',
+    mc_short_model: '',
+    mc_status: 'Active',
+    mc_approval: 'No',
 });
 
 // UI state
@@ -657,6 +523,7 @@ const recordStatus = ref({
 });
 const tableSearchTerm = ref('');
 const selectedCustomer = ref(null);
+const recordMode = ref('new'); // 'new' or 'existing'
 
 // MCS Modal state
 const showMcsTableModal = ref(false);
@@ -673,13 +540,13 @@ const mcsLoading = ref(false);
 const mcsError = ref(null);
 const mcsCurrentPage = ref(1);
 const mcsLastPage = ref(1);
-const mcsStatusFilter = ref('Act'); // Updated to use 'Act' instead of 'active'
+const mcsStatusFilter = ref('Act');
 
 // New state for Maintenance Log Modal
 const showMaintenanceLogModal = ref(false);
 
 // New states for Zoom Dropdown
-const zoomOption = ref(''); // To hold the selected zoom option
+const zoomOption = ref('');
 const showMasterCardSpecModal = ref(false);
 const showMasterCardCurrentPriceModal = ref(false);
 const showMasterCardStandByPriceModal = ref(false);
@@ -687,8 +554,27 @@ const showMasterCardStandByPriceModal = ref(false);
 // New state for Second Password Access Modal
 const showSecondPasswordAccessModal = ref(false);
 
-// Computed property for filtered and sorted MCS data (now fetched from API)
-const filteredMcsData = computed(() => mcsMasterCards.value); // Data is now filtered/sorted by API
+// Error modal state
+const showErrorModal = ref(false);
+
+// Setup MC Component Modal state
+const showSetupMcModal = ref(false);
+const showSetupPdModal = ref(false);
+const mcComponents = ref([
+    { c_num: 'Main', pd: '', pcs_set: '', part_num: '', selected: true },
+    { c_num: 'Fit1', pd: '', pcs_set: '', part_num: '', selected: false },
+    { c_num: 'Fit2', pd: '', pcs_set: '', part_num: '', selected: false },
+    { c_num: 'Fit3', pd: '', pcs_set: '', part_num: '', selected: false },
+    { c_num: 'Fit4', pd: '', pcs_set: '', part_num: '', selected: false },
+    { c_num: 'Fit5', pd: '', pcs_set: '', part_num: '', selected: false },
+    { c_num: 'Fit6', pd: '', pcs_set: '', part_num: '', selected: false },
+    { c_num: 'Fit7', pd: '', pcs_set: '', part_num: '', selected: false },
+    { c_num: 'Fit8', pd: '', pcs_set: '', part_num: '', selected: false },
+    { c_num: 'Fit9', pd: '', pcs_set: '', part_num: '', selected: false },
+]);
+
+// Computed property for filtered and sorted MCS data
+const filteredMcsData = computed(() => mcsMasterCards.value);
 
 // New state for the detailed MC info section
 const showDetailedMcInfo = ref(false);
@@ -708,24 +594,36 @@ const mcDetails = ref({
     int_dim_3: '',
 });
 
+const handleMcsInput = () => {
+    // Reset record mode when user manually changes MCS input
+    if (form.value.mcs && !selectedMcs.value) {
+        recordMode.value = 'new';
+        form.value.mc_approval = 'No';
+    }
+};
+
+const addNewRecord = () => {
+    recordMode.value = 'new';
+    form.value.mc_approval = 'No';
+    recordSelected.value = true;
+};
+
 const searchAc = async () => {
     try {
         const response = await axios.post('/api/update-mc/search-ac', {
             ac: form.value.ac
         });
         console.log(response.data);
-        // Assuming API returns customer_name, update it here
-        mcDetails.value.ac_name = 'Sample AC Name from API'; // Placeholder
-        recordSelected.value = true; // This might need adjustment based on overall flow
+        mcDetails.value.ac_name = 'Sample AC Name from API';
+        recordSelected.value = true;
     } catch (error) {
         console.error('Error searching AC:', error);
     }
 };
 
 const searchMcs = () => {
-    // Directly show the MCS table modal
     showMcsTableModal.value = true;
-    fetchMcsData(); // Fetch data when modal opens
+    fetchMcsData();
 };
 
 const selectRecord = () => {
@@ -741,7 +639,6 @@ const saveRecord = () => {
         return;
     }
     
-    // API call to save record would go here
     console.log(`Saving record: ${JSON.stringify(form.value)}`);
 };
 
@@ -753,15 +650,18 @@ const deleteRecord = () => {
     }
     
     if (confirm('Are you sure you want to delete this record?')) {
-        // API call to delete record would go here
         console.log(`Deleting record: ${form.value.mcs}`);
-        // Reset form after delete
         form.value = {
             ac: '',
             mcs: '',
+            customer_name: '',
+            mc_model: '',
+            mc_short_model: '',
+            mc_status: 'Active',
+            mc_approval: 'No',
         };
         recordSelected.value = false;
-        showDetailedMcInfo.value = false; // Hide detailed info after delete
+        showDetailedMcInfo.value = false;
     }
 };
 
@@ -772,7 +672,6 @@ const printRecord = () => {
         return;
     }
     
-    // Print logic would go here
     console.log(`Printing record: ${form.value.mcs}`);
 };
 
@@ -781,7 +680,6 @@ const closeRecord = () => {
 };
 
 const openCustomerAccountModal = () => {
-    // Skip the options modal and directly show the customer account table
     showCustomerAccountTable.value = true;
 };
 
@@ -799,24 +697,27 @@ const selectCustomer = (customer) => {
     showCustomerAccountTable.value = false;
 };
 
-// MCS Modal actions
-
 const selectMcs = (mcs) => {
     if (!mcs) return;
     
     selectedMcs.value = mcs;
+    recordMode.value = 'existing';
     
     // Populate the mcs field
     form.value.mcs = mcs.seq;
+    form.value.mc_model = mcs.model || '';
+    form.value.mc_short_model = mcs.short_model || '';
+    form.value.mc_status = mcs.status || 'Active';
+    form.value.mc_approval = 'Yes'; // Existing MC is already approved
     
     // Populate mcDetails with data from selected MCS
-    mcDetails.value.ac_name = mcs.customer_name || ''; // Assuming customer_name is available
+    mcDetails.value.ac_name = mcs.customer_name || form.value.customer_name;
     mcDetails.value.mc_model = mcs.model || '';
     mcDetails.value.mc_short_model = mcs.short_model || '';
     mcDetails.value.mc_status = mcs.status || 'Active';
-    mcDetails.value.mc_approval = mcs.approval || 'No';
-    mcDetails.value.last_mcs = mcs.last_mcs || '';
-    mcDetails.value.last_updated_seq = mcs.last_updated_seq || '';
+    mcDetails.value.mc_approval = 'Yes';
+    mcDetails.value.last_mcs = mcs.last_mcs || mcs.seq;
+    mcDetails.value.last_updated_seq = mcs.last_updated_seq || mcs.seq;
     mcDetails.value.ext_dim_1 = mcs.ext_dim_1 || '';
     mcDetails.value.ext_dim_2 = mcs.ext_dim_2 || '';
     mcDetails.value.ext_dim_3 = mcs.ext_dim_3 || '';
@@ -839,7 +740,13 @@ const fetchMcsData = async (page = 1) => {
             statusQuery = '&status[]=Obsolete';
         }
 
-        const response = await axios.get(`/api/update-mc/master-cards?page=${page}&query=${mcsSearchTerm.value}&sortBy=${mcsSortOption.value}&sortOrder=${mcsSortOrder.value}${statusQuery}`);
+        // Filter by customer account if selected
+        let customerFilter = '';
+        if (form.value.ac) {
+            customerFilter = `&customer_code=${form.value.ac}`;
+        }
+
+        const response = await axios.get(`/api/update-mc/master-cards?page=${page}&query=${mcsSearchTerm.value}&sortBy=${mcsSortOption.value}&sortOrder=${mcsSortOrder.value}${statusQuery}${customerFilter}`);
         mcsMasterCards.value = response.data.data;
         mcsCurrentPage.value = response.data.current_page;
         mcsLastPage.value = response.data.last_page;
@@ -857,61 +764,98 @@ const goToMcsPage = (page) => {
     }
 };
 
-const handleMcsProceed = () => {
+const handleMcsProceed = async () => {
     console.log('Proceed button clicked');
-    // Logic to proceed with the selected MCS record
-    if (form.value.ac && form.value.mcs) {
-        // Populate mcDetails with data from selected MCS. If not selected, it uses dummy data.
-        const selectedRecord = selectedMcs.value; // Use the actual selected record
+    
+    if (!form.value.ac) {
+        alert('Please select customer account (AC#) first.');
+        return;
+    }
+    
+    if (!form.value.mcs) {
+        alert('Please enter MCS# to proceed.');
+        return;
+    }
 
-        if (selectedRecord) {
-            mcDetails.value.ac_name = selectedRecord.customer_name || 'BAHAGIA IDKHO MANDIRI, PT'; // Use actual customer_name if available
-            mcDetails.value.mc_model = selectedRecord.model;
-            mcDetails.value.mc_short_model = selectedRecord.short_model || '';
-            mcDetails.value.mc_status = selectedRecord.status || 'Active';
-            mcDetails.value.mc_approval = selectedRecord.approval || 'No';
-            mcDetails.value.last_mcs = selectedRecord.last_mcs || '';
-            mcDetails.value.last_updated_seq = selectedRecord.last_updated_seq || '';
-            mcDetails.value.ext_dim_1 = selectedRecord.ext_dim_1 || '';
-            mcDetails.value.ext_dim_2 = selectedRecord.ext_dim_2 || '';
-            mcDetails.value.ext_dim_3 = selectedRecord.ext_dim_3 || '';
-            mcDetails.value.int_dim_1 = selectedRecord.int_dim_1 || '';
-            mcDetails.value.int_dim_2 = selectedRecord.int_dim_2 || '';
-            mcDetails.value.int_dim_3 = selectedRecord.int_dim_3 || '';
+    // Check if MCS already exists
+    try {
+        const response = await axios.get(`/api/update-mc/check-mcs/${form.value.mcs}`);
+        
+        if (response.data.exists) {
+            // Existing MC - load data and set as approved
+            const existingMc = response.data.data;
+            recordMode.value = 'existing';
+            
+            form.value.mc_model = existingMc.mc_model || '';
+            form.value.mc_short_model = existingMc.mc_short_model || '';
+            form.value.mc_status = existingMc.status || 'Active';
+            form.value.mc_approval = 'Yes';
+            
+            mcDetails.value.ac_name = form.value.customer_name;
+            mcDetails.value.mc_model = existingMc.mc_model || '';
+            mcDetails.value.mc_short_model = existingMc.mc_short_model || '';
+            mcDetails.value.mc_status = existingMc.status || 'Active';
+            mcDetails.value.mc_approval = 'Yes';
+            mcDetails.value.last_mcs = existingMc.mc_seq || form.value.mcs;
+            mcDetails.value.last_updated_seq = existingMc.mc_seq || form.value.mcs;
         } else {
-            // Fallback to dummy data if no record is selected (though selectMcs should handle this)
-            mcDetails.value.ac_name = 'BAHAGIA IDKHO MANDIRI, PT';
-            mcDetails.value.mc_model = 'CARTON BOX BK TIN 48 X 60 GRAM';
-            mcDetails.value.mc_short_model = 'CARTON BOX BK TIN 48';
-            mcDetails.value.mc_status = 'Active';
+            // New MC - set as not approved
+            recordMode.value = 'new';
+            form.value.mc_approval = 'No';
+            form.value.mc_status = 'Active';
+            
+            mcDetails.value.ac_name = form.value.customer_name;
             mcDetails.value.mc_approval = 'No';
-            mcDetails.value.last_mcs = '042597';
-            mcDetails.value.last_updated_seq = '042597';
-            mcDetails.value.ext_dim_1 = '396';
-            mcDetails.value.ext_dim_2 = '243';
-            mcDetails.value.ext_dim_3 = '297';
-            mcDetails.value.int_dim_1 = '393';
-            mcDetails.value.int_dim_2 = '240';
-            mcDetails.value.int_dim_3 = '292';
+            mcDetails.value.mc_status = 'Active';
+            mcDetails.value.last_mcs = '';
+            mcDetails.value.last_updated_seq = '';
         }
         
-        // Also populate the form fields that are displayed on the main page
-        form.value.customer_name = mcDetails.value.ac_name;
-        form.value.product_code = mcDetails.value.mc_model;
-        form.value.status = mcDetails.value.mc_status.toLowerCase(); // Ensure lowercase for select
-
-        showDetailedMcInfo.value = true; // Show the detailed section
-        showMcsTableModal.value = false; // Hide the MCS table modal
+        showDetailedMcInfo.value = true;
         recordSelected.value = true;
-    } else {
-        alert('Please fill in both AC# and MCS# to proceed.');
+        
+    } catch (error) {
+        console.error('Error checking MCS:', error);
+        // Fallback to treating as new MC
+        recordMode.value = 'new';
+        form.value.mc_approval = 'No';
+        showDetailedMcInfo.value = true;
+        recordSelected.value = true;
     }
+};
+
+const handleNextSetup = () => {
+    // Validate MC Model is filled for new records
+    if (recordMode.value === 'new' && !form.value.mc_model.trim()) {
+        showErrorModal.value = true;
+        return;
+    }
+    
+    // Show Setup MC Component modal
+    showSetupMcModal.value = true;
+};
+
+const selectComponent = (component, index) => {
+    // Reset all selections
+    mcComponents.value.forEach(comp => comp.selected = false);
+    // Select the clicked component
+    component.selected = true;
+};
+
+const setupPD = () => {
+    console.log('Setup PD clicked');
+    showSetupPdModal.value = true;
+};
+
+const setupOthers = () => {
+    console.log('Setup Others clicked');
+    // Implementation for Setup Others functionality
 };
 
 const handleZoomChange = () => {
   if (!selectedMcs.value) {
     alert('Please select a Master Card first.');
-    zoomOption.value = ''; // Reset dropdown
+    zoomOption.value = '';
     return;
   }
   switch (zoomOption.value) {
@@ -925,13 +869,11 @@ const handleZoomChange = () => {
       showMasterCardStandByPriceModal.value = true;
       break;
   }
-  zoomOption.value = ''; // Reset dropdown after action
+  zoomOption.value = '';
 };
 
 const handleSecondPasswordSelect = ({ userId, password }) => {
   console.log('Second password access granted for:', userId);
-  // Implement logic after second password is provided, e.g., proceed with the "Next Setup" action
-  // For now, simply log and close.
   showSecondPasswordAccessModal.value = false;
   alert(`Access granted for User ID: ${userId}`);
 };
