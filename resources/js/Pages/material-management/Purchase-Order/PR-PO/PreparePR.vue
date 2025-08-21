@@ -2,11 +2,11 @@
   <AppLayout :header="'Prepare Purchase Requisition'">
     <Head title="Prepare Purchase Requisition" />
 
-    <!-- Header Section -->
+      <!-- Header Section -->
     <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-lg shadow-md">
       <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
         <i class="fas fa-file-plus mr-3"></i> Prepare Purchase Requisition
-      </h2>
+          </h2>
       <p class="text-blue-100">Create new purchase requisition requests</p>
     </div>
 
@@ -106,11 +106,11 @@
             Print
           </button>
         </div>
-      </div>
+        </div>
 
       <!-- PR Form -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Left Column -->
+            <!-- Left Column -->
         <div class="space-y-6">
           <!-- Basic Information -->
           <div class="bg-white p-6 rounded-lg border">
@@ -119,12 +119,12 @@
             <div class="space-y-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">PR Number</label>
-                <input
-                  type="text"
-                  v-model="prForm.pr_number"
+                <input 
+                  type="text" 
+                  v-model="prForm.pr_number" 
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Auto-generated"
-                  readonly
+                  readonly 
                 />
               </div>
               
@@ -139,9 +139,9 @@
                   <option value="HR">HR Department</option>
                   <option value="Finance">Finance Department</option>
                   <option value="Operations">Operations Department</option>
-                </select>
+                  </select>
               </div>
-              
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Purpose</label>
                 <textarea
@@ -150,9 +150,9 @@
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter purpose of purchase requisition..."
                 ></textarea>
+                </div>
               </div>
             </div>
-          </div>
 
           <!-- Item Details -->
           <div class="bg-white p-6 rounded-lg border">
@@ -162,13 +162,13 @@
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">SKU</label>
                 <div class="flex items-center space-x-2">
-                  <input
-                    type="text"
+                  <input 
+                    type="text" 
                     v-model="prForm.sku"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter SKU or search..."
                   />
-                  <button
+                  <button 
                     @click="showSkuModal = true"
                     class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
@@ -176,7 +176,7 @@
                   </button>
                 </div>
               </div>
-              
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
                 <textarea
@@ -186,20 +186,20 @@
                   placeholder="Enter item description..."
                 ></textarea>
               </div>
-              
+
               <div class="grid grid-cols-2 gap-4">
-                <div>
+              <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
-                  <input
+                <input 
                     type="number"
                     v-model="prForm.quantity"
                     min="1"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0"
                   />
-                </div>
-                
-                <div>
+              </div>
+
+              <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Unit Price</label>
                   <input
                     type="number"
@@ -211,19 +211,19 @@
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Total Amount</label>
-                <input
-                  type="text"
+                  <input 
+                    type="text" 
                   :value="formatCurrency(totalAmount)"
                   readonly
                   class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 font-semibold"
                 />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
         <!-- Right Column -->
         <div class="space-y-6">
@@ -244,15 +244,15 @@
               
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Additional Requirements</label>
-                <textarea
+            <textarea 
                   v-model="prForm.additional_requirements"
-                  rows="3"
+              rows="3" 
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter additional requirements..."
-                ></textarea>
-              </div>
-            </div>
+            ></textarea>
           </div>
+        </div>
+      </div>
 
           <!-- Approval Information -->
           <div class="bg-white p-6 rounded-lg border">
@@ -269,15 +269,15 @@
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700"
                     placeholder="Current user"
                   />
-                  <button
+            <button 
                     @click="showUserModal = true"
                     class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
+            >
                     <i class="fas fa-user"></i>
-                  </button>
-                </div>
-              </div>
-              
+            </button>
+          </div>
+        </div>
+
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                 <select
@@ -289,11 +289,11 @@
                   <option value="high">High</option>
                   <option value="urgent">Urgent</option>
                 </select>
-              </div>
+                  </div>
               
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Expected Delivery Date</label>
-                <input
+                  <input 
                   type="date"
                   v-model="prForm.expected_delivery_date"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -318,18 +318,18 @@
               
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Created Date</label>
-                <input
-                  type="text"
+                  <input 
+                    type="text" 
                   :value="formatDate(new Date())"
                   readonly
                   class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700"
                 />
-              </div>
+        </div>
+            </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
     <!-- Modals -->
     <VendorProfileModal
@@ -339,13 +339,13 @@
       @select="selectVendor"
     />
 
-    <SkuLookupModal
+    <SkuLookupModal 
       :show="showSkuModal"
       @close="showSkuModal = false"
       @select="selectSku"
     />
 
-    <UserLookupModal
+    <UserLookupModal 
       :show="showUserModal"
       @close="showUserModal = false"
       @select="selectUser"

@@ -6,7 +6,7 @@
       :class="{ 'bg-gray-700': hasActiveChild, 'text-sm': !isTopLevel, 'text-base': isTopLevel }"
     >
       <div class="flex items-center">
-        <i :class="[icon, 'mr-3', isTopLevel ? 'w-5 h-5' : 'w-4 h-4']"></i>
+        <i :class="[icon, 'mr-3', isTopLevel ? 'w-5 h-5' : 'w-4 h-4', 'text-current']" style="display: inline-block !important;"></i>
         <span>{{ title }}</span>
       </div>
       <i 
@@ -42,7 +42,7 @@
             'bg-blue-600 text-white font-medium': isActive(item.route),
           }"
         >
-          <i :class="[item.icon, 'w-4 h-4 mr-3']"></i>
+          <i :class="[item.icon, 'w-4 h-4 mr-3', 'text-current']" style="display: inline-block !important;"></i>
           <span>{{ item.title }}</span>
         </Link>
         
@@ -53,7 +53,7 @@
           @click.prevent 
           class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
         >
-          <i :class="[item.icon, 'w-4 h-4 mr-3']"></i>
+          <i :class="[item.icon, 'w-4 h-4 mr-3', 'text-current']" style="display: inline-block !important;"></i>
           <span>{{ item.title }}</span>
         </a>
       </template>

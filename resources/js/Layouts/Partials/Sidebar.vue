@@ -495,17 +495,17 @@ const materialManagementItems = [
         icon: 'fas fa-file-invoice',
         children: [
           // Purchase Requisition Management
-          { title: 'Prepare PR', icon: 'fas fa-file-plus', route: '/material-management/purchase-order/pr-po/prepare-pr' },
-          { title: 'Amend PR', icon: 'fas fa-file-edit', route: '/material-management/purchase-order/pr-po/amend-pr' },
-          { title: 'Cancel PR', icon: 'fas fa-file-times', route: '/material-management/purchase-order/pr-po/cancel-pr' },
-          { title: 'Print PR', icon: 'fas fa-file-pdf', route: '/material-management/purchase-order/pr-po/print-pr' },
-          { title: 'Amend Approved PR + Re-Submit', icon: 'fas fa-file-signature', route: '/material-management/purchase-order/pr-po/amend-approved-pr' },
-          { title: 'Approved PR', icon: 'fas fa-file-check', route: '/material-management/purchase-order/pr-po/approved-pr' },
+          { title: 'Prepare PR', icon: 'fa fa-plus', route: '/material-management/purchase-order/pr-po/prepare-pr' },
+          { title: 'Amend PR', icon: 'fa fa-edit', route: '/material-management/purchase-order/pr-po/amend-pr' },
+          { title: 'Cancel PR', icon: 'fa fa-times', route: '/material-management/purchase-order/pr-po/cancel-pr' },
+          { title: 'Print PR', icon: 'fa fa-print', route: '/material-management/purchase-order/pr-po/print-pr' },
+          { title: 'Amend Approved PR + Re-Submit', icon: 'fa fa-pencil', route: '/material-management/purchase-order/pr-po/amend-approved-pr' },
+          { title: 'Approved PR', icon: 'fa fa-check', route: '/material-management/purchase-order/pr-po/approved-pr' },
           
           // Purchase Order Management
-          { title: 'Amend Rejected PO + Re-Submit', icon: 'fas fa-file-export', route: '/material-management/purchase-order/pr-po/amend-rejected-po' },
-          { title: 'Cancel Approved PO', icon: 'fas fa-file-excel', route: '/material-management/purchase-order/pr-po/cancel-approved-po' },
-          { title: 'View & Print PO Log', icon: 'fas fa-file-alt', route: '/material-management/purchase-order/pr-po/view-print-po-log' }
+          { title: 'Amend Rejected PO + Re-Submit', icon: 'fa fa-undo', route: '/material-management/purchase-order/pr-po/amend-rejected-po' },
+          { title: 'Cancel Approved PO', icon: 'fa fa-ban', route: '/material-management/purchase-order/pr-po/cancel-approved-po' },
+          { title: 'View & Print PO Log', icon: 'fa fa-list', route: '/material-management/purchase-order/pr-po/view-print-po-log' }
         ]
       },
       {
