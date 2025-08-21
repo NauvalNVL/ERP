@@ -797,7 +797,6 @@ Route::prefix('fg-stock-in-wo')->group(function () {
 
 // Work Orders API routes
 Route::get('/work-orders', [App\Http\Controllers\Api\FgStockInByWoController::class, 'getWorkOrders']);
-});
 
 // Purchase Requisition API Routes
 Route::prefix('purchase-requisitions')->group(function () {
