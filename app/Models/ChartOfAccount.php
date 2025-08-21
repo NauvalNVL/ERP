@@ -12,6 +12,7 @@ class ChartOfAccount extends Model
         'sub_dept',
         'name',
         'status',
+        'ac_type',
         'control_ac',
     ];
 

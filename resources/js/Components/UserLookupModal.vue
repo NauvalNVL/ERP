@@ -234,11 +234,7 @@ watch(() => props.show, (newVal) => {
   }
 })
 
-onMounted(() => {
-  if (props.show) {
-    searchUsers()
-  }
-})
+// onMounted is not needed since watch handles the show prop
 </script>
 
 <style scoped>

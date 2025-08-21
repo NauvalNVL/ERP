@@ -1,230 +1,271 @@
 <template>
-  <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
-      <div class="fixed inset-0 bg-black bg-opacity-60 transition-opacity" aria-hidden="true" @click="closeModal"></div>
-      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-      <div class="flex flex-col align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full animate-modalScaleIn max-h-[90vh]">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-4 relative flex-shrink-0 rounded-t-lg">
-          <div class="flex items-center">
-            <div class="bg-white bg-opacity-20 p-2 rounded-full mr-4">
-              <i class="fas fa-balance-scale text-white text-xl"></i>
-            </div>
-            <h3 class="text-xl font-bold text-white" id="modal-title">
-              SKU Balance: {{ sku ? sku.sku : 'Loading...' }}
-            </h3>
-          </div>
-          <button @click="closeModal" class="absolute top-4 right-4 text-white opacity-70 hover:opacity-100 transition-opacity">
-            <i class="fas fa-times text-2xl"></i>
-          </button>
-        </div>
+  <div v-if="show" class="fixed inset-0 flex items-center justify-center z-50 p-4">
+    <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" @click="close"></div>
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl z-10 relative transform transition-all duration-300 ease-in-out max-h-[90vh] overflow-hidden">
+    <div class="p-6">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-bold text-gray-900">
+          <i class="fas fa-chart-line mr-2 text-green-500"></i>
+          SKU Balance & Inventory
+        </h3>
+        <button @click="close" class="text-gray-400 hover:text-gray-500 transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
 
-        <!-- Content -->
-        <div class="bg-white px-6 py-4 flex-grow overflow-y-auto max-h-[70vh]">
-          <!-- SKU Information Panel -->
-          <div class="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 class="text-lg font-semibold mb-2">SKU Information</h4>
-                <div class="grid grid-cols-1 gap-2">
-                  <div class="flex">
-                    <span class="font-medium w-32">SKU#:</span>
-                    <span>{{ sku ? sku.sku : '—' }}</span>
-                  </div>
-                  <div class="flex">
-                    <span class="font-medium w-32">Name:</span>
-                    <span>{{ sku ? sku.sku_name : '—' }}</span>
-                  </div>
-                  <div class="flex">
-                    <span class="font-medium w-32">Category:</span>
-                    <span>{{ sku ? sku.category_code : '—' }}</span>
-                  </div>
-                  <div class="flex">
-                    <span class="font-medium w-32">Status:</span>
-                    <span :class="sku && sku.is_active ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'">
-                      {{ sku ? (sku.is_active ? 'ACT' : 'OBS') : '—' }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h4 class="text-lg font-semibold mb-2">Stock Details</h4>
-                <div class="grid grid-cols-1 gap-2">
-                  <div class="flex">
-                    <span class="font-medium w-32">BOH:</span>
-                    <span>{{ formatNumber(sku ? sku.boh : 0) }}</span>
-                  </div>
-                  <div class="flex">
-                    <span class="font-medium w-32">FPO:</span>
-                    <span>{{ formatNumber(sku ? sku.fpo : 0) }}</span>
-                  </div>
-                  <div class="flex">
-                    <span class="font-medium w-32">ROL:</span>
-                    <span>{{ formatNumber(sku ? sku.rol : 0) }}</span>
-                  </div>
-                  <div class="flex">
-                    <span class="font-medium w-32">UOM:</span>
-                    <span>{{ sku ? sku.uom : '—' }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <!-- SKU Info -->
+      <div class="bg-gray-50 rounded-lg p-4 mb-6">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">SKU Code</label>
+            <div class="text-lg font-mono font-bold text-gray-900">{{ sku?.sku }}</div>
           </div>
-
-          <!-- Balance Table -->
-          <h4 class="text-lg font-semibold mb-3">SKU Balance Log</h4>
-          <div class="overflow-x-auto border border-gray-200 rounded-lg">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Note#</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ref Date</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference No.</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STS</th>
-                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Balance Qty</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-if="loading">
-                  <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                    <i class="fas fa-spinner fa-spin mr-2"></i> Loading SKU balance data...
-                  </td>
-                </tr>
-                <tr v-else-if="balanceItems.length === 0">
-                  <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                    No balance data available for this SKU.
-                  </td>
-                </tr>
-                <template v-else>
-                  <tr v-for="(item, index) in balanceItems" :key="index" class="hover:bg-gray-50">
-                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-900">{{ item.note }}</td>
-                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ item.refDate }}</td>
-                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ item.refNo }}</td>
-                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ item.status }}</td>
-                    <td class="px-6 py-2 whitespace-nowrap text-sm text-right text-gray-500">{{ formatNumber(item.balanceQty) }}</td>
-                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ item.location }}</td>
-                  </tr>
-                </template>
-              </tbody>
-            </table>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">SKU Name</label>
+            <div class="text-sm text-gray-600">{{ sku?.sku_name }}</div>
           </div>
-          
-          <!-- Transaction Details Section -->
-          <div class="mt-6">
-            <h4 class="text-lg font-semibold mb-3">In/Out Transactions</h4>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div class="flex mb-2">
-                  <span class="font-medium w-28">In Qty:</span>
-                  <span class="text-blue-600 font-semibold">{{ formatNumber(0.000) }}</span>
-                </div>
-                <div class="flex">
-                  <span class="font-medium w-28">Out Qty:</span>
-                  <span class="text-red-600 font-semibold">{{ formatNumber(0.000) }}</span>
-                </div>
-              </div>
-              
-              <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div class="flex">
-                  <span class="font-medium w-28">Mfg Date:</span>
-                  <span>00/00/0000</span>
-                </div>
-              </div>
-            </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <div class="text-sm text-gray-600">{{ sku?.category_code }}</div>
           </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="bg-gray-100 px-6 py-4 flex justify-end space-x-3 flex-shrink-0 rounded-b-lg">
-          <button @click="printBalance" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center">
-            <i class="fas fa-print mr-2"></i> Print
-          </button>
-          <button @click="closeModal" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg transition-colors">
-            Exit
-          </button>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Unit of Measure</label>
+            <div class="text-sm text-gray-600">{{ sku?.uom }}</div>
+          </div>
         </div>
       </div>
+
+      <!-- Balance Overview -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <i class="fas fa-box text-blue-600 text-2xl"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-blue-600">Balance on Hand</p>
+              <p class="text-2xl font-bold text-blue-900">{{ formatNumber(balance.current_balance) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <i class="fas fa-lock text-yellow-600 text-2xl"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-yellow-600">Reserved</p>
+              <p class="text-2xl font-bold text-yellow-900">{{ formatNumber(balance.reserved_quantity) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-green-600">Available</p>
+              <p class="text-2xl font-bold text-green-900">{{ formatNumber(balance.available_quantity) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Levels -->
+      <div class="bg-gray-50 rounded-lg p-4 mb-6">
+        <h4 class="text-md font-semibold text-gray-800 mb-3">Inventory Levels</h4>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Minimum Level</label>
+            <div class="text-lg font-mono text-red-600">{{ formatNumber(sku?.min_level) }}</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Reorder Level</label>
+            <div class="text-lg font-mono text-orange-600">{{ formatNumber(sku?.reorder_level) }}</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Maximum Level</label>
+            <div class="text-lg font-mono text-green-600">{{ formatNumber(sku?.max_level) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Indicators -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-white border rounded-lg p-4">
+          <h4 class="text-md font-semibold text-gray-800 mb-3">Inventory Status</h4>
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Stock Level:</span>
+              <span class="px-2 py-1 rounded-full text-xs font-medium" :class="getStockLevelClass()">
+                {{ getStockLevelText() }}
+              </span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Last Updated:</span>
+              <span class="text-sm text-gray-900">{{ formatDate(balance.last_updated) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border rounded-lg p-4">
+          <h4 class="text-md font-semibold text-gray-800 mb-3">Quick Actions</h4>
+          <div class="space-y-2">
+            <button @click="refreshBalance" class="w-full text-left px-3 py-2 text-sm bg-blue-50 hover:bg-blue-100 rounded border">
+              <i class="fas fa-sync-alt mr-2"></i> Refresh Balance
+            </button>
+            <button @click="viewHistory" class="w-full text-left px-3 py-2 text-sm bg-gray-50 hover:bg-gray-100 rounded border">
+              <i class="fas fa-history mr-2"></i> View History
+            </button>
+            <button @click="adjustInventory" class="w-full text-left px-3 py-2 text-sm bg-yellow-50 hover:bg-yellow-100 rounded border">
+              <i class="fas fa-edit mr-2"></i> Adjust Inventory
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex justify-end space-x-3 mt-6">
+        <button @click="close" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+          Close
+        </button>
+        <button @click="printBalance" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <i class="fas fa-print mr-1"></i> Print
+        </button>
+      </div>
+    </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
-import axios from 'axios';
+import { ref, onMounted, watch } from 'vue'
+import axios from 'axios'
 
 const props = defineProps({
   show: {
     type: Boolean,
-    required: true,
+    default: false
   },
   sku: {
     type: Object,
-    default: null,
+    default: () => ({})
   }
-});
+})
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close'])
 
 // State
-const loading = ref(false); // Changed to false initially as data will be fetched on show
-const balanceItems = ref([]);
+const balance = ref({
+  sku: '',
+  sku_name: '',
+  current_balance: 0,
+  reserved_quantity: 0,
+  available_quantity: 0,
+  last_updated: null
+})
+const loading = ref(false)
 
-// Watch for changes in the 'show' prop to fetch data when the modal opens
-watch(() => props.show, (newVal) => {
-  if (newVal && props.sku) {
-    fetchBalanceData();
-  } else if (!newVal) {
-    // Clear data when modal is closed
-    balanceItems.value = [];
-  }
-});
-
-const fetchBalanceData = async () => {
-  loading.value = true;
-  balanceItems.value = []; // Clear previous data
+// Methods
+const fetchSkuBalance = async () => {
+  if (!props.sku.sku) return
+  
+  loading.value = true
   try {
-    if (!props.sku || !props.sku.sku) {
-      console.warn('SKU object or SKU ID is missing, cannot fetch balance data.');
-      return;
-    }
-    const response = await axios.get(`/api/material-management/skus/${props.sku.sku}/balance`);
-    balanceItems.value = response.data;
+    const response = await axios.get(`/api/material-management/skus/${props.sku.sku}/balance`)
+    balance.value = response.data
   } catch (error) {
-    console.error('Error fetching SKU balance:', error);
-    // Optionally show a toast error here
-    balanceItems.value = [];
+    console.error('Error fetching SKU balance:', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
-// Utility functions
 const formatNumber = (value) => {
-  if (value === null || value === undefined) return '';
-  return Number(value).toLocaleString(undefined, {
-    minimumFractionDigits: 3,
-    maximumFractionDigits: 3
-  });
-};
+  if (value === null || value === undefined) return '0.000'
+  return parseFloat(value).toFixed(3)
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return 'N/A'
+  return new Date(dateString).toLocaleString()
+}
+
+const getStockLevelClass = () => {
+  const current = parseFloat(balance.value.current_balance) || 0
+  const min = parseFloat(props.sku.min_level) || 0
+  const reorder = parseFloat(props.sku.reorder_level) || 0
+  const max = parseFloat(props.sku.max_level) || 0
+  
+  if (current <= min) {
+    return 'bg-red-100 text-red-800'
+  } else if (current <= reorder) {
+    return 'bg-yellow-100 text-yellow-800'
+  } else if (current >= max) {
+    return 'bg-purple-100 text-purple-800'
+  } else {
+    return 'bg-green-100 text-green-800'
+  }
+}
+
+const getStockLevelText = () => {
+  const current = parseFloat(balance.value.current_balance) || 0
+  const min = parseFloat(props.sku.min_level) || 0
+  const reorder = parseFloat(props.sku.reorder_level) || 0
+  const max = parseFloat(props.sku.max_level) || 0
+  
+  if (current <= min) {
+    return 'Critical Low'
+  } else if (current <= reorder) {
+    return 'Below Reorder'
+  } else if (current >= max) {
+    return 'Overstock'
+  } else {
+    return 'Normal'
+  }
+}
+
+const refreshBalance = () => {
+  fetchSkuBalance()
+}
+
+const viewHistory = () => {
+  // Implement inventory history view
+  console.log('View inventory history for', props.sku.sku)
+}
+
+const adjustInventory = () => {
+  // Implement inventory adjustment
+  console.log('Adjust inventory for', props.sku.sku)
+}
 
 const printBalance = () => {
-  console.log('Printing SKU balance for:', props.sku?.sku);
-  alert('Print functionality would be implemented here');
-};
+  // Implement print functionality
+  window.print()
+}
 
-const closeModal = () => {
-  emit('close');
-};
+const close = () => {
+  emit('close')
+}
+
+// Watchers
+watch(() => props.show, (newVal) => {
+  if (newVal) {
+    fetchSkuBalance()
+  }
+})
+
+onMounted(() => {
+  if (props.show) {
+    fetchSkuBalance()
+  }
+})
 </script>
 
 <style scoped>
-@keyframes modalScaleIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.animate-modalScaleIn {
-  animation: modalScaleIn 0.3s ease-out forwards;
-}
-</style> 
+/* Custom styling if needed */
+</style>

@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('purchase_sub_controls', function (Blueprint $table) {
+            // Drop index first before dropping the column
+            $table->dropIndex('purchase_sub_controls_is_active_index');
+        });
+        
+        Schema::table('purchase_sub_controls', function (Blueprint $table) {
+            // Then drop the columns
             $table->dropColumn(['description', 'is_active']);
-            $table->dropIndex(['is_active']);
         });
     }
 

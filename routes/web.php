@@ -667,6 +667,62 @@ Route::middleware('auth')->group(function () {
             return Inertia::render('material-management/system-requirement/purchase-order-setup/ViewPrintSkuItemNoteAnalysisCode');
         })->name('sknac.vp');
     });
+
+    // Purchase Order Routes
+    Route::prefix('material-management/purchase-order/pr-po')->name('mm.po.pr.')->group(function () {
+        // Purchase Requisition Management
+        Route::get('prepare-pr', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'index'])->name('prepare');
+        Route::get('amend-pr', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO/AmendPR', [
+                'header' => 'Amend Purchase Requisition'
+            ]);
+        })->name('amend');
+        Route::get('cancel-pr', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO/CancelPR', [
+                'header' => 'Cancel Purchase Requisition'
+            ]);
+        })->name('cancel');
+        Route::get('print-pr', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO/PrintPR', [
+                'header' => 'Print Purchase Requisition'
+            ]);
+        })->name('print');
+        Route::get('amend-approved-pr', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO/AmendApprovedPR', [
+                'header' => 'Amend Approved PR + Re-Submit'
+            ]);
+        })->name('amend-approved');
+        Route::get('approved-pr', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO/ApprovedPR', [
+                'header' => 'Approved Purchase Requisitions'
+            ]);
+        })->name('approved');
+        
+        // Purchase Order Management  
+        Route::get('amend-rejected-po', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO/AmendRejectedPO', [
+                'header' => 'Amend Rejected PO + Re-Submit'
+            ]);
+        })->name('amend-rejected-po');
+        Route::get('cancel-approved-po', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO/CancelApprovedPO', [
+                'header' => 'Cancel Approved Purchase Order'
+            ]);
+        })->name('cancel-approved-po');
+        Route::get('view-print-po-log', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO/ViewPrintPOLog', [
+                'header' => 'View & Print PO Log'
+            ]);
+        })->name('view-print-po-log');
+        
+        // Legacy routes for backward compatibility
+        Route::get('pr-approval', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO/PrApproval');
+        })->name('approval');
+        Route::get('view-print-pr', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO/ViewPrintPR');
+        })->name('view-print');
+    });
 });
 
 // Report Group Routes

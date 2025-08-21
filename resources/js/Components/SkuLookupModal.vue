@@ -110,7 +110,7 @@ export default {
   props: {
     show: Boolean,
   },
-  emits: ['close', 'sku-selected'],
+  emits: ['close', 'select'],
   data() {
     return {
       skus: [],
@@ -144,13 +144,10 @@ export default {
     },
   },
   watch: {
-    show: {
-      immediate: true,
-      handler(newVal) {
-        if (newVal) {
-          this.fetchData();
-        }
-      },
+    show(newVal) {
+      if (newVal) {
+        this.fetchData();
+      }
     },
   },
   methods: {
@@ -189,7 +186,7 @@ export default {
       // Debounce could be added here if needed
     },
     selectSku(sku) {
-      this.$emit('sku-selected', sku);
+      this.$emit('select', sku);
       this.$emit('close');
     },
   },

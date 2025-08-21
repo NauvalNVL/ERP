@@ -251,50 +251,12 @@
     </Modal>
 
     <!-- GL Account Selector Modal -->
-    <Modal :show="showGlAccountModal" @close="closeGlAccountModal">
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-lg font-bold text-gray-900">Select GL Account</h3>
-          <button @click="closeGlAccountModal" class="text-gray-400 hover:text-gray-500">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-
-        <div class="overflow-y-auto max-h-96">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account #</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="account in chartOfAccounts" :key="account.id"
-                  @click="selectGlAccount(account)"
-                  :class="{'bg-blue-50': selectedAccount && selectedAccount.id === account.id}"
-                  class="hover:bg-gray-50 cursor-pointer">
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ account.account_number }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ account.name }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ account.status }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="mt-6 flex justify-end space-x-3">
-          <button @click="closeGlAccountModal"
-                  class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
-            Cancel
-          </button>
-          <button @click="confirmGlAccountSelection"
-                  class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
-                  :disabled="!selectedAccount">
-            Select
-          </button>
-        </div>
-      </div>
-    </Modal>
+    <GLAccountModal 
+      :show="showGlAccountModal" 
+      :accounts="chartOfAccounts"
+      @close="closeGlAccountModal"
+      @select="handleGlAccountSelection"
+    />
   </AppLayout>
 </template>
 
@@ -303,6 +265,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Modal from '@/Components/Modal.vue';
+import GLAccountModal from '@/Components/GLAccountModal.vue';
 import ToastContainer from '@/Components/ToastContainer.vue';
 import { useToast } from '@/Composables/useToast';
 import axios from 'axios';
@@ -316,7 +279,6 @@ const props = defineProps({
 const glDistList = ref(props.glDistributions || []);
 const chartOfAccounts = ref(props.chartOfAccounts || []);
 const selectedGlDist = ref(null);
-const selectedAccount = ref(null);
 const loading = ref(false);
 const submitting = ref(false);
 const searchQuery = ref('');
@@ -503,25 +465,17 @@ const saveGlDist = async () => {
 
 const openGlAccountSelector = () => {
   showGlAccountModal.value = true;
-  selectedAccount.value = null;
 };
 
 const closeGlAccountModal = () => {
   showGlAccountModal.value = false;
-  selectedAccount.value = null;
 };
 
-const selectGlAccount = (account) => {
-  selectedAccount.value = account;
-};
-
-const confirmGlAccountSelection = () => {
-  if (selectedAccount.value) {
-    form.value.gl_account = selectedAccount.value.account_number;
-    form.value.gl_account_name = selectedAccount.value.name;
-    form.value.is_linked = true;
-    closeGlAccountModal();
-  }
+const handleGlAccountSelection = (account) => {
+  form.value.gl_account = account.account_number;
+  form.value.gl_account_name = account.name;
+  form.value.is_linked = true;
+  showGlAccountModal.value = false;
 };
 
 const sortBy = (field) => {

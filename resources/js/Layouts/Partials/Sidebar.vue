@@ -494,11 +494,18 @@ const materialManagementItems = [
         title: 'PR/PO',
         icon: 'fas fa-file-invoice',
         children: [
-          { title: 'Purchase Requisition Entry', icon: 'fas fa-file-alt', route: '/material-management/pr-po/purchase-requisition' },
-          { title: 'Purchase Order Entry', icon: 'fas fa-file-signature', route: '/material-management/pr-po/purchase-order' },
-          { title: 'Approve PR/PO', icon: 'fas fa-check-double', route: '/material-management/pr-po/approve' },
-          { title: 'Cancel PR/PO', icon: 'fas fa-times-circle', route: '/material-management/pr-po/cancel' },
-          { title: 'Close PR/PO', icon: 'fas fa-window-close', route: '/material-management/pr-po/close' }
+          // Purchase Requisition Management
+          { title: 'Prepare PR', icon: 'fas fa-file-plus', route: '/material-management/purchase-order/pr-po/prepare-pr' },
+          { title: 'Amend PR', icon: 'fas fa-file-edit', route: '/material-management/purchase-order/pr-po/amend-pr' },
+          { title: 'Cancel PR', icon: 'fas fa-file-times', route: '/material-management/purchase-order/pr-po/cancel-pr' },
+          { title: 'Print PR', icon: 'fas fa-file-pdf', route: '/material-management/purchase-order/pr-po/print-pr' },
+          { title: 'Amend Approved PR + Re-Submit', icon: 'fas fa-file-signature', route: '/material-management/purchase-order/pr-po/amend-approved-pr' },
+          { title: 'Approved PR', icon: 'fas fa-file-check', route: '/material-management/purchase-order/pr-po/approved-pr' },
+          
+          // Purchase Order Management
+          { title: 'Amend Rejected PO + Re-Submit', icon: 'fas fa-file-export', route: '/material-management/purchase-order/pr-po/amend-rejected-po' },
+          { title: 'Cancel Approved PO', icon: 'fas fa-file-excel', route: '/material-management/purchase-order/pr-po/cancel-approved-po' },
+          { title: 'View & Print PO Log', icon: 'fas fa-file-alt', route: '/material-management/purchase-order/pr-po/view-print-po-log' }
         ]
       },
       {

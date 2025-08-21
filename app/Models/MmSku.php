@@ -20,16 +20,31 @@ class MmSku extends Model
         'category_code',
         'type',
         'uom',
+        'valuation_unit',
+        'valuation_per_base_unit',
         'boh',
         'fpo',
         'rol',
+        'days_to_ship',
+        'units_shipped',
+        'location_code',
+        'report_group_code',
+        'min_level',
+        'max_level',
+        'reorder_level',
         'total_part',
         'min_qty',
         'max_qty',
         'additional_name',
+        'additional_name_1',
+        'additional_name_2',
+        'additional_name_3',
+        'additional_name_4',
+        'additional_name_5',
         'part_number1',
         'part_number2',
         'part_number3',
+        'sku_picture_path',
         'is_active',
         'is_locked',
         'locked_by',
@@ -42,6 +57,12 @@ class MmSku extends Model
         'boh' => 'decimal:3',
         'fpo' => 'decimal:3',
         'rol' => 'decimal:3',
+        'valuation_per_base_unit' => 'decimal:3',
+        'days_to_ship' => 'integer',
+        'units_shipped' => 'decimal:3',
+        'min_level' => 'decimal:3',
+        'max_level' => 'decimal:3',
+        'reorder_level' => 'decimal:3',
         'min_qty' => 'decimal:2',
         'max_qty' => 'decimal:2',
         'is_active' => 'boolean',
@@ -57,6 +78,16 @@ class MmSku extends Model
     public function skuType(): BelongsTo
     {
         return $this->belongsTo(SkuType::class, 'type', 'code');
+    }
+
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(MmLocation::class, 'location_code', 'code');
+    }
+
+    public function reportGroup(): BelongsTo
+    {
+        return $this->belongsTo(MmReportGroup::class, 'report_group_code', 'code');
     }
 
     public function prices(): HasMany

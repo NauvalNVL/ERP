@@ -116,7 +116,7 @@ Route::patch('/sku-item-note-analysis-groups/{id}/toggle-active', [App\Http\Cont
 Route::get('/sku-item-note-analysis-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'index']);
 Route::post('/sku-item-note-analysis-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'store']);
 Route::get('/sku-item-note-analysis-codes/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'getForPrint']);
-Route::get('/sku-item-note-analysis-codes/groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'getGroups']);
+Route::get('/sku-item-note-analysis-codes/groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'getAnalysisGroups']);
 Route::get('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'show']);
 Route::put('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'update']);
 Route::delete('/sku-item-note-analysis-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuItemNoteAnalysisCodeController::class, 'destroy']);
@@ -784,4 +784,60 @@ Route::prefix('update-mc')->group(function () {
     Route::post('/search-ac', [UpdateMcController::class, 'searchAc']);
     Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs']);
     Route::get('/master-cards', [UpdateMcController::class, 'apiIndex']);
+});
+
+// Purchase Requisition API Routes
+Route::prefix('purchase-requisitions')->group(function () {
+    Route::get('/', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'apiIndex']);
+    Route::post('/', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'store']);
+    Route::get('/{id}', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'show']);
+    Route::put('/{id}', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'update']);
+    Route::delete('/{id}', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'destroy']);
+    
+    // PR Actions
+    Route::post('/{id}/submit', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'submit']);
+    Route::post('/{id}/approve', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'approve']);
+    Route::post('/{id}/reject', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'reject']);
+    Route::post('/{id}/cancel', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'cancel']);
+    
+    // Utility endpoints
+    Route::get('/statistics/dashboard', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'getStatistics']);
+    Route::get('/approvals/my-pending', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'myPendingApprovals']);
+});
+
+// Purchase Order API Routes
+Route::prefix('purchase-orders')->group(function () {
+    Route::get('/', function () {
+        // Return mock data for now - replace with actual controller
+        return response()->json([
+            [
+                'id' => 1,
+                'po_number' => 'PO-2024-001',
+                'supplier' => 'PT Supplier ABC',
+                'approved_date' => '2024-01-15',
+                'rejected_date' => '2024-01-15',
+                'rejection_reason' => 'Price too high compared to market rate',
+                'delivery_status' => 'Pending',
+                'total_amount' => 15000000,
+                'status' => 'Rejected'
+            ],
+            [
+                'id' => 2,
+                'po_number' => 'PO-2024-002', 
+                'supplier' => 'CV Supplier XYZ',
+                'approved_date' => '2024-01-16',
+                'rejected_date' => '2024-01-16',
+                'rejection_reason' => 'Incomplete documentation and specifications',
+                'delivery_status' => 'In Transit',
+                'total_amount' => 8500000,
+                'status' => 'Approved'
+            ]
+        ]);
+    });
+    Route::post('/{id}/cancel', function ($id) {
+        return response()->json(['message' => 'Purchase order cancelled successfully']);
+    });
+    Route::post('/{id}/amend-rejected', function ($id) {
+        return response()->json(['message' => 'Amendment notes recorded successfully']);
+    });
 });
