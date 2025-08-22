@@ -139,7 +139,7 @@
                     </div>
                     <div class="text-white text-sm mr-2">
                         <span class="mr-2">Sort:</span>
-                        <select :value="mcsSortOption" @change="$emit('fetchMcsData')" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
+                        <select :value="mcsSortOption" @change="handleSortOptionChange" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
                             <option value="mc_seq">MC Seq#</option>
                             <option value="mc_model">MC Model</option>
                             <option value="part_no">MC PD Part#</option>
@@ -218,12 +218,16 @@
                         <tr v-else-if="mcsSortOption === 'ext_dim_1'">
                             <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ext. Dimension</th>
                             <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
+                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comp#</th>
+                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design</th>
                             <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
                             <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         </tr>
                         <tr v-else-if="mcsSortOption === 'int_dim_1'">
                             <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Int. Dimension</th>
                             <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
+                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comp#</th>
+                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design</th>
                             <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
                             <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         </tr>
@@ -268,6 +272,8 @@
                             <template v-else-if="mcsSortOption === 'ext_dim_1'">
                                 <td class="px-2 py-1 border border-gray-300">{{ mcs.ext_dim_1 }}x{{ mcs.ext_dim_2 }}x{{ mcs.ext_dim_3 }}</td>
                                 <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
+                                <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
+                                <td class="px-2 py-1 border border-gray-300">{{ mcs.p_design }}</td>
                                 <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
                                 <td class="px-2 py-1 border border-gray-300">
                                     <span
@@ -280,6 +286,8 @@
                             <template v-else-if="mcsSortOption === 'int_dim_1'">
                                 <td class="px-2 py-1 border border-gray-300">{{ mcs.int_dim_1 }}x{{ mcs.int_dim_2 }}x{{ mcs.int_dim_3 }}</td>
                                 <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
+                                <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
+                                <td class="px-2 py-1 border border-gray-300">{{ mcs.p_design }}</td>
                                 <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
                                 <td class="px-2 py-1 border border-gray-300">
                                     <span
@@ -305,6 +313,112 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <!-- Detail Fields for MC PD Part# Sort Option -->
+                <div v-if="mcsSortOption === 'part_no'" class="mt-4 border border-gray-400 rounded bg-white">
+                    <div class="bg-blue-200 px-3 py-1 border-b border-gray-400">
+                        <h4 class="text-sm font-bold text-blue-900">MASTER CARD DETAILS</h4>
+                    </div>
+                    <div class="p-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="flex items-center">
+                                <label class="text-xs font-medium w-16">Model:</label>
+                                <input 
+                                    type="text" 
+                                    :value="selectedMcs?.model || ''" 
+                                    readonly 
+                                    class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-white"
+                                />
+                            </div>
+                            <div class="flex items-center">
+                                <label class="text-xs font-medium w-16">Ext. Dim:</label>
+                                <div class="flex items-center space-x-1 flex-1">
+                                    <input 
+                                        type="text" 
+                                        :value="selectedMcs?.ext_dim_1 || ''" 
+                                        readonly 
+                                        class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
+                                    />
+                                    <span class="text-xs text-gray-600">x</span>
+                                    <input 
+                                        type="text" 
+                                        :value="selectedMcs?.ext_dim_2 || ''" 
+                                        readonly 
+                                        class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
+                                    />
+                                    <span class="text-xs text-gray-600">x</span>
+                                    <input 
+                                        type="text" 
+                                        :value="selectedMcs?.ext_dim_3 || ''" 
+                                        readonly 
+                                        class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
+                                    />
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <label class="text-xs font-medium w-16">Int. Dim:</label>
+                                <div class="flex items-center space-x-1 flex-1">
+                                    <input 
+                                        type="text" 
+                                        :value="selectedMcs?.int_dim_1 || ''" 
+                                        readonly 
+                                        class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
+                                    />
+                                    <span class="text-xs text-gray-600">x</span>
+                                    <input 
+                                        type="text" 
+                                        :value="selectedMcs?.int_dim_2 || ''" 
+                                        readonly 
+                                        class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
+                                    />
+                                    <span class="text-xs text-gray-600">x</span>
+                                    <input 
+                                        type="text" 
+                                        :value="selectedMcs?.int_dim_3 || ''" 
+                                        readonly 
+                                        class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Fields for MC PD ED Sort Option -->
+                <div v-if="mcsSortOption === 'ext_dim_1'" class="mt-4 border border-gray-400 rounded bg-white">
+                    <div class="bg-blue-200 px-3 py-1 border-b border-gray-400">
+                        <h4 class="text-sm font-bold text-blue-900">MASTER CARD DETAILS</h4>
+                    </div>
+                    <div class="p-3">
+                        <div class="flex items-center">
+                            <label class="text-xs font-medium w-16">Model:</label>
+                            <input 
+                                type="text" 
+                                :value="selectedMcs?.model || ''" 
+                                readonly 
+                                class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-white"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Fields for MC PD ID Sort Option -->
+                <div v-if="mcsSortOption === 'int_dim_1'" class="mt-4 border border-gray-400 rounded bg-white">
+                    <div class="bg-blue-200 px-3 py-1 border-b border-gray-400">
+                        <h4 class="text-sm font-bold text-blue-900">MASTER CARD DETAILS</h4>
+                    </div>
+                    <div class="p-3">
+                        <div class="flex items-center">
+                            <label class="text-xs font-medium w-16">Model:</label>
+                            <input 
+                                type="text" 
+                                :value="selectedMcs?.model || ''" 
+                                readonly 
+                                class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-white"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Modal Footer -->
@@ -790,6 +904,12 @@
 <script setup>
 import { defineEmits, defineProps } from 'vue';
 
+const handleSortOptionChange = (event) => {
+    const newSortOption = event.target.value;
+    emit('updateSortOption', newSortOption);
+    emit('fetchMcsData');
+};
+
 const props = defineProps({
     showErrorModal: Boolean,
     showSetupMcModal: Boolean,
@@ -823,7 +943,8 @@ const emit = defineEmits([
     'selectMcsItem',
     'selectMcs',
     'goToMcsPage',
-    'updateSearchTerm'
+    'updateSearchTerm',
+    'updateSortOption'
 ]);
 </script>
 

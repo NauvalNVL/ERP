@@ -452,6 +452,7 @@
             @selectMcs="selectMcs"
             @goToMcsPage="goToMcsPage"
             @updateSearchTerm="mcsSearchTerm = $event"
+            @updateSortOption="mcsSortOption = $event"
         />
 
         <!-- Maintenance Log Modal -->
