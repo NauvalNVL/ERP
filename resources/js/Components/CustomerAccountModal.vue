@@ -8,6 +8,15 @@
         </h3>
         <div class="flex space-x-3 items-center">
           <div class="text-white text-sm mr-2">
+            <span class="mr-2">Zoom:</span>
+            <select @change="handleZoomChange" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
+              <option value="">Select Zoom</option>
+              <option value="customer_details">Customer Details</option>
+              <option value="customer_address">Customer Address</option>
+              <option value="customer_contacts">Customer Contacts</option>
+            </select>
+          </div>
+          <div class="text-white text-sm mr-2">
             <span class="mr-2">Sort:</span>
             <select v-model="sortBy" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
               <option value="customer_code">Customer Code</option>
@@ -83,24 +92,16 @@
         <div class="text-xs text-gray-500 mr-auto" v-if="filteredAccounts.length > 0">
           {{ filteredAccounts.length }} accounts found
         </div>
-        <button type="button" @click="openCustomerAccountOptionsModal" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">More Options</button>
-        <button type="button" @click="openCustomerAccountZoomModal" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">Zoom</button>
         <button 
           @click="handleSelect" 
           :disabled="!selectedAccount"
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed">
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs disabled:opacity-100 disabled:cursor-not-allowed">
           Select
         </button>
         <button type="button" @click="$emit('close')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">Exit</button>
       </div>
     </div>
   </div>
-
-  <!-- Customer Account Options Modal -->
-  <CustomerAccountOptionsModal
-    :show="showCustomerAccountOptionsModal"
-    @close="showCustomerAccountOptionsModal = false"
-  />
 
   <!-- Customer Account Zoom Modal -->
   <CustomerAccountZoomModal
@@ -113,7 +114,6 @@
 <script>
 import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
-import CustomerAccountOptionsModal from '@/Components/CustomerAccountOptionsModal.vue'
 import CustomerAccountZoomModal from '@/Components/CustomerAccountZoomModal.vue'
 
 export default {
@@ -143,9 +143,6 @@ export default {
     const error = ref(null)
     const sortBy = ref(props.initialSortBy)
     const statusFilter = ref(props.initialStatusFilter.includes('Active') ? 'active' : (props.initialStatusFilter.includes('Obsolete') ? 'obsolete' : 'all'))
-
-    // New state for Customer Account Options Modal
-    const showCustomerAccountOptionsModal = ref(false);
 
     // New state for Customer Account Zoom Modal
     const showCustomerAccountZoomModal = ref(false);
@@ -234,12 +231,31 @@ export default {
     }
     
     // Functions to open new modals
-    const openCustomerAccountOptionsModal = () => {
-      showCustomerAccountOptionsModal.value = true;
-    };
-
     const openCustomerAccountZoomModal = () => {
       showCustomerAccountZoomModal.value = true;
+    };
+
+    const handleZoomChange = (event) => {
+      const zoomOption = event.target.value;
+      if (zoomOption && selectedAccount.value) {
+        // Handle different zoom options
+        switch (zoomOption) {
+          case 'customer_details':
+            // Open zoom modal for customer details
+            showCustomerAccountZoomModal.value = true;
+            break;
+          case 'customer_address':
+            // Handle customer address zoom
+            console.log('Customer address zoom selected');
+            break;
+          case 'customer_contacts':
+            // Handle customer contacts zoom
+            console.log('Customer contacts zoom selected');
+            break;
+        }
+        // Reset zoom dropdown
+        event.target.value = '';
+      }
     };
 
     
@@ -285,10 +301,9 @@ export default {
       handleSelect,
       fetchCustomerAccounts,
       // Expose new modal states and functions
-      showCustomerAccountOptionsModal,
       showCustomerAccountZoomModal,
-      openCustomerAccountOptionsModal,
       openCustomerAccountZoomModal,
+      handleZoomChange,
     }
   }
 }
