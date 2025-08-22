@@ -817,6 +817,423 @@ Route::prefix('purchase-requisitions')->group(function () {
     Route::get('/approvals/my-pending', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'myPendingApprovals']);
 });
 
+    // Vendor API Routes
+    Route::prefix('vendors')->group(function () {
+        Route::get('/', [App\Http\Controllers\VendorController::class, 'index']);
+        Route::get('/search', [App\Http\Controllers\VendorController::class, 'search']);
+        Route::get('/suggestions', [App\Http\Controllers\VendorController::class, 'suggestions']);
+        Route::get('/{apAcNumber}', [App\Http\Controllers\VendorController::class, 'show']);
+    });
+
+    // Location API Routes
+    Route::prefix('locations')->group(function () {
+        Route::get('/', function () {
+            return response()->json([
+                [
+                    'id' => 1,
+                    'code' => 'WH001',
+                    'name' => 'Main Warehouse',
+                    'type' => 'Warehouse',
+                    'status' => 'Active'
+                ],
+                [
+                    'id' => 2,
+                    'code' => 'WH002',
+                    'name' => 'Secondary Warehouse',
+                    'type' => 'Warehouse',
+                    'status' => 'Active'
+                ],
+                [
+                    'id' => 3,
+                    'code' => 'ST001',
+                    'name' => 'Store Room 1',
+                    'type' => 'Storage',
+                    'status' => 'Active'
+                ],
+                [
+                    'id' => 4,
+                    'code' => 'ST002',
+                    'name' => 'Store Room 2',
+                    'type' => 'Storage',
+                    'status' => 'Inactive'
+                ],
+                [
+                    'id' => 5,
+                    'code' => 'OF001',
+                    'name' => 'Office Storage',
+                    'type' => 'Office',
+                    'status' => 'Active'
+                ]
+            ]);
+        });
+    });
+
+    // Purchase Sub Control API Routes
+    Route::prefix('purchase-sub-controls')->group(function () {
+        Route::get('/', function () {
+            return response()->json([
+                [
+                    'id' => 1,
+                    'psc_code' => 'PSC001',
+                    'psc_name' => 'Raw Materials Control',
+                    'category' => 'Raw Materials',
+                    'purchaser' => 'John Doe',
+                    'status' => 'Active'
+                ],
+                [
+                    'id' => 2,
+                    'psc_code' => 'PSC002',
+                    'psc_name' => 'Packaging Materials Control',
+                    'category' => 'Packaging',
+                    'purchaser' => 'Jane Smith',
+                    'status' => 'Active'
+                ],
+                [
+                    'id' => 3,
+                    'psc_code' => 'PSC003',
+                    'psc_name' => 'Office Supplies Control',
+                    'category' => 'Office Supplies',
+                    'purchaser' => 'Mike Johnson',
+                    'status' => 'Active'
+                ],
+                [
+                    'id' => 4,
+                    'psc_code' => 'PSC004',
+                    'psc_name' => 'Maintenance Supplies Control',
+                    'category' => 'Maintenance',
+                    'purchaser' => 'Sarah Wilson',
+                    'status' => 'Inactive'
+                ],
+                [
+                    'id' => 5,
+                    'psc_code' => 'PSC005',
+                    'psc_name' => 'IT Equipment Control',
+                    'category' => 'IT Equipment',
+                    'purchaser' => 'David Brown',
+                    'status' => 'Active'
+                ],
+                [
+                    'id' => 6,
+                    'psc_code' => 'PSC006',
+                    'psc_name' => 'Safety Equipment Control',
+                    'category' => 'Safety Equipment',
+                    'purchaser' => 'Lisa Davis',
+                    'status' => 'Active'
+                ],
+                [
+                    'id' => 7,
+                    'psc_code' => 'PSC007',
+                    'psc_name' => 'Chemical Supplies Control',
+                    'category' => 'Chemicals',
+                    'purchaser' => 'Tom Miller',
+                    'status' => 'Pending'
+                ],
+                [
+                    'id' => 8,
+                    'psc_code' => 'PSC008',
+                    'psc_name' => 'Tooling Control',
+                    'category' => 'Tools',
+                    'purchaser' => 'Amy Garcia',
+                    'status' => 'Active'
+                ]
+            ]);
+        });
+    });
+
+    // PO Arrival Schedule API Routes
+    Route::prefix('po-arrival-schedule')->group(function () {
+        Route::post('/generate', function (Request $request) {
+            // Mock implementation - replace with actual report generation
+            $filters = $request->all();
+            
+            // Simulate report generation delay
+            sleep(2);
+            
+            // Return mock Excel file (CSV for now)
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="PO_Arrival_Schedule.csv"',
+            ];
+            
+            $data = [
+                ['PO Number', 'Supplier', 'SKU', 'Description', 'Quantity', 'ETA', 'Status'],
+                ['PO-2024-001', 'ABADI KARYA MAKMUR', 'SKU001', 'Bearing Type A', '100', '2024-06-25', 'Outstanding'],
+                ['PO-2024-002', 'ACCURA SOLIDTECH', 'SKU002', 'Locknut Type B', '50', '2024-06-28', 'Partial'],
+                ['PO-2024-003', 'ACEN JAYA ELEKTRIK', 'SKU003', 'Push Button', '200', '2024-07-01', 'Completed'],
+            ];
+            
+            $csv = '';
+            foreach ($data as $row) {
+                $csv .= implode(',', $row) . "\n";
+            }
+            
+            return response($csv, 200, $headers);
+        });
+    });
+
+    // PR/PO Reports API Routes
+    Route::prefix('pr-po-reports')->group(function () {
+        Route::post('/generate', function (Request $request) {
+            // Mock implementation for PR/PO Reports
+            $filters = $request->all();
+            sleep(2);
+            
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="PR_PO_Reports.csv"',
+            ];
+            
+            $data = [
+                ['PR Number', 'PO Number', 'Supplier', 'SKU', 'Quantity', 'Amount', 'Status'],
+                ['PR-2024-001', 'PO-2024-001', 'ABADI KARYA MAKMUR', 'SKU001', '100', '15000000', 'Approved'],
+                ['PR-2024-002', 'PO-2024-002', 'ACCURA SOLIDTECH', 'SKU002', '50', '8500000', 'Pending'],
+            ];
+            
+            $csv = '';
+            foreach ($data as $row) {
+                $csv .= implode(',', $row) . "\n";
+            }
+            
+            return response($csv, 200, $headers);
+        });
+        
+        Route::post('/preview', function (Request $request) {
+            return response()->json([
+                'summary' => [
+                    'totalPR' => 45,
+                    'totalPO' => 38,
+                    'totalAmount' => 250000000,
+                    'avgProcessingTime' => 4.5
+                ],
+                'prpoData' => [
+                    [
+                        'id' => 1,
+                        'pr_number' => 'PR-2024-001',
+                        'po_number' => 'PO-2024-001',
+                        'supplier' => 'ABADI KARYA MAKMUR',
+                        'sku' => 'SKU001',
+                        'quantity' => 100,
+                        'amount' => 15000000,
+                        'pr_status' => 'Approved',
+                        'po_status' => 'Approved'
+                    ],
+                    [
+                        'id' => 2,
+                        'pr_number' => 'PR-2024-002',
+                        'po_number' => 'PO-2024-002',
+                        'supplier' => 'ACCURA SOLIDTECH',
+                        'sku' => 'SKU002',
+                        'quantity' => 50,
+                        'amount' => 8500000,
+                        'pr_status' => 'Pending',
+                        'po_status' => 'Draft'
+                    ]
+                ]
+            ]);
+        });
+        
+        Route::get('/recent', function () {
+            return response()->json([
+                [
+                    'id' => 1,
+                    'generatedDate' => '2024-01-20',
+                    'period' => '01/2024',
+                    'recordCount' => 150,
+                    'generatedBy' => 'Admin User'
+                ]
+            ]);
+        });
+    });
+
+    // PO RC & RT Reports API Routes
+    Route::prefix('po-rc-rt-reports')->group(function () {
+        Route::post('/generate', function (Request $request) {
+            $filters = $request->all();
+            sleep(2);
+            
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="PO_RC_RT_Report.csv"',
+            ];
+            
+            $data = [
+                ['Date', 'Type', 'PO Number', 'Vendor', 'SKU', 'Qty', 'Amount', 'Status'],
+                ['2024-01-15', 'RC', 'PO-2024-001', 'ABADI KARYA MAKMUR', 'SKU001', '100', '15000000', 'Posted'],
+                ['2024-01-16', 'RT', 'PO-2024-002', 'ACCURA SOLIDTECH', 'SKU002', '10', '1500000', 'Draft'],
+            ];
+            
+            $csv = '';
+            foreach ($data as $row) {
+                $csv .= implode(',', $row) . "\n";
+            }
+            
+            return response($csv, 200, $headers);
+        });
+        
+        Route::post('/preview', function (Request $request) {
+            return response()->json([
+                'summary' => [
+                    'totalRC' => 25,
+                    'totalRT' => 5,
+                    'totalAmount' => 'Rp 250,000,000',
+                    'avgProcessingTime' => 3.2
+                ],
+                'transactions' => [
+                    [
+                        'id' => 1,
+                        'date' => '2024-01-15',
+                        'type' => 'RC',
+                        'poNumber' => 'PO-2024-001',
+                        'vendor' => 'ABADI KARYA MAKMUR',
+                        'sku' => 'SKU001',
+                        'quantity' => 100,
+                        'amount' => 15000000,
+                        'status' => 'Posted'
+                    ]
+                ]
+            ]);
+        });
+        
+        Route::get('/recent', function () {
+            return response()->json([
+                [
+                    'id' => 1,
+                    'generatedDate' => '2024-01-20',
+                    'period' => '01/2024',
+                    'recordCount' => 30,
+                    'generatedBy' => 'Admin User'
+                ]
+            ]);
+        });
+    });
+
+    // PSC Reports API Routes
+    Route::prefix('psc-reports')->group(function () {
+        Route::post('/generate', function (Request $request) {
+            $filters = $request->all();
+            sleep(2);
+            
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="PSC_Report.csv"',
+            ];
+            
+            $data = [
+                ['PSC Code', 'PSC Name', 'Category', 'Purchaser', 'SKU Count', 'Total Value', 'Status'],
+                ['PSC001', 'Raw Materials Control', 'Raw Materials', 'John Doe', '150', '250000000', 'Active'],
+                ['PSC002', 'Packaging Materials Control', 'Packaging', 'Jane Smith', '75', '120000000', 'Active'],
+            ];
+            
+            $csv = '';
+            foreach ($data as $row) {
+                $csv .= implode(',', $row) . "\n";
+            }
+            
+            return response($csv, 200, $headers);
+        });
+        
+        Route::post('/preview', function (Request $request) {
+            return response()->json([
+                'summary' => [
+                    'totalPSC' => 8,
+                    'activePSC' => 7,
+                    'totalItems' => 500,
+                    'avgValue' => 'Rp 45,000,000'
+                ],
+                'pscData' => [
+                    [
+                        'id' => 1,
+                        'psc_code' => 'PSC001',
+                        'category' => 'Raw Materials',
+                        'purchaser' => 'John Doe',
+                        'sku_count' => 150,
+                        'total_value' => 250000000,
+                        'status' => 'Active',
+                        'last_activity' => '2024-01-20'
+                    ]
+                ]
+            ]);
+        });
+        
+        Route::get('/recent', function () {
+            return response()->json([
+                [
+                    'id' => 1,
+                    'generatedDate' => '2024-01-20',
+                    'period' => '01/2024',
+                    'recordCount' => 8,
+                    'generatedBy' => 'Admin User'
+                ]
+            ]);
+        });
+    });
+
+    // SKU Historical Price Reports API Routes
+    Route::prefix('sku-historical-price-reports')->group(function () {
+        Route::post('/generate', function (Request $request) {
+            $filters = $request->all();
+            sleep(2);
+            
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="SKU_Historical_Price_Report.csv"',
+            ];
+            
+            $data = [
+                ['Date', 'SKU', 'Vendor', 'Price Type', 'Price', 'Currency', 'Change', 'Source'],
+                ['2024-01-15', 'SKU001', 'ABADI KARYA MAKMUR', 'Purchase', '150000', 'IDR', '+5.2%', 'PO'],
+                ['2024-01-16', 'SKU002', 'ACCURA SOLIDTECH', 'Standard', '85000', 'IDR', '-2.1%', 'Contract'],
+            ];
+            
+            $csv = '';
+            foreach ($data as $row) {
+                $csv .= implode(',', $row) . "\n";
+            }
+            
+            return response($csv, 200, $headers);
+        });
+        
+        Route::post('/preview', function (Request $request) {
+            return response()->json([
+                'summary' => [
+                    'totalRecords' => 1250,
+                    'uniqueSkus' => 150,
+                    'avgPrice' => 125000,
+                    'priceChanges' => 45
+                ],
+                'priceHistory' => [
+                    [
+                        'id' => 1,
+                        'date' => '2024-01-15',
+                        'sku' => 'SKU001',
+                        'vendor' => 'ABADI KARYA MAKMUR',
+                        'price_type' => 'Purchase',
+                        'price' => 150000,
+                        'currency' => 'IDR',
+                        'price_change' => 5.2,
+                        'source' => 'PO'
+                    ]
+                ],
+                'priceTrends' => [
+                    ['date' => '2024-01-01', 'avg_price' => 120000],
+                    ['date' => '2024-01-15', 'avg_price' => 125000]
+                ]
+            ]);
+        });
+        
+        Route::get('/recent', function () {
+            return response()->json([
+                [
+                    'id' => 1,
+                    'generatedDate' => '2024-01-20',
+                    'period' => '2024-01-01 to 2024-01-20',
+                    'recordCount' => 1250,
+                    'generatedBy' => 'Admin User'
+                ]
+            ]);
+        });
+    });
+
 // Purchase Order API Routes
 Route::prefix('purchase-orders')->group(function () {
     Route::get('/', function () {

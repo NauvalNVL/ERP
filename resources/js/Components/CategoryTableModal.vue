@@ -1,38 +1,46 @@
 <template>
-  <div v-if="show" class="fixed inset-0 flex items-center justify-center z-50 p-4">
-    <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" @click="close"></div>
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl z-10 relative transform transition-all duration-300 ease-in-out max-h-[90vh] overflow-hidden">
-    <div class="p-6">
+  <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModal"></div>
+
+      <!-- Modal panel -->
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
       <!-- Header -->
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-bold text-gray-900">
-          <i class="fas fa-folder mr-2 text-blue-500"></i>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-between items-center">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">
           Category Table
         </h3>
-        <button @click="close" class="text-gray-400 hover:text-gray-500 transition-colors">
-          <i class="fas fa-times text-xl"></i>
+          <button
+            @click="closeModal"
+            class="text-gray-400 hover:text-gray-600 focus:outline-none"
+          >
+            <i class="fas fa-times"></i>
         </button>
       </div>
 
-      <!-- Search Bar -->
+        <!-- Content -->
+        <div class="px-4 py-5 sm:p-6">
+          <!-- Search -->
       <div class="mb-4">
         <div class="relative">
-          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-            <i class="fas fa-search"></i>
-          </span>
           <input 
+                v-model="searchQuery"
             type="text" 
-            v-model="searchQuery" 
-            placeholder="Search by code or name..." 
-            class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-          >
+                placeholder="Search categories..."
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                @input="searchCategories"
+              />
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
         </div>
       </div>
 
       <!-- Table -->
-      <div class="overflow-y-auto max-h-96 border rounded-lg">
+          <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50 sticky top-0">
+              <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Code
@@ -40,64 +48,54 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Name
               </th>
-              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Action
-              </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-if="loading" class="animate-pulse">
-              <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
-                <div class="flex justify-center items-center space-x-2">
-                  <i class="fas fa-spinner fa-spin"></i>
-                  <span>Loading categories...</span>
-                </div>
-              </td>
-            </tr>
-            <tr v-else-if="filteredCategories.length === 0">
-              <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
-                No categories found
-              </td>
-            </tr>
-            <tr v-for="category in filteredCategories" 
-                :key="category.code" 
-                :class="{'bg-blue-50': selectedCategory && selectedCategory.code === category.code}"
+                <tr
+                  v-for="category in filteredCategories"
+                  :key="category.id"
                 @click="selectCategory(category)"
-                class="hover:bg-gray-50 cursor-pointer">
+                  class="hover:bg-blue-50 cursor-pointer"
+                  :class="{ 'bg-blue-100': selectedCategory?.id === category.id }"
+                >
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ category.code }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ category.name }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center text-sm">
-                <button 
-                  @click.stop="selectAndClose(category)"
-                  class="text-blue-600 hover:text-blue-900 font-medium"
-                >
-                  Select
-                </button>
               </td>
             </tr>
           </tbody>
         </table>
+          </div>
+
+          <!-- Loading state -->
+          <div v-if="loading" class="text-center py-4">
+            <i class="fas fa-spinner fa-spin text-blue-500"></i>
+            <span class="ml-2 text-gray-600">Loading categories...</span>
+          </div>
+
+          <!-- Empty state -->
+          <div v-if="!loading && filteredCategories.length === 0" class="text-center py-4">
+            <span class="text-gray-500">No categories found</span>
+          </div>
       </div>
 
       <!-- Footer -->
-      <div class="flex justify-end space-x-3 mt-6">
-        <button 
-          @click="close" 
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-        >
-          Exit
-        </button>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
         <button 
           @click="confirmSelection" 
           :disabled="!selectedCategory"
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Select
         </button>
+          <button
+            @click="closeModal"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            Exit
+          </button>
       </div>
     </div>
     </div>
@@ -105,9 +103,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import axios from 'axios'
-
+import { ref, computed, watch, onMounted } from 'vue'
 
 const props = defineProps({
   show: {
@@ -116,15 +112,15 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close', 'categorySelected'])
+const emit = defineEmits(['close', 'select'])
 
-// State
+// Reactive data
 const categories = ref([])
-const searchQuery = ref('')
 const selectedCategory = ref(null)
+const searchQuery = ref('')
 const loading = ref(false)
 
-// Computed
+// Computed properties
 const filteredCategories = computed(() => {
   if (!searchQuery.value) {
     return categories.value
@@ -138,47 +134,102 @@ const filteredCategories = computed(() => {
 })
 
 // Methods
-const fetchCategories = async () => {
-  loading.value = true
-  try {
-    const response = await axios.get('/api/material-management/categories')
-    categories.value = response.data
-  } catch (error) {
-    console.error('Error fetching categories:', error)
-  } finally {
-    loading.value = false
-  }
+const closeModal = () => {
+  emit('close')
+  resetModal()
+}
+
+const resetModal = () => {
+  selectedCategory.value = null
+  searchQuery.value = ''
 }
 
 const selectCategory = (category) => {
   selectedCategory.value = category
 }
 
-const selectAndClose = (category) => {
-  selectedCategory.value = category
-  confirmSelection()
-}
-
 const confirmSelection = () => {
   if (selectedCategory.value) {
-    emit('categorySelected', selectedCategory.value)
-    close()
+    emit('select', selectedCategory.value)
+    closeModal()
   }
 }
 
-const close = () => {
-  emit('close')
-  searchQuery.value = ''
-  selectedCategory.value = null
+const searchCategories = () => {
+  // Search is handled by computed property
 }
 
-// Watch for modal open
+const fetchCategories = async () => {
+  loading.value = true
+  try {
+    const response = await fetch('/api/categories')
+    if (response.ok) {
+      const data = await response.json()
+      categories.value = data
+    } else {
+      console.error('Failed to fetch categories')
+      // Fallback to mock data
+      categories.value = [
+        { id: 1, code: '#A1.01', name: 'BEARING' },
+        { id: 2, code: '#A1.02', name: 'BEARING' },
+        { id: 3, code: '#A1.03', name: 'LOCKNUT' },
+        { id: 4, code: '#A1.04', name: 'PUSH BOTOM' },
+        { id: 5, code: '#A1.05', name: 'FITING ANGIN' },
+        { id: 6, code: '#A1.06', name: 'BEARING FILLO BLOCK' },
+        { id: 7, code: '#A1.07', name: 'BEARING' },
+        { id: 8, code: '#A1.08', name: 'LOCKNUT' },
+        { id: 9, code: '#A1.09', name: 'PUSH BOTOM' },
+        { id: 10, code: '#A1.10', name: 'FITING ANGIN' },
+        { id: 11, code: '#A1.11', name: 'BEARING FILLO BLOCK' },
+        { id: 12, code: '#A1.12', name: 'BEARING' },
+        { id: 13, code: '#A1.13', name: 'LOCKNUT' },
+        { id: 14, code: '#A1.14', name: 'PUSH BOTOM' },
+        { id: 15, code: '#A1.15', name: 'FITING ANGIN' },
+        { id: 16, code: '#A1.16', name: 'BEARING FILLO BLOCK' },
+        { id: 17, code: '#A2.01', name: 'BEARING' },
+        { id: 18, code: '#A2.02', name: 'LOCKNUT' },
+        { id: 19, code: '#A2.03', name: 'PUSH BOTOM' },
+        { id: 20, code: '#A2.04', name: 'FITING ANGIN' }
+      ]
+    }
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    // Fallback to mock data
+    categories.value = [
+      { id: 1, code: '#A1.01', name: 'BEARING' },
+      { id: 2, code: '#A1.02', name: 'BEARING' },
+      { id: 3, code: '#A1.03', name: 'LOCKNUT' },
+      { id: 4, code: '#A1.04', name: 'PUSH BOTOM' },
+      { id: 5, code: '#A1.05', name: 'FITING ANGIN' },
+      { id: 6, code: '#A1.06', name: 'BEARING FILLO BLOCK' },
+      { id: 7, code: '#A1.07', name: 'BEARING' },
+      { id: 8, code: '#A1.08', name: 'LOCKNUT' },
+      { id: 9, code: '#A1.09', name: 'PUSH BOTOM' },
+      { id: 10, code: '#A1.10', name: 'FITING ANGIN' },
+      { id: 11, code: '#A1.11', name: 'BEARING FILLO BLOCK' },
+      { id: 12, code: '#A1.12', name: 'BEARING' },
+      { id: 13, code: '#A1.13', name: 'LOCKNUT' },
+      { id: 14, code: '#A1.14', name: 'PUSH BOTOM' },
+      { id: 15, code: '#A1.15', name: 'FITING ANGIN' },
+      { id: 16, code: '#A1.16', name: 'BEARING FILLO BLOCK' },
+      { id: 17, code: '#A2.01', name: 'BEARING' },
+      { id: 18, code: '#A2.02', name: 'LOCKNUT' },
+      { id: 19, code: '#A2.03', name: 'PUSH BOTOM' },
+      { id: 20, code: '#A2.04', name: 'FITING ANGIN' }
+    ]
+  } finally {
+    loading.value = false
+  }
+}
+
+// Watch for show prop changes
 watch(() => props.show, (newVal) => {
   if (newVal) {
     fetchCategories()
   }
 })
 
+// Lifecycle
 onMounted(() => {
   if (props.show) {
     fetchCategories()

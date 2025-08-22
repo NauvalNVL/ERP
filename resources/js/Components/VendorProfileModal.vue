@@ -149,49 +149,25 @@ const selectedVendor = ref(null)
 const loading = ref(false)
 const searchQuery = ref('')
 
-// Mock vendor data - replace with actual API call
-const mockVendors = [
-  {
-    id: 1,
-    vendor_name: 'ABADI KARYA MAKMUR',
-    ap_ac_number: '2100201421',
-    status: 'A-Act',
-    ac_type: 'Local',
-    currency: 'IDR',
-    gl_ap_control: 'HUTANG',
-    gl_bank_control: 'RP PERMATA'
-  },
-  {
-    id: 2,
-    vendor_name: 'ABADI PRATAMA INDONESIA PT.',
-    ap_ac_number: '2100201514',
-    status: 'A-Act',
-    ac_type: 'Local',
-    currency: 'IDR',
-    gl_ap_control: 'HUTANG',
-    gl_bank_control: 'RP PERMATA'
-  },
-  {
-    id: 3,
-    vendor_name: 'ACCURA SOLIDTECH ADISEJAHTERA, PT.',
-    ap_ac_number: '2100201198',
-    status: 'A-Act',
-    ac_type: 'Local',
-    currency: 'IDR',
-    gl_ap_control: 'HUTANG B',
-    gl_bank_control: 'RP PERMATA'
-  },
-  {
-    id: 4,
-    vendor_name: 'ACEN JAYA ELEKTRIK, UD.',
-    ap_ac_number: '2100201199',
-    status: 'A-Act',
-    ac_type: 'Local',
-    currency: 'IDR',
-    gl_ap_control: 'HUTANG',
-    gl_bank_control: 'RP PERMATA'
+// Fetch vendors from API
+const fetchVendors = async () => {
+  loading.value = true
+  try {
+    const response = await fetch('/api/vendors?active=1')
+    if (response.ok) {
+      const data = await response.json()
+      vendors.value = data.data || data
+    } else {
+      console.error('Failed to fetch vendors')
+      vendors.value = []
+    }
+  } catch (error) {
+    console.error('Error fetching vendors:', error)
+    vendors.value = []
+  } finally {
+    loading.value = false
   }
-]
+}
 
 const filteredVendors = computed(() => {
   if (!searchQuery.value) {
@@ -215,16 +191,24 @@ const getStatusClass = (status) => {
 }
 
 const searchVendors = async () => {
+  if (!searchQuery.value.trim()) {
+    await fetchVendors()
+    return
+  }
+  
   loading.value = true
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500))
-    vendors.value = mockVendors.filter(vendor =>
-      vendor.vendor_name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      vendor.ap_ac_number.toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
+    const response = await fetch(`/api/vendors/search?query=${encodeURIComponent(searchQuery.value)}`)
+    if (response.ok) {
+      const data = await response.json()
+      vendors.value = data
+    } else {
+      console.error('Failed to search vendors')
+      vendors.value = []
+    }
   } catch (error) {
     console.error('Error searching vendors:', error)
+    vendors.value = []
   } finally {
     loading.value = false
   }
@@ -260,9 +244,12 @@ const closeModal = () => {
 // Watch for show prop changes
 watch(() => props.show, (newVal) => {
   if (newVal) {
-    vendors.value = mockVendors
+    fetchVendors()
     if (props.currentVendorId) {
-      selectedVendor.value = vendors.value.find(v => v.ap_ac_number === props.currentVendorId)
+      // Find vendor by AP AC number after loading
+      setTimeout(() => {
+        selectedVendor.value = vendors.value.find(v => v.ap_ac_number === props.currentVendorId)
+      }, 100)
     }
   }
 })

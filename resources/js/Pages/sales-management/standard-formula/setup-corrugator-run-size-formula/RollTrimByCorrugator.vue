@@ -277,6 +277,16 @@ async function _saveTrimData(trimData) {
         payload.max_trim = null;
     }
 
+    // Ensure min_trim is a number
+    if (payload.min_trim === '') {
+        payload.min_trim = 0;
+    }
+
+    // Convert to numbers
+    payload.min_trim = Number(payload.min_trim);
+    payload.max_trim = payload.max_trim !== null ? Number(payload.max_trim) : null;
+
+    console.log('Sending payload to API:', [payload]);
     return axios.post('/api/roll-trim-by-corrugator/batch', [payload]);
 }
 
@@ -302,7 +312,12 @@ const updateTrim = async (flute, field) => {
     toast.success(`${flute.flute_code} ${field.replace('_', ' ')} updated.`);
   } catch (error) {
     console.error(`Error updating ${field}:`, error);
-    toast.error(error.response?.data?.message || `Failed to update ${field}.`);
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data?.errors?.max_trim?.[0] ||
+                        `Failed to update ${field}.`;
+    toast.error(errorMessage);
+    
+    // Reload data to revert changes
     loadData();
   } finally {
     savingStatus.value[statusKey] = false;
@@ -326,14 +341,19 @@ const toggleCompute = async (flute) => {
     }
     
     toast.success(`Compute for ${flute.flute_code} updated.`);
-      } catch (error) {
+  } catch (error) {
     console.error('Error toggling compute:', error);
-    toast.error(error.response?.data?.message || 'Failed to update compute status.');
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data?.errors?.max_trim?.[0] ||
+                        'Failed to update compute status.';
+    toast.error(errorMessage);
+    
+    // Revert the change in the UI
     const index = flutes.value.findIndex(f => f.id === flute.id);
     if (index !== -1) {
       flutes.value[index].compute = flute.compute;
     }
-      } finally {
+  } finally {
     toggleLoading.value[flute.id] = false;
   }
 };

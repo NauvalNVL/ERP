@@ -75,32 +75,57 @@ class RollTrimByCorrugatorController extends Controller
      */
     public function apiBatchUpdate(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            '*.flute_id' => 'required|integer|exists:paper_flutes,id',
-            '*.compute' => 'required|boolean',
-            '*.min_trim' => 'nullable|numeric|min:0',
-            '*.max_trim' => 'nullable|numeric|gte:*.min_trim',
-        ]);
+        try {
+            Log::info('apiBatchUpdate called with data:', $request->all());
+            
+            $validator = Validator::make($request->all(), [
+                '*.flute_id' => 'required|integer|exists:paper_flutes,id',
+                '*.compute' => 'required|boolean',
+                '*.min_trim' => 'nullable|numeric|min:0',
+                '*.max_trim' => 'nullable|numeric|min:0',
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+            if ($validator->fails()) {
+                Log::error('Validation failed:', $validator->errors()->toArray());
+                return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+            }
+
+            $results = [];
+            foreach ($request->all() as $trimData) {
+                Log::info('Processing trim data:', $trimData);
+                
+                // Additional validation for max_trim >= min_trim
+                if (isset($trimData['max_trim']) && isset($trimData['min_trim']) && 
+                    $trimData['max_trim'] !== null && $trimData['min_trim'] !== null &&
+                    $trimData['max_trim'] < $trimData['min_trim']) {
+                    Log::error('Max trim validation failed for flute_id: ' . $trimData['flute_id']);
+                    return response()->json([
+                        'message' => 'Validation failed', 
+                        'errors' => ['max_trim' => ['Max trim must be greater than or equal to min trim']]
+                    ], 422);
+                }
+
+                $updateData = [
+                    'compute' => $trimData['compute'] ?? false,
+                    'min_trim' => $trimData['min_trim'] ?? 0,
+                    'max_trim' => $trimData['max_trim'] ?? null,
+                ];
+
+                Log::info('Update data:', $updateData);
+
+                $trim = RollTrimByCorrugator::updateOrCreate(
+                    ['flute_id' => $trimData['flute_id']],
+                    $updateData
+                );
+                $results[] = $trim;
+            }
+
+            Log::info('Batch update completed successfully');
+            return response()->json(['success' => true, 'results' => $results]);
+        } catch (\Exception $e) {
+            Log::error('Error in apiBatchUpdate: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json(['message' => 'Internal server error: ' . $e->getMessage()], 500);
         }
-
-        $results = [];
-        foreach ($request->all() as $trimData) {
-            $updateData = [
-                'compute' => $trimData['compute'] ?? false,
-                'min_trim' => $trimData['min_trim'] ?? 0,
-                'max_trim' => $trimData['max_trim'] ?? null,
-            ];
-
-            $trim = RollTrimByCorrugator::updateOrCreate(
-                ['flute_id' => $trimData['flute_id']],
-                $updateData
-            );
-            $results[] = $trim;
-        }
-
-        return response()->json(['success' => true, 'results' => $results]);
     }
 } 

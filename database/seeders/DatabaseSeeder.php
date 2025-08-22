@@ -64,6 +64,7 @@ class DatabaseSeeder extends Seeder
             ScoringFormulaSeeder::class,
             StandardFormulaSeeder::class,
             UpdateMcSeeder::class,
+            VendorSeeder::class,
         ]);
     }
 }

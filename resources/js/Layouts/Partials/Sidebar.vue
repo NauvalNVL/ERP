@@ -504,28 +504,26 @@ const materialManagementItems = [
           
           // Purchase Order Management
           { title: 'Amend Rejected PO + Re-Submit', icon: 'fa fa-undo', route: '/material-management/purchase-order/pr-po/amend-rejected-po' },
-          { title: 'Cancel Approved PO', icon: 'fa fa-ban', route: '/material-management/purchase-order/pr-po/cancel-approved-po' },
-          { title: 'View & Print PO Log', icon: 'fa fa-list', route: '/material-management/purchase-order/pr-po/view-print-po-log' }
+                       { title: 'Cancel Approved PO', icon: 'fa fa-ban', route: '/material-management/purchase-order/pr-po/cancel-approved-po' },
+             { title: 'View & Print PO Log', icon: 'fa fa-list', route: '/material-management/purchase-order/pr-po/view-print-po-log' }
         ]
       },
       {
         title: 'PR/PO Reports',
         icon: 'fas fa-chart-bar',
         children: [
-          { title: 'Print PR/PO', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-pr-po' },
-          { title: 'Print PR/PO Cancel Report', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-cancel-report' },
-          { title: 'Print PR/PO Status Report', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-status-report' },
-          { title: 'Print PR/PO Delivery Schedule Report', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-delivery-schedule' },
-          { title: 'Print PR/PO Analysis Report', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-analysis-report' },
-          { title: 'Print Supplier Performance Report', icon: 'fas fa-print', route: '/material-management/pr-po-reports/print-supplier-performance' }
+          { title: 'View & print PO Arrival Schedule', icon: 'fas fa-calendar', route: '/material-management/purchase-order/pr-po/view-print-po-arrival-schedule' },
+          { title: 'View & print PR PO Reports', icon: 'fas fa-print', route: '/material-management/purchase-order/pr-po/view-print-pr-po-reports' },
+          { title: 'View & print PO RC & RT Report', icon: 'fas fa-print', route: '/material-management/purchase-order/pr-po/view-print-po-rc-rt-report' },
+          { title: 'View & print PSC Report', icon: 'fas fa-print', route: '/material-management/purchase-order/pr-po/view-print-psc-report' },
+          { title: 'View & print SKU historical price', icon: 'fas fa-print', route: '/material-management/purchase-order/pr-po/view-print-sku-historical-price' }
         ]
       },
       {
         title: 'PR/PO Period End Closing',
         icon: 'fas fa-calendar-check',
         children: [
-          { title: 'Purge Closed PR/PO', icon: 'fas fa-trash-alt', route: '/material-management/pr-po-period-end/purge-closed' },
-          { title: 'Purge Cancelled PR/PO', icon: 'fas fa-trash-alt', route: '/material-management/pr-po-period-end/purge-cancelled' }
+          { title: 'Perform PR & PO Period-End Closing', icon: 'fas fa-play-circle', route: '/material-management/purchase-order/pr-po/perform-pr-po-period-closing' }
         ]
       }
     ]

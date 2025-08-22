@@ -18,7 +18,7 @@ return new class extends Migration
                 $table->foreignId('flute_id')->constrained('paper_flutes');
                 $table->boolean('compute')->default(false);
                 $table->integer('min_trim')->default(0);
-                $table->integer('max_trim')->default(100);
+                $table->integer('max_trim')->nullable();
                 $table->timestamps();
             });
         }

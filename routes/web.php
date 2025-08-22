@@ -715,6 +715,45 @@ Route::middleware('auth')->group(function () {
             ]);
         })->name('view-print-po-log');
         
+        // View & Print PO Arrival Schedule
+        Route::get('view-print-po-arrival-schedule', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO-Reports/ViewPrintPOArrivalSchedule', [
+                'header' => 'View & Print PO Arrival Schedule'
+            ]);
+        })->name('view-print-po-arrival-schedule');
+        
+        // PR/PO Reports Routes
+        Route::get('view-print-pr-po-reports', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO-Reports/ViewPrintPRPOReports', [
+                'header' => 'View & Print PR/PO Reports'
+            ]);
+        })->name('view-print-pr-po-reports');
+        
+        Route::get('view-print-po-rc-rt-report', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO-Reports/ViewPrintPORCRTReport', [
+                'header' => 'View & Print PO RC & RT Report'
+            ]);
+        })->name('view-print-po-rc-rt-report');
+        
+        Route::get('view-print-psc-report', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO-Reports/ViewPrintPSCReport', [
+                'header' => 'View & Print PSC Report'
+            ]);
+        })->name('view-print-psc-report');
+        
+        Route::get('view-print-sku-historical-price', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PO-Reports/ViewPrintSKUHistoricalPrice', [
+                'header' => 'View & Print SKU Historical Price'
+            ]);
+        })->name('view-print-sku-historical-price');
+        
+        // PR/PO Period-End Closing
+        Route::get('perform-pr-po-period-closing', function () {
+            return Inertia::render('material-management/Purchase-Order/PR-PR-Period-End-Closing/PerformPR&POPeriod-EndClosing', [
+                'header' => 'Perform PR & PO Period-End Closing'
+            ]);
+        })->name('perform-pr-po-period-closing');
+        
         // Legacy routes for backward compatibility
         Route::get('pr-approval', function () {
             return Inertia::render('material-management/Purchase-Order/PR-PO/PrApproval');
