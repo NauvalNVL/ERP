@@ -6,7 +6,7 @@
 
       <!-- Modal panel -->
       <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-        <!-- Header -->
+      <!-- Header -->
         <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-medium text-gray-900">Location Lookup</h3>
@@ -14,18 +14,18 @@
               @click="closeModal"
               class="text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <i class="fas fa-times text-xl"></i>
-            </button>
+          <i class="fas fa-times text-xl"></i>
+        </button>
           </div>
-        </div>
+      </div>
 
-        <!-- Search Bar -->
+      <!-- Search Bar -->
         <div class="px-6 py-4 border-b border-gray-200">
           <div class="flex space-x-4">
             <div class="flex-1">
-              <input
+          <input 
                 v-model="searchQuery"
-                type="text"
+            type="text" 
                 placeholder="Search locations..."
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 @input="searchLocations"
@@ -38,22 +38,22 @@
               <i class="fas fa-search mr-2"></i>
               Search
             </button>
-          </div>
         </div>
+      </div>
 
-        <!-- Table -->
+      <!-- Table -->
         <div class="max-h-96 overflow-y-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50 sticky top-0">
-              <tr>
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50 sticky top-0">
+            <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location Code</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location Name</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
               <tr v-for="location in filteredLocations" :key="location.id" class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ location.code }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ location.name }}</td>
@@ -62,46 +62,46 @@
                   <span :class="getStatusColor(location.status)">
                     {{ location.status }}
                   </span>
-                </td>
+              </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
-                    @click="selectLocation(location)"
+                @click="selectLocation(location)"
                     class="text-blue-600 hover:text-blue-900 mr-3"
                   >
                     <i class="fas fa-check mr-1"></i>
-                    Select
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                  Select
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-        <!-- Footer -->
+      <!-- Footer -->
         <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
           <div class="flex justify-between items-center">
             <div class="text-sm text-gray-600">
               Showing {{ filteredLocations.length }} of {{ locations.length }} locations
             </div>
             <div class="flex space-x-3">
-              <button
+        <button 
                 @click="resetModal"
                 class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-              >
+        >
                 <i class="fas fa-undo mr-2"></i>
                 Reset
-              </button>
-              <button
+        </button>
+        <button 
                 @click="closeModal"
                 class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-              >
+        >
                 <i class="fas fa-times mr-2"></i>
                 Exit
-              </button>
+        </button>
             </div>
           </div>
-        </div>
       </div>
+    </div>
     </div>
   </div>
 </template>
@@ -267,7 +267,7 @@ const fetchLocations = async () => {
 
 // Lifecycle
 onMounted(() => {
-  fetchLocations()
+    fetchLocations()
 })
 
 watch(() => props.show, (newValue) => {

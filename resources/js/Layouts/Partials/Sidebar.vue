@@ -536,29 +536,45 @@ const materialManagementItems = [
         title: 'RC/RT',
         icon: 'fas fa-exchange-alt',
         children: [
-          { title: 'Receive Note Entry', icon: 'fas fa-file-import', route: '/material-management/inventory-control/rc-rt/receive-note' },
-          { title: 'Return Note Entry', icon: 'fas fa-file-export', route: '/material-management/inventory-control/rc-rt/return-note' },
-          { title: 'Cancel RC/RT', icon: 'fas fa-times-circle', route: '/material-management/inventory-control/rc-rt/cancel' }
+          { title: 'Prepare RC', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/rc-rt/prepare-rc' },
+          { title: 'Amend RC', icon: 'fas fa-edit', route: '/material-management/inventory-control/rc-rt/amend-rc' },
+          { title: 'Print RC', icon: 'fas fa-print', route: '/material-management/inventory-control/rc-rt/print-rc' },
+          { title: 'View & Print RC Log', icon: 'fas fa-list-alt', route: '/material-management/inventory-control/rc-rt/view-print-rc-log' },
+          { title: 'Prepare RT', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/rc-rt/prepare-rt' },
+          { title: 'Amend RT', icon: 'fas fa-edit', route: '/material-management/inventory-control/rc-rt/amend-rt' },
+          { title: 'Print RT', icon: 'fas fa-print', route: '/material-management/inventory-control/rc-rt/print-rt' },
+          { title: 'View & Print RT Log', icon: 'fas fa-list-alt', route: '/material-management/inventory-control/rc-rt/view-print-rt-log' }
         ]
       },
+
       {
         title: 'IS/MI/MO/LT',
-        icon: 'fas fa-arrows-alt-h',
+        icon: 'fas fa-exchange-alt',
         children: [
-          { title: 'Issue Note Entry', icon: 'fas fa-file-upload', route: '/material-management/inventory-control/is-mi-mo-lt/issue-note' },
-          { title: 'Stock-In Entry', icon: 'fas fa-dolly-flatbed', route: '/material-management/inventory-control/is-mi-mo-lt/stock-in' },
-          { title: 'Stock-Out Entry', icon: 'fas fa-dolly', route: '/material-management/inventory-control/is-mi-mo-lt/stock-out' },
-          { title: 'Location Transfer Entry', icon: 'fas fa-people-carry', route: '/material-management/inventory-control/is-mi-mo-lt/location-transfer' },
-          { title: 'Cancel IS/MI/MO/LT', icon: 'fas fa-ban', route: '/material-management/inventory-control/is-mi-mo-lt/cancel' }
+          { title: 'Prepare IS', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/is-mi-mo-lt/prepare-is' },
+          { title: 'Cancel IS', icon: 'fas fa-times', route: '/material-management/inventory-control/is-mi-mo-lt/cancel-is' },
+          { title: 'Print IS', icon: 'fas fa-print', route: '/material-management/inventory-control/is-mi-mo-lt/print-is' },
+          { title: 'Prepare MI', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/is-mi-mo-lt/prepare-mi' },
+          { title: 'Cancel MI', icon: 'fas fa-times', route: '/material-management/inventory-control/is-mi-mo-lt/cancel-mi' },
+          { title: 'Print MI', icon: 'fas fa-print', route: '/material-management/inventory-control/is-mi-mo-lt/print-mi' },
+          { title: 'Prepare MO', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/is-mi-mo-lt/prepare-mo' },
+          { title: 'View & Print IS/MI/MO/LT Log', icon: 'fas fa-list-alt', route: '/material-management/inventory-control/is-mi-mo-lt/view-print-log' }
         ]
       },
       {
         title: 'DR/CN',
         icon: 'fas fa-file-invoice-dollar',
         children: [
-          { title: 'Debit Note Entry', icon: 'fas fa-file-medical', route: '/material-management/inventory-control/dr-cn/debit-note' },
-          { title: 'Credit Note Entry', icon: 'fas fa-file-prescription', route: '/material-management/inventory-control/dr-cn/credit-note' },
-          { title: 'Cancel DR/CN', icon: 'fas fa-times', route: '/material-management/inventory-control/dr-cn/cancel' }
+          { title: 'Prepare DN', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/dr-cn/prepare-dn' },
+          { title: 'Amend DN', icon: 'fas fa-edit', route: '/material-management/inventory-control/dr-cn/amend-dn' },
+          { title: 'Cancel DN', icon: 'fas fa-times', route: '/material-management/inventory-control/dr-cn/cancel-dn' },
+          { title: 'Print DN', icon: 'fas fa-print', route: '/material-management/inventory-control/dr-cn/print-dn' },
+          { title: 'View & Print DN Log', icon: 'fas fa-list-alt', route: '/material-management/inventory-control/dr-cn/view-print-dn-log' },
+          { title: 'Prepare CN', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/dr-cn/prepare-cn' },
+          { title: 'Amend CN', icon: 'fas fa-edit', route: '/material-management/inventory-control/dr-cn/amend-cn' },
+          { title: 'Cancel CN', icon: 'fas fa-times', route: '/material-management/inventory-control/dr-cn/cancel-cn' },
+          { title: 'Print CN', icon: 'fas fa-print', route: '/material-management/inventory-control/dr-cn/print-cn' },
+          { title: 'View & Print CN Log', icon: 'fas fa-list-alt', route: '/material-management/inventory-control/dr-cn/view-print-cn-log' }
         ]
       },
       {

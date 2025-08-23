@@ -10,12 +10,12 @@
         <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-medium text-gray-900">Purchase Sub Control (PSC) Lookup</h3>
-            <button
-              @click="closeModal"
-              class="text-gray-400 hover:text-gray-600 transition-colors"
-            >
+          <button
+            @click="closeModal"
+            class="text-gray-400 hover:text-gray-600 transition-colors"
+          >
               <i class="fas fa-times text-xl"></i>
-            </button>
+          </button>
           </div>
         </div>
 
@@ -23,13 +23,13 @@
         <div class="px-6 py-4 border-b border-gray-200">
           <div class="flex space-x-4">
             <div class="flex-1">
-              <input
-                v-model="searchQuery"
-                type="text"
+            <input
+              v-model="searchQuery"
+              type="text"
                 placeholder="Search PSC by code, name, or category..."
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 @input="searchPSCs"
-              />
+            />
             </div>
             <button
               @click="searchPSCs"
@@ -86,20 +86,20 @@
               Showing {{ filteredPSCs.length }} of {{ pscs.length }} PSC records
             </div>
             <div class="flex space-x-3">
-              <button
+          <button
                 @click="resetModal"
                 class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-              >
+          >
                 <i class="fas fa-undo mr-2"></i>
                 Reset
-              </button>
-              <button
-                @click="closeModal"
+          </button>
+          <button
+            @click="closeModal"
                 class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-              >
+          >
                 <i class="fas fa-times mr-2"></i>
-                Exit
-              </button>
+            Exit
+          </button>
             </div>
           </div>
         </div>
@@ -132,10 +132,10 @@ const filteredPSCs = computed(() => {
     return pscs.value
   }
   
-  const query = searchQuery.value.toLowerCase()
+      const query = searchQuery.value.toLowerCase()
   return pscs.value.filter(psc => 
     psc.psc_code.toLowerCase().includes(query) ||
-    psc.psc_name.toLowerCase().includes(query) ||
+               psc.psc_name.toLowerCase().includes(query) ||
     psc.category.toLowerCase().includes(query) ||
     psc.purchaser.toLowerCase().includes(query)
   )

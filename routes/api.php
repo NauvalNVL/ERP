@@ -1270,3 +1270,77 @@ Route::prefix('purchase-orders')->group(function () {
         return response()->json(['message' => 'Amendment notes recorded successfully']);
     });
 });
+
+// RC/RT API Routes
+Route::prefix('rc-rt')->group(function () {
+    // RC Transactions
+    Route::get('/rc-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGetRcTransactions']);
+    Route::get('/rt-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGetRtTransactions']);
+    
+    // CRUD Operations
+    Route::post('/transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiStore']);
+    Route::put('/transactions/{id}', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiUpdate']);
+    Route::post('/transactions/{id}/post', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiPost']);
+    Route::post('/transactions/{id}/cancel', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiCancel']);
+    
+    // Lookup Data
+    Route::get('/suppliers', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGetSuppliers']);
+    Route::get('/skus', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGetSkus']);
+    Route::get('/locations', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGetLocations']);
+    
+    // Reports
+    Route::post('/generate-report', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGenerateReport']);
+});
+
+// DR/CN API Routes
+Route::prefix('dr-cn')->group(function () {
+    // Generate Note Number
+    Route::post('/generate-number', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGenerateNoteNumber']);
+    
+    // DN Transactions
+    Route::get('/dn-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGetDnTransactions']);
+    Route::get('/cn-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGetCnTransactions']);
+    
+    // CRUD Operations
+    Route::post('/transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiStore']);
+    Route::put('/transactions/{id}', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiUpdate']);
+    Route::post('/transactions/{id}/post', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiPost']);
+    Route::post('/transactions/{id}/cancel', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiCancel']);
+    
+    // Lookup Data
+    Route::get('/vendors', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGetVendors']);
+    Route::get('/skus', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGetSkus']);
+    Route::get('/locations', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGetLocations']);
+    
+    // Reports
+    Route::post('/generate-report', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGenerateReport']);
+});
+
+// IS/MI/MO/LT API Routes
+Route::prefix('is-mi-mo-lt')->group(function () {
+    // IS Transactions
+    Route::get('/is-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetIsTransactions']);
+    Route::get('/mi-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetMiTransactions']);
+    Route::get('/mo-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetMoTransactions']);
+    Route::get('/lt-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetLtTransactions']);
+    
+    // All Transactions (for ViewPrintLog)
+    Route::get('/transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetTransactions']);
+    
+    // CRUD Operations
+    Route::post('/transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiStore']);
+    Route::put('/transactions/{id}', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiUpdate']);
+    Route::post('/transactions/{id}/post', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiPost']);
+    Route::post('/transactions/{id}/cancel', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiCancel']);
+    
+    // Generate Number
+    Route::post('/generate-number', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGenerateNumber']);
+    
+    // Lookup Data
+    Route::get('/skus', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetSkus']);
+    Route::get('/locations', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetLocations']);
+    Route::get('/categories', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetCategories']);
+    
+    // Reports
+    Route::post('/generate-report', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGenerateReport']);
+});

@@ -105,7 +105,8 @@ class DrCrNote extends Model
             'Pending' => 'bg-yellow-100 text-yellow-800',
             'Approved' => 'bg-green-100 text-green-800',
             'Rejected' => 'bg-red-100 text-red-800',
-            'Posted' => 'bg-blue-100 text-blue-800'
+            'Posted' => 'bg-blue-100 text-blue-800',
+            'Cancelled' => 'bg-red-100 text-red-800'
         ];
         return $classes[$this->status] ?? 'bg-gray-100 text-gray-800';
     }
@@ -180,6 +181,7 @@ class DrCrNote extends Model
         $month = date('m');
         
         $lastNote = self::where('note_number', 'like', "{$prefix}{$year}{$month}%")
+            ->where('status', '!=', 'Cancelled') // Exclude cancelled notes from numbering
             ->orderBy('note_number', 'desc')
             ->first();
         

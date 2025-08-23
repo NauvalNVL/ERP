@@ -24,7 +24,7 @@ return new class extends Migration
             $table->decimal('amount', 15, 2);
             $table->text('description');
             $table->text('reason')->nullable();
-            $table->enum('status', ['Draft', 'Pending', 'Approved', 'Rejected', 'Posted'])->default('Draft');
+            $table->enum('status', ['Draft', 'Pending', 'Approved', 'Rejected', 'Posted', 'Cancelled'])->default('Draft');
             $table->date('note_date');
             $table->date('due_date')->nullable();
             $table->string('currency', 3)->default('IDR');

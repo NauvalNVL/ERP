@@ -434,6 +434,60 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('warehouse-management/FinishedGoods/index');
     })->name('vue.warehouse-management.finished-goods');
 
+    // Inventory Control Routes
+    Route::prefix('material-management/inventory-control')->name('mm.ic.')->group(function () {
+        // RC/RT Routes
+        Route::prefix('rc-rt')->name('rc-rt.')->group(function () {
+            // RC Routes
+            Route::get('prepare-rc', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'prepareRc'])->name('prepare-rc');
+            Route::get('amend-rc', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'amendRc'])->name('amend-rc');
+            Route::get('print-rc', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'printRc'])->name('print-rc');
+            Route::get('view-print-rc-log', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'viewPrintRcLog'])->name('view-print-rc-log');
+            
+            // RT Routes
+            Route::get('prepare-rt', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'prepareRt'])->name('prepare-rt');
+            Route::get('amend-rt', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'amendRt'])->name('amend-rt');
+            Route::get('print-rt', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'printRt'])->name('print-rt');
+            Route::get('view-print-rt-log', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'viewPrintRtLog'])->name('view-print-rt-log');
+        });
+
+        // DR/CN Routes
+        Route::prefix('dr-cn')->name('dr-cn.')->group(function () {
+            // DN Routes
+            Route::get('prepare-dn', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'prepareDn'])->name('prepare-dn');
+            Route::get('amend-dn', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'amendDn'])->name('amend-dn');
+            Route::get('cancel-dn', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'cancelDn'])->name('cancel-dn');
+            Route::get('print-dn', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'printDn'])->name('print-dn');
+            Route::get('view-print-dn-log', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'viewPrintDnLog'])->name('view-print-dn-log');
+            
+            // CN Routes
+            Route::get('prepare-cn', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'prepareCn'])->name('prepare-cn');
+            Route::get('amend-cn', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'amendCn'])->name('amend-cn');
+            Route::get('cancel-cn', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'cancelCn'])->name('cancel-cn');
+            Route::get('print-cn', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'printCn'])->name('print-cn');
+            Route::get('view-print-cn-log', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'viewPrintCnLog'])->name('view-print-cn-log');
+        });
+
+        // IS/MI/MO/LT Routes
+        Route::prefix('is-mi-mo-lt')->name('is-mi-mo-lt.')->group(function () {
+            // IS Routes
+            Route::get('prepare-is', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'prepareIs'])->name('prepare-is');
+            Route::get('cancel-is', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'cancelIs'])->name('cancel-is');
+            Route::get('print-is', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'printIs'])->name('print-is');
+            
+            // MI Routes
+            Route::get('prepare-mi', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'prepareMi'])->name('prepare-mi');
+            Route::get('cancel-mi', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'cancelMi'])->name('cancel-mi');
+            Route::get('print-mi', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'printMi'])->name('print-mi');
+            
+            // MO Routes
+            Route::get('prepare-mo', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'prepareMo'])->name('prepare-mo');
+            
+            // Log Routes
+            Route::get('view-print-log', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'viewPrintLog'])->name('view-print-log');
+        });
+    });
+
     Route::get('/warehouse-management/finished-goods/setup-maintenance', function () {
         return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance');
     })->name('vue.warehouse-management.finished-goods.setup-maintenance');
