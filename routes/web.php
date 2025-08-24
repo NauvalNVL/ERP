@@ -486,6 +486,13 @@ Route::middleware('auth')->group(function () {
             // Log Routes
             Route::get('view-print-log', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'viewPrintLog'])->name('view-print-log');
         });
+
+        // Inventory Period-End Closing Routes
+        Route::prefix('period-end-closing')->name('period-end-closing.')->group(function () {
+            Route::get('perform-inventory-period-end-closing', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Period-End-Closing/PerformInventoryPeriodEndClosing');
+            })->name('perform-inventory-period-end-closing');
+        });
     });
 
     Route::get('/warehouse-management/finished-goods/setup-maintenance', function () {
@@ -1332,3 +1339,53 @@ Route::prefix('update-mc')->group(function () {
     Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs'])->name('update-mc.search-mcs');
     Route::get('/master-cards', [UpdateMcController::class, 'apiIndex'])->name('update-mc.master-cards');
 });
+
+        // Inventory Reports Routes
+        Route::prefix('material-management/inventory-control/inventory-reports')->name('mm.ic.inventory-reports.')->group(function () {
+            Route::get('/print-sku-balance', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Reports/PrintSkuBalance');
+            })->name('print-sku-balance');
+            
+            Route::get('/print-sku-reorder', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Reports/PrintSkuReorder');
+            })->name('print-sku-reorder');
+            
+            Route::get('/print-sku-ledger', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Reports/PrintSkuLedger');
+            })->name('print-sku-ledger');
+            
+            Route::get('/print-sku-aging', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Reports/PrintSkuAging');
+            })->name('print-sku-aging');
+            
+            Route::get('/print-sku-open-item-aging', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Reports/PrintSkuOpenItemAging');
+            })->name('print-sku-open-item-aging');
+            
+            Route::get('/inquire-sku-account', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Reports/InquireSkuAccount');
+            })->name('inquire-sku-account');
+        });
+
+        // Inventory Stock-Take Routes
+        Route::prefix('material-management/inventory-control/inventory-stock-take')->name('mm.ic.inventory-stock-take.')->group(function () {
+            Route::get('/run-stock-take-new-batch', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Stock-Take/RunStockTakeNewBatch');
+            })->name('run-stock-take-new-batch');
+            
+            Route::get('/input-stock-take-data', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Stock-Take/InputStockTakeData');
+            })->name('input-stock-take-data');
+            
+            Route::get('/print-stock-take-data', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Stock-Take/PrintStockTakeData');
+            })->name('print-stock-take-data');
+            
+            Route::get('/print-system-stock-take-data', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Stock-Take/PrintSystemStockTakeData');
+            })->name('print-system-stock-take-data');
+            
+            Route::get('/print-stock-take-matching-report', function() {
+                return Inertia::render('material-management/Inventory-Control/Inventory-Stock-Take/PrintStockTakeMatchingReport');
+            })->name('print-stock-take-matching-report');
+        });

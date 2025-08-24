@@ -297,6 +297,245 @@ Route::get('/area-groups', function() {
 
 // Add to the end of the file
 Route::get('/material-management/control-period', [MmControlPeriodController::class, 'getControlPeriod'])->name('mm.control-period.get');
+
+// Inventory Reports API Routes
+Route::prefix('material-management/inventory-reports')->group(function () {
+    Route::get('/sku-balance', function() {
+        return response()->json([
+            'data' => [
+                [
+                    'sku' => 'SKU001',
+                    'sku_name' => 'Raw Material A',
+                    'category_code' => 'CAT001',
+                    'type' => 'S',
+                    'balance' => 1000,
+                    'unit_price' => 50000,
+                    'total_value' => 50000000,
+                    'status' => 'Active'
+                ]
+            ],
+            'summary' => [
+                'totalSkus' => 1,
+                'totalBalance' => 1000,
+                'totalValue' => 50000000,
+                'lowStockItems' => 0
+            ],
+            'pagination' => [
+                'from' => 1,
+                'to' => 1,
+                'total' => 1
+            ]
+        ]);
+    });
+    
+    Route::post('/sku-balance/generate', function() {
+        return response()->json(['message' => 'Report generated successfully']);
+    });
+    
+    Route::post('/sku-balance/export', function() {
+        return response()->json(['message' => 'Report exported successfully']);
+    });
+    
+    Route::get('/sku-reorder', function() {
+        return response()->json([
+            'data' => [
+                [
+                    'sku' => 'SKU001',
+                    'sku_name' => 'Raw Material A',
+                    'category_code' => 'CAT001',
+                    'current_balance' => 50,
+                    'min_level' => 100,
+                    'reorder_level' => 150,
+                    'max_level' => 500,
+                    'shortage' => 50,
+                    'status' => 'Below Min'
+                ]
+            ],
+            'summary' => [
+                'belowMinLevel' => 1,
+                'atReorderLevel' => 0,
+                'aboveMaxLevel' => 0,
+                'totalValue' => 2500000
+            ],
+            'pagination' => [
+                'from' => 1,
+                'to' => 1,
+                'total' => 1
+            ]
+        ]);
+    });
+    
+    Route::post('/sku-reorder/generate', function() {
+        return response()->json(['message' => 'Report generated successfully']);
+    });
+    
+    Route::post('/sku-reorder/export', function() {
+        return response()->json(['message' => 'Report exported successfully']);
+    });
+    
+    Route::get('/sku-ledger', function() {
+        return response()->json([
+            'data' => [
+                [
+                    'id' => 1,
+                    'transaction_date' => '2024-01-15',
+                    'reference_number' => 'RC-2024-001',
+                    'transaction_type' => 'RC',
+                    'description' => 'Receive from supplier',
+                    'in_quantity' => 100,
+                    'out_quantity' => null,
+                    'running_balance' => 100,
+                    'unit_price' => 50000,
+                    'total_value' => 5000000
+                ]
+            ],
+            'summary' => [
+                'totalIn' => 100,
+                'totalOut' => 0,
+                'netMovement' => 100,
+                'totalValue' => 5000000
+            ],
+            'pagination' => [
+                'from' => 1,
+                'to' => 1,
+                'total' => 1
+            ]
+        ]);
+    });
+    
+    Route::post('/sku-ledger/generate', function() {
+        return response()->json(['message' => 'Report generated successfully']);
+    });
+    
+    Route::post('/sku-ledger/export', function() {
+        return response()->json(['message' => 'Report exported successfully']);
+    });
+    
+    Route::get('/sku-aging', function() {
+        return response()->json([
+            'data' => [
+                [
+                    'sku' => 'SKU001',
+                    'sku_name' => 'Raw Material A',
+                    'category_code' => 'CAT001',
+                    'current' => 500,
+                    'days_31_60' => 200,
+                    'days_61_90' => 150,
+                    'days_91_180' => 100,
+                    'over_180' => 50,
+                    'total_value' => 50000000,
+                    'status' => 'Current'
+                ]
+            ],
+            'summary' => [
+                'current' => 500,
+                'days_31_60' => 200,
+                'days_61_90' => 150,
+                'days_91_180' => 100,
+                'over_180' => 50
+            ],
+            'pagination' => [
+                'from' => 1,
+                'to' => 1,
+                'total' => 1
+            ]
+        ]);
+    });
+    
+    Route::post('/sku-aging/generate', function() {
+        return response()->json(['message' => 'Report generated successfully']);
+    });
+    
+    Route::post('/sku-aging/export', function() {
+        return response()->json(['message' => 'Report exported successfully']);
+    });
+    
+    Route::get('/sku-open-item-aging', function() {
+        return response()->json([
+            'data' => [
+                [
+                    'id' => 1,
+                    'transaction_date' => '2024-01-15',
+                    'sku_code' => 'SKU001',
+                    'reference_number' => 'RC-2024-001',
+                    'transaction_type' => 'RC',
+                    'quantity' => 100,
+                    'unit_price' => 50000,
+                    'total_value' => 5000000,
+                    'age_days' => 15,
+                    'status' => 'Current'
+                ]
+            ],
+            'summary' => [
+                'current' => 1,
+                'days_31_60' => 0,
+                'days_61_90' => 0,
+                'days_91_180' => 0,
+                'over_180' => 0
+            ],
+            'pagination' => [
+                'from' => 1,
+                'to' => 1,
+                'total' => 1
+            ]
+        ]);
+    });
+    
+    Route::post('/sku-open-item-aging/generate', function() {
+        return response()->json(['message' => 'Report generated successfully']);
+    });
+    
+    Route::post('/sku-open-item-aging/export', function() {
+        return response()->json(['message' => 'Report exported successfully']);
+    });
+    
+    Route::get('/inquire-sku-account', function() {
+        return response()->json([
+            'sku' => [
+                'sku_code' => 'SKU001',
+                'sku_name' => 'Raw Material A',
+                'category_code' => 'CAT001',
+                'type' => 'S',
+                'unit' => 'PCS',
+                'current_balance' => 1000,
+                'total_value' => 50000000,
+                'min_level' => 100,
+                'reorder_level' => 150,
+                'max_level' => 500,
+                'unit_price' => 50000,
+                'last_updated' => '2024-01-15',
+                'status' => 'Active'
+            ],
+            'transactions' => [
+                [
+                    'id' => 1,
+                    'transaction_date' => '2024-01-15',
+                    'reference_number' => 'RC-2024-001',
+                    'transaction_type' => 'RC',
+                    'in_quantity' => 100,
+                    'out_quantity' => null,
+                    'running_balance' => 100,
+                    'total_value' => 5000000
+                ]
+            ],
+            'aging' => [
+                'current' => 500,
+                'days_31_60' => 200,
+                'days_61_90' => 150,
+                'days_91_180' => 100,
+                'over_180' => 50
+            ]
+        ]);
+    });
+    
+    Route::post('/inquire-sku-account/export', function() {
+        return response()->json(['message' => 'Report exported successfully']);
+    });
+    
+    Route::post('/inquire-sku-account/print', function() {
+        return response()->json(['message' => 'Report printed successfully']);
+    });
+});
 Route::post('/material-management/control-period', [MmControlPeriodController::class, 'updateControlPeriod'])->name('mm.control-period.update');
 Route::options('/material-management/control-period', function () {
     return response()->json([], 200)
@@ -1343,4 +1582,125 @@ Route::prefix('is-mi-mo-lt')->group(function () {
     
     // Reports
     Route::post('/generate-report', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGenerateReport']);
+});
+
+// Inventory Period-End Closing API Routes
+Route::prefix('material-management/inventory-control/period-end-closing')->group(function () {
+    Route::get('/current-period', function() {
+        return response()->json([
+            'current_period' => '6 2025',
+            'next_period' => '7 2025',
+            'last_updated' => now()->format('Y-m-d H:i:s')
+        ]);
+    });
+
+    Route::get('/transaction-counts', function() {
+        return response()->json([
+            'rc_count' => 441,
+            'rt_count' => 3,
+            'is_count' => 1432,
+            'mi_count' => 3,
+            'mo_count' => 0,
+            'dn_count' => 0,
+            'cn_count' => 0,
+            'lt_count' => 0,
+            'zero_tran_status' => 'Zero Tran is Allowed to Close'
+        ]);
+    });
+
+    Route::post('/perform-closing', function() {
+        // Simulate processing time
+        sleep(2);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Inventory period closed successfully',
+            'new_current_period' => '7 2025',
+            'new_next_period' => '8 2025',
+            'closed_at' => now()->format('Y-m-d H:i:s')
+        ]);
+    });
+
+    Route::get('/closing-status', function() {
+        return response()->json([
+            'can_close' => true,
+            'pending_transactions' => 0,
+            'warnings' => [
+                'Ensure nobody is using the Inventory Control module.',
+                'Ensure that you have already backup the data.'
+            ]
+        ]);
+    });
+});
+
+// Inventory Stock-Take API Routes
+Route::prefix('material-management/inventory-control/stock-take')->group(function () {
+    Route::get('/current-batch', function() {
+        return response()->json([
+            'current_period' => '6 2025',
+            'last_batch' => [
+                'run_period' => '5 2025',
+                'run_date' => '26/05/2025',
+                'run_time' => '09:13',
+                'run_uid' => 'acc03',
+                'run_ref' => 'STOCK OPNAME 05/2025'
+            ]
+        ]);
+    });
+
+    Route::post('/create-batch', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Batch created successfully',
+            'batch_ref' => 'STOCK OPNAME 06/2025'
+        ]);
+    });
+
+    Route::get('/sku-list', function() {
+        return response()->json([
+            ['sku_code' => '001-A01001', 'sku_name' => 'ANNELING WIRE 2.8MM (KAWAT PRESS BALLER)', 'category' => '001', 'uom' => 'KG'],
+            ['sku_code' => '001-A02003', 'sku_name' => 'ARMEX BAKING SODA POWDER (25KG/BAG)', 'category' => '001', 'uom' => 'BAG'],
+            ['sku_code' => '001-A03001', 'sku_name' => 'ALUMINIUM CHLOROHYDRANT/BETAGARD 4040 (ACH)', 'category' => '001', 'uom' => 'KG'],
+            ['sku_code' => '001-B01001', 'sku_name' => 'BORAK', 'category' => '001', 'uom' => 'KG'],
+            ['sku_code' => '001-B03001', 'sku_name' => 'BEDAK POWDER', 'category' => '001', 'uom' => 'BTL'],
+            ['sku_code' => '007-S01327', 'sku_name' => 'SERVICE AC SERVO DRIVER TIPE DASD-S60 SPEA', 'category' => '007', 'uom' => 'UNIT']
+        ]);
+    });
+
+    Route::post('/save-stock-take-data', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Stock-take data saved successfully'
+        ]);
+    });
+
+    Route::get('/stock-take-data', function() {
+        return response()->json([
+            ['sku' => '001-A01001', 'name' => 'ANNELING WIRE 2.8MM (KAWAT PRESS BALLER)', 'loc' => '006', 'ref' => '001-A01001-003'],
+            ['sku' => '001-A02003', 'name' => 'ARMEX BAKING SODA POWDER (25KG/BAG)', 'loc' => '002', 'ref' => '001-A02003-005'],
+            ['sku' => '001-A03001', 'name' => 'ALUMINIUM CHLOROHYDRANT/BETAGARD 4040 (ACH)', 'loc' => '003', 'ref' => '001-A03001-001'],
+            ['sku' => '001-B01001', 'name' => 'BORAK', 'loc' => '001', 'ref' => '001-B01001-002'],
+            ['sku' => '001-B03001', 'name' => 'BEDAK POWDER', 'loc' => '012', 'ref' => '001-B03001-004']
+        ]);
+    });
+
+    Route::post('/generate-report', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Report generated successfully',
+            'report_id' => 'STK-' . date('Ymd-His'),
+            'records' => 23,
+            'pages' => 2
+        ]);
+    });
+
+    Route::post('/generate-matching-report', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Matching report generated successfully',
+            'matched_records' => 2,
+            'unmatched_records' => 0,
+            'report_id' => 'MATCH-' . date('Ymd-His')
+        ]);
+    });
 });

@@ -548,20 +548,6 @@ const materialManagementItems = [
       },
 
       {
-        title: 'IS/MI/MO/LT',
-        icon: 'fas fa-exchange-alt',
-        children: [
-          { title: 'Prepare IS', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/is-mi-mo-lt/prepare-is' },
-          { title: 'Cancel IS', icon: 'fas fa-times', route: '/material-management/inventory-control/is-mi-mo-lt/cancel-is' },
-          { title: 'Print IS', icon: 'fas fa-print', route: '/material-management/inventory-control/is-mi-mo-lt/print-is' },
-          { title: 'Prepare MI', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/is-mi-mo-lt/prepare-mi' },
-          { title: 'Cancel MI', icon: 'fas fa-times', route: '/material-management/inventory-control/is-mi-mo-lt/cancel-mi' },
-          { title: 'Print MI', icon: 'fas fa-print', route: '/material-management/inventory-control/is-mi-mo-lt/print-mi' },
-          { title: 'Prepare MO', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/is-mi-mo-lt/prepare-mo' },
-          { title: 'View & Print IS/MI/MO/LT Log', icon: 'fas fa-list-alt', route: '/material-management/inventory-control/is-mi-mo-lt/view-print-log' }
-        ]
-      },
-      {
         title: 'DR/CN',
         icon: 'fas fa-file-invoice-dollar',
         children: [
@@ -578,36 +564,47 @@ const materialManagementItems = [
         ]
       },
       {
-        title: 'Inventory Reports',
-        icon: 'fas fa-chart-pie',
+        title: 'IS/MI/MO/LT',
+        icon: 'fas fa-exchange-alt',
         children: [
-          { title: 'Print RC/RT', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-rc-rt' },
-          { title: 'Print IS/MI/MO/LT', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-is-mi-mo-lt' },
-          { title: 'Print DR/CN', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-dr-cn' },
-          { title: 'Print Stock Card Report', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-stock-card' },
-          { title: 'Print Stock Balance Report', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-stock-balance' },
-          { title: 'Print Stock Aging Report', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-stock-aging' },
-          { title: 'Print Re-Order Advice Report', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-reorder-advice' },
-          { title: 'Print Slow Moving Item Report', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-reports/print-slow-moving' }
+          { title: 'Prepare IS', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/is-mi-mo-lt/prepare-is' },
+          { title: 'Cancel IS', icon: 'fas fa-times', route: '/material-management/inventory-control/is-mi-mo-lt/cancel-is' },
+          { title: 'Print IS', icon: 'fas fa-print', route: '/material-management/inventory-control/is-mi-mo-lt/print-is' },
+          { title: 'Prepare MI', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/is-mi-mo-lt/prepare-mi' },
+          { title: 'Cancel MI', icon: 'fas fa-times', route: '/material-management/inventory-control/is-mi-mo-lt/cancel-mi' },
+          { title: 'Print MI', icon: 'fas fa-print', route: '/material-management/inventory-control/is-mi-mo-lt/print-mi' },
+          { title: 'Prepare MO', icon: 'fas fa-plus-circle', route: '/material-management/inventory-control/is-mi-mo-lt/prepare-mo' },
+          { title: 'View & Print IS/MI/MO/LT Log', icon: 'fas fa-list-alt', route: '/material-management/inventory-control/is-mi-mo-lt/view-print-log' }
         ]
       },
       {
-        title: 'Inventory Stock Take',
-        icon: 'fas fa-clipboard-check',
+        title: 'Inventory Reports',
+        icon: 'fas fa-chart-pie',
         children: [
-          { title: 'Initialize Stock Take', icon: 'fas fa-play-circle', route: '/material-management/inventory-control/stock-take/initialize' },
-          { title: 'Print Stock Take Sheet', icon: 'fas fa-print', route: '/material-management/inventory-control/stock-take/print-sheet' },
-          { title: 'Update Stock Take Variance', icon: 'fas fa-edit', route: '/material-management/inventory-control/stock-take/update-variance' },
-          { title: 'Print Stock Take Variance Report', icon: 'fas fa-print', route: '/material-management/inventory-control/stock-take/print-variance-report' },
-          { title: 'Post Stock Take Variance', icon: 'fas fa-paper-plane', route: '/material-management/inventory-control/stock-take/post-variance' }
+          { title: 'Print SKU Balance Report', icon: 'fas fa-balance-scale', route: '/material-management/inventory-control/inventory-reports/print-sku-balance' },
+          { title: 'Print SKU Reorder Report', icon: 'fas fa-sort-amount-down', route: '/material-management/inventory-control/inventory-reports/print-sku-reorder' },
+          { title: 'Print SKU Ledger Report', icon: 'fas fa-book', route: '/material-management/inventory-control/inventory-reports/print-sku-ledger' },
+          { title: 'Print SKU Aging Report', icon: 'fas fa-clock', route: '/material-management/inventory-control/inventory-reports/print-sku-aging' },
+          { title: 'Print SKU Open Item Aging Report', icon: 'fas fa-hourglass-half', route: '/material-management/inventory-control/inventory-reports/print-sku-open-item-aging' },
+          { title: 'Inquire SKU Account', icon: 'fas fa-search', route: '/material-management/inventory-control/inventory-reports/inquire-sku-account' }
         ]
       },
       {
         title: 'Inventory Period End Closing',
         icon: 'fas fa-calendar-alt',
         children: [
-          { title: 'Purge Closed Transaction', icon: 'fas fa-trash', route: '/material-management/inventory-control/period-end/purge-closed' },
-          { title: 'Purge Cancelled Transaction', icon: 'fas fa-trash', route: '/material-management/inventory-control/period-end/purge-cancelled' }
+          { title: 'Perform Inventory Period-End Closing', icon: 'fas fa-play-circle', route: '/material-management/inventory-control/period-end-closing/perform-inventory-period-end-closing' }
+        ]
+      },
+      {
+        title: 'Inventory Stock-Take',
+        icon: 'fas fa-clipboard-check',
+        children: [
+          { title: 'Run Stock-Take New Batch', icon: 'fas fa-play-circle', route: '/material-management/inventory-control/inventory-stock-take/run-stock-take-new-batch' },
+          { title: 'Input Stock-Take Data', icon: 'fas fa-edit', route: '/material-management/inventory-control/inventory-stock-take/input-stock-take-data' },
+          { title: 'Print Stock-Take Data', icon: 'fas fa-print', route: '/material-management/inventory-control/inventory-stock-take/print-stock-take-data' },
+          { title: 'Print System Stock-Take Data', icon: 'fas fa-database', route: '/material-management/inventory-control/inventory-stock-take/print-system-stock-take-data' },
+          { title: 'Print Stock-Take Matching Report', icon: 'fas fa-chart-line', route: '/material-management/inventory-control/inventory-stock-take/print-stock-take-matching-report' }
         ]
       }
     ]
