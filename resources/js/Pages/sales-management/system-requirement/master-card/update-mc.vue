@@ -439,6 +439,8 @@
             :selectedMcs="selectedMcs"
             :mcsCurrentPage="mcsCurrentPage"
             :mcsLastPage="mcsLastPage"
+            :productDesigns="productDesigns"
+            :paperFlutes="paperFlutes"
             @closeErrorModal="showErrorModal = false"
             @closeSetupMcModal="showSetupMcModal = false"
             @closeSetupPdModal="showSetupPdModal = false"
@@ -453,6 +455,8 @@
             @goToMcsPage="goToMcsPage"
             @updateSearchTerm="mcsSearchTerm = $event"
             @updateSortOption="mcsSortOption = $event"
+            @productDesignSelected="onProductDesignSelected"
+            @paperFluteSelected="onPaperFluteSelected"
         />
 
         <!-- Maintenance Log Modal -->
@@ -593,6 +597,80 @@ const mcDetails = ref({
     int_dim_1: '',
     int_dim_2: '',
     int_dim_3: '',
+});
+
+// Product Design data - sample data matching the image format
+const productDesigns = ref([
+    { pd_code: 'APR', pd_name: 'APR', pd_design_type: 'T-Trading', idc: 'NA', product: '005', joint: 'No', joint_to_print: 'No', pcs_to_joint: '1', score: 'Yes', slot: 'No', flute_style: 'Blank N/A', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B0', pd_name: 'B0/B0', pd_design_type: 'M-Manufacture', idc: '0510', product: '001', joint: 'No', joint_to_print: 'No', pcs_to_joint: '1', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B0 DJ', pd_name: 'B0/B0 DOUBLE JOINT', pd_design_type: 'M-Manufacture', idc: '0511u2', product: '001', joint: 'Yes', joint_to_print: 'Yes', pcs_to_joint: '2', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B0/B1', pd_name: 'B0/B1 FLEP+FLAP', pd_design_type: 'M-Manufacture', idc: '0200B', product: '001', joint: 'No', joint_to_print: 'No', pcs_to_joint: '1', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B0/B1 4J', pd_name: 'B0/B1 4 JOINT', pd_design_type: 'M-Manufacture', idc: '0200+B', product: '001', joint: 'Yes', joint_to_print: 'Yes', pcs_to_joint: '4', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B0/B1 DJ', pd_name: 'B0/B1 DOUBLE JOINT', pd_design_type: 'M-Manufacture', idc: '0201+B', product: '001', joint: 'Yes', joint_to_print: 'Yes', pcs_to_joint: '2', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B1', pd_name: 'REGULAR BOX', pd_design_type: 'M-Manufacture', idc: '0201', product: '001', joint: 'No', joint_to_print: 'No', pcs_to_joint: '1', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B1 4J', pd_name: 'B1 4 JOINT', pd_design_type: 'M-Manufacture', idc: '0201+a', product: '001', joint: 'Yes', joint_to_print: 'Yes', pcs_to_joint: '4', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B1 4J 2C', pd_name: 'B1 4 JOINT 2 CREASING', pd_design_type: 'M-Manufacture', idc: '0201+', product: '001', joint: 'Yes', joint_to_print: 'Yes', pcs_to_joint: '4', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B1 DJ', pd_name: 'B1 DOUBLE JOINT + CREASING', pd_design_type: 'M-Manufacture', idc: '0201J2', product: '001', joint: 'Yes', joint_to_print: 'Yes', pcs_to_joint: '2', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B1+1CRJ', pd_name: 'B1+1CREASING JOINT', pd_design_type: 'M-Manufacture', idc: '0201+', product: '001', joint: 'Yes', joint_to_print: 'Yes', pcs_to_joint: '1', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B1+1CRDJ', pd_name: 'B1+1CREASING DOUBLE JOINT', pd_design_type: 'M-Manufacture', idc: '0201+2', product: '001', joint: 'Yes', joint_to_print: 'Yes', pcs_to_joint: '2', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B1+2CRJ', pd_name: 'B1+2CREASING', pd_design_type: 'M-Manufacture', idc: '0201+2', product: '001', joint: 'Yes', joint_to_print: 'Yes', pcs_to_joint: '1', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B1-FB', pd_name: 'REGULAR BOX FLUTE REVERSE', pd_design_type: 'M-Manufacture', idc: '0201R', product: '001', joint: 'No', joint_to_print: 'No', pcs_to_joint: '1', score: 'Yes', slot: 'No', flute_style: 'R-Reverse/Rotate', print_flute: 'Yes', input_weight: 'Yes' },
+    { pd_code: 'B1/B0', pd_name: 'B1/B0 FLEP FLAP', pd_design_type: 'M-Manufacture', idc: '0200T', product: '001', joint: 'No', joint_to_print: 'No', pcs_to_joint: '1', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B1/B0 4J', pd_name: 'B1/B0 4 JOINT', pd_design_type: 'M-Manufacture', idc: '0200+T', product: '001', joint: 'Yes', joint_to_print: 'Yes', pcs_to_joint: '4', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B1/B0 DJ', pd_name: 'B1/B0 DOUBLE JOINT', pd_design_type: 'M-Manufacture', idc: '0201+T', product: '001', joint: 'Yes', joint_to_print: 'Yes', pcs_to_joint: '2', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' },
+    { pd_code: 'B1/B4', pd_name: 'B1/B4', pd_design_type: 'M-Manufacture', idc: 'NA', product: '001', joint: 'No', joint_to_print: 'No', pcs_to_joint: '1', score: 'Yes', slot: 'No', flute_style: 'N-Normal', print_flute: 'No', input_weight: 'Yes' }
+]);
+
+const onProductDesignSelected = (design) => {
+    // Update the P/Design field in the form or wherever it's needed
+    console.log('Product Design Selected:', design);
+    // You can add logic here to update form fields based on the selected design
+};
+
+// Paper Flute data - akan diambil dari API
+const paperFlutes = ref([]);
+const paperFluteLoading = ref(false);
+
+// Fetch paper flutes dari API
+const fetchPaperFlutes = async () => {
+    paperFluteLoading.value = true;
+    try {
+        const res = await fetch('/api/paper-flutes', { 
+            headers: { 
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            } 
+        });
+        
+        if (!res.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await res.json();
+        if (Array.isArray(data)) {
+            console.log('Paper Flutes data:', data.slice(0, 3)); // Debug: show first 3 items
+            paperFlutes.value = data;
+        } else {
+            paperFlutes.value = [];
+            console.error('Unexpected data format:', data);
+        }
+    } catch (e) {
+        console.error('Error fetching paper flutes:', e);
+        paperFlutes.value = [];
+    } finally {
+        paperFluteLoading.value = false;
+    }
+};
+
+const onPaperFluteSelected = (flute) => {
+    // Update the Flute field in the form or wherever it's needed
+    console.log('Paper Flute Selected:', flute);
+    // You can add logic here to update form fields based on the selected flute
+};
+
+// Load paper flutes saat komponen dimount
+onMounted(() => {
+    fetchPaperFlutes();
 });
 
 const handleMcsInput = () => {
