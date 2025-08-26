@@ -479,15 +479,15 @@
                             <div class="flex items-center space-x-4 flex-1">
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">P/Design:</label>
-                                    <input type="text" class="w-32 px-2 py-1 border border-gray-400 text-xs">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                    <input type="text" v-model="selectedProductDesign" class="w-32 px-2 py-1 border border-gray-400 text-xs" readonly>
+                                    <button @click="showProductDesignModal = true" class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-12">Flute:</label>
-                                    <input type="text" class="w-20 px-2 py-1 border border-gray-400 text-xs">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                    <input type="text" v-model="selectedPaperFlute" class="w-20 px-2 py-1 border border-gray-400 text-xs" readonly>
+                                    <button @click="showPaperFluteModal = true" class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
@@ -509,6 +509,22 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Column Headers -->
+                        <div class="flex items-center mb-1">
+                            <div class="flex items-center p-2 flex-1">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-16"></div> <!-- Spacer for label column -->
+                                    <div class="w-12 text-xs text-center font-medium text-gray-600">DB</div>
+                                    <div class="w-12 text-xs text-center font-medium text-gray-600">B</div>
+                                    <div class="w-12 text-xs text-center font-medium text-gray-600">!L</div>
+                                    <div class="w-16 text-xs text-center font-medium text-gray-600">A/C/E</div>
+                                    <div class="w-12 text-xs text-center font-medium text-gray-600">2L</div>
+                                </div>
+                            </div>
+                            <!-- Right side column spacer -->
+                            <div class="w-64"></div>
                         </div>
 
                         <!-- Row 2: B/Quality (Yellow background) -->
@@ -535,21 +551,35 @@
                             </div>
                         </div>
 
-                        <!-- Row 3: SQ -->
+
+
+                        <!-- Row 3: SO -->
                         <div class="flex items-center mb-2">
-                            <div class="flex items-center space-x-4 flex-1">
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-8">SQ:</label>
-                                    <input type="text" class="w-32 px-2 py-1 border border-gray-400 text-xs">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="text" class="w-32 px-2 py-1 border border-gray-400 text-xs">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                        <i class="fas fa-search"></i>
-                                    </button>
+                            <div class="flex items-center p-2 rounded flex-1">
+                                <div class="flex items-center justify-between w-full">
+                                    <div class="flex items-center space-x-1">
+                                        <label class="text-xs font-bold w-16">SO:</label>
+                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <input type="text" class="w-16 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <!-- Right side column for measurements -->
@@ -564,21 +594,33 @@
                             </div>
                         </div>
 
-                        <!-- Row 4: WQ -->
+                        <!-- Row 4: WO -->
                         <div class="flex items-center mb-2">
-                            <div class="flex items-center space-x-4 flex-1">
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-8">WQ:</label>
-                                    <input type="text" class="w-32 px-2 py-1 border border-gray-400 text-xs">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="text" class="w-32 px-2 py-1 border border-gray-400 text-xs">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                        <i class="fas fa-search"></i>
-                                    </button>
+                            <div class="flex items-center p-2 rounded flex-1">
+                                <div class="flex items-center justify-between w-full">
+                                    <div class="flex items-center space-x-1">
+                                        <label class="text-xs font-bold w-16">WO:</label>
+                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <input type="text" class="w-16 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <!-- Right side column for measurements -->
@@ -899,15 +941,55 @@
             </div>
         </div>
     </div>
+
+    <!-- Product Design Modal -->
+    <ProductDesignModal
+        :show="showProductDesignModal"
+        :designs="productDesigns"
+        :products="[]"
+        :doubleClickAction="'select'"
+        @close="showProductDesignModal = false"
+        @select="onProductDesignSelected"
+    />
+
+    <!-- Paper Flute Modal -->
+    <PaperFluteModal
+        :show="showPaperFluteModal"
+        :flutes="paperFlutes"
+        @close="showPaperFluteModal = false"
+        @select="onPaperFluteSelected"
+    />
 </template>
 
 <script setup>
-import { defineEmits, defineProps } from 'vue';
+import { defineEmits, defineProps, ref } from 'vue';
+import ProductDesignModal from '@/Components/product-design-modal.vue';
+import PaperFluteModal from '@/Components/paper-flute-selector-modal.vue';
+
+// Product Design Modal
+const showProductDesignModal = ref(false);
+const selectedProductDesign = ref('');
+
+// Paper Flute Modal
+const showPaperFluteModal = ref(false);
+const selectedPaperFlute = ref('');
 
 const handleSortOptionChange = (event) => {
     const newSortOption = event.target.value;
     emit('updateSortOption', newSortOption);
     emit('fetchMcsData');
+};
+
+const onProductDesignSelected = (design) => {
+    selectedProductDesign.value = design.pd_code;
+    showProductDesignModal.value = false;
+    emit('productDesignSelected', design);
+};
+
+const onPaperFluteSelected = (flute) => {
+    selectedPaperFlute.value = flute.code;
+    showPaperFluteModal.value = false;
+    emit('paperFluteSelected', flute);
 };
 
 const props = defineProps({
@@ -927,7 +1009,15 @@ const props = defineProps({
     mcsMasterCards: Array,
     selectedMcs: Object,
     mcsCurrentPage: Number,
-    mcsLastPage: Number
+    mcsLastPage: Number,
+    productDesigns: {
+        type: Array,
+        default: () => []
+    },
+    paperFlutes: {
+        type: Array,
+        default: () => []
+    }
 });
 
 const emit = defineEmits([
@@ -944,7 +1034,9 @@ const emit = defineEmits([
     'selectMcs',
     'goToMcsPage',
     'updateSearchTerm',
-    'updateSortOption'
+    'updateSortOption',
+    'productDesignSelected',
+    'paperFluteSelected'
 ]);
 </script>
 
