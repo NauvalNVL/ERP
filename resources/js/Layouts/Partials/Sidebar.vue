@@ -387,6 +387,28 @@ const salesManagementItems = [
         ]
       },
       {
+        title: 'Transaction',
+        icon: 'fas fa-exchange-alt',
+        children: [
+          { title: 'Prepare MC SO', icon: 'fas fa-file-invoice', route: '/sales-order/transaction/prepare-mc-so' },
+          { title: 'Prepare SB SO', icon: 'fas fa-file-invoice-dollar', route: '/sales-order/transaction/prepare-sb-so' },
+          { title: 'Prepare JIT SO', icon: 'fas fa-clock', route: '/sales-order/transaction/prepare-jit-so' },
+          { title: 'Print SO', icon: 'fas fa-print', route: '/sales-order/transaction/print-so' },
+          { title: 'Cancel SO', icon: 'fas fa-times-circle', route: '/sales-order/transaction/cancel-so' },
+          { title: 'Amend SO', icon: 'fas fa-edit', route: '/sales-order/transaction/amend-so' },
+          { title: 'Amend Approved SO', icon: 'fas fa-check-double', route: '/sales-order/transaction/amend-approved-so' },
+          { title: 'Amend SO Price', icon: 'fas fa-dollar-sign', route: '/sales-order/transaction/amend-so-price' },
+          { title: 'Amend Approved SO Price', icon: 'fas fa-check-dollar', route: '/sales-order/transaction/amend-approved-so-price' },
+          { title: 'Close SO', icon: 'fas fa-check-circle', route: '/sales-order/transaction/close-so' },
+          { title: 'Close SO by Period', icon: 'fas fa-calendar-check', route: '/sales-order/transaction/close-so-by-period' },
+          { title: 'Unclose SO', icon: 'fas fa-undo', route: '/sales-order/transaction/unclose-so' },
+          { title: 'Re-Submit Rejected SO for Credit Check', icon: 'fas fa-redo', route: '/sales-order/transaction/resubmit-rejected-so' },
+          { title: 'Release WO by SO', icon: 'fas fa-unlock', route: '/sales-order/transaction/release-wo-by-so' },
+          { title: 'Print SO Log', icon: 'fas fa-list-alt', route: '/sales-order/transaction/print-so-log' },
+          { title: 'Print SO JIT Tracking', icon: 'fas fa-search', route: '/sales-order/transaction/print-so-jit-tracking' },
+        ]
+      },
+      {
         title: 'Report',
         icon: 'fas fa-chart-pie',
         children: [
