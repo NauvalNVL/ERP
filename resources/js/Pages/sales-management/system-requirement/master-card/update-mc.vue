@@ -53,6 +53,7 @@
                                             type="text" 
                                             id="ac" 
                                             v-model="form.ac"
+                                            @input="handleAcInput"
                                             class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
                                         />
                                         <button 
@@ -322,35 +323,41 @@
                                 <ul class="text-sm text-gray-600 space-y-2">
                                     <li class="flex items-start">
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full mr-2 shadow-sm mt-0.5">
-                                            <i class="fas fa-search text-white text-xs"></i>
+                                            <i class="fas fa-building text-white text-xs"></i>
                                         </span>
-                                        <span>Select customer account first (AC#)</span>
+                                        <span><strong>Step 1:</strong> Select Customer Account (AC#) first</span>
                                     </li>
                                     <li class="flex items-start">
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mr-2 shadow-sm mt-0.5">
-                                            <i class="fas fa-mouse-pointer text-white text-xs"></i>
+                                            <i class="fas fa-search text-white text-xs"></i>
                                         </span>
-                                        <span>Enter existing MCS# or new number</span>
+                                        <span><strong>Step 2:</strong> Search existing MCS or enter new number</span>
                                     </li>
                                     <li class="flex items-start">
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mr-2 shadow-sm mt-0.5">
                                             <i class="fas fa-play text-white text-xs"></i>
                                         </span>
-                                        <span>Click "Proceed" to continue</span>
+                                        <span><strong>Step 3:</strong> Click "Proceed" to continue</span>
                                     </li>
                                     <li v-if="showDetailedMcInfo" class="flex items-start">
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full mr-2 shadow-sm mt-0.5">
                                             <i class="fas fa-edit text-white text-xs"></i>
                                         </span>
-                                        <span>Fill MC Model for new records</span>
+                                        <span><strong>Step 4:</strong> Fill MC Model for new records</span>
                                     </li>
                                     <li v-if="showDetailedMcInfo" class="flex items-start">
                                         <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-red-400 to-rose-400 rounded-full mr-2 shadow-sm mt-0.5">
                                             <i class="fas fa-cogs text-white text-xs"></i>
                                         </span>
-                                        <span>Use Next Setup to configure components</span>
+                                        <span><strong>Step 5:</strong> Use Next Setup to configure components</span>
                                     </li>
                                 </ul>
+                                <div class="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
+                                    <p class="text-xs text-yellow-800 font-medium">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Master Cards are linked to specific Customer Accounts. Only MCs belonging to the selected customer will be shown.
+                                    </p>
+                                </div>
                             </div>
 
                             <div class="p-4 bg-blue-50 rounded-lg">
@@ -681,6 +688,35 @@ const handleMcsInput = () => {
     }
 };
 
+const handleAcInput = () => {
+    // Reset MCS data when AC# is manually changed
+    if (!form.value.ac || form.value.ac !== (selectedCustomer.value?.customer_code || '')) {
+        selectedMcs.value = null;
+        mcsMasterCards.value = [];
+        form.value.mcs = '';
+        form.value.customer_name = '';
+        showDetailedMcInfo.value = false;
+        recordMode.value = 'new';
+        
+        // Reset MC details
+        mcDetails.value = {
+            ac_name: '',
+            mc_model: '',
+            mc_short_model: '',
+            mc_status: 'Active',
+            mc_approval: 'No',
+            last_mcs: '',
+            last_updated_seq: '',
+            ext_dim_1: '',
+            ext_dim_2: '',
+            ext_dim_3: '',
+            int_dim_1: '',
+            int_dim_2: '',
+            int_dim_3: '',
+        };
+    }
+};
+
 const addNewRecord = () => {
     recordMode.value = 'new';
     form.value.mc_approval = 'No';
@@ -701,6 +737,12 @@ const searchAc = async () => {
 };
 
 const searchMcs = () => {
+    // Validasi customer account harus dipilih terlebih dahulu
+    if (!form.value.ac) {
+        alert('Please select Customer Account (AC#) first before searching Master Cards.');
+        return;
+    }
+    
     showMcsTableModal.value = true;
     fetchMcsData();
 };
@@ -772,6 +814,31 @@ const selectCustomer = (customer) => {
     selectedCustomer.value = customer;
     form.value.ac = customer.customer_code;
     form.value.customer_name = customer.customer_name;
+    
+    // Reset MCS data ketika customer berubah
+    form.value.mcs = '';
+    selectedMcs.value = null;
+    mcsMasterCards.value = [];
+    showDetailedMcInfo.value = false;
+    recordMode.value = 'new';
+    
+    // Reset MC details
+    mcDetails.value = {
+        ac_name: customer.customer_name,
+        mc_model: '',
+        mc_short_model: '',
+        mc_status: 'Active',
+        mc_approval: 'No',
+        last_mcs: '',
+        last_updated_seq: '',
+        ext_dim_1: '',
+        ext_dim_2: '',
+        ext_dim_3: '',
+        int_dim_1: '',
+        int_dim_2: '',
+        int_dim_3: '',
+    };
+    
     recordSelected.value = true;
     showCustomerAccountTable.value = false;
 };
@@ -811,6 +878,15 @@ const selectMcs = (mcs) => {
 const fetchMcsData = async (page = 1) => {
     mcsLoading.value = true;
     mcsError.value = null;
+    
+    // Validasi customer account harus ada sebelum fetch data
+    if (!form.value.ac) {
+        mcsError.value = 'Please select Customer Account (AC#) first.';
+        mcsMasterCards.value = [];
+        mcsLoading.value = false;
+        return;
+    }
+    
     try {
         let statusQuery = '';
         if (mcsStatusFilter.value === 'Act') {
@@ -819,19 +895,24 @@ const fetchMcsData = async (page = 1) => {
             statusQuery = '&status[]=Obsolete';
         }
 
-        // Filter by customer account if selected
-        let customerFilter = '';
-        if (form.value.ac) {
-            customerFilter = `&customer_code=${form.value.ac}`;
-        }
+        // Filter by customer account - WAJIB ada
+        const customerFilter = `&customer_code=${encodeURIComponent(form.value.ac)}`;
 
-        const response = await axios.get(`/api/update-mc/master-cards?page=${page}&query=${mcsSearchTerm.value}&sortBy=${mcsSortOption.value}&sortOrder=${mcsSortOrder.value}${statusQuery}${customerFilter}`);
-        mcsMasterCards.value = response.data.data;
-        mcsCurrentPage.value = response.data.current_page;
-        mcsLastPage.value = response.data.last_page;
+        const response = await axios.get(`/api/update-mc/master-cards?page=${page}&query=${encodeURIComponent(mcsSearchTerm.value)}&sortBy=${mcsSortOption.value}&sortOrder=${mcsSortOrder.value}${statusQuery}${customerFilter}`);
+        
+        mcsMasterCards.value = response.data.data || [];
+        mcsCurrentPage.value = response.data.current_page || 1;
+        mcsLastPage.value = response.data.last_page || 1;
+        
+        // Set error message jika tidak ada data MC untuk customer ini
+        if (mcsMasterCards.value.length === 0 && !mcsSearchTerm.value) {
+            mcsError.value = `No Master Cards found for Customer Account: ${form.value.ac}`;
+        }
+        
     } catch (error) {
         console.error('Error fetching MCS data:', error);
-        mcsError.value = 'Failed to load master cards.';
+        mcsError.value = 'Failed to load master cards for this customer.';
+        mcsMasterCards.value = [];
     } finally {
         mcsLoading.value = false;
     }
@@ -856,13 +937,20 @@ const handleMcsProceed = async () => {
         return;
     }
 
-    // Check if MCS already exists
+    // Check if MCS already exists for this specific customer
     try {
-        const response = await axios.get(`/api/update-mc/check-mcs/${form.value.mcs}`);
+        const response = await axios.get(`/api/update-mc/check-mcs/${form.value.mcs}?customer_code=${encodeURIComponent(form.value.ac)}`);
         
         if (response.data.exists) {
             // Existing MC - load data and set as approved
             const existingMc = response.data.data;
+            
+            // Validasi apakah MC ini memang milik customer yang dipilih
+            if (existingMc.customer_code !== form.value.ac) {
+                alert(`MCS# ${form.value.mcs} exists but belongs to a different customer. Please check your data.`);
+                return;
+            }
+            
             recordMode.value = 'existing';
             
             form.value.mc_model = existingMc.mc_model || '';
@@ -898,6 +986,10 @@ const handleMcsProceed = async () => {
         // Fallback to treating as new MC
         recordMode.value = 'new';
         form.value.mc_approval = 'No';
+        form.value.mc_status = 'Active';
+        mcDetails.value.ac_name = form.value.customer_name;
+        mcDetails.value.mc_approval = 'No';
+        mcDetails.value.mc_status = 'Active';
         showDetailedMcInfo.value = true;
         recordSelected.value = true;
     }

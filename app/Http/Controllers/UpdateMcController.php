@@ -57,10 +57,25 @@ class UpdateMcController extends Controller
         $sortBy = $request->input('sortBy', 'mc_seq'); // Default sort by 'mc_seq'
         $sortOrder = $request->input('sortOrder', 'asc'); // Default sort order 'asc'
         $statuses = $request->input('status', ['Act']); // Default to 'Act' status
+        $customerCode = $request->input('customer_code'); // Customer filter
         $perPage = $request->input('per_page', 10); // Items per page
 
         // Build the query using Eloquent
         $masterCards = MasterCard::query();
+
+        // MANDATORY: Filter by customer_code if provided
+        if ($customerCode) {
+            $masterCards->where('customer_code', $customerCode);
+        } else {
+            // If no customer_code provided, return empty result for security
+            return response()->json([
+                'current_page' => 1,
+                'last_page' => 1,
+                'per_page' => $perPage,
+                'total' => 0,
+                'data' => [],
+            ]);
+        }
 
         // Apply search query if provided
         if ($query) {
@@ -70,19 +85,28 @@ class UpdateMcController extends Controller
             });
         }
 
-        // Apply status filter
-        $validStatuses = ['Act', 'Obsolete']; // Define expected database status values
+        // Apply status filter - handle both 'Act' and 'Active' status values
+        $validStatuses = ['Act', 'Active', 'Obsolete']; // Define expected database status values
         $filteredStatuses = array_intersect($statuses, $validStatuses);
 
         if (!empty($filteredStatuses)) {
-            $masterCards->whereIn('status', $filteredStatuses);
+            // Map 'Act' to also include 'Active' for compatibility
+            $dbStatuses = [];
+            foreach ($filteredStatuses as $status) {
+                if ($status === 'Act') {
+                    $dbStatuses[] = 'Active'; // Map 'Act' to 'Active' in database
+                } else {
+                    $dbStatuses[] = $status;
+                }
+            }
+            $masterCards->whereIn('status', $dbStatuses);
         } else {
             // If no valid status is provided, default to active
-            $masterCards->where('status', 'Act');
+            $masterCards->where('status', 'Active');
         }
 
         // Apply sorting
-        $validSortColumns = ['mc_seq', 'mc_model', 'part_no', 'comp_no', 'status', 'ext_dim_1', 'int_dim_1'];
+        $validSortColumns = ['mc_seq', 'mc_model', 'part_no', 'comp_no', 'status', 'ext_dim_1', 'int_dim_1', 'customer_code'];
         if (!in_array($sortBy, $validSortColumns)) {
             $sortBy = 'mc_seq'; // Fallback to a safe default
         }
@@ -97,16 +121,21 @@ class UpdateMcController extends Controller
             return [
                 'seq' => $item->mc_seq,
                 'model' => $item->mc_model,
+                'short_model' => $item->mc_short_model,
                 'part' => $item->part_no,
                 'comp' => $item->comp_no,
                 'status' => $item->status,
                 'p_design' => $item->p_design,
+                'customer_code' => $item->customer_code,
+                'customer_name' => $item->customer_code, // Use customer_code for now
                 'ext_dim_1' => $item->ext_dim_1,
                 'ext_dim_2' => $item->ext_dim_2,
                 'ext_dim_3' => $item->ext_dim_3,
                 'int_dim_1' => $item->int_dim_1,
                 'int_dim_2' => $item->int_dim_2,
                 'int_dim_3' => $item->int_dim_3,
+                'last_mcs' => $item->mc_seq,
+                'last_updated_seq' => $item->mc_seq,
             ];
         });
 
@@ -118,27 +147,43 @@ class UpdateMcController extends Controller
             'data' => $transformedData,
         ];
 
-        Log::info('Master Card Query Results:', ['count' => $result['total'], 'data' => $result['data']]);
+        Log::info('Master Card Query Results:', [
+            'customer_code' => $customerCode,
+            'count' => $result['total'], 
+            'data_sample' => $transformedData->take(2)->toArray()
+        ]);
 
         return response()->json($result);
     }
 
     /**
-     * Check if MCS number exists in database.
+     * Check if MCS number exists in database with customer validation.
      *
      * @param  string  $mcsNumber
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function checkMcs($mcsNumber)
+    public function checkMcs($mcsNumber, Request $request)
     {
         try {
-            $masterCard = MasterCard::where('mc_seq', $mcsNumber)->first();
+            $customerCode = $request->input('customer_code');
+            
+            // Build query with customer validation
+            $query = MasterCard::where('mc_seq', $mcsNumber);
+            
+            // If customer_code is provided, validate ownership
+            if ($customerCode) {
+                $query->where('customer_code', $customerCode);
+            }
+            
+            $masterCard = $query->first();
             
             if ($masterCard) {
                 return response()->json([
                     'exists' => true,
                     'data' => [
                         'mc_seq' => $masterCard->mc_seq,
+                        'customer_code' => $masterCard->customer_code,
                         'mc_model' => $masterCard->mc_model,
                         'mc_short_model' => $masterCard->mc_short_model ?? '',
                         'status' => $masterCard->status,
@@ -151,11 +196,24 @@ class UpdateMcController extends Controller
                         'int_dim_1' => $masterCard->int_dim_1,
                         'int_dim_2' => $masterCard->int_dim_2,
                         'int_dim_3' => $masterCard->int_dim_3,
+                        'customer_name' => $masterCard->customer_code, // Use customer_code for now
                         'created_at' => $masterCard->created_at,
                         'updated_at' => $masterCard->updated_at,
                     ]
                 ]);
             } else {
+                // Check if MCS exists but belongs to different customer
+                if ($customerCode) {
+                    $existsElsewhere = MasterCard::where('mc_seq', $mcsNumber)->exists();
+                    if ($existsElsewhere) {
+                        return response()->json([
+                            'exists' => false,
+                            'data' => null,
+                            'message' => 'MCS exists but belongs to a different customer'
+                        ]);
+                    }
+                }
+                
                 return response()->json([
                     'exists' => false,
                     'data' => null
