@@ -448,6 +448,8 @@
             :mcsLastPage="mcsLastPage"
             :productDesigns="productDesigns"
             :paperFlutes="paperFlutes"
+            :soValues="soValues"
+            :woValues="woValues"
             @closeErrorModal="showErrorModal = false"
             @closeSetupMcModal="showSetupMcModal = false"
             @closeSetupPdModal="showSetupPdModal = false"
@@ -464,6 +466,8 @@
             @updateSortOption="mcsSortOption = $event"
             @productDesignSelected="onProductDesignSelected"
             @paperFluteSelected="onPaperFluteSelected"
+            @openPaperQualityModal="openPaperQualityModal"
+            @openWoPaperQualityModal="openWoPaperQualityModal"
         />
 
         <!-- Maintenance Log Modal -->
@@ -498,6 +502,22 @@
             @select="handleSecondPasswordSelect"
         />
 
+        <!-- Paper Quality Modal -->
+        <PaperQualityModal
+            :show="showPaperQualityModal"
+            :qualities="paperQualities"
+            @close="showPaperQualityModal = false"
+            @select="onPaperQualitySelected"
+        />
+
+        <!-- Chemical Coat Modal (parent copy for consistency; selection handled in child for now) -->
+        <ChemicalCoatModal
+            :show="showChemicalCoatModal"
+            :coats="chemicalCoats"
+            @close="showChemicalCoatModal = false"
+            @select="() => { showChemicalCoatModal = false }"
+        />
+
     </AppLayout>
 </template>
 
@@ -513,6 +533,8 @@ import MasterCardZoomModal from '@/Components/MasterCardZoomModal.vue';
 import MasterCardCurrentPriceModal from '@/Components/MasterCardCurrentPriceModal.vue';
 import MasterCardStandByPriceModal from '@/Components/MasterCardStandByPriceModal.vue';
 import SecondPasswordAccessModal from '@/Components/SecondPasswordAccessModal.vue';
+import PaperQualityModal from '@/Components/paper-quality-modal.vue';
+import ChemicalCoatModal from '@/Components/chemical-coat-modal.vue';
 
 // Form data
 const form = ref({
@@ -566,8 +588,26 @@ const showMasterCardStandByPriceModal = ref(false);
 // New state for Second Password Access Modal
 const showSecondPasswordAccessModal = ref(false);
 
+// New state for Paper Quality Modal
+const showPaperQualityModal = ref(false);
+const paperQualities = ref([]);
+const paperQualityLoading = ref(false);
+const selectedPaperQuality = ref(null);
+const activeSoIndex = ref(null); // Track which SO button was clicked
+const activeWoIndex = ref(null); // Track which WO button was clicked
+
+// SO values storage
+const soValues = ref(['', '', '', '', '']); // Array to store 5 SO values
+// WO values storage
+const woValues = ref(['', '', '', '', '']); // Array to store 5 WO values
+
 // Error modal state
 const showErrorModal = ref(false);
+
+// Chemical coat modal state (available for future parent usage if needed)
+const showChemicalCoatModal = ref(false);
+const chemicalCoats = ref([]);
+const chemicalCoatLoading = ref(false);
 
 // Setup MC Component Modal state
 const showSetupMcModal = ref(false);
@@ -673,6 +713,72 @@ const onPaperFluteSelected = (flute) => {
     // Update the Flute field in the form or wherever it's needed
     console.log('Paper Flute Selected:', flute);
     // You can add logic here to update form fields based on the selected flute
+};
+
+// Fetch paper qualities dari API
+const fetchPaperQualities = async () => {
+    paperQualityLoading.value = true;
+    try {
+        const res = await fetch('/api/paper-qualities', { 
+            headers: { 
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            } 
+        });
+        
+        if (!res.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await res.json();
+        if (Array.isArray(data)) {
+            console.log('Paper Qualities data:', data.slice(0, 3)); // Debug: show first 3 items
+            paperQualities.value = data;
+        } else {
+            paperQualities.value = [];
+            console.error('Unexpected data format:', data);
+        }
+    } catch (e) {
+        console.error('Error fetching paper qualities:', e);
+        paperQualities.value = [];
+    } finally {
+        paperQualityLoading.value = false;
+    }
+};
+
+// Handle SO button click to open paper quality modal
+const openPaperQualityModal = (soIndex) => {
+    activeSoIndex.value = soIndex;
+    activeWoIndex.value = null;
+    showPaperQualityModal.value = true;
+    fetchPaperQualities();
+};
+
+// Handle WO button click to open paper quality modal
+const openWoPaperQualityModal = (woIndex) => {
+    activeWoIndex.value = woIndex;
+    activeSoIndex.value = null;
+    showPaperQualityModal.value = true;
+    fetchPaperQualities();
+};
+
+// Handle paper quality selection
+const onPaperQualitySelected = (quality) => {
+    if (!quality) return;
+    selectedPaperQuality.value = quality;
+    const value = quality.paper_quality || quality.paper_name || '';
+    if (activeSoIndex.value !== null) {
+        soValues.value[activeSoIndex.value] = value;
+        console.log(`Paper Quality Selected for SO ${activeSoIndex.value + 1}:`, quality);
+        console.log(`SO ${activeSoIndex.value + 1} updated to:`, soValues.value[activeSoIndex.value]);
+    } else if (activeWoIndex.value !== null) {
+        woValues.value[activeWoIndex.value] = value;
+        console.log(`Paper Quality Selected for WO ${activeWoIndex.value + 1}:`, quality);
+        console.log(`WO ${activeWoIndex.value + 1} updated to:`, woValues.value[activeWoIndex.value]);
+    }
+    showPaperQualityModal.value = false;
+    activeSoIndex.value = null;
+    activeWoIndex.value = null;
 };
 
 // Load paper flutes saat komponen dimount

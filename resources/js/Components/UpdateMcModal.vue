@@ -559,24 +559,24 @@
                                 <div class="flex items-center justify-between w-full">
                                     <div class="flex items-center space-x-1">
                                         <label class="text-xs font-bold w-16">SO:</label>
-                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <input type="text" :value="soValues[0]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <button @click="emit('openPaperQualityModal', 0)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <input type="text" :value="soValues[1]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <button @click="emit('openPaperQualityModal', 1)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <input type="text" :value="soValues[2]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <button @click="emit('openPaperQualityModal', 2)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" class="w-16 px-1 py-1 border border-gray-400 text-xs text-center">
-                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <input type="text" :value="soValues[3]" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <button @click="emit('openPaperQualityModal', 3)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <input type="text" :value="soValues[4]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <button @click="emit('openPaperQualityModal', 4)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>
@@ -600,24 +600,24 @@
                                 <div class="flex items-center justify-between w-full">
                                     <div class="flex items-center space-x-1">
                                         <label class="text-xs font-bold w-16">WO:</label>
-                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <input type="text" :value="woValues[0]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <button @click="emit('openWoPaperQualityModal', 0)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <input type="text" :value="woValues[1]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <button @click="emit('openWoPaperQualityModal', 1)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <input type="text" :value="woValues[2]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <button @click="emit('openWoPaperQualityModal', 2)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" class="w-16 px-1 py-1 border border-gray-400 text-xs text-center">
-                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <input type="text" :value="woValues[3]" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <button @click="emit('openWoPaperQualityModal', 3)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                        <button class="px-1 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                        <input type="text" :value="woValues[4]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <button @click="emit('openWoPaperQualityModal', 4)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>
@@ -658,7 +658,10 @@
                                 </div>
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">Chem Coat:</label>
-                                    <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                    <input type="text" :value="selectedChemicalCoat" readonly class="w-24 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="showChemicalCoatModal = true" title="Select Chemical Coat">
+                                        <i class="fas fa-search"></i>
+                                    </button>
                                 </div>
                             </div>
                             <!-- Right side column for measurements -->
@@ -692,8 +695,8 @@
                                 </div>
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">R/F Tape:</label>
-                                    <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                    <input type="text" :value="selectedReinforcementTape" readonly class="w-28 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="showReinforcementTapeModal = true" title="Select Reinforcement Tape">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
@@ -721,8 +724,11 @@
                         <!-- Score L Row -->
                         <div class="flex items-center mb-2">
                             <label class="text-xs font-medium w-16">Score L:</label>
-                            <div class="flex space-x-1">
-                                <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center" v-for="i in 10" :key="'scoreL'+i">
+                            <div class="flex items-center space-x-1">
+                                <template v-for="i in 10" :key="'scoreL'+i">
+                                    <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                    <span v-if="i < 10" class="text-xs text-gray-500 font-bold">+</span>
+                                </template>
                             </div>
                             <button class="ml-2 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                 <i class="fas fa-calculator"></i>
@@ -740,8 +746,11 @@
                         <!-- Score W Row -->
                         <div class="flex items-center mb-2">
                             <label class="text-xs font-medium w-16">Score W:</label>
-                            <div class="flex space-x-1">
-                                <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center" v-for="i in 10" :key="'scoreW'+i">
+                            <div class="flex items-center space-x-1">
+                                <template v-for="i in 10" :key="'scoreW'+i">
+                                    <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                    <span v-if="i < 10" class="text-xs text-gray-500 font-bold">+</span>
+                                </template>
                             </div>
                             <button class="ml-2 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                 <i class="fas fa-calculator"></i>
@@ -760,8 +769,8 @@
                         <div class="flex items-center mb-2 space-x-4">
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-12">P/Size:</label>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                <input type="text" :value="selectedPaperSize" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="showPaperSizeModal = true" title="Select Paper Size">
                                     <i class="fas fa-search"></i>
                                 </button>
                                 <span class="text-xs ml-1">mm</span>
@@ -959,12 +968,39 @@
         @close="showPaperFluteModal = false"
         @select="onPaperFluteSelected"
     />
+
+    <!-- Chemical Coat Modal -->
+    <ChemicalCoatModal
+        :show="showChemicalCoatModal"
+        :coats="chemicalCoatRows"
+        @close="showChemicalCoatModal = false"
+        @select="(coat) => { selectedChemicalCoat = coat?.name || coat?.code || ''; showChemicalCoatModal = false; }"
+    />
+
+    <!-- Reinforcement Tape Modal -->
+    <ReinforcementTapeModal
+        :show="showReinforcementTapeModal"
+        :rows="reinforcementTapeRows"
+        @close="showReinforcementTapeModal = false"
+        @select="(row) => { selectedReinforcementTape = row?.name || row?.code || ''; showReinforcementTapeModal = false; }"
+    />
+
+    <!-- Paper Size Modal -->
+    <PaperSizeModal
+        :show="showPaperSizeModal"
+        :paperSizes="paperSizeRows"
+        @close="showPaperSizeModal = false"
+        @select="(size) => { selectedPaperSize = size?.size || ''; showPaperSizeModal = false; }"
+    />
 </template>
 
 <script setup>
 import { defineEmits, defineProps, ref } from 'vue';
 import ProductDesignModal from '@/Components/product-design-modal.vue';
 import PaperFluteModal from '@/Components/paper-flute-selector-modal.vue';
+import ChemicalCoatModal from '@/Components/chemical-coat-modal.vue';
+import ReinforcementTapeModal from '@/Components/reinforcement-tape-modal.vue';
+import PaperSizeModal from '@/Components/paper-size-modal.vue';
 
 // Product Design Modal
 const showProductDesignModal = ref(false);
@@ -973,6 +1009,35 @@ const selectedProductDesign = ref('');
 // Paper Flute Modal
 const showPaperFluteModal = ref(false);
 const selectedPaperFlute = ref('');
+
+// Chemical Coat Modal
+const showChemicalCoatModal = ref(false);
+const selectedChemicalCoat = ref('');
+const chemicalCoatRows = ref([
+    { code: '001', name: 'VERNISH', dry_end_code: '' },
+    { code: '002', name: 'WATER BASE COATING', dry_end_code: '' },
+    { code: '003', name: 'GLOSS COAT', dry_end_code: '' },
+    { code: '004', name: 'MATTE COAT', dry_end_code: '' },
+    { code: '005', name: 'UV COATING', dry_end_code: '' }
+]);
+
+// Reinforcement Tape Modal
+const showReinforcementTapeModal = ref(false);
+const selectedReinforcementTape = ref('');
+const reinforcementTapeRows = ref([
+    { code: '001', name: 'LAKBAN SERAT', dry_end_code: '' }
+]);
+
+// Paper Size Modal
+const showPaperSizeModal = ref(false);
+const selectedPaperSize = ref('');
+const paperSizeRows = ref([
+    { id: 1, size: '210.00', inches: '8.27', description: 'A4 Paper Size' },
+    { id: 2, size: '297.00', inches: '11.69', description: 'A4 Paper Size' },
+    { id: 3, size: '148.00', inches: '5.83', description: 'A5 Paper Size' },
+    { id: 4, size: '105.00', inches: '4.13', description: 'A6 Paper Size' },
+    { id: 5, size: '74.00', inches: '2.91', description: 'A7 Paper Size' }
+]);
 
 const handleSortOptionChange = (event) => {
     const newSortOption = event.target.value;
@@ -1017,6 +1082,14 @@ const props = defineProps({
     paperFlutes: {
         type: Array,
         default: () => []
+    },
+    soValues: {
+        type: Array,
+        default: () => ['', '', '', '', '']
+    },
+    woValues: {
+        type: Array,
+        default: () => ['', '', '', '', '']
     }
 });
 
@@ -1036,7 +1109,9 @@ const emit = defineEmits([
     'updateSearchTerm',
     'updateSortOption',
     'productDesignSelected',
-    'paperFluteSelected'
+    'paperFluteSelected',
+    'openPaperQualityModal',
+    'openWoPaperQualityModal'
 ]);
 </script>
 
