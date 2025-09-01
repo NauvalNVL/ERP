@@ -29,6 +29,7 @@
         title="System Manager"
         icon="fas fa-cogs"
         :items="systemManagerItems"
+        :current-path="currentPath"
       />
 
       <!-- Sales Management -->
@@ -36,6 +37,7 @@
         title="Sales Management"
         icon="fas fa-chart-line"
         :items="salesManagementItems"
+        :current-path="currentPath"
       />
 
       <!-- Material Management -->
@@ -43,6 +45,7 @@
         title="Material Management"
         icon="fas fa-boxes"
         :items="materialManagementItems"
+        :current-path="currentPath"
       />
 
       <!-- Production Management -->
@@ -50,6 +53,7 @@
         title="Production Management"
         icon="fas fa-industry"
         :items="productionManagementItems"
+        :current-path="currentPath"
       />
 
       <!-- Warehouse Management -->
@@ -57,6 +61,7 @@
         title="Warehouse Management"
         icon="fas fa-warehouse"
         :items="warehouseManagementItems"
+        :current-path="currentPath"
       />
 
       <!-- Data Mining -->
@@ -382,6 +387,28 @@ const salesManagementItems = [
         ]
       },
       {
+        title: 'Transaction',
+        icon: 'fas fa-exchange-alt',
+        children: [
+          { title: 'Prepare MC SO', icon: 'fas fa-file-invoice', route: '/sales-order/transaction/prepare-mc-so' },
+          { title: 'Prepare SB SO', icon: 'fas fa-file-invoice-dollar', route: '/sales-order/transaction/prepare-sb-so' },
+          { title: 'Prepare JIT SO', icon: 'fas fa-clock', route: '/sales-order/transaction/prepare-jit-so' },
+          { title: 'Print SO', icon: 'fas fa-print', route: '/sales-order/transaction/print-so' },
+          { title: 'Cancel SO', icon: 'fas fa-times-circle', route: '/sales-order/transaction/cancel-so' },
+          { title: 'Amend SO', icon: 'fas fa-edit', route: '/sales-order/transaction/amend-so' },
+          { title: 'Amend Approved SO', icon: 'fas fa-check-double', route: '/sales-order/transaction/amend-approved-so' },
+          { title: 'Amend SO Price', icon: 'fas fa-dollar-sign', route: '/sales-order/transaction/amend-so-price' },
+          { title: 'Amend Approved SO Price', icon: 'fas fa-check-dollar', route: '/sales-order/transaction/amend-approved-so-price' },
+          { title: 'Close SO', icon: 'fas fa-check-circle', route: '/sales-order/transaction/close-so' },
+          { title: 'Close SO by Period', icon: 'fas fa-calendar-check', route: '/sales-order/transaction/close-so-by-period' },
+          { title: 'Unclose SO', icon: 'fas fa-undo', route: '/sales-order/transaction/unclose-so' },
+          { title: 'Re-Submit Rejected SO for Credit Check', icon: 'fas fa-redo', route: '/sales-order/transaction/resubmit-rejected-so' },
+          { title: 'Release WO by SO', icon: 'fas fa-unlock', route: '/sales-order/transaction/release-wo-by-so' },
+          { title: 'Print SO Log', icon: 'fas fa-list-alt', route: '/sales-order/transaction/print-so-log' },
+          { title: 'Print SO JIT Tracking', icon: 'fas fa-search', route: '/sales-order/transaction/print-so-jit-tracking' },
+        ]
+      },
+      {
         title: 'Report',
         icon: 'fas fa-chart-pie',
         children: [
@@ -617,21 +644,31 @@ const materialManagementItems = [
         title: 'Setup Account',
         icon: 'fas fa-user-cog',
         children: [
-          { title: 'Define Chart of Account', icon: 'fas fa-sitemap', route: '/material-management/account/setup/chart-of-account' },
-          { title: 'Define Account Type', icon: 'fas fa-tags', route: '/material-management/account/setup/account-type' },
-          { title: 'Define Account Sub-Type', icon: 'fas fa-tag', route: '/material-management/account/setup/account-sub-type' },
-          { title: 'Define Department', icon: 'fas fa-building', route: '/material-management/account/setup/department' },
-          { title: 'View & Print Chart of Account', icon: 'fas fa-print', route: '/material-management/account/setup/chart-of-account/view-print' },
-          { title: 'View & Print Account Type', icon: 'fas fa-print', route: '/material-management/account/setup/account-type/view-print' },
-          { title: 'View & Print Account Sub-Type', icon: 'fas fa-print', route: '/material-management/account/setup/account-sub-type/view-print' },
-          { title: 'View & Print Department', icon: 'fas fa-print', route: '/material-management/account/setup/department/view-print' }
+          { title: 'Setup Purchase SKU Accounts', icon: 'fas fa-shopping-cart', route: '/material-management/account/setup-account/setup-purchase-sku-accounts' },
+          { title: 'Setup Purchase Tax Accounts', icon: 'fas fa-percentage', route: '/material-management/account/setup-account/setup-purchase-tax-accounts' },
+          { title: 'Setup Purchase DN/CN Accounts', icon: 'fas fa-exchange-alt', route: '/material-management/account/setup-account/setup-purchase-dn-cn-accounts' },
+          { title: 'Setup Inventory SKU Accounts', icon: 'fas fa-boxes', route: '/material-management/account/setup-account/setup-inventory-sku-accounts' },
+          { title: 'View & Print Purchase AP Accounts', icon: 'fas fa-print', route: '/material-management/account/setup-account/view-print-purchase-ap-accounts' },
+          { title: 'View & Print Purchase SKU Accounts', icon: 'fas fa-print', route: '/material-management/account/setup-account/view-print-purchase-sku-accounts' },
+          { title: 'View & Print Purchase Tax Accounts', icon: 'fas fa-print', route: '/material-management/account/setup-account/view-print-purchase-tax-accounts' },
+          { title: 'View & Print Purchase DN/CN Accounts', icon: 'fas fa-print', route: '/material-management/account/setup-account/view-print-purchase-dn-cn-accounts' },
+          { title: 'View & Print Inventory SKU Accounts', icon: 'fas fa-print', route: '/material-management/account/setup-account/view-print-inventory-sku-accounts' }
         ]
       },
       {
         title: 'Posting to Accounts',
         icon: 'fas fa-file-import',
         children: [
-          { title: 'Post RC', icon: 'fas fa-share-square', route: '/material-management/account/posting/post-rc' },
+          {
+            title: 'Post RC',
+            icon: 'fas fa-share-square',
+            children: [
+              { title: 'Prepare RC Posting Batch', icon: 'fas fa-plus', route: '/material-management/accounts/posting-to-accounts/post-rc/prepare-rc-posting-batch' },
+              { title: 'Cancel RC Posting Batch', icon: 'fas fa-times', route: '/material-management/accounts/posting-to-accounts/post-rc/cancel-rc-posting-batch' },
+              { title: 'View & Print RC Posting Batch', icon: 'fas fa-print', route: '/material-management/accounts/posting-to-accounts/post-rc/view-print-rc-posting-batch' },
+              { title: 'Confirm to Post RC', icon: 'fas fa-check', route: '/material-management/accounts/posting-to-accounts/post-rc/confirm-to-post-rc' }
+            ]
+          },
           { title: 'Post RT', icon: 'fas fa-reply', route: '/material-management/account/posting/post-rt' },
           { title: 'Post DN', icon: 'fas fa-arrow-up', route: '/material-management/account/posting/post-dn' },
           { title: 'Post CN', icon: 'fas fa-arrow-down', route: '/material-management/account/posting/post-cn' },

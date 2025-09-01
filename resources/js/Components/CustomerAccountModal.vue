@@ -117,6 +117,9 @@ import axios from 'axios'
 import CustomerAccountZoomModal from '@/Components/CustomerAccountZoomModal.vue'
 
 export default {
+  components: {
+    CustomerAccountZoomModal
+  },
   props: {
     show: {
       type: Boolean,

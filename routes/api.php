@@ -1704,3 +1704,145 @@ Route::prefix('material-management/inventory-control/stock-take')->group(functio
         ]);
     });
 });
+
+// Setup Account API Routes
+Route::prefix('material-management/account/setup-account')->group(function () {
+    // Purchase SKU Accounts
+    Route::get('/purchase-sku-accounts', function() {
+        return response()->json([
+            ['sku_code' => '001-A01001', 'sku_name' => 'ANNELING WIRE 2.8MM', 'account_code' => '1100', 'account_name' => 'Inventory - Raw Materials'],
+            ['sku_code' => '001-A02003', 'sku_name' => 'ARMEX BAKING SODA POWDER', 'account_code' => '1100', 'account_name' => 'Inventory - Raw Materials'],
+            ['sku_code' => '001-A03001', 'sku_name' => 'ALUMINIUM CHLOROHYDRANT', 'account_code' => '1100', 'account_name' => 'Inventory - Raw Materials'],
+            ['sku_code' => '001-B01001', 'sku_name' => 'BORAK', 'account_code' => '1100', 'account_name' => 'Inventory - Raw Materials'],
+            ['sku_code' => '001-B03001', 'sku_name' => 'BEDAK POWDER', 'account_code' => '1100', 'account_name' => 'Inventory - Raw Materials']
+        ]);
+    });
+
+    Route::post('/purchase-sku-accounts', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase SKU account setup saved successfully'
+        ]);
+    });
+
+    // Purchase Tax Accounts
+    Route::get('/purchase-tax-accounts', function() {
+        return response()->json([
+            ['tax_type' => 'VAT', 'tax_rate' => '11%', 'account_code' => '2100', 'account_name' => 'VAT Payable'],
+            ['tax_type' => 'PPh21', 'tax_rate' => '2%', 'account_code' => '2101', 'account_name' => 'PPh21 Payable'],
+            ['tax_type' => 'PPh22', 'tax_rate' => '1.5%', 'account_code' => '2102', 'account_name' => 'PPh22 Payable'],
+            ['tax_type' => 'PPh23', 'tax_rate' => '2%', 'account_code' => '2103', 'account_name' => 'PPh23 Payable']
+        ]);
+    });
+
+    Route::post('/purchase-tax-accounts', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase tax account setup saved successfully'
+        ]);
+    });
+
+    // Purchase DN/CN Accounts
+    Route::get('/purchase-dn-cn-accounts', function() {
+        return response()->json([
+            ['transaction_type' => 'DN', 'account_code' => '1200', 'account_name' => 'Accounts Payable - DN'],
+            ['transaction_type' => 'CN', 'account_code' => '1201', 'account_name' => 'Accounts Payable - CN']
+        ]);
+    });
+
+    Route::post('/purchase-dn-cn-accounts', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase DN/CN account setup saved successfully'
+        ]);
+    });
+
+    // Inventory SKU Accounts
+    Route::get('/inventory-sku-accounts', function() {
+        return response()->json([
+            ['sku_code' => '001-A01001', 'sku_name' => 'ANNELING WIRE 2.8MM', 'account_code' => '1100', 'account_name' => 'Inventory - Raw Materials'],
+            ['sku_code' => '001-A02003', 'sku_name' => 'ARMEX BAKING SODA POWDER', 'account_code' => '1100', 'account_name' => 'Inventory - Raw Materials'],
+            ['sku_code' => '001-A03001', 'sku_name' => 'ALUMINIUM CHLOROHYDRANT', 'account_code' => '1100', 'account_name' => 'Inventory - Raw Materials'],
+            ['sku_code' => '001-B01001', 'sku_name' => 'BORAK', 'account_code' => '1100', 'account_name' => 'Inventory - Raw Materials'],
+            ['sku_code' => '001-B03001', 'sku_name' => 'BEDAK POWDER', 'account_code' => '1100', 'account_name' => 'Inventory - Raw Materials']
+        ]);
+    });
+
+    Route::post('/inventory-sku-accounts', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Inventory SKU account setup saved successfully'
+        ]);
+    });
+
+    // Purchase AP Accounts
+    Route::get('/purchase-ap-accounts', function() {
+        return response()->json([
+            ['vendor_code' => 'V001', 'vendor_name' => 'PT SUPPLIER UTAMA', 'account_code' => '2000', 'account_name' => 'Accounts Payable'],
+            ['vendor_code' => 'V002', 'vendor_name' => 'PT SUPPLIER SEKUNDER', 'account_code' => '2000', 'account_name' => 'Accounts Payable'],
+            ['vendor_code' => 'V003', 'vendor_name' => 'PT SUPPLIER TERSIER', 'account_code' => '2000', 'account_name' => 'Accounts Payable']
+        ]);
+    });
+
+    // Generate Reports
+    Route::post('/generate-purchase-sku-report', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase SKU accounts report generated successfully',
+            'report_id' => 'PSKU-' . date('Ymd-His'),
+            'records' => 5,
+            'pages' => 1
+        ]);
+    });
+
+    Route::post('/generate-purchase-tax-report', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase tax accounts report generated successfully',
+            'report_id' => 'PTAX-' . date('Ymd-His'),
+            'records' => 4,
+            'pages' => 1
+        ]);
+    });
+
+    Route::post('/generate-purchase-dn-cn-report', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase DN/CN accounts report generated successfully',
+            'report_id' => 'PDNCN-' . date('Ymd-His'),
+            'records' => 2,
+            'pages' => 1
+        ]);
+    });
+
+    Route::post('/generate-inventory-sku-report', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Inventory SKU accounts report generated successfully',
+            'report_id' => 'ISKU-' . date('Ymd-His'),
+            'records' => 5,
+            'pages' => 1
+        ]);
+    });
+
+    Route::post('/generate-purchase-ap-report', function() {
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase AP accounts report generated successfully',
+            'report_id' => 'PAP-' . date('Ymd-His'),
+            'records' => 3,
+            'pages' => 1
+        ]);
+    });
+});
+
+// RC Posting Batch API Routes
+Route::prefix('material-management/accounts/rc-posting-batch')->group(function () {
+    Route::get('/current-periods', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'getCurrentPeriods']);
+    Route::get('/available-rc-notes', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'getAvailableRcNotes']);
+    Route::post('/prepare', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'prepareBatchAction']);
+    Route::post('/cancel', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'cancelBatchAction']);
+    Route::get('/batches', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'getBatches']);
+    Route::post('/confirm-to-post', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'confirmToPostAction']);
+    Route::get('/batch-details', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'getBatchDetails']);
+});

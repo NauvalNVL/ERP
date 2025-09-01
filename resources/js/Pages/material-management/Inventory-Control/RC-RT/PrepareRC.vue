@@ -452,7 +452,7 @@
             
             <div class="space-y-3 max-h-64 overflow-y-auto">
               <div
-                v-for="transaction in recentTransactions"
+                v-for="transaction in recentTransactions.filter(t => t && t.id)"
                 :key="transaction.id"
                 class="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
                 @click="loadTransaction(transaction)"
@@ -461,7 +461,7 @@
                   <div class="flex-1">
                     <div class="font-medium text-sm text-gray-800">{{ transaction.transaction_number }}</div>
                     <div class="text-xs text-gray-600">{{ transaction.supplier_name }}</div>
-                    <div class="text-xs text-gray-600">{{ transaction.sku_code }} - {{ transaction.quantity }} {{ transaction.uom }}</div>
+                    <div class="text-xs text-gray-600">{{ transaction.sku_code }} - {{ transaction.quantity }}</div>
                   </div>
                   <div class="text-right">
                     <div class="text-xs text-gray-500">{{ formatDate(transaction.transaction_date) }}</div>
@@ -767,15 +767,19 @@ const loadTransaction = (transaction) => {
 const duplicateLastTransaction = () => {
   if (recentTransactions.value.length > 0) {
     const lastTransaction = recentTransactions.value[0]
-    form.value = {
-      ...lastTransaction,
-      transaction_number: '',
-      transaction_date: new Date().toISOString().split('T')[0],
-      quantity: '',
-      unit_price: '',
-      remarks: ''
+    if (lastTransaction && lastTransaction.id) {
+      form.value = {
+        ...lastTransaction,
+        transaction_number: '',
+        transaction_date: new Date().toISOString().split('T')[0],
+        quantity: '',
+        unit_price: '',
+        remarks: ''
+      }
+      success('Last transaction duplicated')
+    } else {
+      error('Invalid transaction data')
     }
-    success('Last transaction duplicated')
   } else {
     error('No recent transactions to duplicate')
   }
@@ -823,10 +827,21 @@ const loadRecentTransactions = async () => {
   try {
     const response = await axios.get('/api/rc-rt/rc-transactions?limit=5')
     if (response.data.success) {
-      recentTransactions.value = response.data.data
+      // Handle paginated response - the actual array is in response.data.data.data
+      const paginatedData = response.data.data
+      const dataArray = Array.isArray(paginatedData?.data) ? paginatedData.data : []
+      // Filter out any null or invalid transactions
+      recentTransactions.value = dataArray.filter(transaction => 
+        transaction && 
+        transaction.id && 
+        transaction.transaction_number
+      )
+    } else {
+      recentTransactions.value = []
     }
   } catch (err) {
     console.error('Error loading recent transactions:', err)
+    recentTransactions.value = [] // Ensure it's always an array
   }
 }
 

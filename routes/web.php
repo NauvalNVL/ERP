@@ -225,10 +225,28 @@ Route::middleware('auth')->group(function () {
              return Inertia::render('sales-management/sales-order/setup/print-ac-auto-wo');
          })->name('vue.sales-order.setup.print-ac-auto-wo');
          
-         // Sales Order Setup - Print MC Auto WO
-         Route::get('/sales-order/setup/print-mc-auto-wo', function () {
-             return Inertia::render('sales-management/sales-order/setup/print-mc-auto-wo');
-         })->name('vue.sales-order.setup.print-mc-auto-wo');
+                 // Sales Order Setup - Print MC Auto WO
+        Route::get('/sales-order/setup/print-mc-auto-wo', function () {
+            return Inertia::render('sales-management/sales-order/setup/print-mc-auto-wo');
+        })->name('vue.sales-order.setup.print-mc-auto-wo');
+
+        // Sales Order Transaction - Prepare MC SO
+        Route::get('/sales-order/transaction/prepare-mc-so', function () {
+            return Inertia::render('sales-management/sales-order/Transaction/PrepareMCSO');
+        })->name('vue.sales-order.transaction.prepare-mc-so');
+
+        // Sales Order API routes for reports
+        Route::get('/api/sales-order/print-log', [App\Http\Controllers\SalesOrderController::class, 'printLog']);
+        Route::get('/api/sales-order/print-jit-tracking', [App\Http\Controllers\SalesOrderController::class, 'printJitTracking']);
+        
+        // Sales Order API routes
+        Route::post('/api/sales-order', [App\Http\Controllers\SalesOrderController::class, 'store']);
+        Route::get('/api/sales-order/customer/{customerCode}', [App\Http\Controllers\SalesOrderController::class, 'getCustomer']);
+        Route::get('/api/sales-order/master-card/{mcSeq}', [App\Http\Controllers\SalesOrderController::class, 'getMasterCard']);
+        Route::get('/api/sales-order/salesperson/{salespersonCode}', [App\Http\Controllers\SalesOrderController::class, 'getSalesperson']);
+        Route::get('/api/sales-order/product-design/{masterCardSeq}', [App\Http\Controllers\SalesOrderController::class, 'getProductDesignData']);
+        Route::post('/api/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign']);
+        Route::post('/api/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
 
          // Sales Order Report - Rough Cut Report - Define Report Format
          Route::get('/sales-order/report/rough-cut-report/define-report-format', function () {
@@ -1388,4 +1406,54 @@ Route::prefix('update-mc')->group(function () {
             Route::get('/print-stock-take-matching-report', function() {
                 return Inertia::render('material-management/Inventory-Control/Inventory-Stock-Take/PrintStockTakeMatchingReport');
             })->name('print-stock-take-matching-report');
+        });
+
+        // Setup Account Routes
+        Route::prefix('material-management/account/setup-account')->name('mm.account.setup-account.')->group(function () {
+            Route::get('/setup-purchase-sku-accounts', function() {
+                return Inertia::render('material-management/Accounts/Setup-Accounts/SetupPurchaseSkuAccounts');
+            })->name('setup-purchase-sku-accounts');
+            
+            Route::get('/setup-purchase-tax-accounts', function() {
+                return Inertia::render('material-management/Accounts/Setup-Accounts/SetupPurchaseTaxAccounts');
+            })->name('setup-purchase-tax-accounts');
+            
+            Route::get('/setup-purchase-dn-cn-accounts', function() {
+                return Inertia::render('material-management/Accounts/Setup-Accounts/SetupPurchaseDnCnAccounts');
+            })->name('setup-purchase-dn-cn-accounts');
+            
+            Route::get('/setup-inventory-sku-accounts', function() {
+                return Inertia::render('material-management/Accounts/Setup-Accounts/SetupInventorySkuAccounts');
+            })->name('setup-inventory-sku-accounts');
+            
+            Route::get('/view-print-purchase-ap-accounts', function() {
+                return Inertia::render('material-management/Accounts/Setup-Accounts/ViewPrintPurchaseApAccounts');
+            })->name('view-print-purchase-ap-accounts');
+            
+            Route::get('/view-print-purchase-sku-accounts', function() {
+                return Inertia::render('material-management/Accounts/Setup-Accounts/ViewPrintPurchaseSkuAccounts');
+            })->name('view-print-purchase-sku-accounts');
+            
+            Route::get('/view-print-purchase-tax-accounts', function() {
+                return Inertia::render('material-management/Accounts/Setup-Accounts/ViewPrintPurchaseTaxAccounts');
+            })->name('view-print-purchase-tax-accounts');
+            
+            Route::get('/view-print-purchase-dn-cn-accounts', function() {
+                return Inertia::render('material-management/Accounts/Setup-Accounts/ViewPrintPurchaseDnCnAccounts');
+            })->name('view-print-purchase-dn-cn-accounts');
+            
+            Route::get('/view-print-inventory-sku-accounts', function() {
+                return Inertia::render('material-management/Accounts/Setup-Accounts/ViewPrintInventorySkuAccounts');
+            })->name('view-print-inventory-sku-accounts');
+        });
+
+        // Post RC Routes
+        Route::prefix('material-management/accounts/posting-to-accounts/post-rc')->name('mm.accounts.posting-to-accounts.post-rc.')->group(function () {
+            Route::get('/prepare-rc-posting-batch', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'prepareBatch'])->name('prepare-rc-posting-batch');
+            
+            Route::get('/cancel-rc-posting-batch', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'cancelBatch'])->name('cancel-rc-posting-batch');
+            
+            Route::get('/view-print-rc-posting-batch', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'viewPrintBatch'])->name('view-print-rc-posting-batch');
+            
+            Route::get('/confirm-to-post-rc', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'confirmToPost'])->name('confirm-to-post-rc');
         });
