@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 z-50 overflow-y-auto">
+  <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
     <!-- Backdrop -->
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
     
@@ -251,6 +251,10 @@ import DeliveryCodePreviewModal from '@/Components/DeliveryCodePreviewModal.vue'
 import { useToast } from '@/Composables/useToast'
 
 const props = defineProps({
+  show: {
+    type: Boolean,
+    required: true
+  },
   customer: Object,
   orderDetails: Object
 })
