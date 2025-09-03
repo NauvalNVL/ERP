@@ -103,12 +103,12 @@
     </div>
   </div>
 
-  <!-- Customer Account Zoom Modal -->
-  <CustomerAccountZoomModal
-    :show="showCustomerAccountZoomModal"
-    @close="showCustomerAccountZoomModal = false"
-    :customerAccountData="selectedAccount"
-  />
+    <!-- Customer Account Zoom Modal -->
+    <CustomerAccountZoomModal
+        :show="showCustomerAccountZoomModal"
+        @close="showCustomerAccountZoomModal = false"
+        :customerAccountData="selectedAccount"
+    />
 </template>
 
 <script>
@@ -217,10 +217,10 @@ export default {
       return filtered
     })
 
-    const selectAccount = (account) => {
-      console.log('Selecting account:', account)
-      selectedAccount.value = account
-    }
+        const selectAccount = (account) => {
+            console.log("Selecting account:", account);
+            selectedAccount.value = account;
+        };
 
     const handleSelect = () => {
       if (selectedAccount.value) {
