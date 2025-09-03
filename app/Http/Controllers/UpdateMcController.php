@@ -60,8 +60,8 @@ class UpdateMcController extends Controller
         $customerCode = $request->input('customer_code'); // Customer filter
         $perPage = $request->input('per_page', 10); // Items per page
 
-        // Build the query using Eloquent
-        $masterCards = MasterCard::query();
+        // Build the query using Eloquent with relationship
+        $masterCards = MasterCard::with('customerAccount');
 
         // MANDATORY: Filter by customer_code if provided
         if ($customerCode) {
@@ -127,7 +127,7 @@ class UpdateMcController extends Controller
                 'status' => $item->status,
                 'p_design' => $item->p_design,
                 'customer_code' => $item->customer_code,
-                'customer_name' => $item->customer_code, // Use customer_code for now
+                'customer_name' => $item->customerAccount ? $item->customerAccount->customer_name : $item->customer_code,
                 'ext_dim_1' => $item->ext_dim_1,
                 'ext_dim_2' => $item->ext_dim_2,
                 'ext_dim_3' => $item->ext_dim_3,
@@ -168,8 +168,8 @@ class UpdateMcController extends Controller
         try {
             $customerCode = $request->input('customer_code');
             
-            // Build query with customer validation
-            $query = MasterCard::where('mc_seq', $mcsNumber);
+            // Build query with customer validation and relationship
+            $query = MasterCard::with('customerAccount')->where('mc_seq', $mcsNumber);
             
             // If customer_code is provided, validate ownership
             if ($customerCode) {
@@ -196,7 +196,7 @@ class UpdateMcController extends Controller
                         'int_dim_1' => $masterCard->int_dim_1,
                         'int_dim_2' => $masterCard->int_dim_2,
                         'int_dim_3' => $masterCard->int_dim_3,
-                        'customer_name' => $masterCard->customer_code, // Use customer_code for now
+                        'customer_name' => $masterCard->customerAccount ? $masterCard->customerAccount->customer_name : $masterCard->customer_code,
                         'created_at' => $masterCard->created_at,
                         'updated_at' => $masterCard->updated_at,
                     ]

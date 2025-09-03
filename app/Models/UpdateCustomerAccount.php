@@ -31,4 +31,10 @@ class UpdateCustomerAccount extends Model
         'currency',
         'status'
     ];
+
+    // Relationship with MasterCard
+    public function masterCards()
+    {
+        return $this->hasMany(MasterCard::class, 'customer_code', 'customer_code');
+    }
 }
