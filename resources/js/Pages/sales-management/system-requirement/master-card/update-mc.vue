@@ -1167,7 +1167,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import { Link } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import axios from "axios";
@@ -1198,6 +1198,9 @@ const form = ref({
 // Loading state variables
 const isLoading = ref(false);
 const isProcessing = ref(false);
+
+// Flag to prevent input handlers from clearing data during programmatic updates
+const isProgrammaticUpdate = ref(false);
 
 // Customer Account State
 const customersList = ref([]);
@@ -1299,7 +1302,7 @@ const loadCustomerAccounts = async () => {
 };
 
 // This is the main selectCustomer function that will be used
-const selectCustomer = (customer) => {
+const selectCustomer = async (customer) => {
     if (!customer) return;
 
     // Show processing state
@@ -1309,17 +1312,33 @@ const selectCustomer = (customer) => {
     selectedCustomer.value = customer;
 
     // Set the form fields with customer information
-    form.ac = customer.customer_code;
-    form.customer_name = customer.customer_name;
+    isProgrammaticUpdate.value = true; // Prevent input handlers from clearing data
+    
+    // Use nextTick to ensure DOM updates
+    await nextTick();
+    form.value.ac = customer.customer_code;
+    form.value.customer_name = customer.customer_name;
+    
+    // Force reactivity update
+    await nextTick();
+    isProgrammaticUpdate.value = false; // Re-enable input handlers
+    
+    console.log('Customer selected:', {
+        ac: form.value.ac,
+        customer_name: form.value.customer_name,
+        selectedCustomer: customer
+    });
 
     // Close the modal
     showCustomerAccountModal.value = false;
 
     // Reset Master Card data when customer changes
-    form.mcs = "";
+    isProgrammaticUpdate.value = true; // Prevent input handlers from clearing data
+    form.value.mcs = "";
+    isProgrammaticUpdate.value = false; // Re-enable input handlers
     selectedMcs.value = null;
     mcsMasterCards.value = [];
-    showDetailedMcInfo.value = true; // Show the details section immediately for better UX
+    showDetailedMcInfo.value = false; // Don't show details until MC is selected or MCS number is entered
     recordMode.value = "new";
 
     // Prepare suggested values based on customer data
@@ -1328,10 +1347,10 @@ const selectCustomer = (customer) => {
         customer.short_name || customer.customer_code || "";
 
     // Update form fields first to ensure they're visible in the UI
-    form.mc_model = suggestedModel;
-    form.mc_short_model = suggestedShortModel;
-    form.mc_status = "Active";
-    form.mc_approval = "No";
+    form.value.mc_model = suggestedModel;
+    form.value.mc_short_model = suggestedShortModel;
+    form.value.mc_status = "Active";
+    form.value.mc_approval = "No";
 
     // Then update mcDetails to keep everything in sync
     mcDetails.value = {
@@ -1943,20 +1962,36 @@ onMounted(() => {
 });
 
 const handleMcsInput = () => {
+    // Skip if this is a programmatic update
+    if (isProgrammaticUpdate.value) {
+        return;
+    }
+
     // Reset record mode when user manually changes MCS input
-    if (form.mcs && !selectedMcs.value) {
+    if (form.value.mcs && !selectedMcs.value) {
         recordMode.value = "new";
-        form.mc_approval = "No";
+        form.value.mc_approval = "No";
+        // Show detailed MC info when user enters MCS number
+        showDetailedMcInfo.value = true;
+    } else if (!form.value.mcs) {
+        // Hide detailed MC info when MCS input is cleared
+        showDetailedMcInfo.value = false;
+        recordMode.value = "new";
     }
 };
 
 const handleAcInput = () => {
+    // Skip if this is a programmatic update
+    if (isProgrammaticUpdate.value) {
+        return;
+    }
+
     // Reset MCS data when AC# is manually changed
-    if (!form.ac || form.ac !== (selectedCustomer.value?.customer_code || "")) {
+    if (!form.value.ac || form.value.ac !== (selectedCustomer.value?.customer_code || "")) {
         selectedMcs.value = null;
         mcsMasterCards.value = [];
-        form.mcs = "";
-        form.customer_name = "";
+        form.value.mcs = "";
+        form.value.customer_name = "";
         showDetailedMcInfo.value = false;
         recordMode.value = "new";
 
@@ -1981,14 +2016,15 @@ const handleAcInput = () => {
 
 const addNewRecord = () => {
     recordMode.value = "new";
-    form.mc_approval = "No";
+    form.value.mc_approval = "No";
     recordSelected.value = true;
+    showDetailedMcInfo.value = true; // Show detailed MC info for new record
 };
 
 const searchAc = async () => {
     try {
         const response = await axios.post("/api/update-mc/search-ac", {
-            ac: form.ac,
+            ac: form.value.ac,
         });
         console.log(response.data);
         mcDetails.value.ac_name = "Sample AC Name from API";
@@ -2000,7 +2036,7 @@ const searchAc = async () => {
 
 const searchMcs = () => {
     // Validate customer account must be selected first
-    if (!form.ac) {
+    if (!form.value.ac) {
         toast.error(
             "Please select Customer Account (AC#) first before searching Master Cards"
         );
@@ -2015,7 +2051,9 @@ const searchMcs = () => {
 const selectRecord = () => {
     console.log("Record select clicked");
     recordSelected.value = true;
-    form.customer_name = "Selected Customer";
+    isProgrammaticUpdate.value = true; // Prevent input handlers from clearing data
+    form.value.customer_name = "Selected Customer";
+    isProgrammaticUpdate.value = false; // Re-enable input handlers
 };
 
 const saveRecord = () => {
@@ -2036,14 +2074,16 @@ const deleteRecord = () => {
     }
 
     if (confirm("Are you sure you want to delete this record?")) {
-        console.log(`Deleting record: ${form.mcs}`);
-        form.ac = "";
-        form.mcs = "";
-        form.customer_name = "";
-        form.mc_model = "";
-        form.mc_short_model = "";
-        form.mc_status = "Active";
-        form.mc_approval = "No";
+        console.log(`Deleting record: ${form.value.mcs}`);
+        isProgrammaticUpdate.value = true; // Prevent input handlers from clearing data
+        form.value.ac = "";
+        form.value.mcs = "";
+        form.value.customer_name = "";
+        form.value.mc_model = "";
+        form.value.mc_short_model = "";
+        form.value.mc_status = "Active";
+        form.value.mc_approval = "No";
+        isProgrammaticUpdate.value = false; // Re-enable input handlers
         recordSelected.value = false;
         showDetailedMcInfo.value = false;
     }
@@ -2056,7 +2096,7 @@ const printRecord = () => {
         return;
     }
 
-    console.log(`Printing record: ${form.mcs}`);
+    console.log(`Printing record: ${form.value.mcs}`);
 };
 
 const closeRecord = () => {
@@ -2071,7 +2111,7 @@ const applyFilter = () => {
 
 // This duplicate has been removed as we're using the first implementation
 
-const selectMcs = (mcs) => {
+const selectMcs = async (mcs) => {
     if (!mcs) return;
 
     // Show processing state
@@ -2088,15 +2128,30 @@ const selectMcs = (mcs) => {
     const mcApproval = mcs.approval === "No" ? "No" : "Yes";
 
     // Populate form fields (UI values)
-    form.mcs = mcsSeq;
-    form.mc_model = mcModel;
-    form.mc_short_model = mcShortModel;
-    form.mc_status = mcStatus;
-    form.mc_approval = mcApproval;
+    isProgrammaticUpdate.value = true; // Prevent input handlers from clearing data
+    
+    // Use nextTick to ensure DOM updates
+    await nextTick();
+    form.value.mcs = mcsSeq;
+    form.value.mc_model = mcModel;
+    form.value.mc_short_model = mcShortModel;
+    form.value.mc_status = mcStatus;
+    form.value.mc_approval = mcApproval;
+    
+    // Force reactivity update
+    await nextTick();
+    isProgrammaticUpdate.value = false; // Re-enable input handlers
+    
+    console.log('Master Card selected:', {
+        mcs: form.value.mcs,
+        mc_model: form.value.mc_model,
+        mc_short_model: form.value.mc_short_model,
+        selectedMcs: mcs
+    });
 
     // Update MC details in sync with form
     mcDetails.value = {
-        ac_name: form.customer_name,
+        ac_name: form.value.customer_name,
         mc_model: mcModel,
         mc_short_model: mcShortModel,
         mc_status: mcStatus,
@@ -2131,7 +2186,7 @@ const fetchMcsData = async (page = 1) => {
     mcsError.value = null;
 
     // Validate customer account must exist before fetching data
-    if (!form.ac) {
+    if (!form.value.ac) {
         mcsError.value = "Please select Customer Account (AC#) first.";
         mcsMasterCards.value = [];
         mcsLoading.value = false;
@@ -2151,7 +2206,7 @@ const fetchMcsData = async (page = 1) => {
         }
 
         // Filter by customer account - REQUIRED
-        const customerFilter = `&customer_code=${encodeURIComponent(form.ac)}`;
+        const customerFilter = `&customer_code=${encodeURIComponent(form.value.ac)}`;
 
         // Make API call using fetch for more control
         const response = await fetch(
@@ -2195,9 +2250,9 @@ const fetchMcsData = async (page = 1) => {
         // Set UI feedback if no data found
         if (mcsMasterCards.value.length === 0) {
             if (mcsSearchTerm.value) {
-                mcsError.value = `No Master Cards found matching "${mcsSearchTerm.value}" for Customer: ${form.customer_name}`;
+                mcsError.value = `No Master Cards found matching "${mcsSearchTerm.value}" for Customer: ${form.value.customer_name}`;
             } else {
-                mcsError.value = `No Master Cards found for Customer: ${form.customer_name} (${form.ac})`;
+                mcsError.value = `No Master Cards found for Customer: ${form.value.customer_name} (${form.value.ac})`;
             }
 
             // If no master cards, inform user they can create a new one
@@ -2206,7 +2261,7 @@ const fetchMcsData = async (page = 1) => {
             );
         } else {
             toast.success(
-                `Found ${mcsMasterCards.value.length} master card(s) for ${form.customer_name}`
+                `Found ${mcsMasterCards.value.length} master card(s) for ${form.value.customer_name}`
             );
         }
     } catch (error) {
@@ -2228,13 +2283,13 @@ const goToMcsPage = (page) => {
 const handleMcsProceed = async () => {
     console.log("Proceed button clicked");
 
-    if (!form.ac) {
+    if (!form.value.ac) {
         toast.error("Please select customer account (AC#) first");
         openCustomerAccountModal();
         return;
     }
 
-    if (!form.mcs) {
+    if (!form.value.mcs) {
         toast.error("Please enter MCS# to proceed");
         return;
     }
@@ -2249,8 +2304,8 @@ const handleMcsProceed = async () => {
         // Use fetch instead of axios for better error handling
         const response = await fetch(
             `/api/update-mc/check-mcs/${
-                form.mcs
-            }?customer_code=${encodeURIComponent(form.ac)}`,
+                form.value.mcs
+            }?customer_code=${encodeURIComponent(form.value.ac)}`,
             {
                 headers: {
                     Accept: "application/json",
@@ -2274,9 +2329,9 @@ const handleMcsProceed = async () => {
             const existingMc = responseData.data;
 
             // Validate if this MC belongs to the selected customer
-            if (!existingMc || existingMc.customer_code !== form.ac) {
+            if (!existingMc || existingMc.customer_code !== form.value.ac) {
                 toast.error(
-                    `MCS# ${form.mcs} exists but belongs to a different customer. Please check your data.`
+                    `MCS# ${form.value.mcs} exists but belongs to a different customer. Please check your data.`
                 );
                 toast.dismiss(loadingToast);
                 return;
@@ -2290,20 +2345,22 @@ const handleMcsProceed = async () => {
             const mcStatus = existingMc.status || "Active";
 
             // Update form with existing MC data - UI values
-            form.mc_model = mcModel;
-            form.mc_short_model = mcShortModel;
-            form.mc_status = mcStatus;
-            form.mc_approval = "Yes";
+            isProgrammaticUpdate.value = true; // Prevent input handlers from clearing data
+            form.value.mc_model = mcModel;
+            form.value.mc_short_model = mcShortModel;
+            form.value.mc_status = mcStatus;
+            form.value.mc_approval = "Yes";
+            isProgrammaticUpdate.value = false; // Re-enable input handlers
 
             // Update MC details - synchronized
             mcDetails.value = {
-                ac_name: form.customer_name,
+                ac_name: form.value.customer_name,
                 mc_model: mcModel,
                 mc_short_model: mcShortModel,
                 mc_status: mcStatus,
                 mc_approval: "Yes",
-                last_mcs: existingMc.mc_seq || form.mcs,
-                last_updated_seq: existingMc.mc_seq || form.mcs,
+                last_mcs: existingMc.mc_seq || form.value.mcs,
+                last_updated_seq: existingMc.mc_seq || form.value.mcs,
                 ext_dim_1: existingMc.ext_dim_1 || "",
                 ext_dim_2: existingMc.ext_dim_2 || "",
                 ext_dim_3: existingMc.ext_dim_3 || "",
@@ -2319,14 +2376,16 @@ const handleMcsProceed = async () => {
             recordMode.value = "new";
 
             // Update form values first (UI)
-            form.mc_model = ""; // Clear any previous values
-            form.mc_short_model = "";
-            form.mc_approval = "No";
-            form.mc_status = "Active";
+            isProgrammaticUpdate.value = true; // Prevent input handlers from clearing data
+            form.value.mc_model = ""; // Clear any previous values
+            form.value.mc_short_model = "";
+            form.value.mc_approval = "No";
+            form.value.mc_status = "Active";
+            isProgrammaticUpdate.value = false; // Re-enable input handlers
 
             // Update MC details for new record (keep in sync)
             mcDetails.value = {
-                ac_name: form.customer_name,
+                ac_name: form.value.customer_name,
                 mc_model: "",
                 mc_short_model: "",
                 mc_status: "Active",
@@ -2367,10 +2426,12 @@ const handleMcsProceed = async () => {
         recordMode.value = "new";
 
         // Update form values (UI) - explicitly set each field
-        form.mc_model = ""; // Clear any previous values
-        form.mc_short_model = "";
-        form.mc_approval = "No";
-        form.mc_status = "Active";
+        isProgrammaticUpdate.value = true; // Prevent input handlers from clearing data
+        form.value.mc_model = ""; // Clear any previous values
+        form.value.mc_short_model = "";
+        form.value.mc_approval = "No";
+        form.value.mc_status = "Active";
+        isProgrammaticUpdate.value = false; // Re-enable input handlers
 
         // Clear loading states
         isLoading.value = false;
@@ -2378,7 +2439,7 @@ const handleMcsProceed = async () => {
 
         // Update MC details (keep in sync)
         mcDetails.value = {
-            ac_name: form.customer_name,
+            ac_name: form.value.customer_name,
             mc_model: "",
             mc_short_model: "",
             mc_status: "Active",
@@ -2400,7 +2461,7 @@ const handleMcsProceed = async () => {
 
 const handleNextSetup = () => {
     // Validate MC Model is filled for new records
-    if (recordMode.value === "new" && !form.mc_model.trim()) {
+    if (recordMode.value === "new" && !form.value.mc_model.trim()) {
         showErrorModal.value = true;
         return;
     }

@@ -25,12 +25,14 @@ class MasterCard extends Model
         'comp_no',
         'p_design',
         'status',
+        'customer_code',
         'ext_dim_1',
         'ext_dim_2',
         'ext_dim_3',
         'int_dim_1',
         'int_dim_2',
         'int_dim_3',
+        'customer_code',
     ];
 
     // Accessor untuk mendapatkan seq dari mc_seq
@@ -55,5 +57,11 @@ class MasterCard extends Model
     public function getCompAttribute()
     {
         return $this->comp_no;
+    }
+
+    // Relationship with UpdateCustomerAccount
+    public function customerAccount()
+    {
+        return $this->belongsTo(UpdateCustomerAccount::class, 'customer_code', 'customer_code');
     }
 }
