@@ -25,7 +25,7 @@
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Search Customer:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Search Customer (Click search button to browse):</label>
                             <div class="relative flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-user"></i>
@@ -33,18 +33,17 @@
                                 <input 
                                     type="text" 
                                     v-model="searchQuery" 
-                                    placeholder="Enter code or name..."
-                                    @keyup.enter="searchCustomers"
+                                    placeholder="Enter code or name, then click search button to browse..."
+                                    @keyup.enter="openCustomerAccountModal"
                                     class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                 >
                                 <button 
                                     type="button" 
-                                    @click="searchCustomers" 
-                                    :disabled="isSearching"
-                                    class="inline-flex items-center px-3 py-2 border border-gray-300 bg-blue-500 hover:bg-blue-600 text-white disabled:bg-blue-300"
+                                    @click="openCustomerAccountModal" 
+                                    class="inline-flex items-center px-3 py-2 border border-gray-300 bg-blue-500 hover:bg-blue-600 text-white transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
+                                    title="Browse Customer Accounts"
                                 >
-                                    <i v-if="!isSearching" class="fas fa-search"></i>
-                                    <div v-else class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                    <i class="fas fa-search"></i>
                                 </button>
                                 <button 
                                     v-if="searchQuery"
@@ -60,18 +59,18 @@
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Create New:</label>
                             <button 
                                 type="button" 
-                                @click="openCustomerAccountModal" 
-                                class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded"
+                                @click="openAddNewCustomerModal" 
+                                class="w-full flex items-center justify-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded transition-colors"
                             >
-                                <i class="fas fa-table mr-2"></i> Browse All
+                                <i class="fas fa-plus mr-2"></i> Add New
                             </button>
                         </div>
                     </div>
 
-                    <!-- Search Results / Customer Table -->
+                    <!-- Selected Customer Display -->
                     <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mt-4">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
@@ -94,7 +93,7 @@
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <tr v-if="customers.length === 0">
                                         <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                                            Search for customers using the field above.
+                                            Click the search button above to browse and select customers from the modal.
                                         </td>
                                     </tr>
                                     <tr 
@@ -157,6 +156,17 @@
                                 <p class="text-xs text-gray-500 mt-1">Search and select a customer to view or edit</p>
                             </div>
                         </div>
+
+                        <!-- How to Use Instructions -->
+                        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">How to Use</h4>
+                            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                                <li>Type a customer code or name in the search field</li>
+                                <li>Click the <i class="fas fa-search text-blue-600"></i> search button to open the customer account browser</li>
+                                <li>Select a customer from the modal table to load their information</li>
+                                <li>Use the "Add New" button to create a new customer account</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
@@ -209,9 +219,218 @@
     <CustomerAccountModal 
         v-if="showCustomerAccountModal"
         :show="showCustomerAccountModal"
+        :initial-search="searchQuery"
         @close="closeCustomerAccountModal"
         @select="selectCustomerAccount"
     />
+
+    <!-- Add New Customer Modal -->
+    <div v-if="showAddNewCustomerModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="closeAddNewCustomerModal"></div>
+
+            <!-- Modal panel -->
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl w-full">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white">
+                    <div class="flex items-center">
+                        <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">Add New Customer Account</h3>
+                    </div>
+                    <button type="button" @click="closeAddNewCustomerModal" class="text-white hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Modal content -->
+                <div class="bg-white px-6 pt-5 pb-6 max-h-[70vh] overflow-y-auto">
+                    <!-- New Customer Form -->
+                    <div class="space-y-6">
+                        <!-- Basic Information -->
+                        <div class="border-b border-gray-200 pb-4">
+                            <h4 class="text-base font-medium text-gray-800 mb-3">
+                                <i class="fas fa-info-circle mr-2 text-green-500"></i>Basic Information
+                            </h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Customer Code *</label>
+                                    <input type="text" v-model="newCustomerForm.customer_code" class="form-input" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Customer Name *</label>
+                                    <input type="text" v-model="newCustomerForm.customer_name" class="form-input" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Short Name</label>
+                                    <input type="text" v-model="newCustomerForm.short_name" class="form-input">
+                                    <span class="text-xs text-gray-500">For Production</span>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+                                    <input type="text" v-model="newCustomerForm.contact_person" class="form-input">
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                    <textarea v-model="newCustomerForm.address" rows="3" class="form-input"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="border-b border-gray-200 pb-4">
+                            <h4 class="text-base font-medium text-gray-800 mb-3">
+                                <i class="fas fa-phone mr-2 text-green-500"></i>Contact Information
+                            </h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Telephone No</label>
+                                    <input type="text" v-model="newCustomerForm.telephone_no" class="form-input">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Fax No</label>
+                                    <input type="text" v-model="newCustomerForm.fax_no" class="form-input">
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input type="email" v-model="newCustomerForm.co_email" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Settings -->
+                        <div class="border-b border-gray-200 pb-4">
+                            <h4 class="text-base font-medium text-gray-800 mb-3">
+                                <i class="fas fa-credit-card mr-2 text-green-500"></i>Financial Settings
+                            </h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Credit Limit</label>
+                                    <input type="number" v-model="newCustomerForm.credit_limit" class="form-input" min="0" step="0.01">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Credit Terms (Days)</label>
+                                    <input type="number" v-model="newCustomerForm.credit_terms" class="form-input" min="0">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
+                                    <select v-model="newCustomerForm.ac_type" class="form-input">
+                                        <option value="N-Local">N-Local</option>
+                                        <option value="Y-Foreign">Y-Foreign</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Currency Code</label>
+                                    <input type="text" v-model="newCustomerForm.currency_code" class="form-input">
+                                    <span class="text-xs text-gray-500">Leave blank if Local Account</span>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Print AR Aging</label>
+                                    <select v-model="newCustomerForm.print_ar_aging" class="form-input">
+                                        <option value="N-No">N-No</option>
+                                        <option value="Y-Yes">Y-Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Classification -->
+                        <div class="border-b border-gray-200 pb-4">
+                            <h4 class="text-base font-medium text-gray-800 mb-3">
+                                <i class="fas fa-tags mr-2 text-green-500"></i>Classification
+                            </h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code</label>
+                                    <div class="flex">
+                                        <input type="text" v-model="newCustomerForm.salesperson_code" class="form-input flex-grow rounded-r-none">
+                                        <button type="button" @click="openSalespersonModal($event)" class="px-3 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 transition-colors">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <div v-if="newCustomerForm.salesperson_code && getSalespersonName(newCustomerForm.salesperson_code)" class="mt-1 text-sm text-gray-600">
+                                        {{ getSalespersonName(newCustomerForm.salesperson_code) }}
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Industrial Code</label>
+                                    <div class="flex">
+                                        <input type="text" v-model="newCustomerForm.industrial_code" class="form-input flex-grow rounded-r-none">
+                                        <button type="button" @click="openIndustryModal($event)" class="px-3 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 transition-colors">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <div v-if="newCustomerForm.industrial_code && getIndustryName(newCustomerForm.industrial_code)" class="mt-1 text-sm text-gray-600">
+                                        {{ getIndustryName(newCustomerForm.industrial_code) }}
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Geographical</label>
+                                    <div class="flex">
+                                        <input type="text" v-model="newCustomerForm.geographical" class="form-input flex-grow rounded-r-none">
+                                        <button type="button" @click="openGeoModal($event)" class="px-3 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 transition-colors">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <div v-if="newCustomerForm.geographical && getGeoLocation(newCustomerForm.geographical)" class="mt-1 text-sm text-gray-600">
+                                        {{ getGeoLocation(newCustomerForm.geographical) }}
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Customer Group</label>
+                                    <div class="flex">
+                                        <input type="text" v-model="newCustomerForm.grouping_code" class="form-input flex-grow rounded-r-none">
+                                        <button type="button" @click="openCustomerGroupModal($event)" class="px-3 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 transition-colors">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <div v-if="newCustomerForm.grouping_code && getCustomerGroupName(newCustomerForm.grouping_code)" class="mt-1 text-sm text-gray-600">
+                                        {{ getCustomerGroupName(newCustomerForm.grouping_code) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3">
+                    <button type="button" @click="closeAddNewCustomerModal" class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        Cancel
+                    </button>
+                    <button 
+                        type="button" 
+                        @click="saveNewCustomerAccount" 
+                        :disabled="isSaving" 
+                        class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-400"
+                    >
+                        <i v-if="!isSaving" class="fas fa-save mr-2"></i>
+                        <div v-else class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                        {{ isSaving ? 'Creating...' : 'Create Customer' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Support Modals -->
     <SalespersonModal
@@ -514,11 +733,11 @@ const showIndustryModal = ref(false)
 const showGeoModal = ref(false)
 const showCustomerGroupModal = ref(false)
 const showEditModal = ref(false)
+const showAddNewCustomerModal = ref(false)
 const notification = ref({ show: false, message: '', type: 'success' })
 const customerSelected = ref(false)
 const searchQuery = ref('')
 const customers = ref([])
-const isSearching = ref(false)
 const isSaving = ref(false)
 
 // Data from API
@@ -548,45 +767,39 @@ const form = reactive({
     print_ar_aging: 'N-No' // Default value
 })
 
-// Search for customers
+// Form state for new customer
+const newCustomerForm = reactive({
+    customer_code: '',
+    customer_name: '',
+    short_name: '',
+    address: '',
+    contact_person: '',
+    telephone_no: '',
+    fax_no: '',
+    co_email: '',
+    credit_limit: 0,
+    credit_terms: 0,
+    ac_type: 'N-Local',
+    currency_code: '',
+    salesperson_code: '',
+    industrial_code: '',
+    geographical: '',
+    grouping_code: '',
+    print_ar_aging: 'N-No'
+})
+
+// Search for customers - Now handled by modal
 const searchCustomers = async () => {
-    if (!searchQuery.value.trim()) {
-        showNotification('Please enter a search term', 'warning')
-        return
-    }
-    
-    isSearching.value = true
-    
-    try {
-        const response = await axios.get('/api/customer-accounts', {
-            params: { search: searchQuery.value }
-        })
-        
-        if (response.data && Array.isArray(response.data.data)) {
-            customers.value = response.data.data
-        } else if (Array.isArray(response.data)) {
-            customers.value = response.data
-        } else {
-            customers.value = []
-            throw new Error('Unexpected response format')
-        }
-        
-        if (customers.value.length === 0) {
-            showNotification('No customers found matching your search', 'warning')
-        }
-    } catch (error) {
-        console.error('Error searching customers:', error)
-        showNotification('Error searching for customers: ' + (error.response?.data?.message || error.message), 'error')
-        customers.value = []
-    } finally {
-        isSearching.value = false
-    }
+    // This function is now deprecated as search is handled by the modal
+    // Opening the modal will automatically filter based on the search query
+    openCustomerAccountModal()
 }
 
 // Clear search results
 const clearSearch = () => {
     searchQuery.value = ''
     customers.value = []
+    // Note: The modal will automatically update its search when searchQuery changes
 }
 
 // Data loading functions
@@ -729,6 +942,35 @@ const openCustomerAccountModal = () => {
 
 const closeCustomerAccountModal = () => {
     showCustomerAccountModal.value = false
+}
+
+// Add new customer modal functions
+const openAddNewCustomerModal = () => {
+    // Reset form to default values
+    Object.assign(newCustomerForm, {
+        customer_code: '',
+        customer_name: '',
+        short_name: '',
+        address: '',
+        contact_person: '',
+        telephone_no: '',
+        fax_no: '',
+        co_email: '',
+        credit_limit: 0,
+        credit_terms: 0,
+        ac_type: 'N-Local',
+        currency_code: '',
+        salesperson_code: '',
+        industrial_code: '',
+        geographical: '',
+        grouping_code: '',
+        print_ar_aging: 'N-No'
+    })
+    showAddNewCustomerModal.value = true
+}
+
+const closeAddNewCustomerModal = () => {
+    showAddNewCustomerModal.value = false
 }
 
 const selectCustomerAccount = (account) => {
@@ -907,17 +1149,12 @@ const saveCustomerAccount = async () => {
             showNotification('Customer account saved successfully', 'success')
             showEditModal.value = false
             
-            // Refresh the search results to show updated data
-            if (searchQuery.value) {
-                await searchCustomers()
-            } else {
-                // If we're not in a search context, update the local list if the customer exists
-                const index = customers.value.findIndex(c => c.customer_code === form.customer_code)
-                if (index !== -1) {
-                    customers.value[index] = { 
-                        ...customers.value[index], 
-                        ...customerData 
-                    }
+            // Update the local list if the customer exists
+            const index = customers.value.findIndex(c => c.customer_code === form.customer_code)
+            if (index !== -1) {
+                customers.value[index] = { 
+                    ...customers.value[index], 
+                    ...customerData 
                 }
             }
         } else {
@@ -926,6 +1163,105 @@ const saveCustomerAccount = async () => {
     } catch (error) {
         console.error('Error saving customer account:', error)
         let errorMessage = 'Failed to save customer account'
+        
+        if (error.response) {
+            // Handle validation errors
+            if (error.response.status === 422 && error.response.data.errors) {
+                // Log detailed validation errors for debugging
+                console.error('Validation errors:', error.response.data.errors)
+                
+                // Format validation errors for display
+                const validationErrors = Object.entries(error.response.data.errors).map(([field, messages]) => {
+                    return `${field}: ${messages.join(', ')}`;
+                });
+                
+                errorMessage += ': ' + validationErrors.join(' | ')
+            } else if (error.response.data.message) {
+                errorMessage += ': ' + error.response.data.message
+            }
+        } else if (error.message) {
+            errorMessage += ': ' + error.message
+        }
+        
+        showNotification(errorMessage, 'error')
+    } finally {
+        isSaving.value = false
+    }
+}
+
+// Save new customer account function
+const saveNewCustomerAccount = async () => {
+    // Basic validation
+    if (!newCustomerForm.customer_code.trim()) {
+        showNotification('Customer code is required', 'warning')
+        return
+    }
+    
+    if (!newCustomerForm.customer_name.trim()) {
+        showNotification('Customer name is required', 'warning')
+        return
+    }
+    
+    // Check if customer code already exists
+    const existingCustomer = customers.value.find(c => c.customer_code === newCustomerForm.customer_code.trim())
+    if (existingCustomer) {
+        showNotification('Customer code already exists. Please use a different code.', 'warning')
+        return
+    }
+    
+    isSaving.value = true
+    
+    try {
+        // Create a copy of the form data to send to the API
+        const customerData = { ...newCustomerForm }
+        
+        // Ensure numeric fields are properly formatted
+        if (customerData.credit_limit) {
+            customerData.credit_limit = parseFloat(customerData.credit_limit);
+        }
+        
+        if (customerData.credit_terms) {
+            customerData.credit_terms = parseInt(customerData.credit_terms);
+        }
+        
+        console.log('Creating new customer:', customerData);
+        
+        const response = await axios.post('/api/customer-accounts', customerData);
+        
+        if (response.data && response.status >= 200 && response.status < 300) {
+            showNotification('New customer account created successfully', 'success')
+            closeAddNewCustomerModal()
+            
+            // Add the new customer to the local list
+            const newCustomer = response.data
+            customers.value.unshift(newCustomer)
+            
+            // Clear the form
+            Object.assign(newCustomerForm, {
+                customer_code: '',
+                customer_name: '',
+                short_name: '',
+                address: '',
+                contact_person: '',
+                telephone_no: '',
+                fax_no: '',
+                co_email: '',
+                credit_limit: 0,
+                credit_terms: 0,
+                ac_type: 'N-Local',
+                currency_code: '',
+                salesperson_code: '',
+                industrial_code: '',
+                geographical: '',
+                grouping_code: '',
+                print_ar_aging: 'N-No'
+            })
+        } else {
+            throw new Error(response.data?.message || 'No data returned from the server')
+        }
+    } catch (error) {
+        console.error('Error creating new customer account:', error)
+        let errorMessage = 'Failed to create new customer account'
         
         if (error.response) {
             // Handle validation errors
@@ -978,10 +1314,7 @@ onMounted(() => {
         showNotification(page.props.flash.message, 'success')
     }
     
-    // Load initial data if search query is provided
-    if (searchQuery.value) {
-        searchCustomers()
-    }
+    // Note: Search is now handled by the modal, no need to pre-load search results
 })
 </script>
 

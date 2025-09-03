@@ -5,6 +5,7 @@
       <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
         <h3 class="text-xl font-semibold flex items-center">
           <i class="fas fa-list mr-3"></i>Customer Account Table
+          <span class="ml-3 text-sm font-normal opacity-75">(Press ESC to clear search)</span>
         </h3>
         <div class="flex space-x-3 items-center">
           <div class="text-white text-sm mr-2">
@@ -28,8 +29,33 @@
         </div>
       </div>
 
+      <!-- Search Bar -->
+      <div class="px-4 py-2 bg-gray-50 border-b border-gray-200">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-search text-gray-400"></i>
+          </div>
+          <input 
+            type="text" 
+            v-model="searchQuery"
+            placeholder="Search by customer code or name..."
+            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            @keyup.escape="searchQuery = ''"
+          >
+          <div v-if="searchQuery" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <button 
+              @click="searchQuery = ''"
+              class="text-gray-400 hover:text-gray-600"
+              title="Clear search"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Modal Body -->
-      <div class="p-2 overflow-y-auto" style="max-height: 60vh;">
+      <div class="p-2 overflow-y-auto" style="max-height: 55vh;">
         <div v-if="loading" class="flex justify-center items-center p-4">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
           <span class="ml-2 text-gray-600">Loading data...</span>
@@ -42,7 +68,19 @@
           </button>
         </div>
         <div v-else-if="filteredAccounts.length === 0" class="p-4 text-amber-700 bg-amber-50 rounded border border-amber-200">
-          No customer accounts found. Please adjust your filter criteria or add new accounts.
+          <div v-if="searchQuery" class="text-center">
+            <i class="fas fa-search text-amber-600 mb-2 text-2xl"></i>
+            <p class="font-medium mb-1">No customer accounts found matching "{{ searchQuery }}"</p>
+            <p class="text-sm">Try adjusting your search terms or clearing the search to see all accounts.</p>
+            <button @click="searchQuery = ''" class="mt-2 px-3 py-1 bg-amber-500 text-white text-xs rounded hover:bg-amber-600">
+              Clear Search
+            </button>
+          </div>
+          <div v-else class="text-center">
+            <i class="fas fa-exclamation-triangle text-amber-600 mb-2 text-2xl"></i>
+            <p class="font-medium mb-1">No customer accounts found</p>
+            <p class="text-sm">Please adjust your filter criteria or add new accounts.</p>
+          </div>
         </div>
         <table v-else class="min-w-full text-xs border border-gray-300">
           <thead class="bg-gray-200 sticky top-0">
@@ -81,7 +119,10 @@
       <!-- Modal Footer -->
       <div class="flex items-center justify-end gap-2 p-2 border-t border-gray-200 bg-gray-100 rounded-b-lg">
         <div class="text-xs text-gray-500 mr-auto" v-if="filteredAccounts.length > 0">
-          {{ filteredAccounts.length }} accounts found
+          {{ filteredAccounts.length }} of {{ allAccounts.length }} accounts shown
+          <span v-if="searchQuery" class="ml-2 text-blue-600">
+            (filtered by "{{ searchQuery }}")
+          </span>
         </div>
         <button 
           @click="handleSelect" 
@@ -116,6 +157,10 @@ export default {
     initialStatusFilter: {
       type: Array,
       default: () => ['Active']
+    },
+    initialSearch: {
+      type: String,
+      default: ''
     }
   },
   emits: ['close', 'select', 'sort'],
@@ -126,6 +171,7 @@ export default {
     const error = ref(null)
     const sortBy = ref(props.initialSortBy)
     const statusFilter = ref(props.initialStatusFilter.includes('Active') ? 'active' : (props.initialStatusFilter.includes('Obsolete') ? 'obsolete' : 'all'))
+    const searchQuery = ref(props.initialSearch)
 
     const fetchCustomerAccounts = async () => {
       if (props.customerAccounts && props.customerAccounts.length > 0) {
@@ -173,6 +219,15 @@ export default {
 
     const filteredAccounts = computed(() => {
       let filtered = [...allAccounts.value]
+      
+      // Filter based on search query
+      if (searchQuery.value.trim()) {
+        const query = searchQuery.value.toLowerCase().trim()
+        filtered = filtered.filter(account => 
+          account.customer_code?.toLowerCase().includes(query) ||
+          account.customer_name?.toLowerCase().includes(query)
+        )
+      }
       
       // Filter based on status
       if (statusFilter.value === 'active') {
@@ -229,6 +284,11 @@ export default {
       }
     }, { deep: true })
 
+    // Watch for changes in initialSearch prop
+    watch(() => props.initialSearch, (newSearch) => {
+      searchQuery.value = newSearch
+    })
+
     return {
       allAccounts,
       filteredAccounts,
@@ -237,6 +297,7 @@ export default {
       error,
       sortBy,
       statusFilter,
+      searchQuery,
       selectAccount,
       handleSelect,
       fetchCustomerAccounts
