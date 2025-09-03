@@ -31,6 +31,7 @@ class MasterCard extends Model
         'int_dim_1',
         'int_dim_2',
         'int_dim_3',
+        'customer_code',
     ];
 
     // Accessor untuk mendapatkan seq dari mc_seq

@@ -69,32 +69,6 @@
                             </h3>
                         </div>
 
-                        <!-- Instructions -->
-                        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 mb-2 flex items-center">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                Instructions:
-                            </h4>
-                            <ol class="text-sm text-blue-700 space-y-1 list-decimal list-inside">
-                                <li><strong>Step 1:</strong> Select Customer Account (AC#) first by clicking the search icon</li>
-                                <li><strong>Step 2:</strong> Search existing Master Cards or enter new MCS number</li>
-                                <li><strong>Step 3:</strong> Click 'Proceed' to continue with detailed information</li>
-                            </ol>
-                        </div>
-
-                        <!-- Success Message when customer is selected -->
-                        <div v-if="form.ac && form.customer_name" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                            <h4 class="text-sm font-semibold text-green-800 mb-2 flex items-center">
-                                <i class="fas fa-check-circle mr-2"></i>
-                                Customer Selected Successfully:
-                            </h4>
-                            <div class="text-sm text-green-700">
-                                <p><strong>AC#:</strong> {{ form.ac }}</p>
-                                <p><strong>Customer Name:</strong> {{ form.customer_name }}</p>
-                                <p class="mt-2">You can now search for existing Master Cards or proceed with creating a new one.</p>
-                            </div>
-                        </div>
-
                         <!-- Form content -->
                         <form @submit.prevent="saveRecord" class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -233,14 +207,6 @@
                                         </div>
                                         <span>Proceed</span>
                                     </button>
-                                </div>
-                            </div>
-
-                            <!-- Action Instructions -->
-                            <div v-if="form.ac && form.customer_name" class="mt-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-                                <div class="flex items-center text-sm text-indigo-700">
-                                    <i class="fas fa-lightbulb mr-2"></i>
-                                    <span><strong>Next Steps:</strong> Click the search icon next to MCS# to find existing Master Cards, or click "Proceed" to create a new one.</span>
                                 </div>
                             </div>
 
@@ -1339,8 +1305,6 @@ const loadCustomerAccounts = async () => {
 const selectCustomer = async (customer) => {
     if (!customer) return;
 
-    console.log('selectCustomer called with:', customer);
-
     // Show processing state
     isProcessing.value = true;
 
@@ -1374,7 +1338,6 @@ const selectCustomer = async (customer) => {
     isProgrammaticUpdate.value = false; // Re-enable input handlers
     selectedMcs.value = null;
     mcsMasterCards.value = [];
-    mcsError.value = null; // Clear any previous errors
     showDetailedMcInfo.value = false; // Don't show details until MC is selected or MCS number is entered
     recordMode.value = "new";
 
@@ -2072,10 +2035,6 @@ const searchAc = async () => {
 };
 
 const searchMcs = () => {
-    console.log('searchMcs called');
-    console.log('Current form.ac:', form.value.ac);
-    console.log('Current form.customer_name:', form.value.customer_name);
-    
     // Validate customer account must be selected first
     if (!form.value.ac) {
         toast.error(
@@ -2085,7 +2044,6 @@ const searchMcs = () => {
         return;
     }
 
-    console.log('Opening MCS table modal and fetching data...');
     showMcsTableModal.value = true;
     fetchMcsData();
 };
@@ -2227,9 +2185,6 @@ const fetchMcsData = async (page = 1) => {
     mcsLoading.value = true;
     mcsError.value = null;
 
-    console.log('fetchMcsData called with page:', page);
-    console.log('Current form.ac:', form.value.ac);
-
     // Validate customer account must exist before fetching data
     if (!form.value.ac) {
         mcsError.value = "Please select Customer Account (AC#) first.";
@@ -2253,23 +2208,21 @@ const fetchMcsData = async (page = 1) => {
         // Filter by customer account - REQUIRED
         const customerFilter = `&customer_code=${encodeURIComponent(form.value.ac)}`;
 
-        // Build API URL
-        const apiUrl = `/api/update-mc/master-cards?page=${page}&query=${encodeURIComponent(
-            mcsSearchTerm.value
-        )}&sortBy=${mcsSortOption.value}&sortOrder=${
-            mcsSortOrder.value
-        }${statusQuery}${customerFilter}`;
-        
-        console.log('API URL:', apiUrl);
-
         // Make API call using fetch for more control
-        const response = await fetch(apiUrl, {
-            headers: {
-                Accept: "application/json",
-                "X-Requested-With": "XMLHttpRequest",
-            },
-            credentials: "same-origin",
-        });
+        const response = await fetch(
+            `/api/update-mc/master-cards?page=${page}&query=${encodeURIComponent(
+                mcsSearchTerm.value
+            )}&sortBy=${mcsSortOption.value}&sortOrder=${
+                mcsSortOrder.value
+            }${statusQuery}${customerFilter}`,
+            {
+                headers: {
+                    Accept: "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+                credentials: "same-origin",
+            }
+        );
 
         if (!response.ok) {
             throw new Error(
@@ -2307,7 +2260,6 @@ const fetchMcsData = async (page = 1) => {
                 "No existing Master Cards found. You can create a new one."
             );
         } else {
-            console.log(`Found ${mcsMasterCards.value.length} master card(s):`, mcsMasterCards.value);
             toast.success(
                 `Found ${mcsMasterCards.value.length} master card(s) for ${form.value.customer_name}`
             );
