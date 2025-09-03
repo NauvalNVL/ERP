@@ -55,6 +55,7 @@
                         <!-- Header Search -->
                         <div
                             class="hidden md:flex items-center w-full max-w-md ml-4 relative"
+                            ref="searchContainer"
                         >
                             <div class="relative flex-1">
                                 <span
@@ -108,6 +109,12 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Backdrop to close search on outside click without blocking dropdown -->
+                        <div
+                            v-if="openSearch"
+                            class="fixed inset-0 z-40 bg-transparent"
+                            @click="openSearch = false"
+                        ></div>
                     </div>
                 </div>
             </nav>
@@ -165,6 +172,7 @@ const headerHidden = ref(false);
 let lastScrollY = typeof window !== "undefined" ? window.scrollY : 0;
 let ticking = false;
 const scrollArea = ref(null);
+const searchContainer = ref(null);
 
 const toggleSidebar = () => {
     sidebarStore.toggleMobile();
@@ -240,6 +248,17 @@ onMounted(() => {
         window.addEventListener("scroll", onScroll, { passive: true });
         lastScrollY = window.scrollY || 0;
     }
+    // Global outside-click to close search dropdown anywhere on the page
+    const handleDocumentClick = (e) => {
+        if (!openSearch.value) return;
+        if (
+            searchContainer.value &&
+            !searchContainer.value.contains(e.target)
+        ) {
+            openSearch.value = false;
+        }
+    };
+    document.addEventListener("click", handleDocumentClick);
     // Cleanup
     onUnmounted(() => {
         if (scrollArea.value) {
@@ -247,6 +266,7 @@ onMounted(() => {
         } else {
             window.removeEventListener("scroll", onScroll);
         }
+        document.removeEventListener("click", handleDocumentClick);
     });
 });
 
