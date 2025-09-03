@@ -56,12 +56,16 @@
                       type="number" 
                       min="1" 
                       max="12"
-                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                      readonly
+                      disabled
                     >
                     <input 
                       v-model="currentPeriod.year" 
                       type="number"
-                      class="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                      class="w-20 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                      readonly
+                      disabled
                     >
                   </div>
                 </div>
@@ -92,7 +96,9 @@
                       v-model="forwardPeriod" 
                         type="number"
                       min="1" 
-                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                      readonly
+                      disabled
                       >
                     <span class="text-xs text-gray-500">Months</span>
                     </div>
@@ -104,7 +110,9 @@
                       v-model="backwardPeriod" 
                         type="number"
                       min="1" 
-                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                      readonly
+                      disabled
                       >
                     <span class="text-xs text-gray-500">Months</span>
                   </div>
@@ -120,17 +128,23 @@
                 <input 
                   v-model="lastSOOrder.prefix" 
                   type="text" 
-                  class="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                  class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                  readonly
+                  disabled
                 >
                 <input 
                   v-model="lastSOOrder.year" 
                   type="number" 
-                  class="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                  class="w-20 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                  readonly
+                  disabled
                 >
                 <input 
                   v-model="lastSOOrder.number" 
                   type="number" 
-                  class="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
+                  class="w-24 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                  readonly
+                  disabled
                 >
                 </div>
               </div>
@@ -203,10 +217,13 @@
                   <label class="block text-xs font-medium text-gray-600 mb-1">Order Mode:</label>
                   <select 
                     v-model="orderDetails.orderMode" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
+                    disabled
                   >
-                    <option value="0">0-Order by Customer</option>
-                    <option value="1">1-Deliver & Invoice to Customer</option>
+                    <option value="0">0-Order by Customer + Deliver & Invoice to Customer</option>
+                    <option value="1">1-Order by Customer + Deliver to Customer + Invoice to Different Address</option>
+                    <option value="2">2-Order by Customer + Deliver to Different Address + Invoice to Customer</option>
+                    <option value="3">3-Order by Customer + Deliver to Different Address + Invoice to Different Address</option>
                   </select>
                 </div>
                   <div>
@@ -215,13 +232,16 @@
                     <input 
                       v-model="orderDetails.product.code" 
                       type="text"
-                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                      readonly
+                      disabled
                     >
                     <input 
                       v-model="orderDetails.product.name" 
                       type="text"
-                      class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
+                      class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
+                      disabled
                     >
                   </div>
                   </div>
@@ -234,13 +254,16 @@
                     <input 
                       v-model="orderDetails.salesperson.code" 
                       type="text"
-                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                      readonly
+                      disabled
                     >
                     <input 
                       v-model="orderDetails.salesperson.name" 
                       type="text" 
-                      class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
+                      class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
+                      disabled
                     >
                   </div>
                 </div>
@@ -249,8 +272,9 @@
                   <input 
                     v-model="orderDetails.currency" 
                     type="text"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
                     readonly
+                    disabled
                   >
                 </div>
                 </div>
@@ -262,16 +286,23 @@
                     v-model="orderDetails.exchangeRate" 
                     type="number" 
                     step="0.000001" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
+                    readonly
+                    disabled
                   >
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Exchange Method:</label>
-                  <input 
+                  <select 
                     v-model="orderDetails.exchangeMethod" 
-                    type="text" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
+                    disabled
                   >
+                    <option value="N/A">N/A</option>
+                    <option value="Spot Rate">Spot Rate</option>
+                    <option value="Forward Rate">Forward Rate</option>
+                    <option value="Fixed Rate">Fixed Rate</option>
+                  </select>
                 </div>
               </div>
 
@@ -280,7 +311,9 @@
                 <input 
                   v-model="orderDetails.customerPOrder" 
                   type="text" 
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
+                  readonly
+                  disabled
                 >
               </div>
 
@@ -292,12 +325,14 @@
                     v-model="orderDetails.pOrderDate" 
                       type="date"
                     :class="[
-                      'flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                      'flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600',
                       { 'calendar-explicitly-opened': calendarExplicitlyOpened }
                     ]"
                     @change="updateDayOfWeek"
                     @focus="handleDateInputFocus"
                     @blur="handleDateInputBlur"
+                    readonly
+                    disabled
                     >
                     <button 
                       @click.prevent="openCalendar"
@@ -321,10 +356,9 @@
                 <div class="flex items-center space-x-2">
                   <input 
                     v-model="orderDetails.setQuantity" 
-                    type="checkbox" 
-                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  >
-                  <span class="text-sm text-gray-700">Leave blank for loose item order</span>
+                    type="text" 
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Leave blank for loose item order">
                   </div>
                 </div>
 
@@ -419,19 +453,17 @@
                   <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">
                     Sales Tax:
-                    <span class="text-xs text-gray-400 font-normal">(Auto-set by Order Type)</span>
+                    <span class="text-xs text-gray-400 font-normal">Tick for Y-Yes</span>
                   </label>
                   <div class="flex items-center space-x-2">
                     <input 
                       v-model="orderDetails.salesTax" 
                       type="checkbox" 
                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      :class="{'bg-gray-100': currentOrderTypeConfig}"
-                      title="This value is automatically set based on the selected Order Type"
+                      title="Tick for Y-Yes"
                     >
                     <span class="text-sm text-gray-700">
                       {{ orderDetails.salesTax ? 'Y-Yes' : 'N-No' }}
-                      <span v-if="currentOrderTypeConfig" class="text-xs text-blue-600 ml-1">(Auto)</span>
                     </span>
                   </div>
                 </div>
@@ -440,7 +472,10 @@
                   <input 
                     v-model="orderDetails.lotNumber" 
                     type="text" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
+                    placeholder="Enter lot number"
+                    readonly
+                    disabled
                   >
                 </div>
               </div>
@@ -451,6 +486,7 @@
                   v-model="orderDetails.remark" 
                     rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter remark"
                   ></textarea>
                 </div>
 
@@ -460,6 +496,7 @@
                   v-model="orderDetails.instruction1" 
                     rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter instruction 1"
                   ></textarea>
                 </div>
 
@@ -469,6 +506,7 @@
                   v-model="orderDetails.instruction2" 
                     rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter instruction 2"
                   ></textarea>
               </div>
             </div>
@@ -1129,14 +1167,14 @@ const openCalendar = async () => {
       // Check if showPicker is supported (modern browsers)
       if (typeof dateInput.showPicker === 'function') {
         console.log('showPicker() is supported, attempting to use it')
-        try {
-          // Focus the input first
-          dateInput.focus()
-          console.log('Date input focused')
-          
-          // Wait for focus to take effect
-          await new Promise(resolve => setTimeout(resolve, 100))
-          
+    try {
+      // Focus the input first
+      dateInput.focus()
+      console.log('Date input focused')
+      
+      // Wait for focus to take effect
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
           dateInput.showPicker()
           console.log('Calendar opened successfully using showPicker()')
           success('Calendar opened. Select a date.')
