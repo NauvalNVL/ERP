@@ -82,6 +82,19 @@
                             </ol>
                         </div>
 
+                        <!-- Success Message when customer is selected -->
+                        <div v-if="form.ac && form.customer_name" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <h4 class="text-sm font-semibold text-green-800 mb-2 flex items-center">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                Customer Selected Successfully:
+                            </h4>
+                            <div class="text-sm text-green-700">
+                                <p><strong>AC#:</strong> {{ form.ac }}</p>
+                                <p><strong>Customer Name:</strong> {{ form.customer_name }}</p>
+                                <p class="mt-2">You can now search for existing Master Cards or proceed with creating a new one.</p>
+                            </div>
+                        </div>
+
                         <!-- Form content -->
                         <form @submit.prevent="saveRecord" class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -220,6 +233,14 @@
                                         </div>
                                         <span>Proceed</span>
                                     </button>
+                                </div>
+                            </div>
+
+                            <!-- Action Instructions -->
+                            <div v-if="form.ac && form.customer_name" class="mt-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
+                                <div class="flex items-center text-sm text-indigo-700">
+                                    <i class="fas fa-lightbulb mr-2"></i>
+                                    <span><strong>Next Steps:</strong> Click the search icon next to MCS# to find existing Master Cards, or click "Proceed" to create a new one.</span>
                                 </div>
                             </div>
 
@@ -2051,6 +2072,10 @@ const searchAc = async () => {
 };
 
 const searchMcs = () => {
+    console.log('searchMcs called');
+    console.log('Current form.ac:', form.value.ac);
+    console.log('Current form.customer_name:', form.value.customer_name);
+    
     // Validate customer account must be selected first
     if (!form.value.ac) {
         toast.error(
@@ -2060,6 +2085,7 @@ const searchMcs = () => {
         return;
     }
 
+    console.log('Opening MCS table modal and fetching data...');
     showMcsTableModal.value = true;
     fetchMcsData();
 };
