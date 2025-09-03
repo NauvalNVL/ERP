@@ -94,15 +94,16 @@ class UpdateMcController extends Controller
             $dbStatuses = [];
             foreach ($filteredStatuses as $status) {
                 if ($status === 'Act') {
-                    $dbStatuses[] = 'Active'; // Map 'Act' to 'Active' in database
+                    $dbStatuses[] = 'Act'; // Keep 'Act' as is in database
+                    $dbStatuses[] = 'Active'; // Also include 'Active' for compatibility
                 } else {
                     $dbStatuses[] = $status;
                 }
             }
             $masterCards->whereIn('status', $dbStatuses);
         } else {
-            // If no valid status is provided, default to active
-            $masterCards->where('status', 'Active');
+            // If no valid status is provided, default to both 'Act' and 'Active'
+            $masterCards->whereIn('status', ['Act', 'Active']);
         }
 
         // Apply sorting
