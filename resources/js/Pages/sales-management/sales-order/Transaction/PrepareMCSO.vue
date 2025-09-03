@@ -325,14 +325,12 @@
                     v-model="orderDetails.pOrderDate" 
                       type="date"
                     :class="[
-                      'flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600',
+                      'flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
                       { 'calendar-explicitly-opened': calendarExplicitlyOpened }
                     ]"
                     @change="updateDayOfWeek"
                     @focus="handleDateInputFocus"
                     @blur="handleDateInputBlur"
-                    readonly
-                    disabled
                     >
                     <button 
                       @click.prevent="openCalendar"
@@ -486,7 +484,7 @@
                   v-model="orderDetails.remark" 
                     rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter remark"
+                  placeholder=""
                   ></textarea>
                 </div>
 
@@ -496,7 +494,7 @@
                   v-model="orderDetails.instruction1" 
                     rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter instruction 1"
+                  placeholder=""
                   ></textarea>
                 </div>
 
@@ -506,7 +504,7 @@
                   v-model="orderDetails.instruction2" 
                     rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter instruction 2"
+                  placeholder=""
                   ></textarea>
               </div>
             </div>
@@ -614,7 +612,7 @@ import DeliveryScheduleModal from '@/Components/DeliveryScheduleModal.vue'
 import DeliveryLocationModal from '@/Components/DeliveryLocationModal.vue'
 import { useToast } from '@/Composables/useToast'
 
-const { success, error } = useToast()
+const { success, error, info } = useToast()
 
 // Period Information
 const currentPeriod = reactive({
@@ -672,7 +670,7 @@ const orderDetails = reactive({
   exchangeMethod: 'N/A',
   customerPOrder: '',
   pOrderDate: new Date().toISOString().split('T')[0],
-  setQuantity: false,
+  setQuantity: '',
   orderGroup: 'Sales',
   orderType: 'S1-Sales',
   salesTax: false,
