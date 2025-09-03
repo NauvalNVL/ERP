@@ -62,6 +62,7 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmReportGroupContr
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController;
 use App\Http\Controllers\CustomerWarehouseRequirementController;
+use App\Http\Controllers\SalesOrderController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -236,17 +237,17 @@ Route::middleware('auth')->group(function () {
         })->name('vue.sales-order.transaction.prepare-mc-so');
 
         // Sales Order API routes for reports
-        Route::get('/api/sales-order/print-log', [App\Http\Controllers\SalesOrderController::class, 'printLog']);
-        Route::get('/api/sales-order/print-jit-tracking', [App\Http\Controllers\SalesOrderController::class, 'printJitTracking']);
+        Route::get('/api/sales-order/print-log', [SalesOrderController::class, 'printLog']);
+        Route::get('/api/sales-order/print-jit-tracking', [SalesOrderController::class, 'printJitTracking']);
         
         // Sales Order API routes
-        Route::post('/api/sales-order', [App\Http\Controllers\SalesOrderController::class, 'store']);
-        Route::get('/api/sales-order/customer/{customerCode}', [App\Http\Controllers\SalesOrderController::class, 'getCustomer']);
-        Route::get('/api/sales-order/master-card/{mcSeq}', [App\Http\Controllers\SalesOrderController::class, 'getMasterCard']);
-        Route::get('/api/sales-order/salesperson/{salespersonCode}', [App\Http\Controllers\SalesOrderController::class, 'getSalesperson']);
-        Route::get('/api/sales-order/product-design/{masterCardSeq}', [App\Http\Controllers\SalesOrderController::class, 'getProductDesignData']);
-        Route::post('/api/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign']);
-        Route::post('/api/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
+        Route::post('/api/sales-order', [SalesOrderController::class, 'store']);
+        Route::get('/api/sales-order/customer/{customerCode}', [SalesOrderController::class, 'getCustomer']);
+        Route::get('/api/sales-order/master-card/{mcSeq}', [SalesOrderController::class, 'getMasterCard']);
+        Route::get('/api/sales-order/product-design/{masterCardSeq}', [SalesOrderController::class, 'getProductDesignData']);
+        Route::get('/api/sales-order/salesperson/{salespersonCode}', [SalesOrderController::class, 'getSalesperson']);
+        Route::post('/api/sales-order/product-design', [SalesOrderController::class, 'saveProductDesign']);
+        Route::post('/api/sales-order/delivery-schedule', [SalesOrderController::class, 'saveDeliverySchedule']);
 
          // Sales Order Report - Rough Cut Report - Define Report Format
          Route::get('/sales-order/report/rough-cut-report/define-report-format', function () {

@@ -7,7 +7,7 @@
           <div class="flex items-center space-x-4">
             <i class="fas fa-clipboard-list text-2xl text-blue-600"></i>
             <div>
-              <h1 class="text-xl font-semibold text-gray-800">Prepare MC SO</h1>
+            <h1 class="text-xl font-semibold text-gray-800">Prepare MC SO</h1>
               <p class="text-xs text-gray-500">F2: Customer • F3: Master Card • F4: Calendar • Ctrl+S: Save • F5: Refresh</p>
             </div>
             </div>
@@ -291,14 +291,20 @@
                     ref="pOrderDateInput"
                     v-model="orderDetails.pOrderDate" 
                       type="date"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    :class="[
+                      'flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                      { 'calendar-explicitly-opened': calendarExplicitlyOpened }
+                    ]"
                     @change="updateDayOfWeek"
+                    @focus="handleDateInputFocus"
+                    @blur="handleDateInputBlur"
                     >
                     <button 
-                      @click="openCalendar"
+                      @click.prevent="openCalendar"
                     :disabled="calendarLoading"
-                    class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed calendar-button"
                       title="Open Calendar (F4 or click input field)"
+                      type="button"
                     >
                     <i v-if="calendarLoading" class="fas fa-spinner fa-spin"></i>
                     <i v-else class="fas fa-calendar-alt"></i>
@@ -363,21 +369,70 @@
                     {{ orderType.label }}
                   </option>
                   </select>
-                  <div class="mt-1 text-xs text-gray-500">
-                    <span v-if="selectedOrderTypeDescription">{{ selectedOrderTypeDescription }}</span>
+                  <div v-if="selectedOrderTypeDescription" class="mt-1 text-xs text-gray-500 italic">
+                    {{ selectedOrderTypeDescription }}
+                  </div>
+                  
+                  <!-- Workflow Steps Display -->
+                  <div v-if="currentOrderTypeConfig && currentOrderTypeConfig.workflow" class="mt-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 shadow-sm">
+                    <div class="text-xs font-semibold text-blue-900 mb-2 flex items-center">
+                      <i class="fas fa-route mr-1"></i>
+                      Workflow Process:
+                    </div>
+                    <div class="flex items-center space-x-2 text-xs flex-wrap gap-y-1">
+                      <template v-for="(step, index) in getWorkflowSteps()" :key="step.code">
+                        <div class="flex items-center px-2 py-1 bg-white rounded-md border border-blue-300 text-blue-800 font-medium shadow-sm">
+                          <i :class="step.icon + ' mr-1 text-blue-600'"></i>
+                          {{ step.name }}
+                        </div>
+                        <i v-if="index < getWorkflowSteps().length - 1" class="fas fa-chevron-right text-blue-500"></i>
+                      </template>
+                    </div>
+                    
+                    <!-- Special Indicators -->
+                    <div class="mt-2 flex items-center space-x-3 text-xs">
+                      <div v-if="currentOrderTypeConfig.isKanban" class="flex items-center text-orange-600">
+                        <i class="fas fa-clock mr-1"></i>
+                        <span class="font-medium">JIT/Kanban Mode</span>
+                      </div>
+                      <div v-if="currentOrderTypeConfig.skipCorrugator" class="flex items-center text-purple-600">
+                        <i class="fas fa-forward mr-1"></i>
+                        <span class="font-medium">Skip Corrugator</span>
+                      </div>
+                      <div v-if="currentOrderTypeConfig.corrugatorOnly" class="flex items-center text-green-600">
+                        <i class="fas fa-cog mr-1"></i>
+                        <span class="font-medium">Corrugator Only</span>
+                      </div>
+                      <div v-if="currentOrderTypeConfig.requiresInvoice" class="flex items-center text-blue-600">
+                        <i class="fas fa-file-invoice-dollar mr-1"></i>
+                        <span class="font-medium">With Invoice</span>
+                      </div>
+                      <div v-else class="flex items-center text-gray-600">
+                        <i class="fas fa-ban mr-1"></i>
+                        <span class="font-medium">No Invoice</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">Sales Tax:</label>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">
+                    Sales Tax:
+                    <span class="text-xs text-gray-400 font-normal">(Auto-set by Order Type)</span>
+                  </label>
                   <div class="flex items-center space-x-2">
                     <input 
                       v-model="orderDetails.salesTax" 
                       type="checkbox" 
                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      :class="{'bg-gray-100': currentOrderTypeConfig}"
+                      title="This value is automatically set based on the selected Order Type"
                     >
-                    <span class="text-sm text-gray-700">Tick for Y-Yes</span>
+                    <span class="text-sm text-gray-700">
+                      {{ orderDetails.salesTax ? 'Y-Yes' : 'N-No' }}
+                      <span v-if="currentOrderTypeConfig" class="text-xs text-blue-600 ml-1">(Auto)</span>
+                    </span>
                   </div>
                 </div>
                 <div>
@@ -512,7 +567,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
 import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue'
@@ -605,15 +660,15 @@ const dayOfWeek = computed(() => {
   if (!orderDetails.pOrderDate) return ''
   
   try {
-    const date = new Date(orderDetails.pOrderDate)
+  const date = new Date(orderDetails.pOrderDate)
     
     // Check if date is valid
     if (isNaN(date.getTime())) {
       return ''
     }
     
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    return days[date.getDay()]
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  return days[date.getDay()]
   } catch (err) {
     console.warn('Error calculating day of week:', err)
     return ''
@@ -631,7 +686,8 @@ const orderTypesConfig = {
       requiresInventory: true,
       requiresProduction: true,
       requiresDelivery: true,
-      requiresInvoice: true
+      requiresInvoice: true,
+      salesTax: true
     },
     {
       code: 'S2-Sales',
@@ -642,7 +698,8 @@ const orderTypesConfig = {
       requiresProduction: false,
       requiresDelivery: true,
       requiresInvoice: true,
-      isKanban: true
+      isKanban: true,
+      salesTax: true
     },
     {
       code: 'S3-Sales',
@@ -653,7 +710,8 @@ const orderTypesConfig = {
       requiresProduction: true,
       requiresDelivery: true,
       requiresInvoice: true,
-      skipCorrugator: true
+      skipCorrugator: true,
+      salesTax: true
     }
   ],
   'Non-Sales': [
@@ -665,7 +723,8 @@ const orderTypesConfig = {
       requiresInventory: true,
       requiresProduction: true,
       requiresDelivery: true,
-      requiresInvoice: false
+      requiresInvoice: false,
+      salesTax: false
     },
     {
       code: 'N2-NonSales',
@@ -676,7 +735,8 @@ const orderTypesConfig = {
       requiresProduction: true,
       requiresDelivery: false,
       requiresInvoice: false,
-      skipCorrugator: true
+      skipCorrugator: true,
+      salesTax: false
     },
     {
       code: 'N3-NonSales',
@@ -686,7 +746,8 @@ const orderTypesConfig = {
       requiresInventory: true,
       requiresProduction: true,
       requiresDelivery: false,
-      requiresInvoice: false
+      requiresInvoice: false,
+      salesTax: false
     },
     {
       code: 'N4-NonSales',
@@ -697,7 +758,8 @@ const orderTypesConfig = {
       requiresProduction: true,
       requiresDelivery: false,
       requiresInvoice: false,
-      corrugatorOnly: true
+      corrugatorOnly: true,
+      salesTax: false
     }
   ]
 }
@@ -765,25 +827,25 @@ const updateOrderTypeUI = () => {
     invoice: typeConfig.requiresInvoice
   })
   
-  // Update sales tax based on order type
-  if (typeConfig.requiresInvoice) {
-    // Enable sales tax for types that require invoicing
-    orderDetails.salesTax = true
-  } else {
-    // Disable sales tax for non-sales types
-    orderDetails.salesTax = false
-  }
+  // Update sales tax based on order type configuration
+  orderDetails.salesTax = typeConfig.salesTax || false
   
   // Special handling for Kanban/JIT orders
   if (typeConfig.isKanban) {
     console.log('Kanban/JIT order detected - special handling enabled')
-    // Could add special UI hints or validations for Kanban orders
+    info('Kanban/JIT mode: Production will be scheduled based on delivery requirements')
   }
   
   // Special handling for corrugator-only orders
   if (typeConfig.corrugatorOnly) {
     console.log('Corrugator-only order detected')
-    // Could disable certain fields that are not relevant
+    info('Corrugator-only mode: Order will stop after corrugator process')
+  }
+  
+  // Special handling for orders that skip corrugator
+  if (typeConfig.skipCorrugator) {
+    console.log('Skip corrugator mode detected')
+    info('Direct converting mode: Order will skip corrugator process')
   }
 }
 
@@ -796,16 +858,30 @@ const getWorkflowSteps = () => {
     const stepNames = {
       'SO': 'Sales Order',
       'Corr': 'Corrugator',
-      'Conv': 'Converting',
+      'Conv': 'Converting', 
       'FG': 'Finished Goods',
       'DO': 'Delivery Order',
       'IV': 'Invoice'
     }
     return {
       code: step,
-      name: stepNames[step] || step
+      name: stepNames[step] || step,
+      icon: getWorkflowStepIcon(step)
     }
   })
+}
+
+// Get workflow step icons
+const getWorkflowStepIcon = (step) => {
+  const iconMap = {
+    'SO': 'fas fa-file-alt',
+    'Corr': 'fas fa-cogs',
+    'Conv': 'fas fa-industry',
+    'FG': 'fas fa-boxes',
+    'DO': 'fas fa-shipping-fast',
+    'IV': 'fas fa-file-invoice-dollar'
+  }
+  return iconMap[step] || 'fas fa-circle'
 }
 
 // Check if current order type requires specific workflow step
@@ -864,6 +940,11 @@ const refreshPage = () => {
     instruction1: '',
     instruction2: ''
   })
+  
+  // Update UI after reset
+  updateOrderTypeUI()
+  
+  success('Form reset successfully')
 }
 
 const printLog = async () => {
@@ -1016,61 +1097,80 @@ const validateMasterCard = async () => {
 // Add ref for P/Order Date input
 const pOrderDateInput = ref(null)
 const calendarLoading = ref(false)
+const calendarExplicitlyOpened = ref(false)
 
 const openCalendar = async () => {
   try {
     calendarLoading.value = true
+    calendarExplicitlyOpened.value = true
+    console.log('Opening calendar...')
+    
+    // Wait for Vue to update the DOM
+    await nextTick()
     
     // Use specific ref instead of generic selector
     const dateInput = pOrderDateInput.value
+    console.log('Date input element:', dateInput)
     
-    if (dateInput) {
-      // Focus the input first
-      dateInput.focus()
-      
-      // Wait a bit for focus to take effect
-      await new Promise(resolve => setTimeout(resolve, 50))
-      
+    if (!dateInput) {
+      console.error('Date input element not found')
+      error('Calendar input not available. Please refresh the page.')
+      return
+    }
+
+    // Check if element is visible and not disabled
+    if (dateInput.disabled || dateInput.style.display === 'none') {
+      console.warn('Date input is disabled or hidden')
+      error('Date input is not available for interaction.')
+      return
+    }
+
+    try {
       // Check if showPicker is supported (modern browsers)
       if (typeof dateInput.showPicker === 'function') {
+        console.log('showPicker() is supported, attempting to use it')
         try {
-          await dateInput.showPicker()
+          // Focus the input first
+          dateInput.focus()
+          console.log('Date input focused')
+          
+          // Wait for focus to take effect
+          await new Promise(resolve => setTimeout(resolve, 100))
+          
+          dateInput.showPicker()
           console.log('Calendar opened successfully using showPicker()')
+          success('Calendar opened. Select a date.')
         } catch (pickerErr) {
-          console.warn('showPicker() failed, trying fallback:', pickerErr)
-          // Fallback if showPicker fails due to user interaction requirements
-          dateInput.click()
+          console.warn('showPicker() failed:', pickerErr.message)
+          error('Calendar could not be opened automatically. Please click directly on the date field.')
         }
       } else {
         // Fallback for browsers that don't support showPicker
-        console.log('showPicker not supported, using fallback method')
-        dateInput.click()
+        console.log('showPicker() not supported, using fallback method')
         
-        // Additional fallback: simulate user interaction
-        setTimeout(() => {
-          const clickEvent = new MouseEvent('click', {
-            view: window,
-            bubbles: true,
-            cancelable: true,
-            clientX: dateInput.getBoundingClientRect().right - 20,
-            clientY: dateInput.getBoundingClientRect().top + dateInput.offsetHeight / 2
-          })
-          dateInput.dispatchEvent(clickEvent)
-        }, 100)
+        // Focus the input and show a message to click manually
+        dateInput.focus()
+        success('Please click on the date field to open the calendar')
       }
       
-      // Provide user feedback
-      success('Calendar opened. Select a date or press Escape to close.')
-      
-    } else {
-      console.warn('P/Order Date input not found')
-      error('Calendar input not available. Please refresh the page.')
+    } catch (interactionErr) {
+      console.error('Calendar interaction error:', interactionErr)
+      error('Unable to open calendar. Please click directly on the date field.')
     }
+      
   } catch (err) {
     console.error('Error opening calendar:', err)
-    error('Error opening calendar. Please click directly on the date field.')
+    error('Error opening calendar: ' + (err.message || 'Unknown error'))
   } finally {
-    calendarLoading.value = false
+    // Add a small delay to show loading state
+    setTimeout(() => {
+      calendarLoading.value = false
+      // Reset the flag after a delay
+      setTimeout(() => {
+        calendarExplicitlyOpened.value = false
+        console.log('Calendar flag reset - calendar will no longer show automatically')
+      }, 2000) // Increased delay to ensure user has time to interact
+    }, 200)
   }
 }
 
@@ -1099,6 +1199,103 @@ const updateDayOfWeek = () => {
     
     // The computed property dayOfWeek will automatically update
     console.log('Date changed to:', orderDetails.pOrderDate, 'Day:', dayOfWeek.value)
+  }
+}
+
+// Handle date input focus - prevent automatic calendar display
+const handleDateInputFocus = (event) => {
+  // Always prevent calendar from showing on focus unless explicitly opened
+  if (!calendarExplicitlyOpened.value) {
+    event.preventDefault()
+    event.stopPropagation()
+    console.log('Date input focused - calendar prevented from showing automatically')
+    
+    // Force blur to prevent any browser default behavior
+    setTimeout(() => {
+      if (event.target === document.activeElement) {
+        event.target.blur()
+      }
+    }, 10)
+  } else {
+    console.log('Date input focused - calendar allowed (explicitly opened)')
+  }
+}
+
+// Handle date input blur - close any open calendar
+const handleDateInputBlur = () => {
+  console.log('Date input blurred - closing any open calendar')
+  // Reset the flag when input loses focus
+  calendarExplicitlyOpened.value = false
+  // The browser will automatically close the calendar when input loses focus
+}
+
+// Handle date input click - prevent automatic calendar
+const handleDateInputClick = (event) => {
+  // Only allow calendar to show if it's explicitly triggered by the calendar button
+  if (!calendarExplicitlyOpened.value) {
+    event.preventDefault()
+    event.stopPropagation()
+    // Focus the input without showing calendar
+    event.target.focus()
+    
+    // Force blur after a short delay to prevent any browser default behavior
+    setTimeout(() => {
+      if (event.target === document.activeElement) {
+        event.target.blur()
+      }
+    }, 50)
+  }
+}
+
+// Handle date input keydown - prevent automatic calendar
+const handleDateInputKeydown = (event) => {
+  // Only allow calendar to show if it's explicitly opened
+  if (!calendarExplicitlyOpened.value) {
+    // Prevent all key events that might trigger calendar
+    if (event.key === 'Enter' || event.key === ' ' || event.key === 'Tab') {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    
+    // Prevent any other key that might trigger calendar
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'F4') {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+  }
+}
+
+// Handle document click - close calendar when clicking outside
+const handleDocumentClick = (event) => {
+  const dateInput = pOrderDateInput.value
+  if (dateInput && event.target !== dateInput && !dateInput.contains(event.target)) {
+    // If clicking outside the date input, blur it to close any open calendar
+    if (document.activeElement === dateInput) {
+      dateInput.blur()
+      calendarExplicitlyOpened.value = false
+    }
+    
+    // Also check if the clicked element is not the calendar button
+    const calendarButton = event.target.closest('.calendar-button')
+    if (!calendarButton) {
+      // Reset the flag when clicking anywhere else
+      calendarExplicitlyOpened.value = false
+    }
+  }
+}
+
+// Handle mouse events to prevent calendar
+const handleDateInputMouseDown = (event) => {
+  if (!calendarExplicitlyOpened.value) {
+    event.preventDefault()
+    event.stopPropagation()
+  }
+}
+
+const handleDateInputMouseUp = (event) => {
+  if (!calendarExplicitlyOpened.value) {
+    event.preventDefault()
+    event.stopPropagation()
   }
 }
 
@@ -1164,14 +1361,14 @@ const saveProductDesign = async (designData) => {
     const data = await response.json()
     
     if (data.success) {
-      console.log('Product design saved:', designData)
-      showProductDesignModal.value = false
-      success('Product design saved successfully')
-      
-      // Open delivery schedule after product design
-      setTimeout(() => {
-        showDeliveryScheduleModal.value = true
-      }, 500)
+  console.log('Product design saved:', designData)
+  showProductDesignModal.value = false
+  success('Product design saved successfully')
+  
+  // Open delivery schedule after product design
+  setTimeout(() => {
+    showDeliveryScheduleModal.value = true
+  }, 500)
     } else {
       throw new Error(data.message || 'Failed to save product design')
     }
@@ -1193,15 +1390,15 @@ const saveDeliveryLocation = async (locationData) => {
   try {
     // Store delivery location data locally for now
     // In a real implementation, you might save this to the database
-    console.log('Delivery location saved:', locationData)
+  console.log('Delivery location saved:', locationData)
     
     // Update order details with delivery location if provided
     if (locationData.address) {
       orderDetails.deliveryAddress = locationData.address
     }
     
-    showDeliveryLocationModal.value = false
-    success('Delivery location saved successfully')
+  showDeliveryLocationModal.value = false
+  success('Delivery location saved successfully')
   } catch (err) {
     console.error('Error saving delivery location:', err)
     error('Error saving delivery location: ' + (err.message || 'Network error'))
@@ -1237,9 +1434,9 @@ const saveDeliverySchedule = async (scheduleData) => {
     const data = await response.json()
     
     if (data.success) {
-      console.log('Delivery schedule saved:', scheduleData)
-      showDeliveryScheduleModal.value = false
-      success('Delivery schedule saved successfully')
+  console.log('Delivery schedule saved:', scheduleData)
+  showDeliveryScheduleModal.value = false
+  success('Delivery schedule saved successfully')
       
       // Optionally, you can proceed with final sales order creation here
     } else {
@@ -1427,11 +1624,11 @@ onMounted(() => {
     }
   }
   
-  // Initialize Order Type UI
-  updateOrderTypeUI()
-  
   // Initialize form validation
   validatePeriod()
+  
+  // Initialize Order Type UI
+  updateOrderTypeUI()
 })
 
 // Keyboard shortcuts
@@ -1536,7 +1733,7 @@ const clearDraft = () => {
 let autoSaveInterval = null
 
 // Initialize component
-onMounted(() => {
+onMounted(async () => {
   // Set default values
   const today = new Date()
   currentPeriod.month = today.getMonth() + 1
@@ -1556,6 +1753,9 @@ onMounted(() => {
   // Initialize form validation
   validatePeriod()
   
+  // Initialize Order Type UI
+  updateOrderTypeUI()
+  
   // Load draft if available
   loadDraft()
   
@@ -1564,6 +1764,27 @@ onMounted(() => {
   
   // Setup auto-save
   autoSaveInterval = setInterval(saveDraft, 30000) // Save every 30 seconds
+  
+  // Ensure date input is properly initialized
+  await nextTick()
+  console.log('PrepareMCSO component mounted successfully, date input ref:', pOrderDateInput.value)
+  
+            // Add event listener to prevent calendar from showing on other elements
+      const dateInput = pOrderDateInput.value
+      if (dateInput) {
+              // Add event listeners to prevent calendar from showing automatically
+      dateInput.addEventListener('focus', handleDateInputFocus)
+      dateInput.addEventListener('blur', handleDateInputBlur)
+      dateInput.addEventListener('click', handleDateInputClick)
+      dateInput.addEventListener('keydown', handleDateInputKeydown)
+      
+      // Add additional event listeners to prevent calendar
+      dateInput.addEventListener('mousedown', handleDateInputMouseDown)
+      dateInput.addEventListener('mouseup', handleDateInputMouseUp)
+      
+      // Add document click listener to close calendar when clicking outside
+      document.addEventListener('click', handleDocumentClick)
+      }
 })
 
 // Cleanup on unmount
@@ -1571,6 +1792,24 @@ onUnmounted(() => {
   clearTimeout(window.customerValidationTimeout)
   clearTimeout(window.mcValidationTimeout)
   document.removeEventListener('keydown', handleKeyDown)
+  
+  // Remove calendar-related event listeners
+  const dateInput = pOrderDateInput.value
+  if (dateInput) {
+    // Remove all event listeners to prevent memory leaks
+    dateInput.removeEventListener('focus', handleDateInputFocus)
+    dateInput.removeEventListener('blur', handleDateInputBlur)
+    dateInput.removeEventListener('click', handleDateInputClick)
+    dateInput.removeEventListener('keydown', handleDateInputKeydown)
+    
+    // Remove additional event listeners
+    dateInput.removeEventListener('mousedown', handleDateInputMouseDown)
+    dateInput.removeEventListener('mouseup', handleDateInputMouseUp)
+  }
+  
+  // Remove document click listener
+  document.removeEventListener('click', handleDocumentClick)
+  
   if (autoSaveInterval) {
     clearInterval(autoSaveInterval)
   }
@@ -1611,5 +1850,82 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   right: 0;
   top: 0;
   width: auto;
+}
+
+/* Prevent calendar from showing on focus */
+input[type="date"]:focus {
+  /* Remove any default browser styling that might trigger calendar */
+  outline: none;
+}
+
+/* Ensure calendar only shows when explicitly triggered */
+input[type="date"] {
+  /* Prevent automatic calendar display */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Custom calendar button styling */
+.calendar-button {
+  position: relative;
+  z-index: 10;
+}
+
+/* Prevent calendar from showing on input focus */
+input[type="date"]:focus:not(.calendar-explicitly-opened) {
+  /* Remove any default browser styling that might trigger calendar */
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Additional focus prevention */
+input[type="date"]:not(.calendar-explicitly-opened):focus {
+  /* Prevent any browser default behavior */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Additional prevention for calendar display */
+input[type="date"]:not(.calendar-explicitly-opened)::-webkit-calendar-picker-indicator {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Additional prevention for Firefox and other browsers */
+input[type="date"]:not(.calendar-explicitly-opened)::-moz-calendar-picker-indicator {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Additional prevention for Edge and IE */
+input[type="date"]:not(.calendar-explicitly-opened)::-ms-clear,
+input[type="date"]:not(.calendar-explicitly-opened)::-ms-expand {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Ensure calendar only shows when explicitly triggered */
+input[type="date"].calendar-explicitly-opened {
+  /* Allow calendar to show when explicitly opened */
+  -webkit-appearance: auto;
+  -moz-appearance: auto;
+  appearance: auto;
+}
+
+/* Prevent calendar from showing on non-explicit focus */
+input[type="date"]:not(.calendar-explicitly-opened) {
+  /* Completely prevent calendar from showing */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 </style>
