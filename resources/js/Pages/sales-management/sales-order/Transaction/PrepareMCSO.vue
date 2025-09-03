@@ -359,7 +359,7 @@
                     type="text" 
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Leave blank for loose item order">
-                </div>
+                  </div>
                 </div>
 
                 <div>
@@ -1167,14 +1167,14 @@ const openCalendar = async () => {
       // Check if showPicker is supported (modern browsers)
       if (typeof dateInput.showPicker === 'function') {
         console.log('showPicker() is supported, attempting to use it')
-        try {
-          // Focus the input first
-          dateInput.focus()
-          console.log('Date input focused')
-          
-          // Wait for focus to take effect
-          await new Promise(resolve => setTimeout(resolve, 100))
-          
+    try {
+      // Focus the input first
+      dateInput.focus()
+      console.log('Date input focused')
+      
+      // Wait for focus to take effect
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
           dateInput.showPicker()
           console.log('Calendar opened successfully using showPicker()')
           success('Calendar opened. Select a date.')

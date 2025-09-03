@@ -69,6 +69,19 @@
                             </h3>
                         </div>
 
+                        <!-- Instructions -->
+                        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <h4 class="text-sm font-semibold text-blue-800 mb-2 flex items-center">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Instructions:
+                            </h4>
+                            <ol class="text-sm text-blue-700 space-y-1 list-decimal list-inside">
+                                <li><strong>Step 1:</strong> Select Customer Account (AC#) first by clicking the search icon</li>
+                                <li><strong>Step 2:</strong> Search existing Master Cards or enter new MCS number</li>
+                                <li><strong>Step 3:</strong> Click 'Proceed' to continue with detailed information</li>
+                            </ol>
+                        </div>
+
                         <!-- Form content -->
                         <form @submit.prevent="saveRecord" class="space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1305,6 +1318,8 @@ const loadCustomerAccounts = async () => {
 const selectCustomer = async (customer) => {
     if (!customer) return;
 
+    console.log('selectCustomer called with:', customer);
+
     // Show processing state
     isProcessing.value = true;
 
@@ -1338,6 +1353,7 @@ const selectCustomer = async (customer) => {
     isProgrammaticUpdate.value = false; // Re-enable input handlers
     selectedMcs.value = null;
     mcsMasterCards.value = [];
+    mcsError.value = null; // Clear any previous errors
     showDetailedMcInfo.value = false; // Don't show details until MC is selected or MCS number is entered
     recordMode.value = "new";
 
@@ -2185,6 +2201,9 @@ const fetchMcsData = async (page = 1) => {
     mcsLoading.value = true;
     mcsError.value = null;
 
+    console.log('fetchMcsData called with page:', page);
+    console.log('Current form.ac:', form.value.ac);
+
     // Validate customer account must exist before fetching data
     if (!form.value.ac) {
         mcsError.value = "Please select Customer Account (AC#) first.";
@@ -2208,21 +2227,23 @@ const fetchMcsData = async (page = 1) => {
         // Filter by customer account - REQUIRED
         const customerFilter = `&customer_code=${encodeURIComponent(form.value.ac)}`;
 
+        // Build API URL
+        const apiUrl = `/api/update-mc/master-cards?page=${page}&query=${encodeURIComponent(
+            mcsSearchTerm.value
+        )}&sortBy=${mcsSortOption.value}&sortOrder=${
+            mcsSortOrder.value
+        }${statusQuery}${customerFilter}`;
+        
+        console.log('API URL:', apiUrl);
+
         // Make API call using fetch for more control
-        const response = await fetch(
-            `/api/update-mc/master-cards?page=${page}&query=${encodeURIComponent(
-                mcsSearchTerm.value
-            )}&sortBy=${mcsSortOption.value}&sortOrder=${
-                mcsSortOrder.value
-            }${statusQuery}${customerFilter}`,
-            {
-                headers: {
-                    Accept: "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-                credentials: "same-origin",
-            }
-        );
+        const response = await fetch(apiUrl, {
+            headers: {
+                Accept: "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            credentials: "same-origin",
+        });
 
         if (!response.ok) {
             throw new Error(
@@ -2260,6 +2281,7 @@ const fetchMcsData = async (page = 1) => {
                 "No existing Master Cards found. You can create a new one."
             );
         } else {
+            console.log(`Found ${mcsMasterCards.value.length} master card(s):`, mcsMasterCards.value);
             toast.success(
                 `Found ${mcsMasterCards.value.length} master card(s) for ${form.value.customer_name}`
             );
