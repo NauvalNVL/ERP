@@ -1116,6 +1116,93 @@ Route::prefix('api')->group(function () {
     Route::get('/material-management/skus/categories', [MmSkuController::class, 'getCategories']);
     Route::get('/material-management/skus/units', [MmSkuController::class, 'getUnits']);
     Route::get('/material-management/skus/types', [MmSkuController::class, 'getTypes']);
+
+    // Expose a concise list of navigable menu routes for header search
+    Route::get('/menu-routes', function () {
+        $routes = [];
+        $abbrMap = [
+            'mc' => 'Master Card',
+            'so' => 'Sales Order',
+            'fg' => 'Finished Goods',
+            'dn' => 'Debit Note',
+            'cn' => 'Credit Note',
+            'rc' => 'RC',
+            'rt' => 'RT',
+            'is' => 'Issue Slip',
+            'mi' => 'Material Issue',
+            'mo' => 'Material Order',
+            'lt' => 'Location Transfer',
+            'ac' => 'Account',
+            'sku' => 'SKU',
+            'pd' => 'Product Design',
+            'wo' => 'Work Order',
+            'po' => 'Purchase Order',
+            'pr' => 'Purchase Requisition',
+        ];
+        $crudExclude = ['index', 'create', 'edit'];
+        $genericView = ['view', 'view-print', 'viewandprint', 'view-printing', 'viewandprinting', 'view_print'];
+
+        $humanize = function (string $leaf) use ($abbrMap) {
+            $tokens = preg_split('/[-_\s]+/', strtolower($leaf));
+            $words = array_map(function ($t) use ($abbrMap) {
+                if ($t === '') return '';
+                if (isset($abbrMap[$t])) return $abbrMap[$t];
+                if (strlen($t) <= 3 && preg_match('/^[a-z]+$/', $t)) return strtoupper($t);
+                return ucwords($t);
+            }, $tokens);
+            return trim(preg_replace('/\s+/', ' ', implode(' ', $words)));
+        };
+
+        foreach (Route::getRoutes() as $route) {
+            $name = $route->getName();
+            $methods = $route->methods();
+            if (!in_array('GET', $methods)) {
+                continue;
+            }
+            $uri = '/' . ltrim($route->uri(), '/');
+            if (str_starts_with($uri, '/api/')) {
+                continue;
+            }
+            if ($name && str_contains($name, 'vue.')) {
+                $parts = explode('.', $name);
+                $leaf = end($parts) ?: $name;
+                if (in_array(strtolower($leaf), $crudExclude, true)) {
+                    continue;
+                }
+
+                // Determine title; if leaf is generic view, prepend with previous meaningful segment
+                $title = '';
+                $leafLower = strtolower($leaf);
+                if (in_array($leafLower, $genericView, true)) {
+                    // find previous non-generic segment
+                    $prev = '';
+                    for ($i = count($parts) - 2; $i >= 0; $i--) {
+                        $candidate = $parts[$i];
+                        if (!in_array(strtolower($candidate), array_merge($crudExclude, $genericView), true)) {
+                            $prev = $candidate;
+                            break;
+                        }
+                    }
+                    $subject = $prev !== '' ? $humanize($prev) : 'Data';
+                    $title = 'View & Print ' . $subject;
+                } else {
+                    $title = $humanize($leaf);
+                }
+
+                $routes[] = [
+                    'name' => $name,
+                    'uri' => $uri,
+                    'title' => $title,
+                ];
+                continue;
+            }
+        }
+        $routes = collect($routes)
+            ->unique('uri')
+            ->values()
+            ->all();
+        return response()->json($routes);
+    });
 });
 
 // Roll Size Route
