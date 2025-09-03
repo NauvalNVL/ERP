@@ -380,6 +380,7 @@ Route::middleware('auth')->group(function () {
          Route::get('/sales-management/system-requirement/master-card/update-mc', [UpdateMcController::class, 'index'])->name('vue.master-card.update-mc');
          Route::post('/api/update-mc/search-ac', [UpdateMcController::class, 'searchAc']);
          Route::post('/api/update-mc/search-mcs', [UpdateMcController::class, 'searchMcs']);
+         Route::get('/api/update-mc/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs']);
          
          // Add route for approve-mc
          Route::get('/sales-management/system-requirement/master-card/approve-mc', function () {
@@ -1357,6 +1358,7 @@ Route::prefix('update-mc')->group(function () {
     Route::post('/search-ac', [UpdateMcController::class, 'searchAc'])->name('update-mc.search-ac');
     Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs'])->name('update-mc.search-mcs');
     Route::get('/master-cards', [UpdateMcController::class, 'apiIndex'])->name('update-mc.master-cards');
+    Route::get('/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs'])->name('update-mc.check-mcs');
 });
 
         // Inventory Reports Routes

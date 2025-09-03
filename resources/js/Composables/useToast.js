@@ -22,6 +22,16 @@ export function useToast() {
     }
   };
 
+  const loading = (message) => {
+    const id = state.nextId++;
+    state.toasts.push({ id, message, type: 'loading' });
+    return id; // Return the toast ID for dismissal
+  };
+
+  const dismiss = (id) => {
+    removeToast(id);
+  };
+
   const success = (message) => addToast(message, 'success');
   const error = (message) => addToast(message, 'error');
   const warning = (message) => addToast(message, 'warning');
@@ -31,6 +41,8 @@ export function useToast() {
     ...toRefs(state),
     addToast,
     removeToast,
+    loading,
+    dismiss,
     success,
     error,
     warning,
