@@ -301,10 +301,19 @@ const fetchCustomerAccounts = async () => {
         
         const data = await response.json();
         console.log('Received customer accounts data:', data);
-        customerAccounts.value = data.map(account => ({
-            ...account,
-            status: account.status || 'Active'  // Default to Active if status is missing
-        }));
+        
+        // Handle the data structure - it might be wrapped in a 'data' property
+        const accountsData = data.data || data;
+        
+        if (Array.isArray(accountsData)) {
+            customerAccounts.value = accountsData.map(account => ({
+                ...account,
+                status: account.status || 'Active'  // Default to Active if status is missing
+            }));
+        } else {
+            console.error('Expected array but received:', typeof accountsData, accountsData);
+            customerAccounts.value = [];
+        }
     } catch (error) {
         console.error('Error fetching customer accounts:', error);
     } finally {
