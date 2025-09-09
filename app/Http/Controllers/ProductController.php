@@ -9,12 +9,20 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Database\Seeders\ProductSeeder;
 
 class ProductController extends Controller
 {
     public function index()
     {
         $products = Product::all();
+        
+        // If there are no products in the database, seed them
+        if ($products->isEmpty()) {
+            $this->seedData();
+            $products = Product::all();
+        }
+        
         $productGroups = ProductGroup::all();
         $categories = $this->getCategories();
         
@@ -373,6 +381,30 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete product: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function seedData()
+    {
+        try {
+            $seeder = new ProductSeeder();
+            $seeder->run();
+        } catch (\Exception $e) {
+            Log::error('Error seeding product data: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            return response()->json(['success' => true, 'message' => 'Product seed data created successfully']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating product seed data: ' . $e->getMessage()
             ], 500);
         }
     }

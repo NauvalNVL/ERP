@@ -54,10 +54,7 @@
                     </div>
                     <div v-else-if="productGroups.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
                         <p class="text-sm font-medium text-yellow-800">No product group data available.</p>
-                        <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
-                        <div class="mt-2 flex items-center space-x-3">
-                            <button @click="loadSeedData" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Run Product Group Seeder</button>
-                        </div>
+                        <p class="text-xs text-yellow-700 mt-1">Data will be automatically loaded when available.</p>
                     </div>
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
                         <p class="text-sm font-medium text-green-800">Data available: {{ productGroups.length }} groups found.</p>
@@ -501,34 +498,6 @@ const deleteGroup = async (id) => {
     }
 };
 
-const loadSeedData = async () => {
-    saving.value = true;
-    try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-        
-        const response = await fetch('/api/product-groups/seed', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            }
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showNotification('Product group data seeded successfully', 'success');
-            await fetchProductGroups();
-        } else {
-            showNotification('Error seeding data: ' + (result.message || 'Unknown error'), 'error');
-        }
-    } catch (e) {
-        console.error('Error seeding data:', e);
-        showNotification('Error seeding data. Please try again.', 'error');
-    } finally {
-        saving.value = false;
-    }
-};
 
 const showNotification = (message, type = 'success') => {
     notification.value = {

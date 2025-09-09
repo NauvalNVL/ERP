@@ -22,8 +22,7 @@ class ScoringToolController extends Controller
             
             // If there are no tools in the database, seed them
             if ($scoringTools->isEmpty()) {
-                $seeder = new ScoringToolSeeder();
-                $seeder->run();
+                $this->seedData();
                 $scoringTools = ScoringTool::orderBy('code')->get();
             }
             
@@ -379,21 +378,26 @@ class ScoringToolController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function seed()
+    private function seedData()
     {
         try {
             $seeder = new ScoringToolSeeder();
             $seeder->run();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Scoring tool data seeded successfully'
-            ]);
         } catch (\Exception $e) {
-            Log::error('Error in ScoringToolController@seed: ' . $e->getMessage());
+            Log::error('Error seeding scoring tool data: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            return response()->json(['success' => true, 'message' => 'Scoring tool seed data created successfully']);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to seed scoring tool data: ' . $e->getMessage()
+                'message' => 'Error creating scoring tool seed data: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -59,10 +59,7 @@
                     </div>
                     <div v-else-if="salespersonTeams.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
                         <p class="text-sm font-medium text-yellow-800">No salesperson team data available.</p>
-                        <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
-                        <div class="mt-2 flex items-center space-x-3">
-                            <button @click="loadSeedData" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Run Salesperson Team Seeder</button>
-                        </div>
+                        <p class="text-xs text-yellow-700 mt-1">Data will be automatically loaded when available.</p>
                     </div>
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
                         <p class="text-sm font-medium text-green-800">Data available: {{ salespersonTeams.length }} salesperson teams found.</p>
@@ -563,41 +560,6 @@ const deleteSalespersonTeam = async (code) => {
     }
 };
 
-const loadSeedData = async () => {
-    saving.value = true;
-    try {
-        const csrfToken = getCsrfToken();
-        
-        const response = await fetch('/api/salesperson-teams/seed', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin'
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error seeding data');
-        }
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showNotification('Salesperson team data seeded successfully', 'success');
-            await fetchSalespersonTeams();
-        } else {
-            showNotification('Error seeding data: ' + (result.message || 'Unknown error'), 'error');
-        }
-    } catch (e) {
-        console.error('Error seeding data:', e);
-        showNotification('Error seeding data: ' + e.message, 'error');
-    } finally {
-        saving.value = false;
-    }
-};
 
 const showNotification = (message, type = 'success') => {
     notification.value = {

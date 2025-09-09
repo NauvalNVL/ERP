@@ -15,6 +15,12 @@ class SalesTeamController extends Controller
             // Always load from database, ordered by code
             $salesTeams = SalesTeam::orderBy('code')->get();
             
+            // If no data exists, automatically seed the data
+            if ($salesTeams->isEmpty()) {
+                $this->seedData();
+                $salesTeams = SalesTeam::orderBy('code')->get();
+            }
+            
             // If the request wants JSON, return JSON response
             if (request()->wantsJson() || request()->ajax()) {
                 return response()->json($salesTeams);
@@ -212,11 +218,11 @@ class SalesTeamController extends Controller
     }
 
     /**
-     * Seed sales team data.
+     * Seed sales team data (private method for internal use).
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return void
      */
-    public function seed()
+    private function seedData()
     {
         try {
             // Default sales teams
@@ -226,22 +232,33 @@ class SalesTeamController extends Controller
                 ['code' => '03', 'name' => 'MANAGEMENT MNC']
             ];
 
-            $created = [];
-
             foreach ($defaultTeams as $team) {
                 $exists = SalesTeam::where('code', $team['code'])->exists();
                 if (!$exists) {
-                    $created[] = SalesTeam::create([
+                    SalesTeam::create([
                         'code' => $team['code'],
                         'name' => $team['name']
                     ]);
                 }
             }
+        } catch (\Exception $e) {
+            Log::error('Error seeding sales team data: ' . $e->getMessage());
+        }
+    }
 
+    /**
+     * Seed sales team data (public API method).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            
             return response()->json([
                 'success' => true,
-                'message' => 'Sales team seed data created successfully',
-                'created' => $created
+                'message' => 'Sales team seed data created successfully'
             ]);
         } catch (\Exception $e) {
             Log::error('Error seeding sales team data: ' . $e->getMessage());

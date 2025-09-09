@@ -12,24 +12,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // Standard Requirement Seeders - Sales Management
-            SalesTeamSeeder::class,
-            SalespersonSeeder::class,
-            SalespersonTeamSeeder::class,
-            IndustrySeeder::class,
-            GeoSeeder::class,
-            ProductGroupSeeder::class,
-            ProductSeeder::class,
-            ProductDesignSeeder::class,
-            ScoringToolSeeder::class,
-            PaperQualitySeeder::class,
-            PaperFluteSeeder::class,
-            PaperSizeSeeder::class,
-            ColorGroupSeeder::class,
-            ColorSeeder::class,
-            FinishingSeeder::class,
-            
-            // Other existing seeders
             PurchaseSubControlSeeder::class,
             ApproverSeeder::class,
             PurchaserSeeder::class,
@@ -54,6 +36,7 @@ class DatabaseSeeder extends Seeder
             ForeignCurrencySeeder::class,
             MmLocationSeeder::class,
             CorrugatorSpecByProductSeeder::class,
+            ProductDesignSeeder::class,
             RollSizeSeeder::class,
             RollTrimByProductDesignSeeder::class,
             RollTrimByCorrugatorSeeder::class,
@@ -73,12 +56,26 @@ class DatabaseSeeder extends Seeder
             ObsolateReactiveMCSeeder::class,
             BusinessFormSeeder::class,
             UserSeeder::class,
+            FinishingSeeder::class,
             ComputationMethodSeeder::class,
+            PaperFluteSeeder::class,
+            ProductSeeder::class,
             CorrugatorConfigSeeder::class,
             ScoringFormulaSeeder::class,
             StandardFormulaSeeder::class,
             UpdateMcSeeder::class,
             VendorSeeder::class,
+            SalespersonSeeder::class,
+            SalesTeamSeeder::class,
+            SalespersonTeamSeeder::class,
+            ScoringToolSeeder::class,
+            PaperQualitySeeder::class,
+            PaperSizeSeeder::class,
+            ColorGroupSeeder::class,
+            ColorSeeder::class,
+            IndustrySeeder::class,
+            GeoSeeder::class,
+            ProductGroupSeeder::class,
         ]);
     }
 }

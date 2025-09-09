@@ -45,6 +45,21 @@ class ColorController extends Controller
             
             $colorGroups = ColorGroup::all();
             
+            // If no data exists, automatically seed the data
+            if ($colors->isEmpty()) {
+                $this->seedData();
+                $colors = DB::table('colors')
+                    ->select([
+                        'color_id',
+                        'color_name',
+                        'origin',
+                        'color_group_id',
+                        'cg_type'
+                    ])
+                    ->orderBy('color_id', 'asc')
+                    ->get();
+            }
+            
             // For debugging
             if ($colors->isEmpty()) {
                 Log::info('No colors found in the database');
@@ -442,11 +457,11 @@ class ColorController extends Controller
     }
 
     /**
-     * Seed the database with sample color data.
+     * Seed color data (private method for internal use).
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return void
      */
-    public function seed()
+    private function seedData()
     {
         try {
             // Sample color data
@@ -463,8 +478,6 @@ class ColorController extends Controller
                 ['color_id' => 'WT01', 'color_name' => 'White Standard', 'origin' => 'ID', 'color_group_id' => 'W', 'cg_type' => 'X-Flexo'],
             ];
 
-            $createdCount = 0;
-
             foreach ($sampleData as $data) {
                 // Skip if color already exists
                 if (DB::table('colors')->where('color_id', $data['color_id'])->exists()) {
@@ -475,12 +488,25 @@ class ColorController extends Controller
                     'created_at' => now(),
                     'updated_at' => now()
                 ]));
-                $createdCount++;
             }
+        } catch (\Exception $e) {
+            Log::error('Error seeding color data: ' . $e->getMessage());
+        }
+    }
 
+    /**
+     * Seed the database with sample color data (public API method).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            
             return response()->json([
                 'success' => true,
-                'message' => "Successfully seeded $createdCount colors"
+                'message' => 'Color seed data created successfully'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ColorController@seed: ' . $e->getMessage());

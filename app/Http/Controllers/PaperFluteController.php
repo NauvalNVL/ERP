@@ -23,8 +23,7 @@ class PaperFluteController extends Controller
             
             // If there are no flutes in the database, seed them
             if ($paperFlutes->isEmpty()) {
-                $seeder = new PaperFluteSeeder();
-                $seeder->run();
+                $this->seedData();
                 $paperFlutes = PaperFlute::orderBy('code')->get();
             }
             
@@ -378,6 +377,30 @@ class PaperFluteController extends Controller
         } catch (\Exception $e) {
             Log::error('Error fetching paper flutes for API: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load paper flute data'], 500);
+        }
+    }
+
+    private function seedData()
+    {
+        try {
+            $seeder = new PaperFluteSeeder();
+            $seeder->run();
+        } catch (\Exception $e) {
+            Log::error('Error seeding paper flute data: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            return response()->json(['success' => true, 'message' => 'Paper flute seed data created successfully']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating paper flute seed data: ' . $e->getMessage()
+            ], 500);
         }
     }
 } 
