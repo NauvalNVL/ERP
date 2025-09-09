@@ -123,11 +123,11 @@
                             <h5 class="font-medium text-gray-700 mb-3">Update Account Status</h5>
                             <div class="flex items-center space-x-6">
                                 <label class="inline-flex items-center">
-                                    <input type="radio" class="form-radio h-5 w-5 text-blue-600" v-model="newStatus" value="Y" checked>
+                                    <input type="radio" name="account-status" class="form-radio h-5 w-5 text-blue-600" v-model="newStatus" value="Y">
                                     <span class="ml-2 text-gray-700">Activate Account</span>
                                 </label>
                                 <label class="inline-flex items-center">
-                                    <input type="radio" class="form-radio h-5 w-5 text-red-600" v-model="newStatus" value="N">
+                                    <input type="radio" name="account-status" class="form-radio h-5 w-5 text-red-600" v-model="newStatus" value="N">
                                     <span class="ml-2 text-gray-700">Deactivate Account</span>
                                 </label>
                             </div>
