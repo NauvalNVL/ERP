@@ -1119,6 +1119,64 @@ Route::prefix('api')->group(function () {
     Route::get('/material-management/skus/types', [MmSkuController::class, 'getTypes']);
 
 
+    // Test route for auto-seeder
+    Route::get('/test-auto-seeder', function () {
+        return Inertia::render('TestAutoSeeder');
+    })->name('test.auto-seeder');
+
+    // Auto-seeder route for standard requirements
+    Route::post('/api/auto-seed-standard-requirements', function () {
+        try {
+            $seeders = [
+                \Database\Seeders\SalesTeamSeeder::class,
+                \Database\Seeders\SalespersonSeeder::class,
+                \Database\Seeders\SalespersonTeamSeeder::class,
+                \Database\Seeders\IndustrySeeder::class,
+                \Database\Seeders\GeoSeeder::class,
+                \Database\Seeders\ProductGroupSeeder::class,
+                \Database\Seeders\ProductSeeder::class,
+                \Database\Seeders\ProductDesignSeeder::class,
+                \Database\Seeders\ScoringToolSeeder::class,
+                \Database\Seeders\PaperQualitySeeder::class,
+                \Database\Seeders\PaperFluteSeeder::class,
+                \Database\Seeders\PaperSizeSeeder::class,
+                \Database\Seeders\ColorGroupSeeder::class,
+                \Database\Seeders\ColorSeeder::class,
+                \Database\Seeders\FinishingSeeder::class,
+            ];
+
+            $results = [];
+            foreach ($seeders as $seederClass) {
+                try {
+                    $seeder = new $seederClass();
+                    $seeder->run();
+                    $results[] = [
+                        'seeder' => class_basename($seederClass),
+                        'status' => 'success',
+                        'message' => 'Seeded successfully'
+                    ];
+                } catch (\Exception $e) {
+                    $results[] = [
+                        'seeder' => class_basename($seederClass),
+                        'status' => 'error',
+                        'message' => $e->getMessage()
+                    ];
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Standard requirements seeding completed',
+                'results' => $results
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error running auto-seed: ' . $e->getMessage()
+            ], 500);
+        }
+    });
+
     // Expose a concise list of navigable menu routes for header search
     Route::get('/menu-routes', function () {
         $routes = [];

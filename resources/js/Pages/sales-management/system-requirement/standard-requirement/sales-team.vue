@@ -248,6 +248,7 @@ import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import SalesTeamModal from '@/Components/sales-team-modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { useAutoSeeder } from '@/Composables/useAutoSeeder';
 
 // Get the header from props
 const props = defineProps({
@@ -267,6 +268,9 @@ const searchQuery = ref('');
 const editForm = ref({ code: '', name: '', description: '' });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
+
+// Auto-seeder functionality
+const { checkAndRunAutoSeed } = useAutoSeeder();
 
 // Reference to the CSRF form
 const csrfForm = ref(null);
@@ -338,8 +342,10 @@ const fetchSalesTeams = async () => {
     }
 };
 
-onMounted(() => {
-    fetchSalesTeams();
+onMounted(async () => {
+    // Run auto-seeder first, then fetch data
+    await checkAndRunAutoSeed();
+    await fetchSalesTeams();
 });
 
 // Watch for changes in search query to filter the data
