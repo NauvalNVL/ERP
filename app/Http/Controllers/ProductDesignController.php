@@ -14,6 +14,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use Database\Seeders\ProductDesignSeeder;
 
 class ProductDesignController extends Controller
 {
@@ -30,6 +31,13 @@ class ProductDesignController extends Controller
             }
 
             $productDesigns = ProductDesign::paginate(10);
+            
+            // If there are no product designs in the database, seed them
+            if ($productDesigns->isEmpty()) {
+                $this->seedData();
+                $productDesigns = ProductDesign::paginate(10);
+            }
+            
         return view('sales-management.system-requirement.system-requirement.standard-requirement.productdesign', compact('productDesigns'));
         } catch (\Exception $e) {
             Log::error('Error in ProductDesignController@index: ' . $e->getMessage());
@@ -591,6 +599,30 @@ class ProductDesignController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error retrieving product design: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function seedData()
+    {
+        try {
+            $seeder = new ProductDesignSeeder();
+            $seeder->run();
+        } catch (\Exception $e) {
+            Log::error('Error seeding product design data: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            return response()->json(['success' => true, 'message' => 'Product design seed data created successfully']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating product design seed data: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -16,6 +16,12 @@ class ProductGroupController extends Controller
             // Always load from database, ordered by product_group_id
             $productGroups = ProductGroup::orderBy('product_group_id')->get();
             
+            // If there are no product groups in the database, seed them
+            if ($productGroups->isEmpty()) {
+                $this->seedData();
+                $productGroups = ProductGroup::orderBy('product_group_id')->get();
+            }
+            
             // If the request wants JSON, return JSON response
             if ($request->wantsJson() || $request->ajax() || $request->is('api/*')) {
                 return response()->json($productGroups);
@@ -168,7 +174,7 @@ class ProductGroupController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function apiSeed()
+    private function seedData()
     {
         try {
             $sampleGroups = [
@@ -179,31 +185,31 @@ class ProductGroupController extends Controller
                 ['code' => 'F', 'name' => 'Film', 'is_active' => true],
             ];
 
-            $createdGroups = [];
             foreach ($sampleGroups as $group) {
                 // Check if the group already exists
                 $existingGroup = ProductGroup::where('product_group_id', $group['code'])->first();
                 
                 if (!$existingGroup) {
-                    $newGroup = ProductGroup::create([
+                    ProductGroup::create([
                         'product_group_id' => $group['code'],
                         'product_group_name' => $group['name'],
                         'is_active' => $group['is_active']
                     ]);
-                    
-                    $createdGroups[] = [
-                        'id' => $newGroup->id,
-                        'code' => $newGroup->product_group_id,
-                        'name' => $newGroup->product_group_name,
-                        'is_active' => $newGroup->is_active
-                    ];
                 }
             }
+        } catch (\Exception $e) {
+            Log::error('Error seeding product group data: ' . $e->getMessage());
+            throw $e;
+        }
+    }
 
+    public function apiSeed()
+    {
+        try {
+            $this->seedData();
             return response()->json([
                 'success' => true,
-                'message' => count($createdGroups) . ' product groups seeded successfully',
-                'data' => $createdGroups
+                'message' => 'Product group seed data created successfully'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ProductGroupController@apiSeed: ' . $e->getMessage());

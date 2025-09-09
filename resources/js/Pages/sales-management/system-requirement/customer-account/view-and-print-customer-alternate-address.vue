@@ -34,7 +34,7 @@
                         <i class="fas fa-print text-white"></i>
                       </div>
                       <span>Print</span>
-    </div>
+                </div>
                 </button>
                   <button @click="exportToExcel" class="bg-gradient-to-r from-green-600 to-teal-500 text-white hover:from-green-700 hover:to-teal-600 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md relative overflow-hidden group">
                     <span class="absolute inset-0 bg-white opacity-20 transform scale-x-0 origin-left transition-transform group-hover:scale-x-100"></span>
@@ -233,13 +233,13 @@
         </div>
 
           <!-- Table Footer -->
-          <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
+          <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-white">
             <div class="flex items-center justify-between">
               <div class="flex items-center">
                 <i class="fas fa-info-circle mr-2 text-blue-500"></i>
                 <span>Showing {{ filteredAddresses.length }} of {{ addresses.length }} entries</span>
               </div>
-              <div class="text-xs text-gray-400">Generated: {{ new Date().toLocaleString() }}</div>
+              <div class="text-xs text-white">Generated: {{ new Date().toLocaleString() }}</div>
             </div>
           </div>
         </div>
@@ -254,7 +254,7 @@
             </div>
             <div class="flex-1">
               <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-3">Instructions</h4>
-              <ul class="list-disc pl-5 text-sm text-gray-600 space-y-2">
+              <ul class="list-disc pl-5 text-sm text-white space-y-2">
                 <li>Use the search box to filter by customer name, code, or address</li>
                 <li>Click the column headers to sort the data</li>
                 <li>Use the status filter to show active or obsolete records</li>

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Geo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Database\Seeders\GeoSeeder;
 
 class GeoController extends Controller
 {
@@ -12,10 +14,22 @@ class GeoController extends Controller
         try {
             if ($request->ajax()) {
                 $geos = Geo::orderBy('country')->orderBy('state')->get();
+                
+                if ($geos->isEmpty()) {
+                    $this->seedData();
+                    $geos = Geo::orderBy('country')->orderBy('state')->get();
+                }
+                
                 return response()->json($geos);
             }
             
-        $geoData = Geo::all();
+            $geoData = Geo::all();
+            
+            if ($geoData->isEmpty()) {
+                $this->seedData();
+                $geoData = Geo::all();
+            }
+            
             return view('sales-management.system-requirement.system-requirement.standard-requirement.geo', compact('geoData'));
         } catch (\Exception $e) {
             if ($request->ajax()) {
@@ -179,6 +193,30 @@ class GeoController extends Controller
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error in GeoController@apiIndex: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load geo data'], 500);
+        }
+    }
+
+    private function seedData()
+    {
+        try {
+            $seeder = new GeoSeeder();
+            $seeder->run();
+        } catch (\Exception $e) {
+            Log::error('Error seeding geo data: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            return response()->json(['success' => true, 'message' => 'Geo seed data created successfully']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating geo seed data: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

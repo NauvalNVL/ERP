@@ -22,9 +22,8 @@ class SalespersonController extends Controller
             
             // If there are no salespersons in the database, seed them
             if ($salespersons->isEmpty()) {
-                $seeder = new SalespersonSeeder();
-                $seeder->run();
-        $salespersons = Salesperson::orderBy('code')->get();
+                $this->seedData();
+                $salespersons = Salesperson::orderBy('code')->get();
             }
             
             // If the request wants JSON, return JSON response
@@ -260,7 +259,7 @@ class SalespersonController extends Controller
         }
     }
 
-    public function seed()
+    private function seedData()
     {
         try {
             DB::beginTransaction();
@@ -270,18 +269,22 @@ class SalespersonController extends Controller
             $seeder->run();
             
             DB::commit();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Salesperson data seeded successfully'
-            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error seeding salesperson data: ' . $e->getMessage());
-            
+            throw $e;
+        }
+    }
+
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            return response()->json(['success' => true, 'message' => 'Salesperson seed data created successfully']);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error seeding salesperson data: ' . $e->getMessage()
+                'message' => 'Error creating salesperson seed data: ' . $e->getMessage()
             ], 500);
         }
     }

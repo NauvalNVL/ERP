@@ -59,10 +59,7 @@
                     </div>
                     <div v-else-if="finishings.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
                         <p class="text-sm font-medium text-yellow-800">No finishing data available.</p>
-                        <p class="text-xs text-yellow-700 mt-1">Make sure the database is properly configured and seeders have been run.</p>
-                        <div class="mt-2 flex items-center space-x-3">
-                            <button @click="loadSeedData" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">Run Finishing Seeder</button>
-                        </div>
+                        <p class="text-xs text-yellow-700 mt-1">Data will be automatically loaded when available.</p>
                     </div>
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
                         <p class="text-sm font-medium text-green-800">Data available: {{ finishings.length }} finishing methods found.</p>
@@ -506,37 +503,6 @@ const deleteFinishing = async (code) => {
     }
 };
 
-const loadSeedData = async () => {
-    saving.value = true;
-    try {
-        // Get fresh CSRF token
-        const csrfToken = getCsrfToken();
-        
-        const response = await fetch('/api/finishings/seed', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin' // Include cookies in the request
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showNotification('Finishing data seeded successfully', 'success');
-            await fetchFinishings();
-        } else {
-            showNotification('Error seeding data: ' + (result.message || 'Unknown error'), 'error');
-        }
-    } catch (e) {
-        console.error('Error seeding data:', e);
-        showNotification('Error seeding data. Please try again.', 'error');
-    } finally {
-        saving.value = false;
-    }
-};
 
 const showNotification = (message, type = 'success') => {
     notification.value = {

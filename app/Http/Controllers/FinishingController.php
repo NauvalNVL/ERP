@@ -16,6 +16,12 @@ class FinishingController extends Controller
             // Always load from database, ordered by code
             $finishings = Finishing::orderBy('code')->get();
             
+            // If no data exists, automatically seed the data
+            if ($finishings->isEmpty()) {
+                $this->seedData();
+                $finishings = Finishing::orderBy('code')->get();
+            }
+            
             // If the request wants JSON, return JSON response
             if (request()->wantsJson() || request()->ajax()) {
                 return response()->json($finishings);
@@ -221,11 +227,11 @@ class FinishingController extends Controller
     }
 
     /**
-     * Seed finishing data.
+     * Seed finishing data (private method for internal use).
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return void
      */
-    public function seed()
+    private function seedData()
     {
         try {
             // Default finishings
@@ -237,23 +243,34 @@ class FinishingController extends Controller
                 ['code' => 'W', 'description' => 'Wrapping', 'is_compute' => false]
             ];
 
-            $created = [];
-
             foreach ($defaultFinishings as $finishing) {
                 $exists = Finishing::where('code', $finishing['code'])->exists();
                 if (!$exists) {
-                    $created[] = Finishing::create([
+                    Finishing::create([
                         'code' => $finishing['code'],
                         'description' => $finishing['description'],
                         'is_compute' => $finishing['is_compute']
                     ]);
                 }
             }
+        } catch (\Exception $e) {
+            Log::error('Error seeding finishing data: ' . $e->getMessage());
+        }
+    }
 
+    /**
+     * Seed finishing data (public API method).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            
             return response()->json([
                 'success' => true,
-                'message' => 'Finishing seed data created successfully',
-                'created' => $created
+                'message' => 'Finishing seed data created successfully'
             ]);
         } catch (\Exception $e) {
             Log::error('Error seeding finishing data: ' . $e->getMessage());

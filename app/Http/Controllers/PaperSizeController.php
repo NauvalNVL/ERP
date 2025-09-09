@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Database\Seeders\PaperSizeSeeder;
 
 class PaperSizeController extends Controller
 {
@@ -17,10 +18,23 @@ class PaperSizeController extends Controller
             // Jika request adalah AJAX, kembalikan data dalam format JSON
             if (request()->ajax() || request()->wantsJson()) {
                 $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+                
+                if ($paperSizes->isEmpty()) {
+                    $this->seedData();
+                    $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+                }
+                
                 return response()->json($paperSizes);
             }
             
             $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+            
+            // If there are no paper sizes in the database, seed them
+            if ($paperSizes->isEmpty()) {
+                $this->seedData();
+                $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+            }
+            
             return view('sales-management.system-requirement.system-requirement.standard-requirement.papersize', compact('paperSizes'));
         } catch (\Exception $e) {
             Log::error('Error in PaperSizeController@index: ' . $e->getMessage());
@@ -348,6 +362,30 @@ class PaperSizeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete paper size: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function seedData()
+    {
+        try {
+            $seeder = new PaperSizeSeeder();
+            $seeder->run();
+        } catch (\Exception $e) {
+            Log::error('Error seeding paper size data: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            return response()->json(['success' => true, 'message' => 'Paper size seed data created successfully']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating paper size seed data: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -71,10 +71,7 @@
                     </div>
                     <div v-else-if="customerGroups.length === 0">
                       <p class="text-sm font-medium">No customer group data available.</p>
-                      <p class="text-xs text-yellow-700 mt-1">Make sure the database is configured and seeders have been run.</p>
-                      <button @click="loadSeedData" class="mt-2 text-xs px-3 py-1 rounded-md transition-colors bg-yellow-400 text-yellow-900 hover:bg-yellow-500">
-                          Run Customer Group Seeder
-                      </button>
+                      <p class="text-xs text-yellow-700 mt-1">Data will be automatically loaded when available.</p>
                   </div>
                     <div v-else>
                       <p class="text-sm font-medium">Data ready: {{ customerGroups.length }} customer groups found.</p>
@@ -385,25 +382,6 @@ const deleteCustomerGroup = async (groupCode) => {
   }
 };
 
-const loadSeedData = async () => {
-  saving.value = true;
-  try {
-    const response = await axios.post('/api/customer-groups/seed');
-    const result = response.data;
-    if (result.success) {
-      showNotification('Customer group data seeded successfully!', 'success');
-      await fetchCustomerGroups();
-    } else {
-      showNotification('Error seeding data: ' + (result.message || 'Unknown error'), 'error');
-    }
-  } catch (e) {
-    const errorMessage = e.response?.data?.message || e.message || 'An error occurred';
-    console.error('Error seeding data:', e);
-    showNotification(`Error seeding data: ${errorMessage}`, 'error');
-  } finally {
-    saving.value = false;
-  }
-};
 
 const showNotification = (message, type = 'success') => {
   notification.value = {

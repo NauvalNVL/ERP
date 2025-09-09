@@ -13,6 +13,12 @@ class IndustryController extends Controller
     {
         $industries = Industry::orderBy('code')->get();
         
+        // If no data exists, automatically seed the data
+        if ($industries->isEmpty()) {
+            $this->seedData();
+            $industries = Industry::orderBy('code')->get();
+        }
+        
         if (request()->ajax() || request()->wantsJson()) {
             return response()->json($industries);
         }
@@ -169,6 +175,60 @@ class IndustryController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in IndustryController@apiIndex: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load industry data'], 500);
+        }
+    }
+
+    /**
+     * Seed industry data (private method for internal use).
+     *
+     * @return void
+     */
+    private function seedData()
+    {
+        try {
+            // Default industries
+            $defaultIndustries = [
+                ['code' => 'F', 'name' => 'Food'],
+                ['code' => 'E', 'name' => 'Electronics'],
+                ['code' => 'P', 'name' => 'Pharmaceuticals'],
+                ['code' => 'A', 'name' => 'Automotive'],
+                ['code' => 'R', 'name' => 'Retail']
+            ];
+
+            foreach ($defaultIndustries as $industry) {
+                $exists = Industry::where('code', $industry['code'])->exists();
+                if (!$exists) {
+                    Industry::create([
+                        'code' => $industry['code'],
+                        'name' => $industry['name']
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error seeding industry data: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Seed industry data (public API method).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Industry seed data created successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error seeding industry data: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error seeding industry data: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

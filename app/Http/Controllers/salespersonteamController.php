@@ -36,6 +36,22 @@ class SalespersonTeamController extends Controller
                 ->orderBy('s_person_code')
                 ->get();
             
+            // If there are no salesperson teams in the database, seed them
+            if ($salespersons->isEmpty()) {
+                $this->seedData();
+                $salespersons = DB::table('salesperson_teams')
+                    ->select(
+                        'id',
+                        's_person_code',
+                        'salesperson_name',
+                        'st_code',
+                        'sales_team_name',
+                        'sales_team_position'
+                    )
+                    ->orderBy('s_person_code')
+                    ->get();
+            }
+            
             // Mengambil data sales team untuk dropdown dan convert ke collection
             $salesTeams = collect([
                 (object)['id' => 1, 'code' => '01', 'name' => 'MBI'],
@@ -364,7 +380,7 @@ class SalespersonTeamController extends Controller
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function apiSeed()
+    private function seedData()
     {
         try {
             $sampleData = [
@@ -391,21 +407,32 @@ class SalespersonTeamController extends Controller
                 ]
             ];
             
-            // Clear existing data first
-            DB::table('salesperson_teams')->truncate();
-            
-            // Insert sample data
+            // Insert sample data only if it doesn't exist
             foreach ($sampleData as $data) {
-                DB::table('salesperson_teams')->insert(array_merge($data, [
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]));
+                $exists = DB::table('salesperson_teams')
+                    ->where('s_person_code', $data['s_person_code'])
+                    ->exists();
+                
+                if (!$exists) {
+                    DB::table('salesperson_teams')->insert(array_merge($data, [
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]));
+                }
             }
-            
+        } catch (\Exception $e) {
+            Log::error('Error seeding salesperson team data: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function apiSeed()
+    {
+        try {
+            $this->seedData();
             return response()->json([
                 'success' => true,
-                'message' => 'Sample data seeded successfully',
-                'count' => count($sampleData)
+                'message' => 'Sample data seeded successfully'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in SalespersonTeamController@apiSeed: ' . $e->getMessage());

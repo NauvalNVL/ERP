@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Database\Seeders\PaperQualitySeeder;
 
 class PaperQualityController extends Controller
 {
@@ -15,6 +16,13 @@ class PaperQualityController extends Controller
     {
         try {
             $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->get();
+            
+            // If there are no paper qualities in the database, seed them
+            if ($paperQualities->isEmpty()) {
+                $this->seedData();
+                $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->get();
+            }
+            
             return view('sales-management.system-requirement.system-requirement.standard-requirement.paperquality', compact('paperQualities'));
         } catch (\Exception $e) {
             Log::error('Error in PaperQualityController@index: ' . $e->getMessage());
@@ -490,6 +498,30 @@ class PaperQualityController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete paper quality: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function seedData()
+    {
+        try {
+            $seeder = new PaperQualitySeeder();
+            $seeder->run();
+        } catch (\Exception $e) {
+            Log::error('Error seeding paper quality data: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            return response()->json(['success' => true, 'message' => 'Paper quality seed data created successfully']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating paper quality seed data: ' . $e->getMessage()
             ], 500);
         }
     }

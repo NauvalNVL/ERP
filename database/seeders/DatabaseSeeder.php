@@ -65,6 +65,17 @@ class DatabaseSeeder extends Seeder
             StandardFormulaSeeder::class,
             UpdateMcSeeder::class,
             VendorSeeder::class,
+            SalespersonSeeder::class,
+            SalesTeamSeeder::class,
+            SalespersonTeamSeeder::class,
+            ScoringToolSeeder::class,
+            PaperQualitySeeder::class,
+            PaperSizeSeeder::class,
+            ColorGroupSeeder::class,
+            ColorSeeder::class,
+            IndustrySeeder::class,
+            GeoSeeder::class,
+            ProductGroupSeeder::class,
         ]);
     }
 }

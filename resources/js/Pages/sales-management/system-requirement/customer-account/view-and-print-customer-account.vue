@@ -233,7 +233,7 @@
                 </table>
 
                 <!-- Table Footer -->
-              <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
+              <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-white">
                     <div class="flex items-center justify-between">
                   <div class="flex items-center">
                     <i class="fas fa-info-circle mr-2 text-blue-500"></i>
@@ -242,7 +242,7 @@
                   <div v-if="searchQuery || statusFilter !== 'all'" class="text-blue-600">
                     Filtered from {{ customerAccounts.length }} total records
                   </div>
-                        <div class="text-xs text-gray-400">Generated: {{ currentDate }}</div>
+                        <div class="text-xs text-white">Generated: {{ currentDate }}</div>
                 </div>
                     </div>
                 </div>
@@ -257,7 +257,7 @@
             </div>
             Print Instructions
             </h3>
-          <ul class="list-disc pl-5 text-sm text-gray-600 space-y-2">
+          <ul class="list-disc pl-5 text-sm text-white space-y-2">
                 <li>Click the "Print List" button above to print this customer account list</li>
                 <li>Use landscape orientation for better results</li>
                 <li>You can search, filter by status, or sort data before printing</li>
@@ -301,10 +301,19 @@ const fetchCustomerAccounts = async () => {
         
         const data = await response.json();
         console.log('Received customer accounts data:', data);
-        customerAccounts.value = data.map(account => ({
-            ...account,
-            status: account.status || 'Active'  // Default to Active if status is missing
-        }));
+        
+        // Handle the data structure - it might be wrapped in a 'data' property
+        const accountsData = data.data || data;
+        
+        if (Array.isArray(accountsData)) {
+            customerAccounts.value = accountsData.map(account => ({
+                ...account,
+                status: account.status || 'Active'  // Default to Active if status is missing
+            }));
+        } else {
+            console.error('Expected array but received:', typeof accountsData, accountsData);
+            customerAccounts.value = [];
+        }
     } catch (error) {
         console.error('Error fetching customer accounts:', error);
     } finally {
