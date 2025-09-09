@@ -726,11 +726,13 @@
                             <label class="text-xs font-medium w-16">Score L:</label>
                             <div class="flex items-center space-x-1">
                                 <template v-for="i in 10" :key="'scoreL'+i">
-                                    <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                    <input type="text" v-model.number="scoreL[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
                                     <span v-if="i < 10" class="text-xs text-gray-500 font-bold">+</span>
                                 </template>
                             </div>
-                            <button class="ml-2 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                            <span class="mx-2 text-xs font-bold">=</span>
+                            <input type="text" :value="scoreLTotal" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
+                            <button class="ml-2 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="calculateScoreL">
                                 <i class="fas fa-calculator"></i>
                             </button>
                             <div class="ml-auto flex items-center">
@@ -748,11 +750,13 @@
                             <label class="text-xs font-medium w-16">Score W:</label>
                             <div class="flex items-center space-x-1">
                                 <template v-for="i in 10" :key="'scoreW'+i">
-                                    <input type="text" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
+                                    <input type="text" v-model.number="scoreW[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
                                     <span v-if="i < 10" class="text-xs text-gray-500 font-bold">+</span>
                                 </template>
                             </div>
-                            <button class="ml-2 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                            <span class="mx-2 text-xs font-bold">=</span>
+                            <input type="text" :value="scoreWTotal" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50">
+                            <button class="ml-2 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="calculateScoreW">
                                 <i class="fas fa-calculator"></i>
                             </button>
                             <div class="ml-auto flex items-center">
@@ -792,8 +796,8 @@
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-12">S/Tool:</label>
-                                <input type="text" value="1" class="w-8 px-2 py-1 border border-gray-400 text-xs">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                <input type="text" :value="selectedScoringToolCode" readonly class="w-8 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openScoringToolModal" title="Select Scoring Tool">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
@@ -811,27 +815,33 @@
                         <div class="flex items-center mb-2">
                             <label class="text-xs font-medium w-20">Print Color:</label>
                             <div class="flex space-x-1">
-                                <button class="w-8 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" v-for="i in 7" :key="'color'+i">
-                                    <i class="fas fa-search"></i>
-                                </button>
+                                <div v-for="i in 7" :key="'color'+i" class="flex items-center space-x-1">
+                                    <input type="text" :value="printColorCodes[i-1]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                    <button class="w-8 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openColorModal(i-1)" title="Select Color">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Print Area Row -->
                         <div class="flex items-center mb-2">
-                            <label class="text-xs font-medium w-20">Print Area(%):</label>
-                            <div class="flex space-x-1">
-                                <input type="text" value="0.00" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center" v-for="i in 7" :key="'area'+i">
+                            <div class="flex items-center w-80">
+                                <label class="text-xs font-medium w-20">Print Area(%):</label>
+                                <div class="flex space-x-1">
+                                    <input type="text" value="0.00" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center" v-for="i in 7" :key="'area'+i">
+                                </div>
                             </div>
-                            <div class="ml-auto flex items-center">
-                                <label class="text-xs font-medium w-16">Pit Block#:</label>
-                                <input type="text" class="w-32 px-2 py-1 border border-gray-400 text-xs">
+                            <div class="w-64"></div>
+                            <div class="flex items-center w-64">
+                                <label class="text-xs font-medium w-24">Pit Block#:</label>
+                                <input type="text" class="w-24 px-2 py-1 border border-gray-400 text-xs">
                             </div>
                         </div>
 
                         <!-- D/Cut Sheet Row -->
                         <div class="flex items-center mb-2 space-x-4">
-                            <div class="flex items-center">
+                            <div class="flex items-center w-80">
                                 <label class="text-xs font-medium w-20">D/Cut Sheet:</label>
                                 <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 <span class="text-xs ml-1">L</span>
@@ -841,14 +851,14 @@
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
-                            <div class="flex items-center">
-                                <label class="text-xs font-medium w-20">D/Cut Block#:</label>
+                            <div class="flex items-center w-64">
+                                <label class="text-xs font-medium w-24">D/Cut Block#:</label>
                                 <input type="text" class="w-24 px-2 py-1 border border-gray-400 text-xs">
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-16">Glueing:</label>
-                                <input type="text" class="w-20 px-2 py-1 border border-gray-400 text-xs">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                <input type="text" :value="selectedGlueingCode" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openGlueingModal" title="Select Glueing Material">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
@@ -862,7 +872,7 @@
 
                         <!-- D/Cut Mould Row -->
                         <div class="flex items-center mb-2 space-x-4">
-                            <div class="flex items-center">
+                            <div class="flex items-center w-80">
                                 <label class="text-xs font-medium w-20">D/Cut Mould:</label>
                                 <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 <span class="text-xs ml-1">L</span>
@@ -872,20 +882,21 @@
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
-                            <div class="flex items-center">
+                            <div class="flex items-center w-64">
                                 <label class="text-xs font-medium w-24">Stitch Wire Pcs:</label>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                <input type="text" :value="selectedStitchWireCode" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openStitchWireModal" title="Select Stitch Wire">
                                     <i class="fas fa-search"></i>
                                 </button>
+                                <input type="text" v-model="stitchWirePieces" class="ml-2 w-16 px-2 py-1 border border-gray-400 text-xs text-right" placeholder="pcs">
                                 <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                     <i class="fas fa-calculator"></i>
                                 </button>
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-16">Wrapping:</label>
-                                <input type="text" class="w-20 px-2 py-1 border border-gray-400 text-xs">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                <input type="text" :value="selectedWrappingCode" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openWrappingModal" title="Select Wrapping Material">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
@@ -899,19 +910,20 @@
 
                         <!-- Finishing Row -->
                         <div class="flex items-center mb-2 space-x-4">
-                            <div class="flex items-center">
+                            <div class="flex items-center w-80">
                                 <label class="text-xs font-medium w-16">Finishing:</label>
-                                <input type="text" class="w-32 px-2 py-1 border border-gray-400 text-xs">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                <input type="text" :value="selectedFinishingCode" readonly class="w-32 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openFinishingModal" title="Select Finishing">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
-                            <div class="flex items-center">
+                            <div class="flex items-center w-64">
                                 <label class="text-xs font-medium w-24">Bundle String Qty:</label>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                <input type="text" :value="selectedBundlingStringCode" readonly class="w-16 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openBundlingStringModal" title="Select Bundling String">
                                     <i class="fas fa-search"></i>
                                 </button>
+                                <input type="text" v-model="bundlingStringQty" class="ml-2 w-16 px-2 py-1 border border-gray-400 text-xs text-right" placeholder="qty">
                                 <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                     <i class="fas fa-calculator"></i>
                                 </button>
@@ -930,19 +942,18 @@
 
                         <!-- Item Remark Row -->
                         <div class="flex items-center">
-                            <div class="flex items-center">
+                            <div class="flex items-center w-80">
                                 <label class="text-xs font-medium w-20">Item Remark:</label>
                                 <input type="text" class="w-40 px-2 py-1 border border-gray-400 text-xs">
                             </div>
-                            <div class="ml-auto flex items-center space-x-4">
-                                <div class="flex items-center">
-                                    <label class="text-xs font-medium w-16">Peel Off%:</label>
-                                    <input type="text" value="0.00" class="w-16 px-2 py-1 border border-gray-400 text-xs text-right">
-                                </div>
-                                <div class="bg-gray-200 border border-gray-400 px-3 py-1 text-center">
-                                    <div class="text-xs font-bold">MSP</div>
-                                    <div class="text-xs">Sub Material</div>
-                                </div>
+                            <div class="w-64"></div>
+                            <div class="flex items-center w-64">
+                                <label class="text-xs font-medium w-24">Peel Off%:</label>
+                                <input type="text" value="0.00" class="w-24 px-2 py-1 border border-gray-400 text-xs text-right">
+                            </div>
+                            <div class="ml-auto flex items-center space-x-2">
+                                <button class="px-3 py-1 bg-gray-200 border border-gray-400 text-xs font-bold cursor-default" disabled>MSP</button>
+                                <button class="px-3 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openSubMaterialModal">Sub-Material</button>
                             </div>
                         </div>
                     </div>
@@ -992,12 +1003,69 @@
         @close="showPaperSizeModal = false"
         @select="(size) => { selectedPaperSize = size?.size || ''; showPaperSizeModal = false; }"
     />
+    <ColorModal
+        :show="showColorModal"
+        :colors="colors"
+        :color-groups="colorGroups"
+        @close="showColorModal = false"
+        @select="onColorSelected"
+    />
+    <FinishingModal
+        :show="showFinishingModal"
+        :finishings="finishings"
+        @close="showFinishingModal = false"
+        @select="onFinishingSelected"
+    />
+    <ScoringToolModal
+        :show="showScoringToolModal"
+        :scoring-tools="scoringTools"
+        @close="showScoringToolModal = false"
+        @select="onScoringToolSelected"
+    />
+    <StitchWireModal
+        :show="showStitchWireModal"
+        :items="stitchWireItems"
+        @close="showStitchWireModal = false"
+        @select="onStitchWireSelected"
+    />
+    <BundlingStringModal
+        :show="showBundlingStringModal"
+        :items="bundlingStringItems"
+        @close="showBundlingStringModal = false"
+        @select="onBundlingStringSelected"
+    />
+    <GlueingMaterialModal
+        :show="showGlueingModal"
+        :items="glueingItems"
+        @close="showGlueingModal = false"
+        @select="onGlueingSelected"
+    />
+    <WrappingMaterialModal
+        :show="showWrappingModal"
+        :items="wrappingItems"
+        @close="showWrappingModal = false"
+        @select="onWrappingSelected"
+    />
+    <SubMaterialModal
+        :show="showSubMaterialModal"
+        :value="subMaterials"
+        @update:value="(v) => { subMaterials = v }"
+        @close="showSubMaterialModal = false"
+    />
 </template>
 
 <script setup>
 import { defineEmits, defineProps, ref } from 'vue';
 import ProductDesignModal from '@/Components/product-design-modal.vue';
 import PaperFluteModal from '@/Components/paper-flute-selector-modal.vue';
+import ScoringToolModal from '@/Components/scoring-tool-modal.vue';
+import ColorModal from '@/Components/color-modal.vue';
+import FinishingModal from '@/Components/finishing-modal.vue';
+import StitchWireModal from '@/Components/stitch-wire-modal.vue';
+import BundlingStringModal from '@/Components/bundling-string-modal.vue';
+import GlueingMaterialModal from '@/Components/glueing-material-modal.vue';
+import SubMaterialModal from '@/Components/sub-material-modal.vue';
+import WrappingMaterialModal from '@/Components/wrapping-material-modal.vue';
 import ChemicalCoatModal from '@/Components/chemical-coat-modal.vue';
 import ReinforcementTapeModal from '@/Components/reinforcement-tape-modal.vue';
 import PaperSizeModal from '@/Components/paper-size-modal.vue';
@@ -1038,6 +1106,193 @@ const paperSizeRows = ref([
     { id: 4, size: '105.00', inches: '4.13', description: 'A6 Paper Size' },
     { id: 5, size: '74.00', inches: '2.91', description: 'A7 Paper Size' }
 ]);
+
+// Scoring Tool Modal
+const showScoringToolModal = ref(false);
+const selectedScoringToolCode = ref('');
+const scoringTools = ref([]);
+
+const openScoringToolModal = async () => {
+    if (scoringTools.value.length === 0) {
+        try {
+            const response = await fetch('/api/scoring-tools', {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                scoringTools.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+            } else {
+                scoringTools.value = [];
+            }
+        } catch (e) {
+            scoringTools.value = [];
+        }
+    }
+    showScoringToolModal.value = true;
+};
+
+const onScoringToolSelected = (tool) => {
+    selectedScoringToolCode.value = tool?.code || '';
+    showScoringToolModal.value = false;
+};
+
+// Color Modal for Print Colors
+const showColorModal = ref(false);
+const colors = ref([]);
+const colorGroups = ref([]);
+const activePrintColorIndex = ref(0);
+const printColorCodes = ref(['', '', '', '', '', '', '']);
+
+const openColorModal = async (index) => {
+    activePrintColorIndex.value = index;
+    if (colors.value.length === 0) {
+        try {
+            const res = await fetch('/api/colors', { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
+            if (res.ok) {
+                const data = await res.json();
+                colors.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+            }
+        } catch (e) {}
+    }
+    if (colorGroups.value.length === 0) {
+        try {
+            const res = await fetch('/api/color-groups', { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
+            if (res.ok) {
+                const data = await res.json();
+                colorGroups.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+            }
+        } catch (e) {}
+    }
+    showColorModal.value = true;
+};
+
+const onColorSelected = (color) => {
+    if (color && typeof activePrintColorIndex.value === 'number') {
+        const next = [...printColorCodes.value];
+        next[activePrintColorIndex.value] = color.color_id || '';
+        printColorCodes.value = next;
+    }
+    showColorModal.value = false;
+};
+
+// Score L/W state and calculators
+const scoreL = ref(Array(10).fill(''));
+const scoreW = ref(Array(10).fill(''));
+const scoreLTotal = ref('');
+const scoreWTotal = ref('');
+
+const calculateScore = (arr) => {
+    return arr
+        .map(v => parseFloat(String(v).toString().replace(/,/g, '.')))
+        .filter(v => !isNaN(v))
+        .reduce((sum, v) => sum + v, 0)
+        .toFixed(2);
+};
+
+const calculateScoreL = () => {
+    scoreLTotal.value = calculateScore(scoreL.value);
+};
+
+const calculateScoreW = () => {
+    scoreWTotal.value = calculateScore(scoreW.value);
+};
+
+// Finishing Modal
+const showFinishingModal = ref(false);
+const finishings = ref([]);
+const selectedFinishingCode = ref('');
+
+const openFinishingModal = async () => {
+    if (finishings.value.length === 0) {
+        try {
+            const res = await fetch('/api/finishings', { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
+            if (res.ok) {
+                const data = await res.json();
+                finishings.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+            }
+        } catch (e) {}
+    }
+    showFinishingModal.value = true;
+};
+
+const onFinishingSelected = (finishing) => {
+    selectedFinishingCode.value = finishing?.code || '';
+    showFinishingModal.value = false;
+};
+
+// Stitch Wire Modal
+const showStitchWireModal = ref(false);
+const selectedStitchWireCode = ref('');
+const stitchWireItems = ref([
+    { code: '001', name: 'TIPE 1+1+1+1+1' },
+    { code: '002', name: 'TIPE 2+1+1+1+2' },
+    { code: '003', name: 'TIPE 2+2+2+2+2' }
+]);
+const stitchWirePieces = ref('');
+
+const openStitchWireModal = async () => {
+    // If later there is an API, fetch here similarly to others
+    showStitchWireModal.value = true;
+};
+
+const onStitchWireSelected = (item) => {
+    selectedStitchWireCode.value = item?.code || '';
+    showStitchWireModal.value = false;
+};
+
+// Bundling String Modal
+const showBundlingStringModal = ref(false);
+const selectedBundlingStringCode = ref('');
+const bundlingStringItems = ref([
+    { code: '001', name: '5 MM' },
+    { code: '002', name: '7 MM' }
+]);
+const bundlingStringQty = ref('');
+
+const openBundlingStringModal = async () => {
+    // If later there is an API, fetch here similarly to others
+    showBundlingStringModal.value = true;
+};
+
+const onBundlingStringSelected = (item) => {
+    selectedBundlingStringCode.value = item?.code || '';
+    showBundlingStringModal.value = false;
+};
+
+// Sub-Material Modal
+const showSubMaterialModal = ref(false);
+let subMaterials = ref([]);
+const openSubMaterialModal = () => { showSubMaterialModal.value = true; };
+
+// Glueing Material Modal
+const showGlueingModal = ref(false);
+const selectedGlueingCode = ref('');
+const glueingItems = ref([
+    { code: '001', name: 'PVAC' }
+]);
+const openGlueingModal = async () => {
+    // Placeholder for future API fetch
+    showGlueingModal.value = true;
+};
+const onGlueingSelected = (item) => {
+    selectedGlueingCode.value = item?.code || '';
+    showGlueingModal.value = false;
+};
+
+// Wrapping Material Modal
+const showWrappingModal = ref(false);
+const selectedWrappingCode = ref('');
+const wrappingItems = ref([
+    { code: '001', name: 'PLASTIK' },
+    { code: '002', name: 'KERTAS' }
+]);
+const openWrappingModal = async () => {
+    showWrappingModal.value = true;
+};
+const onWrappingSelected = (item) => {
+    selectedWrappingCode.value = item?.code || '';
+    showWrappingModal.value = false;
+};
 
 const handleSortOptionChange = (event) => {
     const newSortOption = event.target.value;
