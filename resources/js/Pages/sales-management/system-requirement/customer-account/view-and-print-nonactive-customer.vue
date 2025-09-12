@@ -63,14 +63,14 @@
                                 <div class="flex items-center gap-4">
                                     <div class="relative flex group flex-1">
                                         <input type="text" v-model="form.salesman_code_from" id="salesman_code_from" class="input-field" placeholder="From">
-                                        <button type="button" class="lookup-button from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600">
+                                        <button type="button" @click="openSalespersonModal('from')" class="lookup-button from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>
                                     <span class="text-gray-500 font-medium">TO</span>
                                     <div class="relative flex group flex-1">
                                         <input type="text" v-model="form.salesman_code_to" class="input-field" placeholder="To">
-                                        <button type="button" class="lookup-button from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600">
+                                        <button type="button" @click="openSalespersonModal('to')" class="lookup-button from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>
@@ -88,14 +88,14 @@
                                 <div class="flex items-center gap-4">
                                      <div class="relative flex group flex-1">
                                         <input type="text" v-model="form.customer_code_from" id="customer_code_from" class="input-field" placeholder="From">
-                                        <button type="button" class="lookup-button from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+                                        <button type="button" @click="openCustomerAccountModal('from')" class="lookup-button from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>
                                     <span class="text-gray-500 font-medium">TO</span>
                                     <div class="relative flex group flex-1">
                                         <input type="text" v-model="form.customer_code_to" class="input-field" placeholder="To">
-                                        <button type="button" class="lookup-button from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+                                        <button type="button" @click="openCustomerAccountModal('to')" class="lookup-button from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>
@@ -249,12 +249,32 @@
                  </div>
             </div>
         </div>
+
+        <!-- Salesperson Modal -->
+        <SalespersonModal 
+            v-if="showSalespersonModal" 
+            :show="showSalespersonModal" 
+            :salespersons="salespersonList" 
+            @close="closeSalespersonModal" 
+            @select="onSalespersonSelect" 
+        />
+        <!-- Customer Account Modal -->
+        <CustomerAccountModal
+            v-if="showCustomerAccountModal"
+            :show="showCustomerAccountModal"
+            :customer-accounts="customerAccounts"
+            @close="closeCustomerAccountModal"
+            @select="onCustomerAccountSelect"
+        />
     </AppLayout>
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import SalespersonModal from '@/Components/salesperson-modal.vue';
+import CustomerAccountModal from '@/Components/customer-account-modal.vue';
 
 const form = useForm({
     sales_period_month: new Date().getMonth() + 1,
@@ -269,6 +289,39 @@ const form = useForm({
     non_active_months: 0,
 });
 
+// Salesperson lookup state
+const showSalespersonModal = ref(false);
+const salespersonList = ref([]);
+const salespersonTarget = ref('from'); // 'from' | 'to'
+
+const openSalespersonModal = async (target) => {
+    salespersonTarget.value = target;
+    try {
+        const res = await fetch('/api/salespersons', {
+            headers: { 'Accept': 'application/json' }
+        });
+        const data = await res.json();
+        salespersonList.value = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+    } catch (e) {
+        salespersonList.value = [];
+    }
+    showSalespersonModal.value = true;
+};
+
+const closeSalespersonModal = () => {
+    showSalespersonModal.value = false;
+};
+
+const onSalespersonSelect = (person) => {
+    if (!person || !person.code) return;
+    if (salespersonTarget.value === 'from') {
+        form.salesman_code_from = person.code;
+    } else {
+        form.salesman_code_to = person.code;
+    }
+    showSalespersonModal.value = false;
+};
+
 const submit = () => {
     // Logic to submit the form for printing
     console.log('Printing report with criteria:', form.data());
@@ -279,6 +332,37 @@ const submit = () => {
 const cancel = () => {
     // Logic to cancel and maybe go back to the dashboard or previous page
     window.history.back();
+};
+
+// Customer account lookup state
+const showCustomerAccountModal = ref(false);
+const customerAccounts = ref([]);
+const customerTarget = ref('from');
+
+const openCustomerAccountModal = async (target) => {
+    customerTarget.value = target;
+    try {
+        const res = await fetch('/api/customer-accounts', { headers: { 'Accept': 'application/json' } });
+        const data = await res.json();
+        customerAccounts.value = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+    } catch (e) {
+        customerAccounts.value = [];
+    }
+    showCustomerAccountModal.value = true;
+};
+
+const closeCustomerAccountModal = () => {
+    showCustomerAccountModal.value = false;
+};
+
+const onCustomerAccountSelect = (account) => {
+    if (!account || !account.customer_code) return;
+    if (customerTarget.value === 'from') {
+        form.customer_code_from = account.customer_code;
+    } else {
+        form.customer_code_to = account.customer_code;
+    }
+    showCustomerAccountModal.value = false;
 };
 </script>
 
