@@ -18,7 +18,7 @@
             <div
                 class="absolute bottom-0 right-0 w-32 h-32 bg-yellow-400 opacity-5 rounded-full translate-y-10 translate-x-10"
             ></div>
-
+            
             <div class="flex items-center">
                 <div
                     class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner flex items-center justify-center relative overflow-hidden mr-4"
@@ -69,7 +69,7 @@
                                 <i class="fas fa-edit text-white"></i>
                             </div>
                             <h3 class="text-xl font-semibold text-gray-800">
-                                Master Card Management
+                                Select Master Card
                             </h3>
                         </div>
 
@@ -88,7 +88,7 @@
                                                 class="fas fa-building text-white text-xs"
                                             ></i>
                                         </span>
-                                        AC#:
+                                        Customer A/C#:
                                     </label>
                                     <div class="relative flex group">
                                         <span
@@ -96,57 +96,27 @@
                                         >
                                             <i class="fas fa-hashtag"></i>
                                         </span>
-                                        <input
-                                            type="text"
-                                            id="ac"
+                                        <input 
+                                            type="text" 
+                                            id="ac" 
                                             v-model="searchTerm"
-                                            placeholder="Search master cards..."
-                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
                                         />
-                                        <button
+                                        <button 
                                             type="button"
                                             @click="openCustomerAccountModal"
-                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm group"
+                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gray-200 text-gray-700 rounded-r-md"
                                         >
-                                            <span
-                                                class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"
-                                            ></span>
-                                            <span class="flex items-center">
-                                                <i
-                                                    class="fas fa-search relative z-10 mr-1"
-                                                ></i>
-                                                <span
-                                                    class="text-xs font-medium hidden md:inline-block"
-                                                    >Find Customer</span
-                                                >
-                                            </span>
+                                            <i class="fas fa-table"></i>
                                         </button>
                                     </div>
                                 </div>
 
-                                <div class="flex items-end">
-                                    <button
-                                        type="button"
-                                        @click="handleAddNew"
-                                        class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
-                                    >
-                                        <span
-                                            class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"
-                                        ></span>
-                                        <div
-                                            class="bg-white bg-opacity-30 rounded-full p-1.5 mr-2 flex items-center justify-center"
-                                        >
-                                            <i
-                                                class="fas fa-plus text-white text-xs"
-                                            ></i>
-                                        </div>
-                                        <span>Add New</span>
-                                    </button>
-                                </div>
+                                <div class="flex items-end"></div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
+                            <div>
                                     <label
                                         for="mcs"
                                         class="block text-sm font-medium text-gray-700 mb-1 flex items-center"
@@ -157,72 +127,37 @@
                                             <i
                                                 class="fas fa-barcode text-white text-xs"
                                             ></i>
-                                        </span>
-                                        MCS#:
-                                    </label>
+                                    </span>
+                                    M/Card Seq#:
+                                </label>
                                     <div class="relative flex group">
                                         <span
                                             class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors"
                                         >
                                             <i class="fas fa-barcode"></i>
                                         </span>
-                                        <input
-                                            type="text"
-                                            id="mcs"
+                                        <input 
+                                            type="text" 
+                                            id="mcs" 
                                             v-model="mcsInput"
-                                            placeholder="Enter MCS number"
-                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300"
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
                                         />
-                                        <button
+                                        <button 
                                             type="button"
                                             @click="openMcsModal"
-                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
+                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gray-200 text-gray-700 rounded-r-md"
                                         >
-                                            <span
-                                                class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"
-                                            ></span>
-                                            <i
-                                                class="fas fa-search relative z-10"
-                                            ></i>
+                                            <i class="fas fa-table"></i>
                                         </button>
                                     </div>
-                                </div>
-
+                                    </div>
+                                    
                                 <div class="flex items-end">
                                     <!-- Empty space to maintain grid alignment -->
                                 </div>
                             </div>
 
-                            <!-- Master Card Table -->
-                            <!-- Bagian tabel dihapus sesuai permintaan user -->
-
-                            <div
-                                class="px-6 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between mt-4 rounded-b-lg"
-                            >
-                                <span class="text-sm text-gray-500">
-                                    Showing
-                                    {{ filteredMasterCards.length }} master
-                                    cards
-                                </span>
-                                <div class="flex items-center space-x-2">
-                                    <button
-                                        class="px-3 py-1 bg-white border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 shadow-sm"
-                                    >
-                                        <i
-                                            class="fas fa-chevron-left mr-1 text-xs"
-                                        ></i>
-                                        Previous
-                                    </button>
-                                    <button
-                                        class="px-3 py-1 bg-gradient-to-r from-indigo-500 to-purple-600 border border-indigo-500 rounded-md text-sm text-white hover:from-indigo-600 hover:to-purple-700 shadow-sm"
-                                    >
-                                        Next
-                                        <i
-                                            class="fas fa-chevron-right ml-1 text-xs"
-                                        ></i>
-                                    </button>
-                                </div>
-                            </div>
+                            <!-- Minimal footer omitted to match legacy UI -->
                         </div>
                     </div>
                 </div>
@@ -310,7 +245,7 @@
                                 </ul>
                             </div>
                         </div>
-
+                        
                         <!-- Selected Master Card Detail -->
                         <div v-if="selectedMasterCard" class="mt-6">
                             <div
@@ -328,7 +263,7 @@
                                     </span>
                                     Selected Master Card
                                 </h4>
-
+                                
                                 <div class="flex items-center mb-3">
                                     <div
                                         class="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-lg flex items-center justify-center mr-3 shadow-md"
@@ -348,7 +283,7 @@
                                         </p>
                                     </div>
                                 </div>
-
+                                
                                 <div class="space-y-2 text-sm">
                                     <div
                                         class="flex justify-between items-center"
@@ -369,7 +304,7 @@
                                         <span class="text-gray-500"
                                             >Status:</span
                                         >
-                                        <span
+                                        <span 
                                             class="px-2 py-1 rounded-full text-xs font-medium"
                                             :class="{
                                                 'bg-gradient-to-r from-green-400 to-green-500 text-white':
@@ -394,9 +329,9 @@
                                         </span>
                                     </div>
                                 </div>
-
+                                
                                 <div class="mt-4 grid grid-cols-2 gap-2">
-                                    <button
+                                    <button 
                                         @click="
                                             handleApprove(selectedMasterCard)
                                         "
@@ -405,7 +340,7 @@
                                         <i class="fas fa-check text-xs"></i>
                                         <span>Approve</span>
                                     </button>
-                                    <button
+                                    <button 
                                         @click="
                                             handleReject(selectedMasterCard)
                                         "
@@ -417,7 +352,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        
                         <!-- Filter Options -->
                         <div class="mt-6">
                             <h4
@@ -432,7 +367,7 @@
                                 </span>
                                 Filter Options
                             </h4>
-
+                            
                             <div class="space-y-3">
                                 <div>
                                     <label
@@ -478,14 +413,14 @@
                                         </label>
                                     </div>
                                 </div>
-
+                                
                                 <div>
                                     <label
                                         class="text-xs font-medium text-gray-700 block mb-1"
                                         >Sort by:</label
                                     >
-                                    <select
-                                        v-model="sortBy"
+                                    <select 
+                                        v-model="sortBy" 
                                         class="block w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                                     >
                                         <option value="seq">MC Sequence</option>
@@ -819,7 +754,7 @@
                         <div
                             class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"
                         ></div>
-
+                        
                         <div class="flex items-center">
                             <div
                                 class="bg-white bg-opacity-20 p-2 rounded-full mr-3"
@@ -831,7 +766,7 @@
                             </h3>
                         </div>
                     </div>
-
+                    
                     <div class="bg-white px-6 py-5">
                         <div class="sm:flex sm:items-start">
                             <div
@@ -877,12 +812,12 @@
                             </div>
                         </div>
                     </div>
-
+                    
                     <div
                         class="bg-gray-50 px-6 py-4 flex justify-end space-x-3"
                     >
-                        <button
-                            type="button"
+                        <button 
+                            type="button" 
                             class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-5 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
                             @click="confirmApproval"
                         >
@@ -892,8 +827,8 @@
                             <i class="fas fa-check text-sm mr-1"></i>
                             <span>Approve</span>
                         </button>
-                        <button
-                            type="button"
+                        <button 
+                            type="button" 
                             class="bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-700 px-5 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
                             @click="showApprovalModal = false"
                         >
@@ -984,7 +919,7 @@
                         <div
                             class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"
                         ></div>
-
+                        
                         <div class="flex items-center">
                             <div
                                 class="bg-white bg-opacity-20 p-2 rounded-full mr-3"
@@ -996,7 +931,7 @@
                             </h3>
                         </div>
                     </div>
-
+                    
                     <div class="bg-white px-6 py-5">
                         <div class="sm:flex sm:items-start mb-4">
                             <div
@@ -1037,7 +972,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div class="mb-3">
                             <label
                                 class="block text-sm font-medium text-gray-700 mb-2 flex items-center"
@@ -1051,20 +986,20 @@
                                 </span>
                                 Rejection Reason:
                             </label>
-                            <textarea
-                                v-model="rejectionReason"
-                                rows="4"
+                            <textarea 
+                                v-model="rejectionReason" 
+                                rows="4" 
                                 placeholder="Please provide a detailed reason for rejecting this master card..."
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                             ></textarea>
                         </div>
                     </div>
-
+                    
                     <div
                         class="bg-gray-50 px-6 py-4 flex justify-end space-x-3"
                     >
-                        <button
-                            type="button"
+                        <button 
+                            type="button" 
                             class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-5 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
                             @click="confirmRejection"
                         >
@@ -1074,8 +1009,8 @@
                             <i class="fas fa-times text-sm mr-1"></i>
                             <span>Reject</span>
                         </button>
-                        <button
-                            type="button"
+                        <button 
+                            type="button" 
                             class="bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-700 px-5 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
                             @click="showRejectionModal = false"
                         >
@@ -1124,8 +1059,8 @@
                             >
                                 Select Option
                             </h3>
-                            <button
-                                @click="showOptionModal = false"
+                            <button 
+                                @click="showOptionModal = false" 
                                 class="text-white opacity-70 hover:opacity-100 focus:outline-none"
                             >
                                 <svg
@@ -1192,11 +1127,11 @@
                                 </label>
                             </div>
                         </div>
-
+                        
                         <div class="flex justify-center space-x-4">
-                            <button
-                                type="button"
-                                class="inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            <button 
+                                type="button" 
+                                class="inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" 
                                 @click="handleSelectOption"
                             >
                                 <svg
@@ -1215,9 +1150,9 @@
                                 </svg>
                                 Apply
                             </button>
-                            <button
-                                type="button"
-                                class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            <button 
+                                type="button" 
+                                class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" 
                                 @click="showOptionModal = false"
                             >
                                 <svg
@@ -1253,7 +1188,7 @@
         />
 
         <!-- Customer Account Modal -->
-        <CustomerAccountModal
+        <CustomerAccountModal 
             v-if="showCustomerAccountTable"
             :show="showCustomerAccountTable"
             :customer-accounts="
@@ -1277,7 +1212,7 @@
                 class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
                 @click="showCustomerAccountOptionsModal = false"
             ></div>
-
+            
             <!-- Modal content -->
             <div
                 class="relative bg-white rounded-lg shadow-xl w-96 mx-auto max-w-lg z-10 transform transition-all"
@@ -1311,7 +1246,7 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-
+                
                 <div class="p-6 space-y-6">
                     <!-- Sort By Options -->
                     <div
@@ -1352,7 +1287,7 @@
                             </label>
                         </div>
                     </div>
-
+                    
                     <!-- Record Status Options -->
                     <div
                         class="bg-white border border-gray-300 rounded-md shadow-sm p-4"
@@ -1389,12 +1324,12 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <div
                     class="flex items-center justify-center space-x-4 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg"
                 >
-                    <button
-                        @click="applyOptionsFromCustomerTable"
+                    <button 
+                        @click="applyOptionsFromCustomerTable" 
                         class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium py-2 px-8 rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg relative overflow-hidden group"
                     >
                         <span
@@ -1402,11 +1337,11 @@
                         ></span>
                         <span class="inline-flex items-center">
                             <i class="fas fa-check mr-2"></i>
-                            OK
+                        OK
                         </span>
                     </button>
-                    <button
-                        @click="showCustomerAccountOptionsModal = false"
+                    <button 
+                        @click="showCustomerAccountOptionsModal = false" 
                         class="bg-gradient-to-r from-gray-300 to-gray-400 hover:from-gray-400 hover:to-gray-500 text-gray-800 font-medium py-2 px-8 rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 shadow-md hover:shadow-lg relative overflow-hidden group"
                     >
                         <span
@@ -1430,7 +1365,7 @@
                 class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
                 @click="showMcsOptionsModal = false"
             ></div>
-
+            
             <!-- Modal content -->
             <div
                 class="relative bg-white rounded-lg shadow-xl w-96 mx-auto max-w-lg z-10 transform transition-all"
@@ -1464,7 +1399,7 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-
+                
                 <div class="p-6 space-y-6">
                     <!-- Sort By Options -->
                     <div
@@ -1536,7 +1471,7 @@
                             </label>
                         </div>
                     </div>
-
+                    
                     <!-- Sort Order Options -->
                     <div
                         class="bg-white border border-gray-300 rounded-md shadow-sm p-4"
@@ -1578,7 +1513,7 @@
                             </label>
                         </div>
                     </div>
-
+                    
                     <!-- MC Status Options -->
                     <div
                         class="bg-white border border-gray-300 rounded-md shadow-sm p-4"
@@ -1613,18 +1548,18 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <div
                     class="flex items-center justify-center space-x-4 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg"
                 >
-                    <button
-                        @click="applyMcsFilter"
+                    <button 
+                        @click="applyMcsFilter" 
                         class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
                         <i class="fas fa-check mr-2"></i>OK
                     </button>
-                    <button
-                        @click="showMcsOptionsModal = false"
+                    <button 
+                        @click="showMcsOptionsModal = false" 
                         class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
                     >
                         <i class="fas fa-times mr-2"></i>Exit
@@ -1724,10 +1659,10 @@
                             }}</span>
                         </div>
                         <div class="relative w-full md:w-64">
-                            <input
-                                type="text"
-                                v-model="mcsSearchTerm"
-                                placeholder="Search..."
+                            <input 
+                                type="text" 
+                                v-model="mcsSearchTerm" 
+                                placeholder="Search..." 
                                 class="border border-indigo-200 rounded-lg py-2 px-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 w-full shadow-sm"
                             />
                             <i
@@ -1742,7 +1677,7 @@
                             <thead
                                 class="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-400 text-white"
                             >
-                                <tr v-if="mcsSortOption === 'part'">
+                            <tr v-if="mcsSortOption === 'part'">
                                     <th
                                         class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold"
                                     >
@@ -1768,7 +1703,7 @@
                                     >
                                         Status
                                     </th>
-                                </tr>
+                            </tr>
                                 <tr
                                     v-else-if="
                                         ['seq', 'model'].includes(mcsSortOption)
@@ -1796,8 +1731,8 @@
                                     >
                                         Status
                                     </th>
-                                </tr>
-                                <tr v-else-if="mcsSortOption === 'ed'">
+                            </tr>
+                            <tr v-else-if="mcsSortOption === 'ed'">
                                     <th
                                         class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold"
                                     >
@@ -1828,8 +1763,8 @@
                                     >
                                         Status
                                     </th>
-                                </tr>
-                                <tr v-else-if="mcsSortOption === 'id'">
+                            </tr>
+                            <tr v-else-if="mcsSortOption === 'id'">
                                     <th
                                         class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold"
                                     >
@@ -1860,8 +1795,8 @@
                                     >
                                         Status
                                     </th>
-                                </tr>
-                                <tr v-else>
+                            </tr>
+                            <tr v-else>
                                     <th
                                         class="px-4 py-3 border-b-2 border-indigo-200 text-left font-bold"
                                     >
@@ -1892,19 +1827,19 @@
                                     >
                                         Status
                                     </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-indigo-100">
-                                <template v-if="mcsSortOption === 'part'">
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-indigo-100">
+                            <template v-if="mcsSortOption === 'part'">
                                     <tr
                                         v-for="(mcs, index) in filteredMcsData"
                                         :key="mcs.seq + '-part'"
-                                        class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
                                         :class="{
                                             'bg-gradient-to-r from-blue-100 to-cyan-100':
                                                 selectedMcs?.seq === mcs.seq,
                                         }"
-                                        @click="selectForViewMcs(mcs)"
+                                    @click="selectForViewMcs(mcs)"
                                         @dblclick="selectMcs(mcs)"
                                     >
                                         <td
@@ -1947,9 +1882,9 @@
                                                 class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow"
                                                 >{{ mcs.status }}</span
                                             >
-                                        </td>
-                                    </tr>
-                                </template>
+                                    </td>
+                                </tr>
+                            </template>
                                 <template
                                     v-else-if="
                                         ['seq', 'model'].includes(mcsSortOption)
@@ -1958,12 +1893,12 @@
                                     <tr
                                         v-for="(mcs, index) in filteredMcsData"
                                         :key="mcs.seq + '-seqmodel'"
-                                        class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
                                         :class="{
                                             'bg-gradient-to-r from-blue-100 to-cyan-100':
                                                 selectedMcs?.seq === mcs.seq,
                                         }"
-                                        @click="selectForViewMcs(mcs)"
+                                    @click="selectForViewMcs(mcs)"
                                         @dblclick="selectMcs(mcs)"
                                     >
                                         <td
@@ -2003,19 +1938,19 @@
                                                 class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow"
                                                 >{{ mcs.status }}</span
                                             >
-                                        </td>
-                                    </tr>
-                                </template>
-                                <template v-else-if="mcsSortOption === 'ed'">
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else-if="mcsSortOption === 'ed'">
                                     <tr
                                         v-for="(mcs, index) in filteredMcsData"
                                         :key="mcs.seq + '-ed'"
-                                        class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
                                         :class="{
                                             'bg-gradient-to-r from-blue-100 to-cyan-100':
                                                 selectedMcs?.seq === mcs.seq,
                                         }"
-                                        @click="selectForViewMcs(mcs)"
+                                    @click="selectForViewMcs(mcs)"
                                         @dblclick="selectMcs(mcs)"
                                     >
                                         <td
@@ -2063,19 +1998,19 @@
                                                 class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow"
                                                 >{{ mcs.status }}</span
                                             >
-                                        </td>
-                                    </tr>
-                                </template>
-                                <template v-else-if="mcsSortOption === 'id'">
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else-if="mcsSortOption === 'id'">
                                     <tr
                                         v-for="(mcs, index) in filteredMcsData"
                                         :key="mcs.seq + '-id'"
-                                        class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
                                         :class="{
                                             'bg-gradient-to-r from-blue-100 to-cyan-100':
                                                 selectedMcs?.seq === mcs.seq,
                                         }"
-                                        @click="selectForViewMcs(mcs)"
+                                    @click="selectForViewMcs(mcs)"
                                         @dblclick="selectMcs(mcs)"
                                     >
                                         <td
@@ -2123,19 +2058,19 @@
                                                 class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow"
                                                 >{{ mcs.status }}</span
                                             >
-                                        </td>
-                                    </tr>
-                                </template>
-                                <template v-else>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else>
                                     <tr
                                         v-for="(mcs, index) in filteredMcsData"
                                         :key="mcs.seq + '-other'"
-                                        class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
+                                    class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-100 cursor-pointer transition-all duration-150"
                                         :class="{
                                             'bg-gradient-to-r from-blue-100 to-cyan-100':
                                                 selectedMcs?.seq === mcs.seq,
                                         }"
-                                        @click="selectForViewMcs(mcs)"
+                                    @click="selectForViewMcs(mcs)"
                                         @dblclick="selectMcs(mcs)"
                                     >
                                         <td
@@ -2183,10 +2118,10 @@
                                                 class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow"
                                                 >{{ mcs.status }}</span
                                             >
-                                        </td>
-                                    </tr>
-                                </template>
-                                <tr v-if="filteredMcsData.length === 0">
+                                    </td>
+                                </tr>
+                            </template>
+                            <tr v-if="filteredMcsData.length === 0">
                                     <td
                                         :colspan="
                                             mcsSortOption === 'part'
@@ -2205,10 +2140,10 @@
                                     >
                                         No master card records found matching
                                         your criteria
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                     </div>
                     <!-- Tambahkan textbox Model, Ext. Dim, Int. Dim hanya saat sort by MC PD Part# -->
                     <div
@@ -2326,7 +2261,7 @@
                     class="flex flex-wrap items-center justify-end gap-3 p-5 border-t-2 border-indigo-200 bg-gradient-to-r from-blue-50 via-cyan-50 to-white rounded-b-2xl"
                 >
                     <!-- BUTTONS: More Option, Zoom, Select, Exit (JANGAN DIUBAH POSISINYA) -->
-                    <button
+                    <button 
                         @click="showMcsOptionsFromTableModal('from')"
                         class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-teal-400 via-blue-500 to-indigo-500 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-cyan-200 before:via-blue-300 before:to-indigo-200 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl"
                     >
@@ -2335,7 +2270,7 @@
                             More Options
                         </span>
                     </button>
-                    <button
+                    <button 
                         class="bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-500 hover:to-cyan-600 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow transition-all group relative overflow-hidden flex items-center"
                     >
                         <span
@@ -2343,8 +2278,8 @@
                         ></span>
                         <i class="fas fa-search-plus mr-2"></i> Zoom
                     </button>
-                    <button
-                        @click="selectMcs(selectedMcs)"
+                    <button 
+                        @click="selectMcs(selectedMcs)" 
                         :disabled="!selectedMcs"
                         class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-2 px-4 rounded-lg text-base shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed transition-all group relative overflow-hidden flex items-center"
                     >
@@ -2353,8 +2288,8 @@
                         ></span>
                         <i class="fas fa-check-circle mr-2"></i> Select
                     </button>
-                    <button
-                        @click="showMcsTableModal = false"
+                    <button 
+                        @click="showMcsTableModal = false" 
                         class="relative overflow-hidden font-bold py-2 px-5 rounded-xl text-base shadow-lg transition-all duration-200 group flex items-center border-0 focus:outline-none bg-gradient-to-r from-pink-500 via-red-500 to-orange-400 text-white before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-rose-200 before:via-red-200 before:to-orange-100 before:opacity-0 group-hover:before:opacity-40 before:blur-sm before:transition-opacity before:duration-300 group-hover:scale-105 group-hover:shadow-2xl"
                     >
                         <span class="relative z-10 flex items-center">
@@ -2375,7 +2310,7 @@
                 class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
                 @click="showMcsOptionsModalTo = false"
             ></div>
-
+            
             <!-- Modal content -->
             <div
                 class="relative bg-white rounded-lg shadow-xl w-96 mx-auto max-w-lg z-10 transform transition-all"
@@ -2409,7 +2344,7 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-
+                
                 <div class="p-6 space-y-6">
                     <!-- Sort By Options -->
                     <div
@@ -2481,7 +2416,7 @@
                             </label>
                         </div>
                     </div>
-
+                    
                     <!-- Sort Order Options -->
                     <div
                         class="bg-white border border-gray-300 rounded-md shadow-sm p-4"
@@ -2523,7 +2458,7 @@
                             </label>
                         </div>
                     </div>
-
+                    
                     <!-- MC Status Options -->
                     <div
                         class="bg-white border border-gray-300 rounded-md shadow-sm p-4"
@@ -2558,18 +2493,18 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <div
                     class="flex items-center justify-center space-x-4 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg"
                 >
-                    <button
-                        @click="applyMcsFilterTo"
+                    <button 
+                        @click="applyMcsFilterTo" 
                         class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
                         <i class="fas fa-check mr-2"></i>OK
                     </button>
-                    <button
-                        @click="showMcsOptionsModalTo = false"
+                    <button 
+                        @click="showMcsOptionsModalTo = false" 
                         class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-8 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
                     >
                         <i class="fas fa-times mr-2"></i>Exit
@@ -2583,20 +2518,20 @@
             v-if="false && showMcsTableModalTo"
             class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
         >
-            <!-- Modal content -->
+          <!-- Modal content -->
             <div
                 class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-3/4 max-w-4xl mx-auto flex flex-col max-h-[90vh]"
             >
-                <!-- Modal header -->
+            <!-- Modal header -->
                 <div
                     class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg"
                 >
-                    <h3 class="text-xl font-semibold flex items-center">
-                        <i class="fas fa-id-card mr-3"></i>Master Card Table
-                    </h3>
-                    <div class="flex space-x-3 items-center">
-                        <div class="text-white text-sm mr-2">
-                            <span class="mr-2">Zoom:</span>
+              <h3 class="text-xl font-semibold flex items-center">
+                <i class="fas fa-id-card mr-3"></i>Master Card Table
+              </h3>
+              <div class="flex space-x-3 items-center">
+                <div class="text-white text-sm mr-2">
+                  <span class="mr-2">Zoom:</span>
                             <select
                                 class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs"
                             >
@@ -2609,51 +2544,51 @@
                                 <option value="stand_by_price">
                                     Stand by price
                                 </option>
-                            </select>
-                        </div>
-                        <div class="text-white text-sm mr-2">
-                            <span class="mr-2">Sort:</span>
+                  </select>
+                </div>
+                <div class="text-white text-sm mr-2">
+                  <span class="mr-2">Sort:</span>
                             <select
                                 v-model="mcsSortOption"
                                 class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs"
                             >
-                                <option value="seq">MC Seq#</option>
-                                <option value="model">MC Model</option>
-                                <option value="part">MC PD Part#</option>
-                                <option value="ed">MC PD ED</option>
-                                <option value="id">MC PD ID</option>
-                            </select>
-                        </div>
-                        <div class="text-white text-sm mr-2">
-                            <span class="mr-2">Order:</span>
+                    <option value="seq">MC Seq#</option>
+                    <option value="model">MC Model</option>
+                    <option value="part">MC PD Part#</option>
+                    <option value="ed">MC PD ED</option>
+                    <option value="id">MC PD ID</option>
+                  </select>
+                </div>
+                <div class="text-white text-sm mr-2">
+                  <span class="mr-2">Order:</span>
                             <select
                                 v-model="mcsSortOrder"
                                 class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs"
                             >
-                                <option value="asc">Asc</option>
-                                <option value="desc">Desc</option>
-                            </select>
-                        </div>
-                        <div class="text-white text-sm">
-                            <span class="mr-2">Status:</span>
+                    <option value="asc">Asc</option>
+                    <option value="desc">Desc</option>
+                  </select>
+                </div>
+                <div class="text-white text-sm">
+                  <span class="mr-2">Status:</span>
                             <select
                                 v-model="mcsRecordStatus.active"
                                 class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs"
                             >
-                                <option :value="true">Active</option>
-                                <option :value="false">Obsolete</option>
-                            </select>
-                        </div>
+                    <option :value="true">Active</option>
+                    <option :value="false">Obsolete</option>
+                  </select>
+                </div>
                         <button
                             type="button"
                             @click="showMcsTableModalTo = false"
                             class="text-white hover:text-gray-200 focus:outline-none"
                         >
-                            <i class="fas fa-times text-xl"></i>
-                        </button>
-                    </div>
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
                 </div>
-                <!-- Modal Body -->
+            <!-- Modal Body -->
                 <div
                     class="p-2 overflow-y-auto flex-grow"
                     style="max-height: 60vh"
@@ -2661,25 +2596,25 @@
                     <div
                         class="mb-4 flex flex-col md:flex-row justify-between items-center gap-4"
                     >
-                        <div class="relative w-full md:w-64">
-                            <input
-                                type="text"
-                                v-model="mcsSearchTermTo"
-                                placeholder="Search..."
-                                class="border border-gray-300 rounded-md py-1 px-2 text-xs focus:ring-blue-500 focus:border-blue-500 w-full shadow-sm"
-                            />
+                <div class="relative w-full md:w-64">
+                  <input 
+                    type="text" 
+                    v-model="mcsSearchTermTo" 
+                    placeholder="Search..." 
+                    class="border border-gray-300 rounded-md py-1 px-2 text-xs focus:ring-blue-500 focus:border-blue-500 w-full shadow-sm"
+                  />
                             <i
                                 class="fas fa-search absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
                             ></i>
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto rounded-lg shadow">
+                </div>
+              </div>
+              
+              <div class="overflow-x-auto rounded-lg shadow">
                         <table
                             class="min-w-full text-xs border border-gray-300"
                         >
-                            <thead class="bg-gray-200 sticky top-0">
-                                <tr v-if="mcsSortOption === 'part'">
+                  <thead class="bg-gray-200 sticky top-0">
+                    <tr v-if="mcsSortOption === 'part'">
                                     <th
                                         class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
@@ -2705,7 +2640,7 @@
                                     >
                                         Status
                                     </th>
-                                </tr>
+                    </tr>
                                 <tr
                                     v-else-if="
                                         ['seq', 'model'].includes(mcsSortOption)
@@ -2733,8 +2668,8 @@
                                     >
                                         Status
                                     </th>
-                                </tr>
-                                <tr v-else-if="mcsSortOption === 'ed'">
+                    </tr>
+                    <tr v-else-if="mcsSortOption === 'ed'">
                                     <th
                                         class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
@@ -2765,8 +2700,8 @@
                                     >
                                         Status
                                     </th>
-                                </tr>
-                                <tr v-else-if="mcsSortOption === 'id'">
+                    </tr>
+                    <tr v-else-if="mcsSortOption === 'id'">
                                     <th
                                         class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
@@ -2797,8 +2732,8 @@
                                     >
                                         Status
                                     </th>
-                                </tr>
-                                <tr v-else>
+                    </tr>
+                    <tr v-else>
                                     <th
                                         class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
@@ -2824,21 +2759,21 @@
                                     >
                                         Status
                                     </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <template v-if="mcsSortOption === 'part'">
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <template v-if="mcsSortOption === 'part'">
                                     <tr
                                         v-for="(
                                             mcs, index
                                         ) in filteredMcsDataTo"
                                         :key="mcs.seq + '-part'"
-                                        class="hover:bg-blue-100 cursor-pointer"
+                        class="hover:bg-blue-100 cursor-pointer"
                                         :class="{
                                             'bg-blue-200':
                                                 selectedMcsTo?.seq === mcs.seq,
                                         }"
-                                        @click="selectForViewMcsTo(mcs)"
+                        @click="selectForViewMcsTo(mcs)"
                                         @dblclick="selectMcsTo(mcs)"
                                     >
                                         <td
@@ -2864,7 +2799,7 @@
                                         <td
                                             class="px-2 py-1 border border-gray-300"
                                         >
-                                            <span
+                          <span
                                                 :class="
                                                     mcs.status === 'Act' ||
                                                     mcs.status === 'Active'
@@ -2873,11 +2808,11 @@
                                                 "
                                                 class="px-2 py-0.5 rounded-full text-xs"
                                             >
-                                                {{ mcs.status }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </template>
+                            {{ mcs.status }}
+                          </span>
+                        </td>
+                      </tr>
+                    </template>
                                 <template
                                     v-else-if="
                                         ['seq', 'model'].includes(mcsSortOption)
@@ -2888,12 +2823,12 @@
                                             mcs, index
                                         ) in filteredMcsDataTo"
                                         :key="mcs.seq + '-seqmodel'"
-                                        class="hover:bg-blue-100 cursor-pointer"
+                        class="hover:bg-blue-100 cursor-pointer"
                                         :class="{
                                             'bg-blue-200':
                                                 selectedMcsTo?.seq === mcs.seq,
                                         }"
-                                        @click="selectForViewMcsTo(mcs)"
+                        @click="selectForViewMcsTo(mcs)"
                                         @dblclick="selectMcsTo(mcs)"
                                     >
                                         <td
@@ -2916,7 +2851,7 @@
                                         <td
                                             class="px-2 py-1 border border-gray-300"
                                         >
-                                            <span
+                          <span
                                                 :class="
                                                     mcs.status === 'Act' ||
                                                     mcs.status === 'Active'
@@ -2925,23 +2860,23 @@
                                                 "
                                                 class="px-2 py-0.5 rounded-full text-xs"
                                             >
-                                                {{ mcs.status }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </template>
-                                <template v-else-if="mcsSortOption === 'ed'">
+                            {{ mcs.status }}
+                          </span>
+                        </td>
+                      </tr>
+                    </template>
+                    <template v-else-if="mcsSortOption === 'ed'">
                                     <tr
                                         v-for="(
                                             mcs, index
                                         ) in filteredMcsDataTo"
                                         :key="mcs.seq + '-ed'"
-                                        class="hover:bg-blue-100 cursor-pointer"
+                        class="hover:bg-blue-100 cursor-pointer"
                                         :class="{
                                             'bg-blue-200':
                                                 selectedMcsTo?.seq === mcs.seq,
                                         }"
-                                        @click="selectForViewMcsTo(mcs)"
+                        @click="selectForViewMcsTo(mcs)"
                                         @dblclick="selectMcsTo(mcs)"
                                     >
                                         <td
@@ -2972,7 +2907,7 @@
                                         <td
                                             class="px-2 py-1 border border-gray-300"
                                         >
-                                            <span
+                          <span
                                                 :class="
                                                     mcs.status === 'Act' ||
                                                     mcs.status === 'Active'
@@ -2981,23 +2916,23 @@
                                                 "
                                                 class="px-2 py-0.5 rounded-full text-xs"
                                             >
-                                                {{ mcs.status }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </template>
-                                <template v-else-if="mcsSortOption === 'id'">
+                            {{ mcs.status }}
+                          </span>
+                        </td>
+                      </tr>
+                    </template>
+                    <template v-else-if="mcsSortOption === 'id'">
                                     <tr
                                         v-for="(
                                             mcs, index
                                         ) in filteredMcsDataTo"
                                         :key="mcs.seq + '-id'"
-                                        class="hover:bg-blue-100 cursor-pointer"
+                        class="hover:bg-blue-100 cursor-pointer"
                                         :class="{
                                             'bg-blue-200':
                                                 selectedMcsTo?.seq === mcs.seq,
                                         }"
-                                        @click="selectForViewMcsTo(mcs)"
+                        @click="selectForViewMcsTo(mcs)"
                                         @dblclick="selectMcsTo(mcs)"
                                     >
                                         <td
@@ -3028,7 +2963,7 @@
                                         <td
                                             class="px-2 py-1 border border-gray-300"
                                         >
-                                            <span
+                          <span
                                                 :class="
                                                     mcs.status === 'Act' ||
                                                     mcs.status === 'Active'
@@ -3037,23 +2972,23 @@
                                                 "
                                                 class="px-2 py-0.5 rounded-full text-xs"
                                             >
-                                                {{ mcs.status }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </template>
-                                <template v-else>
+                            {{ mcs.status }}
+                          </span>
+                        </td>
+                      </tr>
+                    </template>
+                    <template v-else>
                                     <tr
                                         v-for="(
                                             mcs, index
                                         ) in filteredMcsDataTo"
                                         :key="mcs.seq + '-other'"
-                                        class="hover:bg-blue-100 cursor-pointer"
+                        class="hover:bg-blue-100 cursor-pointer"
                                         :class="{
                                             'bg-blue-200':
                                                 selectedMcsTo?.seq === mcs.seq,
                                         }"
-                                        @click="selectForViewMcsTo(mcs)"
+                        @click="selectForViewMcsTo(mcs)"
                                         @dblclick="selectMcsTo(mcs)"
                                     >
                                         <td
@@ -3079,7 +3014,7 @@
                                         <td
                                             class="px-2 py-1 border border-gray-300"
                                         >
-                                            <span
+                          <span
                                                 :class="
                                                     mcs.status === 'Act' ||
                                                     mcs.status === 'Active'
@@ -3088,12 +3023,12 @@
                                                 "
                                                 class="px-2 py-0.5 rounded-full text-xs"
                                             >
-                                                {{ mcs.status }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </template>
-                                <tr v-if="filteredMcsDataTo.length === 0">
+                            {{ mcs.status }}
+                          </span>
+                        </td>
+                      </tr>
+                    </template>
+                    <tr v-if="filteredMcsDataTo.length === 0">
                                     <td
                                         :colspan="
                                             mcsSortOption === 'part'
@@ -3112,12 +3047,12 @@
                                     >
                                         No master card records found matching
                                         your criteria
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Tambahkan textbox Model, Ext. Dim, Int. Dim hanya saat sort by MC PD Part# -->
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- Tambahkan textbox Model, Ext. Dim, Int. Dim hanya saat sort by MC PD Part# -->
                     <div
                         v-if="mcsSortOption === 'part'"
                         class="mt-4 p-4 border border-indigo-200 rounded-lg bg-white"
@@ -3125,8 +3060,8 @@
                         <div
                             class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center"
                         >
-                            <!-- Model -->
-                            <div class="flex items-center gap-2">
+                  <!-- Model -->
+                  <div class="flex items-center gap-2">
                                 <label for="mcs-model-to" class="font-bold w-24"
                                     >Model:</label
                                 >
@@ -3137,65 +3072,65 @@
                                     readonly
                                     class="flex-grow bg-gray-100 border-2 border-gray-300 rounded-md py-1 px-2 focus:outline-none focus:border-blue-500 transition"
                                 />
-                            </div>
+                  </div>
                             <div></div>
                             <!-- Spacer -->
-                            <!-- External Dimensions -->
-                            <div class="flex items-center gap-2">
-                                <label class="font-bold w-24">Ext. Dim:</label>
-                                <div class="flex items-center gap-1">
+                  <!-- External Dimensions -->
+                  <div class="flex items-center gap-2">
+                    <label class="font-bold w-24">Ext. Dim:</label>
+                    <div class="flex items-center gap-1">
                                     <input
                                         type="text"
                                         :value="selectedMcsTo?.ext_dim_1 || ''"
                                         readonly
                                         class="w-20 bg-gray-100 border-2 border-gray-300 rounded-md py-1 px-2 text-center focus:outline-none focus:border-blue-500 transition"
                                     />
-                                    <span>x</span>
+                      <span>x</span>
                                     <input
                                         type="text"
                                         :value="selectedMcsTo?.ext_dim_2 || ''"
                                         readonly
                                         class="w-20 bg-gray-100 border-2 border-gray-300 rounded-md py-1 px-2 text-center focus:outline-none focus:border-blue-500 transition"
                                     />
-                                    <span>x</span>
+                      <span>x</span>
                                     <input
                                         type="text"
                                         :value="selectedMcsTo?.ext_dim_3 || ''"
                                         readonly
                                         class="w-20 bg-gray-100 border-2 border-gray-300 rounded-md py-1 px-2 text-center focus:outline-none focus:border-blue-500 transition"
                                     />
-                                </div>
-                            </div>
-                            <!-- Internal Dimensions -->
-                            <div class="flex items-center gap-2">
-                                <label class="font-bold w-24">Int. Dim:</label>
-                                <div class="flex items-center gap-1">
+                    </div>
+                  </div>
+                  <!-- Internal Dimensions -->
+                  <div class="flex items-center gap-2">
+                    <label class="font-bold w-24">Int. Dim:</label>
+                    <div class="flex items-center gap-1">
                                     <input
                                         type="text"
                                         :value="selectedMcsTo?.int_dim_1 || ''"
                                         readonly
                                         class="w-20 bg-gray-100 border-2 border-gray-300 rounded-md py-1 px-2 text-center focus:outline-none focus:border-blue-500 transition"
                                     />
-                                    <span>x</span>
+                      <span>x</span>
                                     <input
                                         type="text"
                                         :value="selectedMcsTo?.int_dim_2 || ''"
                                         readonly
                                         class="w-20 bg-gray-100 border-2 border-gray-300 rounded-md py-1 px-2 text-center focus:outline-none focus:border-blue-500 transition"
                                     />
-                                    <span>x</span>
+                      <span>x</span>
                                     <input
                                         type="text"
                                         :value="selectedMcsTo?.int_dim_3 || ''"
                                         readonly
                                         class="w-20 bg-gray-100 border-2 border-gray-300 rounded-md py-1 px-2 text-center focus:outline-none focus:border-blue-500 transition"
                                     />
-                                </div>
-                            </div>
-                        </div>
                     </div>
-                    <!-- END Tambah textbox -->
-                    <!-- Tambahkan textbox Model khusus untuk sort by MC PD ED pada Table To -->
+                  </div>
+                </div>
+              </div>
+              <!-- END Tambah textbox -->
+              <!-- Tambahkan textbox Model khusus untuk sort by MC PD ED pada Table To -->
                     <div
                         v-if="mcsSortOption === 'ed'"
                         class="mt-4 flex items-center gap-2"
@@ -3210,8 +3145,8 @@
                             readonly
                             class="flex-grow bg-gray-100 border-2 border-gray-400 rounded-sm py-1 px-2 font-bold text-black focus:outline-none"
                         />
-                    </div>
-                    <!-- Tambahkan textbox Model khusus untuk sort by MC PD ID pada Table To -->
+              </div>
+              <!-- Tambahkan textbox Model khusus untuk sort by MC PD ID pada Table To -->
                     <div
                         v-if="mcsSortOption === 'id'"
                         class="mt-4 flex items-center gap-2"
@@ -3226,28 +3161,28 @@
                             readonly
                             class="flex-grow bg-gray-100 border-2 border-gray-400 rounded-sm py-1 px-2 font-bold text-black focus:outline-none"
                         />
-                    </div>
-                    <!-- END Tambah textbox -->
-                </div>
-                <!-- Modal Footer -->
+              </div>
+              <!-- END Tambah textbox -->
+            </div>
+            <!-- Modal Footer -->
                 <div
                     class="flex items-center justify-end space-x-3 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg"
                 >
-                    <button
-                        @click="selectMcsTo(selectedMcsTo)"
-                        :disabled="!selectedMcsTo"
-                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <i class="fas fa-check mr-2"></i> Select
-                    </button>
-                    <button
-                        @click="showMcsTableModalTo = false"
-                        class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
-                    >
-                        <i class="fas fa-times mr-2"></i> Exit
-                    </button>
-                </div>
+              <button 
+                @click="selectMcsTo(selectedMcsTo)" 
+                :disabled="!selectedMcsTo"
+                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <i class="fas fa-check mr-2"></i> Select
+              </button>
+              <button 
+                @click="showMcsTableModalTo = false" 
+                class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
+              >
+                  <i class="fas fa-times mr-2"></i> Exit
+              </button>
             </div>
+          </div>
         </div>
     </AppLayout>
 </template>
@@ -3559,24 +3494,24 @@ const filteredCustomers = computed(() => {
 // Filter and sort the displayed customers
 const displayedCustomers = computed(() => {
     let result = [...filteredCustomers.value];
-
+    
     // Apply search filter
     if (tableSearchTerm.value) {
         const searchLower = tableSearchTerm.value.toLowerCase();
         result = result.filter(
             (customer) =>
-                customer.code.toLowerCase().includes(searchLower) ||
-                customer.name.toLowerCase().includes(searchLower)
+            customer.code.toLowerCase().includes(searchLower) ||
+            customer.name.toLowerCase().includes(searchLower)
         );
     }
-
+    
     // Apply sorting
     if (sortOption.value === "code") {
         result.sort((a, b) => a.code.localeCompare(b.code));
     } else if (sortOption.value === "name") {
         result.sort((a, b) => a.name.localeCompare(b.name));
     }
-
+    
     return result;
 });
 
@@ -3649,7 +3584,7 @@ const confirmApproval = async () => {
             `/api/approve-mc/approve/${masterCardToAction.value.id}`,
             {
                 method: "POST",
-                headers: {
+            headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": document
                         .querySelector('meta[name="csrf-token"]')
@@ -3658,9 +3593,9 @@ const confirmApproval = async () => {
                 },
             }
         );
-
+        
         const result = await response.json();
-
+        
         if (result.success) {
             // Update the status locally
             const index = masterCards.value.findIndex(
@@ -3671,7 +3606,7 @@ const confirmApproval = async () => {
                 masterCards.value[index].approved_by = result.approved_by;
                 masterCards.value[index].approved_date = result.approved_date;
             }
-
+            
             // Show success message
             alert("Master Card approved successfully!");
         } else {
@@ -3684,7 +3619,7 @@ const confirmApproval = async () => {
         console.error("Error approving master card:", error);
         alert("An error occurred during approval");
     }
-
+    
     showApprovalModal.value = false;
 };
 
@@ -3694,21 +3629,21 @@ const confirmRejection = async () => {
             `/api/approve-mc/reject/${masterCardToAction.value.id}`,
             {
                 method: "POST",
-                headers: {
+            headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": document
                         .querySelector('meta[name="csrf-token"]')
                         .getAttribute("content"),
                     Accept: "application/json",
-                },
-                body: JSON.stringify({
+            },
+            body: JSON.stringify({ 
                     rejection_reason: rejectionReason.value,
                 }),
             }
         );
-
+        
         const result = await response.json();
-
+        
         if (result.success) {
             // Update the status locally
             const index = masterCards.value.findIndex(
@@ -3721,7 +3656,7 @@ const confirmRejection = async () => {
                 masterCards.value[index].rejection_reason =
                     rejectionReason.value;
             }
-
+            
             // Show success message
             alert("Master Card rejected successfully!");
         } else {
@@ -3734,14 +3669,14 @@ const confirmRejection = async () => {
         console.error("Error rejecting master card:", error);
         alert("An error occurred during rejection");
     }
-
+    
     showRejectionModal.value = false;
 };
 
 const handleSelectOption = () => {
     console.log("Selected option:", selectOption.value);
     showOptionModal.value = false;
-
+    
     if (selectOption.value === "customer") {
         // Implement logic for selecting by customer
         console.log("Show customer selection interface");
@@ -3771,7 +3706,7 @@ const handleAddNew = () => {
     modalMode.value = "add";
     // Show the modal
     showEditModal.value = true;
-
+    
     console.log("New master card initialized with:", editingMasterCard.value);
 };
 
@@ -3782,7 +3717,7 @@ const generateUniqueMcSeq = () => {
     const existingSeqs = masterCards.value
         .map((mc) => mc.mc_seq)
         .filter((seq) => seq.includes(`MC-${year}`));
-
+    
     let nextNumber = 1;
     if (existingSeqs.length > 0) {
         // Extract the numeric parts and find the highest
@@ -3792,12 +3727,12 @@ const generateUniqueMcSeq = () => {
                 return match ? parseInt(match[1], 10) : 0;
             })
             .filter((num) => !isNaN(num));
-
+        
         if (numbers.length > 0) {
             nextNumber = Math.max(...numbers) + 1;
         }
     }
-
+    
     // Format with leading zeros (e.g., 001, 012, etc.)
     const paddedNumber = nextNumber.toString().padStart(3, "0");
     return `MC-${year}-${paddedNumber}`;
@@ -3826,36 +3761,36 @@ const handleUpdateMasterCard = async (updatedMasterCardData) => {
                 "Adding new master card to local state:",
                 updatedMasterCardData
             );
-
+            
             // Add the new record to the master cards array at the beginning for visibility
             masterCards.value = [updatedMasterCardData, ...masterCards.value];
-
+            
             // Set the new card as selected
             selectedMasterCard.value = updatedMasterCardData;
-
+            
             // Show confirmation to the user
             alert("Master Card added successfully!");
         } else {
             console.log("Updating existing master card in local state");
-
+            
             // Find the index of the existing record
             const index = masterCards.value.findIndex(
                 (mc) => mc.id === updatedMasterCardData.id
             );
-
+            
             if (index !== -1) {
                 console.log(
                     `Found existing record at index ${index}, updating`
                 );
-
+                
                 // Update the record in the array
                 masterCards.value.splice(index, 1, updatedMasterCardData);
-
+                
                 // If this was the selected record, update the selection
                 if (selectedMasterCard.value?.id === updatedMasterCardData.id) {
                     selectedMasterCard.value = updatedMasterCardData;
                 }
-
+                
                 // Show confirmation to the user
                 alert("Master Card updated successfully!");
             } else {
@@ -3863,7 +3798,7 @@ const handleUpdateMasterCard = async (updatedMasterCardData) => {
                     "Could not find master card with ID",
                     updatedMasterCardData.id
                 );
-
+                
                 // Add it anyway in case it's a valid record
                 masterCards.value.push(updatedMasterCardData);
             }
@@ -3958,7 +3893,7 @@ const selectCustomer = (customer) => {
     selectedCustomer.value = customer;
     searchTerm.value = customer.code || customer.customer_code; // Update the search term with selected customer code
     showCustomerAccountTable.value = false;
-
+    
     // Filter master cards for the selected customer
     if (masterCards.value && masterCards.value.length > 0) {
         const customerCode = customer.code || customer.customer_code;
@@ -3996,7 +3931,7 @@ const openMcsModal = () => {
 const showMcsOptionsFromTableModal = (modalType) => {
     if (modalType === "from") {
         showMcsTableModal.value = false;
-        showMcsOptionsModal.value = true;
+    showMcsOptionsModal.value = true;
     } else if (modalType === "to") {
         showMcsTableModalTo.value = false;
         showMcsOptionsModalTo.value = true;

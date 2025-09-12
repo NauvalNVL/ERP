@@ -208,13 +208,13 @@
                 </table>
 
                 <!-- Table Footer -->
-              <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
+              <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-t border-gray-200 text-sm text-white">
                     <div class="flex items-center justify-between">
                   <div class="flex items-center">
-                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                    <span>Total Customer Groups: <span class="font-semibold text-blue-700">{{ filteredCustomerGroups.length }}</span></span>
+                    <i class="fas fa-info-circle mr-2 text-white"></i>
+                    <span>Total Customer Groups: <span class="font-semibold text-white">{{ filteredCustomerGroups.length }}</span></span>
                   </div>
-                  <div v-if="searchQuery" class="text-blue-600">
+                  <div v-if="searchQuery" class="text-white">
                     Filtered from {{ customerGroups.length }} total records
                   </div>
                         <div class="text-xs text-gray-400">Generated: {{ currentDate }}</div>
@@ -232,7 +232,7 @@
             </div>
             Print Instructions
             </h3>
-          <ul class="list-disc pl-5 text-sm text-gray-600 space-y-2">
+          <ul class="list-disc pl-5 text-sm text-white space-y-2">
                 <li>Click the "Print List" button above to print this customer group list</li>
                 <li>Use landscape orientation for better results</li>
                 <li>You can search or sort data before printing</li>
