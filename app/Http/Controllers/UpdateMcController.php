@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\MasterCard;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class UpdateMcController extends Controller
 {
@@ -157,6 +158,23 @@ class UpdateMcController extends Controller
     }
 
     /**
+     * Show a single Master Card (by mc_seq) with details/PD setup.
+     */
+    public function apiShow($mcSeq, Request $request)
+    {
+        $customerCode = $request->input('customer_code');
+        $query = MasterCard::where('mc_seq', $mcSeq);
+        if ($customerCode) {
+            $query->where('customer_code', $customerCode);
+        }
+        $mc = $query->first();
+        if (!$mc) {
+            return response()->json(['message' => 'Not found'], 404);
+        }
+        return response()->json($mc);
+    }
+
+    /**
      * Check if MCS number exists in database with customer validation.
      *
      * @param  string  $mcsNumber
@@ -226,5 +244,62 @@ class UpdateMcController extends Controller
                 'error' => 'Database error occurred'
             ], 500);
         }
+    }
+
+    /**
+     * Store or update Master Card with details and PD setup.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'mc_seq' => 'required|string',
+            'customer_code' => 'required|string|max:20',
+            'mc_model' => 'nullable|string',
+            'mc_short_model' => 'nullable|string',
+            'status' => 'required|string|in:Active,Obsolete',
+            'mc_approval' => 'required|string|in:Yes,No',
+            'part_no' => 'nullable|string',
+            'comp_no' => 'nullable|string',
+            'p_design' => 'nullable|string',
+            'ext_dim_1' => 'nullable|string',
+            'ext_dim_2' => 'nullable|string',
+            'ext_dim_3' => 'nullable|string',
+            'int_dim_1' => 'nullable|string',
+            'int_dim_2' => 'nullable|string',
+            'int_dim_3' => 'nullable|string',
+            'detailed_master_card' => 'nullable|array',
+            'pd_setup' => 'nullable|array',
+        ]);
+
+        return DB::transaction(function () use ($validated) {
+            $mc = MasterCard::updateOrCreate(
+                [
+                    'mc_seq' => $validated['mc_seq'],
+                    'customer_code' => $validated['customer_code'],
+                ],
+                [
+                    'mc_model' => $validated['mc_model'] ?? null,
+                    'mc_short_model' => $validated['mc_short_model'] ?? null,
+                    'status' => $validated['status'],
+                    'mc_approval' => $validated['mc_approval'],
+                    'part_no' => $validated['part_no'] ?? null,
+                    'comp_no' => $validated['comp_no'] ?? null,
+                    'p_design' => $validated['p_design'] ?? null,
+                    'ext_dim_1' => $validated['ext_dim_1'] ?? null,
+                    'ext_dim_2' => $validated['ext_dim_2'] ?? null,
+                    'ext_dim_3' => $validated['ext_dim_3'] ?? null,
+                    'int_dim_1' => $validated['int_dim_1'] ?? null,
+                    'int_dim_2' => $validated['int_dim_2'] ?? null,
+                    'int_dim_3' => $validated['int_dim_3'] ?? null,
+                    'detailed_master_card' => $validated['detailed_master_card'] ?? null,
+                    'pd_setup' => $validated['pd_setup'] ?? null,
+                ]
+            );
+
+            return response()->json([
+                'message' => 'Master Card saved successfully',
+                'data' => $mc,
+            ], 201);
+        });
     }
 }

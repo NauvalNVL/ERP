@@ -266,6 +266,8 @@ Route::get('/mc-auto-wo-not-releasing', [ApproveMcController::class, 'apiIndexMc
 
 // Add API route for Update MC Master Cards
 Route::get('/update-mc/master-cards', [App\Http\Controllers\UpdateMcController::class, 'apiIndex']);
+Route::get('/update-mc/master-cards/{mcSeq}', [App\Http\Controllers\UpdateMcController::class, 'apiShow']);
+Route::post('/update-mc/master-cards', [App\Http\Controllers\UpdateMcController::class, 'store']);
 
 // Sales Order Report API routes
 Route::get('/report-formats', [SalesOrderReportController::class, 'apiIndexReportFormats']);

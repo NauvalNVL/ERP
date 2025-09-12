@@ -801,6 +801,7 @@
             :showMcsTableModal="showMcsTableModal"
             :formData="form"
             :mcComponents="mcComponents"
+            :mcLoaded="recordMode === 'existing' ? selectedMcsFull : null"
             :zoomOption="zoomOption"
             :mcsSortOption="mcsSortOption"
             :mcsSortOrder="mcsSortOrder"
@@ -834,6 +835,7 @@
             @paperFluteSelected="onPaperFluteSelected"
             @openPaperQualityModal="openPaperQualityModal"
             @openWoPaperQualityModal="openWoPaperQualityModal"
+            @saveMasterCard="saveMasterCardFromModal"
         />
 
         <!-- Maintenance Log Modal -->
@@ -1167,7 +1169,56 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from "vue";
+import { ref, computed, onMounted, nextTick } from 'vue';
+
+const selectedMcsFull = ref(null);
+const saveMasterCardFromModal = async (pdSetup = null) => {
+    try {
+        const payload = {
+            mc_seq: form.value.mcs,
+            customer_code: form.value.ac,
+            mc_model: form.value.mc_model || '',
+            mc_short_model: form.value.mc_short_model || '',
+            status: form.value.mc_status || 'Active',
+            mc_approval: form.value.mc_approval || 'No',
+            part_no: '',
+            comp_no: '',
+            p_design: '',
+            ext_dim_1: mcDetails.value.ext_dim_1 || '',
+            ext_dim_2: mcDetails.value.ext_dim_2 || '',
+            ext_dim_3: mcDetails.value.ext_dim_3 || '',
+            int_dim_1: mcDetails.value.int_dim_1 || '',
+            int_dim_2: mcDetails.value.int_dim_2 || '',
+            int_dim_3: mcDetails.value.int_dim_3 || '',
+            detailed_master_card: {
+                mc_details: mcDetails.value,
+            },
+            pd_setup: pdSetup ? { 
+                ...pdSetup,
+                soValues: Array.isArray(soValues.value) ? soValues.value : [],
+                woValues: Array.isArray(woValues.value) ? woValues.value : [],
+            } : null,
+        };
+
+        const res = await fetch('/api/update-mc/master-cards', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.message || `Failed to save: ${res.status}`);
+        }
+
+        toast.success('Master Card saved');
+        showSetupMcModal.value = false;
+        showSetupPdModal.value = false;
+    } catch (e) {
+        toast.error(e.message || 'Failed to save Master Card');
+    }
+};
 import { Link } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import axios from "axios";
@@ -2166,6 +2217,27 @@ const selectMcs = async (mcs) => {
         int_dim_3: mcs.int_dim_3 || "",
     };
 
+    // Fetch full MC with details + PD setup to hydrate modals
+    try {
+        const res = await fetch(`/api/update-mc/master-cards/${encodeURIComponent(mcsSeq)}?customer_code=${encodeURIComponent(form.value.ac)}`, {
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        });
+        if (res.ok) {
+            const full = await res.json();
+            // Keep a local copy to pass into child modals
+            selectedMcsFull.value = full;
+            // Hydrate SO/WO values from saved pd_setup if available
+            const pd = full?.pd_setup || {};
+            if (Array.isArray(pd.soValues)) {
+                soValues.value = pd.soValues;
+            }
+            if (Array.isArray(pd.woValues)) {
+                woValues.value = pd.woValues;
+            }
+        }
+    } catch (e) {}
+
     // Show confirmation toast
     toast.success(`Selected Master Card: ${mcModel}`);
 
@@ -2479,6 +2551,10 @@ const selectComponent = (component, index) => {
 
 const setupPD = () => {
     console.log("Setup PD clicked");
+    // Ensure PD modal opens fresh when creating a new MC
+    if (recordMode.value === 'new') {
+        selectedMcsFull.value = null;
+    }
     showSetupPdModal.value = true;
 };
 

@@ -63,10 +63,11 @@ class DatabaseSeeder extends Seeder
             CorrugatorConfigSeeder::class,
             ScoringFormulaSeeder::class,
             StandardFormulaSeeder::class,
-            UpdateMcSeeder::class,
+            // UpdateMcSeeder::class, // disabled per request
+            MasterCardSeeder::class,
             VendorSeeder::class,
-            SalespersonSeeder::class,
             SalesTeamSeeder::class,
+            SalespersonSeeder::class,
             SalespersonTeamSeeder::class,
             ScoringToolSeeder::class,
             PaperQualitySeeder::class,
