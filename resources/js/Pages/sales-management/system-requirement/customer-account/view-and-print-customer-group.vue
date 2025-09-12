@@ -274,7 +274,19 @@ const fetchCustomerGroups = async () => {
         }
         
         const data = await response.json();
-        customerGroups.value = data;
+        console.log('Received customer groups data:', data);
+        console.log('Data type:', typeof data);
+        console.log('Is array:', Array.isArray(data));
+        
+        // Handle both data structures - wrapped in 'data' property or direct array
+        if (data && Array.isArray(data.data)) {
+            customerGroups.value = data.data;
+        } else if (Array.isArray(data)) {
+            customerGroups.value = data;
+        } else {
+            customerGroups.value = [];
+            console.error('Unexpected data format:', data);
+        }
     } catch (error) {
         console.error('Error fetching customer groups:', error);
     } finally {

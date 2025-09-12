@@ -12,8 +12,19 @@ class CustomerGroupController extends Controller
 {
     public function index()
     {
-        $customerGroups = CustomerGroup::orderBy('group_code')->get();
-        return view('sales-management.system-requirement.customer-account.customergroup', compact('customerGroups'));
+        try {
+            $customerGroups = CustomerGroup::orderBy('group_code')->get();
+            
+            if ($customerGroups->isEmpty()) {
+                $this->seedData();
+                $customerGroups = CustomerGroup::orderBy('group_code')->get();
+            }
+            
+            return view('sales-management.system-requirement.customer-account.customergroup', compact('customerGroups'));
+        } catch (\Exception $e) {
+            Log::error('Error in CustomerGroup index: ' . $e->getMessage());
+            return view('sales-management.system-requirement.customer-account.customergroup', compact('customerGroups'));
+        }
     }
 
     public function store(Request $request)
@@ -92,6 +103,12 @@ class CustomerGroupController extends Controller
     {
         try {
             $customerGroups = CustomerGroup::orderBy('group_code')->get();
+            
+            if ($customerGroups->isEmpty()) {
+                $this->seedData();
+                $customerGroups = CustomerGroup::orderBy('group_code')->get();
+            }
+            
             Log::info('Customer Groups API Response:', ['data' => $customerGroups->toArray()]);
             return response()->json($customerGroups);
         } catch (\Exception $e) {
@@ -341,9 +358,8 @@ class CustomerGroupController extends Controller
         }
     }
 
-    public function seed()
+    private function seedData()
     {
-        DB::beginTransaction();
         try {
             // Get the numeric user ID
             $userId = (int)$this->getUserId();
@@ -372,14 +388,21 @@ class CustomerGroupController extends Controller
                     ]
                 );
             }
+        } catch (\Exception $e) {
+            Log::error('Error seeding customer groups: ' . $e->getMessage());
+            throw $e;
+        }
+    }
 
-            DB::commit();
+    public function seed()
+    {
+        try {
+            $this->seedData();
             return response()->json([
                 'success' => true,
                 'message' => 'Customer Group seed data created successfully'
             ]);
         } catch (\Exception $e) {
-            DB::rollback();
             Log::error('Error seeding customer groups: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
