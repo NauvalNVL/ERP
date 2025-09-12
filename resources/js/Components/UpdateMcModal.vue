@@ -80,7 +80,7 @@
                 <!-- Component Table -->
                 <div class="mb-6">
                     <table class="min-w-full text-sm border border-gray-300">
-                        <thead class="bg-teal-600 text-white">
+                        <thead class="bg-gray-200 text-gray-800">
                             <tr>
                                 <th class="px-3 py-2 border border-gray-300 text-left">NO</th>
                                 <th class="px-3 py-2 border border-gray-300 text-left">C#</th>
@@ -90,10 +90,10 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                            <tr v-for="(component, index) in mcComponentsToRender" :key="index"
+                            <tr v-for="(component, index) in localComponents" :key="index"
                                 class="hover:bg-gray-100 cursor-pointer"
-                                :class="{ 'bg-yellow-200': component.selected }"
-                                @click="$emit('selectComponent', component, index)">
+                                :class="{ 'bg-yellow-200': selectedComponentIndex === index }"
+                                @click="onSelectComponent(component, index)">
                                 <td class="px-3 py-2 border border-gray-300">{{ String(index + 1).padStart(2, '0') }}</td>
                                 <td class="px-3 py-2 border border-gray-300">{{ component.c_num }}</td>
                                 <td class="px-3 py-2 border border-gray-300">{{ component.pd }}</td>
@@ -107,12 +107,15 @@
                 <!-- Action Buttons -->
                 <div class="flex justify-between">
                     <div class="space-x-2">
-                        <button type="button" @click="$emit('setupPD')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                        <button type="button" @click="openSetupPd()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
                             Setup PD
                         </button>
                         <button type="button" @click="$emit('setupOthers')" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors">
                             Setup Others
                         </button>
+                    </div>
+                    <div class="text-xs text-gray-600 self-center" v-if="selectedComponentIndex !== null">
+                        Editing component: <span class="font-semibold">{{ localComponents[selectedComponentIndex]?.c_num }}</span>
                     </div>
                 </div>
             </div>
@@ -466,7 +469,7 @@
                     <button type="button" class="text-white hover:text-green-300 focus:outline-none">
                         <i class="fas fa-file text-lg"></i>
                     </button>
-                    <button type="button" class="text-white hover:text-yellow-300 focus:outline-none">
+                    <button type="button" class="text-white hover:text-yellow-300 focus:outline-none" @click="applyPdToSelectedComponent" title="Apply PD to selected component">
                         <i class="fas fa-save text-lg"></i>
                     </button>
                     <button type="button" @click="$emit('closeSetupPdModal')" class="text-white hover:text-gray-200 focus:outline-none">
@@ -971,6 +974,12 @@
 
             <!-- Modal Footer -->
             <div class="flex items-center justify-end gap-2 p-3 border-t border-gray-200 bg-gray-100 rounded-b-lg flex-shrink-0">
+                <button 
+                    type="button"
+                    @click="applyPdToSelectedComponent"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">
+                    Apply to {{ localComponents[selectedComponentIndex]?.c_num || 'Component' }}
+                </button>
                 <button 
                     type="button"
                     @click="$emit('saveMasterCard', buildPdSetupPayload())"
@@ -1554,21 +1563,87 @@ watch(() => props.showSetupPdModal, (newVal) => {
         clearPdFields();
     }
 });
+// Local editable 10-row components list and selection state
+const selectedComponentIndex = ref(null);
+const localComponents = ref([]);
+
 // Prefer loaded components when available, else fallback to props.mcComponents
+// Always render exactly 10 rows with C# labels: Main, Fit1..Fit9
 const mcComponentsToRender = computed(() => {
+    const desiredLabels = ['Main', 'Fit1', 'Fit2', 'Fit3', 'Fit4', 'Fit5', 'Fit6', 'Fit7', 'Fit8', 'Fit9'];
+
+    // Source components: loaded first, otherwise props.mcComponents
+    let source = [];
     const fromLoaded = props.mcLoaded?.pd_setup?.components;
     if (Array.isArray(fromLoaded) && fromLoaded.length > 0) {
-        return fromLoaded.map((c, i) => ({
+        source = fromLoaded.map((c) => ({
             c_num: c.c_num || c.comp || '',
             pd: c.pd || c.p_design || '',
             pcs_set: c.pcs_set || c.pcs || '',
             part_num: c.part_num || c.part || '',
-            selected: false,
-            index: i,
+        }));
+    } else if (Array.isArray(props.mcComponents)) {
+        source = props.mcComponents.map((c) => ({
+            c_num: c.c_num || '',
+            pd: c.pd || '',
+            pcs_set: c.pcs_set || '',
+            part_num: c.part_num || '',
         }));
     }
-    return Array.isArray(props.mcComponents) ? props.mcComponents : [];
+
+    // Build exactly 10 rows, normalizing labels and padding missing entries
+    const rows = [];
+    for (let i = 0; i < 10; i++) {
+        const base = source[i] || {};
+        rows.push({
+            c_num: desiredLabels[i],
+            pd: base.pd || '',
+            pcs_set: base.pcs_set || '',
+            part_num: base.part_num || '',
+            selected: false,
+            index: i,
+        });
+    }
+    return rows;
 });
+
+// Initialize and keep localComponents in sync with computed default rows
+watch(mcComponentsToRender, (rows) => {
+    // Preserve existing edits by merging on index
+    const next = rows.map((row, idx) => ({
+        ...(localComponents.value[idx] || {}),
+        ...row,
+        c_num: rows[idx].c_num,
+    }));
+    localComponents.value = next;
+}, { immediate: true });
+
+const onSelectComponent = (component, index) => {
+    selectedComponentIndex.value = index;
+};
+
+const openSetupPd = () => {
+    // Ensure a component is selected; default to index 0 (Main)
+    if (selectedComponentIndex.value === null) selectedComponentIndex.value = 0;
+    emit('setupPD');
+};
+
+// Apply current PD form fields to the selected component row
+const applyPdToSelectedComponent = () => {
+    if (selectedComponentIndex.value === null) return;
+    const idx = selectedComponentIndex.value;
+    const next = [...localComponents.value];
+    next[idx] = {
+        ...next[idx],
+        // Keep C# label fixed
+        c_num: next[idx]?.c_num || ['Main','Fit1','Fit2','Fit3','Fit4','Fit5','Fit6','Fit7','Fit8','Fit9'][idx],
+        // Map PD fields to row
+        pd: selectedProductDesign.value || next[idx]?.pd || '',
+        pcs_set: pcsPerSet.value || next[idx]?.pcs_set || '',
+        part_num: partNo.value || next[idx]?.part_num || '',
+    };
+    localComponents.value = next;
+};
 
 // Build payload for PD setup values to be saved with MasterCard
 const buildPdSetupPayload = () => {
@@ -1615,7 +1690,7 @@ const buildPdSetupPayload = () => {
         subMaterials: subMaterials.value,
         soValues: Array.isArray(props.soValues) ? props.soValues : [],
         woValues: Array.isArray(props.woValues) ? props.woValues : [],
-        components: (mcComponentsToRender?.value || []).map(c => ({
+        components: (localComponents?.value || []).map(c => ({
             c_num: c.c_num,
             pd: c.pd,
             pcs_set: c.pcs_set,
