@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ApproveMC;
+use App\Models\MasterCard;
 use App\Models\UpdateCustomerAccount;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -299,11 +300,35 @@ class ApproveMcController extends Controller
     public function approve($id)
     {
         try {
-            $approveMc = ApproveMC::findOrFail($id);
+            // Try resolving by primary key id first
+            $approveMc = ApproveMC::find($id);
             
+            // If not found, fall back to mc_seq match
+            if (!$approveMc) {
+                $approveMc = ApproveMC::where('mc_seq', $id)->first();
+            }
+
+            // If still not found, try to seed from MasterCard and approve directly
+            if (!$approveMc) {
+                $master = MasterCard::where('mc_seq', $id)->first();
+                if (!$master) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No ApproveMC or MasterCard record found for identifier: ' . $id,
+                    ], 404);
+                }
+                $approveMc = new ApproveMC();
+                $approveMc->mc_seq = $master->mc_seq;
+                $approveMc->mc_model = $master->mc_model;
+                $approveMc->customer_code = $master->customer_code;
+                $approveMc->customer_name = $master->customer_code; // placeholder; join to name if available
+                $approveMc->status = 'pending';
+                $approveMc->save();
+            }
+
             // Set approval fields
             $approveMc->status = 'active';
-            $approveMc->approved_by = Auth::user() ? Auth::user()->user_id : 'SYSTEM';
+            $approveMc->approved_by = Auth::user() ? (Auth::user()->user_id ?? Auth::user()->name ?? 'SYSTEM') : 'SYSTEM';
             $approveMc->approved_date = now();
             $approveMc->save();
             
@@ -327,12 +352,33 @@ class ApproveMcController extends Controller
      */
     public function reject(Request $request, $id)
     {
-        $approveMc = ApproveMC::findOrFail($id);
+        // Resolve ApproveMC record by id, then mc_seq, or seed from MasterCard
+        $approveMc = ApproveMC::find($id);
+        if (!$approveMc) {
+            $approveMc = ApproveMC::where('mc_seq', $id)->first();
+        }
+        if (!$approveMc) {
+            $master = MasterCard::where('mc_seq', $id)->first();
+            if (!$master) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No ApproveMC or MasterCard record found for identifier: ' . $id,
+                ], 404);
+            }
+            $approveMc = new ApproveMC();
+            $approveMc->mc_seq = $master->mc_seq;
+            $approveMc->mc_model = $master->mc_model;
+            $approveMc->customer_code = $master->customer_code;
+            $approveMc->customer_name = $master->customer_code;
+            $approveMc->status = 'pending';
+            $approveMc->save();
+        }
 
-        if ($approveMc->status !== 'pending') {
+        // Allow rejecting from any status except already obsolete
+        if ($approveMc->status === 'obsolete') {
             return response()->json([
                 'success' => false,
-                'message' => 'Only pending master cards can be rejected.'
+                'message' => 'Master card is already obsolete.'
             ], 400);
         }
         
@@ -349,7 +395,7 @@ class ApproveMcController extends Controller
         }
 
         $approveMc->status = 'obsolete';
-        $approveMc->rejected_by = Auth::user()->user_id;
+        $approveMc->rejected_by = Auth::user() ? (Auth::user()->user_id ?? Auth::user()->name ?? 'SYSTEM') : 'SYSTEM';
         $approveMc->rejected_date = now();
         $approveMc->rejection_reason = $request->rejection_reason;
         $approveMc->save();

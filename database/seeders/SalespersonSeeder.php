@@ -18,8 +18,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'root',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S102',
@@ -28,8 +26,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S103',
@@ -38,8 +34,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S104',
@@ -48,8 +42,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S105',
@@ -58,8 +50,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S106',
@@ -68,8 +58,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S107',
@@ -88,8 +76,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'MKT',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S109',
@@ -98,8 +84,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S110',
@@ -108,8 +92,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S111',
@@ -118,8 +100,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S112',
@@ -128,8 +108,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S113',
@@ -138,8 +116,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S114',
@@ -168,8 +144,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'MKT',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S117',
@@ -178,8 +152,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S118',
@@ -188,8 +160,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S119',
@@ -198,8 +168,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S120',
@@ -208,8 +176,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'SLS',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S121',
@@ -248,8 +214,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'MKT',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S125',
@@ -288,8 +252,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'MKT',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S129',
@@ -298,8 +260,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'MKT',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S130',
@@ -308,8 +268,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'MKT',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S131',
@@ -318,8 +276,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'MKT',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S132',
@@ -328,8 +284,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'MKT',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S133',
@@ -338,8 +292,6 @@ class SalespersonSeeder extends Seeder
             'position' => 'E - Executive',
             'user_id' => 'MKT',
             'is_active' => true,
-            'created_at' => null,
-            'updated_at' => null,
         ],
         [
             'code' => 'S134',
@@ -418,10 +370,30 @@ class SalespersonSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear the table before seeding
+        // Clear the table before seeding (handle FK constraints for MySQL)
+        try {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        } catch (\Throwable $e) {
+            // Ignore for non-MySQL drivers
+        }
+
         DB::table('salesperson')->truncate();
 
-        DB::table('salesperson')->insert($this->salespersons);
+        $now = now();
+        $rows = array_map(function ($row) use ($now) {
+            // Ensure timestamps exist
+            $row['created_at'] = $row['created_at'] ?? $now;
+            $row['updated_at'] = $row['updated_at'] ?? $now;
+            return $row;
+        }, $this->salespersons);
+
+        DB::table('salesperson')->insert($rows);
+
+        try {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        } catch (\Throwable $e) {
+            // Ignore for non-MySQL drivers
+        }
     }
 
     /**
