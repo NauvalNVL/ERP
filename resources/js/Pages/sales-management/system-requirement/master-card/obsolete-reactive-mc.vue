@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <div class="rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-indigo-50">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
                 <!-- Left Column - Main Content (The Form) -->
@@ -42,27 +42,13 @@
                                     AC#:
                                 </label>
                                 <div class="relative flex group">
-                                    <input type="text" id="ac" v-model="form.ac" placeholder="Customer Account" class="input-field">
+                                    <input type="text" id="ac" v-model="form.ac" placeholder="Customer Account" class="input-field" style="min-width:220px;max-width:340px;width:100%;">
                                     <button @click="openCustomerLookup" type="button" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
                             </div>
-                            <!-- Product Code -->
-                            <div>
-                                <label for="product_code" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                                     <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 text-white mr-3 shadow-md transition-transform group-hover:scale-110">
-                                        <i class="fas fa-box text-xs"></i>
-                                    </span>
-                                    Product Code:
-                                </label>
-                                <div class="relative flex group">
-                                    <input type="text" id="product_code" v-model="form.product_code" placeholder="Product Code" class="input-field">
-                                    <button @click="openProductLookup" type="button" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
+                            
                             <!-- MCS# Range -->
                             <div>
                                 <label for="mcs_from" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
@@ -73,97 +59,63 @@
                                 </label>
                                 <div class="flex items-center gap-4">
                                     <div class="relative flex group flex-1">
-                                        <input type="text" id="mcs_from" v-model="form.mcs_from" placeholder="From Sequence" class="input-field">
+                                        <input type="text" id="mcs_from" v-model="form.mcs_from" placeholder="From Sequence" class="input-field" style="min-width:220px;max-width:340px;width:100%;">
                                         <button @click="openMcsLookup('from')" type="button" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>
-                                    <span class="text-gray-500 font-medium">TO</span>
-                                    <div class="relative flex group flex-1">
-                                        <input type="text" id="mcs_to" v-model="form.mcs_to" placeholder="To Sequence" class="input-field">
-                                        <button @click="openMcsLookup('to')" type="button" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
                             
-                            <!-- Divider -->
-                            <div class="border-t border-gray-200 !my-6"></div>
-
-                            <!-- Action To Perform -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                                    <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white mr-3 shadow-md transition-transform group-hover:scale-110">
-                                        <i class="fas fa-bolt text-xs"></i>
-                                    </span>
-                                    Action To Perform
-                                </label>
-                                <div class="flex flex-col sm:flex-row gap-4 mt-2">
-                                    <label class="action-radio" :class="{ 'action-radio-obsolete-active': form.action === 'obsolete' }">
-                                        <input type="radio" v-model="form.action" value="obsolete" name="action-radio" class="hidden">
-                                        <i class="fas fa-ban w-6 text-xl" :class="form.action === 'obsolete' ? 'text-red-500' : 'text-gray-400'"></i>
-                                        <span class="font-bold" :class="form.action === 'obsolete' ? 'text-red-800' : 'text-gray-700'">Obsolete Active</span>
-                                    </label>
-                                    <label class="action-radio" :class="{ 'action-radio-reactivate-active': form.action === 'reactivate' }">
-                                        <input type="radio" v-model="form.action" value="reactivate" name="action-radio" class="hidden">
-                                        <i class="fas fa-check-circle w-6 text-xl" :class="form.action === 'reactivate' ? 'text-green-500' : 'text-gray-400'"></i>
-                                        <span class="font-bold" :class="form.action === 'reactivate' ? 'text-green-800' : 'text-gray-700'">Reactivate Obsolete</span>
-                                    </label>
-                                </div>
-                            </div>
                             
-                            <!-- Reason -->
-                            <div>
-                                <label for="reason" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                                    <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 text-white mr-3 shadow-md transition-transform group-hover:scale-110">
-                                        <i class="fas fa-comment-dots text-xs"></i>
-                                    </span>
-                                    Provide Reason
-                                </label>
-                                <textarea id="reason" v-model="form.reason" rows="3" placeholder="A reason must be provided..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 shadow-sm focus:shadow-lg transition-shadow"></textarea>
-                            </div>
-
-                            <!-- Process Button -->
-                            <div class="pt-6 text-center border-t border-gray-200">
-                                <button @click="processSelections" class="process-button group">
-                                    <span class="shimmer-effect"></span>
-                                    <i class="fas fa-cogs mr-3 text-xl group-hover:animate-spin"></i>
-                                    Process Selections
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column - Quick Info Panel -->
+                <!-- Right Column - Description Info Panel -->
                 <div class="lg:col-span-1 animate-fade-in-up animation-delay-300">
                     <div class="sticky top-24">
                         <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-teal-500">
                             <div class="flex items-center mb-4 pb-3 border-b border-gray-200">
-                                 <div class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-4 shadow-md">
+                                <div class="p-2 bg-gradient-to-r from-teal-500 to-green-500 rounded-lg mr-4 shadow-md">
                                     <i class="fas fa-info-circle text-white"></i>
                                 </div>
-                                <h3 class="text-lg font-semibold text-gray-800">Instructions</h3>
+                                <h3 class="text-lg font-semibold text-gray-800">Deskripsi Menu Obsolete & Reactive MC</h3>
                             </div>
-                            <ul class="text-sm text-gray-600 space-y-4">
-                                <li class="flex items-start">
-                                    <i class="fas fa-filter text-teal-500 w-4 mt-1 mr-3 flex-shrink-0"></i>
-                                    <span>Fill in one or more criteria to filter the master cards you want to update.</span>
-                                </li>
-                                <li class="flex items-start">
-                                    <i class="fas fa-bolt text-teal-500 w-4 mt-1 mr-3 flex-shrink-0"></i>
-                                    <span>Choose whether to <span class="font-semibold text-red-600">Obsolete</span> or <span class="font-semibold text-green-600">Reactivate</span>.</span>
-                                </li>
-                                 <li class="flex items-start">
-                                    <i class="fas fa-comment-dots text-teal-500 w-4 mt-1 mr-3 flex-shrink-0"></i>
-                                    <span>A reason for the bulk action is mandatory.</span>
-                                </li>
-                                <li class="flex items-start">
-                                    <i class="fas fa-cogs text-teal-500 w-4 mt-1 mr-3 flex-shrink-0"></i>
-                                    <span>Click 'Process Selections' to apply the changes. This action is irreversible.</span>
-                                </li>
-                            </ul>
+                            <div class="text-sm text-gray-700 space-y-4">
+                                <p>
+                                    Menu ini digunakan untuk mengubah status Master Card secara massal menjadi
+                                    <span class="font-semibold text-red-600">Obsolete</span> atau
+                                    <span class="font-semibold text-green-600">Reactive</span> berdasarkan kriteria yang ditentukan.
+                                </p>
+                                <div class="space-y-3">
+                                    <div class="flex items-start bg-white border-l-4 border-indigo-500 rounded-md p-3 shadow-sm">
+                                        <span class="text-indigo-600 mr-3"><i class="fas fa-filter"></i></span>
+                                        <div>
+                                            <p class="font-semibold text-gray-900 text-sm">Tentukan Kriteria</p>
+                                            <p class="text-gray-700 text-sm">Isi AC#, range MCS#, atau produk untuk memfilter MC.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start bg-white border-l-4 border-blue-500 rounded-md p-3 shadow-sm">
+                                        <span class="text-blue-600 mr-3"><i class="fas fa-exchange-alt"></i></span>
+                                        <div>
+                                            <p class="font-semibold text-gray-900 text-sm">Pilih Aksi</p>
+                                            <p class="text-gray-700 text-sm">Obsolete untuk menonaktifkan, Reactive untuk mengaktifkan kembali.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start bg-white border-l-4 border-emerald-500 rounded-md p-3 shadow-sm">
+                                        <span class="text-emerald-600 mr-3"><i class="fas fa-comment-dots"></i></span>
+                                        <div>
+                                            <p class="font-semibold text-gray-900 text-sm">Tambahkan Alasan</p>
+                                            <p class="text-gray-700 text-sm">Wajib mengisi alasan agar perubahan tercatat jelas.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start">
+                                    <span class="text-yellow-600 mr-3"><i class="fas fa-info-circle"></i></span>
+                                    <p class="text-sm text-yellow-800">Perubahan status akan mempengaruhi ketersediaan MC pada proses berikutnya.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
