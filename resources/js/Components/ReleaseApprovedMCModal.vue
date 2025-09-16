@@ -1,135 +1,99 @@
 <template>
   <transition name="fade">
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30 py-8">
-      <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl mx-auto relative animate-fade-in-up max-h-[90vh] flex flex-col">
+      <div class="bg-white rounded-lg shadow-2xl w-full max-w-3xl mx-auto relative animate-fade-in-up max-h-[90vh] flex flex-col">
         <!-- Modal Header -->
-        <div class="bg-gradient-to-r from-teal-500 to-green-600 p-4 rounded-t-lg shadow-md flex items-center justify-between flex-shrink-0">
+        <div class="bg-gradient-to-r from-indigo-600 to-blue-600 p-4 rounded-t-lg shadow-md flex items-center justify-between flex-shrink-0">
           <div class="flex items-center gap-2">
-            <i class="fas fa-hand-holding-usd text-white text-2xl"></i>
+            <i class="fas fa-unlock-alt text-white text-2xl"></i>
             <h2 class="text-xl font-bold text-white">Release Approved MC</h2>
           </div>
-          <button @click="$emit('close')" class="text-white hover:text-gray-100 text-2xl transition-transform transform hover:rotate-90">&times;</button>
+          <button @click="$emit('close')" class="text-white hover:text-gray-100 text-2xl">&times;</button>
         </div>
 
         <!-- Modal Body -->
         <div class="p-6 flex-grow overflow-y-auto">
-          <!-- Customer Info -->
-          <div class="bg-blue-50 p-4 rounded-lg shadow-inner mb-4 border border-blue-100">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
-              <div class="flex items-center">
-                <i class="fas fa-user-circle text-blue-600 mr-2"></i>
-                <span class="font-semibold text-gray-700">Customer:</span>
-                <input type="text" :value="customerCode" readonly class="ml-2 px-2 py-1 border border-blue-200 rounded-md bg-blue-100 text-blue-800 font-medium w-32" />
-                <input type="text" :value="customerName" readonly class="ml-2 px-2 py-1 border border-blue-200 rounded-md bg-blue-100 text-blue-800 font-medium flex-grow" />
-              </div>
+          <!-- Top fields: AC, Customer, MCS, Model -->
+          <div class="space-y-3 mb-4">
+            <div class="grid grid-cols-12 gap-3 items-center">
+              <label class="col-span-2 text-sm font-medium text-gray-700">AC#:</label>
+              <input :value="customerCode" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
+              <input :value="customerName" readonly class="col-span-7 px-2 py-1 border rounded bg-gray-50" />
+            </div>
+            <div class="grid grid-cols-12 gap-3 items-center">
+              <label class="col-span-2 text-sm font-medium text-gray-700">MCS#:</label>
+              <input :value="mcsFrom" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
+              <label class="col-span-1 text-sm font-medium text-gray-700 text-right">Model:</label>
+              <input :value="selectedMc?.mc_model || ''" readonly class="col-span-6 px-2 py-1 border rounded bg-gray-50" />
             </div>
           </div>
 
-          <!-- Table Section -->
-          <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-lg mb-4 max-h-80 custom-scrollbar">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gradient-to-r from-blue-100 to-indigo-100">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    <div class="flex items-center"><i class="fas fa-hashtag mr-2 text-indigo-500"></i>MCS#</div>
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    <div class="flex items-center"><i class="fas fa-box-open mr-2 text-indigo-500"></i>MODEL</div>
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    <div class="flex items-center"><i class="fas fa-info-circle mr-2 text-indigo-500"></i>STS</div>
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    <div class="flex items-center"><i class="fas fa-check-double mr-2 text-indigo-500"></i>RELEASE</div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-if="filteredMasterCards.length === 0">
-                  <td colspan="4" class="px-6 py-10 text-center text-gray-500">
-                    <div class="flex flex-col items-center justify-center">
-                        <i class="fas fa-clipboard-list text-5xl text-gray-300 mb-3"></i>
-                        <p class="text-lg font-semibold">No matching master cards found.</p> 
-                        <p class="text-sm mt-1">Please ensure the MCS range and filters are correct.</p>
-                    </div>
-                  </td>
-                </tr>
-                <tr v-for="mc in filteredMasterCards" :key="mc.id">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ mc.mc_seq }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ mc.mc_model }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ mc.status }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ mc.released_date ? 'Yes' : 'No' }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Restructured Search & Logs Section -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <!-- Search Section (takes one column) -->
-            <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-lg shadow-inner border border-gray-200">
-              <label for="search" class="block text-sm font-medium text-gray-700 flex items-center mb-2">
-                <i class="fas fa-search text-gray-500 mr-2"></i>Search:
-              </label>
-              <div class="flex w-full">
-                <input type="text" id="search" v-model="searchQuery" placeholder="Search MCS#" class="flex-grow px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:ring-blue-500 focus:border-blue-500 min-w-0" />
-                <button @click="performSearch" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm flex-shrink-0">
-                  Search
-                </button>
-              </div>
-            </div>
-
-            <!-- Logs Section (takes the other column, contains two stacked log entries) -->
-            <div class="grid grid-cols-1 gap-4">
+          <!-- Logs sections -->
+          <div class="space-y-4">
             <!-- Last Maintenance Log -->
-            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 p-4 rounded-lg shadow-inner border border-yellow-100">
-              <h3 class="text-lg font-semibold text-yellow-800 mb-3 flex items-center">
-                <i class="fas fa-history text-yellow-600 mr-2"></i>Last Maintenance Log
-              </h3>
-              <div class="space-y-2">
-                <div class="flex items-center">
-                  <label class="w-24 text-sm font-medium text-gray-700">User ID:</label>
-                  <input type="text" value="mc02" readonly class="flex-grow px-2 py-1 border border-yellow-200 rounded-md bg-yellow-100 text-yellow-800" />
-                </div>
-                <div class="flex items-center">
-                  <label class="w-24 text-sm font-medium text-gray-700">Date & Time:</label>
-                  <input type="text" value="21/03/2020 08:30" readonly class="flex-grow px-2 py-1 border border-yellow-200 rounded-md bg-yellow-100 text-yellow-800" />
-                </div>
-                <div class="flex items-center">
-                  <label class="w-24 text-sm font-medium text-gray-700">Process:</label>
-                  <input type="text" value="Amendment" readonly class="flex-grow px-2 py-1 border border-yellow-200 rounded-md bg-yellow-100 text-yellow-800" />
-                </div>
+            <div class="border rounded p-4">
+              <h3 class="text-sm font-semibold text-gray-700 mb-3">Last Maintenance Log</h3>
+              <div class="grid grid-cols-12 gap-3 items-center mb-2">
+                <label class="col-span-2 text-sm text-gray-700">Process:</label>
+                <input :value="lastMaintenance.process" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
+              </div>
+              <div class="grid grid-cols-12 gap-3 items-center mb-2">
+                <label class="col-span-2 text-sm text-gray-700">User ID:</label>
+                <input :value="lastMaintenance.user" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
+              </div>
+              <div class="grid grid-cols-12 gap-3 items-center">
+                <label class="col-span-2 text-sm text-gray-700">Date:</label>
+                <input :value="lastMaintenance.date" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
+                <label class="col-span-2 text-sm text-gray-700 text-right">Time:</label>
+                <input :value="lastMaintenance.time" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
               </div>
             </div>
+
             <!-- Last Approval Log -->
-            <div class="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 rounded-lg shadow-inner border border-purple-100">
-              <h3 class="text-lg font-semibold text-purple-800 mb-3 flex items-center">
-                <i class="fas fa-clipboard-check text-purple-600 mr-2"></i>Last Approval Log
-              </h3>
-              <div class="space-y-2">
-                <div class="flex items-center">
-                  <label class="w-24 text-sm font-medium text-gray-700">User ID:</label>
-                  <input type="text" value="mc02" readonly class="flex-grow px-2 py-1 border border-purple-200 rounded-md bg-purple-100 text-purple-800" />
-                </div>
-                <div class="flex items-center">
-                  <label class="w-24 text-sm font-medium text-gray-700">Date & Time:</label>
-                  <input type="text" value="21/03/2020 08:30" readonly class="flex-grow px-2 py-1 border border-purple-200 rounded-md bg-purple-100 text-purple-800" />
-                </div>
-                <div class="flex items-center">
-                  <label class="w-24 text-sm font-medium text-gray-700">Active W/O:</label>
-                  <input type="text" value="34" readonly class="flex-grow px-2 py-1 border border-purple-200 rounded-md bg-purple-100 text-purple-800" />
-                  </div>
-                </div>
+            <div class="border rounded p-4">
+              <h3 class="text-sm font-semibold text-gray-700 mb-3">Last Approval Log</h3>
+              <div class="grid grid-cols-12 gap-3 items-center mb-2">
+                <label class="col-span-2 text-sm text-gray-700">User ID:</label>
+                <input :value="lastApproval.user" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
               </div>
+              <div class="grid grid-cols-12 gap-3 items-center">
+                <label class="col-span-2 text-sm text-gray-700">Date:</label>
+                <input :value="lastApproval.date" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
+                <label class="col-span-2 text-sm text-gray-700 text-right">Time:</label>
+                <input :value="lastApproval.time" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
+              </div>
+            </div>
+
+            <!-- Current Release Log -->
+            <div class="border rounded p-4">
+              <h3 class="text-sm font-semibold text-gray-700 mb-3">Current Release Log</h3>
+              <div class="grid grid-cols-12 gap-3 items-center mb-2">
+                <label class="col-span-2 text-sm text-gray-700">User ID:</label>
+                <input :value="currentRelease.user" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
+              </div>
+              <div class="grid grid-cols-12 gap-3 items-center">
+                <label class="col-span-2 text-sm text-gray-700">Date:</label>
+                <input :value="currentRelease.date" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
+                <label class="col-span-2 text-sm text-gray-700 text-right">Time:</label>
+                <input :value="currentRelease.time" readonly class="col-span-3 px-2 py-1 border rounded bg-gray-50" />
+              </div>
+            </div>
+
+            <!-- Active W/Order -->
+            <div class="grid grid-cols-12 gap-3 items-center">
+              <label class="col-span-2 text-sm font-medium text-gray-700">Active W/Order:</label>
+              <input :value="selectedMc?.active_work_orders ?? 0" readonly class="col-span-2 px-2 py-1 border rounded bg-gray-50" />
             </div>
           </div>
         </div>
 
         <!-- Modal Footer -->
         <div class="bg-gray-100 px-4 py-3 sm:px-6 flex justify-end rounded-b-lg flex-shrink-0">
-          <button @click="$emit('close')" class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-base font-medium text-white hover:from-red-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm items-center">
-            <i class="fas fa-times mr-2"></i>
+          <button class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:ml-3 sm:w-auto sm:text-sm items-center mr-2" @click="$emit('close')">
             Close
+          </button>
+          <button class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-base font-medium text-white hover:from-green-700 hover:to-emerald-700 sm:ml-3 sm:w-auto sm:text-sm items-center">
+            Proceed
           </button>
         </div>
       </div>
@@ -154,38 +118,15 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
-const searchQuery = ref('');
-
-// Dummy master card data for demonstration, filtered by the MCS range
-// In a real application, this data would be fetched from an API based on customerCode, mcsFrom, mcsTo
-const dummyMasterCards = computed(() => {
-  // Filter masterCards based on mcsFrom and mcsTo props
-  // For demonstration, we'll use a simple filter.
-  // In a real app, you might need to convert MCS# to numbers for proper range comparison.
-  return props.masterCards.filter(mc => {
-    const mcSeq = parseInt(mc.mc_seq);
-    const from = parseInt(props.mcsFrom);
-    const to = parseInt(props.mcsTo);
-
-    return mcSeq >= from && mcSeq <= to;
-  });
+// Selected MC by exact MCS#
+const selectedMc = computed(() => {
+  return props.masterCards.find(mc => String(mc.mc_seq) === String(props.mcsFrom)) || null;
 });
 
-const filteredMasterCards = computed(() => {
-  if (!searchQuery.value) {
-    return dummyMasterCards.value;
-  }
-  const searchLower = searchQuery.value.toLowerCase();
-  return dummyMasterCards.value.filter(mc =>
-    mc.mc_seq.toLowerCase().includes(searchLower) ||
-    mc.mc_model.toLowerCase().includes(searchLower)
-  );
-});
-
-const performSearch = () => {
-  // Filtering is already handled by filteredMasterCards computed property
-  console.log('Performing search for:', searchQuery.value);
-};
+// Placeholder logs (can be replaced with real data when available)
+const lastMaintenance = ref({ process: 'Amendment', user: 'mc01', date: '01/11/2018', time: '08:43' });
+const lastApproval = ref({ user: 'user', date: '26/08/2025', time: '16:15' });
+const currentRelease = ref({ user: 'user', date: '26/08/2025', time: '16:24' });
 </script>
 
 <style scoped>

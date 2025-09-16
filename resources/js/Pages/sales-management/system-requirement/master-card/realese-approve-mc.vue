@@ -110,207 +110,59 @@
                     </div>
                 </div>
             </div>
-            <!-- Status Checkboxes -->
-            <div class="mb-6">
-                <div class="flex flex-col md:flex-row items-center gap-4 p-4 rounded-xl shadow-lg border-t-4 border-blue-400 bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 relative overflow-hidden animate-fade-in-up">
-                    <div class="flex items-center mb-2 md:mb-0">
-                        <span class="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full mr-3 shadow-md">
-                            <i class="fas fa-filter text-white text-lg"></i>
-                        </span>
-                        <span class="text-lg font-semibold text-blue-800 tracking-wide">MC Status:</span>
-                    </div>
-                    <div class="flex flex-1 flex-col sm:flex-row gap-3 w-full">
-                        <label class="flex items-center flex-1 cursor-pointer bg-white/80 hover:bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 shadow-sm transition-all duration-200 group">
-                            <input type="checkbox" id="status-active" v-model="releaseStatus" value="active" class="h-5 w-5 text-green-500 border-green-300 rounded focus:ring-green-400 transition-all mr-3" />
-                            <span class="flex items-center">
-                                <i class="fas fa-check-circle text-green-500 text-xl mr-2 group-hover:scale-110 transition-transform"></i>
-                                <span class="font-medium text-green-800 text-base">Active</span>
-                            </span>
-                        </label>
-                        <label class="flex items-center flex-1 cursor-pointer bg-white/80 hover:bg-pink-50 border border-pink-200 rounded-lg px-4 py-2 shadow-sm transition-all duration-200 group">
-                            <input type="checkbox" id="status-obsolete" v-model="releaseStatus" value="obsolete" class="h-5 w-5 text-pink-500 border-pink-300 rounded focus:ring-pink-400 transition-all mr-3" />
-                            <span class="flex items-center">
-                                <i class="fas fa-ban text-pink-500 text-xl mr-2 group-hover:scale-110 transition-transform"></i>
-                                <span class="font-medium text-pink-800 text-base">Obsolete</span>
-                            </span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <!-- Action Button -->
-                        <div class="pt-6 text-center border-t border-gray-200">
-                            <button type="button" @click="handleOK" class="process-button group">
-                                <span class="shimmer-effect"></span>
-                                <i class="fas fa-play mr-3 text-xl group-hover:animate-spin"></i>
-                                Proceed
-                </button>
-            </div>
-        </div>
-
-        <!-- Master Card Table Section -->
-                    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6 animate-fade-in-up animation-delay-300">
-            <div class="border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50 p-4 flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-                    <span class="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-3 shadow-sm">
-                        <i class="fas fa-clipboard-check text-white text-sm"></i>
-                    </span>
-                    Approved Master Cards
-                </h3>
-                <div class="flex items-center space-x-2 text-sm text-gray-500">
-                    <div class="flex items-center">
-                        <i class="fas fa-sort text-indigo-500 mr-1"></i>
-                        <span>Sort by:</span>
-                    </div>
-                                <select v-model="sortBy" class="border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="seq">MC Seq#</option>
-                        <option value="model">MC Model</option>
-                        <option value="customer">Customer</option>
-                        <option value="approved_date">Approved Date</option>
-                    </select>
-                </div>
+            
+            
             </div>
             
-            <!-- Error message if there's an error -->
-            <div v-if="error" class="p-6 text-center">
-                <div class="bg-red-50 p-4 rounded-lg border border-red-200 inline-block">
-                    <div class="flex items-center mb-3">
-                        <div class="p-2 bg-red-100 rounded-full mr-3">
-                            <i class="fas fa-exclamation-triangle text-red-600"></i>
-                        </div>
-                        <h4 class="text-red-800 font-medium">Error Loading Data</h4>
-                    </div>
-                    <p class="text-red-700 text-sm">{{ error }}</p>
-                    <button 
-                        @click="fetchData"
-                        class="mt-3 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                        <i class="fas fa-redo mr-2"></i> Try Again
-                    </button>
-                </div>
+        
             </div>
             
-            <!-- Loading indicator -->
-            <div v-else-if="loading" class="p-10 text-center">
-                <div class="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500 mb-4"></div>
-                <p class="text-gray-500">Loading master cards...</p>
-            </div>
-            
-            <!-- Table content when data is loaded -->
-            <div v-else class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <div class="flex items-center">
-                                    <i class="fas fa-hashtag text-indigo-400 mr-2"></i>
-                                    MC Seq#
-                                </div>
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <div class="flex items-center">
-                                    <i class="fas fa-cube text-indigo-400 mr-2"></i>
-                                    MC Model
-                                </div>
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <div class="flex items-center">
-                                    <i class="fas fa-building text-indigo-400 mr-2"></i>
-                                    Customer
-                                </div>
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <div class="flex items-center">
-                                    <i class="fas fa-calendar-check text-indigo-400 mr-2"></i>
-                                    Approved Date
-                                </div>
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <div class="flex items-center">
-                                    <i class="fas fa-unlock-alt text-indigo-400 mr-2"></i>
-                                    Released
-                                </div>
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                <div class="flex items-center">
-                                    <i class="fas fa-tools text-indigo-400 mr-2"></i>
-                                    Actions
-                                </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr 
-                            v-for="mc in filteredMasterCards"
-                            :key="mc.id"
-                            class="hover:bg-indigo-50 transition-colors duration-150 cursor-pointer"
-                            :class="{ 'bg-indigo-50 border-l-4 border-indigo-500': selectedMasterCard?.id === mc.id }"
-                            @click="selectedMasterCard = mc"
-                        >
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ mc.mc_seq }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ mc.mc_model }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ mc.customer_name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ formatDate(mc.approved_date) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span 
-                                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full items-center"
-                                    :class="{
-                                        'bg-green-100 text-green-800': mc.released_date, 
-                                        'bg-yellow-100 text-yellow-800': !mc.released_date
-                                    }">
-                                    <i 
-                                        :class="{
-                                            'fas fa-check-circle mr-1': mc.released_date,
-                                            'fas fa-clock mr-1': !mc.released_date
-                                        }"
-                                    ></i>
-                                    {{ mc.released_date ? 'Released' : 'Not Released' }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button 
-                                    v-if="!mc.released_date" 
-                                    class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 py-1 px-3 rounded-full mr-2 transition-colors" 
-                                    @click.stop="handleRelease(mc)"
-                                >
-                                    <i class="fas fa-unlock text-indigo-600 mr-1"></i> Release
-                                </button>
-                                <button 
-                                    v-else 
-                                    class="bg-red-100 hover:bg-red-200 text-red-800 py-1 px-3 rounded-full transition-colors" 
-                                    @click.stop="handleUnrelease(mc)"
-                                >
-                                    <i class="fas fa-lock text-red-600 mr-1"></i> Unreleased
-                                </button>
-                            </td>
-                        </tr>
-                        <tr v-if="filteredMasterCards.length === 0">
-                            <td colspan="6" class="px-6 py-10 text-center text-gray-500">
-                                <div class="flex flex-col items-center justify-center">
-                                    <div class="bg-gray-100 rounded-full p-4 mb-3">
-                                        <i class="fas fa-search text-gray-400 text-2xl"></i>
-                                    </div>
-                                    <p>No approved master cards found.</p> 
-                                    <p class="text-sm mt-1">Please adjust your search or filter criteria.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Right/Info Column -->
                 <div class="lg:col-span-1 animate-fade-in-up animation-delay-300">
                     <!-- Quick Info Panel -->
                     <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-indigo-500 transition-all duration-300 hover:shadow-xl relative overflow-hidden mb-6">
                         <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50 rounded-full opacity-50"></div>
                         <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-purple-50 rounded-full opacity-50"></div>
-                        <div class="flex items-center justify-center h-full">
-                            <div class="text-center">
-                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Quick Info</h3>
-                                <p class="text-base text-gray-700">
-                                    This section provides quick information about the master cards.
+                        <div>
+                            <div class="flex items-center mb-4">
+                                <span class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg text-white shadow mr-3">
+                                    <i class="fas fa-unlock-alt"></i>
+                                </span>
+                                <h3 class="text-xl font-semibold text-gray-800">Deskripsi Menu Release Approved MC</h3>
+                                </div>
+                            <p class="text-gray-700 leading-relaxed mb-4">
+                                Menu ini digunakan untuk melakukan proses <span class="font-semibold">release</span> Master Card yang sudah
+                                berstatus <span class="font-semibold">approved</span> agar dapat digunakan pada proses produksi.
+                                Anda dapat memilih customer, menentukan MCS#, lalu mengeksekusi release sesuai kebutuhan.
+                            </p>
+                            <div class="grid grid-cols-1 gap-3">
+                                <div class="flex items-start bg-white border-l-4 border-indigo-500 rounded-md p-3 shadow-sm">
+                                    <span class="text-indigo-600 mr-3"><i class="fas fa-user-check"></i></span>
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900">Pilih Customer</p>
+                                        <p class="text-sm text-gray-700">Cari dan pilih AC# customer untuk memfilter Master Card.</p>
+                                </div>
+                                </div>
+                                <div class="flex items-start bg-white border-l-4 border-blue-500 rounded-md p-3 shadow-sm">
+                                    <span class="text-blue-600 mr-3"><i class="fas fa-barcode"></i></span>
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900">Tetapkan MCS#</p>
+                                        <p class="text-sm text-gray-700">Masukkan atau cari nomor MCS yang akan direlease.</p>
+                                </div>
+                                </div>
+                                <div class="flex items-start bg-white border-l-4 border-emerald-500 rounded-md p-3 shadow-sm">
+                                    <span class="text-emerald-600 mr-3"><i class="fas fa-key"></i></span>
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900">Proses Release</p>
+                                        <p class="text-sm text-gray-700">Konfirmasi release dan simpan catatan release bila diperlukan.</p>
+                                </div>
+                                    </div>
+                                </div>
+                            <div class="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start">
+                                <span class="text-yellow-600 mr-3"><i class="fas fa-info-circle"></i></span>
+                                <p class="text-sm text-yellow-800">
+                                    Pastikan data Master Card sudah benar sebelum melakukan release. Tindakan ini akan
+                                    membuka akses penggunaan MC di proses berikutnya.
                                 </p>
                             </div>
                         </div>
@@ -985,6 +837,13 @@ const formatDate = (dateString) => {
         minute: '2-digit'
     }).format(date);
 };
+
+// Auto-open modal when AC# and MCS# are both filled
+watch([searchTerm, () => form.value.mcsFrom], ([ac, mcs]) => {
+    if (ac && mcs) {
+        showReleaseApprovedMCModal.value = true;
+    }
+});
 
 // Action handlers
 const handleOK = () => {
