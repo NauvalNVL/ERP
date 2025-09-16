@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Database\Seeders\SalespersonSeeder;
+use Database\Seeders\SalesTeamSeeder;
 use Inertia\Inertia;
 
 class SalespersonController extends Controller
@@ -251,6 +252,14 @@ class SalespersonController extends Controller
             $salespersons = Salesperson::with('salesTeam')
                 ->orderBy('name')
                 ->get();
+
+            // Auto-seed when empty to ensure data is available for the Vue menu
+            if ($salespersons->isEmpty()) {
+                $this->seedData();
+                $salespersons = Salesperson::with('salesTeam')
+                    ->orderBy('name')
+                    ->get();
+            }
             
             return response()->json($salespersons);
         } catch (\Exception $e) {
@@ -264,7 +273,11 @@ class SalespersonController extends Controller
         try {
             DB::beginTransaction();
             
-            // Run the seeder
+            // Ensure Sales Teams exist first (FK dependency)
+            $teamSeeder = new SalesTeamSeeder();
+            $teamSeeder->run();
+
+            // Run the salesperson seeder
             $seeder = new SalespersonSeeder();
             $seeder->run();
             

@@ -315,9 +315,8 @@
                 <input 
                   v-model="orderDetails.customerPOrder" 
                   type="text" 
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
-                  readonly
-                  disabled
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter customer PO number"
                 >
               </div>
 
@@ -474,10 +473,8 @@
                   <input 
                     v-model="orderDetails.lotNumber" 
                     type="text" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter lot number"
-                    readonly
-                    disabled
                   >
                 </div>
               </div>
@@ -653,6 +650,7 @@ const selectedMasterCard = reactive({
   seq: '',
   model: '',
   status: '',
+  approval: '',
   partNo: '',
   compNo: '',
   pDesign: ''
@@ -694,7 +692,8 @@ const showDeliveryScheduleModal = ref(false)
 
 // Computed properties
 const canProceed = computed(() => {
-  return selectedCustomer.code && selectedMasterCard.seq
+  // Proceed only if MC is approved (Yes) to enforce workflow consistency
+  return selectedCustomer.code && selectedMasterCard.seq && (selectedMasterCard.approval === 'Yes')
 })
 
 const dayOfWeek = computed(() => {
@@ -1098,6 +1097,7 @@ const selectMasterCard = (masterCard) => {
   selectedMasterCard.seq = masterCard.mc_seq
   selectedMasterCard.model = masterCard.mc_model || masterCard.model
   selectedMasterCard.status = masterCard.status
+  selectedMasterCard.approval = masterCard.mc_approval || masterCard.approval || ''
   selectedMasterCard.partNo = masterCard.part_no
   selectedMasterCard.compNo = masterCard.comp_no
   selectedMasterCard.pDesign = masterCard.p_design
@@ -1117,6 +1117,7 @@ const validateMasterCard = async () => {
       const masterCard = data.data
       selectedMasterCard.model = masterCard.mc_model || ''
       selectedMasterCard.status = masterCard.status || 'Active'
+      selectedMasterCard.approval = masterCard.mc_approval || masterCard.approval || 'No'
       selectedMasterCard.partNo = masterCard.part_no || ''
       selectedMasterCard.compNo = masterCard.comp_no || ''
       selectedMasterCard.pDesign = masterCard.p_design || ''
@@ -1126,6 +1127,7 @@ const validateMasterCard = async () => {
       error('Master card not found')
       selectedMasterCard.model = ''
       selectedMasterCard.status = ''
+      selectedMasterCard.approval = ''
       selectedMasterCard.partNo = ''
       selectedMasterCard.compNo = ''
       selectedMasterCard.pDesign = ''
@@ -1135,6 +1137,7 @@ const validateMasterCard = async () => {
     error('Error validating master card: ' + (err.message || 'Network error'))
     selectedMasterCard.model = ''
     selectedMasterCard.status = ''
+    selectedMasterCard.approval = ''
     selectedMasterCard.partNo = ''
     selectedMasterCard.compNo = ''
     selectedMasterCard.pDesign = ''
@@ -1155,6 +1158,7 @@ const loadMasterCardsForCustomer = async () => {
       selectedMasterCard.seq = firstMasterCard.seq
       selectedMasterCard.model = firstMasterCard.model
       selectedMasterCard.status = firstMasterCard.status
+      selectedMasterCard.approval = firstMasterCard.mc_approval || firstMasterCard.approval || 'No'
       selectedMasterCard.partNo = firstMasterCard.part
       selectedMasterCard.compNo = firstMasterCard.comp
       selectedMasterCard.pDesign = firstMasterCard.p_design
@@ -1533,6 +1537,10 @@ const createSalesOrder = async () => {
       error('Master card is required')
       return
     }
+    if (selectedMasterCard.approval !== 'Yes') {
+      error('Selected Master Card is not approved yet')
+      return
+    }
     
     if (!orderDetails.pOrderDate) {
       error('Purchase order date is required')
@@ -1542,6 +1550,7 @@ const createSalesOrder = async () => {
     const requestData = {
       customer_code: selectedCustomer.code,
       master_card_seq: selectedMasterCard.seq,
+      master_card_approval: selectedMasterCard.approval || 'No',
       order_mode: orderDetails.orderMode,
       product_code: orderDetails.product.code,
       salesperson_code: orderDetails.salesperson.code,
