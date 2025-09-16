@@ -289,20 +289,6 @@ const salesManagementItems = [
           { title: 'View & Print MC by Machine', icon: 'fas fa-cogs', route: '/sales-management/system-requirement/master-card/view-and-print-mc-by-machine' }
         ]
       },
-      {
-        title: 'Sales Order',
-        icon: 'fas fa-shopping-bag',
-        children: [
-          { title: 'Define SO Configuration', icon: 'fas fa-cogs', route: '/sales-management/system-requirement/sales-order/define-so-config' },
-          { title: 'Define Analysis Code for Auto WO Generation', icon: 'fas fa-cogs', route: '/sales-management/system-requirement/sales-order/define-ac-auto-wo' },
-          { title: 'Define MC for Auto WO Generation', icon: 'fas fa-cogs', route: '/sales-management/system-requirement/sales-order/define-mc-auto-wo' },
-          { title: 'Define Analysis Code for SO Price Changes', icon: 'fas fa-cogs', route: '/sales-management/system-requirement/sales-order/define-ac-so-price' },
-          { title: 'Define MC for SO Price Changes', icon: 'fas fa-cogs', route: '/sales-management/system-requirement/sales-order/define-mc-so-price' },
-          { title: 'Define SO Cancel Reason', icon: 'fas fa-cogs', route: '/sales-management/system-requirement/sales-order/define-so-cancel-reason' },
-          { title: 'Define SO Item Note Analysis Group', icon: 'fas fa-cogs', route: '/sales-management/system-requirement/sales-order/define-so-item-note-analysis-group' },
-          { title: 'Define SO Item Note Analysis Code', icon: 'fas fa-cogs', route: '/sales-management/system-requirement/sales-order/define-so-item-note-analysis-code' },
-        ]
-      }
     ]
   },
   {
