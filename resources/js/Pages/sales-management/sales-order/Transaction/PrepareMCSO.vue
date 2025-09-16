@@ -199,6 +199,10 @@
                   <div v-if="selectedMasterCard.model" class="mt-1 text-sm text-gray-600">
                     {{ selectedMasterCard.model }}
                   </div>
+                  <div v-if="!selectedMasterCard.seq" class="mt-2 bg-yellow-100 p-3 rounded">
+                    <p class="text-sm font-medium text-yellow-800">No master card data available.</p>
+                    <p class="text-xs text-yellow-700 mt-1">Please select a customer and use the master card lookup to find available master cards.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -687,6 +691,7 @@ const showProductDesignModal = ref(false)
 const showDeliveryLocationModal = ref(false)
 const showDeliveryScheduleModal = ref(false)
 
+
 // Computed properties
 const canProceed = computed(() => {
   return selectedCustomer.code && selectedMasterCard.seq
@@ -1011,7 +1016,7 @@ const openCustomerLookup = () => {
   showCustomerModal.value = true
 }
 
-const selectCustomer = (customer) => {
+const selectCustomer = async (customer) => {
   selectedCustomer.code = customer.customer_code
   selectedCustomer.name = customer.customer_name
   selectedCustomer.address = customer.address || ''
@@ -1024,6 +1029,9 @@ const selectCustomer = (customer) => {
   
   showCustomerModal.value = false
   success('Customer selected successfully')
+  
+  // Auto-load master cards for the selected customer
+  await loadMasterCardsForCustomer()
 }
 
 const validateCustomer = async () => {
@@ -1058,6 +1066,9 @@ const validateCustomer = async () => {
       }
       
       success('Customer validated successfully')
+      
+      // Auto-load master cards for the validated customer
+      await loadMasterCardsForCustomer()
     } else {
       error(data.message || 'Customer not found')
       selectedCustomer.name = ''
@@ -1127,6 +1138,31 @@ const validateMasterCard = async () => {
     selectedMasterCard.partNo = ''
     selectedMasterCard.compNo = ''
     selectedMasterCard.pDesign = ''
+  }
+}
+
+
+const loadMasterCardsForCustomer = async () => {
+  if (!selectedCustomer.code) return
+  
+  try {
+    const response = await fetch(`/api/update-mc/master-cards?customer_code=${selectedCustomer.code}&per_page=50`)
+    const data = await response.json()
+    
+    if (data.data && data.data.length > 0) {
+      // Auto-select the first master card
+      const firstMasterCard = data.data[0]
+      selectedMasterCard.seq = firstMasterCard.seq
+      selectedMasterCard.model = firstMasterCard.model
+      selectedMasterCard.status = firstMasterCard.status
+      selectedMasterCard.partNo = firstMasterCard.part
+      selectedMasterCard.compNo = firstMasterCard.comp
+      selectedMasterCard.pDesign = firstMasterCard.p_design
+      
+      success(`Auto-selected master card: ${firstMasterCard.model}`)
+    }
+  } catch (err) {
+    console.error('Error loading master cards for customer:', err)
   }
 }
 
@@ -1710,63 +1746,6 @@ const handleKeyDown = (event) => {
   }
 }
 
-// Auto-save draft functionality
-const saveDraft = () => {
-  const draftData = {
-    currentPeriod: currentPeriod,
-    updatePeriod: updatePeriod,
-    forwardPeriod: forwardPeriod.value,
-    backwardPeriod: backwardPeriod.value,
-    lastSOOrder: lastSOOrder,
-    selectedCustomer: selectedCustomer,
-    selectedMasterCard: selectedMasterCard,
-    orderDetails: orderDetails,
-    timestamp: new Date().toISOString()
-  }
-  
-  localStorage.setItem('prepare_mc_so_draft', JSON.stringify(draftData))
-}
-
-const loadDraft = () => {
-  const savedDraft = localStorage.getItem('prepare_mc_so_draft')
-  if (savedDraft) {
-    try {
-      const draftData = JSON.parse(savedDraft)
-      // Check if draft is not too old (e.g., within 24 hours)
-      const draftTimestamp = new Date(draftData.timestamp)
-      const now = new Date()
-      const hoursDiff = (now - draftTimestamp) / (1000 * 60 * 60)
-      
-      if (hoursDiff < 24) {
-        // Ask user if they want to restore draft
-        if (confirm('A recent draft was found. Do you want to restore it?')) {
-          Object.assign(currentPeriod, draftData.currentPeriod)
-          Object.assign(updatePeriod, draftData.updatePeriod)
-          forwardPeriod.value = draftData.forwardPeriod
-          backwardPeriod.value = draftData.backwardPeriod
-          Object.assign(lastSOOrder, draftData.lastSOOrder)
-          Object.assign(selectedCustomer, draftData.selectedCustomer)
-          Object.assign(selectedMasterCard, draftData.selectedMasterCard)
-          Object.assign(orderDetails, draftData.orderDetails)
-          success('Draft restored successfully')
-        }
-      } else {
-        // Clear old draft
-        localStorage.removeItem('prepare_mc_so_draft')
-      }
-    } catch (err) {
-      console.warn('Failed to load draft:', err)
-      localStorage.removeItem('prepare_mc_so_draft')
-    }
-  }
-}
-
-const clearDraft = () => {
-  localStorage.removeItem('prepare_mc_so_draft')
-}
-
-// Auto-save every 30 seconds
-let autoSaveInterval = null
 
 // Initialize component
 onMounted(async () => {
@@ -1792,14 +1771,8 @@ onMounted(async () => {
   // Initialize Order Type UI
   updateOrderTypeUI()
   
-  // Load draft if available
-  loadDraft()
-  
   // Setup keyboard shortcuts
   document.addEventListener('keydown', handleKeyDown)
-  
-  // Setup auto-save
-  autoSaveInterval = setInterval(saveDraft, 30000) // Save every 30 seconds
   
   // Ensure date input is properly initialized
   await nextTick()
@@ -1845,12 +1818,6 @@ onUnmounted(() => {
   
   // Remove document click listener
   document.removeEventListener('click', handleDocumentClick)
-  
-  if (autoSaveInterval) {
-    clearInterval(autoSaveInterval)
-  }
-  // Save final draft on unmount
-  saveDraft()
 })
 </script>
 

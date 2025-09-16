@@ -236,6 +236,11 @@ Route::middleware('auth')->group(function () {
             return Inertia::render('sales-management/sales-order/Transaction/PrepareMCSO');
         })->name('vue.sales-order.transaction.prepare-mc-so');
 
+        // Sales Order Transaction - Prepare SB SO
+        Route::get('/sales-order/transaction/prepare-sb-so', function () {
+            return Inertia::render('sales-management/sales-order/Transaction/PrepareSBSO');
+        })->name('vue.sales-order.transaction.prepare-sb-so');
+
         // Sales Order API routes for reports
         Route::get('/api/sales-order/print-log', [SalesOrderController::class, 'printLog']);
         Route::get('/api/sales-order/print-jit-tracking', [SalesOrderController::class, 'printJitTracking']);

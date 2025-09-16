@@ -66,6 +66,13 @@ class UpdateMcController extends Controller
         // MANDATORY: Filter by customer_code if provided
         if ($customerCode) {
             $masterCards->where('customer_code', $customerCode);
+            
+            // Auto-seed data if no master cards found for this customer
+            if ($masterCards->count() === 0) {
+                $this->seedData();
+                // Rebuild query after seeding
+                $masterCards = MasterCard::query()->where('customer_code', $customerCode);
+            }
         } else {
             // If no customer_code provided, return empty result for security
             return response()->json([
@@ -225,6 +232,67 @@ class UpdateMcController extends Controller
                 'exists' => false,
                 'error' => 'Database error occurred'
             ], 500);
+        }
+    }
+
+    /**
+     * Seed master card data from MasterCardSeeder.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function seed()
+    {
+        try {
+            $this->seedData();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Master card data seeded successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error seeding master card data: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error seeding master card data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Private method to seed master card data.
+     *
+     * @return void
+     */
+    private function seedData()
+    {
+        try {
+            $masterCards = [
+                // Semua Master Cards untuk Customer ABDULLAH, BPK (000211-08)
+                ['mc_seq' => '1609138', 'mc_model' => 'BOX BASO 4.5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
+                ['mc_seq' => '1609144', 'mc_model' => 'BOX IKAN HARIMAU 4.5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
+                ['mc_seq' => '1609145', 'mc_model' => 'BOX SRIKAYA 4.5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
+                ['mc_seq' => '1609162', 'mc_model' => 'BIHUN FANIA 5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
+                ['mc_seq' => '1609163', 'mc_model' => 'BIHUN IKAN TUNA 4.5 KG BARU', 'status' => 'Active', 'customer_code' => '000211-08'],
+                ['mc_seq' => '1609164', 'mc_model' => 'BIHUN IKAN TUNA 5 KG BARU', 'status' => 'Active', 'customer_code' => '000211-08'],
+                ['mc_seq' => '1609166', 'mc_model' => 'BIHUN PIRING MAS 5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
+                ['mc_seq' => '1609173', 'mc_model' => 'BOX JAGUNG SRIKAYA 5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
+                ['mc_seq' => '1609181', 'mc_model' => 'BIHUN POHON KOPI 5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
+                ['mc_seq' => '1609182', 'mc_model' => 'BIHUN DELLIS 5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
+                ['mc_seq' => '1609185', 'mc_model' => 'POLOS UK 506 X 356 X 407', 'status' => 'Active', 'customer_code' => '000211-08'],
+                ['mc_seq' => '1609186', 'mc_model' => 'POLOS 480 X 410 X 401', 'status' => 'Active', 'customer_code' => '000211-08'],
+            ];
+
+            foreach ($masterCards as $data) {
+                MasterCard::updateOrCreate(
+                    ['mc_seq' => $data['mc_seq']], // kondisi pencarian
+                    $data // data yang akan diupdate atau dibuat
+                );
+            }
+
+            Log::info('Master card data seeded successfully', ['count' => count($masterCards)]);
+        } catch (\Exception $e) {
+            Log::error('Error in seedData method: ' . $e->getMessage());
+            throw $e;
         }
     }
 }
