@@ -104,7 +104,7 @@
                 <div class="flex items-center">
                     <div class="relative flex group">
                         <input type="text" id="mcsFrom" v-model="form.mcsFrom" placeholder="MCS#" class="input-field" style="min-width:220px;max-width:340px;width:100%;" />
-                        <button type="button" @click="showMcsOptions = true" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
+                        <button type="button" @click="openMcsTableDirect()" class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:from-pink-600 hover:to-orange-600 shadow-sm hover:shadow-md transform hover:-translate-y-px">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
@@ -540,7 +540,7 @@
 
         <!-- Modal Options -->
         <transition name="fade">
-            <div v-if="showOptions" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+            <div v-if="false && showOptions" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
                 <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto relative animate-fade-in-up">
                     <!-- Modal Header -->
                     <div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-t-xl px-6 py-4 flex items-center justify-between">
@@ -640,7 +640,7 @@
 
         <!-- Options Modal from Customer Account -->
         <transition name="fade">
-            <div v-if="showOptionsFromCustomer" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+            <div v-if="false && showOptionsFromCustomer" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
                 <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto relative animate-fade-in-up">
                     <!-- Modal Header -->
                     <div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-t-xl px-6 py-4 flex items-center justify-between">
@@ -690,7 +690,7 @@
 
         <!-- Modal MCS Options -->
         <transition name="fade">
-            <div v-if="showMcsOptions" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+            <div v-if="false && showMcsOptions" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
                 <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto relative animate-fade-in-up">
                     <!-- Modal Header -->
                     <div class="bg-gradient-to-r from-green-500 to-teal-500 rounded-t-xl px-6 py-4 flex items-center justify-between">
@@ -1152,6 +1152,18 @@ function applyMcsOptions(fromOK = false) {
         mcsCurrentPage.value = 1;
         fetchMcsData(1);
     }
+}
+
+// Open Master Card table directly (skip options modal)
+function openMcsTableDirect() {
+    // Map default options
+    mcsSortOption.value = 'mc_seq';
+    mcsSortOrder.value = 'asc';
+    mcsStatusFilter.value = 'Act';
+    // Open the table and load data
+    showMcsTableModal.value = true;
+    mcsCurrentPage.value = 1;
+    fetchMcsData(1);
 }
 
 const selectedCustomer = ref(null); // New ref for selected customer

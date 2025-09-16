@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\MasterCard;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class UpdateMcController extends Controller
 {
@@ -161,6 +162,23 @@ class UpdateMcController extends Controller
         ]);
 
         return response()->json($result);
+    }
+
+    /**
+     * Show a single Master Card (by mc_seq) with details/PD setup.
+     */
+    public function apiShow($mcSeq, Request $request)
+    {
+        $customerCode = $request->input('customer_code');
+        $query = MasterCard::where('mc_seq', $mcSeq);
+        if ($customerCode) {
+            $query->where('customer_code', $customerCode);
+        }
+        $mc = $query->first();
+        if (!$mc) {
+            return response()->json(['message' => 'Not found'], 404);
+        }
+        return response()->json($mc);
     }
 
     /**

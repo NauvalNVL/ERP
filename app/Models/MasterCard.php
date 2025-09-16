@@ -25,6 +25,7 @@ class MasterCard extends Model
         'comp_no',
         'p_design',
         'status',
+        'mc_approval',
         'ext_dim_1',
         'ext_dim_2',
         'ext_dim_3',
@@ -32,6 +33,13 @@ class MasterCard extends Model
         'int_dim_2',
         'int_dim_3',
         'customer_code',
+        'detailed_master_card',
+        'pd_setup',
+    ];
+
+    protected $casts = [
+        'detailed_master_card' => 'array',
+        'pd_setup' => 'array',
     ];
 
     // Accessor untuk mendapatkan seq dari mc_seq

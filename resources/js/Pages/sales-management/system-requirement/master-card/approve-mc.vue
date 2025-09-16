@@ -100,14 +100,17 @@
                                             type="text" 
                                             id="ac" 
                                             v-model="searchTerm"
-                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
                                         />
                                         <button 
                                             type="button"
                                             @click="openCustomerAccountModal"
-                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gray-200 text-gray-700 rounded-r-md"
+                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
                                         >
-                                            <i class="fas fa-table"></i>
+                                            <span
+                                                class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"
+                                            ></span>
+                                            <i class="fas fa-search relative z-10"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -128,7 +131,7 @@
                                                 class="fas fa-barcode text-white text-xs"
                                             ></i>
                                     </span>
-                                    M/Card Seq#:
+                                    MCS#:
                                 </label>
                                     <div class="relative flex group">
                                         <span
@@ -140,14 +143,17 @@
                                             type="text" 
                                             id="mcs" 
                                             v-model="mcsInput"
-                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
                                         />
                                         <button 
                                             type="button"
                                             @click="openMcsModal"
-                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gray-200 text-gray-700 rounded-r-md"
+                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-r-md transition-all transform active:translate-y-px relative overflow-hidden shadow-sm"
                                         >
-                                            <i class="fas fa-table"></i>
+                                            <span
+                                                class="absolute inset-0 bg-white opacity-0 hover:opacity-20 transition-opacity"
+                                            ></span>
+                                            <i class="fas fa-search relative z-10"></i>
                                         </button>
                                     </div>
                                     </div>
@@ -439,7 +445,7 @@
 
         <!-- Main Table & Log Panel (Layout Rapi) -->
         <div
-            v-if="showMainPanel"
+            v-if="false"
             class="rounded-xl shadow-2xl p-6 mt-4 bg-gradient-to-br from-blue-50 via-cyan-50 to-purple-100 border-2 border-indigo-200"
         >
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -742,102 +748,89 @@
                     >&#8203;</span
                 >
                 <div
-                    class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full animate-modalScaleIn"
+                    class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full animate-modalScaleIn"
                 >
-                    <!-- Modal Header with gradient -->
-                    <div
-                        class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 relative overflow-hidden"
-                    >
-                        <div
-                            class="absolute -top-8 -left-8 w-16 h-16 bg-white opacity-10 rounded-full"
-                        ></div>
-                        <div
-                            class="absolute -bottom-8 -right-8 w-16 h-16 bg-white opacity-10 rounded-full"
-                        ></div>
-                        
-                        <div class="flex items-center">
-                            <div
-                                class="bg-white bg-opacity-20 p-2 rounded-full mr-3"
-                            >
-                                <i class="fas fa-check text-white text-xl"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-white">
-                                Approve Master Card
-                            </h3>
-                        </div>
+                    <!-- Header -->
+                    <div class="px-4 py-2 border-b border-gray-300 bg-gray-100 flex items-center justify-between">
+                        <h3 class="text-gray-800 font-semibold">Approve MC</h3>
+                        <button class="text-gray-500 hover:text-gray-700" @click="showApprovalModal = false">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
-                    
-                    <div class="bg-white px-6 py-5">
-                        <div class="sm:flex sm:items-start">
-                            <div
-                                class="bg-gradient-to-br from-green-400 to-green-500 p-3 rounded-lg shadow-md flex-shrink-0 mr-4"
-                            >
-                                <i
-                                    class="fas fa-file-alt text-white text-lg"
-                                ></i>
+
+                    <!-- Body styled like legacy UI -->
+                    <div class="p-4 space-y-4">
+                        <!-- Selected Master Card -->
+                        <div class="border border-gray-400 rounded">
+                            <div class="px-3 py-1 border-b border-gray-400 bg-gray-100 text-sm font-semibold text-gray-700">Selected Master Card</div>
+                            <div class="p-3 space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <label class="w-28 text-sm text-gray-700">Customer A/C#:</label>
+                                    <input type="text" :value="masterCardToAction?.customer_code || ''" readonly class="w-40 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                    <input type="text" :value="masterCardToAction?.customer_name || ''" readonly class="flex-1 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="w-28 text-sm text-gray-700">M/Card Seq#:</label>
+                                    <input type="text" :value="masterCardToAction?.mc_seq || ''" readonly class="w-40 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="w-28 text-sm text-gray-700">Model:</label>
+                                    <input type="text" :value="masterCardToAction?.mc_model || ''" readonly class="flex-1 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-gray-600 mb-3">
-                                    Are you sure you want to approve this master
-                                    card? This action cannot be undone.
-                                </p>
-                                <div
-                                    class="bg-green-50 border border-green-200 rounded-lg p-3 mb-3"
-                                >
-                                    <div class="flex items-center mb-1">
-                                        <i
-                                            class="fas fa-info-circle text-green-600 mr-2"
-                                        ></i>
-                                        <span class="font-medium text-green-900"
-                                            >Master Card Details</span
-                                        >
+                        </div>
+
+                        <!-- Last Maintenance Log -->
+                        <div class="border border-gray-400 rounded">
+                            <div class="px-3 py-1 border-b border-gray-400 bg-gray-100 text-sm font-semibold text-gray-700">Last Maintenance Log</div>
+                            <div class="p-3 space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <label class="w-28 text-sm text-gray-700">Process:</label>
+                                    <input type="text" :value="lastMaintenanceLog.process || ''" readonly class="w-48 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="w-28 text-sm text-gray-700">User ID:</label>
+                                    <input type="text" :value="lastMaintenanceLog.user || ''" readonly class="w-32 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center gap-2">
+                                        <label class="w-28 text-sm text-gray-700">Date:</label>
+                                        <input type="text" :value="lastMaintenanceLog.date || ''" readonly class="w-32 px-2 py-1 border border-gray-400 text-sm bg-white">
                                     </div>
-                                    <p class="text-sm text-green-800">
-                                        <span class="font-medium"
-                                            >MC Seq#:</span
-                                        >
-                                        {{ masterCardToAction?.mc_seq }}
-                                    </p>
-                                    <p class="text-sm text-green-800">
-                                        <span class="font-medium">Model:</span>
-                                        {{ masterCardToAction?.mc_model }}
-                                    </p>
-                                    <p class="text-sm text-green-800">
-                                        <span class="font-medium"
-                                            >Customer:</span
-                                        >
-                                        {{ masterCardToAction?.customer_name }}
-                                    </p>
+                                    <div class="flex items-center gap-2">
+                                        <label class="w-10 text-sm text-gray-700">Time:</label>
+                                        <input type="text" :value="lastMaintenanceLog.time || ''" readonly class="w-20 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Last Approval Log -->
+                        <div class="border border-gray-400 rounded">
+                            <div class="px-3 py-1 border-b border-gray-400 bg-gray-100 text-sm font-semibold text-gray-700">Last Approval Log</div>
+                            <div class="p-3 space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <label class="w-28 text-sm text-gray-700">User ID:</label>
+                                    <input type="text" :value="lastApprovalUser" readonly class="w-32 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="flex items-center gap-2">
+                                        <label class="w-28 text-sm text-gray-700">Date:</label>
+                                        <input type="text" :value="currentApprovalDate" readonly class="w-32 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <label class="w-10 text-sm text-gray-700">Time:</label>
+                                        <input type="text" :value="currentApprovalTime" readonly class="w-20 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div
-                        class="bg-gray-50 px-6 py-4 flex justify-end space-x-3"
-                    >
-                        <button 
-                            type="button" 
-                            class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-5 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
-                            @click="confirmApproval"
-                        >
-                            <span
-                                class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"
-                            ></span>
-                            <i class="fas fa-check text-sm mr-1"></i>
-                            <span>Approve</span>
-                        </button>
-                        <button 
-                            type="button" 
-                            class="bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-700 px-5 py-2 rounded-lg flex items-center space-x-2 transform active:translate-y-px transition-all duration-300 shadow-md relative overflow-hidden group"
-                            @click="showApprovalModal = false"
-                        >
-                            <span
-                                class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"
-                            ></span>
-                            <i class="fas fa-times text-sm mr-1"></i>
-                            <span>Cancel</span>
-                        </button>
+
+                    <!-- Footer -->
+                    <div class="px-4 py-3 border-t border-gray-300 flex justify-end">
+                        <button class="px-6 py-2 bg-gray-200 text-gray-800 rounded mr-2" @click="showApprovalModal = false">Close</button>
+                        <button class="px-6 py-2 bg-blue-600 text-white rounded" @click="confirmApproval">Confirm</button>
                     </div>
                 </div>
             </div>
@@ -1187,19 +1180,13 @@
             @update="handleUpdateMasterCard"
         />
 
-        <!-- Customer Account Modal -->
+        <!-- Customer Account Modal (like Update Customer Account) -->
         <CustomerAccountModal 
             v-if="showCustomerAccountTable"
             :show="showCustomerAccountTable"
-            :customer-accounts="
-                customerAccounts.value.length > 0
-                    ? customerAccounts
-                    : customerData
-            "
-            :loading="loadingCustomers"
+            :customer-accounts="customerAccounts"
             @close="showCustomerAccountTable = false"
             @select="selectCustomer"
-            @sort="handleSortConfirm"
         />
 
         <!-- Customer Account Options Modal -->
@@ -3192,7 +3179,7 @@ import { ref, computed, onMounted, watch } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import MasterCardModal from "@/Components/master-card-modal.vue";
-import CustomerAccountModal from "@/Components/CustomerAccountModal.vue";
+import CustomerAccountModal from "@/Components/customer-account-modal.vue";
 import UpdateMcModal from "@/Components/UpdateMcModal.vue";
 
 const props = defineProps({
@@ -3221,6 +3208,12 @@ const selectedCustomer = ref(null);
 const customerAccounts = ref([]);
 const loadingCustomers = ref(false);
 const notification = ref({ show: false, message: "", type: "success" });
+
+// Derived fields for legacy-like modal layout
+const lastMaintenanceLog = ref({ process: "Amendment", user: "mc01", date: "31/03/2020", time: "13:42" });
+const lastApprovalUser = ref("user");
+const currentApprovalDate = ref(new Date().toLocaleDateString('en-GB'));
+const currentApprovalTime = ref(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
 
 // New Customer Account Options Modal state
 const showCustomerAccountOptionsModal = ref(false);
@@ -3524,6 +3517,12 @@ const fetchMcsData = async () => {
         if (mcsSearchTerm.value) params.set("query", mcsSearchTerm.value);
         params.set("sortBy", mapSortToApi(mcsSortOption.value));
         params.set("sortOrder", mcsSortOrder.value);
+        // IMPORTANT: Backend requires customer_code to return data
+        const customerCode =
+            (selectedCustomer.value && (selectedCustomer.value.code || selectedCustomer.value.customer_code)) || "";
+        if (customerCode) {
+            params.set("customer_code", customerCode);
+        }
         const statuses =
             mcsStatusFilter.value === "all"
                 ? ["Act", "Obsolete"]
@@ -3532,14 +3531,21 @@ const fetchMcsData = async () => {
         params.set("per_page", "10");
         params.set("page", String(mcsCurrentPage.value));
         const res = await fetch(
-            `/update-mc/master-cards?${params.toString()}`,
+            `/api/update-mc/master-cards?${params.toString()}`,
             { headers: { Accept: "application/json" } }
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
-        mcsMasterCards.value = json.data || [];
-        mcsCurrentPage.value = json.current_page || 1;
-        mcsLastPage.value = json.last_page || 1;
+        // Normalize API response like Update MC does
+        if (Array.isArray(json)) {
+            mcsMasterCards.value = json;
+            mcsCurrentPage.value = 1;
+            mcsLastPage.value = 1;
+        } else {
+            mcsMasterCards.value = Array.isArray(json.data) ? json.data : [];
+            mcsCurrentPage.value = json.current_page || json.meta?.current_page || 1;
+            mcsLastPage.value = json.last_page || json.meta?.last_page || 1;
+        }
     } catch (e) {
         mcsError.value = "Failed to load Master Card data";
         console.error(e);
@@ -3580,11 +3586,20 @@ const handleReject = (mc) => {
 
 const confirmApproval = async () => {
     try {
+        // Resolve ApproveMC id from selected data if missing
+        let approveId = masterCardToAction.value?.id;
+        if (!approveId && masterCardToAction.value?.mc_seq && Array.isArray(masterCards.value)) {
+            const found = masterCards.value.find((mc) => String(mc.mc_seq) === String(masterCardToAction.value.mc_seq));
+            approveId = found?.id;
+        }
+        if (!approveId) {
+            throw new Error("ApproveMC id not found for approval");
+        }
         const response = await fetch(
-            `/api/approve-mc/approve/${masterCardToAction.value.id}`,
+            `/api/approve-mc/approve/${approveId}`,
             {
                 method: "POST",
-            headers: {
+                headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": document
                         .querySelector('meta[name="csrf-token"]')
@@ -3599,7 +3614,7 @@ const confirmApproval = async () => {
         if (result.success) {
             // Update the status locally
             const index = masterCards.value.findIndex(
-                (mc) => mc.id === masterCardToAction.value.id
+                (mc) => mc.id === approveId
             );
             if (index !== -1) {
                 masterCards.value[index].status = "active";
@@ -3625,14 +3640,20 @@ const confirmApproval = async () => {
 
 const confirmRejection = async () => {
     try {
+        // Resolve ApproveMC id from selected data if missing
+        let rejectId = masterCardToAction.value?.id;
+        if (!rejectId && masterCardToAction.value?.mc_seq && Array.isArray(masterCards.value)) {
+            const found = masterCards.value.find((mc) => String(mc.mc_seq) === String(masterCardToAction.value.mc_seq));
+            rejectId = found?.id || masterCardToAction.value.mc_seq;
+        }
         const response = await fetch(
-            `/api/approve-mc/reject/${masterCardToAction.value.id}`,
+            `/api/approve-mc/reject/${rejectId}`,
             {
                 method: "POST",
-            headers: {
+                headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": document
-                        .querySelector('meta[name="csrf-token"]')
+                        .querySelector('meta[name=\"csrf-token\"]')
                         .getAttribute("content"),
                     Accept: "application/json",
             },
@@ -3972,10 +3993,59 @@ const selectForViewMcs = (mcs) => {
     selectedMcs.value = mcs;
 };
 
+// Auto load selected Master Card details when both Customer A/C and MCS# are filled
+watch([searchTerm, mcsInput], async ([newAc, newMcs]) => {
+    try {
+        if (!newAc || !newMcs) return;
+
+        const customerCode =
+            (selectedCustomer.value && (selectedCustomer.value.code || selectedCustomer.value.customer_code)) ||
+            String(newAc).trim();
+
+        const res = await fetch(`/api/update-mc/check-mcs/${encodeURIComponent(String(newMcs).trim())}?customer_code=${encodeURIComponent(customerCode)}`, {
+            headers: { Accept: "application/json" },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.exists && data.data) {
+            const d = data.data;
+            const existingApprove = Array.isArray(masterCards.value)
+                ? masterCards.value.find((mc) => String(mc.mc_seq) === String(d.mc_seq))
+                : null;
+            selectedMasterCard.value = {
+                id: existingApprove?.id || d.mc_seq,
+                mc_seq: d.mc_seq,
+                mc_model: d.mc_model || "",
+                customer_code: d.customer_code || customerCode,
+                customer_name: d.customer_name || customerCode,
+                status: (d.status || "Active").toString().toLowerCase(),
+                approved_by: d.approved_by || "",
+                approved_date: d.updated_at || "",
+            };
+
+            // Auto open the approval modal once MC data is loaded
+            masterCardToAction.value = selectedMasterCard.value;
+            // Ensure any previous modal boxes are closed/hidden
+            showMcsTableModal.value = false;
+            showMcsOptionsModal.value = false;
+            showCustomerAccountTable.value = false;
+            showCustomerAccountOptionsModal.value = false;
+            showRejectionModal.value = false;
+            showEditModal.value = false;
+            // Then show the approval modal only
+            showApprovalModal.value = true;
+        }
+    } catch (e) {
+        console.error("Failed to auto-load MC details:", e);
+    }
+}, { immediate: false });
+
 // MCS Options Modal To functions
 
 const showMainPanel = computed(() => {
-    return searchTerm.value && mcsInput.value;
+    // Hide the main table/zoom containers when both A/C and MCS# are filled
+    // so the Selected Master Card panel (legacy-style) is shown instead
+    return !(searchTerm.value && mcsInput.value);
 });
 
 const showMoreOptionsFromCustomerTable = () => {

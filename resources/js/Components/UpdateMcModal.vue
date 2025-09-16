@@ -60,7 +60,7 @@
                             <input type="text" :value="formData.mcs" readonly class="ml-2 px-3 py-1 border border-gray-300 rounded text-sm bg-white flex-1">
                         </div>
                         <div class="flex items-center">
-                            <input type="text" :value="formData.mcs" readonly class="px-3 py-1 border border-gray-300 rounded text-sm bg-white flex-1">
+                            <input type="text" :value="formData.mc_model" readonly class="px-3 py-1 border border-gray-300 rounded text-sm bg-white flex-1">
                         </div>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
                 <!-- Component Table -->
                 <div class="mb-6">
                     <table class="min-w-full text-sm border border-gray-300">
-                        <thead class="bg-teal-600 text-white">
+                        <thead class="bg-gray-200 text-gray-800">
                             <tr>
                                 <th class="px-3 py-2 border border-gray-300 text-left">NO</th>
                                 <th class="px-3 py-2 border border-gray-300 text-left">C#</th>
@@ -90,10 +90,10 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white">
-                            <tr v-for="(component, index) in mcComponents" :key="index"
+                            <tr v-for="(component, index) in localComponents" :key="index"
                                 class="hover:bg-gray-100 cursor-pointer"
-                                :class="{ 'bg-yellow-200': component.selected }"
-                                @click="$emit('selectComponent', component, index)">
+                                :class="{ 'bg-yellow-200': selectedComponentIndex === index }"
+                                @click="onSelectComponent(component, index)">
                                 <td class="px-3 py-2 border border-gray-300">{{ String(index + 1).padStart(2, '0') }}</td>
                                 <td class="px-3 py-2 border border-gray-300">{{ component.c_num }}</td>
                                 <td class="px-3 py-2 border border-gray-300">{{ component.pd }}</td>
@@ -107,14 +107,26 @@
                 <!-- Action Buttons -->
                 <div class="flex justify-between">
                     <div class="space-x-2">
-                        <button type="button" @click="$emit('setupPD')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                        <button type="button" @click="openSetupPd()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
                             Setup PD
                         </button>
                         <button type="button" @click="$emit('setupOthers')" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors">
                             Setup Others
                         </button>
                     </div>
+                    <div class="text-xs text-gray-600 self-center" v-if="selectedComponentIndex !== null">
+                        Editing component: <span class="font-semibold">{{ localComponents[selectedComponentIndex]?.c_num }}</span>
+                    </div>
                 </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="flex items-center justify-end gap-2 p-3 border-t border-gray-200 bg-gray-100 rounded-b-lg flex-shrink-0">
+                <button 
+                    type="button"
+                    @click="$emit('saveMasterCard', buildPdSetupPayload())"
+                    class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+                    Save MasterCard
+                </button>
             </div>
         </div>
     </div>
@@ -457,7 +469,7 @@
                     <button type="button" class="text-white hover:text-green-300 focus:outline-none">
                         <i class="fas fa-file text-lg"></i>
                     </button>
-                    <button type="button" class="text-white hover:text-yellow-300 focus:outline-none">
+                    <button type="button" class="text-white hover:text-yellow-300 focus:outline-none" @click="applyPdToSelectedComponent" title="Apply PD to selected component">
                         <i class="fas fa-save text-lg"></i>
                     </button>
                     <button type="button" @click="$emit('closeSetupPdModal')" class="text-white hover:text-gray-200 focus:outline-none">
@@ -493,10 +505,10 @@
                                 </div>
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">Part No:</label>
-                                    <input type="text" class="w-40 px-2 py-1 border border-gray-400 text-xs">
+                                    <input type="text" v-model="partNo" class="w-40 px-2 py-1 border border-gray-400 text-xs">
                                 </div>
                                 <div class="flex items-center">
-                                    <button class="px-3 py-1 bg-blue-200 border border-gray-400 text-xs font-medium">Description</button>
+                                    <button class="px-3 py-1 bg-blue-200 border border-gray-400 text-xs font-medium" @click="showMoreDescriptionModal = true">Description</button>
                                 </div>
                             </div>
                             <!-- Right side column for measurements -->
@@ -640,21 +652,21 @@
                             <div class="flex items-center space-x-4 flex-1">
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-8">ID:</label>
-                                    <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                    <input type="text" v-model="idL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                     <span class="text-xs ml-1">L</span>
-                                    <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                    <input type="text" v-model="idW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
                                     <span class="text-xs ml-1">W</span>
-                                    <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                    <input type="text" v-model="idH" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
                                     <span class="text-xs ml-1">H</span>
                                     <span class="ml-2 px-2 py-1 bg-red-200 border border-red-400 text-xs">t2e</span>
                                 </div>
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">Pcs/Set:</label>
-                                    <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                    <input type="text" v-model="pcsPerSet" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 </div>
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">Crease:</label>
-                                    <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                    <input type="text" v-model="creaseValue" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 </div>
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">Chem Coat:</label>
@@ -681,17 +693,17 @@
                             <div class="flex items-center space-x-4 flex-1">
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-8">ED:</label>
-                                    <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                    <input type="text" v-model="edL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                     <span class="text-xs ml-1">L</span>
-                                    <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                    <input type="text" v-model="edW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
                                     <span class="text-xs ml-1">W</span>
-                                    <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                    <input type="text" v-model="edH" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
                                     <span class="text-xs ml-1">H</span>
                                     <span class="ml-2 px-2 py-1 bg-red-200 border border-red-400 text-xs">e2t</span>
                                 </div>
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">Nest/Slot:</label>
-                                    <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                    <input type="text" v-model="nestSlot" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 </div>
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">R/F Tape:</label>
@@ -737,7 +749,7 @@
                             </button>
                             <div class="ml-auto flex items-center">
                                 <label class="text-xs font-medium w-20">Sheet Length:</label>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="sheetLength" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                     <i class="fas fa-search"></i>
                                 </button>
@@ -761,7 +773,7 @@
                             </button>
                             <div class="ml-auto flex items-center">
                                 <label class="text-xs font-medium w-20">Sheet Width:</label>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="sheetWidth" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 <span class="text-xs ml-1">mm</span>
                                 <div class="ml-4 bg-gray-200 border border-gray-400 px-3 py-1 text-xs font-bold">
                                     IDC/CAD
@@ -781,18 +793,18 @@
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-16">Con. Out:</label>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="conOut" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-20">Conv. Duct x 2:</label>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="convDuctX2" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-20">Pcs-to-Joint:</label>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="pcsToJoint" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-12">S/Tool:</label>
@@ -835,7 +847,7 @@
                             <div class="w-64"></div>
                             <div class="flex items-center w-64">
                                 <label class="text-xs font-medium w-24">Pit Block#:</label>
-                                <input type="text" class="w-24 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="pitBlockNo" class="w-24 px-2 py-1 border border-gray-400 text-xs">
                             </div>
                         </div>
 
@@ -843,9 +855,9 @@
                         <div class="flex items-center mb-2 space-x-4">
                             <div class="flex items-center w-80">
                                 <label class="text-xs font-medium w-20">D/Cut Sheet:</label>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="dcutSheetL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 <span class="text-xs ml-1">L</span>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                <input type="text" v-model="dcutSheetW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
                                 <span class="text-xs ml-1">W</span>
                                 <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                     <i class="fas fa-search"></i>
@@ -853,7 +865,7 @@
                             </div>
                             <div class="flex items-center w-64">
                                 <label class="text-xs font-medium w-24">D/Cut Block#:</label>
-                                <input type="text" class="w-24 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="dcutBlockNo" class="w-24 px-2 py-1 border border-gray-400 text-xs">
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-16">Glueing:</label>
@@ -864,7 +876,7 @@
                             </div>
                             <div class="ml-auto flex items-center space-x-2">
                                 <div class="flex items-center">
-                                    <input type="checkbox" id="handHole" class="mr-1">
+                                    <input type="checkbox" id="handHole" v-model="handHole" class="mr-1">
                                     <label for="handHole" class="text-xs">Hand Hole:</label>
                                 </div>
                             </div>
@@ -874,9 +886,9 @@
                         <div class="flex items-center mb-2 space-x-4">
                             <div class="flex items-center w-80">
                                 <label class="text-xs font-medium w-20">D/Cut Mould:</label>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="dcutMouldL" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 <span class="text-xs ml-1">L</span>
-                                <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
+                                <input type="text" v-model="dcutMouldW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
                                 <span class="text-xs ml-1">W</span>
                                 <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                     <i class="fas fa-search"></i>
@@ -902,7 +914,7 @@
                             </div>
                             <div class="ml-auto flex items-center space-x-2">
                                 <div class="flex items-center">
-                                    <input type="checkbox" id="rotaryDCut" class="mr-1">
+                                    <input type="checkbox" id="rotaryDCut" v-model="rotaryDCut" class="mr-1">
                                     <label for="rotaryDCut" class="text-xs">Rotary D/Cut:</label>
                                 </div>
                             </div>
@@ -930,11 +942,11 @@
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-16">Bdl/Pallet:</label>
-                                <input type="text" value="0" class="w-12 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="bdlPerPallet" class="w-12 px-2 py-1 border border-gray-400 text-xs">
                             </div>
                             <div class="ml-auto flex items-center space-x-2">
                                 <div class="flex items-center">
-                                    <input type="checkbox" id="fullBlockPrint" class="mr-1">
+                                    <input type="checkbox" id="fullBlockPrint" v-model="fullBlockPrint" class="mr-1">
                                     <label for="fullBlockPrint" class="text-xs">Full Block Print:</label>
                                 </div>
                             </div>
@@ -944,12 +956,12 @@
                         <div class="flex items-center">
                             <div class="flex items-center w-80">
                                 <label class="text-xs font-medium w-20">Item Remark:</label>
-                                <input type="text" class="w-40 px-2 py-1 border border-gray-400 text-xs">
+                                <input type="text" v-model="itemRemark" class="w-40 px-2 py-1 border border-gray-400 text-xs">
                             </div>
                             <div class="w-64"></div>
                             <div class="flex items-center w-64">
                                 <label class="text-xs font-medium w-24">Peel Off%:</label>
-                                <input type="text" value="0.00" class="w-24 px-2 py-1 border border-gray-400 text-xs text-right">
+                                <input type="text" v-model="peelOffPercent" class="w-24 px-2 py-1 border border-gray-400 text-xs text-right">
                             </div>
                             <div class="ml-auto flex items-center space-x-2">
                                 <button class="px-3 py-1 bg-gray-200 border border-gray-400 text-xs font-bold cursor-default" disabled>MSP</button>
@@ -958,6 +970,28 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex items-center justify-end gap-2 p-3 border-t border-gray-200 bg-gray-100 rounded-b-lg flex-shrink-0">
+                <button 
+                    type="button"
+                    @click="applyPdToSelectedComponent"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">
+                    Apply to {{ localComponents[selectedComponentIndex]?.c_num || 'Component' }}
+                </button>
+                <button 
+                    type="button"
+                    @click="$emit('saveMasterCard', buildPdSetupPayload())"
+                    class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+                    Save MasterCard
+                </button>
+                <button 
+                    type="button"
+                    @click="$emit('closeSetupPdModal')"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded">
+                    Close
+                </button>
             </div>
         </div>
     </div>
@@ -1040,6 +1074,12 @@
         @close="showGlueingModal = false"
         @select="onGlueingSelected"
     />
+    <MoreDescriptionModal
+        :show="showMoreDescriptionModal"
+        :value="moreDescriptions"
+        @update:value="(v) => { moreDescriptions = v }"
+        @close="showMoreDescriptionModal = false"
+    />
     <WrappingMaterialModal
         :show="showWrappingModal"
         :items="wrappingItems"
@@ -1055,7 +1095,7 @@
 </template>
 
 <script setup>
-import { defineEmits, defineProps, ref } from 'vue';
+import { defineEmits, defineProps, ref, computed, watch, onMounted } from 'vue';
 import ProductDesignModal from '@/Components/product-design-modal.vue';
 import PaperFluteModal from '@/Components/paper-flute-selector-modal.vue';
 import ScoringToolModal from '@/Components/scoring-tool-modal.vue';
@@ -1066,6 +1106,7 @@ import BundlingStringModal from '@/Components/bundling-string-modal.vue';
 import GlueingMaterialModal from '@/Components/glueing-material-modal.vue';
 import SubMaterialModal from '@/Components/sub-material-modal.vue';
 import WrappingMaterialModal from '@/Components/wrapping-material-modal.vue';
+import MoreDescriptionModal from '@/Components/more-description-modal.vue';
 import ChemicalCoatModal from '@/Components/chemical-coat-modal.vue';
 import ReinforcementTapeModal from '@/Components/reinforcement-tape-modal.vue';
 import PaperSizeModal from '@/Components/paper-size-modal.vue';
@@ -1294,6 +1335,39 @@ const onWrappingSelected = (item) => {
     showWrappingModal.value = false;
 };
 
+// More Description Modal
+const showMoreDescriptionModal = ref(false);
+let moreDescriptions = ref([]);
+
+// Additional PD state bindings
+const partNo = ref('');
+const idL = ref('');
+const idW = ref('');
+const idH = ref('');
+const pcsPerSet = ref('');
+const creaseValue = ref('');
+const edL = ref('');
+const edW = ref('');
+const edH = ref('');
+const nestSlot = ref('');
+const sheetLength = ref('');
+const sheetWidth = ref('');
+const conOut = ref('');
+const convDuctX2 = ref('');
+const pcsToJoint = ref('');
+const dcutSheetL = ref('');
+const dcutSheetW = ref('');
+const dcutMouldL = ref('');
+const dcutMouldW = ref('');
+const dcutBlockNo = ref('');
+const pitBlockNo = ref('');
+const bdlPerPallet = ref('');
+const peelOffPercent = ref('');
+const itemRemark = ref('');
+const handHole = ref(false);
+const rotaryDCut = ref(false);
+const fullBlockPrint = ref(false);
+
 const handleSortOptionChange = (event) => {
     const newSortOption = event.target.value;
     emit('updateSortOption', newSortOption);
@@ -1319,6 +1393,10 @@ const props = defineProps({
     showMcsTableModal: Boolean,
     formData: Object,
     mcComponents: Array,
+    mcLoaded: {
+        type: Object,
+        default: null
+    },
     zoomOption: String,
     mcsSortOption: String,
     mcsSortOrder: String,
@@ -1366,8 +1444,260 @@ const emit = defineEmits([
     'productDesignSelected',
     'paperFluteSelected',
     'openPaperQualityModal',
-    'openWoPaperQualityModal'
+    'openWoPaperQualityModal',
+    'saveMasterCard'
 ]);
+
+// Clear all PD form fields
+const clearPdFields = () => {
+    partNo.value = '';
+    selectedProductDesign.value = '';
+    selectedPaperFlute.value = '';
+    selectedChemicalCoat.value = '';
+    selectedReinforcementTape.value = '';
+    selectedPaperSize.value = '';
+    selectedScoringToolCode.value = '';
+    printColorCodes.value = ['', '', '', '', '', '', ''];
+    scoreL.value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    scoreW.value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    sheetLength.value = '';
+    sheetWidth.value = '';
+    conOut.value = '';
+    convDuctX2.value = '';
+    pcsToJoint.value = '';
+    idL.value = '';
+    idW.value = '';
+    idH.value = '';
+    edL.value = '';
+    edW.value = '';
+    edH.value = '';
+    pcsPerSet.value = '';
+    creaseValue.value = '';
+    nestSlot.value = '';
+    dcutSheetL.value = '';
+    dcutSheetW.value = '';
+    dcutMouldL.value = '';
+    dcutMouldW.value = '';
+    dcutBlockNo.value = '';
+    pitBlockNo.value = '';
+    stitchWirePieces.value = '';
+    bdlPerPallet.value = '';
+    peelOffPercent.value = '';
+    itemRemark.value = '';
+    handHole.value = false;
+    rotaryDCut.value = false;
+    fullBlockPrint.value = false;
+    selectedFinishingCode.value = '';
+    selectedStitchWireCode.value = '';
+    stitchWirePieces.value = '';
+    selectedBundlingStringCode.value = '';
+    bundlingStringQty.value = '';
+    selectedGlueingCode.value = '';
+    selectedWrappingCode.value = '';
+    moreDescriptions.value = [];
+    subMaterials.value = [];
+};
+
+// When mcLoaded is provided, hydrate PD form fields
+const hydratePdFromLoaded = () => {
+    const pd = props.mcLoaded?.pd_setup || {};
+    if (!pd) {
+        // If no loaded data, clear all fields for new MC
+        clearPdFields();
+        return;
+    }
+    partNo.value = pd.partNo || '';
+    selectedProductDesign.value = pd.selectedProductDesign || '';
+    selectedPaperFlute.value = pd.selectedPaperFlute || '';
+    selectedChemicalCoat.value = pd.selectedChemicalCoat || '';
+    selectedReinforcementTape.value = pd.selectedReinforcementTape || '';
+    selectedPaperSize.value = pd.selectedPaperSize || '';
+    selectedScoringToolCode.value = pd.selectedScoringToolCode || '';
+    printColorCodes.value = Array.isArray(pd.printColorCodes) ? pd.printColorCodes : printColorCodes.value;
+    scoreL.value = Array.isArray(pd.scoreL) ? pd.scoreL : scoreL.value;
+    scoreW.value = Array.isArray(pd.scoreW) ? pd.scoreW : scoreW.value;
+    sheetLength.value = pd.sheetLength || '';
+    sheetWidth.value = pd.sheetWidth || '';
+    conOut.value = pd.conOut || '';
+    convDuctX2.value = pd.convDuctX2 || '';
+    pcsToJoint.value = pd.pcsToJoint || '';
+    idL.value = pd.id?.L || '';
+    idW.value = pd.id?.W || '';
+    idH.value = pd.id?.H || '';
+    edL.value = pd.ed?.L || '';
+    edW.value = pd.ed?.W || '';
+    edH.value = pd.ed?.H || '';
+    pcsPerSet.value = pd.pcsPerSet || '';
+    creaseValue.value = pd.creaseValue || '';
+    nestSlot.value = pd.nestSlot || '';
+    dcutSheetL.value = pd.dcutSheet?.L || '';
+    dcutSheetW.value = pd.dcutSheet?.W || '';
+    dcutMouldL.value = pd.dcutMould?.L || '';
+    dcutMouldW.value = pd.dcutMould?.W || '';
+    dcutBlockNo.value = pd.dcutBlockNo || '';
+    pitBlockNo.value = pd.pitBlockNo || '';
+    stitchWirePieces.value = pd.stitchWirePieces || '';
+    bdlPerPallet.value = pd.bdlPerPallet || '';
+    peelOffPercent.value = pd.peelOffPercent || '';
+    itemRemark.value = pd.itemRemark || '';
+    handHole.value = !!pd.handHole;
+    rotaryDCut.value = !!pd.rotaryDCut;
+    fullBlockPrint.value = !!pd.fullBlockPrint;
+    selectedFinishingCode.value = pd.selectedFinishingCode || '';
+    selectedStitchWireCode.value = pd.selectedStitchWireCode || '';
+    stitchWirePieces.value = pd.stitchWirePieces || '';
+    selectedBundlingStringCode.value = pd.selectedBundlingStringCode || '';
+    bundlingStringQty.value = pd.bundlingStringQty || '';
+    selectedGlueingCode.value = pd.selectedGlueingCode || '';
+    selectedWrappingCode.value = pd.selectedWrappingCode || '';
+    moreDescriptions.value = Array.isArray(pd.moreDescriptions) ? pd.moreDescriptions : [];
+    subMaterials.value = Array.isArray(pd.subMaterials) ? pd.subMaterials : [];
+};
+
+watch(() => props.mcLoaded, hydratePdFromLoaded, { immediate: true });
+
+// Clear PD fields when Setup PD modal is opened for new MC
+watch(() => props.showSetupPdModal, (newVal) => {
+    if (newVal && !props.mcLoaded) {
+        // If opening Setup PD modal and no MC is loaded (new MC), clear all fields
+        clearPdFields();
+    }
+});
+// Local editable 10-row components list and selection state
+const selectedComponentIndex = ref(null);
+const localComponents = ref([]);
+
+// Prefer loaded components when available, else fallback to props.mcComponents
+// Always render exactly 10 rows with C# labels: Main, Fit1..Fit9
+const mcComponentsToRender = computed(() => {
+    const desiredLabels = ['Main', 'Fit1', 'Fit2', 'Fit3', 'Fit4', 'Fit5', 'Fit6', 'Fit7', 'Fit8', 'Fit9'];
+
+    // Source components: loaded first, otherwise props.mcComponents
+    let source = [];
+    const fromLoaded = props.mcLoaded?.pd_setup?.components;
+    if (Array.isArray(fromLoaded) && fromLoaded.length > 0) {
+        source = fromLoaded.map((c) => ({
+            c_num: c.c_num || c.comp || '',
+            pd: c.pd || c.p_design || '',
+            pcs_set: c.pcs_set || c.pcs || '',
+            part_num: c.part_num || c.part || '',
+        }));
+    } else if (Array.isArray(props.mcComponents)) {
+        source = props.mcComponents.map((c) => ({
+            c_num: c.c_num || '',
+            pd: c.pd || '',
+            pcs_set: c.pcs_set || '',
+            part_num: c.part_num || '',
+        }));
+    }
+
+    // Build exactly 10 rows, normalizing labels and padding missing entries
+    const rows = [];
+    for (let i = 0; i < 10; i++) {
+        const base = source[i] || {};
+        rows.push({
+            c_num: desiredLabels[i],
+            pd: base.pd || '',
+            pcs_set: base.pcs_set || '',
+            part_num: base.part_num || '',
+            selected: false,
+            index: i,
+        });
+    }
+    return rows;
+});
+
+// Initialize and keep localComponents in sync with computed default rows
+watch(mcComponentsToRender, (rows) => {
+    // Preserve existing edits by merging on index
+    const next = rows.map((row, idx) => ({
+        ...(localComponents.value[idx] || {}),
+        ...row,
+        c_num: rows[idx].c_num,
+    }));
+    localComponents.value = next;
+}, { immediate: true });
+
+const onSelectComponent = (component, index) => {
+    selectedComponentIndex.value = index;
+};
+
+const openSetupPd = () => {
+    // Ensure a component is selected; default to index 0 (Main)
+    if (selectedComponentIndex.value === null) selectedComponentIndex.value = 0;
+    emit('setupPD');
+};
+
+// Apply current PD form fields to the selected component row
+const applyPdToSelectedComponent = () => {
+    if (selectedComponentIndex.value === null) return;
+    const idx = selectedComponentIndex.value;
+    const next = [...localComponents.value];
+    next[idx] = {
+        ...next[idx],
+        // Keep C# label fixed
+        c_num: next[idx]?.c_num || ['Main','Fit1','Fit2','Fit3','Fit4','Fit5','Fit6','Fit7','Fit8','Fit9'][idx],
+        // Map PD fields to row
+        pd: selectedProductDesign.value || next[idx]?.pd || '',
+        pcs_set: pcsPerSet.value || next[idx]?.pcs_set || '',
+        part_num: partNo.value || next[idx]?.part_num || '',
+    };
+    localComponents.value = next;
+};
+
+// Build payload for PD setup values to be saved with MasterCard
+const buildPdSetupPayload = () => {
+    return {
+        partNo: partNo.value,
+        selectedProductDesign: selectedProductDesign.value,
+        selectedPaperFlute: selectedPaperFlute.value,
+        selectedChemicalCoat: selectedChemicalCoat.value,
+        selectedReinforcementTape: selectedReinforcementTape.value,
+        selectedPaperSize: selectedPaperSize.value,
+        selectedScoringToolCode: selectedScoringToolCode.value,
+        printColorCodes: printColorCodes.value,
+        scoreL: scoreL.value,
+        scoreW: scoreW.value,
+        sheetLength: sheetLength.value,
+        sheetWidth: sheetWidth.value,
+        conOut: conOut.value,
+        convDuctX2: convDuctX2.value,
+        pcsToJoint: pcsToJoint.value,
+        id: { L: idL.value, W: idW.value, H: idH.value },
+        ed: { L: edL.value, W: edW.value, H: edH.value },
+        pcsPerSet: pcsPerSet.value,
+        creaseValue: creaseValue.value,
+        nestSlot: nestSlot.value,
+        dcutSheet: { L: dcutSheetL.value, W: dcutSheetW.value },
+        dcutMould: { L: dcutMouldL.value, W: dcutMouldW.value },
+        dcutBlockNo: dcutBlockNo.value,
+        pitBlockNo: pitBlockNo.value,
+        stitchWirePieces: stitchWirePieces.value,
+        bdlPerPallet: bdlPerPallet.value,
+        peelOffPercent: peelOffPercent.value,
+        itemRemark: itemRemark.value,
+        handHole: handHole.value,
+        rotaryDCut: rotaryDCut.value,
+        fullBlockPrint: fullBlockPrint.value,
+        selectedFinishingCode: selectedFinishingCode.value,
+        selectedStitchWireCode: selectedStitchWireCode.value,
+        stitchWirePieces: stitchWirePieces.value,
+        selectedBundlingStringCode: selectedBundlingStringCode.value,
+        bundlingStringQty: bundlingStringQty.value,
+        selectedGlueingCode: selectedGlueingCode.value,
+        selectedWrappingCode: selectedWrappingCode.value,
+        moreDescriptions: moreDescriptions.value,
+        subMaterials: subMaterials.value,
+        soValues: Array.isArray(props.soValues) ? props.soValues : [],
+        woValues: Array.isArray(props.woValues) ? props.woValues : [],
+        components: (localComponents?.value || []).map(c => ({
+            c_num: c.c_num,
+            pd: c.pd,
+            pcs_set: c.pcs_set,
+            part_num: c.part_num,
+        })),
+    };
+};
 </script>
 
 <style scoped>
