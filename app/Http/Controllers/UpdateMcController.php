@@ -67,13 +67,6 @@ class UpdateMcController extends Controller
         // MANDATORY: Filter by customer_code if provided
         if ($customerCode) {
             $masterCards->where('customer_code', $customerCode);
-            
-            // Auto-seed data if no master cards found for this customer
-            if ($masterCards->count() === 0) {
-                $this->seedData();
-                // Rebuild query after seeding
-                $masterCards = MasterCard::query()->where('customer_code', $customerCode);
-            }
         } else {
             // If no customer_code provided, return empty result for security
             return response()->json([
@@ -254,63 +247,59 @@ class UpdateMcController extends Controller
     }
 
     /**
-     * Seed master card data from MasterCardSeeder.
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * Store or update Master Card with details and PD setup.
      */
-    public function seed()
+    public function store(Request $request)
     {
-        try {
-            $this->seedData();
-            
+        $validated = $request->validate([
+            'mc_seq' => 'required|string',
+            'customer_code' => 'required|string|max:20',
+            'mc_model' => 'nullable|string',
+            'mc_short_model' => 'nullable|string',
+            'status' => 'required|string|in:Active,Obsolete',
+            'mc_approval' => 'required|string|in:Yes,No',
+            'part_no' => 'nullable|string',
+            'comp_no' => 'nullable|string',
+            'p_design' => 'nullable|string',
+            'ext_dim_1' => 'nullable|string',
+            'ext_dim_2' => 'nullable|string',
+            'ext_dim_3' => 'nullable|string',
+            'int_dim_1' => 'nullable|string',
+            'int_dim_2' => 'nullable|string',
+            'int_dim_3' => 'nullable|string',
+            'detailed_master_card' => 'nullable|array',
+            'pd_setup' => 'nullable|array',
+        ]);
+
+        return DB::transaction(function () use ($validated) {
+            $mc = MasterCard::updateOrCreate(
+                [
+                    'mc_seq' => $validated['mc_seq'],
+                    'customer_code' => $validated['customer_code'],
+                ],
+                [
+                    'mc_model' => $validated['mc_model'] ?? null,
+                    'mc_short_model' => $validated['mc_short_model'] ?? null,
+                    'status' => $validated['status'],
+                    'mc_approval' => $validated['mc_approval'],
+                    'part_no' => $validated['part_no'] ?? null,
+                    'comp_no' => $validated['comp_no'] ?? null,
+                    'p_design' => $validated['p_design'] ?? null,
+                    'ext_dim_1' => $validated['ext_dim_1'] ?? null,
+                    'ext_dim_2' => $validated['ext_dim_2'] ?? null,
+                    'ext_dim_3' => $validated['ext_dim_3'] ?? null,
+                    'int_dim_1' => $validated['int_dim_1'] ?? null,
+                    'int_dim_2' => $validated['int_dim_2'] ?? null,
+                    'int_dim_3' => $validated['int_dim_3'] ?? null,
+                    'detailed_master_card' => $validated['detailed_master_card'] ?? null,
+                    'pd_setup' => $validated['pd_setup'] ?? null,
+                ]
+            );
+
             return response()->json([
-                'success' => true,
-                'message' => 'Master card data seeded successfully'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error seeding master card data: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error seeding master card data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Private method to seed master card data.
-     *
-     * @return void
-     */
-    private function seedData()
-    {
-        try {
-            $masterCards = [
-                // Semua Master Cards untuk Customer ABDULLAH, BPK (000211-08)
-                ['mc_seq' => '1609138', 'mc_model' => 'BOX BASO 4.5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
-                ['mc_seq' => '1609144', 'mc_model' => 'BOX IKAN HARIMAU 4.5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
-                ['mc_seq' => '1609145', 'mc_model' => 'BOX SRIKAYA 4.5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
-                ['mc_seq' => '1609162', 'mc_model' => 'BIHUN FANIA 5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
-                ['mc_seq' => '1609163', 'mc_model' => 'BIHUN IKAN TUNA 4.5 KG BARU', 'status' => 'Active', 'customer_code' => '000211-08'],
-                ['mc_seq' => '1609164', 'mc_model' => 'BIHUN IKAN TUNA 5 KG BARU', 'status' => 'Active', 'customer_code' => '000211-08'],
-                ['mc_seq' => '1609166', 'mc_model' => 'BIHUN PIRING MAS 5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
-                ['mc_seq' => '1609173', 'mc_model' => 'BOX JAGUNG SRIKAYA 5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
-                ['mc_seq' => '1609181', 'mc_model' => 'BIHUN POHON KOPI 5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
-                ['mc_seq' => '1609182', 'mc_model' => 'BIHUN DELLIS 5 KG', 'status' => 'Active', 'customer_code' => '000211-08'],
-                ['mc_seq' => '1609185', 'mc_model' => 'POLOS UK 506 X 356 X 407', 'status' => 'Active', 'customer_code' => '000211-08'],
-                ['mc_seq' => '1609186', 'mc_model' => 'POLOS 480 X 410 X 401', 'status' => 'Active', 'customer_code' => '000211-08'],
-            ];
-
-            foreach ($masterCards as $data) {
-                MasterCard::updateOrCreate(
-                    ['mc_seq' => $data['mc_seq']], // kondisi pencarian
-                    $data // data yang akan diupdate atau dibuat
-                );
-            }
-
-            Log::info('Master card data seeded successfully', ['count' => count($masterCards)]);
-        } catch (\Exception $e) {
-            Log::error('Error in seedData method: ' . $e->getMessage());
-            throw $e;
-        }
+                'message' => 'Master Card saved successfully',
+                'data' => $mc,
+            ], 201);
+        });
     }
 }

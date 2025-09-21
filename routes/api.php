@@ -40,7 +40,6 @@ use App\Http\Controllers\DeliveryOrderFormatController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
 use App\Http\Controllers\CustomerWarehouseRequirementController;
 use App\Http\Controllers\UpdateMcController;
-use App\Http\Controllers\PrepareSBSOController;
 
 /*
 |--------------------------------------------------------------------------
@@ -1027,24 +1026,6 @@ Route::prefix('update-mc')->group(function () {
     Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs']);
     Route::get('/master-cards', [UpdateMcController::class, 'apiIndex']);
     Route::get('/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs']);
-    Route::post('/seed', [UpdateMcController::class, 'seed']);
-});
-
-// Prepare SB SO API Routes
-Route::prefix('prepare-sb-so')->group(function () {
-    Route::get('/orders', [PrepareSBSOController::class, 'apiIndex']);
-    Route::post('/orders', [PrepareSBSOController::class, 'store']);
-    Route::put('/orders/{id}', [PrepareSBSOController::class, 'update']);
-    Route::delete('/orders/{id}', [PrepareSBSOController::class, 'destroy']);
-    Route::get('/customer-info', [PrepareSBSOController::class, 'getCustomerInfo']);
-    Route::get('/salesperson-info', [PrepareSBSOController::class, 'getSalespersonInfo']);
-    Route::get('/product-designs', [PrepareSBSOController::class, 'getProductDesigns']);
-    Route::get('/paper-flutes', [PrepareSBSOController::class, 'getPaperFlutes']);
-    Route::get('/paper-qualities', [PrepareSBSOController::class, 'getPaperQualities']);
-    Route::get('/paper-sizes', [PrepareSBSOController::class, 'getPaperSizes']);
-    Route::post('/calculate-dimensions', [PrepareSBSOController::class, 'calculateDimensions']);
-    Route::post('/print-so-log', [PrepareSBSOController::class, 'printSOLog']);
-    Route::post('/print-so-jit-tracking', [PrepareSBSOController::class, 'printSOJITTracking']);
 });
 
 // FG Stock-In by WO API routes
