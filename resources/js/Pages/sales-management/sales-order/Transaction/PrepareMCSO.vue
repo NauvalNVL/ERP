@@ -603,14 +603,42 @@
       :initial-status-filter="['Active']"
     />
 
-    <!-- Master Card Lookup Modal -->
-    <MasterCardSearchSelectModal 
-      :show="showMasterCardModal" 
-      @close="showMasterCardModal = false" 
-      @select-mc="selectMasterCard"
-      :customer-code="selectedCustomer.code"
-      :initial-sort-column="'mc_seq'"
-      :initial-filter-status="{ active: true, obsolete: false, pending: false }"
+    <!-- Master Card Table Modal (replaces legacy search/select) -->
+    <UpdateMcModal
+      v-if="showMcsTableModal"
+      :showErrorModal="false"
+      :showSetupMcModal="false"
+      :showSetupPdModal="false"
+      :showMcsTableModal="showMcsTableModal"
+      :formData="{}"
+      :mcComponents="[]"
+      :zoomOption="'mc_specification'"
+      :mcsSortOption="mcsSortOption"
+      :mcsSortOrder="mcsSortOrder"
+      :mcsStatusFilter="mcsStatusFilter"
+      :mcsSearchTerm="mcsSearchTerm"
+      :mcsLoading="mcsLoading"
+      :mcsError="mcsError"
+      :mcsMasterCards="mcsMasterCards"
+      :selectedMcs="selectedMcs"
+      :mcsCurrentPage="mcsCurrentPage"
+      :mcsLastPage="mcsLastPage"
+      :productDesigns="[]"
+      :paperFlutes="[]"
+      @closeErrorModal="() => {}"
+      @closeSetupMcModal="() => {}"
+      @closeSetupPdModal="() => {}"
+      @closeMcsTableModal="showMcsTableModal = false"
+      @selectComponent="() => {}"
+      @setupPD="() => {}"
+      @setupOthers="() => {}"
+      @handleZoomChange="handleZoomChange"
+      @fetchMcsData="fetchMcsData"
+      @selectMcsItem="selectedMcs = $event"
+      @selectMcs="selectMcs"
+      @goToMcsPage="goToMcsPage"
+      @updateSearchTerm="updateSearchTerm"
+      @updateSortOption="updateSortOption"
     />
 
     <!-- Product Design Screen Modal -->
@@ -645,7 +673,7 @@
 import { ref, reactive, computed, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
-import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue'
+import UpdateMcModal from '@/Components/UpdateMcModal.vue'
 import ProductDesignScreenModal from '@/Components/ProductDesignScreenModal.vue'
 import DeliveryScheduleModal from '@/Components/DeliveryScheduleModal.vue'
 import DeliveryLocationModal from '@/Components/DeliveryLocationModal.vue'
@@ -722,10 +750,23 @@ const orderDetails = reactive({
 
 // Modal visibility
 const showCustomerModal = ref(false)
-const showMasterCardModal = ref(false)
+const showMasterCardModal = ref(false) // legacy (unused)
 const showProductDesignModal = ref(false)
 const showDeliveryLocationModal = ref(false)
 const showDeliveryScheduleModal = ref(false)
+
+// New MCS Table Modal state and handlers
+const showMcsTableModal = ref(false)
+const mcsSortOption = ref('mc_seq')
+const mcsSortOrder = ref('asc')
+const mcsStatusFilter = ref('Act')
+const mcsSearchTerm = ref('')
+const mcsLoading = ref(false)
+const mcsError = ref('')
+const mcsMasterCards = ref([])
+const selectedMcs = ref(null)
+const mcsCurrentPage = ref(1)
+const mcsLastPage = ref(1)
 
 
 // Computed properties
@@ -773,7 +814,7 @@ const dayOfWeek = computed(() => {
   }
 })
 
-// Order Types configuration based on ERP CPS
+// Order Types configuration based on ERP CPS - matching the dropdown options from the image
 const orderTypesConfig = {
   Sales: [
     {
@@ -826,14 +867,13 @@ const orderTypesConfig = {
     },
     {
       code: 'N2-NonSales',
-      label: 'N2-NonSales (SO-Conv-FG)',
-      description: 'Converting Only: Sales Order → Converting → Finished Goods',
-      workflow: ['SO', 'Conv', 'FG'],
-      requiresInventory: true,
-      requiresProduction: true,
-      requiresDelivery: false,
+      label: 'N2-NonSales (SO-DO)',
+      description: 'Sales Order → Delivery Order (Minimal workflow)',
+      workflow: ['SO', 'DO'],
+      requiresInventory: false,
+      requiresProduction: false,
+      requiresDelivery: true,
       requiresInvoice: false,
-      skipCorrugator: true,
       salesTax: false
     },
     {
@@ -1164,19 +1204,32 @@ const openMasterCardLookup = () => {
     error('Please select a customer first')
     return
   }
-  showMasterCardModal.value = true
+  selectedMcs.value = null
+  showMcsTableModal.value = true
+  fetchMcsData()
 }
 
-const selectMasterCard = (masterCard) => {
-  selectedMasterCard.seq = masterCard.mc_seq
-  selectedMasterCard.model = masterCard.mc_model || masterCard.model
-  selectedMasterCard.status = masterCard.status
-  selectedMasterCard.approval = masterCard.mc_approval || 'No'
-  selectedMasterCard.partNo = masterCard.part_no
-  selectedMasterCard.compNo = masterCard.comp_no
-  selectedMasterCard.pDesign = masterCard.p_design
+const selectMcs = (mc) => {
+  if (!mc) return
   
-  showMasterCardModal.value = false
+  // Normalize possible API field names to match the expected format
+  const seq = mc.seq || mc.mc_seq || mc.mc_sequence || ''
+  const model = mc.model || mc.mc_model || ''
+  const status = mc.status || mc.sts || ''
+  const approval = mc.mc_approval || mc.approval || 'No'
+  const partNo = mc.part || mc.part_no || mc.part_num || ''
+  const compNo = mc.comp || mc.comp_no || mc.component || ''
+  const pDesign = mc.p_design || mc.pd || ''
+  
+  selectedMasterCard.seq = String(seq)
+  selectedMasterCard.model = String(model)
+  selectedMasterCard.status = String(status)
+  selectedMasterCard.approval = String(approval)
+  selectedMasterCard.partNo = String(partNo)
+  selectedMasterCard.compNo = String(compNo)
+  selectedMasterCard.pDesign = String(pDesign)
+  
+  showMcsTableModal.value = false
   
   // Show appropriate message based on approval status
   if (selectedMasterCard.approval === 'Yes') {
@@ -1230,7 +1283,112 @@ const validateMasterCard = async () => {
 }
 
 
-// Removed auto-select behavior per requirement. Kept helper if needed later
+const mapMcsRows = (rows) => {
+  if (!Array.isArray(rows)) return []
+  return rows.map(r => ({
+    seq: r.seq ?? r.mc_seq ?? r.mc_sequence ?? '',
+    model: r.model ?? r.mc_model ?? '',
+    part: r.part ?? r.part_no ?? r.part_num ?? '',
+    comp: r.comp ?? r.comp_no ?? r.comp_num ?? r.component ?? '',
+    p_design: r.p_design ?? r.pd ?? '',
+    ext_dim_1: r.ext_dim_1 ?? r.ed_l ?? r.ext_l ?? '',
+    ext_dim_2: r.ext_dim_2 ?? r.ed_w ?? r.ext_w ?? '',
+    ext_dim_3: r.ext_dim_3 ?? r.ed_h ?? r.ext_h ?? '',
+    int_dim_1: r.int_dim_1 ?? r.id_l ?? '',
+    int_dim_2: r.int_dim_2 ?? r.id_w ?? '',
+    int_dim_3: r.int_dim_3 ?? r.id_h ?? '',
+    status: r.status ?? r.sts ?? '',
+    mc_approval: r.mc_approval ?? r.approval ?? 'No',
+  }))
+}
+
+const fetchMcsData = async (page = 1) => {
+  mcsLoading.value = true
+  mcsError.value = ''
+
+  // Validate customer account must exist before fetching data
+  if (!selectedCustomer.code) {
+    mcsError.value = "Please select Customer Account (AC#) first."
+    mcsMasterCards.value = []
+    mcsLoading.value = false
+    return
+  }
+
+  try {
+    // Build query parameters exactly like Update MC
+    let statusQuery = ""
+    if (mcsStatusFilter.value === "Act") {
+      statusQuery = "&status[]=Act"
+    } else if (mcsStatusFilter.value === "Obsolete") {
+      statusQuery = "&status[]=Obsolete"
+    }
+
+    // Filter by customer account - REQUIRED
+    const customerFilter = `&customer_code=${encodeURIComponent(selectedCustomer.code)}`
+
+    // Make API call using the same endpoint as Update MC
+    const response = await fetch(
+      `/api/update-mc/master-cards?page=${page}&query=${encodeURIComponent(
+        mcsSearchTerm.value
+      )}&sortBy=${mcsSortOption.value}&sortOrder=${
+        mcsSortOrder.value
+      }${statusQuery}${customerFilter}`,
+      {
+        headers: {
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        credentials: "same-origin",
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(
+        `Server returned ${response.status}: ${response.statusText}`
+      )
+    }
+
+    const responseData = await response.json()
+    console.log("MC data response:", responseData)
+
+    // Process response - handle different response formats
+    if (responseData.data && Array.isArray(responseData.data)) {
+      mcsMasterCards.value = mapMcsRows(responseData.data)
+      mcsCurrentPage.value = responseData.current_page || 1
+      mcsLastPage.value = responseData.last_page || 1
+    } else if (Array.isArray(responseData)) {
+      mcsMasterCards.value = mapMcsRows(responseData)
+      mcsCurrentPage.value = 1
+      mcsLastPage.value = 1
+    } else {
+      mcsMasterCards.value = []
+      mcsCurrentPage.value = 1
+      mcsLastPage.value = 1
+    }
+  } catch (e) {
+    console.error("Error fetching MC data:", e)
+    mcsError.value = e?.message || 'Failed to load Master Cards'
+    mcsMasterCards.value = []
+  } finally {
+    mcsLoading.value = false
+  }
+}
+
+const goToMcsPage = (page) => {
+  if (page < 1 || page > mcsLastPage.value) return
+  mcsCurrentPage.value = page
+  fetchMcsData(page)
+}
+
+const updateSearchTerm = (val) => {
+  mcsSearchTerm.value = val || ''
+}
+
+const updateSortOption = (val) => {
+  mcsSortOption.value = val || 'mc_seq'
+}
+
+const handleZoomChange = () => {}
 const loadMasterCardsForCustomer = async () => {
   // Intentionally left blank to avoid auto-filling MC when customer changes
 }
