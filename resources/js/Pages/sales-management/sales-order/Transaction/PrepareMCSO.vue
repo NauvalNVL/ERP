@@ -223,14 +223,9 @@
                     </div>
                   </div>
                   
-                  <div v-if="!selectedMasterCard.seq && selectedCustomer.code" class="mt-2 bg-blue-100 p-3 rounded">
-                    <p class="text-sm font-medium text-blue-800">Master card selection required.</p>
-                    <p class="text-xs text-blue-700 mt-1">Please use the master card lookup button to select a master card for this customer.</p>
-                  </div>
-                  
-                  <div v-if="!selectedMasterCard.seq && !selectedCustomer.code" class="mt-2 bg-yellow-100 p-3 rounded">
+                  <div v-if="!selectedMasterCard.seq" class="mt-2 bg-yellow-100 p-3 rounded">
                     <p class="text-sm font-medium text-yellow-800">No master card data available.</p>
-                    <p class="text-xs text-yellow-700 mt-1">Please select a customer first, then use the master card lookup to find available master cards.</p>
+                    <p class="text-xs text-yellow-700 mt-1">Please select a customer and use the master card lookup to find available master cards.</p>
                   </div>
                 </div>
               </div>
@@ -1089,7 +1084,7 @@ const selectCustomer = async (customer) => {
   orderDetails.salesperson.code = customer.salesperson_code || ''
   orderDetails.currency = customer.currency_code || 'IDR'
   
-  // Clear any previously selected master card
+  // Reset previously selected Master Card when customer changes
   Object.assign(selectedMasterCard, {
     seq: '',
     model: '',
@@ -1099,12 +1094,9 @@ const selectCustomer = async (customer) => {
     compNo: '',
     pDesign: ''
   })
-  
+
   showCustomerModal.value = false
   success('Customer selected successfully')
-  
-  // Load master cards info for the selected customer (without auto-selection)
-  await loadMasterCardsForCustomer()
 }
 
 const validateCustomer = async () => {
@@ -1125,6 +1117,17 @@ const validateCustomer = async () => {
       orderDetails.salesperson.code = customer.salesperson_code || ''
       orderDetails.currency = customer.currency_code || 'IDR'
       
+      // Reset previously selected Master Card when customer validated
+      Object.assign(selectedMasterCard, {
+        seq: '',
+        model: '',
+        status: '',
+        approval: '',
+        partNo: '',
+        compNo: '',
+        pDesign: ''
+      })
+
       // Fetch salesperson name if available
       if (customer.salesperson_code) {
         try {
@@ -1139,20 +1142,6 @@ const validateCustomer = async () => {
       }
       
       success('Customer validated successfully')
-      
-      // Clear any previously selected master card
-      Object.assign(selectedMasterCard, {
-        seq: '',
-        model: '',
-        status: '',
-        approval: '',
-        partNo: '',
-        compNo: '',
-        pDesign: ''
-      })
-      
-      // Load master cards info for the validated customer (without auto-selection)
-      await loadMasterCardsForCustomer()
     } else {
       error(data.message || 'Customer not found')
       selectedCustomer.name = ''
@@ -1241,23 +1230,9 @@ const validateMasterCard = async () => {
 }
 
 
+// Removed auto-select behavior per requirement. Kept helper if needed later
 const loadMasterCardsForCustomer = async () => {
-  if (!selectedCustomer.code) return
-  
-  try {
-    const response = await fetch(`/api/update-mc/master-cards?customer_code=${selectedCustomer.code}&per_page=50`)
-    const data = await response.json()
-    
-    if (data.data && data.data.length > 0) {
-      // Just show info about available master cards, don't auto-select
-      success(`Found ${data.data.length} master card(s) available for this customer. Please select one manually.`)
-    } else {
-      info('No master cards found for this customer. Please check with the administrator.')
-    }
-  } catch (err) {
-    console.error('Error loading master cards for customer:', err)
-    error('Error loading master cards for customer: ' + (err.message || 'Network error'))
-  }
+  // Intentionally left blank to avoid auto-filling MC when customer changes
 }
 
 // Add ref for P/Order Date input

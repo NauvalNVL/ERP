@@ -119,6 +119,15 @@ class UpdateMcController extends Controller
 
         // Transform the data to match the frontend expectations
         $transformedData = $paginatedMasterCards->getCollection()->map(function ($item) {
+            // Derive approval status: either explicit 'Yes' on master_cards or active in approve_mcs
+            try {
+                $isApproved = ($item->mc_approval === 'Yes') || \App\Models\ApproveMC::where('mc_seq', $item->mc_seq)
+                    ->where('status', 'active')
+                    ->exists();
+            } catch (\Throwable $e) {
+                $isApproved = ($item->mc_approval === 'Yes');
+            }
+
             return [
                 'seq' => $item->mc_seq,
                 'model' => $item->mc_model,
@@ -126,7 +135,7 @@ class UpdateMcController extends Controller
                 'part' => $item->part_no,
                 'comp' => $item->comp_no,
                 'status' => $item->status,
-                'mc_approval' => $item->mc_approval ?? 'No',
+                'mc_approval' => $isApproved ? 'Yes' : 'No',
                 'p_design' => $item->p_design,
                 'customer_code' => $item->customer_code,
                 'customer_name' => $item->customer_code, // Use customer_code for now
@@ -198,6 +207,15 @@ class UpdateMcController extends Controller
             $masterCard = $query->first();
             
             if ($masterCard) {
+                // Derive approval from both sources
+                try {
+                    $isApproved = ($masterCard->mc_approval === 'Yes') || \App\Models\ApproveMC::where('mc_seq', $masterCard->mc_seq)
+                        ->where('status', 'active')
+                        ->exists();
+                } catch (\Throwable $e) {
+                    $isApproved = ($masterCard->mc_approval === 'Yes');
+                }
+
                 return response()->json([
                     'exists' => true,
                     'data' => [
@@ -206,7 +224,7 @@ class UpdateMcController extends Controller
                         'mc_model' => $masterCard->mc_model,
                         'mc_short_model' => $masterCard->mc_short_model ?? '',
                         'status' => $masterCard->status,
-                        'mc_approval' => $masterCard->mc_approval ?? 'No',
+                        'mc_approval' => $isApproved ? 'Yes' : 'No',
                         'part_no' => $masterCard->part_no,
                         'comp_no' => $masterCard->comp_no,
                         'p_design' => $masterCard->p_design,
