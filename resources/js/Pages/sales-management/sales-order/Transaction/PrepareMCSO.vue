@@ -199,9 +199,38 @@
                   <div v-if="selectedMasterCard.model" class="mt-1 text-sm text-gray-600">
                     {{ selectedMasterCard.model }}
                   </div>
-                  <div v-if="!selectedMasterCard.seq" class="mt-2 bg-yellow-100 p-3 rounded">
+                  
+                  <!-- Master Card Approval Status -->
+                  <div v-if="selectedMasterCard.seq && approvalStatusMessage" class="mt-2 p-3 rounded" 
+                       :class="{
+                         'bg-green-100 border border-green-200': approvalStatusMessage.type === 'success',
+                         'bg-yellow-100 border border-yellow-200': approvalStatusMessage.type === 'warning',
+                         'bg-blue-100 border border-blue-200': approvalStatusMessage.type === 'info'
+                       }">
+                    <div class="flex items-center">
+                      <i :class="{
+                        'fas fa-check-circle text-green-600': approvalStatusMessage.type === 'success',
+                        'fas fa-exclamation-triangle text-yellow-600': approvalStatusMessage.type === 'warning',
+                        'fas fa-info-circle text-blue-600': approvalStatusMessage.type === 'info'
+                      }" class="mr-2"></i>
+                      <p class="text-sm font-medium" :class="{
+                        'text-green-800': approvalStatusMessage.type === 'success',
+                        'text-yellow-800': approvalStatusMessage.type === 'warning',
+                        'text-blue-800': approvalStatusMessage.type === 'info'
+                      }">
+                        {{ approvalStatusMessage.message }}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div v-if="!selectedMasterCard.seq && selectedCustomer.code" class="mt-2 bg-blue-100 p-3 rounded">
+                    <p class="text-sm font-medium text-blue-800">Master card selection required.</p>
+                    <p class="text-xs text-blue-700 mt-1">Please use the master card lookup button to select a master card for this customer.</p>
+                  </div>
+                  
+                  <div v-if="!selectedMasterCard.seq && !selectedCustomer.code" class="mt-2 bg-yellow-100 p-3 rounded">
                     <p class="text-sm font-medium text-yellow-800">No master card data available.</p>
-                    <p class="text-xs text-yellow-700 mt-1">Please select a customer and use the master card lookup to find available master cards.</p>
+                    <p class="text-xs text-yellow-700 mt-1">Please select a customer first, then use the master card lookup to find available master cards.</p>
                   </div>
                 </div>
               </div>
@@ -552,6 +581,20 @@
                   <li v-if="!selectedMasterCard.seq">Select a master card sequence</li>
                 </ul>
               </div>
+              
+              <!-- Master Card Approval Warning -->
+              <div v-if="canProceed && !isMasterCardApproved" class="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <div class="flex items-center">
+                  <i class="fas fa-exclamation-triangle text-orange-600 mr-2"></i>
+                  <span class="text-sm text-orange-800 font-medium">
+                    Master Card Approval Notice
+                  </span>
+                </div>
+                <p class="text-xs text-orange-700 mt-1">
+                  The selected master card is not yet approved. You can proceed with creating the sales order, 
+                  but the master card may need to be approved before production can begin.
+                </p>
+              </div>
                 </div>
               </div>
             </div>
@@ -692,8 +735,28 @@ const showDeliveryScheduleModal = ref(false)
 
 // Computed properties
 const canProceed = computed(() => {
-  // Proceed only if MC is approved (Yes) to enforce workflow consistency
-  return selectedCustomer.code && selectedMasterCard.seq && (selectedMasterCard.approval === 'Yes')
+  // Allow proceeding if customer and master card are selected
+  // Approval status will be shown as warning but won't block the process
+  return selectedCustomer.code && selectedMasterCard.seq
+})
+
+// Computed property to check if master card is approved
+const isMasterCardApproved = computed(() => {
+  return selectedMasterCard.approval === 'Yes'
+})
+
+// Computed property to get approval status message
+const approvalStatusMessage = computed(() => {
+  if (!selectedMasterCard.seq) return ''
+  
+  switch (selectedMasterCard.approval) {
+    case 'Yes':
+      return { type: 'success', message: 'Master Card is approved and ready for use' }
+    case 'No':
+      return { type: 'warning', message: 'Master Card is not approved yet. You can proceed but approval may be required later.' }
+    default:
+      return { type: 'info', message: 'Master Card approval status is unknown' }
+  }
 })
 
 const dayOfWeek = computed(() => {
@@ -1026,10 +1089,21 @@ const selectCustomer = async (customer) => {
   orderDetails.salesperson.code = customer.salesperson_code || ''
   orderDetails.currency = customer.currency_code || 'IDR'
   
+  // Clear any previously selected master card
+  Object.assign(selectedMasterCard, {
+    seq: '',
+    model: '',
+    status: '',
+    approval: '',
+    partNo: '',
+    compNo: '',
+    pDesign: ''
+  })
+  
   showCustomerModal.value = false
   success('Customer selected successfully')
   
-  // Auto-load master cards for the selected customer
+  // Load master cards info for the selected customer (without auto-selection)
   await loadMasterCardsForCustomer()
 }
 
@@ -1066,7 +1140,18 @@ const validateCustomer = async () => {
       
       success('Customer validated successfully')
       
-      // Auto-load master cards for the validated customer
+      // Clear any previously selected master card
+      Object.assign(selectedMasterCard, {
+        seq: '',
+        model: '',
+        status: '',
+        approval: '',
+        partNo: '',
+        compNo: '',
+        pDesign: ''
+      })
+      
+      // Load master cards info for the validated customer (without auto-selection)
       await loadMasterCardsForCustomer()
     } else {
       error(data.message || 'Customer not found')
@@ -1097,13 +1182,19 @@ const selectMasterCard = (masterCard) => {
   selectedMasterCard.seq = masterCard.mc_seq
   selectedMasterCard.model = masterCard.mc_model || masterCard.model
   selectedMasterCard.status = masterCard.status
-  selectedMasterCard.approval = masterCard.mc_approval || masterCard.approval || ''
+  selectedMasterCard.approval = masterCard.mc_approval || 'No'
   selectedMasterCard.partNo = masterCard.part_no
   selectedMasterCard.compNo = masterCard.comp_no
   selectedMasterCard.pDesign = masterCard.p_design
   
   showMasterCardModal.value = false
-  success('Master card selected successfully')
+  
+  // Show appropriate message based on approval status
+  if (selectedMasterCard.approval === 'Yes') {
+    success('Master card selected successfully - Approved and ready for use')
+  } else {
+    success('Master card selected successfully - Not yet approved')
+  }
 }
 
 const validateMasterCard = async () => {
@@ -1117,12 +1208,17 @@ const validateMasterCard = async () => {
       const masterCard = data.data
       selectedMasterCard.model = masterCard.mc_model || ''
       selectedMasterCard.status = masterCard.status || 'Active'
-      selectedMasterCard.approval = masterCard.mc_approval || masterCard.approval || 'No'
+      selectedMasterCard.approval = masterCard.mc_approval || 'No'
       selectedMasterCard.partNo = masterCard.part_no || ''
       selectedMasterCard.compNo = masterCard.comp_no || ''
       selectedMasterCard.pDesign = masterCard.p_design || ''
       
-      success('Master card validated successfully')
+      // Show appropriate message based on approval status
+      if (selectedMasterCard.approval === 'Yes') {
+        success('Master card validated successfully - Approved and ready for use')
+      } else {
+        success('Master card validated successfully - Not yet approved')
+      }
     } else {
       error('Master card not found')
       selectedMasterCard.model = ''
@@ -1153,20 +1249,14 @@ const loadMasterCardsForCustomer = async () => {
     const data = await response.json()
     
     if (data.data && data.data.length > 0) {
-      // Auto-select the first master card
-      const firstMasterCard = data.data[0]
-      selectedMasterCard.seq = firstMasterCard.seq
-      selectedMasterCard.model = firstMasterCard.model
-      selectedMasterCard.status = firstMasterCard.status
-      selectedMasterCard.approval = firstMasterCard.mc_approval || firstMasterCard.approval || 'No'
-      selectedMasterCard.partNo = firstMasterCard.part
-      selectedMasterCard.compNo = firstMasterCard.comp
-      selectedMasterCard.pDesign = firstMasterCard.p_design
-      
-      success(`Auto-selected master card: ${firstMasterCard.model}`)
+      // Just show info about available master cards, don't auto-select
+      success(`Found ${data.data.length} master card(s) available for this customer. Please select one manually.`)
+    } else {
+      info('No master cards found for this customer. Please check with the administrator.')
     }
   } catch (err) {
     console.error('Error loading master cards for customer:', err)
+    error('Error loading master cards for customer: ' + (err.message || 'Network error'))
   }
 }
 
@@ -1537,9 +1627,10 @@ const createSalesOrder = async () => {
       error('Master card is required')
       return
     }
+    // Note: We allow proceeding even if master card is not approved
+    // The approval status is shown as a warning to the user
     if (selectedMasterCard.approval !== 'Yes') {
-      error('Selected Master Card is not approved yet')
-      return
+      info('Warning: Selected Master Card is not approved yet. Proceeding with sales order creation.')
     }
     
     if (!orderDetails.pOrderDate) {

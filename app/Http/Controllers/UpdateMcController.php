@@ -126,6 +126,7 @@ class UpdateMcController extends Controller
                 'part' => $item->part_no,
                 'comp' => $item->comp_no,
                 'status' => $item->status,
+                'mc_approval' => $item->mc_approval ?? 'No',
                 'p_design' => $item->p_design,
                 'customer_code' => $item->customer_code,
                 'customer_name' => $item->customer_code, // Use customer_code for now
@@ -205,6 +206,7 @@ class UpdateMcController extends Controller
                         'mc_model' => $masterCard->mc_model,
                         'mc_short_model' => $masterCard->mc_short_model ?? '',
                         'status' => $masterCard->status,
+                        'mc_approval' => $masterCard->mc_approval ?? 'No',
                         'part_no' => $masterCard->part_no,
                         'comp_no' => $masterCard->comp_no,
                         'p_design' => $masterCard->p_design,
