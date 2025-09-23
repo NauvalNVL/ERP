@@ -356,8 +356,6 @@
                       { 'calendar-explicitly-opened': calendarExplicitlyOpened }
                     ]"
                     @change="updateDayOfWeek"
-                    @focus="handleDateInputFocus"
-                    @blur="handleDateInputBlur"
                     >
                     <button 
                       @click.prevent="openCalendar"
@@ -1461,14 +1459,9 @@ const openCalendar = async () => {
     console.error('Error opening calendar:', err)
     error('Error opening calendar: ' + (err.message || 'Unknown error'))
   } finally {
-    // Add a small delay to show loading state
+    // End loading state shortly after triggering the picker; keep the flag until user picks or cancels
     setTimeout(() => {
       calendarLoading.value = false
-      // Reset the flag after a delay
-      setTimeout(() => {
-        calendarExplicitlyOpened.value = false
-        console.log('Calendar flag reset - calendar will no longer show automatically')
-      }, 2000) // Increased delay to ensure user has time to interact
     }, 200)
   }
 }
@@ -1497,106 +1490,13 @@ const updateDayOfWeek = () => {
     }
     
     // The computed property dayOfWeek will automatically update
+    // Close explicit calendar state after selection
+    calendarExplicitlyOpened.value = false
     console.log('Date changed to:', orderDetails.pOrderDate, 'Day:', dayOfWeek.value)
   }
 }
 
-// Handle date input focus - prevent automatic calendar display
-const handleDateInputFocus = (event) => {
-  // Always prevent calendar from showing on focus unless explicitly opened
-  if (!calendarExplicitlyOpened.value) {
-    event.preventDefault()
-    event.stopPropagation()
-    console.log('Date input focused - calendar prevented from showing automatically')
-    
-    // Force blur to prevent any browser default behavior
-    setTimeout(() => {
-      if (event.target === document.activeElement) {
-        event.target.blur()
-      }
-    }, 10)
-  } else {
-    console.log('Date input focused - calendar allowed (explicitly opened)')
-  }
-}
-
-// Handle date input blur - close any open calendar
-const handleDateInputBlur = () => {
-  console.log('Date input blurred - closing any open calendar')
-  // Reset the flag when input loses focus
-  calendarExplicitlyOpened.value = false
-  // The browser will automatically close the calendar when input loses focus
-}
-
-// Handle date input click - prevent automatic calendar
-const handleDateInputClick = (event) => {
-  // Only allow calendar to show if it's explicitly triggered by the calendar button
-  if (!calendarExplicitlyOpened.value) {
-    event.preventDefault()
-    event.stopPropagation()
-    // Focus the input without showing calendar
-    event.target.focus()
-    
-    // Force blur after a short delay to prevent any browser default behavior
-    setTimeout(() => {
-      if (event.target === document.activeElement) {
-        event.target.blur()
-      }
-    }, 50)
-  }
-}
-
-// Handle date input keydown - prevent automatic calendar
-const handleDateInputKeydown = (event) => {
-  // Only allow calendar to show if it's explicitly opened
-  if (!calendarExplicitlyOpened.value) {
-    // Prevent all key events that might trigger calendar
-    if (event.key === 'Enter' || event.key === ' ' || event.key === 'Tab') {
-      event.preventDefault()
-      event.stopPropagation()
-    }
-    
-    // Prevent any other key that might trigger calendar
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'F4') {
-      event.preventDefault()
-      event.stopPropagation()
-    }
-  }
-}
-
-// Handle document click - close calendar when clicking outside
-const handleDocumentClick = (event) => {
-  const dateInput = pOrderDateInput.value
-  if (dateInput && event.target !== dateInput && !dateInput.contains(event.target)) {
-    // If clicking outside the date input, blur it to close any open calendar
-    if (document.activeElement === dateInput) {
-      dateInput.blur()
-      calendarExplicitlyOpened.value = false
-    }
-    
-    // Also check if the clicked element is not the calendar button
-    const calendarButton = event.target.closest('.calendar-button')
-    if (!calendarButton) {
-      // Reset the flag when clicking anywhere else
-      calendarExplicitlyOpened.value = false
-    }
-  }
-}
-
-// Handle mouse events to prevent calendar
-const handleDateInputMouseDown = (event) => {
-  if (!calendarExplicitlyOpened.value) {
-    event.preventDefault()
-    event.stopPropagation()
-  }
-}
-
-const handleDateInputMouseUp = (event) => {
-  if (!calendarExplicitlyOpened.value) {
-    event.preventDefault()
-    event.stopPropagation()
-  }
-}
+// Removed aggressive focus/click prevention handlers; rely on native picker
 
 // Add date validation helper
 const validateDate = (dateString) => {
@@ -2013,20 +1913,7 @@ onMounted(async () => {
   
             // Add event listener to prevent calendar from showing on other elements
       const dateInput = pOrderDateInput.value
-      if (dateInput) {
-              // Add event listeners to prevent calendar from showing automatically
-      dateInput.addEventListener('focus', handleDateInputFocus)
-      dateInput.addEventListener('blur', handleDateInputBlur)
-      dateInput.addEventListener('click', handleDateInputClick)
-      dateInput.addEventListener('keydown', handleDateInputKeydown)
-      
-      // Add additional event listeners to prevent calendar
-      dateInput.addEventListener('mousedown', handleDateInputMouseDown)
-      dateInput.addEventListener('mouseup', handleDateInputMouseUp)
-      
-      // Add document click listener to close calendar when clicking outside
-      document.addEventListener('click', handleDocumentClick)
-      }
+      // We rely on native picker behavior; no extra listeners needed
 })
 
 // Cleanup on unmount
@@ -2035,22 +1922,7 @@ onUnmounted(() => {
   clearTimeout(window.mcValidationTimeout)
   document.removeEventListener('keydown', handleKeyDown)
   
-  // Remove calendar-related event listeners
-  const dateInput = pOrderDateInput.value
-  if (dateInput) {
-    // Remove all event listeners to prevent memory leaks
-    dateInput.removeEventListener('focus', handleDateInputFocus)
-    dateInput.removeEventListener('blur', handleDateInputBlur)
-    dateInput.removeEventListener('click', handleDateInputClick)
-    dateInput.removeEventListener('keydown', handleDateInputKeydown)
-    
-    // Remove additional event listeners
-    dateInput.removeEventListener('mousedown', handleDateInputMouseDown)
-    dateInput.removeEventListener('mouseup', handleDateInputMouseUp)
-  }
-  
-  // Remove document click listener
-  document.removeEventListener('click', handleDocumentClick)
+  // No calendar-related listeners registered
 })
 </script>
 
@@ -2074,94 +1946,10 @@ button:disabled {
   }
 }
 
-/* Date input styles */
-input[type="date"]::-webkit-calendar-picker-indicator {
-  background: transparent;
-  bottom: 0;
-  color: transparent;
-  cursor: pointer;
-  height: auto;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: auto;
-}
-
-/* Prevent calendar from showing on focus */
-input[type="date"]:focus {
-  /* Remove any default browser styling that might trigger calendar */
-  outline: none;
-}
-
-/* Ensure calendar only shows when explicitly triggered */
-input[type="date"] {
-  /* Prevent automatic calendar display */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
-
 /* Custom calendar button styling */
 .calendar-button {
   position: relative;
   z-index: 10;
 }
-
-/* Prevent calendar from showing on input focus */
-input[type="date"]:focus:not(.calendar-explicitly-opened) {
-  /* Remove any default browser styling that might trigger calendar */
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Additional focus prevention */
-input[type="date"]:not(.calendar-explicitly-opened):focus {
-  /* Prevent any browser default behavior */
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-/* Additional prevention for calendar display */
-input[type="date"]:not(.calendar-explicitly-opened)::-webkit-calendar-picker-indicator {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* Additional prevention for Firefox and other browsers */
-input[type="date"]:not(.calendar-explicitly-opened)::-moz-calendar-picker-indicator {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* Additional prevention for Edge and IE */
-input[type="date"]:not(.calendar-explicitly-opened)::-ms-clear,
-input[type="date"]:not(.calendar-explicitly-opened)::-ms-expand {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* Ensure calendar only shows when explicitly triggered */
-input[type="date"].calendar-explicitly-opened {
-  /* Allow calendar to show when explicitly opened */
-  -webkit-appearance: auto;
-  -moz-appearance: auto;
-  appearance: auto;
-}
-
-/* Prevent calendar from showing on non-explicit focus */
-input[type="date"]:not(.calendar-explicitly-opened) {
-  /* Completely prevent calendar from showing */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
+/* Allow native date picker behavior; no suppression CSS */
 </style>
