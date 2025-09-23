@@ -98,7 +98,8 @@ class SalesOrderController extends Controller
                 'instruction1' => $request->instruction1,
                 'instruction2' => $request->instruction2,
                 'status' => 'Draft',
-                'created_by' => Auth::id(),
+                // In SQL Server, created_by is BIGINT; avoid inserting non-numeric IDs
+                'created_by' => is_numeric(Auth::id()) ? (int) Auth::id() : null,
             ]);
 
             return response()->json([
