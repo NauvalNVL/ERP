@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Models\UpdateCustomerAccount;
 use App\Models\MasterCard;
+use App\Models\SalesOrder;
 use App\Models\Salesperson;
 use Inertia\Inertia;
 
@@ -54,37 +55,51 @@ class SalesOrderController extends Controller
         }
 
         try {
+            // Pull related entities
+            $customer = UpdateCustomerAccount::where('customer_code', $request->customer_code)->first();
+            $mc = MasterCard::where('mc_seq', $request->master_card_seq)->first();
+
+            if (!$customer) {
+                return response()->json(['success' => false, 'message' => 'Customer not found'], 404);
+            }
+            if (!$mc) {
+                return response()->json(['success' => false, 'message' => 'Master Card not found'], 404);
+            }
+
             // Generate SO number
             $soNumber = $this->generateSONumber();
 
-            // Create sales order record (you'll need to create a SalesOrder model)
-            $salesOrder = [
+            // Combine snapshot data per flow
+            $salesOrder = SalesOrder::create([
                 'so_number' => $soNumber,
-                'customer_code' => $request->customer_code,
-                'master_card_seq' => $request->master_card_seq,
-                'order_mode' => $request->order_mode,
-                'product_code' => $request->product_code,
-                'salesperson_code' => $request->salesperson_code,
+                'customer_code' => $customer->customer_code,
+                'customer_name' => $customer->customer_name ?? null,
+                'customer_address' => $customer->address ?? null,
+                'credit_terms' => $customer->credit_terms ?? null,
+                'credit_limit' => $customer->credit_limit ?? null,
+                'salesperson_code' => $request->salesperson_code ?: ($customer->salesperson_code ?? null),
                 'currency' => $request->currency,
                 'exchange_rate' => $request->exchange_rate ?? 0,
-                'customer_po_number' => $request->customer_po_number,
-                'po_date' => $request->po_date,
+
+                'master_card_seq' => $mc->mc_seq,
+                'master_card_model' => $mc->mc_model ?? null,
+                'p_design' => $mc->p_design ?? null,
+                'uom' => 'PCS',
+
+                'order_mode' => $request->order_mode,
+                'product_code' => $request->product_code,
                 'order_group' => $request->order_group,
                 'order_type' => $request->order_type,
-                'sales_tax' => $request->sales_tax ?? false,
+                'sales_tax' => (bool)($request->sales_tax ?? false),
                 'lot_number' => $request->lot_number,
+                'customer_po_number' => $request->customer_po_number,
+                'po_date' => $request->po_date,
                 'remark' => $request->remark,
                 'instruction1' => $request->instruction1,
                 'instruction2' => $request->instruction2,
-                'status' => 'PENDING',
+                'status' => 'Draft',
                 'created_by' => Auth::id(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-
-            // For now, we'll just log the sales order data
-            // In a real implementation, you'd save this to a sales_orders table
-            Log::info('Sales Order Created:', $salesOrder);
+            ]);
 
             return response()->json([
                 'success' => true,
