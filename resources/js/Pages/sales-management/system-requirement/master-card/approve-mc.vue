@@ -79,7 +79,7 @@
                                 <div>
                                     <label
                                         for="ac"
-                                        class="block text-sm font-medium text-gray-700 mb-1 flex items-center"
+                                        class="text-sm font-medium text-gray-700 mb-1 flex items-center"
                                     >
                                         <span
                                             class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 shadow-sm"
@@ -100,7 +100,7 @@
                                             type="text" 
                                             id="ac" 
                                             v-model="searchTerm"
-                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
+                                        class="flex-1 min-w-0 w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
                                         />
                                         <button 
                                             type="button"
@@ -122,7 +122,7 @@
                             <div>
                                     <label
                                         for="mcs"
-                                        class="block text-sm font-medium text-gray-700 mb-1 flex items-center"
+                                        class="text-sm font-medium text-gray-700 mb-1 flex items-center"
                                     >
                                         <span
                                             class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-pink-500 to-red-500 rounded-full mr-2 shadow-sm"
@@ -143,7 +143,7 @@
                                             type="text" 
                                             id="mcs" 
                                             v-model="mcsInput"
-                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
+                                        class="flex-1 min-w-0 w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
                                         />
                                         <button 
                                             type="button"
@@ -748,79 +748,101 @@
                     >&#8203;</span
                 >
                 <div
-                    class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full animate-modalScaleIn"
+                    class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full animate-modalScaleIn"
                 >
                     <!-- Header -->
-                    <div class="px-4 py-2 border-b border-gray-300 bg-gray-100 flex items-center justify-between">
-                        <h3 class="text-gray-800 font-semibold">Approve MC</h3>
-                        <button class="text-gray-500 hover:text-gray-700" @click="showApprovalModal = false">
+                    <div class="px-6 py-4 bg-gradient-to-r from-indigo-700 via-blue-600 to-violet-600 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-white/20 p-2 rounded-lg shadow-sm">
+                                <i class="fas fa-check text-white"></i>
+                            </span>
+                            <div>
+                                <h3 class="text-white text-lg font-semibold leading-tight">Approve MC</h3>
+                                <p class="text-white/80 text-xs">Review detail master card sebelum konfirmasi</p>
+                            </div>
+                        </div>
+                        <button class="text-white/80 hover:text-white" @click="showApprovalModal = false" aria-label="Close">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
 
-                    <!-- Body styled like legacy UI -->
-                    <div class="p-4 space-y-4">
+                    <!-- Body colorful -->
+                    <div class="p-6 space-y-6 bg-gradient-to-br from-white to-indigo-50">
                         <!-- Selected Master Card -->
-                        <div class="border border-gray-400 rounded">
-                            <div class="px-3 py-1 border-b border-gray-400 bg-gray-100 text-sm font-semibold text-gray-700">Selected Master Card</div>
-                            <div class="p-3 space-y-2">
-                                <div class="flex items-center gap-2">
-                                    <label class="w-28 text-sm text-gray-700">Customer A/C#:</label>
-                                    <input type="text" :value="masterCardToAction?.customer_code || ''" readonly class="w-40 px-2 py-1 border border-gray-400 text-sm bg-white">
-                                    <input type="text" :value="masterCardToAction?.customer_name || ''" readonly class="flex-1 px-2 py-1 border border-gray-400 text-sm bg-white">
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <label class="w-28 text-sm text-gray-700">M/Card Seq#:</label>
-                                    <input type="text" :value="masterCardToAction?.mc_seq || ''" readonly class="w-40 px-2 py-1 border border-gray-400 text-sm bg-white">
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <label class="w-28 text-sm text-gray-700">Model:</label>
-                                    <input type="text" :value="masterCardToAction?.mc_model || ''" readonly class="flex-1 px-2 py-1 border border-gray-400 text-sm bg-white">
+                        <div class="rounded-xl border border-indigo-200 bg-white shadow-sm overflow-hidden">
+                            <div class="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-sm font-semibold flex items-center gap-2">
+                                <i class="fas fa-id-card"></i>
+                                Selected Master Card
+                            </div>
+                            <div class="p-5">
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                    <div class="md:col-span-3 flex items-center text-sm text-gray-600">Customer A/C#</div>
+                                    <div class="md:col-span-3">
+                                        <input type="text" :value="masterCardToAction?.customer_code || ''" readonly class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50 rounded-md">
+                                    </div>
+                                    <div class="md:col-span-2 flex items-center text-sm text-gray-600">Customer Name</div>
+                                    <div class="md:col-span-4">
+                                        <input type="text" :value="masterCardToAction?.customer_name || ''" readonly class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50 rounded-md">
+                                    </div>
+                                    <div class="md:col-span-3 flex items-center text-sm text-gray-600">M/Card Seq#</div>
+                                    <div class="md:col-span-3">
+                                        <input type="text" :value="masterCardToAction?.mc_seq || ''" readonly class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50 rounded-md">
+                                    </div>
+                                    <div class="md:col-span-2 flex items-center text-sm text-gray-600">Model</div>
+                                    <div class="md:col-span-4">
+                                        <input type="text" :value="masterCardToAction?.mc_model || ''" readonly class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50 rounded-md">
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Last Maintenance Log -->
-                        <div class="border border-gray-400 rounded">
-                            <div class="px-3 py-1 border-b border-gray-400 bg-gray-100 text-sm font-semibold text-gray-700">Last Maintenance Log</div>
-                            <div class="p-3 space-y-2">
-                                <div class="flex items-center gap-2">
-                                    <label class="w-28 text-sm text-gray-700">Process:</label>
-                                    <input type="text" :value="lastMaintenanceLog.process || ''" readonly class="w-48 px-2 py-1 border border-gray-400 text-sm bg-white">
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <label class="w-28 text-sm text-gray-700">User ID:</label>
-                                    <input type="text" :value="lastMaintenanceLog.user || ''" readonly class="w-32 px-2 py-1 border border-gray-400 text-sm bg-white">
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <div class="flex items-center gap-2">
-                                        <label class="w-28 text-sm text-gray-700">Date:</label>
-                                        <input type="text" :value="lastMaintenanceLog.date || ''" readonly class="w-32 px-2 py-1 border border-gray-400 text-sm bg-white">
+                        <div class="rounded-xl border border-emerald-200 bg-white shadow-sm overflow-hidden">
+                            <div class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold flex items-center gap-2">
+                                <i class="fas fa-tools"></i>
+                                Last Maintenance Log
+                            </div>
+                            <div class="p-5">
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                    <div class="md:col-span-3 flex items-center text-sm text-gray-600">Process</div>
+                                    <div class="md:col-span-3">
+                                        <input type="text" :value="lastMaintenanceLog.process || ''" readonly class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50 rounded-md">
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <label class="w-10 text-sm text-gray-700">Time:</label>
-                                        <input type="text" :value="lastMaintenanceLog.time || ''" readonly class="w-20 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                    <div class="md:col-span-2 flex items-center text-sm text-gray-600">User ID</div>
+                                    <div class="md:col-span-4">
+                                        <input type="text" :value="lastMaintenanceLog.user || ''" readonly class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50 rounded-md">
+                                    </div>
+                                    <div class="md:col-span-3 flex items-center text-sm text-gray-600">Date</div>
+                                    <div class="md:col-span-3">
+                                        <input type="text" :value="lastMaintenanceLog.date || ''" readonly class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50 rounded-md">
+                                    </div>
+                                    <div class="md:col-span-2 flex items-center text-sm text-gray-600">Time</div>
+                                    <div class="md:col-span-4">
+                                        <input type="text" :value="lastMaintenanceLog.time || ''" readonly class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50 rounded-md">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Last Approval Log -->
-                        <div class="border border-gray-400 rounded">
-                            <div class="px-3 py-1 border-b border-gray-400 bg-gray-100 text-sm font-semibold text-gray-700">Last Approval Log</div>
-                            <div class="p-3 space-y-2">
-                                <div class="flex items-center gap-2">
-                                    <label class="w-28 text-sm text-gray-700">User ID:</label>
-                                    <input type="text" :value="lastApprovalUser" readonly class="w-32 px-2 py-1 border border-gray-400 text-sm bg-white">
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <div class="flex items-center gap-2">
-                                        <label class="w-28 text-sm text-gray-700">Date:</label>
-                                        <input type="text" :value="currentApprovalDate" readonly class="w-32 px-2 py-1 border border-gray-400 text-sm bg-white">
+                        <div class="rounded-xl border border-sky-200 bg-white shadow-sm overflow-hidden">
+                            <div class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 text-white text-sm font-semibold flex items-center gap-2">
+                                <i class="fas fa-user-check"></i>
+                                Last Approval Log
+                            </div>
+                            <div class="p-5">
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                    <div class="md:col-span-3 flex items-center text-sm text-gray-600">User ID</div>
+                                    <div class="md:col-span-3">
+                                        <input type="text" :value="lastApprovalUser" readonly class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50 rounded-md">
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <label class="w-10 text-sm text-gray-700">Time:</label>
-                                        <input type="text" :value="currentApprovalTime" readonly class="w-20 px-2 py-1 border border-gray-400 text-sm bg-white">
+                                    <div class="md:col-span-2 flex items-center text-sm text-gray-600">Date</div>
+                                    <div class="md:col-span-4">
+                                        <input type="text" :value="currentApprovalDate" readonly class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50 rounded-md">
+                                    </div>
+                                    <div class="md:col-span-3 flex items-center text-sm text-gray-600">Time</div>
+                                    <div class="md:col-span-3">
+                                        <input type="text" :value="currentApprovalTime" readonly class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50 rounded-md">
                                     </div>
                                 </div>
                             </div>
@@ -828,9 +850,9 @@
                     </div>
 
                     <!-- Footer -->
-                    <div class="px-4 py-3 border-t border-gray-300 flex justify-end">
-                        <button class="px-6 py-2 bg-gray-200 text-gray-800 rounded mr-2" @click="showApprovalModal = false">Close</button>
-                        <button class="px-6 py-2 bg-blue-600 text-white rounded" @click="confirmApproval">Confirm</button>
+                    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-2">
+                        <button class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition" @click="showApprovalModal = false">Close</button>
+                        <button class="px-5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg shadow transition" @click="confirmApproval">Confirm</button>
                     </div>
                 </div>
             </div>
@@ -968,7 +990,7 @@
                         
                         <div class="mb-3">
                             <label
-                                class="block text-sm font-medium text-gray-700 mb-2 flex items-center"
+                                class="text-sm font-medium text-gray-700 mb-2 flex items-center"
                             >
                                 <span
                                     class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-red-500 to-red-600 rounded-full mr-2 shadow-sm"

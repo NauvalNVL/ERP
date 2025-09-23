@@ -172,7 +172,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useToast } from '@/Composables/useToast'
 
 const props = defineProps({
@@ -181,7 +181,11 @@ const props = defineProps({
     required: true
   },
   masterCard: Object,
-  customer: Object
+  customer: Object,
+  initialQuantity: {
+    type: Number,
+    default: 0
+  }
 })
 
 const emit = defineEmits(['close', 'save'])
@@ -426,6 +430,15 @@ const setQuantity = () => {
   })
 }
 
+// Allow parent to push quantity while modal is open
+const applyExternalQuantity = (qty) => {
+  const numericQty = Number(qty) || 0
+  totalQuantity.value = numericQty
+  setQuantity()
+}
+
+defineExpose({ applyExternalQuantity })
+
 const openCustomerServiceDashboard = () => {
   if (!lastSONumber.value) {
     error('Please enter SO number')
@@ -466,6 +479,19 @@ onMounted(() => {
   
   // Calculate initial amounts
   items.forEach(calculateAmount)
+
+  // Initialize quantity from parent if provided
+  if (props.initialQuantity && Number(props.initialQuantity) > 0) {
+    totalQuantity.value = Number(props.initialQuantity)
+    setQuantity()
+  }
+})
+
+// Keep quantity in sync with parent changes
+watch(() => props.initialQuantity, (newVal) => {
+  const numericQty = Number(newVal) || 0
+  totalQuantity.value = numericQty
+  setQuantity()
 })
 </script>
 

@@ -646,6 +646,8 @@
       @save="saveProductDesign"
           :master-card="selectedMasterCard"
           :customer="selectedCustomer"
+          :initial-quantity="normalizedSetQuantity"
+          ref="productDesignModalRef"
     />
 
     <!-- Delivery Location Modal -->
@@ -752,6 +754,22 @@ const showMasterCardModal = ref(false) // legacy (unused)
 const showProductDesignModal = ref(false)
 const showDeliveryLocationModal = ref(false)
 const showDeliveryScheduleModal = ref(false)
+// Ref to Product Design modal for live quantity sync
+const productDesignModalRef = ref(null)
+
+// Normalize setQuantity to number
+const normalizedSetQuantity = computed(() => {
+  const raw = orderDetails.setQuantity
+  const num = typeof raw === 'string' ? parseFloat(raw) : Number(raw)
+  return isNaN(num) ? 0 : num
+})
+
+// Sync set quantity to Product Design modal when value changes while modal is open
+watch(() => normalizedSetQuantity.value, (qty) => {
+  if (showProductDesignModal.value && productDesignModalRef.value?.applyExternalQuantity) {
+    productDesignModalRef.value.applyExternalQuantity(qty)
+  }
+})
 
 // New MCS Table Modal state and handlers
 const showMcsTableModal = ref(false)
@@ -1121,6 +1139,24 @@ const selectCustomer = async (customer) => {
   // Update order details
   orderDetails.salesperson.code = customer.salesperson_code || ''
   orderDetails.currency = customer.currency_code || 'IDR'
+  
+  // Populate salesperson name immediately if code exists
+  try {
+    if (orderDetails.salesperson.code) {
+      const spResponse = await fetch(`/api/sales-order/salesperson/${orderDetails.salesperson.code}`)
+      const spData = await spResponse.json()
+      if (spData.success && spData.data) {
+        orderDetails.salesperson.name = spData.data.name || ''
+      } else {
+        orderDetails.salesperson.name = ''
+      }
+    } else {
+      orderDetails.salesperson.name = ''
+    }
+  } catch (spErr) {
+    console.warn('Could not fetch salesperson details on select:', spErr)
+    orderDetails.salesperson.name = ''
+  }
   
   // Reset previously selected Master Card when customer changes
   Object.assign(selectedMasterCard, {
