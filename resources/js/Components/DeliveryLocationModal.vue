@@ -92,6 +92,7 @@
                     v-model="shipTo.sameAddress" 
                     type="checkbox"
                     class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        @change="applySameAddress"
                   >
                   <label class="text-sm text-gray-700">Leave blank if ship to the same address</label>
                 </div>
@@ -105,7 +106,9 @@
                   <input 
                     v-model="shipTo.deliveryCode" 
                     type="text"
-                    class="w-20 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    :disabled="shipTo.sameAddress"
+                    @keyup.enter.prevent="validateDeliveryCode"
+                    class="w-20 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
                   >
                   <button 
                     @click="openDeliveryCodeLookup" 
@@ -122,7 +125,8 @@
                 <input 
                   v-model="shipTo.customerName" 
                   type="text"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  :readonly="shipTo.sameAddress"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 read-only:bg-gray-100 read-only:text-gray-500"
                 >
               </div>
             </div>
@@ -132,7 +136,8 @@
               <textarea 
                 v-model="shipTo.address" 
                 rows="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                :readonly="shipTo.sameAddress"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 read-only:bg-gray-100 read-only:text-gray-500"
               ></textarea>
             </div>
           </div>
@@ -162,7 +167,7 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="location in deliveryLocations" :key="location.delivery_code" class="hover:bg-gray-50">
+                  <tr v-for="location in deliveryLocations" :key="location.delivery_code + location.address" class="hover:bg-gray-50">
                     <td class="px-4 py-3 text-sm text-gray-900 font-medium">{{ location.delivery_code }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ location.ship_to }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ location.country }}</td>
@@ -263,20 +268,35 @@ const emit = defineEmits(['close', 'save'])
 
 const { success, error } = useToast()
 
-// Form data
+// Base customer (from Update Customer Account)
+const mainCustomer = reactive({
+  name: '',
+  address: '',
+  email: '',
+  contact: ''
+})
+
+// Form data (shown in modal)
 const orderBy = reactive({
-  customerName: ''
+  customerName: '',
+  address: '',
+  email: '',
+  contact: ''
 })
 
 const billTo = reactive({
   customerName: '',
-  address: ''
+  address: '',
+  email: '',
+  contact: ''
 })
 
 const shipTo = reactive({
   deliveryCode: '',
   customerName: '',
   address: '',
+  email: '',
+  contact: '',
   sameAddress: false
 })
 
@@ -309,7 +329,38 @@ const selectDeliveryCode = (deliveryCode) => {
   shipTo.deliveryCode = deliveryCode.code
   shipTo.customerName = deliveryCode.ship_to
   shipTo.address = deliveryCode.address
+  shipTo.email = deliveryCode.email || ''
+  shipTo.contact = deliveryCode.contact_person || ''
   showDeliveryCodeModal.value = false
+}
+
+const validateDeliveryCode = async () => {
+  if (!shipTo.deliveryCode || shipTo.sameAddress) return
+  try {
+    const res = await fetch(`/api/customer-alternate-addresses/${props.customer?.customer_code}`)
+    const data = await res.json()
+    const found = Array.isArray(data) ? data.find(d => (d.delivery_code || '').toUpperCase() === shipTo.deliveryCode.toUpperCase()) : null
+    if (found) {
+      shipTo.customerName = found.alternate_name || shipTo.customerName
+      shipTo.address = found.address || shipTo.address
+      shipTo.email = found.email || ''
+      shipTo.contact = found.contact_person || ''
+    } else {
+      error('Delivery code not found for this customer')
+    }
+  } catch (e) {
+    error('Failed to validate delivery code')
+  }
+}
+
+const applySameAddress = () => {
+  if (shipTo.sameAddress) {
+    shipTo.deliveryCode = ''
+    shipTo.customerName = mainCustomer.name
+    shipTo.address = mainCustomer.address
+    shipTo.email = mainCustomer.email
+    shipTo.contact = mainCustomer.contact
+  }
 }
 
 const selectDeliveryLocation = (location) => {
@@ -344,6 +395,13 @@ const exitTable = () => {
 }
 
 const saveLocation = () => {
+  // If delivery code empty, ship to defaults to main customer
+  if (!shipTo.deliveryCode) {
+    shipTo.customerName = mainCustomer.name
+    shipTo.address = mainCustomer.address
+    shipTo.email = mainCustomer.email
+    shipTo.contact = mainCustomer.contact
+  }
   if (!billTo.customerName || !shipTo.customerName) {
     error('Please fill in required fields')
     return
@@ -359,18 +417,56 @@ const saveLocation = () => {
 }
 
 // Initialize component
-onMounted(() => {
-  if (props.customer) {
-    orderBy.customerName = props.customer.customer_name || props.customer.name
-    billTo.customerName = props.customer.customer_name || props.customer.name
-    billTo.address = props.customer.address || 'TANGERANG'
-    shipTo.customerName = props.customer.customer_name || props.customer.name
-    shipTo.address = props.customer.address || 'TANGERANG'
-  }
-
+onMounted(async () => {
+  await loadMainCustomer()
   // Load delivery locations for customer
   loadDeliveryLocations()
 })
+
+const loadMainCustomer = async () => {
+  try {
+    const code = props.customer?.customer_code || props.customer?.code
+    if (!code) return
+    const res = await fetch(`/api/sales-order/customer/${code}`)
+    const data = await res.json()
+    if (data?.success && data.data) {
+      const c = data.data
+      mainCustomer.name = c.customer_name || ''
+      mainCustomer.address = c.address || ''
+      mainCustomer.email = c.email || ''
+      mainCustomer.contact = c.contact || ''
+
+      // Populate Order by / Bill to from main customer
+      orderBy.customerName = mainCustomer.name
+      orderBy.address = mainCustomer.address
+      orderBy.email = mainCustomer.email
+      orderBy.contact = mainCustomer.contact
+
+      billTo.customerName = mainCustomer.name
+      billTo.address = mainCustomer.address
+      billTo.email = mainCustomer.email
+      billTo.contact = mainCustomer.contact
+
+      // Default Ship to = main customer (when no code)
+      if (!shipTo.deliveryCode || shipTo.sameAddress) {
+        shipTo.customerName = mainCustomer.name
+        shipTo.address = mainCustomer.address
+        shipTo.email = mainCustomer.email
+        shipTo.contact = mainCustomer.contact
+      }
+    }
+  } catch (e) {
+    // fallback from props
+    mainCustomer.name = props.customer?.customer_name || props.customer?.name || ''
+    mainCustomer.address = props.customer?.address || ''
+    orderBy.customerName = mainCustomer.name
+    orderBy.address = mainCustomer.address
+    billTo.customerName = mainCustomer.name
+    billTo.address = mainCustomer.address
+    shipTo.customerName = mainCustomer.name
+    shipTo.address = mainCustomer.address
+  }
+}
 
 const loadDeliveryLocations = async () => {
   if (!props.customer?.customer_code) return
@@ -393,6 +489,12 @@ const loadDeliveryLocations = async () => {
         fax_no: location.fax_no || '',
         email: location.email || ''
       }))
+      // Ensure uniqueness by code+address like CPS tables
+      const uniq = new Map()
+      deliveryLocations.value.forEach(l => {
+        uniq.set(`${l.delivery_code}|${l.address}`, l)
+      })
+      deliveryLocations.value = Array.from(uniq.values())
     }
   } catch (err) {
     console.error('Error loading delivery locations:', err)

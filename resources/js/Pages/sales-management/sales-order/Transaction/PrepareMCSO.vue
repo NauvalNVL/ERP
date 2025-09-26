@@ -543,14 +543,7 @@
               <i class="fas fa-cogs mr-2"></i>
               Continue to Product Design
                 </button>
-                <button 
-              @click="openDeliveryLocation" 
-              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center disabled:bg-gray-400 disabled:cursor-not-allowed"
-              :disabled="!canProceed"
-            >
-              <i class="fas fa-truck mr-2"></i>
-              Set Delivery Location
-                </button>
+                
                 <button 
               @click="createSalesOrder" 
               class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -1588,11 +1581,18 @@ const saveProductDesign = async (designData) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
       },
+      credentials: 'same-origin',
       body: JSON.stringify(requestData)
     })
     
+    if (!response.ok) {
+      const text = await response.text()
+      throw new Error(`Request failed (${response.status}). ${text?.slice(0, 120)}`)
+    }
     const data = await response.json()
     
     if (data.success) {
@@ -1600,10 +1600,10 @@ const saveProductDesign = async (designData) => {
   showProductDesignModal.value = false
   success('Product design saved successfully')
   
-  // Open delivery schedule after product design
+  // After saving product design, open Delivery Location modal
   setTimeout(() => {
-    showDeliveryScheduleModal.value = true
-  }, 500)
+    showDeliveryLocationModal.value = true
+  }, 400)
     } else {
       throw new Error(data.message || 'Failed to save product design')
     }
@@ -1627,13 +1627,38 @@ const saveDeliveryLocation = async (locationData) => {
     // In a real implementation, you might save this to the database
   console.log('Delivery location saved:', locationData)
     
-    // Update order details with delivery location if provided
-    if (locationData.address) {
-      orderDetails.deliveryAddress = locationData.address
+    // Persist full structure into orderDetails to be used on SO creation
+    orderDetails.deliveryLocation = {
+      orderBy: {
+        name: locationData.orderBy?.customerName || '',
+        address: locationData.orderBy?.address || '',
+        email: locationData.orderBy?.email || '',
+        contact: locationData.orderBy?.contact || ''
+      },
+      billTo: {
+        name: locationData.billTo?.customerName || '',
+        address: locationData.billTo?.address || '',
+        email: locationData.billTo?.email || '',
+        contact: locationData.billTo?.contact || ''
+      },
+      shipTo: {
+        code: locationData.shipTo?.deliveryCode || '',
+        name: locationData.shipTo?.customerName || '',
+        address: locationData.shipTo?.address || '',
+        email: locationData.shipTo?.email || '',
+        contact: locationData.shipTo?.contact || ''
+      }
     }
+    // Backward compatible single field for quick view
+    orderDetails.deliveryAddress = orderDetails.deliveryLocation.shipTo.address || orderDetails.deliveryLocation.billTo.address
     
   showDeliveryLocationModal.value = false
   success('Delivery location saved successfully')
+
+  // After setting delivery location, proceed to Delivery Schedule
+  setTimeout(() => {
+    showDeliveryScheduleModal.value = true
+  }, 300)
   } catch (err) {
     console.error('Error saving delivery location:', err)
     error('Error saving delivery location: ' + (err.message || 'Network error'))
@@ -1661,11 +1686,18 @@ const saveDeliverySchedule = async (scheduleData) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
       },
+      credentials: 'same-origin',
       body: JSON.stringify(requestData)
     })
     
+    if (!response.ok) {
+      const text = await response.text()
+      throw new Error(`Request failed (${response.status}). ${text?.slice(0, 120)}`)
+    }
     const data = await response.json()
     
     if (data.success) {
@@ -1732,11 +1764,18 @@ const createSalesOrder = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
       },
+      credentials: 'same-origin',
       body: JSON.stringify(requestData)
     })
     
+    if (!response.ok) {
+      const text = await response.text()
+      throw new Error(`Request failed (${response.status}). ${text?.slice(0, 120)}`)
+    }
     const data = await response.json()
     
     if (data.success) {
