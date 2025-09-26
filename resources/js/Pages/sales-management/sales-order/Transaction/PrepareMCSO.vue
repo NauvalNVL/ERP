@@ -1,4 +1,4 @@
-<template>
+  <template>
   <AppLayout header="Prepare MC SO">
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
       <!-- Header with controls -->
