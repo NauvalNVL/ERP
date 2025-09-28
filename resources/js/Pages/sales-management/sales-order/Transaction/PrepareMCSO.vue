@@ -1600,6 +1600,9 @@ const saveProductDesign = async (designData) => {
   showProductDesignModal.value = false
   success('Product design saved successfully')
   
+  // Fetch customer alternate delivery location data and populate orderDetails
+  await fetchCustomerAlternateDeliveryData()
+  
   // After saving product design, open Delivery Location modal
   setTimeout(() => {
     showDeliveryLocationModal.value = true
@@ -1610,6 +1613,102 @@ const saveProductDesign = async (designData) => {
   } catch (err) {
     console.error('Error saving product design:', err)
     error('Error saving product design: ' + (err.message || 'Network error'))
+  }
+}
+
+const fetchCustomerAlternateDeliveryData = async () => {
+  try {
+    const customerCode = selectedCustomer.code
+    if (!customerCode) {
+      console.log('No customer code available for fetching alternate delivery data')
+      return
+    }
+
+    console.log('Fetching customer alternate delivery data for:', customerCode)
+    const response = await fetch(`/api/customer-alternate-addresses/${customerCode}`)
+    const data = await response.json()
+    
+    if (Array.isArray(data) && data.length > 0) {
+      // Use the first alternate address if multiple exist
+      const alternateAddress = data[0]
+      
+      // Populate orderDetails with delivery location data from customer alternate delivery location table
+      orderDetails.deliveryLocation = {
+        orderBy: {
+          name: alternateAddress.bill_to_name || selectedCustomer.customer_name || '',
+          address: alternateAddress.bill_to_address || selectedCustomer.address || '',
+          email: selectedCustomer.email || '',
+          contact: selectedCustomer.contact || ''
+        },
+        billTo: {
+          name: alternateAddress.bill_to_name || selectedCustomer.customer_name || '',
+          address: alternateAddress.bill_to_address || selectedCustomer.address || '',
+          email: selectedCustomer.email || '',
+          contact: selectedCustomer.contact || ''
+        },
+        shipTo: {
+          code: alternateAddress.delivery_code || '',
+          name: alternateAddress.ship_to_name || selectedCustomer.customer_name || '',
+          address: alternateAddress.ship_to_address || selectedCustomer.address || '',
+          email: alternateAddress.email || selectedCustomer.email || '',
+          contact: alternateAddress.contact_person || selectedCustomer.contact || ''
+        }
+      }
+      
+      console.log('Customer alternate delivery data populated:', orderDetails.deliveryLocation)
+      success('Customer delivery location data loaded from alternate address table')
+    } else {
+      // No alternate address found, use main customer data
+      orderDetails.deliveryLocation = {
+        orderBy: {
+          name: selectedCustomer.customer_name || '',
+          address: selectedCustomer.address || '',
+          email: selectedCustomer.email || '',
+          contact: selectedCustomer.contact || ''
+        },
+        billTo: {
+          name: selectedCustomer.customer_name || '',
+          address: selectedCustomer.address || '',
+          email: selectedCustomer.email || '',
+          contact: selectedCustomer.contact || ''
+        },
+        shipTo: {
+          code: '',
+          name: selectedCustomer.customer_name || '',
+          address: selectedCustomer.address || '',
+          email: selectedCustomer.email || '',
+          contact: selectedCustomer.contact || ''
+        }
+      }
+      
+      console.log('No alternate address found, using main customer data')
+    }
+  } catch (err) {
+    console.error('Error fetching customer alternate delivery data:', err)
+    // Fallback to main customer data
+    orderDetails.deliveryLocation = {
+      orderBy: {
+        name: selectedCustomer.customer_name || '',
+        address: selectedCustomer.address || '',
+        email: selectedCustomer.email || '',
+        contact: selectedCustomer.contact || ''
+      },
+      billTo: {
+        name: selectedCustomer.customer_name || '',
+        address: selectedCustomer.address || '',
+        email: selectedCustomer.email || '',
+        contact: selectedCustomer.contact || ''
+      },
+      shipTo: {
+        code: '',
+        name: selectedCustomer.customer_name || '',
+        address: selectedCustomer.address || '',
+        email: selectedCustomer.email || '',
+        contact: selectedCustomer.contact || ''
+      }
+    }
+    
+    console.log('Error occurred, using fallback customer data')
   }
 }
 

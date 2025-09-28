@@ -145,7 +145,7 @@
                 @click="openCustomerServiceDashboard"
                 class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
               >
-                Continue
+                Customer Service Dashboard Using Last SO#
               </button>
             </div>
           </div>
@@ -168,12 +168,20 @@
         </div>
       </div>
     </div>
+
+    <!-- Customer Service Dashboard Modal -->
+    <CustomerServiceDashboardModal 
+      :show="showCustomerServiceModal" 
+      :soNumber="lastSONumber"
+      @close="showCustomerServiceModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useToast } from '@/Composables/useToast'
+import CustomerServiceDashboardModal from './CustomerServiceDashboardModal.vue'
 
 const props = defineProps({
   show: {
@@ -197,6 +205,7 @@ const balanceDate = ref('08/2025')
 const lastSONumber = ref('3.0620')
 const totalQuantity = ref(10)
 const totalUnitPrice = ref(3036.3600)
+const showCustomerServiceModal = ref(false)
 
 const items = reactive([
   {
@@ -445,8 +454,8 @@ const openCustomerServiceDashboard = () => {
     return
   }
   
-  // Open customer service dashboard logic here
-  success('Opening Customer Service Dashboard')
+  // Open customer service dashboard modal
+  showCustomerServiceModal.value = true
 }
 
 const saveDesign = () => {

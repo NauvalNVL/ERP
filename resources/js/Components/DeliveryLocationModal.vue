@@ -74,29 +74,11 @@
 
           <!-- Ship to Section -->
           <div class="bg-gray-50 rounded-lg p-4 mb-6">
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center mb-3">
               <h4 class="text-md font-medium text-gray-800 flex items-center">
                 <i class="fas fa-shipping-fast mr-2 text-orange-600"></i>
                 Ship to
               </h4>
-              <div class="flex items-center space-x-4">
-                <button 
-                  @click="openDeliveryCodeLookup" 
-                  class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                  title="Delivery Code Lookup"
-                >
-                  <i class="fas fa-search"></i>
-                </button>
-                <div class="flex items-center">
-                  <input 
-                    v-model="shipTo.sameAddress" 
-                    type="checkbox"
-                    class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-        @change="applySameAddress"
-                  >
-                  <label class="text-sm text-gray-700">Leave blank if ship to the same address</label>
-                </div>
-              </div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -117,6 +99,15 @@
                   >
                     <i class="fas fa-search"></i>
                   </button>
+                  <div class="flex items-center">
+                    <input 
+                      v-model="shipTo.sameAddress" 
+                      type="checkbox"
+                      class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      @change="applySameAddress"
+                    >
+                    <label class="text-sm text-gray-700">Leave blank if ship to the same address</label>
+                  </div>
                 </div>
               </div>
               
@@ -241,18 +232,18 @@
     </div>
 
     <!-- Delivery Code Lookup Modal -->
-    <DeliveryCodePreviewModal 
-      v-if="showDeliveryCodeModal" 
+    <DeliveryCodeLookupModal 
+      :show="showDeliveryCodeModal" 
       @close="showDeliveryCodeModal = false" 
       @select="selectDeliveryCode"
-      :customer-code="customer?.customer_code"
+      :customerCode="customer?.customer_code || customer?.code"
     />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import DeliveryCodePreviewModal from '@/Components/DeliveryCodePreviewModal.vue'
+import DeliveryCodeLookupModal from '@/Components/DeliveryCodeLookupModal.vue'
 import { useToast } from '@/Composables/useToast'
 
 const props = defineProps({
@@ -425,6 +416,44 @@ onMounted(async () => {
 
 const loadMainCustomer = async () => {
   try {
+    // First check if we have pre-populated data from orderDetails (from customer alternate delivery location table)
+    if (props.orderDetails?.deliveryLocation) {
+      const prePopulated = props.orderDetails.deliveryLocation
+      
+      // Use pre-populated data from customer alternate delivery location table
+      if (prePopulated.orderBy) {
+        orderBy.customerName = prePopulated.orderBy.name || ''
+        orderBy.address = prePopulated.orderBy.address || ''
+        orderBy.email = prePopulated.orderBy.email || ''
+        orderBy.contact = prePopulated.orderBy.contact || ''
+      }
+      
+      if (prePopulated.billTo) {
+        billTo.customerName = prePopulated.billTo.name || ''
+        billTo.address = prePopulated.billTo.address || ''
+        billTo.email = prePopulated.billTo.email || ''
+        billTo.contact = prePopulated.billTo.contact || ''
+      }
+      
+      if (prePopulated.shipTo) {
+        shipTo.deliveryCode = prePopulated.shipTo.code || ''
+        shipTo.customerName = prePopulated.shipTo.name || ''
+        shipTo.address = prePopulated.shipTo.address || ''
+        shipTo.email = prePopulated.shipTo.email || ''
+        shipTo.contact = prePopulated.shipTo.contact || ''
+      }
+      
+      // Set main customer data from orderBy
+      mainCustomer.name = orderBy.customerName
+      mainCustomer.address = orderBy.address
+      mainCustomer.email = orderBy.email
+      mainCustomer.contact = orderBy.contact
+      
+      console.log('Using pre-populated delivery location data from customer alternate delivery location table')
+      return
+    }
+    
+    // Fallback to API call if no pre-populated data
     const code = props.customer?.customer_code || props.customer?.code
     if (!code) return
     const res = await fetch(`/api/sales-order/customer/${code}`)
