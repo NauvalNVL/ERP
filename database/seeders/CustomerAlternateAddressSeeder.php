@@ -19,7 +19,7 @@ class CustomerAlternateAddressSeeder extends Seeder
         
         $alternateAddresses = [
             [
-                'customer_code' => '000211-09',
+                'customer_code' => '000211-08',
                 'delivery_code' => 'B103',
                 'country' => 'INDONESIA',
                 'state' => 'BANTEN',
@@ -33,6 +33,24 @@ class CustomerAlternateAddressSeeder extends Seeder
                 'tel_no' => '6191875',
                 'fax_no' => '5407992',
                 'email' => 'abdullah.bpk@example.com',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'customer_code' => '000211-08',
+                'delivery_code' => 'P104',
+                'country' => 'INDONESIA',
+                'state' => 'BANTEN',
+                'town' => 'TANGERANG',
+                'town_section' => 'PAMULANG',
+                'bill_to_name' => 'ABDULLAH BPK',
+                'bill_to_address' => 'JL. PASAR MINGGU NO. 45, JAKARTA SELATAN',
+                'ship_to_name' => 'ABDULLAH PAMULANG',
+                'ship_to_address' => 'JL. PAMULANG RAYA NO. 123, PAMULANG - TANGERANG',
+                'contact_person' => 'ABDULLAH',
+                'tel_no' => '6191875',
+                'fax_no' => '5407992',
+                'email' => 'abdullah.pamulang@example.com',
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],

@@ -172,20 +172,12 @@
       </div>
     </div>
 
-    <!-- Delivery Schedule Screen Modal -->
-    <DeliveryScheduleScreenModal 
-      :show="showDeliveryScheduleModal" 
-      :deliveryData="selectedLocation"
-      @close="showDeliveryScheduleModal = false"
-      @save="saveDeliverySchedule"
-    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useToast } from '@/Composables/useToast'
-import DeliveryScheduleScreenModal from './DeliveryScheduleScreenModal.vue'
 
 const props = defineProps({
   show: {
@@ -206,7 +198,6 @@ const { success, error } = useToast()
 const selectedLocation = ref(null)
 
 // Modal visibility
-const showDeliveryScheduleModal = ref(false)
 
 // Form data for displaying location details
 const formData = reactive({
@@ -273,24 +264,24 @@ const selectDeliveryCode = () => {
     return
   }
   
-  // Open delivery schedule modal instead of directly selecting
-  showDeliveryScheduleModal.value = true
-}
-
-const saveDeliverySchedule = (scheduleData) => {
-  // Close the delivery schedule modal
-  showDeliveryScheduleModal.value = false
-  
-  // Emit the selected delivery code with schedule data
+  // Directly emit the selected delivery code
   emit('select', {
     code: selectedLocation.value.delivery_code,
     ship_to: selectedLocation.value.ship_to,
     address: selectedLocation.value.address,
     email: selectedLocation.value.email,
     contact_person: selectedLocation.value.contact,
-    scheduleData: scheduleData
+    country: selectedLocation.value.country,
+    town: selectedLocation.value.town,
+    state: selectedLocation.value.state,
+    section: selectedLocation.value.section,
+    tel_no: selectedLocation.value.tel_no,
+    fax_no: selectedLocation.value.fax_no
   })
+  
+  success('Delivery location selected successfully')
 }
+
 
 // Load delivery locations for customer
 const loadDeliveryLocations = async () => {

@@ -1625,6 +1625,17 @@ const fetchCustomerAlternateDeliveryData = async () => {
     }
 
     console.log('Fetching customer alternate delivery data for:', customerCode)
+    
+    // First, get the main customer account data
+    const customerResponse = await fetch(`/api/sales-order/customer/${customerCode}`)
+    const customerData = await customerResponse.json()
+    
+    let mainCustomerData = null
+    if (customerData?.success && customerData.data) {
+      mainCustomerData = customerData.data
+    }
+    
+    // Then, get alternate addresses
     const response = await fetch(`/api/customer-alternate-addresses/${customerCode}`)
     const data = await response.json()
     
@@ -1635,23 +1646,23 @@ const fetchCustomerAlternateDeliveryData = async () => {
       // Populate orderDetails with delivery location data from customer alternate delivery location table
       orderDetails.deliveryLocation = {
         orderBy: {
-          name: alternateAddress.bill_to_name || selectedCustomer.customer_name || '',
-          address: alternateAddress.bill_to_address || selectedCustomer.address || '',
-          email: selectedCustomer.email || '',
-          contact: selectedCustomer.contact || ''
+          name: mainCustomerData?.customer_name || selectedCustomer.name || '',
+          address: mainCustomerData?.address || selectedCustomer.address || '',
+          email: mainCustomerData?.co_email || mainCustomerData?.email || selectedCustomer.email || '',
+          contact: mainCustomerData?.contact_person || mainCustomerData?.contact || selectedCustomer.contact || ''
         },
         billTo: {
-          name: alternateAddress.bill_to_name || selectedCustomer.customer_name || '',
-          address: alternateAddress.bill_to_address || selectedCustomer.address || '',
-          email: selectedCustomer.email || '',
-          contact: selectedCustomer.contact || ''
+          name: alternateAddress.bill_to_name || mainCustomerData?.customer_name || selectedCustomer.name || '',
+          address: alternateAddress.bill_to_address || mainCustomerData?.address || selectedCustomer.address || '',
+          email: mainCustomerData?.co_email || mainCustomerData?.email || selectedCustomer.email || '',
+          contact: mainCustomerData?.contact_person || mainCustomerData?.contact || selectedCustomer.contact || ''
         },
         shipTo: {
           code: alternateAddress.delivery_code || '',
-          name: alternateAddress.ship_to_name || selectedCustomer.customer_name || '',
-          address: alternateAddress.ship_to_address || selectedCustomer.address || '',
-          email: alternateAddress.email || selectedCustomer.email || '',
-          contact: alternateAddress.contact_person || selectedCustomer.contact || ''
+          name: alternateAddress.ship_to_name || mainCustomerData?.customer_name || selectedCustomer.name || '',
+          address: alternateAddress.ship_to_address || mainCustomerData?.address || selectedCustomer.address || '',
+          email: alternateAddress.email || mainCustomerData?.co_email || mainCustomerData?.email || selectedCustomer.email || '',
+          contact: alternateAddress.contact_person || mainCustomerData?.contact_person || mainCustomerData?.contact || selectedCustomer.contact || ''
         }
       }
       
@@ -1661,23 +1672,23 @@ const fetchCustomerAlternateDeliveryData = async () => {
       // No alternate address found, use main customer data
       orderDetails.deliveryLocation = {
         orderBy: {
-          name: selectedCustomer.customer_name || '',
-          address: selectedCustomer.address || '',
-          email: selectedCustomer.email || '',
-          contact: selectedCustomer.contact || ''
+          name: mainCustomerData?.customer_name || selectedCustomer.name || '',
+          address: mainCustomerData?.address || selectedCustomer.address || '',
+          email: mainCustomerData?.co_email || mainCustomerData?.email || selectedCustomer.email || '',
+          contact: mainCustomerData?.contact_person || mainCustomerData?.contact || selectedCustomer.contact || ''
         },
         billTo: {
-          name: selectedCustomer.customer_name || '',
-          address: selectedCustomer.address || '',
-          email: selectedCustomer.email || '',
-          contact: selectedCustomer.contact || ''
+          name: mainCustomerData?.customer_name || selectedCustomer.name || '',
+          address: mainCustomerData?.address || selectedCustomer.address || '',
+          email: mainCustomerData?.co_email || mainCustomerData?.email || selectedCustomer.email || '',
+          contact: mainCustomerData?.contact_person || mainCustomerData?.contact || selectedCustomer.contact || ''
         },
         shipTo: {
           code: '',
-          name: selectedCustomer.customer_name || '',
-          address: selectedCustomer.address || '',
-          email: selectedCustomer.email || '',
-          contact: selectedCustomer.contact || ''
+          name: mainCustomerData?.customer_name || selectedCustomer.name || '',
+          address: mainCustomerData?.address || selectedCustomer.address || '',
+          email: mainCustomerData?.co_email || mainCustomerData?.email || selectedCustomer.email || '',
+          contact: mainCustomerData?.contact_person || mainCustomerData?.contact || selectedCustomer.contact || ''
         }
       }
       
@@ -1688,20 +1699,20 @@ const fetchCustomerAlternateDeliveryData = async () => {
     // Fallback to main customer data
     orderDetails.deliveryLocation = {
       orderBy: {
-        name: selectedCustomer.customer_name || '',
+        name: selectedCustomer.name || '',
         address: selectedCustomer.address || '',
         email: selectedCustomer.email || '',
         contact: selectedCustomer.contact || ''
       },
       billTo: {
-        name: selectedCustomer.customer_name || '',
+        name: selectedCustomer.name || '',
         address: selectedCustomer.address || '',
         email: selectedCustomer.email || '',
         contact: selectedCustomer.contact || ''
       },
       shipTo: {
         code: '',
-        name: selectedCustomer.customer_name || '',
+        name: selectedCustomer.name || '',
         address: selectedCustomer.address || '',
         email: selectedCustomer.email || '',
         contact: selectedCustomer.contact || ''

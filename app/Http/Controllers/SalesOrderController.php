@@ -45,6 +45,7 @@ class SalesOrderController extends Controller
             'remark' => 'nullable|string',
             'instruction1' => 'nullable|string',
             'instruction2' => 'nullable|string',
+            'set_quantity' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -55,22 +56,28 @@ class SalesOrderController extends Controller
         }
 
         try {
+            // Log the incoming request data for debugging
+            Log::info('Creating sales order with data:', $request->all());
+            
             // Pull related entities
             $customer = UpdateCustomerAccount::where('customer_code', $request->customer_code)->first();
             $mc = MasterCard::where('mc_seq', $request->master_card_seq)->first();
 
             if (!$customer) {
+                Log::error('Customer not found: ' . $request->customer_code);
                 return response()->json(['success' => false, 'message' => 'Customer not found'], 404);
             }
             if (!$mc) {
+                Log::error('Master Card not found: ' . $request->master_card_seq);
                 return response()->json(['success' => false, 'message' => 'Master Card not found'], 404);
             }
 
             // Generate SO number
             $soNumber = $this->generateSONumber();
+            Log::info('Generated SO number: ' . $soNumber);
 
-            // Combine snapshot data per flow
-            $salesOrder = SalesOrder::create([
+            // Prepare data for creation
+            $salesOrderData = [
                 'so_number' => $soNumber,
                 'customer_code' => $customer->customer_code,
                 'customer_name' => $customer->customer_name ?? null,
@@ -100,7 +107,14 @@ class SalesOrderController extends Controller
                 'status' => 'Draft',
                 // In SQL Server, created_by is BIGINT; avoid inserting non-numeric IDs
                 'created_by' => is_numeric(Auth::id()) ? (int) Auth::id() : null,
-            ]);
+            ];
+
+            Log::info('Sales order data prepared:', $salesOrderData);
+
+            // Create the sales order
+            $salesOrder = SalesOrder::create($salesOrderData);
+
+            Log::info('Sales order created successfully with ID: ' . $salesOrder->id);
 
             return response()->json([
                 'success' => true,
@@ -113,6 +127,7 @@ class SalesOrderController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error creating sales order: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             
             return response()->json([
                 'success' => false,
@@ -130,10 +145,19 @@ class SalesOrderController extends Controller
         $prefix = 'SO';
         
         // Get the last SO number for this year
-        // For now, we'll generate a simple incremental number
-        $lastNumber = 1; // In real implementation, get from database
+        $lastSO = SalesOrder::where('so_number', 'like', $prefix . $year . '%')
+            ->orderBy('so_number', 'desc')
+            ->first();
         
-        return $prefix . $year . str_pad($lastNumber, 4, '0', STR_PAD_LEFT);
+        if ($lastSO) {
+            // Extract the number part and increment
+            $lastNumber = (int) substr($lastSO->so_number, -4);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+        
+        return $prefix . $year . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
     }
 
     /**

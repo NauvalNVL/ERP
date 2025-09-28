@@ -58,6 +58,7 @@
                     v-model="billTo.customerName" 
                     type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    readonly
                   >
                 </div>
                 <div>
@@ -66,6 +67,7 @@
                     v-model="billTo.address" 
                     rows="3"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    readonly
                   ></textarea>
                 </div>
               </div>
@@ -158,7 +160,15 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="location in deliveryLocations" :key="location.delivery_code + location.address" class="hover:bg-gray-50">
+                  <tr 
+                    v-for="(location, index) in deliveryLocations" 
+                    :key="location.delivery_code + location.address" 
+                    :class="[
+                      'hover:bg-gray-50 cursor-pointer transition-colors',
+                      selectedRowIndex === index ? 'bg-blue-100 border-blue-300' : ''
+                    ]"
+                    @click="selectRow(index)"
+                  >
                     <td class="px-4 py-3 text-sm text-gray-900 font-medium">{{ location.delivery_code }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ location.ship_to }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ location.country }}</td>
@@ -172,7 +182,7 @@
                     <td class="px-4 py-3 text-sm text-gray-900">{{ location.email }}</td>
                     <td class="px-4 py-3 text-center">
                       <button 
-                        @click="selectDeliveryLocation(location)"
+                        @click.stop="selectDeliveryLocation(location)"
                         class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
                       >
                         Select
@@ -185,12 +195,6 @@
 
             <!-- Table Action Buttons -->
             <div class="flex justify-center space-x-3 mt-4">
-              <button 
-                @click="moreOptions"
-                class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-              >
-                More Options
-              </button>
               <button 
                 @click="zoomTable"
                 class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
@@ -242,7 +246,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import DeliveryCodeLookupModal from '@/Components/DeliveryCodeLookupModal.vue'
 import { useToast } from '@/Composables/useToast'
 
@@ -269,17 +273,12 @@ const mainCustomer = reactive({
 
 // Form data (shown in modal)
 const orderBy = reactive({
-  customerName: '',
-  address: '',
-  email: '',
-  contact: ''
+  customerName: ''
 })
 
 const billTo = reactive({
   customerName: '',
-  address: '',
-  email: '',
-  contact: ''
+  address: ''
 })
 
 const shipTo = reactive({
@@ -293,6 +292,9 @@ const shipTo = reactive({
 
 // Modal visibility
 const showDeliveryCodeModal = ref(false)
+
+// Selected row tracking
+const selectedRowIndex = ref(-1)
 
 // Delivery locations data
 const deliveryLocations = ref([
@@ -320,27 +322,54 @@ const selectDeliveryCode = (deliveryCode) => {
   shipTo.deliveryCode = deliveryCode.code
   shipTo.customerName = deliveryCode.ship_to
   shipTo.address = deliveryCode.address
-  shipTo.email = deliveryCode.email || ''
-  shipTo.contact = deliveryCode.contact_person || ''
   showDeliveryCodeModal.value = false
 }
 
 const validateDeliveryCode = async () => {
   if (!shipTo.deliveryCode || shipTo.sameAddress) return
+  
+  const customerCode = props.customer?.customer_code || props.customer?.code
+  if (!customerCode) {
+    error('Customer code is required to validate delivery code')
+    return
+  }
+  
   try {
-    const res = await fetch(`/api/customer-alternate-addresses/${props.customer?.customer_code}`)
+    console.log('Validating delivery code:', shipTo.deliveryCode, 'for customer:', customerCode)
+    const res = await fetch(`/api/customer-alternate-addresses/${customerCode}`)
     const data = await res.json()
-    const found = Array.isArray(data) ? data.find(d => (d.delivery_code || '').toUpperCase() === shipTo.deliveryCode.toUpperCase()) : null
+    
+    if (!Array.isArray(data)) {
+      console.error('Invalid response format from API:', data)
+      error('Failed to validate delivery code - invalid response format')
+      return
+    }
+    
+    console.log('Available delivery codes for customer:', data.map(d => d.delivery_code))
+    
+    const found = data.find(d => 
+      (d.delivery_code || '').toUpperCase() === shipTo.deliveryCode.toUpperCase()
+    )
+    
     if (found) {
-      shipTo.customerName = found.alternate_name || shipTo.customerName
-      shipTo.address = found.address || shipTo.address
-      shipTo.email = found.email || ''
-      shipTo.contact = found.contact_person || ''
+      // Update ship-to information from CustomerAlternateAddress
+      shipTo.customerName = found.ship_to_name || found.alternate_name || shipTo.customerName
+      shipTo.address = found.ship_to_address || found.address || shipTo.address
+      
+      console.log('Delivery code validated successfully:', {
+        code: shipTo.deliveryCode,
+        name: shipTo.customerName,
+        address: shipTo.address
+      })
+      success('Delivery code validated successfully')
     } else {
-      error('Delivery code not found for this customer')
+      const availableCodes = data.map(d => d.delivery_code).join(', ')
+      error(`Delivery code "${shipTo.deliveryCode}" not found for this customer. Available codes: ${availableCodes}`)
+      console.warn('Delivery code not found:', shipTo.deliveryCode, 'Available codes:', availableCodes)
     }
   } catch (e) {
-    error('Failed to validate delivery code')
+    console.error('Error validating delivery code:', e)
+    error('Failed to validate delivery code: ' + (e.message || 'Network error'))
   }
 }
 
@@ -349,21 +378,36 @@ const applySameAddress = () => {
     shipTo.deliveryCode = ''
     shipTo.customerName = mainCustomer.name
     shipTo.address = mainCustomer.address
-    shipTo.email = mainCustomer.email
-    shipTo.contact = mainCustomer.contact
+    
+    console.log('Applied same address - Ship to now matches main customer:', {
+      name: shipTo.customerName,
+      address: shipTo.address
+    })
+  } else {
+    // When unchecking, clear the ship-to fields
+    shipTo.customerName = ''
+    shipTo.address = ''
+    
+    console.log('Cleared ship-to fields - ready for delivery code input')
   }
+}
+
+const selectRow = (index) => {
+  selectedRowIndex.value = index
+  console.log('Row selected:', index)
 }
 
 const selectDeliveryLocation = (location) => {
   shipTo.deliveryCode = location.delivery_code
   shipTo.customerName = location.ship_to
   shipTo.address = location.address
-  success('Delivery location selected')
-}
-
-const moreOptions = () => {
-  // Open more options dialog
-  success('More options clicked')
+  
+  console.log('Delivery location selected:', {
+    code: shipTo.deliveryCode,
+    name: shipTo.customerName,
+    address: shipTo.address
+  })
+  success('Delivery location selected successfully')
 }
 
 const zoomTable = () => {
@@ -373,11 +417,15 @@ const zoomTable = () => {
 
 const selectFromTable = () => {
   // Select from table functionality
-  if (!shipTo.deliveryCode) {
-    error('Please select a delivery location first')
+  if (selectedRowIndex.value === -1) {
+    error('Please select a row from the table first')
     return
   }
-  success('Location selected from table')
+  
+  const selectedLocation = deliveryLocations.value[selectedRowIndex.value]
+  if (selectedLocation) {
+    selectDeliveryLocation(selectedLocation)
+  }
 }
 
 const exitTable = () => {
@@ -390,8 +438,6 @@ const saveLocation = () => {
   if (!shipTo.deliveryCode) {
     shipTo.customerName = mainCustomer.name
     shipTo.address = mainCustomer.address
-    shipTo.email = mainCustomer.email
-    shipTo.contact = mainCustomer.contact
   }
   if (!billTo.customerName || !shipTo.customerName) {
     error('Please fill in required fields')
@@ -407,6 +453,26 @@ const saveLocation = () => {
   emit('save', locationData)
 }
 
+// Watch for delivery code changes to auto-validate
+watch(() => shipTo.deliveryCode, (newCode, oldCode) => {
+  if (newCode && newCode !== oldCode && !shipTo.sameAddress) {
+    // Debounce validation to avoid too many API calls
+    clearTimeout(window.deliveryCodeValidationTimeout)
+    window.deliveryCodeValidationTimeout = setTimeout(() => {
+      validateDeliveryCode()
+    }, 500)
+  }
+})
+
+// Watch for customer prop changes
+watch(() => props.customer, (newCustomer) => {
+  if (newCustomer && (newCustomer.customer_code || newCustomer.code)) {
+    console.log('Customer prop changed, reloading data:', newCustomer)
+    loadMainCustomer()
+    loadDeliveryLocations()
+  }
+}, { deep: true })
+
 // Initialize component
 onMounted(async () => {
   await loadMainCustomer()
@@ -416,6 +482,11 @@ onMounted(async () => {
 
 const loadMainCustomer = async () => {
   try {
+    console.log('loadMainCustomer called with props:', {
+      customer: props.customer,
+      orderDetails: props.orderDetails
+    })
+    
     // First check if we have pre-populated data from orderDetails (from customer alternate delivery location table)
     if (props.orderDetails?.deliveryLocation) {
       const prePopulated = props.orderDetails.deliveryLocation
@@ -423,16 +494,11 @@ const loadMainCustomer = async () => {
       // Use pre-populated data from customer alternate delivery location table
       if (prePopulated.orderBy) {
         orderBy.customerName = prePopulated.orderBy.name || ''
-        orderBy.address = prePopulated.orderBy.address || ''
-        orderBy.email = prePopulated.orderBy.email || ''
-        orderBy.contact = prePopulated.orderBy.contact || ''
       }
       
       if (prePopulated.billTo) {
         billTo.customerName = prePopulated.billTo.name || ''
         billTo.address = prePopulated.billTo.address || ''
-        billTo.email = prePopulated.billTo.email || ''
-        billTo.contact = prePopulated.billTo.contact || ''
       }
       
       if (prePopulated.shipTo) {
@@ -445,88 +511,136 @@ const loadMainCustomer = async () => {
       
       // Set main customer data from orderBy
       mainCustomer.name = orderBy.customerName
-      mainCustomer.address = orderBy.address
-      mainCustomer.email = orderBy.email
-      mainCustomer.contact = orderBy.contact
+      mainCustomer.address = billTo.address
+      mainCustomer.email = ''
+      mainCustomer.contact = ''
       
       console.log('Using pre-populated delivery location data from customer alternate delivery location table')
       return
     }
     
-    // Fallback to API call if no pre-populated data
+    // Fetch customer account data from UpdateCustomerAccount table
     const code = props.customer?.customer_code || props.customer?.code
-    if (!code) return
+    if (!code) {
+      console.warn('No customer code available for loading customer account data')
+      console.log('Customer prop:', props.customer)
+      return
+    }
+    
+    console.log('Fetching customer account data for:', code)
     const res = await fetch(`/api/sales-order/customer/${code}`)
     const data = await res.json()
+    
     if (data?.success && data.data) {
-      const c = data.data
-      mainCustomer.name = c.customer_name || ''
-      mainCustomer.address = c.address || ''
-      mainCustomer.email = c.email || ''
-      mainCustomer.contact = c.contact || ''
+      const customer = data.data
+      
+      // Populate main customer data from UpdateCustomerAccount
+      mainCustomer.name = customer.customer_name || ''
+      mainCustomer.address = customer.address || ''
+      mainCustomer.email = customer.co_email || customer.email || ''
+      mainCustomer.contact = customer.contact_person || customer.contact || ''
 
-      // Populate Order by / Bill to from main customer
+      // Populate Order by / Bill to from main customer account data
       orderBy.customerName = mainCustomer.name
-      orderBy.address = mainCustomer.address
-      orderBy.email = mainCustomer.email
-      orderBy.contact = mainCustomer.contact
 
       billTo.customerName = mainCustomer.name
       billTo.address = mainCustomer.address
-      billTo.email = mainCustomer.email
-      billTo.contact = mainCustomer.contact
 
-      // Default Ship to = main customer (when no code)
+      // Default Ship to = main customer (when no delivery code)
       if (!shipTo.deliveryCode || shipTo.sameAddress) {
         shipTo.customerName = mainCustomer.name
         shipTo.address = mainCustomer.address
         shipTo.email = mainCustomer.email
         shipTo.contact = mainCustomer.contact
       }
+      
+      console.log('Customer account data loaded successfully:', {
+        name: mainCustomer.name,
+        address: mainCustomer.address,
+        email: mainCustomer.email,
+        contact: mainCustomer.contact
+      })
+    } else {
+      console.warn('Failed to load customer account data:', data?.message || 'Unknown error')
+      // Fallback to props data
+      mainCustomer.name = props.customer?.customer_name || props.customer?.name || ''
+      mainCustomer.address = props.customer?.address || ''
+      mainCustomer.email = props.customer?.email || ''
+      mainCustomer.contact = props.customer?.contact || ''
+      
+      orderBy.customerName = mainCustomer.name
+      
+      billTo.customerName = mainCustomer.name
+      billTo.address = mainCustomer.address
+      
+      shipTo.customerName = mainCustomer.name
+      shipTo.address = mainCustomer.address
+      shipTo.email = mainCustomer.email
+      shipTo.contact = mainCustomer.contact
     }
   } catch (e) {
-    // fallback from props
+    console.error('Error loading customer account data:', e)
+    // Fallback to props data
     mainCustomer.name = props.customer?.customer_name || props.customer?.name || ''
     mainCustomer.address = props.customer?.address || ''
+    mainCustomer.email = props.customer?.email || ''
+    mainCustomer.contact = props.customer?.contact || ''
+    
     orderBy.customerName = mainCustomer.name
-    orderBy.address = mainCustomer.address
+    
     billTo.customerName = mainCustomer.name
     billTo.address = mainCustomer.address
+    
     shipTo.customerName = mainCustomer.name
     shipTo.address = mainCustomer.address
+    shipTo.email = mainCustomer.email
+    shipTo.contact = mainCustomer.contact
   }
 }
 
 const loadDeliveryLocations = async () => {
-  if (!props.customer?.customer_code) return
+  const customerCode = props.customer?.customer_code || props.customer?.code
+  if (!customerCode) {
+    console.warn('No customer code available for loading delivery locations')
+    console.log('Customer prop in loadDeliveryLocations:', props.customer)
+    return
+  }
   
   try {
-    const response = await fetch(`/api/customer-alternate-addresses/${props.customer.customer_code}`)
+    console.log('Fetching customer alternate addresses for:', customerCode)
+    const response = await fetch(`/api/customer-alternate-addresses/${customerCode}`)
     const data = await response.json()
     
     if (data && Array.isArray(data)) {
       deliveryLocations.value = data.map(location => ({
-        delivery_code: location.delivery_code || 'P103',
-        ship_to: location.alternate_name || props.customer.customer_name,
+        delivery_code: location.delivery_code || '',
+        ship_to: location.ship_to_name || location.alternate_name || mainCustomer.name,
         country: location.country || 'INDONESIA',
-        town: location.town || 'TANGERANG',
-        state: location.state || 'BANTEN',
-        section: location.section || 'TANGERANG',
-        address: location.address || '',
+        town: location.town || '',
+        state: location.state || '',
+        section: location.town_section || location.section || '',
+        address: location.ship_to_address || location.address || '',
         contact: location.contact_person || '',
-        tel_no: location.telephone_no || '',
+        tel_no: location.tel_no || location.telephone_no || '',
         fax_no: location.fax_no || '',
         email: location.email || ''
       }))
+      
       // Ensure uniqueness by code+address like CPS tables
       const uniq = new Map()
       deliveryLocations.value.forEach(l => {
         uniq.set(`${l.delivery_code}|${l.address}`, l)
       })
       deliveryLocations.value = Array.from(uniq.values())
+      
+      console.log('Loaded delivery locations:', deliveryLocations.value.length, 'locations')
+    } else {
+      console.log('No alternate addresses found for customer:', customerCode)
+      deliveryLocations.value = []
     }
   } catch (err) {
     console.error('Error loading delivery locations:', err)
+    deliveryLocations.value = []
   }
 }
 </script>
