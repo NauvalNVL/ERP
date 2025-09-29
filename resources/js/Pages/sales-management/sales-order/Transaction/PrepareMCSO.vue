@@ -1765,10 +1765,24 @@ const saveDeliveryLocation = async (locationData) => {
   showDeliveryLocationModal.value = false
   success('Delivery location saved successfully')
 
-  // After setting delivery location, proceed to Delivery Schedule
-  setTimeout(() => {
-    showDeliveryScheduleModal.value = true
-  }, 300)
+  // Create Sales Order first, then proceed to Delivery Schedule
+  try {
+    const soResponse = await createSalesOrder()
+    if (soResponse.success) {
+      orderDetails.so_number = soResponse.so_number
+      success(`Sales Order ${soResponse.so_number} created successfully!`)
+      
+      // After creating SO, proceed to Delivery Schedule
+      setTimeout(() => {
+        showDeliveryScheduleModal.value = true
+      }, 300)
+    } else {
+      error('Failed to create Sales Order: ' + soResponse.message)
+    }
+  } catch (err) {
+    console.error('Error creating Sales Order:', err)
+    error('Error creating Sales Order: ' + (err.message || 'Network error'))
+  }
   } catch (err) {
     console.error('Error saving delivery location:', err)
     error('Error saving delivery location: ' + (err.message || 'Network error'))
@@ -1783,13 +1797,33 @@ const saveDeliverySchedule = async (scheduleData) => {
       return
     }
     
+    // First, we need to create the Sales Order if it doesn't exist
+    let soNumber = orderDetails.value.so_number
+    
+    if (!soNumber) {
+      // Create the Sales Order first
+      const soResponse = await createSalesOrder()
+      if (!soResponse.success) {
+        error('Failed to create Sales Order: ' + soResponse.message)
+        return
+      }
+      soNumber = soResponse.so_number
+      orderDetails.value.so_number = soNumber
+    }
+    
+    // Now save the delivery schedule
     const requestData = {
-      customer_code: selectedCustomer.code,
-      master_card_seq: selectedMasterCard.seq,
-      entries: scheduleData.entries,
-      entry_total: scheduleData.entryTotal || 0,
-      order_total: scheduleData.orderTotal || 0,
-      ...scheduleData
+      so_number: soNumber,
+      entries: scheduleData.entries.map(entry => ({
+        line_number: entry.line_number || 1,
+        schedule_date: entry.date,
+        schedule_time: entry.time,
+        delivery_quantity: parseFloat(entry.main) || 0,
+        due_status: entry.due,
+        remark: entry.remark,
+        delivery_code: entry.delivery_code,
+        delivery_location: entry.delivery_location
+      }))
     }
     
     const response = await fetch('/api/sales-order/delivery-schedule', {
@@ -1811,9 +1845,9 @@ const saveDeliverySchedule = async (scheduleData) => {
     const data = await response.json()
     
     if (data.success) {
-  console.log('Delivery schedule saved:', scheduleData)
-  showDeliveryScheduleModal.value = false
-  success('Delivery schedule saved successfully')
+      console.log('Delivery schedule saved:', scheduleData)
+      showDeliveryScheduleModal.value = false
+      success('Delivery schedule saved successfully')
       
       // Optionally, you can proceed with final sales order creation here
     } else {
@@ -1867,7 +1901,18 @@ const createSalesOrder = async () => {
       remark: orderDetails.remark,
       instruction1: orderDetails.instruction1,
       instruction2: orderDetails.instruction2,
-      set_quantity: orderDetails.setQuantity
+      set_quantity: orderDetails.setQuantity,
+      details: [
+        {
+          line_number: 1,
+          item_code: orderDetails.product.code,
+          item_description: orderDetails.product.description,
+          order_quantity: parseFloat(orderDetails.setQuantity) || 0,
+          unit_price: parseFloat(orderDetails.unitPrice) || 0,
+          uom: orderDetails.uom,
+          remark: orderDetails.remark
+        }
+      ]
     }
     
     const response = await fetch('/api/sales-order', {
@@ -1889,23 +1934,31 @@ const createSalesOrder = async () => {
     const data = await response.json()
     
     if (data.success) {
-      success(`Sales Order ${data.data.so_number} created successfully!`)
-      
-      // Reset form after successful creation
-      setTimeout(() => {
-        refreshPage()
-      }, 2000)
+      return {
+        success: true,
+        so_number: data.data.so_number,
+        data: data.data
+      }
     } else {
       if (data.errors) {
         const errorMessages = Object.values(data.errors).flat().join(', ')
-        error('Validation errors: ' + errorMessages)
+        return {
+          success: false,
+          message: 'Validation errors: ' + errorMessages
+        }
       } else {
-        throw new Error(data.message || 'Failed to create sales order')
+        return {
+          success: false,
+          message: data.message || 'Failed to create sales order'
+        }
       }
     }
   } catch (err) {
     console.error('Error creating sales order:', err)
-    error('Error creating sales order: ' + (err.message || 'Network error'))
+    return {
+      success: false,
+      message: 'Error creating sales order: ' + (err.message || 'Network error')
+    }
   }
 }
 

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\UpdateCustomerAccount;
 use App\Models\MasterCard;
 use App\Models\SalesOrder;
+use App\Models\SalesOrderDetail;
+use App\Models\DeliverySchedule;
 use App\Models\Salesperson;
 use Inertia\Inertia;
 
@@ -46,6 +48,14 @@ class SalesOrderController extends Controller
             'instruction1' => 'nullable|string',
             'instruction2' => 'nullable|string',
             'set_quantity' => 'nullable|string',
+            'details' => 'required|array',
+            'details.*.line_number' => 'required|integer',
+            'details.*.item_code' => 'required|string',
+            'details.*.item_description' => 'nullable|string',
+            'details.*.order_quantity' => 'required|numeric|min:0',
+            'details.*.unit_price' => 'required|numeric|min:0',
+            'details.*.uom' => 'nullable|string',
+            'details.*.remark' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -113,6 +123,23 @@ class SalesOrderController extends Controller
 
             // Create the sales order
             $salesOrder = SalesOrder::create($salesOrderData);
+
+            // Create sales order details
+            if ($request->has('details') && is_array($request->details)) {
+                foreach ($request->details as $detail) {
+                    SalesOrderDetail::create([
+                        'so_number' => $soNumber,
+                        'line_number' => $detail['line_number'],
+                        'item_code' => $detail['item_code'],
+                        'item_description' => $detail['item_description'] ?? null,
+                        'order_quantity' => $detail['order_quantity'],
+                        'unit_price' => $detail['unit_price'],
+                        'line_total' => $detail['order_quantity'] * $detail['unit_price'],
+                        'uom' => $detail['uom'] ?? 'PCS',
+                        'remark' => $detail['remark'] ?? null,
+                    ]);
+                }
+            }
 
             Log::info('Sales order created successfully with ID: ' . $salesOrder->id);
 
@@ -355,9 +382,16 @@ class SalesOrderController extends Controller
     public function saveDeliverySchedule(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'so_number' => 'required|string',
             'entries' => 'required|array',
-            'entry_total' => 'required|numeric',
-            'order_total' => 'required|numeric',
+            'entries.*.line_number' => 'required|integer',
+            'entries.*.schedule_date' => 'required|date',
+            'entries.*.schedule_time' => 'nullable|date_format:H:i',
+            'entries.*.delivery_quantity' => 'required|numeric|min:0',
+            'entries.*.due_status' => 'required|string|in:ETD,ETA,TBA',
+            'entries.*.remark' => 'nullable|string',
+            'entries.*.delivery_code' => 'nullable|string',
+            'entries.*.delivery_location' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -368,21 +402,211 @@ class SalesOrderController extends Controller
         }
 
         try {
-            // Save delivery schedule data to database
-            // For now, we'll just log the data
-            Log::info('Delivery Schedule Saved:', $request->all());
+            DB::beginTransaction();
+
+            $soNumber = $request->so_number;
+            $entries = $request->entries;
+
+            // Get the sales order to validate it exists
+            $salesOrder = SalesOrder::where('so_number', $soNumber)->first();
+            if (!$salesOrder) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sales Order not found'
+                ], 404);
+            }
+
+            // Validate that all line numbers exist in sales order details
+            $existingLineNumbers = SalesOrderDetail::where('so_number', $soNumber)
+                ->pluck('line_number')
+                ->toArray();
+
+            foreach ($entries as $entry) {
+                if (!in_array($entry['line_number'], $existingLineNumbers)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Line number {$entry['line_number']} not found in Sales Order"
+                    ], 422);
+                }
+            }
+
+            // Validate quantities don't exceed order quantities
+            foreach ($entries as $entry) {
+                $lineDetail = SalesOrderDetail::where('so_number', $soNumber)
+                    ->where('line_number', $entry['line_number'])
+                    ->first();
+
+                $existingScheduledQty = DeliverySchedule::where('so_number', $soNumber)
+                    ->where('line_number', $entry['line_number'])
+                    ->sum('delivery_quantity');
+
+                $newScheduledQty = $existingScheduledQty + $entry['delivery_quantity'];
+
+                if ($newScheduledQty > $lineDetail->order_quantity) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Scheduled quantity for line {$entry['line_number']} exceeds order quantity"
+                    ], 422);
+                }
+            }
+
+            // Save delivery schedule entries
+            $savedEntries = [];
+            foreach ($entries as $entry) {
+                $schedule = DeliverySchedule::create([
+                    'so_number' => $soNumber,
+                    'line_number' => $entry['line_number'],
+                    'schedule_sequence' => $this->getNextScheduleSequence($soNumber, $entry['line_number']),
+                    'schedule_date' => $entry['schedule_date'],
+                    'schedule_time' => $entry['schedule_time'] ?? null,
+                    'delivery_quantity' => $entry['delivery_quantity'],
+                    'due_status' => $entry['due_status'],
+                    'remark' => $entry['remark'] ?? null,
+                    'delivery_code' => $entry['delivery_code'] ?? null,
+                    'delivery_location' => $entry['delivery_location'] ?? null,
+                ]);
+
+                $savedEntries[] = $schedule;
+            }
+
+            DB::commit();
+
+            Log::info('Delivery Schedule Saved:', [
+                'so_number' => $soNumber,
+                'entries_count' => count($savedEntries),
+                'saved_at' => now()
+            ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Delivery schedule saved successfully'
+                'message' => 'Delivery schedule saved successfully',
+                'data' => [
+                    'so_number' => $soNumber,
+                    'entries_count' => count($savedEntries),
+                    'saved_at' => now()
+                ]
             ]);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Error saving delivery schedule: ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error saving delivery schedule'
+                'message' => 'Error saving delivery schedule: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get the next schedule sequence for a line item
+     */
+    private function getNextScheduleSequence($soNumber, $lineNumber)
+    {
+        $maxSequence = DeliverySchedule::where('so_number', $soNumber)
+            ->where('line_number', $lineNumber)
+            ->max('schedule_sequence');
+
+        return ($maxSequence ?? 0) + 1;
+    }
+
+    /**
+     * Get delivery schedules for a sales order
+     */
+    public function getDeliverySchedules(Request $request, $soNumber)
+    {
+        try {
+            $salesOrder = SalesOrder::with(['details', 'deliverySchedules'])
+                ->where('so_number', $soNumber)
+                ->first();
+
+            if (!$salesOrder) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sales Order not found'
+                ], 404);
+            }
+
+            $deliverySchedules = DeliverySchedule::where('so_number', $soNumber)
+                ->with('salesOrderDetail')
+                ->orderBy('line_number')
+                ->orderBy('schedule_sequence')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'sales_order' => $salesOrder,
+                    'delivery_schedules' => $deliverySchedules,
+                    'summary' => [
+                        'total_order_quantity' => $salesOrder->total_order_quantity,
+                        'total_scheduled_quantity' => $salesOrder->total_scheduled_quantity,
+                        'remaining_quantity' => $salesOrder->remaining_quantity,
+                        'is_fully_scheduled' => $salesOrder->isFullyScheduled(),
+                    ]
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error getting delivery schedules: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error getting delivery schedules'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get delivery schedule summary for validation
+     */
+    public function getDeliveryScheduleSummary(Request $request, $soNumber)
+    {
+        try {
+            $salesOrder = SalesOrder::where('so_number', $soNumber)->first();
+            
+            if (!$salesOrder) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sales Order not found'
+                ], 404);
+            }
+
+            $details = SalesOrderDetail::where('so_number', $soNumber)->get();
+            $summary = [];
+
+            foreach ($details as $detail) {
+                $scheduledQty = DeliverySchedule::where('so_number', $soNumber)
+                    ->where('line_number', $detail->line_number)
+                    ->sum('delivery_quantity');
+
+                $summary[] = [
+                    'line_number' => $detail->line_number,
+                    'item_code' => $detail->item_code,
+                    'order_quantity' => $detail->order_quantity,
+                    'scheduled_quantity' => $scheduledQty,
+                    'remaining_quantity' => $detail->order_quantity - $scheduledQty,
+                    'is_fully_scheduled' => $scheduledQty >= $detail->order_quantity,
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'so_number' => $soNumber,
+                    'summary' => $summary,
+                    'total_order_quantity' => $salesOrder->total_order_quantity,
+                    'total_scheduled_quantity' => $salesOrder->total_scheduled_quantity,
+                    'remaining_quantity' => $salesOrder->remaining_quantity,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error getting delivery schedule summary: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error getting delivery schedule summary'
             ], 500);
         }
     }
