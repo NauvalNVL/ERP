@@ -203,7 +203,7 @@ const { success, error } = useToast()
 // Data
 const balanceDate = ref('08/2025')
 const lastSONumber = ref('3.0620')
-const totalQuantity = ref(10)
+const totalQuantity = ref(null)
 const totalUnitPrice = ref(3036.3600)
 const showCustomerServiceModal = ref(false)
 
@@ -212,7 +212,7 @@ const items = reactive([
     name: 'Main',
     design: 'B1',
     pcs: 1,
-    quantity: 50,
+    quantity: null,
     unitPrice: 3036.3600,
     unit: 'Pcs',
     amount: 0,
@@ -441,9 +441,16 @@ const setQuantity = () => {
 
 // Allow parent to push quantity while modal is open
 const applyExternalQuantity = (qty) => {
-  const numericQty = Number(qty) || 0
-  totalQuantity.value = numericQty
-  setQuantity()
+  if (qty && Number(qty) > 0) {
+    const numericQty = Number(qty)
+    totalQuantity.value = numericQty
+    setQuantity()
+  } else {
+    // If no quantity or zero, clear the values
+    totalQuantity.value = null
+    items[0].quantity = null
+    calculateAmount(items[0])
+  }
 }
 
 defineExpose({ applyExternalQuantity })
@@ -493,14 +500,25 @@ onMounted(() => {
   if (props.initialQuantity && Number(props.initialQuantity) > 0) {
     totalQuantity.value = Number(props.initialQuantity)
     setQuantity()
+  } else {
+    // If no initial quantity provided, set main item quantity to null
+    items[0].quantity = null
+    totalQuantity.value = null
   }
 })
 
 // Keep quantity in sync with parent changes
 watch(() => props.initialQuantity, (newVal) => {
-  const numericQty = Number(newVal) || 0
-  totalQuantity.value = numericQty
-  setQuantity()
+  if (newVal && Number(newVal) > 0) {
+    const numericQty = Number(newVal)
+    totalQuantity.value = numericQty
+    setQuantity()
+  } else {
+    // If no quantity or zero, clear the values
+    totalQuantity.value = null
+    items[0].quantity = null
+    calculateAmount(items[0])
+  }
 })
 </script>
 

@@ -26,7 +26,6 @@ return new class extends Migration
 
             // Foreign key constraints
             $table->foreign('so_number')->references('so_number')->on('sales_orders')->onDelete('cascade');
-            $table->foreign(['so_number', 'line_number'])->references(['so_number', 'line_number'])->on('sales_order_details')->onDelete('cascade');
             
             // Indexes
             $table->index(['so_number', 'line_number']);
