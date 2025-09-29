@@ -39,20 +39,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Entry Date:</label>
-                <div class="flex items-center space-x-2">
-                  <input 
-                    v-model="entryDate" 
-                    type="date"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                  >
-                  <button 
-                    @click="openCalendar"
-                    class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                    title="Calendar"
-                  >
-                    <i class="fas fa-calendar-alt text-sm"></i>
-                  </button>
-                </div>
+                <input 
+                  v-model="entryDate" 
+                  type="date"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                >
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Entry LM:</label>
@@ -307,12 +298,6 @@ const getFreeLMClass = (freeLM) => {
   return 'text-green-600'
 }
 
-const openCalendar = () => {
-  const dateInput = document.querySelector('input[type="date"]')
-  if (dateInput) {
-    dateInput.showPicker()
-  }
-}
 
 const refreshData = async () => {
   try {
