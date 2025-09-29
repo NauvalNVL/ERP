@@ -121,12 +121,6 @@
             </div>
             <!-- Modal Footer -->
             <div class="flex items-center justify-end gap-2 p-3 border-t border-gray-200 bg-gray-100 rounded-b-lg flex-shrink-0">
-                <button 
-                    type="button"
-                    @click="$emit('saveMasterCard', buildPdSetupPayload())"
-                    class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
-                    Save MasterCard
-                </button>
             </div>
         </div>
     </div>
@@ -469,9 +463,6 @@
                     <button type="button" class="text-white hover:text-green-300 focus:outline-none">
                         <i class="fas fa-file text-lg"></i>
                     </button>
-                    <button type="button" class="text-white hover:text-yellow-300 focus:outline-none" @click="applyPdToSelectedComponent" title="Apply PD to selected component">
-                        <i class="fas fa-save text-lg"></i>
-                    </button>
                     <button type="button" @click="$emit('closeSetupPdModal')" class="text-white hover:text-gray-200 focus:outline-none">
                         <i class="fas fa-times text-lg"></i>
                     </button>
@@ -571,23 +562,23 @@
                                 <div class="flex items-center justify-between w-full">
                                     <div class="flex items-center space-x-1">
                                         <label class="text-xs font-bold w-16">SO:</label>
-                                        <input type="text" :value="soValues[0]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="displaySoValues[0]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openPaperQualityModal', 0)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="soValues[1]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="displaySoValues[1]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openPaperQualityModal', 1)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="soValues[2]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="displaySoValues[2]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openPaperQualityModal', 2)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="soValues[3]" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="displaySoValues[3]" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openPaperQualityModal', 3)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="soValues[4]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="displaySoValues[4]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openPaperQualityModal', 4)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
@@ -612,23 +603,23 @@
                                 <div class="flex items-center justify-between w-full">
                                     <div class="flex items-center space-x-1">
                                         <label class="text-xs font-bold w-16">WO:</label>
-                                        <input type="text" :value="woValues[0]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="displayWoValues[0]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openWoPaperQualityModal', 0)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="woValues[1]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="displayWoValues[1]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openWoPaperQualityModal', 1)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="woValues[2]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="displayWoValues[2]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openWoPaperQualityModal', 2)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="woValues[3]" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="displayWoValues[3]" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openWoPaperQualityModal', 3)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="woValues[4]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="displayWoValues[4]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openWoPaperQualityModal', 4)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
@@ -976,12 +967,6 @@
             <div class="flex items-center justify-end gap-2 p-3 border-t border-gray-200 bg-gray-100 rounded-b-lg flex-shrink-0">
                 <button 
                     type="button"
-                    @click="applyPdToSelectedComponent"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">
-                    Apply to {{ localComponents[selectedComponentIndex]?.c_num || 'Component' }}
-                </button>
-                <button 
-                    type="button"
                     @click="$emit('saveMasterCard', buildPdSetupPayload())"
                     class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
                     Save MasterCard
@@ -1095,6 +1080,21 @@
 </template>
 
 <script setup>
+// Convert stored objects (like paper quality object) into display strings
+const normalizeDisplay = (vals) => {
+    const toStringVal = (v) => {
+        if (v && typeof v === 'object') {
+            return v.paper_quality || v.paper_name || v.name || v.code || '';
+        }
+        return v ?? '';
+    };
+    const arr = Array.isArray(vals) ? vals : [];
+    return [0,1,2,3,4].map(i => toStringVal(arr[i]));
+};
+
+// These reflect what parent passes, but coerced to string for UI display-only
+const displaySoValues = computed(() => normalizeDisplay(props.soValues));
+const displayWoValues = computed(() => normalizeDisplay(props.woValues));
 import { defineEmits, defineProps, ref, computed, watch, onMounted } from 'vue';
 import ProductDesignModal from '@/Components/product-design-modal.vue';
 import PaperFluteModal from '@/Components/paper-flute-selector-modal.vue';
@@ -1445,7 +1445,9 @@ const emit = defineEmits([
     'paperFluteSelected',
     'openPaperQualityModal',
     'openWoPaperQualityModal',
-    'saveMasterCard'
+    'saveMasterCard',
+    'requestClearSoWo',
+    'requestSetSoWo'
 ]);
 
 // Clear all PD form fields
@@ -1562,10 +1564,22 @@ watch(() => props.showSetupPdModal, (newVal) => {
         // If opening Setup PD modal and no MC is loaded (new MC), clear all fields
         clearPdFields();
     }
+    // Option B: SO/WO are global at root pd_setup; do not change parent's SO/WO on modal open
 });
 // Local editable 10-row components list and selection state
-const selectedComponentIndex = ref(null);
+const selectedComponentIndex = ref(0);
 const localComponents = ref([]);
+
+// Per-component PD state (now includes per-component SO/WO and Print Colors)
+const makeEmptyPdState = () => ({
+    partNo: '',
+    selectedProductDesign: '',
+    pcsPerSet: '',
+    soValues: ['', '', '', '', ''],
+    woValues: ['', '', '', '', ''],
+    printColorCodes: ['', '', '', '', '', '', ''],
+});
+const componentForms = ref(Array.from({ length: 10 }, () => makeEmptyPdState()));
 
 // Prefer loaded components when available, else fallback to props.mcComponents
 // Always render exactly 10 rows with C# labels: Main, Fit1..Fit9
@@ -1618,15 +1632,126 @@ watch(mcComponentsToRender, (rows) => {
     localComponents.value = next;
 }, { immediate: true });
 
+// Initialize componentForms basic fields from loaded components (pd/pcs_set/part_num)
+watch(() => props.mcLoaded, (loaded) => {
+    try { console.debug('[UpdateMcModal] mcLoaded changed, pd_setup snapshot:', JSON.parse(JSON.stringify(loaded?.pd_setup || null))); } catch (e) {}
+    // Utilities (SO/WO extraction kept only for legacy root fallback)
+    const desiredLabels = ['Main', 'Fit1', 'Fit2', 'Fit3', 'Fit4', 'Fit5', 'Fit6', 'Fit7', 'Fit8', 'Fit9'];
+    const fromNumberedKeys = (obj, baseKey) => {
+        if (!obj || typeof obj !== 'object') return [];
+        const entries = [];
+        for (let i = 1; i <= 5; i++) {
+            const variants = [
+                `${baseKey}${i}`,
+                `${baseKey}_${i}`,
+                `${baseKey}${i}`.toUpperCase(),
+                `${baseKey}_${i}`.toUpperCase(),
+            ];
+            let found = '';
+            for (const k of Object.keys(obj)) {
+                if (variants.includes(k)) {
+                    found = obj[k] ?? '';
+                    break;
+                }
+            }
+            entries.push(found);
+        }
+        return entries;
+    };
+    const normalize5 = (arr) => {
+        const base = Array.isArray(arr) ? arr.slice(0, 5) : [];
+        return base.concat(['', '', '', '', '']).slice(0, 5);
+    };
+    // Option B: drop per-component extraction
+
+// Hydrate per-component PD basics and per-component SO/WO/Print Colors
+    if (loaded?.pd_setup) {
+        const pd = loaded.pd_setup;
+        for (let idx = 0; idx < componentForms.value.length; idx++) {
+            const cf = componentForms.value[idx] || makeEmptyPdState();
+            // Basic fields from components when available
+            const compSrc = Array.isArray(pd.components)
+                ? (pd.components[idx] || null)
+                : (pd.components && typeof pd.components === 'object' ? pd.components[desiredLabels[idx]] : null);
+            if (compSrc) {
+                cf.selectedProductDesign = compSrc.pd || compSrc.p_design || cf.selectedProductDesign;
+                cf.pcsPerSet = compSrc.pcs_set || compSrc.pcs || cf.pcsPerSet;
+                cf.partNo = compSrc.part_num || compSrc.part || cf.partNo;
+            }
+            // Hydrate per-component SO/WO and print colors when present
+            const soArr = compSrc ? (Array.isArray(compSrc.soValues) ? compSrc.soValues : (Array.isArray(compSrc.so) ? compSrc.so : fromNumberedKeys(compSrc, 'so'))) : [];
+            const woArr = compSrc ? (Array.isArray(compSrc.woValues) ? compSrc.woValues : (Array.isArray(compSrc.wo) ? compSrc.wo : fromNumberedKeys(compSrc, 'wo'))) : [];
+            const pcArr = compSrc ? (Array.isArray(compSrc.printColorCodes) ? compSrc.printColorCodes : []) : [];
+            cf.soValues = Array.isArray(cf.soValues) && cf.soValues.some(v => v) ? cf.soValues : normalize5(soArr);
+            cf.woValues = Array.isArray(cf.woValues) && cf.woValues.some(v => v) ? cf.woValues : normalize5(woArr);
+            cf.printColorCodes = Array.isArray(cf.printColorCodes) && cf.printColorCodes.some(v => v) ? cf.printColorCodes : (Array.isArray(pcArr) ? pcArr.slice(0,7).concat(['','','','','','']).slice(0,7) : ['', '', '', '', '', '', '']);
+            componentForms.value[idx] = { ...makeEmptyPdState(), ...cf };
+        }
+    }
+    // Reflect selected component SO/WO into parent UI so paper quality buttons/editors work per C#
+    try {
+        const cf = componentForms.value[selectedComponentIndex.value] || makeEmptyPdState();
+            emit('requestSetSoWo', {
+                so: Array.isArray(cf.soValues) ? cf.soValues : ['', '', '', '', ''],
+                wo: Array.isArray(cf.woValues) ? cf.woValues : ['', '', '', '', ''],
+            });
+    } catch (e) {}
+}, { immediate: true });
+
 const onSelectComponent = (component, index) => {
     selectedComponentIndex.value = index;
+    // When selecting a component, reflect its SO/WO into parent UI state
+    try {
+        const idx = selectedComponentIndex.value;
+        const cf = componentForms.value[idx] || makeEmptyPdState();
+        if ((!cf.soValues?.some(v => v)) && (!cf.woValues?.some(v => v))) {
+            emit('requestClearSoWo');
+        } else {
+            emit('requestSetSoWo', {
+                so: Array.isArray(cf.soValues) ? cf.soValues : ['', '', '', '', ''],
+                wo: Array.isArray(cf.woValues) ? cf.woValues : ['', '', '', '', ''],
+            });
+        }
+    } catch (e) {}
 };
 
 const openSetupPd = () => {
     // Ensure a component is selected; default to index 0 (Main)
     if (selectedComponentIndex.value === null) selectedComponentIndex.value = 0;
+    // If the selected component row is empty (no PD, PCS/SET, PART#), clear the PD form
+    try {
+        const idx = selectedComponentIndex.value;
+        const row = Array.isArray(localComponents.value) ? localComponents.value[idx] : null;
+        const isRowEmpty = row && !row.pd && !row.pcs_set && !row.part_num;
+        if (isRowEmpty) {
+            clearPdFields();
+            // Also request parent to clear SO/WO paper quality values
+            emit('requestClearSoWo');
+        } else if (row) {
+            // If row has saved values, hydrate PD key fields from the selected component
+            // Preserve already-loaded global PD (from mcLoaded), but override component-specific fields
+            const cf = componentForms.value[selectedComponentIndex.value] || makeEmptyPdState();
+            partNo.value = cf.partNo || row.part_num || partNo.value || '';
+            selectedProductDesign.value = cf.selectedProductDesign || row.pd || selectedProductDesign.value || '';
+            pcsPerSet.value = cf.pcsPerSet || row.pcs_set || pcsPerSet.value || '';
+            // Option B: no per-component SO/WO hydration/emits
+        }
+    } catch (e) {}
     emit('setupPD');
 };
+
+// Persist PD fields into the current component form so they don't affect others
+watch([partNo, selectedProductDesign, pcsPerSet], () => {
+    if (selectedComponentIndex.value === null) return;
+    const idx = selectedComponentIndex.value;
+    const next = { ...(componentForms.value[idx] || makeEmptyPdState()) };
+    next.partNo = partNo.value;
+    next.selectedProductDesign = selectedProductDesign.value;
+    next.pcsPerSet = pcsPerSet.value;
+    componentForms.value[idx] = next;
+});
+
+// Option B: stop syncing parent SO/WO into per-component forms
 
 // Apply current PD form fields to the selected component row
 const applyPdToSelectedComponent = () => {
@@ -1647,6 +1772,8 @@ const applyPdToSelectedComponent = () => {
 
 // Build payload for PD setup values to be saved with MasterCard
 const buildPdSetupPayload = () => {
+    // Ensure current PD inputs are applied to the currently selected component row
+    try { applyPdToSelectedComponent(); } catch (e) {}
     return {
         partNo: partNo.value,
         selectedProductDesign: selectedProductDesign.value,
@@ -1655,6 +1782,7 @@ const buildPdSetupPayload = () => {
         selectedReinforcementTape: selectedReinforcementTape.value,
         selectedPaperSize: selectedPaperSize.value,
         selectedScoringToolCode: selectedScoringToolCode.value,
+        // Root printColorCodes kept as a summary of selected component for compatibility
         printColorCodes: printColorCodes.value,
         scoreL: scoreL.value,
         scoreW: scoreW.value,
@@ -1688,13 +1816,15 @@ const buildPdSetupPayload = () => {
         selectedWrappingCode: selectedWrappingCode.value,
         moreDescriptions: moreDescriptions.value,
         subMaterials: subMaterials.value,
-        soValues: Array.isArray(props.soValues) ? props.soValues : [],
-        woValues: Array.isArray(props.woValues) ? props.woValues : [],
-        components: (localComponents?.value || []).map(c => ({
+        // No global SO/WO; store them per component instead
+        components: (localComponents?.value || []).map((c, idx) => ({
             c_num: c.c_num,
-            pd: c.pd,
-            pcs_set: c.pcs_set,
-            part_num: c.part_num,
+            pd: (componentForms.value[idx]?.selectedProductDesign) || c.pd,
+            pcs_set: (componentForms.value[idx]?.pcsPerSet) || c.pcs_set,
+            part_num: (componentForms.value[idx]?.partNo) || c.part_num,
+            soValues: (componentForms.value[idx]?.soValues) || ['', '', '', '', ''],
+            woValues: (componentForms.value[idx]?.woValues) || ['', '', '', '', ''],
+            printColorCodes: (componentForms.value[idx]?.printColorCodes) || ['', '', '', '', '', '', ''],
         })),
     };
 };

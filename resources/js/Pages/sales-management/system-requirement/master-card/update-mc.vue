@@ -835,6 +835,8 @@
             @paperFluteSelected="onPaperFluteSelected"
             @openPaperQualityModal="openPaperQualityModal"
             @openWoPaperQualityModal="openWoPaperQualityModal"
+            @requestClearSoWo="clearSoWo"
+            @requestSetSoWo="({ so, wo }) => { soValues.value = Array.isArray(so) ? so : ['', '', '', '', '']; woValues.value = Array.isArray(wo) ? wo : ['', '', '', '', '']; }"
             @saveMasterCard="saveMasterCardFromModal"
         />
 
@@ -1172,6 +1174,11 @@
 import { ref, computed, onMounted, nextTick } from 'vue';
 
 const selectedMcsFull = ref(null);
+// Reset SO/WO paper quality arrays to empty values
+const clearSoWo = () => {
+    soValues.value = ['', '', '', '', ''];
+    woValues.value = ['', '', '', '', ''];
+};
 const saveMasterCardFromModal = async (pdSetup = null) => {
     try {
         const payload = {
@@ -1193,10 +1200,9 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
             detailed_master_card: {
                 mc_details: mcDetails.value,
             },
+            // pd_setup provided by child modal now contains root-level soValues/woValues like printColorCodes
             pd_setup: pdSetup ? { 
-                ...pdSetup,
-                soValues: Array.isArray(soValues.value) ? soValues.value : [],
-                woValues: Array.isArray(woValues.value) ? woValues.value : [],
+                ...pdSetup
             } : null,
         };
 
@@ -1213,8 +1219,23 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         }
 
         toast.success('Master Card saved');
-        showSetupMcModal.value = false;
-        showSetupPdModal.value = false;
+        // Refresh full MC so subsequent openings have the latest pd_setup
+        try {
+            if (form.value.mcs && form.value.ac) {
+                const mcsSeqEnc = encodeURIComponent(form.value.mcs);
+                const custEnc = encodeURIComponent(form.value.ac);
+                const refRes = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`, {
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                if (refRes.ok) {
+                    selectedMcsFull.value = await refRes.json();
+                }
+            }
+        } catch (e) {
+            console.error('Failed to refresh full MC after save:', e);
+        }
+        // Keep Setup PD modal open after save as requested
     } catch (e) {
         toast.error(e.message || 'Failed to save Master Card');
     }
@@ -1556,6 +1577,56 @@ const mcComponents = ref([
     { c_num: "Fit8", pd: "", pcs_set: "", part_num: "", selected: false },
     { c_num: "Fit9", pd: "", pcs_set: "", part_num: "", selected: false },
 ]);
+
+// Helpers to hydrate SO/WO from stored pd_setup (Option B: root-level only)
+const normalize5 = (arr) => {
+    const base = Array.isArray(arr) ? arr.slice(0, 5) : [];
+    return base.concat(["", "", "", "", ""]).slice(0, 5);
+};
+const extractPerComponentSoWo = (pd, idx) => {
+    if (!pd) return { so: [], wo: [] };
+    const desiredLabels = ['Main','Fit1','Fit2','Fit3','Fit4','Fit5','Fit6','Fit7','Fit8','Fit9'];
+    const label = desiredLabels[idx] || 'Main';
+    const fromNumberedKeys = (obj, baseKey) => {
+        if (!obj || typeof obj !== 'object') return [];
+        const entries = [];
+        for (let i = 1; i <= 5; i++) {
+            const variants = [`${baseKey}${i}`, `${baseKey}_${i}`, `${baseKey}${i}`.toUpperCase(), `${baseKey}_${i}`.toUpperCase()];
+            let found = '';
+            for (const k of Object.keys(obj)) { if (variants.includes(k)) { found = obj[k] ?? ''; break; } }
+            entries.push(found);
+        }
+        return entries;
+    };
+    // Array components
+    if (Array.isArray(pd.components)) {
+        const comp = pd.components[idx] || null;
+        if (comp) {
+            const soArr = Array.isArray(comp.soValues) ? comp.soValues : (Array.isArray(comp.so) ? comp.so : fromNumberedKeys(comp, 'so'));
+            const woArr = Array.isArray(comp.woValues) ? comp.woValues : (Array.isArray(comp.wo) ? comp.wo : fromNumberedKeys(comp, 'wo'));
+            return { so: soArr, wo: woArr };
+        }
+    }
+    // Map components
+    if (pd.components && typeof pd.components === 'object' && !Array.isArray(pd.components)) {
+        const comp = pd.components[label];
+        if (comp) {
+            const soArr = Array.isArray(comp.soValues) ? comp.soValues : (Array.isArray(comp.so) ? comp.so : fromNumberedKeys(comp, 'so'));
+            const woArr = Array.isArray(comp.woValues) ? comp.woValues : (Array.isArray(comp.wo) ? comp.wo : fromNumberedKeys(comp, 'wo'));
+            return { so: soArr, wo: woArr };
+        }
+    }
+    return { so: [], wo: [] };
+};
+
+const hydrateSoWoFromFull = (full) => {
+    if (!full || !full.pd_setup) return;
+    // Default to selected component index 0
+    const idx = 0;
+    const { so, wo } = extractPerComponentSoWo(full.pd_setup, idx);
+    soValues.value = normalize5(so);
+    woValues.value = normalize5(wo);
+};
 
 // Computed property for filtered and sorted MCS data
 const filteredMcsData = computed(() => mcsMasterCards.value);
@@ -2227,14 +2298,24 @@ const selectMcs = async (mcs) => {
             const full = await res.json();
             // Keep a local copy to pass into child modals
             selectedMcsFull.value = full;
-            // Hydrate SO/WO values from saved pd_setup if available
-            const pd = full?.pd_setup || {};
-            if (Array.isArray(pd.soValues)) {
-                soValues.value = pd.soValues;
-            }
-            if (Array.isArray(pd.woValues)) {
-                woValues.value = pd.woValues;
-            }
+            // Hydrate SO/WO for currently selected component and prefill PD code
+            try {
+                hydrateSoWoFromFull(selectedMcsFull.value);
+                const compName = (mcComponents.value.find(c => c.selected) || mcComponents.value[0]).c_num;
+                const pd = full.pd_setup || {};
+                let compEntry = null;
+                if (Array.isArray(pd.components)) {
+                    compEntry = pd.components.find(x => (x.c_num || x.component || '').toLowerCase() === compName.toLowerCase());
+                } else if (pd.components && typeof pd.components === 'object') {
+                    compEntry = pd.components[compName];
+                } else if (pd[compName]) {
+                    compEntry = pd[compName];
+                }
+                if (compEntry && compEntry.pd) {
+                    const target = mcComponents.value.find(c => c.c_num === compName);
+                    if (target) target.pd = compEntry.pd;
+                }
+            } catch (e) {}
         }
     } catch (e) {}
 
@@ -2335,6 +2416,25 @@ const fetchMcsData = async (page = 1) => {
             toast.success(
                 `Found ${mcsMasterCards.value.length} master card(s) for ${form.value.customer_name}`
             );
+            // If a specific MC is currently selected in form, try to fetch full and hydrate SO/WO
+            try {
+                const currentSeq = form.value.mcs;
+                if (currentSeq) {
+                    const found = mcsMasterCards.value.find(x => (x.seq || x.mc_seq || '').toString() === currentSeq.toString());
+                    if (found) {
+                        const mcsSeqEnc = encodeURIComponent(currentSeq);
+                        const custEnc = encodeURIComponent(form.value.ac);
+                        const resFull = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`, {
+                            headers: { 'Accept': 'application/json' },
+                            credentials: 'same-origin'
+                        });
+                        if (resFull.ok) {
+                            selectedMcsFull.value = await resFull.json();
+                            hydrateSoWoFromFull(selectedMcsFull.value);
+                        }
+                    }
+                }
+            } catch (e) {}
         }
     } catch (error) {
         console.error("Error fetching MCS data:", error);
@@ -2440,6 +2540,21 @@ const handleMcsProceed = async () => {
                 int_dim_2: existingMc.int_dim_2 || "",
                 int_dim_3: existingMc.int_dim_3 || "",
             };
+
+            // Fetch full MC (including pd_setup) to hydrate SO/WO and pass to modals
+            try {
+                const mcsSeqEnc = encodeURIComponent(form.value.mcs);
+                const custEnc = encodeURIComponent(form.value.ac);
+                const res = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`, {
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                if (res.ok) {
+                    const full = await res.json();
+                    selectedMcsFull.value = full;
+                    // Do not set global SO/WO from root; child modal manages per-component SO/WO
+                }
+            } catch (e) {}
 
             toast.dismiss(loadingToast);
             toast.success("Existing master card loaded successfully");
@@ -2554,8 +2669,49 @@ const setupPD = () => {
     // Ensure PD modal opens fresh when creating a new MC
     if (recordMode.value === 'new') {
         selectedMcsFull.value = null;
+        // For new MC, use current local arrays as-is
+        showSetupPdModal.value = true;
+        return;
     }
-    showSetupPdModal.value = true;
+
+    // For existing MC, ensure full data (including pd_setup) is loaded and hydrate local SO/WO before opening
+    const ensureSelectedMcsFullLoaded = async () => {
+        if (selectedMcsFull.value || !form.value.mcs || !form.value.ac) return;
+        try {
+            const mcsSeqEnc = encodeURIComponent(form.value.mcs);
+            const custEnc = encodeURIComponent(form.value.ac);
+            const res = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`, {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin'
+            });
+            if (res.ok) {
+                selectedMcsFull.value = await res.json();
+            }
+        } catch (e) {
+            console.error('Failed to load full MC for PD setup:', e);
+        }
+    };
+
+    const hydratePdSetupFromFull = () => {
+        const full = selectedMcsFull.value;
+        if (!full || !full.pd_setup) return;
+        const pd = full.pd_setup;
+        const rootSo = Array.isArray(pd.soValues) ? pd.soValues : (Array.isArray(pd.so) ? pd.so : []);
+        const rootWo = Array.isArray(pd.woValues) ? pd.woValues : (Array.isArray(pd.wo) ? pd.wo : []);
+        const normalize5 = (arr) => (Array.isArray(arr) ? arr.slice(0,5) : []).concat(["","","","",""]).slice(0,5);
+        soValues.value = normalize5(rootSo);
+        woValues.value = normalize5(rootWo);
+    };
+
+    ensureSelectedMcsFullLoaded()
+        .then(() => {
+            hydratePdSetupFromFull();
+            showSetupPdModal.value = true;
+        })
+        .catch(() => {
+            // Even if loading fails, still open modal to allow user to proceed
+            showSetupPdModal.value = true;
+        });
 };
 
 const setupOthers = () => {
