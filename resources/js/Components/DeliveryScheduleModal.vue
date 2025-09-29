@@ -170,12 +170,11 @@
                 <div class="grid grid-cols-3 gap-4">
                   <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">No.</label>
-                    <input 
-                      v-model="scheduleEntry.no" 
-                      type="text"
-                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      readonly
+                    <div 
+                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-700"
                     >
+                      {{ scheduleEntry.no }}
+                    </div>
                   </div>
                   <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Set</label>
@@ -193,8 +192,9 @@
                       v-model="scheduleEntry.main" 
                       type="number"
                       min="0"
-                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      @input="calculateTotals"
+                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-100 text-gray-600"
+                      readonly
+                      disabled
                     >
                   </div>
                 </div>
@@ -207,7 +207,9 @@
                       v-model="scheduleEntry[`fit${i}`]" 
                       type="number"
                       min="0"
-                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-100 text-gray-600"
+                      readonly
+                      disabled
                       @input="calculateTotals"
                     >
                   </div>
@@ -452,7 +454,7 @@ const addNewEntry = () => {
   resetForm()
   isEditing.value = false
   selectedEntry.value = null
-  scheduleEntry.no = (scheduleEntries.value.length + 1).toString().padStart(4, '0')
+  scheduleEntry.no = (scheduleEntries.value.length + 1).toString()
 }
 
 const editSelectedEntry = () => {
@@ -475,7 +477,7 @@ const deleteSelectedEntry = () => {
     scheduleEntries.value.splice(index, 1)
     // Renumber remaining entries
     scheduleEntries.value.forEach((entry, idx) => {
-      entry.no = (idx + 1).toString().padStart(4, '0')
+      entry.no = (idx + 1).toString()
     })
     success('Entry deleted successfully')
   }
@@ -505,7 +507,9 @@ const addScheduleEntry = () => {
   const newEntry = {
     id: isEditing.value ? scheduleEntry.id : Date.now(),
     ...scheduleEntry,
-    no: scheduleEntry.no || (scheduleEntries.value.length + 1).toString().padStart(4, '0')
+    // Ensure Main mirrors Set and numbering is automatic
+    main: scheduleEntry.set,
+    no: (isEditing.value ? scheduleEntry.no : (scheduleEntries.value.length + 1).toString())
   }
 
   if (isEditing.value) {
@@ -529,7 +533,7 @@ const addScheduleEntry = () => {
 const resetForm = () => {
   Object.assign(scheduleEntry, {
     id: null,
-    no: (scheduleEntries.value.length + 1).toString().padStart(4, '0'),
+    no: (scheduleEntries.value.length + 1).toString(),
     set: '',
     main: '',
     fit1: '',
@@ -552,6 +556,10 @@ const calculateTotals = () => {
   // This method is called when quantities change
   // The computed properties will automatically update
 }
+// Keep Main in sync with Set input
+watch(() => scheduleEntry.set, (val) => {
+  scheduleEntry.main = val
+})
 
 const formatDate = (dateString) => {
   if (!dateString) return ''
