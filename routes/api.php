@@ -278,7 +278,13 @@ Route::get('/customer-service/dashboard-data', [CustomerServiceController::class
 Route::get('/customer-service/account-credit-data', [CustomerServiceController::class, 'apiAccountCreditData']);
 Route::get('/customer-service/delivery-schedule-data', [CustomerServiceController::class, 'apiDeliveryScheduleData']);
 Route::get('/customer-service/finished-goods-data', [CustomerServiceController::class, 'apiFinishedGoodsData']);
-Route::get('/customer-service/production-monitoring-data', [CustomerServiceController::class, 'apiProductionMonitoringData']); 
+Route::get('/customer-service/production-monitoring-data', [CustomerServiceController::class, 'apiProductionMonitoringData']);
+
+// Sales Order API routes
+Route::post('/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
+Route::get('/sales-order/delivery-schedule/{soNumber}', [App\Http\Controllers\SalesOrderController::class, 'getDeliveryScheduleSummary']);
+Route::post('/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign']);
+Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderController::class, 'getCustomer']); 
 
 // New: Placeholder API routes for Sales Order Delivery Schedule Modals
 Route::get('/po-refs', function() {

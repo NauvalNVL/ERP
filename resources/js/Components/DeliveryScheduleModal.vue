@@ -223,20 +223,11 @@
                   <div class="grid grid-cols-2 gap-4">
                     <div>
                       <label class="block text-xs font-medium text-gray-600 mb-1">Date</label>
-                      <div class="flex items-center space-x-2">
-                        <input 
-                          v-model="scheduleEntry.date" 
-                          type="date"
-                          class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                        <button 
-                          @click="openCalendar"
-                          class="p-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                          title="Calendar"
-                        >
-                          <i class="fas fa-calendar-alt text-sm"></i>
-                        </button>
-                      </div>
+                      <input 
+                        v-model="scheduleEntry.date" 
+                        type="date"
+                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
                     </div>
                     <div>
                       <label class="block text-xs font-medium text-gray-600 mb-1">Time</label>
@@ -578,12 +569,6 @@ const refreshScreen = () => {
   success('Screen refreshed')
 }
 
-const openCalendar = () => {
-  const dateInput = document.querySelector('input[type="date"]')
-  if (dateInput) {
-    dateInput.showPicker()
-  }
-}
 
 const printSOLog = async () => {
   try {
@@ -650,18 +635,43 @@ const saveSchedule = async () => {
       return
     }
 
-    const response = await axios.post('/api/sales-order/delivery-schedule', {
-      so_number: props.orderDetails.so_number,
-      entries: scheduleEntries.value.map(entry => ({
+    // Validate entries before sending
+    const validatedEntries = scheduleEntries.value.map(entry => {
+      const deliveryQuantity = parseFloat(entry.main) || parseFloat(entry.set) || 0
+      
+      // Validate required fields
+      if (!entry.date) {
+        throw new Error(`Entry ${entry.no}: Date is required`)
+      }
+      
+      if (deliveryQuantity <= 0) {
+        throw new Error(`Entry ${entry.no}: Delivery quantity must be greater than 0`)
+      }
+      
+      if (!entry.due || !['ETD', 'ETA', 'TBA'].includes(entry.due)) {
+        throw new Error(`Entry ${entry.no}: Due status must be ETD, ETA, or TBA`)
+      }
+
+      return {
         line_number: entry.line_number || 1,
         schedule_date: entry.date,
-        schedule_time: entry.time,
-        delivery_quantity: parseFloat(entry.main) || 0,
+        schedule_time: entry.time || '00:00',
+        delivery_quantity: deliveryQuantity,
         due_status: entry.due,
-        remark: entry.remark,
-        delivery_code: entry.delivery_code,
-        delivery_location: entry.delivery_location
-      }))
+        remark: entry.remark || '',
+        delivery_code: entry.delivery_code || '',
+        delivery_location: entry.delivery_location || ''
+      }
+    })
+
+    console.log('Sending delivery schedule data:', {
+      so_number: props.orderDetails.so_number,
+      entries: validatedEntries
+    })
+
+    const response = await axios.post('/api/sales-order/delivery-schedule', {
+      so_number: props.orderDetails.so_number,
+      entries: validatedEntries
     })
 
     if (response.data.success) {
@@ -672,7 +682,21 @@ const saveSchedule = async () => {
     }
   } catch (err) {
     console.error('Error saving delivery schedule:', err)
-    error('Failed to save delivery schedule')
+    
+    // Handle validation errors more specifically
+    if (err.response && err.response.status === 422) {
+      const validationErrors = err.response.data.errors
+      if (validationErrors) {
+        const errorMessages = Object.values(validationErrors).flat()
+        error('Validation error: ' + errorMessages.join(', '))
+      } else {
+        error('Validation error: ' + (err.response.data.message || 'Invalid data'))
+      }
+    } else if (err.message) {
+      error(err.message)
+    } else {
+      error('Failed to save delivery schedule')
+    }
   }
 }
 

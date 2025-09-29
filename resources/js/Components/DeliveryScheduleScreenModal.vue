@@ -234,9 +234,6 @@
                 <div class="flex items-center space-x-2">
                   <label class="text-xs font-medium w-12">Date:</label>
                   <input v-model="scheduleForm.date" type="text" value="00/00/0000" class="px-2 py-1 border border-gray-400 text-xs w-24">
-                  <button class="px-2 py-1 bg-gray-200 border border-gray-400 text-xs">
-                    📅
-                  </button>
                 </div>
                 
                 <!-- Time -->

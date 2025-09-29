@@ -247,7 +247,6 @@ Route::middleware('auth')->group(function () {
         
         // Sales Order API routes
         Route::post('/api/sales-order', [SalesOrderController::class, 'store']);
-        Route::get('/api/sales-order/customer/{customerCode}', [SalesOrderController::class, 'getCustomer']);
         Route::get('/api/sales-order/master-card/{mcSeq}', [SalesOrderController::class, 'getMasterCard']);
         Route::get('/api/sales-order/product-design/{masterCardSeq}', [SalesOrderController::class, 'getProductDesignData']);
         Route::get('/api/sales-order/salesperson/{salespersonCode}', [SalesOrderController::class, 'getSalesperson']);

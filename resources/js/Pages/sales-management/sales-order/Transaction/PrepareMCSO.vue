@@ -351,22 +351,9 @@
                     ref="pOrderDateInput"
                     v-model="orderDetails.pOrderDate" 
                       type="date"
-                    :class="[
-                      'flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-                      { 'calendar-explicitly-opened': calendarExplicitlyOpened }
-                    ]"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     @change="updateDayOfWeek"
                     >
-                    <button 
-                      @click.prevent="openCalendar"
-                    :disabled="calendarLoading"
-                    class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed calendar-button"
-                      title="Open Calendar (F4 or click input field)"
-                      type="button"
-                    >
-                    <i v-if="calendarLoading" class="fas fa-spinner fa-spin"></i>
-                    <i v-else class="fas fa-calendar-alt"></i>
-                    </button>
                   <span class="text-xs text-gray-500 min-w-[35px]">{{ dayOfWeek }}</span>
                 </div>
                   </div>
@@ -1422,78 +1409,6 @@ const loadMasterCardsForCustomer = async () => {
 
 // Add ref for P/Order Date input
 const pOrderDateInput = ref(null)
-const calendarLoading = ref(false)
-const calendarExplicitlyOpened = ref(false)
-
-const openCalendar = async () => {
-  try {
-    calendarLoading.value = true
-    calendarExplicitlyOpened.value = true
-    console.log('Opening calendar...')
-    
-    // Wait for Vue to update the DOM
-    await nextTick()
-    
-    // Use specific ref instead of generic selector
-    const dateInput = pOrderDateInput.value
-    console.log('Date input element:', dateInput)
-    
-    if (!dateInput) {
-      console.error('Date input element not found')
-      error('Calendar input not available. Please refresh the page.')
-      return
-    }
-
-    // Check if element is visible and not disabled
-    if (dateInput.disabled || dateInput.style.display === 'none') {
-      console.warn('Date input is disabled or hidden')
-      error('Date input is not available for interaction.')
-      return
-    }
-
-    try {
-      // Check if showPicker is supported (modern browsers)
-      if (typeof dateInput.showPicker === 'function') {
-        console.log('showPicker() is supported, attempting to use it')
-    try {
-      // Focus the input first
-      dateInput.focus()
-      console.log('Date input focused')
-      
-      // Wait for focus to take effect
-      await new Promise(resolve => setTimeout(resolve, 100))
-      
-          dateInput.showPicker()
-          console.log('Calendar opened successfully using showPicker()')
-          success('Calendar opened. Select a date.')
-        } catch (pickerErr) {
-          console.warn('showPicker() failed:', pickerErr.message)
-          error('Calendar could not be opened automatically. Please click directly on the date field.')
-        }
-      } else {
-        // Fallback for browsers that don't support showPicker
-        console.log('showPicker() not supported, using fallback method')
-        
-        // Focus the input and show a message to click manually
-        dateInput.focus()
-        success('Please click on the date field to open the calendar')
-      }
-      
-    } catch (interactionErr) {
-      console.error('Calendar interaction error:', interactionErr)
-      error('Unable to open calendar. Please click directly on the date field.')
-    }
-      
-  } catch (err) {
-    console.error('Error opening calendar:', err)
-    error('Error opening calendar: ' + (err.message || 'Unknown error'))
-  } finally {
-    // End loading state shortly after triggering the picker; keep the flag until user picks or cancels
-    setTimeout(() => {
-      calendarLoading.value = false
-    }, 200)
-  }
-}
 
 // Function to update day of week when date changes
 const updateDayOfWeek = () => {
@@ -2184,10 +2099,4 @@ button:disabled {
   }
 }
 
-/* Custom calendar button styling */
-.calendar-button {
-  position: relative;
-  z-index: 10;
-}
-/* Allow native date picker behavior; no suppression CSS */
 </style>
