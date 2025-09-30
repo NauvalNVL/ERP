@@ -642,4 +642,112 @@ class SalesOrderController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Store Sales Order into legacy-style 'so' table (for CPS compatibility)
+     */
+    public function apiStoreToSo(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'customer_code' => 'required|string',
+            'customer_name' => 'nullable|string',
+            'master_card_seq' => 'required|string',
+            'master_card_model' => 'nullable|string',
+            'p_design' => 'nullable|string',
+            'salesperson_code' => 'nullable|string',
+            'currency' => 'required|string',
+            'exchange_rate' => 'nullable|numeric',
+            'customer_po_number' => 'nullable|string',
+            'po_date' => 'required|date',
+            'order_group' => 'required|string',
+            'order_type' => 'required|string',
+            'lot_number' => 'nullable|string',
+            'remark' => 'nullable|string',
+            'instruction1' => 'nullable|string',
+            'instruction2' => 'nullable|string',
+            'details' => 'required|array|min:1',
+            'details.*.order_quantity' => 'required|numeric|min:0',
+            'details.*.unit_price' => 'required|numeric|min:0',
+            'details.*.item_code' => 'nullable|string',
+            'details.*.uom' => 'nullable|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $poDate = \Carbon\Carbon::parse($request->po_date);
+            $mm = $poDate->format('m');
+            $yyyy = $poDate->format('Y');
+
+            // Generate SO number in format MM-YYYY-#####
+            $prefix = $mm . '-' . $yyyy . '-';
+            $last = \Illuminate\Support\Facades\DB::table('so')
+                ->where('SO_Num', 'like', $prefix . '%')
+                ->orderBy('SO_Num', 'desc')
+                ->value('SO_Num');
+            $seq = 1;
+            if ($last) {
+                $parts = explode('-', $last);
+                $seq = isset($parts[2]) ? ((int) $parts[2]) + 1 : 1;
+            }
+            $soNum = $prefix . str_pad($seq, 5, '0', STR_PAD_LEFT);
+
+            $first = $request->details[0];
+            $qty = (float) ($first['order_quantity'] ?? 0);
+            $unitPrice = (float) ($first['unit_price'] ?? 0);
+            $amount = $qty * $unitPrice;
+
+            // Map into legacy columns
+            $row = [
+                'YYYY' => $yyyy,
+                'MM' => $mm,
+                'SO_Num' => $soNum,
+                'STS' => 'Draft',
+                'TYPE' => $request->order_type,
+                'SO_DMY' => $poDate->format('d/m/Y'),
+                'AC_Num' => $request->customer_code,
+                'AC_NAME' => $request->customer_name,
+                'SLM' => $request->salesperson_code,
+                'GROUP_' => $request->order_group,
+                'PO_Num' => $request->customer_po_number,
+                'PO_DATE' => $poDate->format('d/m/Y'),
+                'LOT_Num' => $request->lot_number,
+                'MCS_Num' => $request->master_card_seq,
+                'MODEL' => $request->master_card_model,
+                'PRODUCT' => $first['item_code'] ?? null,
+                'P_DESIGN' => $request->p_design,
+                'UNIT' => $first['uom'] ?? 'PCS',
+                'CURR' => $request->currency,
+                'EX_RATE' => $request->exchange_rate ?? 0,
+                'SO_QTY' => $qty,
+                'UNIT_PRICE' => $unitPrice,
+                'AMOUNT' => $amount,
+                'SO_REMARK' => $request->remark,
+                'SO_INSTRUCTION_1' => $request->instruction1,
+                'SO_INSTRUCTION_2' => $request->instruction2,
+                'NW_UID' => Auth::user()->name ?? 'system',
+                'NW_DATE' => now()->format('d/m/Y'),
+                'NW_TIME' => now()->format('H:i'),
+            ];
+
+            \Illuminate\Support\Facades\DB::table('so')->insert($row);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'SO saved to legacy table successfully',
+                'data' => [
+                    'so_number' => $soNum,
+                    'row' => $row,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error saving to so table: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving to SO table: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

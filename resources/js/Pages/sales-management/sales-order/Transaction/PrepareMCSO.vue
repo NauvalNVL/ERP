@@ -1843,6 +1843,35 @@ const createSalesOrder = async () => {
     const data = await response.json()
     
     if (data.success) {
+      // Also save a CPS-compatible record into 'so' table
+      try {
+        const legacyPayload = {
+          customer_code: requestData.customer_code,
+          customer_name: selectedCustomer.name,
+          master_card_seq: requestData.master_card_seq,
+          master_card_model: selectedMasterCard.model,
+          p_design: selectedMasterCard.pDesign,
+          salesperson_code: requestData.salesperson_code,
+          currency: requestData.currency,
+          exchange_rate: requestData.exchange_rate,
+          customer_po_number: requestData.customer_po_number,
+          po_date: requestData.po_date,
+          order_group: requestData.order_group,
+          order_type: requestData.order_type,
+          lot_number: requestData.lot_number,
+          remark: requestData.remark,
+          instruction1: requestData.instruction1,
+          instruction2: requestData.instruction2,
+          details: requestData.details
+        }
+        await fetch('/api/sales-order/save-to-so', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(legacyPayload)
+        })
+      } catch (e) {
+        console.warn('Failed to save to legacy SO table:', e)
+      }
       return {
         success: true,
         so_number: data.data.so_number,
