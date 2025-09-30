@@ -85,66 +85,6 @@
             </button>
           </div>
         </div>
-          <!-- Period -->
-          <div class="lg:col-span-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Current Period</label>
-            <div class="flex gap-2">
-              <input v-model.number="form.period.month" type="number" min="1" max="12" class="w-20 input" />
-              <input v-model.number="form.period.year" type="number" min="2000" max="2099" class="w-28 input" />
-            </div>
-          </div>
-
-          <!-- SO Range / Single SO quick search -->
-          <div class="lg:col-span-6">
-            <label class="block text-sm font-medium text-gray-700 mb-1">S/Order# Range</label>
-            <div class="grid grid-cols-2 gap-3">
-              <div class="flex items-center gap-2">
-                <input v-model.number="form.from.month" type="number" min="1" max="12" class="w-16 input" />
-                <input v-model.number="form.from.year" type="number" min="2000" max="2099" class="w-20 input" />
-                <input v-model="form.from.seq" type="text" class="flex-1 input" placeholder="sequence" />
-              </div>
-              <div class="flex items-center gap-2">
-                <input v-model.number="form.to.month" type="number" min="1" max="12" class="w-16 input" />
-                <input v-model.number="form.to.year" type="number" min="2000" max="2099" class="w-20 input" />
-                <input v-model="form.to.seq" type="text" class="flex-1 input" placeholder="sequence" />
-              </div>
-            </div>
-            <div class="mt-3 flex items-center gap-2">
-              <input v-model="quick.so" class="input flex-1" placeholder="Quick print by SO Number (e.g. SO20250001)" />
-              <button class="btn" @click="quickPrint">Quick Print</button>
-            </div>
-          </div>
-
-          <!-- Copies -->
-          <div class="lg:col-span-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Number of Copy</label>
-            <select v-model.number="form.copies" class="input w-full">
-              <option v-for="n in 9" :key="n" :value="n">{{ n }}</option>
-            </select>
-          </div>
-
-          <!-- Status -->
-          <div class="lg:col-span-12">
-            <label class="block text-sm font-medium text-gray-700 mb-2">S/Order Status</label>
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <label class="status"><input type="checkbox" v-model="form.status.outstanding" /> Outstanding</label>
-              <label class="status"><input type="checkbox" v-model="form.status.partial" /> Partial Completed</label>
-              <label class="status"><input type="checkbox" v-model="form.status.closed" /> Closed</label>
-              <label class="status"><input type="checkbox" v-model="form.status.completed" /> Completed</label>
-              <label class="status"><input type="checkbox" v-model="form.status.cancelled" /> Cancelled</label>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="lg:col-span-12 flex items-center justify-end gap-3">
-            <button
-              class="btn-secondary"
-              @click="openPrinter()"
-            >
-              <i class="fa-solid fa-print mr-2"></i> Proceed
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- Preview -->
