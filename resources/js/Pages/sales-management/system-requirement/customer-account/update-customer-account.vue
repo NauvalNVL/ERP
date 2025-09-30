@@ -70,39 +70,6 @@
                         </div>
                     </div>
 
-                    <!-- Selected Customer Display -->
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mt-4">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-if="customers.length === 0">
-                                        <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                                            Click the search button above to browse and select customers from the modal.
-                                        </td>
-                                    </tr>
-                                    <tr 
-                                        v-for="customer in customers" 
-                                        :key="customer.customer_code" 
-                                        @click="selectCustomerForEdit(customer)"
-                                        class="hover:bg-blue-50 cursor-pointer transition-colors"
-                                    >
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {{ customer.customer_code }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                                            {{ customer.customer_name }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                                            {{ customer.address || 'N/A' }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ customer.telephone_no || 'N/A' }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
             </div>
             
@@ -122,8 +89,9 @@
                             <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
                             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
                                 <li>Search for a customer by code or name</li>
-                                <li>Click on a customer to edit their details</li>
-                                <li>Use the Browse All button to see all customers</li>
+                                <li>Click the search button to browse customers in the modal</li>
+                                <li>Select a customer from the modal to edit their details</li>
+                                <li>Use the "Add New" button to create new customers</li>
                                 <li>Save changes after editing customer information</li>
                             </ul>
                         </div>
@@ -846,75 +814,7 @@ const loadCustomerGroups = async () => {
     }
 }
 
-// Select customer from table and open edit modal
-const selectCustomerForEdit = (customer) => {
-    // Make a copy of the customer data to avoid direct reference
-    const customerData = { ...customer }
-    
-    // Fill the form with customer data, ensuring all required fields have valid values
-    form.customer_code = customerData.customer_code
-    form.customer_name = customerData.customer_name || ''
-    form.short_name = customerData.short_name || ''
-    form.address = customerData.address || ''
-    form.contact_person = customerData.contact_person || ''
-    form.telephone_no = customerData.telephone_no || ''
-    form.fax_no = customerData.fax_no || ''
-    form.co_email = customerData.co_email || ''
-    form.credit_limit = customerData.credit_limit || 0
-    form.credit_terms = customerData.credit_terms || 0
-    form.ac_type = customerData.ac_type || customerData.account_type || 'N-Local'
-    
-    // Ensure ac_type has a valid value
-    if (!['Y-Foreign', 'N-Local'].includes(form.ac_type)) {
-        form.ac_type = 'N-Local'
-    }
-    
-    form.currency_code = customerData.currency_code || ''
-    form.salesperson_code = customerData.salesperson_code || ''
-    form.industrial_code = customerData.industrial_code || ''
-    form.geographical = customerData.geographical || ''
-    form.grouping_code = customerData.grouping_code || ''
-    form.print_ar_aging = customerData.print_ar_aging || 'N-No'
-    
-    // Ensure print_ar_aging has a valid value
-    if (!['Y-Yes', 'N-No'].includes(form.print_ar_aging)) {
-        form.print_ar_aging = 'N-No'
-    }
-    
-    customerSelected.value = true
-    showEditModal.value = true // Automatically open the edit modal
-    
-    // If we don't have all the customer data, fetch the complete record
-    if (!customerData.fax_no || customerData.credit_limit === undefined || 
-        customerData.credit_terms === undefined || !customerData.currency_code ||
-        !customerData.industrial_code || !customerData.geographical || !customerData.grouping_code) {
-        
-        fetchCompleteCustomerData(customerData.id)
-    }
-}
 
-// Add a new function to fetch complete customer data
-const fetchCompleteCustomerData = async (id) => {
-    try {
-        const response = await axios.get(`/api/customer-accounts/${id}`)
-        if (response.data) {
-            // Update form with complete data
-            const completeData = response.data
-            
-            // Update form fields that might be missing in the initial data
-            form.fax_no = completeData.fax_no || form.fax_no
-            form.credit_limit = completeData.credit_limit || form.credit_limit
-            form.credit_terms = completeData.credit_terms || form.credit_terms
-            form.currency_code = completeData.currency_code || form.currency_code
-            form.industrial_code = completeData.industrial_code || form.industrial_code
-            form.geographical = completeData.geographical || form.geographical
-            form.grouping_code = completeData.grouping_code || form.grouping_code
-            form.print_ar_aging = completeData.print_ar_aging || form.print_ar_aging
-        }
-    } catch (error) {
-        console.error('Error fetching complete customer data:', error)
-    }
-}
 
 // Helper functions to get names for selected codes
 const getIndustryName = (code) => {
