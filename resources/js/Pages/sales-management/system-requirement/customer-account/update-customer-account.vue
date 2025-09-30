@@ -74,22 +74,6 @@
                     <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mt-4">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Customer Code
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Customer Name
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Address
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Contact
-                                        </th>
-                                    </tr>
-                                </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <tr v-if="customers.length === 0">
                                         <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
@@ -219,6 +203,7 @@
     <CustomerAccountModal 
         v-if="showCustomerAccountModal"
         :show="showCustomerAccountModal"
+        :customerAccounts="customers"
         :initial-search="searchQuery"
         @close="closeCustomerAccountModal"
         @select="selectCustomerAccount"
@@ -278,8 +263,18 @@
                                 </div>
                                 
                                 <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                                    <textarea v-model="newCustomerForm.address" rows="3" class="form-input"></textarea>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address 1</label>
+                                    <textarea v-model="newCustomerForm.address" rows="2" class="form-input"></textarea>
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address 2</label>
+                                    <textarea v-model="newCustomerForm.address2" rows="2" class="form-input"></textarea>
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address 3</label>
+                                    <textarea v-model="newCustomerForm.address3" rows="2" class="form-input"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -337,6 +332,11 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Currency Code</label>
                                     <input type="text" v-model="newCustomerForm.currency_code" class="form-input">
                                     <span class="text-xs text-gray-500">Leave blank if Local Account</span>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">NPWP</label>
+                                    <input type="text" v-model="newCustomerForm.npwp" class="form-input" placeholder="Enter NPWP number">
                                 </div>
                                 
                                 <div>
@@ -773,6 +773,8 @@ const newCustomerForm = reactive({
     customer_name: '',
     short_name: '',
     address: '',
+    address2: '',
+    address3: '',
     contact_person: '',
     telephone_no: '',
     fax_no: '',
@@ -781,6 +783,7 @@ const newCustomerForm = reactive({
     credit_terms: 0,
     ac_type: 'N-Local',
     currency_code: '',
+    npwp: '',
     salesperson_code: '',
     industrial_code: '',
     geographical: '',
@@ -936,7 +939,10 @@ const getCustomerGroupName = (code) => {
 }
 
 // Customer account modal functions
-const openCustomerAccountModal = () => {
+const openCustomerAccountModal = async () => {
+    // Always reload data to ensure fresh data
+    await loadCustomerAccounts()
+    
     showCustomerAccountModal.value = true
 }
 
@@ -952,6 +958,8 @@ const openAddNewCustomerModal = () => {
         customer_name: '',
         short_name: '',
         address: '',
+        address2: '',
+        address3: '',
         contact_person: '',
         telephone_no: '',
         fax_no: '',
@@ -960,6 +968,7 @@ const openAddNewCustomerModal = () => {
         credit_terms: 0,
         ac_type: 'N-Local',
         currency_code: '',
+        npwp: '',
         salesperson_code: '',
         industrial_code: '',
         geographical: '',
@@ -1034,7 +1043,12 @@ const closeSalespersonModal = () => {
 }
 
 const selectSalesperson = (salesperson) => {
-    form.salesperson_code = salesperson.code;
+    // Check if we're in add new customer modal or edit modal
+    if (showAddNewCustomerModal.value) {
+        newCustomerForm.salesperson_code = salesperson.code;
+    } else {
+        form.salesperson_code = salesperson.code;
+    }
     closeSalespersonModal();
 }
 
@@ -1052,7 +1066,12 @@ const closeIndustryModal = () => {
 }
 
 const selectIndustry = (industry) => {
-    form.industrial_code = industry.code;
+    // Check if we're in add new customer modal or edit modal
+    if (showAddNewCustomerModal.value) {
+        newCustomerForm.industrial_code = industry.code;
+    } else {
+        form.industrial_code = industry.code;
+    }
     closeIndustryModal();
 }
 
@@ -1070,7 +1089,12 @@ const closeGeoModal = () => {
 }
 
 const selectGeo = (geo) => {
-    form.geographical = geo.code;
+    // Check if we're in add new customer modal or edit modal
+    if (showAddNewCustomerModal.value) {
+        newCustomerForm.geographical = geo.code;
+    } else {
+        form.geographical = geo.code;
+    }
     closeGeoModal();
 }
 
@@ -1088,7 +1112,12 @@ const closeCustomerGroupModal = () => {
 }
 
 const selectCustomerGroup = (group) => {
-    form.grouping_code = group.group_code;
+    // Check if we're in add new customer modal or edit modal
+    if (showAddNewCustomerModal.value) {
+        newCustomerForm.grouping_code = group.group_code;
+    } else {
+        form.grouping_code = group.group_code;
+    }
     closeCustomerGroupModal();
 }
 
@@ -1103,6 +1132,15 @@ const saveCustomerAccount = async () => {
     if (!form.customer_name.trim()) {
         showNotification('Customer name is required', 'warning')
         return
+    }
+    
+    // Email validation if provided
+    if (form.co_email && form.co_email.trim()) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(form.co_email)) {
+            showNotification('Please enter a valid email address', 'warning')
+            return
+        }
     }
     
     // Ensure required fields have valid values
@@ -1149,14 +1187,8 @@ const saveCustomerAccount = async () => {
             showNotification('Customer account saved successfully', 'success')
             showEditModal.value = false
             
-            // Update the local list if the customer exists
-            const index = customers.value.findIndex(c => c.customer_code === form.customer_code)
-            if (index !== -1) {
-                customers.value[index] = { 
-                    ...customers.value[index], 
-                    ...customerData 
-                }
-            }
+            // Reload customer accounts to get the latest data
+            await loadCustomerAccounts()
         } else {
             throw new Error(response.data?.message || 'No data returned from the server')
         }
@@ -1202,6 +1234,15 @@ const saveNewCustomerAccount = async () => {
         return
     }
     
+    // Email validation if provided
+    if (newCustomerForm.co_email && newCustomerForm.co_email.trim()) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(newCustomerForm.co_email)) {
+            showNotification('Please enter a valid email address', 'warning')
+            return
+        }
+    }
+    
     // Check if customer code already exists
     const existingCustomer = customers.value.find(c => c.customer_code === newCustomerForm.customer_code.trim())
     if (existingCustomer) {
@@ -1232,9 +1273,8 @@ const saveNewCustomerAccount = async () => {
             showNotification('New customer account created successfully', 'success')
             closeAddNewCustomerModal()
             
-            // Add the new customer to the local list
-            const newCustomer = response.data
-            customers.value.unshift(newCustomer)
+            // Reload customer accounts to get the latest data
+            await loadCustomerAccounts()
             
             // Clear the form
             Object.assign(newCustomerForm, {
@@ -1242,6 +1282,8 @@ const saveNewCustomerAccount = async () => {
                 customer_name: '',
                 short_name: '',
                 address: '',
+                address2: '',
+                address3: '',
                 contact_person: '',
                 telephone_no: '',
                 fax_no: '',
@@ -1250,6 +1292,7 @@ const saveNewCustomerAccount = async () => {
                 credit_terms: 0,
                 ac_type: 'N-Local',
                 currency_code: '',
+                npwp: '',
                 salesperson_code: '',
                 industrial_code: '',
                 geographical: '',
@@ -1301,9 +1344,24 @@ const showNotification = (message, type = 'success') => {
     }, 3000)
 }
 
+// Load customer accounts
+const loadCustomerAccounts = async () => {
+    try {
+        const response = await axios.get('/api/customers-with-status')
+        
+        if (response.data && response.data.data) {
+            customers.value = response.data.data
+        }
+    } catch (error) {
+        console.error('Error loading customer accounts:', error)
+        showNotification('Failed to load customer accounts', 'error')
+    }
+}
+
 // Initialize component
 onMounted(() => {
     // Load data from APIs
+    loadCustomerAccounts()
     loadIndustries()
     loadGeos()
     loadSalespersons()
@@ -1313,8 +1371,6 @@ onMounted(() => {
     if (page.props.flash && page.props.flash.message) {
         showNotification(page.props.flash.message, 'success')
     }
-    
-    // Note: Search is now handled by the modal, no need to pre-load search results
 })
 </script>
 

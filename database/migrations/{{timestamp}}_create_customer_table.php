@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('CUSTOMER', function (Blueprint $table) {
             $collation = 'SQL_Latin1_General_CP1_CI_AS';
 
-            $table->string('CODE', 50)->nullable()->collation($collation);
+            $table->string('CODE', 50)->collation($collation);
             $table->string('AC_STS', 50)->nullable()->collation($collation);
             $table->string('NAME', 250)->nullable()->collation($collation);
             $table->string('ADDRESS1', 250)->nullable()->collation($collation);
@@ -35,8 +35,8 @@ return new class extends Migration
             $table->string('NPWP', 50)->nullable()->collation($collation);
             $table->string('CUST_TYPE', 50)->nullable()->collation($collation);
 
-            // Tambahkan primary key atau index jika diperlukan
-            // $table->primary('CODE');
+            // Set primary key
+            $table->primary('CODE');
         });
     }
 

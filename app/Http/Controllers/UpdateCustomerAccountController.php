@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\UpdateCustomerAccount;
+use App\Models\Customer;
 use App\Models\Industry;
 use App\Models\Geo;
+use App\Models\Salesperson;
+use App\Models\CustomerGroup;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
 
@@ -13,60 +15,88 @@ class UpdateCustomerAccountController extends Controller
 {
     public function index()
     {
-        $accounts = \App\Models\UpdateCustomerAccount::all();
+        $customers = Customer::all();
         $industries = Industry::all();
         $geoData = Geo::all();
-        return view('sales-management.system-requirement.system-requirement.customer account.updatecustomeraccount', compact('accounts', 'industries', 'geoData'));
+        $salespersons = Salesperson::all();
+        $customerGroups = CustomerGroup::all();
+        return view('sales-management.system-requirement.system-requirement.customer account.updatecustomeraccount', compact('customers', 'industries', 'geoData', 'salespersons', 'customerGroups'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'customer_code' => 'required|string|max:20',
-            'customer_name' => 'required|string|max:100',
+            'customer_code' => 'required|string|max:50',
+            'customer_name' => 'required|string|max:250',
             'short_name' => 'nullable|string|max:50',
             'address' => 'nullable|string',
-            'contact_person' => 'nullable|string|max:100',
-            'telephone_no' => 'nullable|string|max:30',
-            'fax_no' => 'nullable|string|max:30',
-            'co_email' => 'nullable|email|max:100',
+            'address2' => 'nullable|string',
+            'address3' => 'nullable|string',
+            'contact_person' => 'nullable|string|max:50',
+            'telephone_no' => 'nullable|string|max:100',
+            'fax_no' => 'nullable|string|max:50',
+            'co_email' => 'nullable|string|max:50',
             'credit_limit' => 'nullable|numeric',
-            'credit_terms' => 'nullable|integer',
+            'credit_terms' => 'nullable|numeric',
             'ac_type' => 'required|string|in:Y-Foreign,N-Local',
-            'currency_code' => 'nullable|string|max:10',
-            'salesperson_code' => 'nullable|string|max:20',
-            'industrial_code' => 'nullable|string|max:20',
-            'geographical' => 'nullable|string|max:20',
-            'grouping_code' => 'nullable|string|max:20',
+            'currency_code' => 'nullable|string|max:50',
+            'salesperson_code' => 'nullable|string|max:50',
+            'industrial_code' => 'nullable|string|max:50',
+            'geographical' => 'nullable|string|max:50',
+            'grouping_code' => 'nullable|string|max:50',
             'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
         ]);
 
+        // Map frontend data to CUSTOMER table structure
+        $customerData = [
+            'CODE' => $validated['customer_code'],
+            'AC_STS' => 'A', // Active status
+            'NAME' => $validated['customer_name'],
+            'ADDRESS1' => $validated['address'] ?? '',
+            'ADDRESS2' => $validated['address2'] ?? '',
+            'ADDRESS3' => $validated['address3'] ?? '',
+            'PERSON_CONTACT' => $validated['contact_person'] ?? '',
+            'TEL_NO' => $validated['telephone_no'] ?? '',
+            'FAX_NO' => $validated['fax_no'] ?? '',
+            'EMAIL' => $validated['co_email'] ?? '',
+            'CREDIT_LIMIT' => $validated['credit_limit'] ?? 0,
+            'TERM' => $validated['credit_terms'] ?? 0,
+            'TYPE' => $validated['ac_type'],
+            'CURRENCY' => $validated['currency_code'] ?? '',
+            'SLM' => $validated['salesperson_code'] ?? '',
+            'AREA' => $validated['geographical'] ?? '',
+            'IND' => $validated['industrial_code'] ?? '',
+            'GROUP_' => $validated['grouping_code'] ?? '',
+            'NPWP' => '',
+            'CUST_TYPE' => $validated['print_ar_aging'] === 'Y-Yes' ? 'Y' : 'N'
+        ];
+
         // Check if customer with this code already exists
-        $existingAccount = UpdateCustomerAccount::where('customer_code', $validated['customer_code'])->first();
+        $existingCustomer = Customer::where('CODE', $validated['customer_code'])->first();
         
-        if ($existingAccount) {
-            // Update existing account
-            $existingAccount->update($validated);
-            return to_route('vue.update-customer-account.index')->with('message', 'Customer account updated successfully');
+        if ($existingCustomer) {
+            // Update existing customer
+            $existingCustomer->update($customerData);
+            return response()->json(['success' => true, 'message' => 'Customer updated successfully']);
         } else {
-            // Create new account
-            UpdateCustomerAccount::create($validated);
-            return to_route('vue.update-customer-account.index')->with('message', 'Customer account created successfully');
+            // Create new customer
+            Customer::create($customerData);
+            return response()->json(['success' => true, 'message' => 'Customer created successfully']);
         }
     }
 
     public function apiIndex(Request $request)
     {
         try {
-            Log::info('Fetching customer accounts...');
-            $query = UpdateCustomerAccount::query();
+            Log::info('Fetching customers...');
+            $query = Customer::query();
 
             // Apply search filter
             if ($request->has('search')) {
                 $search = $request->input('search');
                 $query->where(function ($q) use ($search) {
-                    $q->where('customer_code', 'like', '%' . $search . '%')
-                      ->orWhere('customer_name', 'like', '%' . $search . '%');
+                    $q->where('CODE', 'like', '%' . $search . '%')
+                      ->orWhere('NAME', 'like', '%' . $search . '%');
                 });
             }
 
@@ -75,44 +105,34 @@ class UpdateCustomerAccountController extends Controller
                 $sortBy = $request->input('sort_by');
                 $query->orderBy($sortBy);
             } else {
-                $query->orderBy('customer_code'); // Default sort
+                $query->orderBy('CODE'); // Default sort
             }
 
-            // Temporarily disable status filters for testing
-            // $filterActive = filter_var($request->input('filter_active', false), FILTER_VALIDATE_BOOLEAN);
-            // $filterObsolete = filter_var($request->input('filter_obsolete', false), FILTER_VALIDATE_BOOLEAN);
-
-            // if ($filterActive && !$filterObsolete) {
-            //     $query->where('status', 'Active');
-            // } elseif (!$filterActive && $filterObsolete) {
-            //     $query->where('status', 'Obsolete');
-            // } elseif (!($filterActive && $filterObsolete)) {
-            //     if (!$filterActive && !$filterObsolete) {
-            //          return response()->json(['data' => []]);
-            //     }
-            // }
-
-            $accounts = $query->get();
-            Log::info('Found ' . $accounts->count() . ' customer accounts with applied filters');
+            $customers = $query->get();
+            Log::info('Found ' . $customers->count() . ' customers with applied filters');
             
             // Transform data to ensure consistent format with expected fields
-            $formatted = $accounts->map(function($account) {
-                // Default to Active if status is not set, or map to 'Active'/'Obsolete'
-                $status = $account->status ?? 'Active'; // Assuming 'status' column exists
-                
+            $formatted = $customers->map(function($customer) {
                 return [
-                    'id' => $account->id, // Ensure ID is returned for keying in Vue
-                    'customer_code' => $account->customer_code,
-                    'customer_name' => $account->customer_name,
-                    'short_name' => $account->short_name,
-                    'salesperson_code' => $account->salesperson_code, // Use salesperson_code
-                    'account_type' => $account->ac_type,
-                    'currency_code' => $account->currency_code,
-                    'address' => $account->address,
-                    'contact_person' => $account->contact_person,
-                    'telephone_no' => $account->telephone_no,
-                    'co_email' => $account->co_email,
-                    'status' => $status, 
+                    'id' => $customer->CODE, // Use CODE as ID
+                    'customer_code' => $customer->CODE,
+                    'customer_name' => $customer->NAME,
+                    'short_name' => '', // Not available in CUSTOMER table
+                    'salesperson_code' => $customer->SLM,
+                    'account_type' => $customer->TYPE,
+                    'currency_code' => $customer->CURRENCY,
+                    'address' => $customer->ADDRESS1,
+                    'contact_person' => $customer->PERSON_CONTACT,
+                    'telephone_no' => $customer->TEL_NO,
+                    'co_email' => $customer->EMAIL,
+                    'status' => $customer->AC_STS,
+                    'credit_limit' => $customer->CREDIT_LIMIT,
+                    'credit_terms' => $customer->TERM,
+                    'fax_no' => $customer->FAX_NO,
+                    'industrial_code' => $customer->IND,
+                    'geographical' => $customer->AREA,
+                    'grouping_code' => $customer->GROUP_,
+                    'print_ar_aging' => $customer->CUST_TYPE === 'Y' ? 'Y-Yes' : 'N-No'
                 ];
             });
             
@@ -131,48 +151,83 @@ class UpdateCustomerAccountController extends Controller
     public function apiStore(Request $request)
     {
         try {
-            Log::info('API Store Customer Account Request:', ['data' => $request->all()]);
+            Log::info('API Store Customer Request:', ['data' => $request->all()]);
             
             $validated = $request->validate([
-                'customer_code' => 'required|string|max:20',
-                'customer_name' => 'required|string|max:100',
+                'customer_code' => 'required|string|max:50',
+                'customer_name' => 'required|string|max:250',
                 'short_name' => 'nullable|string|max:50',
                 'address' => 'nullable|string',
-                'contact_person' => 'nullable|string|max:100',
-                'telephone_no' => 'nullable|string|max:30',
-                'fax_no' => 'nullable|string|max:30',
-                'co_email' => 'nullable|email|max:100',
+                'address2' => 'nullable|string',
+                'address3' => 'nullable|string',
+                'contact_person' => 'nullable|string|max:50',
+                'telephone_no' => 'nullable|string|max:100',
+                'fax_no' => 'nullable|string|max:50',
+                'co_email' => 'nullable|string|max:50',
                 'credit_limit' => 'nullable|numeric',
-                'credit_terms' => 'nullable|integer',
+                'credit_terms' => 'nullable|numeric',
                 'ac_type' => 'required|string|in:Y-Foreign,N-Local',
-                'currency_code' => 'nullable|string|max:10',
-                'salesperson_code' => 'nullable|string|max:20',
-                'industrial_code' => 'nullable|string|max:20',
-                'geographical' => 'nullable|string|max:20',
-                'grouping_code' => 'nullable|string|max:20',
+                'currency_code' => 'nullable|string|max:50',
+                'npwp' => 'nullable|string|max:50',
+                'salesperson_code' => 'nullable|string|max:50',
+                'industrial_code' => 'nullable|string|max:50',
+                'geographical' => 'nullable|string|max:50',
+                'grouping_code' => 'nullable|string|max:50',
                 'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
             ]);
             
             Log::info('Validated data:', $validated);
 
-            // Check if customer with this code already exists
-            $existingAccount = UpdateCustomerAccount::where('customer_code', $validated['customer_code'])->first();
-            
-            if ($existingAccount) {
-                // Update existing account
-                Log::info('Updating existing account:', ['id' => $existingAccount->id, 'code' => $existingAccount->customer_code]);
-                $existingAccount->update($validated);
+            // Additional email validation if not empty
+            if (!empty($validated['co_email']) && !filter_var($validated['co_email'], FILTER_VALIDATE_EMAIL)) {
                 return response()->json([
-                    'message' => 'Customer account updated successfully',
-                    'data' => $existingAccount
+                    'message' => 'Validation failed',
+                    'errors' => ['co_email' => ['The co_email field must be a valid email address.']]
+                ], 422);
+            }
+
+            // Map frontend data to CUSTOMER table structure
+            $customerData = [
+                'CODE' => $validated['customer_code'],
+                'AC_STS' => 'A', // Active status
+                'NAME' => $validated['customer_name'],
+                'ADDRESS1' => $validated['address'] ?? '',
+                'ADDRESS2' => $validated['address2'] ?? '',
+                'ADDRESS3' => $validated['address3'] ?? '',
+                'PERSON_CONTACT' => $validated['contact_person'] ?? '',
+                'TEL_NO' => $validated['telephone_no'] ?? '',
+                'FAX_NO' => $validated['fax_no'] ?? '',
+                'EMAIL' => $validated['co_email'] ?? '',
+                'CREDIT_LIMIT' => $validated['credit_limit'] ?? 0,
+                'TERM' => $validated['credit_terms'] ?? 0,
+                'TYPE' => $validated['ac_type'],
+                'CURRENCY' => $validated['currency_code'] ?? '',
+                'SLM' => $validated['salesperson_code'] ?? '',
+                'AREA' => $validated['geographical'] ?? '',
+                'IND' => $validated['industrial_code'] ?? '',
+                'GROUP_' => $validated['grouping_code'] ?? '',
+                'NPWP' => $validated['npwp'] ?? '',
+                'CUST_TYPE' => $validated['print_ar_aging'] === 'Y-Yes' ? 'Y' : 'N'
+            ];
+
+            // Check if customer with this code already exists
+            $existingCustomer = Customer::where('CODE', $validated['customer_code'])->first();
+            
+            if ($existingCustomer) {
+                // Update existing customer
+                Log::info('Updating existing customer:', ['code' => $existingCustomer->CODE]);
+                $existingCustomer->update($customerData);
+                return response()->json([
+                    'message' => 'Customer updated successfully',
+                    'data' => $existingCustomer
                 ]);
             } else {
-                // Create new account
-                Log::info('Creating new account:', ['code' => $validated['customer_code']]);
-                $newAccount = UpdateCustomerAccount::create($validated);
+                // Create new customer
+                Log::info('Creating new customer:', ['code' => $validated['customer_code']]);
+                $newCustomer = Customer::create($customerData);
                 return response()->json([
-                    'message' => 'Customer account created successfully',
-                    'data' => $newAccount
+                    'message' => 'Customer created successfully',
+                    'data' => $newCustomer
                 ], 201);
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -191,30 +246,57 @@ class UpdateCustomerAccountController extends Controller
 
     public function apiUpdate(Request $request, $id)
     {
-        $account = UpdateCustomerAccount::findOrFail($id);
+        $customer = Customer::where('CODE', $id)->firstOrFail();
 
         $validated = $request->validate([
-            'customer_code' => 'required|string|max:20',
-            'customer_name' => 'required|string|max:100',
+            'customer_code' => 'required|string|max:50',
+            'customer_name' => 'required|string|max:250',
             'short_name' => 'nullable|string|max:50',
             'address' => 'nullable|string',
-            'contact_person' => 'nullable|string|max:100',
-            'telephone_no' => 'nullable|string|max:30',
-            'fax_no' => 'nullable|string|max:30',
-            'co_email' => 'nullable|email|max:100',
+            'address2' => 'nullable|string',
+            'address3' => 'nullable|string',
+            'contact_person' => 'nullable|string|max:50',
+            'telephone_no' => 'nullable|string|max:100',
+            'fax_no' => 'nullable|string|max:50',
+            'co_email' => 'nullable|string|max:50',
             'credit_limit' => 'nullable|numeric',
-            'credit_terms' => 'nullable|integer',
+            'credit_terms' => 'nullable|numeric',
             'ac_type' => 'required|string|in:Y-Foreign,N-Local',
-            'currency_code' => 'nullable|string|max:10',
-            'salesperson_code' => 'nullable|string|max:20',
-            'industrial_code' => 'nullable|string|max:20',
-            'geographical' => 'nullable|string|max:20',
-            'grouping_code' => 'nullable|string|max:20',
+            'currency_code' => 'nullable|string|max:50',
+            'npwp' => 'nullable|string|max:50',
+            'salesperson_code' => 'nullable|string|max:50',
+            'industrial_code' => 'nullable|string|max:50',
+            'geographical' => 'nullable|string|max:50',
+            'grouping_code' => 'nullable|string|max:50',
             'print_ar_aging' => 'required|string|in:Y-Yes,N-No'
         ]);
 
-        $account->update($validated);
-        return response()->json($account);
+        // Map frontend data to CUSTOMER table structure
+        $customerData = [
+            'CODE' => $validated['customer_code'],
+            'AC_STS' => 'A', // Active status
+            'NAME' => $validated['customer_name'],
+            'ADDRESS1' => $validated['address'] ?? '',
+            'ADDRESS2' => $validated['address2'] ?? '',
+            'ADDRESS3' => $validated['address3'] ?? '',
+            'PERSON_CONTACT' => $validated['contact_person'] ?? '',
+            'TEL_NO' => $validated['telephone_no'] ?? '',
+            'FAX_NO' => $validated['fax_no'] ?? '',
+            'EMAIL' => $validated['co_email'] ?? '',
+            'CREDIT_LIMIT' => $validated['credit_limit'] ?? 0,
+            'TERM' => $validated['credit_terms'] ?? 0,
+            'TYPE' => $validated['ac_type'],
+            'CURRENCY' => $validated['currency_code'] ?? '',
+            'SLM' => $validated['salesperson_code'] ?? '',
+            'AREA' => $validated['geographical'] ?? '',
+            'IND' => $validated['industrial_code'] ?? '',
+            'GROUP_' => $validated['grouping_code'] ?? '',
+            'NPWP' => $validated['npwp'] ?? '',
+            'CUST_TYPE' => $validated['print_ar_aging'] === 'Y-Yes' ? 'Y' : 'N'
+        ];
+
+        $customer->update($customerData);
+        return response()->json($customer);
     }
 
     /**
@@ -223,21 +305,44 @@ class UpdateCustomerAccountController extends Controller
     public function apiShow($id)
     {
         try {
-            Log::info('Fetching single customer account', ['id' => $id]);
-            $account = UpdateCustomerAccount::findOrFail($id);
+            Log::info('Fetching single customer', ['id' => $id]);
+            $customer = Customer::where('CODE', $id)->firstOrFail();
             
-            Log::info('Found customer account', ['customer_code' => $account->customer_code]);
+            Log::info('Found customer', ['customer_code' => $customer->CODE]);
             
-            return response()->json($account);
+            // Transform data to match frontend expectations
+            $formatted = [
+                'id' => $customer->CODE,
+                'customer_code' => $customer->CODE,
+                'customer_name' => $customer->NAME,
+                'short_name' => '',
+                'salesperson_code' => $customer->SLM,
+                'account_type' => $customer->TYPE,
+                'currency_code' => $customer->CURRENCY,
+                'address' => $customer->ADDRESS1,
+                'contact_person' => $customer->PERSON_CONTACT,
+                'telephone_no' => $customer->TEL_NO,
+                'co_email' => $customer->EMAIL,
+                'status' => $customer->AC_STS,
+                'credit_limit' => $customer->CREDIT_LIMIT,
+                'credit_terms' => $customer->TERM,
+                'fax_no' => $customer->FAX_NO,
+                'industrial_code' => $customer->IND,
+                'geographical' => $customer->AREA,
+                'grouping_code' => $customer->GROUP_,
+                'print_ar_aging' => $customer->CUST_TYPE === 'Y' ? 'Y-Yes' : 'N-No'
+            ];
+            
+            return response()->json($formatted);
         } catch (\Exception $e) {
-            Log::error('Error fetching customer account', [
+            Log::error('Error fetching customer', [
                 'id' => $id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
             
             return response()->json([
-                'message' => 'Customer account not found: ' . $e->getMessage()
+                'message' => 'Customer not found: ' . $e->getMessage()
             ], 404);
         }
     }

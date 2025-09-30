@@ -77,9 +77,9 @@
               <td class="px-2 py-1 border border-gray-300">{{ account.currency_code }}</td>
               <td class="px-2 py-1 border border-gray-300">
                 <span 
-                  :class="(account.status === 'Active' || !account.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                  :class="(account.status === 'A' || account.status === 'Active' || !account.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                   class="px-2 py-0.5 rounded-full text-xs">
-                  {{ account.status || 'Active' }}
+                  {{ account.status === 'A' ? 'Active' : (account.status === 'I' ? 'Inactive' : (account.status || 'Active')) }}
                 </span>
               </td>
             </tr>
@@ -151,9 +151,14 @@ export default {
     const showCustomerAccountZoomModal = ref(false);
 
     const fetchCustomerAccounts = async () => {
+      console.log('fetchCustomerAccounts called')
+      console.log('props.customerAccounts:', props.customerAccounts)
+      console.log('props.customerAccounts length:', props.customerAccounts?.length)
+      
       if (props.customerAccounts && props.customerAccounts.length > 0) {
         console.log('Using provided customer accounts:', props.customerAccounts.length)
         allAccounts.value = props.customerAccounts
+        loading.value = false
         return
       }
       
@@ -198,13 +203,20 @@ export default {
     }
 
     const filteredAccounts = computed(() => {
+      console.log('filteredAccounts computed called')
+      console.log('allAccounts.value:', allAccounts.value)
+      console.log('allAccounts.value length:', allAccounts.value.length)
+      console.log('statusFilter.value:', statusFilter.value)
+      
       let filtered = [...allAccounts.value]
       
       // Filter based on status
       if (statusFilter.value === 'active') {
-        filtered = filtered.filter(account => account.status === 'Active' || account.status === undefined)
+        filtered = filtered.filter(account => account.status === 'A' || account.status === 'Active' || account.status === undefined)
+        console.log('After active filter:', filtered.length)
       } else if (statusFilter.value === 'obsolete') {
-        filtered = filtered.filter(account => account.status === 'Inactive' || account.status === 'Obsolete')
+        filtered = filtered.filter(account => account.status === 'I' || account.status === 'Inactive' || account.status === 'Obsolete')
+        console.log('After obsolete filter:', filtered.length)
       }
       
       // Sort based on selected field
@@ -214,6 +226,7 @@ export default {
         return fieldA.localeCompare(fieldB)
       })
       
+      console.log('Final filtered accounts:', filtered.length)
       return filtered
     })
 
@@ -280,17 +293,24 @@ export default {
     // Watch for changes in the show prop to fetch data when modal is shown
     watch(() => props.show, (newValue) => {
       if (newValue === true) {
-        fetchCustomerAccounts()
+        // Only fetch from API if no customer accounts are provided via props
+        if (!props.customerAccounts || props.customerAccounts.length === 0) {
+          fetchCustomerAccounts()
+        }
       }
     }, { immediate: true })
 
     // Watch for changes in external customer accounts
     watch(() => props.customerAccounts, (newAccounts) => {
       if (newAccounts && newAccounts.length > 0) {
-        console.log('Customer accounts prop updated:', newAccounts.length)
         allAccounts.value = newAccounts
+        loading.value = false
+        // Auto-select first account if none selected
+        if (!selectedAccount.value) {
+          selectedAccount.value = newAccounts[0]
+        }
       }
-    }, { deep: true })
+    }, { deep: true, immediate: true })
 
     return {
       allAccounts,
