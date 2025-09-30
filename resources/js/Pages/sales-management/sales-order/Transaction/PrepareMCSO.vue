@@ -726,6 +726,8 @@ const orderDetails = reactive({
   remark: '',
   instruction1: '',
   instruction2: ''
+  ,
+  so_number: ''
 })
 
 // Modal visibility
@@ -1072,7 +1074,8 @@ const refreshPage = () => {
     lotNumber: '',
     remark: '',
     instruction1: '',
-    instruction2: ''
+    instruction2: '',
+    so_number: ''
   })
   
   // Update UI after reset
@@ -1683,7 +1686,7 @@ const saveDeliveryLocation = async (locationData) => {
   // Create Sales Order first, then proceed to Delivery Schedule
   try {
     const soResponse = await createSalesOrder()
-    if (soResponse.success) {
+    if (soResponse?.success) {
       orderDetails.so_number = soResponse.so_number
       success(`Sales Order ${soResponse.so_number} created successfully!`)
       
@@ -1692,7 +1695,7 @@ const saveDeliveryLocation = async (locationData) => {
         showDeliveryScheduleModal.value = true
       }, 300)
     } else {
-      error('Failed to create Sales Order: ' + soResponse.message)
+      error('Failed to create Sales Order: ' + (soResponse?.message || 'Unknown error'))
     }
   } catch (err) {
     console.error('Error creating Sales Order:', err)
@@ -1713,7 +1716,7 @@ const saveDeliverySchedule = async (scheduleData) => {
     }
     
     // First, we need to create the Sales Order if it doesn't exist
-    let soNumber = orderDetails.value.so_number
+    let soNumber = orderDetails.so_number
     
     if (!soNumber) {
       // Create the Sales Order first
@@ -1723,22 +1726,13 @@ const saveDeliverySchedule = async (scheduleData) => {
         return
       }
       soNumber = soResponse.so_number
-      orderDetails.value.so_number = soNumber
+      orderDetails.so_number = soNumber
     }
     
-    // Now save the delivery schedule
+    // Now save the delivery schedule (entries already validated by modal)
     const requestData = {
       so_number: soNumber,
-      entries: scheduleData.entries.map(entry => ({
-        line_number: entry.line_number || 1,
-        schedule_date: entry.date,
-        schedule_time: entry.time,
-        delivery_quantity: parseFloat(entry.main) || 0,
-        due_status: entry.due,
-        remark: entry.remark,
-        delivery_code: entry.delivery_code,
-        delivery_location: entry.delivery_location
-      }))
+      entries: scheduleData.entries
     }
     
     const response = await fetch('/api/sales-order/delivery-schedule', {

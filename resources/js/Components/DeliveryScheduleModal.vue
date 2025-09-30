@@ -88,6 +88,25 @@
 
         <!-- Content -->
         <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          <!-- Validation Error Popup -->
+          <div v-if="showErrorPopup" class="fixed inset-0 z-50 flex items-center justify-center">
+            <div class="fixed inset-0 bg-black bg-opacity-40"></div>
+            <div class="relative bg-white rounded-lg shadow-xl w-[360px]">
+              <div class="px-4 py-3 border-b border-gray-200 flex items-center">
+                <span class="text-sm text-gray-500">Error</span>
+              </div>
+              <div class="p-4 flex space-x-3 items-start">
+                <div class="text-red-600 text-2xl leading-none">✖</div>
+                <div class="text-sm">
+                  <div class="flex space-x-2"><span class="text-gray-600">Code:</span><span class="font-medium">{{ errorInfo.code }}</span></div>
+                  <div class="flex space-x-2 mt-1"><span class="text-gray-600">Type:</span><span class="font-medium">{{ errorInfo.type }}</span></div>
+                </div>
+              </div>
+              <div class="px-4 py-3 border-t border-gray-200 flex justify-end">
+                <button @click="showErrorPopup = false" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 text-sm">Close</button>
+              </div>
+            </div>
+          </div>
           <!-- Schedule Grid -->
           <div class="mb-6">
             <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white">
@@ -114,11 +133,11 @@
               <!-- Schedule Entries -->
               <div 
                 v-for="(entry, index) in scheduleEntries" 
-                :key="entry.id"
-                @click="selectEntry(entry)"
+                :key="entry.id ?? index"
+                @click="selectEntry(entry, index)"
                 :class="[
                   'grid grid-cols-16 border-b border-gray-200 cursor-pointer transition-colors',
-                  selectedEntry?.id === entry.id ? 'bg-blue-100' : 'hover:bg-gray-50'
+                  selectedIndex === index ? 'bg-blue-100' : 'bg-white hover:bg-gray-50'
                 ]"
               >
                 <div class="px-2 py-2 border-r border-gray-200 text-sm font-medium">{{ entry.no }}</div>
@@ -409,17 +428,32 @@ const scheduleEntry = reactive({
 // Schedule entries list
 const scheduleEntries = ref([])
 const selectedEntry = ref(null)
+const selectedIndex = ref(-1)
 const isEditing = ref(false)
 
 // Rough cut capacity check
 const showCapacityCheck = ref(false)
 const capacityCheckData = ref(null)
 
+// Error popup state
+const showErrorPopup = ref(false)
+const errorInfo = reactive({ code: '', type: '' })
+
 // Order totals from props
 const orderTotal = computed(() => {
   return {
-    set: props.orderDetails?.setQuantity || 0,
-    main: props.orderDetails?.mainQuantity || 100
+    set: (() => {
+      const val = props.orderDetails?.setQuantity
+      const num = typeof val === 'string' ? parseFloat(val) : Number(val)
+      return isNaN(num) ? 0 : num
+    })(),
+    // default main total to setQuantity when mainQuantity not provided
+    main: (() => {
+      const hasMain = (props.orderDetails?.mainQuantity != null && props.orderDetails?.mainQuantity !== '')
+      const raw = hasMain ? props.orderDetails.mainQuantity : props.orderDetails?.setQuantity
+      const num = typeof raw === 'string' ? parseFloat(raw) : Number(raw)
+      return isNaN(num) ? 0 : num
+    })()
   }
 })
 
@@ -442,8 +476,9 @@ const remaining = computed(() => {
 })
 
 // Methods
-const selectEntry = (entry) => {
+const selectEntry = (entry, index) => {
   selectedEntry.value = entry
+  selectedIndex.value = index
   if (entry) {
     Object.assign(scheduleEntry, { ...entry })
     isEditing.value = true
@@ -484,6 +519,7 @@ const deleteSelectedEntry = () => {
   
   resetForm()
   selectedEntry.value = null
+selectedIndex.value = -1
   isEditing.value = false
 }
 
@@ -528,6 +564,7 @@ const addScheduleEntry = () => {
   resetForm()
   isEditing.value = false
   selectedEntry.value = null
+selectedIndex.value = -1
 }
 
 const resetForm = () => {
@@ -573,6 +610,7 @@ const formatDate = (dateString) => {
 const refreshScreen = () => {
   resetForm()
   selectedEntry.value = null
+  selectedIndex.value = -1
   isEditing.value = false
   success('Screen refreshed')
 }
@@ -631,18 +669,37 @@ const saveSchedule = async () => {
   }
 
   // Validate totals
-  if (remaining.value.set < 0 || remaining.value.main < 0) {
-    error('Entry total exceeds order total. Please adjust quantities.')
+  const totalMain = Number(entryTotal.value.main)
+  const requiredMain = Number(orderTotal.value.main)
+  if (totalMain !== requiredMain) {
+    // Show popup with code 200105
+    errorInfo.code = '200105'
+    errorInfo.type = 'Unmatched Order Qty with Delivery Schedule Qty'
+    showErrorPopup.value = true
     return
   }
 
-  try {
-    // Check if SO number exists, if not, emit an event to create the SO first
-    if (!props.orderDetails.so_number) {
-      error('Sales Order number is required. Please create the Sales Order first.')
+  // Validate that no per-entry or cumulative scheduled qty exceeds order qty
+  let runningTotal = 0
+  for (let i = 0; i < scheduleEntries.value.length; i++) {
+    const e = scheduleEntries.value[i]
+    const qty = Number(e.main || e.set || 0)
+    if (!qty || qty <= 0) {
+      error(`Entry ${e.no || i + 1}: Delivery quantity must be greater than 0`)
       return
     }
+    if (qty > requiredMain) {
+      error(`Entry ${e.no || i + 1}: Scheduled quantity exceeds order quantity`)
+      return
+    }
+    runningTotal += qty
+    if (runningTotal > requiredMain) {
+      error(`Entry ${e.no || i + 1}: Scheduled quantity for line 1 exceeds order quantity`)
+      return
+    }
+  }
 
+  try {
     // Validate entries before sending
     const validatedEntries = scheduleEntries.value.map(entry => {
       const deliveryQuantity = parseFloat(entry.main) || parseFloat(entry.set) || 0
@@ -671,23 +728,8 @@ const saveSchedule = async () => {
         delivery_location: entry.delivery_location || ''
       }
     })
-
-    console.log('Sending delivery schedule data:', {
-      so_number: props.orderDetails.so_number,
-      entries: validatedEntries
-    })
-
-    const response = await axios.post('/api/sales-order/delivery-schedule', {
-      so_number: props.orderDetails.so_number,
-      entries: validatedEntries
-    })
-
-    if (response.data.success) {
-      success('Delivery schedule saved successfully')
-      emit('save', response.data.data)
-    } else {
-      error(response.data.message || 'Failed to save delivery schedule')
-    }
+    // Hand over to parent for actual saving
+    emit('save', { entries: validatedEntries })
   } catch (err) {
     console.error('Error saving delivery schedule:', err)
     
