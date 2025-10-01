@@ -70,55 +70,6 @@
                         </div>
                     </div>
 
-                    <!-- Selected Customer Display -->
-                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mt-4">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Customer Code
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Customer Name
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Address
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Contact
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-if="customers.length === 0">
-                                        <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                                            Click the search button above to browse and select customers from the modal.
-                                        </td>
-                                    </tr>
-                                    <tr 
-                                        v-for="customer in customers" 
-                                        :key="customer.customer_code" 
-                                        @click="selectCustomerForEdit(customer)"
-                                        class="hover:bg-blue-50 cursor-pointer transition-colors"
-                                    >
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {{ customer.customer_code }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                                            {{ customer.customer_name }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                                            {{ customer.address || 'N/A' }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ customer.telephone_no || 'N/A' }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
             </div>
             
@@ -138,8 +89,9 @@
                             <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
                             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
                                 <li>Search for a customer by code or name</li>
-                                <li>Click on a customer to edit their details</li>
-                                <li>Use the Browse All button to see all customers</li>
+                                <li>Click the search button to browse customers in the modal</li>
+                                <li>Select a customer from the modal to edit their details</li>
+                                <li>Use the "Add New" button to create new customers</li>
                                 <li>Save changes after editing customer information</li>
                             </ul>
                         </div>
@@ -219,6 +171,7 @@
     <CustomerAccountModal 
         v-if="showCustomerAccountModal"
         :show="showCustomerAccountModal"
+        :customerAccounts="customers"
         :initial-search="searchQuery"
         @close="closeCustomerAccountModal"
         @select="selectCustomerAccount"
@@ -278,8 +231,18 @@
                                 </div>
                                 
                                 <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                                    <textarea v-model="newCustomerForm.address" rows="3" class="form-input"></textarea>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address 1</label>
+                                    <textarea v-model="newCustomerForm.address" rows="2" class="form-input"></textarea>
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address 2</label>
+                                    <textarea v-model="newCustomerForm.address2" rows="2" class="form-input"></textarea>
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address 3</label>
+                                    <textarea v-model="newCustomerForm.address3" rows="2" class="form-input"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -337,6 +300,11 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Currency Code</label>
                                     <input type="text" v-model="newCustomerForm.currency_code" class="form-input">
                                     <span class="text-xs text-gray-500">Leave blank if Local Account</span>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">NPWP</label>
+                                    <input type="text" v-model="newCustomerForm.npwp" class="form-input" placeholder="Enter NPWP number">
                                 </div>
                                 
                                 <div>
@@ -773,6 +741,8 @@ const newCustomerForm = reactive({
     customer_name: '',
     short_name: '',
     address: '',
+    address2: '',
+    address3: '',
     contact_person: '',
     telephone_no: '',
     fax_no: '',
@@ -781,6 +751,7 @@ const newCustomerForm = reactive({
     credit_terms: 0,
     ac_type: 'N-Local',
     currency_code: '',
+    npwp: '',
     salesperson_code: '',
     industrial_code: '',
     geographical: '',
@@ -843,75 +814,7 @@ const loadCustomerGroups = async () => {
     }
 }
 
-// Select customer from table and open edit modal
-const selectCustomerForEdit = (customer) => {
-    // Make a copy of the customer data to avoid direct reference
-    const customerData = { ...customer }
-    
-    // Fill the form with customer data, ensuring all required fields have valid values
-    form.customer_code = customerData.customer_code
-    form.customer_name = customerData.customer_name || ''
-    form.short_name = customerData.short_name || ''
-    form.address = customerData.address || ''
-    form.contact_person = customerData.contact_person || ''
-    form.telephone_no = customerData.telephone_no || ''
-    form.fax_no = customerData.fax_no || ''
-    form.co_email = customerData.co_email || ''
-    form.credit_limit = customerData.credit_limit || 0
-    form.credit_terms = customerData.credit_terms || 0
-    form.ac_type = customerData.ac_type || customerData.account_type || 'N-Local'
-    
-    // Ensure ac_type has a valid value
-    if (!['Y-Foreign', 'N-Local'].includes(form.ac_type)) {
-        form.ac_type = 'N-Local'
-    }
-    
-    form.currency_code = customerData.currency_code || ''
-    form.salesperson_code = customerData.salesperson_code || ''
-    form.industrial_code = customerData.industrial_code || ''
-    form.geographical = customerData.geographical || ''
-    form.grouping_code = customerData.grouping_code || ''
-    form.print_ar_aging = customerData.print_ar_aging || 'N-No'
-    
-    // Ensure print_ar_aging has a valid value
-    if (!['Y-Yes', 'N-No'].includes(form.print_ar_aging)) {
-        form.print_ar_aging = 'N-No'
-    }
-    
-    customerSelected.value = true
-    showEditModal.value = true // Automatically open the edit modal
-    
-    // If we don't have all the customer data, fetch the complete record
-    if (!customerData.fax_no || customerData.credit_limit === undefined || 
-        customerData.credit_terms === undefined || !customerData.currency_code ||
-        !customerData.industrial_code || !customerData.geographical || !customerData.grouping_code) {
-        
-        fetchCompleteCustomerData(customerData.id)
-    }
-}
 
-// Add a new function to fetch complete customer data
-const fetchCompleteCustomerData = async (id) => {
-    try {
-        const response = await axios.get(`/api/customer-accounts/${id}`)
-        if (response.data) {
-            // Update form with complete data
-            const completeData = response.data
-            
-            // Update form fields that might be missing in the initial data
-            form.fax_no = completeData.fax_no || form.fax_no
-            form.credit_limit = completeData.credit_limit || form.credit_limit
-            form.credit_terms = completeData.credit_terms || form.credit_terms
-            form.currency_code = completeData.currency_code || form.currency_code
-            form.industrial_code = completeData.industrial_code || form.industrial_code
-            form.geographical = completeData.geographical || form.geographical
-            form.grouping_code = completeData.grouping_code || form.grouping_code
-            form.print_ar_aging = completeData.print_ar_aging || form.print_ar_aging
-        }
-    } catch (error) {
-        console.error('Error fetching complete customer data:', error)
-    }
-}
 
 // Helper functions to get names for selected codes
 const getIndustryName = (code) => {
@@ -936,7 +839,10 @@ const getCustomerGroupName = (code) => {
 }
 
 // Customer account modal functions
-const openCustomerAccountModal = () => {
+const openCustomerAccountModal = async () => {
+    // Always reload data to ensure fresh data
+    await loadCustomerAccounts()
+    
     showCustomerAccountModal.value = true
 }
 
@@ -952,6 +858,8 @@ const openAddNewCustomerModal = () => {
         customer_name: '',
         short_name: '',
         address: '',
+        address2: '',
+        address3: '',
         contact_person: '',
         telephone_no: '',
         fax_no: '',
@@ -960,6 +868,7 @@ const openAddNewCustomerModal = () => {
         credit_terms: 0,
         ac_type: 'N-Local',
         currency_code: '',
+        npwp: '',
         salesperson_code: '',
         industrial_code: '',
         geographical: '',
@@ -1034,7 +943,12 @@ const closeSalespersonModal = () => {
 }
 
 const selectSalesperson = (salesperson) => {
-    form.salesperson_code = salesperson.code;
+    // Check if we're in add new customer modal or edit modal
+    if (showAddNewCustomerModal.value) {
+        newCustomerForm.salesperson_code = salesperson.code;
+    } else {
+        form.salesperson_code = salesperson.code;
+    }
     closeSalespersonModal();
 }
 
@@ -1052,7 +966,12 @@ const closeIndustryModal = () => {
 }
 
 const selectIndustry = (industry) => {
-    form.industrial_code = industry.code;
+    // Check if we're in add new customer modal or edit modal
+    if (showAddNewCustomerModal.value) {
+        newCustomerForm.industrial_code = industry.code;
+    } else {
+        form.industrial_code = industry.code;
+    }
     closeIndustryModal();
 }
 
@@ -1070,7 +989,12 @@ const closeGeoModal = () => {
 }
 
 const selectGeo = (geo) => {
-    form.geographical = geo.code;
+    // Check if we're in add new customer modal or edit modal
+    if (showAddNewCustomerModal.value) {
+        newCustomerForm.geographical = geo.code;
+    } else {
+        form.geographical = geo.code;
+    }
     closeGeoModal();
 }
 
@@ -1088,7 +1012,12 @@ const closeCustomerGroupModal = () => {
 }
 
 const selectCustomerGroup = (group) => {
-    form.grouping_code = group.group_code;
+    // Check if we're in add new customer modal or edit modal
+    if (showAddNewCustomerModal.value) {
+        newCustomerForm.grouping_code = group.group_code;
+    } else {
+        form.grouping_code = group.group_code;
+    }
     closeCustomerGroupModal();
 }
 
@@ -1103,6 +1032,15 @@ const saveCustomerAccount = async () => {
     if (!form.customer_name.trim()) {
         showNotification('Customer name is required', 'warning')
         return
+    }
+    
+    // Email validation if provided
+    if (form.co_email && form.co_email.trim()) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(form.co_email)) {
+            showNotification('Please enter a valid email address', 'warning')
+            return
+        }
     }
     
     // Ensure required fields have valid values
@@ -1149,14 +1087,8 @@ const saveCustomerAccount = async () => {
             showNotification('Customer account saved successfully', 'success')
             showEditModal.value = false
             
-            // Update the local list if the customer exists
-            const index = customers.value.findIndex(c => c.customer_code === form.customer_code)
-            if (index !== -1) {
-                customers.value[index] = { 
-                    ...customers.value[index], 
-                    ...customerData 
-                }
-            }
+            // Reload customer accounts to get the latest data
+            await loadCustomerAccounts()
         } else {
             throw new Error(response.data?.message || 'No data returned from the server')
         }
@@ -1202,6 +1134,15 @@ const saveNewCustomerAccount = async () => {
         return
     }
     
+    // Email validation if provided
+    if (newCustomerForm.co_email && newCustomerForm.co_email.trim()) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(newCustomerForm.co_email)) {
+            showNotification('Please enter a valid email address', 'warning')
+            return
+        }
+    }
+    
     // Check if customer code already exists
     const existingCustomer = customers.value.find(c => c.customer_code === newCustomerForm.customer_code.trim())
     if (existingCustomer) {
@@ -1232,9 +1173,8 @@ const saveNewCustomerAccount = async () => {
             showNotification('New customer account created successfully', 'success')
             closeAddNewCustomerModal()
             
-            // Add the new customer to the local list
-            const newCustomer = response.data
-            customers.value.unshift(newCustomer)
+            // Reload customer accounts to get the latest data
+            await loadCustomerAccounts()
             
             // Clear the form
             Object.assign(newCustomerForm, {
@@ -1242,6 +1182,8 @@ const saveNewCustomerAccount = async () => {
                 customer_name: '',
                 short_name: '',
                 address: '',
+                address2: '',
+                address3: '',
                 contact_person: '',
                 telephone_no: '',
                 fax_no: '',
@@ -1250,6 +1192,7 @@ const saveNewCustomerAccount = async () => {
                 credit_terms: 0,
                 ac_type: 'N-Local',
                 currency_code: '',
+                npwp: '',
                 salesperson_code: '',
                 industrial_code: '',
                 geographical: '',
@@ -1301,9 +1244,24 @@ const showNotification = (message, type = 'success') => {
     }, 3000)
 }
 
+// Load customer accounts
+const loadCustomerAccounts = async () => {
+    try {
+        const response = await axios.get('/api/customers-with-status')
+        
+        if (response.data && response.data.data) {
+            customers.value = response.data.data
+        }
+    } catch (error) {
+        console.error('Error loading customer accounts:', error)
+        showNotification('Failed to load customer accounts', 'error')
+    }
+}
+
 // Initialize component
 onMounted(() => {
     // Load data from APIs
+    loadCustomerAccounts()
     loadIndustries()
     loadGeos()
     loadSalespersons()
@@ -1313,8 +1271,6 @@ onMounted(() => {
     if (page.props.flash && page.props.flash.message) {
         showNotification(page.props.flash.message, 'success')
     }
-    
-    // Note: Search is now handled by the modal, no need to pre-load search results
 })
 </script>
 

@@ -106,9 +106,9 @@
               <td class="px-2 py-1 border border-gray-300">{{ account.currency_code }}</td>
               <td class="px-2 py-1 border border-gray-300">
                 <span 
-                  :class="(account.status === 'Active' || !account.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                  :class="(account.status === 'A' || account.status === 'Active' || !account.status) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                   class="px-2 py-0.5 rounded-full text-xs">
-                  {{ account.status || 'Active' }}
+                  {{ account.status === 'A' ? 'Active' : (account.status === 'I' ? 'Inactive' : (account.status || 'Active')) }}
                 </span>
               </td>
             </tr>
@@ -175,7 +175,6 @@ export default {
 
     const fetchCustomerAccounts = async () => {
       if (props.customerAccounts && props.customerAccounts.length > 0) {
-        console.log('Using provided customer accounts:', props.customerAccounts.length)
         allAccounts.value = props.customerAccounts
         return
       }
@@ -186,7 +185,7 @@ export default {
       try {
         console.log('Fetching customer accounts from API...')
         
-        const response = await axios.get('/api/customer-accounts')
+        const response = await axios.get('/api/customers-with-status')
         const data = response.data
         
         if (data.error) {
@@ -231,9 +230,9 @@ export default {
       
       // Filter based on status
       if (statusFilter.value === 'active') {
-        filtered = filtered.filter(account => account.status === 'Active' || account.status === undefined)
+        filtered = filtered.filter(account => account.status === 'A' || account.status === 'Active' || account.status === undefined)
       } else if (statusFilter.value === 'obsolete') {
-        filtered = filtered.filter(account => account.status === 'Inactive' || account.status === 'Obsolete')
+        filtered = filtered.filter(account => account.status === 'I' || account.status === 'Inactive' || account.status === 'Obsolete')
       }
       
       // Sort based on selected field

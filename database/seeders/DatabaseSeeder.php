@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
             MmReportGroupSeeder::class,
             MmUnitSeeder::class,
             DeliveryOrderFormatSeeder::class,
-            UpdateCustomerAccountSeeder::class,
+            CustomerSeeder::class,
             CustomerAlternateAddressSeeder::class,
             ForeignCurrencySeeder::class,
             MmLocationSeeder::class,
