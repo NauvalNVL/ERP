@@ -281,6 +281,7 @@ Route::get('/customer-service/finished-goods-data', [CustomerServiceController::
 Route::get('/customer-service/production-monitoring-data', [CustomerServiceController::class, 'apiProductionMonitoringData']);
 
 // Sales Order API routes
+Route::post('/sales-order', [App\Http\Controllers\SalesOrderController::class, 'store']);
 Route::post('/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
 Route::get('/sales-order/delivery-schedule/{soNumber}', [App\Http\Controllers\SalesOrderController::class, 'getDeliveryScheduleSummary']);
 Route::post('/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign']);

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Models\UpdateCustomerAccount;
+use App\Models\Customer;
 use App\Models\MasterCard;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderDetail;
@@ -70,7 +71,7 @@ class SalesOrderController extends Controller
             Log::info('Creating sales order with data:', $request->all());
             
             // Pull related entities
-            $customer = UpdateCustomerAccount::where('customer_code', $request->customer_code)->first();
+            $customer = Customer::where('CODE', $request->customer_code)->first();
             $mc = MasterCard::where('mc_seq', $request->master_card_seq)->first();
 
             if (!$customer) {
@@ -89,12 +90,12 @@ class SalesOrderController extends Controller
             // Prepare data for creation
             $salesOrderData = [
                 'so_number' => $soNumber,
-                'customer_code' => $customer->customer_code,
-                'customer_name' => $customer->customer_name ?? null,
-                'customer_address' => $customer->address ?? null,
-                'credit_terms' => $customer->credit_terms ?? null,
-                'credit_limit' => $customer->credit_limit ?? null,
-                'salesperson_code' => $request->salesperson_code ?: ($customer->salesperson_code ?? null),
+                'customer_code' => $customer->CODE,
+                'customer_name' => $customer->NAME ?? null,
+                'customer_address' => $customer->ADDRESS1 ?? null,
+                'credit_terms' => $customer->TERM ? (int) $customer->TERM : null,
+                'credit_limit' => $customer->CREDIT_LIMIT ?? null,
+                'salesperson_code' => $request->salesperson_code ?: ($customer->SLM ?? null),
                 'currency' => $request->currency,
                 'exchange_rate' => $request->exchange_rate ?? 0,
 
@@ -193,7 +194,7 @@ class SalesOrderController extends Controller
     public function getCustomer($customerCode)
     {
         try {
-            $customer = UpdateCustomerAccount::where('customer_code', $customerCode)
+            $customer = Customer::where('CODE', $customerCode)
                 ->first();
 
             if (!$customer) {
@@ -203,9 +204,34 @@ class SalesOrderController extends Controller
                 ], 404);
             }
 
+            // Transform the data to match frontend expectations
+            $customerData = [
+                'id' => $customer->CODE,
+                'customer_code' => $customer->CODE,
+                'customer_name' => $customer->NAME,
+                'short_name' => $customer->SHORT_NAME ?? '',
+                'address' => $customer->ADDRESS1 ?? '',
+                'address2' => $customer->ADDRESS2 ?? '',
+                'address3' => $customer->ADDRESS3 ?? '',
+                'contact_person' => $customer->PERSON_CONTACT ?? '',
+                'telephone_no' => $customer->TEL_NO ?? '',
+                'fax_no' => $customer->FAX_NO ?? '',
+                'co_email' => $customer->EMAIL ?? '',
+                'credit_limit' => $customer->CREDIT_LIMIT ?? 0,
+                'credit_terms' => $customer->TERM ?? 0,
+                'account_type' => $customer->TYPE ?? 'N-Local',
+                'currency_code' => $customer->CURRENCY ?? 'IDR',
+                'salesperson_code' => $customer->SLM ?? '',
+                'industrial_code' => $customer->IND ?? '',
+                'geographical' => $customer->AREA ?? '',
+                'grouping_code' => $customer->GROUP_ ?? '',
+                'npwp' => $customer->NPWP ?? '',
+                'status' => $customer->CUST_TYPE ?? 'A'
+            ];
+
             return response()->json([
                 'success' => true,
-                'data' => $customer
+                'data' => $customerData
             ]);
 
         } catch (\Exception $e) {
