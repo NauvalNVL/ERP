@@ -1053,6 +1053,12 @@ Route::prefix('api')->group(function () {
     Route::post('/approve-mc/reject/{id}', [ApproveMcController::class, 'reject']);
     Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);
     
+    // Update MC API routes
+    Route::get('/update-mc/master-cards', [UpdateMcController::class, 'apiIndex']);
+    Route::post('/update-mc/master-cards', [UpdateMcController::class, 'store']);
+    Route::get('/update-mc/master-cards/{mcSeq}', [UpdateMcController::class, 'apiShow']);
+    Route::get('/update-mc/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs']);
+    
     // RealeseApproveMC API routes
     Route::get('/realese-approve-mc', [RealeseApproveMcController::class, 'apiIndex']);
     Route::post('/realese-approve-mc', [RealeseApproveMcController::class, 'store']);
@@ -1456,14 +1462,13 @@ Route::get('/material-management/system-requirement/inventory-setup/unlock-sku-u
 // Add route for CustomerWarehouseRequirement
 Route::get('/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-requirement', [CustomerWarehouseRequirementController::class, 'index'])->name('vue.warehouse-management.finished-goods.setup-maintenance.define-customer-warehouse-requirement');
 
-// Update MC Routes
-Route::prefix('update-mc')->group(function () {
-    Route::get('/', [UpdateMcController::class, 'index'])->name('update-mc.index');
-    Route::post('/search-ac', [UpdateMcController::class, 'searchAc'])->name('update-mc.search-ac');
-    Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs'])->name('update-mc.search-mcs');
-    Route::get('/master-cards', [UpdateMcController::class, 'apiIndex'])->name('update-mc.master-cards');
-    Route::get('/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs'])->name('update-mc.check-mcs');
-});
+        // Update MC Routes
+        Route::prefix('update-mc')->group(function () {
+            Route::get('/', [UpdateMcController::class, 'index'])->name('update-mc.index');
+            Route::post('/search-ac', [UpdateMcController::class, 'searchAc'])->name('update-mc.search-ac');
+            Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs'])->name('update-mc.search-mcs');
+            Route::get('/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs'])->name('update-mc.check-mcs');
+        });
 
         // Inventory Reports Routes
         Route::prefix('material-management/inventory-control/inventory-reports')->name('mm.ic.inventory-reports.')->group(function () {

@@ -1181,7 +1181,12 @@ const clearSoWo = () => {
 };
 const saveMasterCardFromModal = async (pdSetup = null) => {
     try {
-        const payload = {
+    const pdRoot = pdSetup ? { ...pdSetup } : {};
+    // Ensure SO/WO arrays are always present at root for backend mapping
+    pdRoot.soValues = Array.isArray(soValues.value) ? [...soValues.value] : [];
+    pdRoot.woValues = Array.isArray(woValues.value) ? [...woValues.value] : [];
+
+    const payload = {
             mc_seq: form.value.mcs,
             customer_code: form.value.ac,
             mc_model: form.value.mc_model || '',
@@ -1200,15 +1205,19 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
             detailed_master_card: {
                 mc_details: mcDetails.value,
             },
-            // pd_setup provided by child modal now contains root-level soValues/woValues like printColorCodes
-            pd_setup: pdSetup ? { 
-                ...pdSetup
-            } : null,
+        // Ensure backend receives normalized root keys
+        pd_setup: pdRoot,
+        // Include PD setup data directly in payload for better mapping
+        ...pdRoot,
         };
 
         const res = await fetch('/api/update-mc/master-cards', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            },
             credentials: 'same-origin',
             body: JSON.stringify(payload),
         });
