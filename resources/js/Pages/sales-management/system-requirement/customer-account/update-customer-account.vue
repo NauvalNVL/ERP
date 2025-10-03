@@ -474,19 +474,34 @@
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Customer Code</label>
+                                    <input type="text" v-model="form.customer_code" class="form-input bg-gray-100" readonly>
+                                    <span class="text-xs text-gray-500">Read-only field</span>
+                                </div>
+                                
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Customer Name</label>
                                     <input type="text" v-model="form.customer_name" class="form-input" required>
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Short Name</label>
-                                    <input type="text" v-model="form.short_name" class="form-input">
-                                    <span class="text-xs text-gray-500">For Production</span>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+                                    <input type="text" v-model="form.contact_person" class="form-input">
                                 </div>
                                 
-                                <div class="col-span-1 md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address 1</label>
                                     <textarea v-model="form.address" rows="2" class="form-input"></textarea>
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address 2</label>
+                                    <textarea v-model="form.address2" rows="2" class="form-input"></textarea>
+                                </div>
+                                
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Address 3</label>
+                                    <textarea v-model="form.address3" rows="2" class="form-input"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -499,11 +514,6 @@
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
-                                    <input type="text" v-model="form.contact_person" class="form-input">
-                                </div>
-                                
-                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Telephone No</label>
                                     <input type="text" v-model="form.telephone_no" class="form-input">
                                 </div>
@@ -513,8 +523,8 @@
                                     <input type="text" v-model="form.fax_no" class="form-input">
                                 </div>
                                 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Co. Email</label>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                                     <input type="email" v-model="form.co_email" class="form-input">
                                 </div>
                             </div>
@@ -523,7 +533,7 @@
                         <!-- Financial Information -->
                         <div class="border-b border-gray-200 pb-4">
                             <h4 class="text-base font-medium text-gray-800 mb-3">
-                                <i class="fas fa-dollar-sign mr-2 text-blue-500"></i>Financial Information
+                                <i class="fas fa-credit-card mr-2 text-blue-500"></i>Financial Information
                             </h4>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -533,40 +543,35 @@
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Credit Terms</label>
-                                    <div class="flex items-center">
-                                        <input type="number" v-model="form.credit_terms" class="form-input">
-                                        <span class="ml-2">Days</span>
-                                    </div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Credit Terms (Days)</label>
+                                    <input type="number" v-model="form.credit_terms" class="form-input">
                                 </div>
                                 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
-                                    <div class="flex space-x-4 mt-1">
-                                        <label class="inline-flex items-center">
-                                            <input type="radio" v-model="form.ac_type" value="Y-Foreign" class="form-radio">
-                                            <span class="ml-2">Y-Foreign</span>
-                                        </label>
-                                        <label class="inline-flex items-center">
-                                            <input type="radio" v-model="form.ac_type" value="N-Local" class="form-radio">
-                                            <span class="ml-2">N-Local</span>
-                                        </label>
-                                    </div>
+                                    <select v-model="form.ac_type" class="form-input">
+                                        <option value="N-Local">N-Local</option>
+                                        <option value="Y-Foreign">Y-Foreign</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Currency Code</label>
+                                    <input type="text" v-model="form.currency_code" class="form-input">
+                                    <span class="text-xs text-gray-500">Leave blank if Local Account</span>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">NPWP</label>
+                                    <input type="text" v-model="form.npwp" class="form-input" placeholder="Enter NPWP number">
                                 </div>
                                 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Print AR Aging</label>
-                                    <div class="flex items-center space-x-4">
-                                        <label class="inline-flex items-center">
-                                            <input type="radio" v-model="form.print_ar_aging" value="Y-Yes" class="form-radio">
-                                            <span class="ml-2">Y-Yes</span>
-                                        </label>
-                                        <label class="inline-flex items-center">
-                                            <input type="radio" v-model="form.print_ar_aging" value="N-No" class="form-radio">
-                                            <span class="ml-2">N-No</span>
-                                        </label>
-                                    </div>
-                                    <span class="text-xs text-gray-500">[For Sales Order]</span>
+                                    <select v-model="form.print_ar_aging" class="form-input">
+                                        <option value="N-No">N-No</option>
+                                        <option value="Y-Yes">Y-Yes</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -578,14 +583,6 @@
                             </h4>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Currency Code</label>
-                                    <div class="flex items-center">
-                                        <input type="text" v-model="form.currency_code" class="form-input w-32">
-                                        <span class="ml-3 text-sm text-gray-500">Leave blank if Local Account</span>
-                                    </div>
-                                </div>
-                                
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code</label>
                                     <div class="flex">
@@ -718,8 +715,9 @@ const customerGroups = ref([])
 const form = reactive({
     customer_code: '',
     customer_name: '',
-    short_name: '',
     address: '',
+    address2: '',
+    address3: '',
     contact_person: '',
     telephone_no: '',
     fax_no: '',
@@ -727,7 +725,7 @@ const form = reactive({
     credit_limit: 0,
     credit_terms: 0,
     ac_type: 'N-Local', // Default value
-    currency_code: '',
+    npwp: '',
     salesperson_code: '',
     industrial_code: '',
     geographical: '',
@@ -739,7 +737,6 @@ const form = reactive({
 const newCustomerForm = reactive({
     customer_code: '',
     customer_name: '',
-    short_name: '',
     address: '',
     address2: '',
     address3: '',
@@ -750,7 +747,6 @@ const newCustomerForm = reactive({
     credit_limit: 0,
     credit_terms: 0,
     ac_type: 'N-Local',
-    currency_code: '',
     npwp: '',
     salesperson_code: '',
     industrial_code: '',
@@ -856,7 +852,6 @@ const openAddNewCustomerModal = () => {
     Object.assign(newCustomerForm, {
         customer_code: '',
         customer_name: '',
-        short_name: '',
         address: '',
         address2: '',
         address3: '',
@@ -867,7 +862,6 @@ const openAddNewCustomerModal = () => {
         credit_limit: 0,
         credit_terms: 0,
         ac_type: 'N-Local',
-        currency_code: '',
         npwp: '',
         salesperson_code: '',
         industrial_code: '',
@@ -889,8 +883,9 @@ const selectCustomerAccount = (account) => {
     // Fill the form with customer data, ensuring all required fields have valid values
     form.customer_code = accountData.customer_code
     form.customer_name = accountData.customer_name || ''
-    form.short_name = accountData.short_name || ''
     form.address = accountData.address || ''
+    form.address2 = accountData.address2 || ''
+    form.address3 = accountData.address3 || ''
     form.contact_person = accountData.contact_person || ''
     form.telephone_no = accountData.telephone_no || ''
     form.fax_no = accountData.fax_no || ''
@@ -904,7 +899,7 @@ const selectCustomerAccount = (account) => {
         form.ac_type = 'N-Local'
     }
     
-    form.currency_code = accountData.currency_code || ''
+    form.npwp = accountData.npwp || ''
     form.salesperson_code = accountData.salesperson_code || ''
     form.industrial_code = accountData.industrial_code || ''
     form.geographical = accountData.geographical || ''
@@ -919,14 +914,6 @@ const selectCustomerAccount = (account) => {
     closeCustomerAccountModal()
     customerSelected.value = true
     showEditModal.value = true // Automatically open the edit modal
-    
-    // If we don't have all the customer data, fetch the complete record
-    if (!accountData.fax_no || accountData.credit_limit === undefined || 
-        accountData.credit_terms === undefined || !accountData.currency_code ||
-        !accountData.industrial_code || !accountData.geographical || !accountData.grouping_code) {
-        
-        fetchCompleteCustomerData(accountData.id)
-    }
 }
 
 // Salesperson modal functions
@@ -1180,7 +1167,6 @@ const saveNewCustomerAccount = async () => {
             Object.assign(newCustomerForm, {
                 customer_code: '',
                 customer_name: '',
-                short_name: '',
                 address: '',
                 address2: '',
                 address3: '',
@@ -1191,7 +1177,6 @@ const saveNewCustomerAccount = async () => {
                 credit_limit: 0,
                 credit_terms: 0,
                 ac_type: 'N-Local',
-                currency_code: '',
                 npwp: '',
                 salesperson_code: '',
                 industrial_code: '',

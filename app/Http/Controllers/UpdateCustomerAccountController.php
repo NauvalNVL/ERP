@@ -117,22 +117,26 @@ class UpdateCustomerAccountController extends Controller
                     'id' => $customer->CODE, // Use CODE as ID
                     'customer_code' => $customer->CODE,
                     'customer_name' => $customer->NAME,
-                    'short_name' => '', // Not available in CUSTOMER table
-                    'salesperson_code' => $customer->SLM,
-                    'account_type' => $customer->TYPE,
-                    'currency_code' => $customer->CURRENCY,
-                    'address' => $customer->ADDRESS1,
-                    'contact_person' => $customer->PERSON_CONTACT,
-                    'telephone_no' => $customer->TEL_NO,
-                    'co_email' => $customer->EMAIL,
-                    'status' => $customer->AC_STS,
-                    'credit_limit' => $customer->CREDIT_LIMIT,
-                    'credit_terms' => $customer->TERM,
-                    'fax_no' => $customer->FAX_NO,
-                    'industrial_code' => $customer->IND,
-                    'geographical' => $customer->AREA,
-                    'grouping_code' => $customer->GROUP_,
-                    'print_ar_aging' => $customer->CUST_TYPE === 'Y' ? 'Y-Yes' : 'N-No'
+                    'short_name' => $customer->SHORT_NAME ?? '',
+                    'address' => $customer->ADDRESS1 ?? '',
+                    'address2' => $customer->ADDRESS2 ?? '',
+                    'address3' => $customer->ADDRESS3 ?? '',
+                    'contact_person' => $customer->PERSON_CONTACT ?? '',
+                    'telephone_no' => $customer->TEL_NO ?? '',
+                    'fax_no' => $customer->FAX_NO ?? '',
+                    'co_email' => $customer->EMAIL ?? '',
+                    'credit_limit' => $customer->CREDIT_LIMIT ?? 0,
+                    'credit_terms' => $customer->TERM ?? 0,
+                    'ac_type' => $customer->TYPE ?? 'N-Local',
+                    'account_type' => $customer->TYPE ?? 'N-Local',
+                    'currency_code' => $customer->CURRENCY ?? '',
+                    'npwp' => $customer->NPWP ?? '',
+                    'salesperson_code' => $customer->SLM ?? '',
+                    'industrial_code' => $customer->IND ?? '',
+                    'geographical' => $customer->AREA ?? '',
+                    'grouping_code' => $customer->GROUP_ ?? '',
+                    'print_ar_aging' => $customer->CUST_TYPE === 'Y' ? 'Y-Yes' : 'N-No',
+                    'status' => $customer->AC_STS ?? 'A'
                 ];
             });
             
@@ -276,6 +280,7 @@ class UpdateCustomerAccountController extends Controller
             'CODE' => $validated['customer_code'],
             'AC_STS' => 'A', // Active status
             'NAME' => $validated['customer_name'],
+            'SHORT_NAME' => $validated['short_name'] ?? '',
             'ADDRESS1' => $validated['address'] ?? '',
             'ADDRESS2' => $validated['address2'] ?? '',
             'ADDRESS3' => $validated['address3'] ?? '',
@@ -315,22 +320,26 @@ class UpdateCustomerAccountController extends Controller
                 'id' => $customer->CODE,
                 'customer_code' => $customer->CODE,
                 'customer_name' => $customer->NAME,
-                'short_name' => '',
-                'salesperson_code' => $customer->SLM,
-                'account_type' => $customer->TYPE,
-                'currency_code' => $customer->CURRENCY,
-                'address' => $customer->ADDRESS1,
-                'contact_person' => $customer->PERSON_CONTACT,
-                'telephone_no' => $customer->TEL_NO,
-                'co_email' => $customer->EMAIL,
-                'status' => $customer->AC_STS,
-                'credit_limit' => $customer->CREDIT_LIMIT,
-                'credit_terms' => $customer->TERM,
-                'fax_no' => $customer->FAX_NO,
-                'industrial_code' => $customer->IND,
-                'geographical' => $customer->AREA,
-                'grouping_code' => $customer->GROUP_,
-                'print_ar_aging' => $customer->CUST_TYPE === 'Y' ? 'Y-Yes' : 'N-No'
+                'short_name' => $customer->SHORT_NAME ?? '',
+                'address' => $customer->ADDRESS1 ?? '',
+                'address2' => $customer->ADDRESS2 ?? '',
+                'address3' => $customer->ADDRESS3 ?? '',
+                'contact_person' => $customer->PERSON_CONTACT ?? '',
+                'telephone_no' => $customer->TEL_NO ?? '',
+                'fax_no' => $customer->FAX_NO ?? '',
+                'co_email' => $customer->EMAIL ?? '',
+                'credit_limit' => $customer->CREDIT_LIMIT ?? 0,
+                'credit_terms' => $customer->TERM ?? 0,
+                'ac_type' => $customer->TYPE ?? 'N-Local',
+                'account_type' => $customer->TYPE ?? 'N-Local',
+                'currency_code' => $customer->CURRENCY ?? '',
+                'npwp' => $customer->NPWP ?? '',
+                'salesperson_code' => $customer->SLM ?? '',
+                'industrial_code' => $customer->IND ?? '',
+                'geographical' => $customer->AREA ?? '',
+                'grouping_code' => $customer->GROUP_ ?? '',
+                'print_ar_aging' => $customer->CUST_TYPE === 'Y' ? 'Y-Yes' : 'N-No',
+                'status' => $customer->AC_STS ?? 'A'
             ];
             
             return response()->json($formatted);
@@ -369,7 +378,7 @@ class UpdateCustomerAccountController extends Controller
                 'reason' => 'required|string|max:255'
             ]);
 
-            $customerAccount = UpdateCustomerAccount::where('customer_code', $customer_code)->first();
+            $customerAccount = Customer::where('CODE', $customer_code)->first();
             
             if (!$customerAccount) {
                 return response()->json([
