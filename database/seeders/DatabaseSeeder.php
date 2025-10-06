@@ -77,6 +77,8 @@ class DatabaseSeeder extends Seeder
             IndustrySeeder::class,
             GeoSeeder::class,
             ProductGroupSeeder::class,
+            VehicleClassSeeder::class,
+            VehicleSeeder::class,
         ]);
     }
 }

@@ -40,6 +40,8 @@ use App\Http\Controllers\DeliveryOrderFormatController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
 use App\Http\Controllers\CustomerWarehouseRequirementController;
 use App\Http\Controllers\UpdateMcController;
+use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\VehicleClassController;
 
 /*
 |--------------------------------------------------------------------------
@@ -1857,3 +1859,18 @@ Route::prefix('material-management/accounts/rc-posting-batch')->group(function (
     Route::post('/confirm-to-post', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'confirmToPostAction']);
     Route::get('/batch-details', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'getBatchDetails']);
 });
+
+// Vehicle API routes
+Route::get('/vehicles', [VehicleController::class, 'apiIndex']);
+Route::post('/vehicles', [VehicleController::class, 'apiStore']);
+Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show']);
+Route::put('/vehicles/{vehicle}', [VehicleController::class, 'apiUpdate']);
+Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'apiDestroy']);
+Route::get('/vehicles/export', [VehicleController::class, 'export']);
+
+// Vehicle Class API routes
+Route::get('/vehicle-classes', [VehicleClassController::class, 'apiIndex']);
+Route::post('/vehicle-classes', [VehicleClassController::class, 'apiStore']);
+Route::get('/vehicle-classes/{vehicleClass}', [VehicleClassController::class, 'show']);
+Route::put('/vehicle-classes/{vehicleClass}', [VehicleClassController::class, 'apiUpdate']);
+Route::delete('/vehicle-classes/{vehicleClass}', [VehicleClassController::class, 'apiDestroy']);
