@@ -23,8 +23,32 @@
 
         <!-- Content -->
         <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+          <!-- Loading State -->
+          <div v-if="loading" class="flex items-center justify-center py-8">
+            <div class="flex items-center space-x-2">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <span class="text-gray-600">Loading delivery locations...</span>
+            </div>
+          </div>
+
+          <!-- Error State -->
+          <div v-else-if="errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+              <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+              <span class="text-red-700">{{ errorMessage }}</span>
+            </div>
+          </div>
+
+          <!-- No Data State -->
+          <div v-else-if="deliveryLocations.length === 0" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+              <i class="fas fa-info-circle text-yellow-500 mr-2"></i>
+              <span class="text-yellow-700">No delivery locations found for this customer. Please add alternate addresses first.</span>
+            </div>
+          </div>
+
           <!-- Delivery Code Table -->
-          <div class="mb-6">
+          <div v-else class="mb-6">
             <div class="border border-gray-400 rounded">
               <!-- Table Header -->
               <div class="bg-gray-200 border-b border-gray-400">
@@ -157,14 +181,16 @@
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-center space-x-3">
           <button 
             @click="selectDeliveryCode"
-            :disabled="!selectedLocation"
+            :disabled="!selectedLocation || loading"
             class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
+            <i v-if="loading" class="fas fa-spinner fa-spin mr-2"></i>
             Select
           </button>
           <button 
             @click="$emit('close')"
-            class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+            :disabled="loading"
+            class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Exit
           </button>
@@ -197,7 +223,9 @@ const { success, error } = useToast()
 // Selected location
 const selectedLocation = ref(null)
 
-// Modal visibility
+// Loading and error states
+const loading = ref(false)
+const errorMessage = ref('')
 
 // Form data for displaying location details
 const formData = reactive({
@@ -212,35 +240,8 @@ const formData = reactive({
   email: ''
 })
 
-// Sample delivery locations data (matching the image)
-const deliveryLocations = ref([
-  {
-    delivery_code: 'B103',
-    ship_to: 'ABDULLAH, BPK',
-    country: 'INDONESIA',
-    town: 'TANGERANG',
-    state: 'BANTEN',
-    section: 'TANGERANG',
-    address: 'JL.YOS SUDARSO NO.61 JURUMUDI BARU-TANGERANG',
-    contact: '',
-    tel_no: '6191875',
-    fax_no: '5407992',
-    email: ''
-  },
-  {
-    delivery_code: 'P104',
-    ship_to: 'AHMAD, TN',
-    country: 'INDONESIA',
-    town: 'JAKARTA',
-    state: 'DKI JAKARTA',
-    section: 'JAKARTA PUSAT',
-    address: 'JL.KEBON SIRIH NO.25 JAKARTA PUSAT',
-    contact: 'Ahmad Taufik',
-    tel_no: '3456789',
-    fax_no: '3456790',
-    email: 'ahmad@email.com'
-  }
-])
+// Delivery locations data from database
+const deliveryLocations = ref([])
 
 // Methods
 const selectLocation = (location) => {
@@ -285,30 +286,73 @@ const selectDeliveryCode = () => {
 
 // Load delivery locations for customer
 const loadDeliveryLocations = async () => {
-  if (!props.customerCode) return
+  if (!props.customerCode) {
+    console.log('No customer code provided')
+    deliveryLocations.value = []
+    return
+  }
+  
+  loading.value = true
+  errorMessage.value = ''
   
   try {
-    // In a real implementation, you would fetch from API
-    // const response = await fetch(`/api/delivery-locations/${props.customerCode}`)
-    // const data = await response.json()
-    // deliveryLocations.value = data.locations || []
-    
-    // For now, using sample data
     console.log('Loading delivery locations for customer:', props.customerCode)
+    
+    const response = await fetch(`/api/customer-alternate-addresses/${props.customerCode}`)
+    const data = await response.json()
+    
+    if (response.ok) {
+      // Transform data to match the expected format
+      deliveryLocations.value = data.map(address => ({
+        delivery_code: address.delivery_code,
+        ship_to: address.ship_to_name || address.bill_to_name || 'N/A',
+        country: address.country || '',
+        town: address.town || '',
+        state: address.state || '',
+        section: address.town_section || '',
+        address: address.ship_to_address || address.bill_to_address || '',
+        contact: address.contact_person || '',
+        tel_no: address.tel_no || '',
+        fax_no: address.fax_no || '',
+        email: address.email || ''
+      }))
+      
+      console.log('Loaded delivery locations:', deliveryLocations.value.length)
+      
+      // Auto-select first location if available
+      if (deliveryLocations.value.length > 0) {
+        selectLocation(deliveryLocations.value[0])
+      } else {
+        // Clear form data if no locations found
+        Object.assign(formData, {
+          country: '',
+          town: '',
+          state: '',
+          section: '',
+          address: '',
+          contact: '',
+          tel_no: '',
+          fax_no: '',
+          email: ''
+        })
+      }
+    } else {
+      console.error('Error loading delivery locations:', data)
+      errorMessage.value = data.error || 'Failed to load delivery locations'
+      error('Failed to load delivery locations: ' + (data.error || 'Unknown error'))
+    }
   } catch (err) {
     console.error('Error loading delivery locations:', err)
+    errorMessage.value = 'Network error: ' + err.message
     error('Failed to load delivery locations')
+  } finally {
+    loading.value = false
   }
 }
 
 // Initialize
 onMounted(() => {
   loadDeliveryLocations()
-  
-  // Auto-select first location if available
-  if (deliveryLocations.value.length > 0) {
-    selectLocation(deliveryLocations.value[0])
-  }
 })
 
 // Watch for customer code changes

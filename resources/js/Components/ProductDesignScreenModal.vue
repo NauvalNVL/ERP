@@ -430,26 +430,31 @@ const formatCurrency = (amount) => {
 }
 
 const setQuantity = () => {
+  console.log('setQuantity called with totalQuantity:', totalQuantity.value)
   // Apply quantity to all items that have a unit price
-  items.forEach(item => {
+  items.forEach((item, index) => {
     if (item.unitPrice && item.unitPrice > 0) {
       item.quantity = totalQuantity.value
       calculateAmount(item)
+      console.log(`Item ${index} (${item.name}): quantity=${item.quantity}, unitPrice=${item.unitPrice}, amount=${item.amount}`)
     }
   })
 }
 
 // Allow parent to push quantity while modal is open
 const applyExternalQuantity = (qty) => {
+  console.log('applyExternalQuantity called with:', qty)
   if (qty && Number(qty) > 0) {
     const numericQty = Number(qty)
     totalQuantity.value = numericQty
     setQuantity()
+    console.log('Quantity applied:', numericQty, 'to items:', items.map(i => ({ name: i.name, quantity: i.quantity })))
   } else {
     // If no quantity or zero, clear the values
     totalQuantity.value = null
     items[0].quantity = null
     calculateAmount(items[0])
+    console.log('Quantity cleared')
   }
 }
 
@@ -486,11 +491,14 @@ const saveDesign = () => {
 
 // Initialize
 onMounted(() => {
+  console.log('ProductDesignScreenModal mounted with initialQuantity:', props.initialQuantity)
+  
   // Load master card data if available
   if (props.masterCard) {
     // Populate design data from master card
     items[0].design = props.masterCard.model || 'B1'
     items[0].unitPrice = props.masterCard.unit_price || 3036.3600
+    console.log('Master card data loaded:', { design: items[0].design, unitPrice: items[0].unitPrice })
   }
   
   // Calculate initial amounts
@@ -498,10 +506,12 @@ onMounted(() => {
 
   // Initialize quantity from parent if provided
   if (props.initialQuantity && Number(props.initialQuantity) > 0) {
+    console.log('Setting initial quantity from props:', props.initialQuantity)
     totalQuantity.value = Number(props.initialQuantity)
     setQuantity()
   } else {
     // If no initial quantity provided, set main item quantity to null
+    console.log('No initial quantity provided, clearing values')
     items[0].quantity = null
     totalQuantity.value = null
   }
@@ -509,12 +519,15 @@ onMounted(() => {
 
 // Keep quantity in sync with parent changes
 watch(() => props.initialQuantity, (newVal) => {
+  console.log('Props initialQuantity changed to:', newVal)
   if (newVal && Number(newVal) > 0) {
     const numericQty = Number(newVal)
+    console.log('Setting quantity from watch:', numericQty)
     totalQuantity.value = numericQty
     setQuantity()
   } else {
     // If no quantity or zero, clear the values
+    console.log('Clearing quantity from watch')
     totalQuantity.value = null
     items[0].quantity = null
     calculateAmount(items[0])

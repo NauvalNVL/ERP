@@ -177,6 +177,7 @@ Route::get('/ac-auto-wo-customers', [UpdateCustomerAccountController::class, 'ap
 
 // Customer Alternate Address API routes
 Route::get('/customer-alternate-addresses', [CustomerAlternateAddressController::class, 'apiIndex']);
+Route::get('/customer-alternate-addresses/{customerCode}', [CustomerAlternateAddressController::class, 'apiGetCustomerAddresses']);
 
 // Corrugator Config Routes
 Route::get('/corrugator-configs', [CorrugatorConfigController::class, 'apiIndex']);
@@ -288,6 +289,8 @@ Route::post('/sales-order/product-design', [App\Http\Controllers\SalesOrderContr
 Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderController::class, 'getCustomer']); 
 // Save to legacy-style SO table (CPS compatibility)
 Route::post('/sales-order/save-to-so', [App\Http\Controllers\SalesOrderController::class, 'apiStoreToSo']);
+// Get sales orders for Print SO
+Route::get('/sales-orders', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrders']);
 
 // New: Placeholder API routes for Sales Order Delivery Schedule Modals
 Route::get('/po-refs', function() {
