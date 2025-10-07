@@ -90,7 +90,7 @@
       <!-- Vehicle Table -->
       <div v-else class="p-6 overflow-auto max-h-96 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50 sticky top-0 z-20 shadow-sm">
+          <thead class="bg-gray-50 sticky top-0 z-20 shadow-sm sticky-header">
             <tr>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider table-cell">Vehicle No</th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider table-cell">Class</th>
@@ -353,11 +353,12 @@ onMounted(() => {
 }
 
 /* Fix sticky header positioning */
-thead {
+thead.sticky-header {
   position: sticky;
   top: 0;
   z-index: 20;
   background-color: #f9fafb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Ensure header cells have proper background and positioning */
