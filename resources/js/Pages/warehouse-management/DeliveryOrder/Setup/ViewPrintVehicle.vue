@@ -2,13 +2,46 @@
   <AppLayout>
     <div class="p-6">
       <!-- Header -->
-      <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">View & Print Vehicle</h1>
-        <p class="text-gray-600">View and print vehicle information reports</p>
+      <div class="mb-8">
+        <div class="relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600">
+          <div class="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,white,transparent_50%)]"></div>
+          <div class="flex items-center justify-between p-5">
+            <div class="flex items-center gap-3 text-white">
+              <i class="fas fa-truck text-2xl"></i>
+              <div>
+                <h1 class="text-2xl font-semibold">View & Print Vehicle</h1>
+                <p class="text-white/80 text-sm">Filter, print or export vehicle information</p>
+              </div>
+            </div>
+            <div class="hidden sm:flex items-center gap-2">
+              <button
+                @click="printReport"
+                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm"
+              >
+                <i class="fas fa-print"></i>
+                Print
+              </button>
+              <button
+                @click="exportToPDF"
+                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm"
+              >
+                <i class="fas fa-file-pdf"></i>
+                PDF
+              </button>
+              <button
+                @click="exportToExcel"
+                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm"
+              >
+                <i class="fas fa-file-csv"></i>
+                CSV
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Filter Section -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- Search -->
           <div>
@@ -152,7 +185,7 @@
       </div>
 
       <!-- Vehicle Report Table -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-medium text-gray-900">Vehicle Report</h3>
           <p class="text-sm text-gray-500">Generated on {{ new Date().toLocaleDateString() }}</p>
@@ -323,6 +356,8 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useToast } from '@/Composables/useToast'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import jsPDF from 'jspdf'
+import 'jspdf-autotable'
 
 const { addToast } = useToast()
 
@@ -443,6 +478,45 @@ const clearFilters = () => {
 
 const printReport = () => {
   window.print()
+}
+
+const exportToPDF = () => {
+  try {
+    const doc = new jsPDF({ orientation: 'landscape' })
+    const title = 'Vehicles Report'
+    doc.setFontSize(14)
+    doc.text(title, 14, 14)
+
+    const headers = [['No.', 'Vehicle #', 'Status', 'Class', 'Description', 'Company', 'Driver Code', 'Driver Name', 'Driver ID', 'Driver Phone', 'Note', 'Created Date']]
+    const rows = vehicles.value.map((v, idx) => [
+      idx + 1,
+      v.VEHICLE_NO,
+      v.VEHICLE_STATUS === 'A' ? 'Active' : 'Obsolete',
+      v.VEHICLE_CLASS,
+      v.VEHICLE_DESCRIPTION || '-',
+      v.VEHICLE_COMPANY || '-',
+      v.DRIVER_CODE || '-',
+      v.DRIVER_NAME || '-',
+      v.DRIVER_ID || '-',
+      v.DRIVER_PHONE || '-',
+      v.NOTE || '-',
+      new Date(v.created_at).toLocaleDateString()
+    ])
+
+    doc.autoTable({
+      head: headers,
+      body: rows,
+      startY: 20,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [79, 70, 229] },
+      alternateRowStyles: { fillColor: [245, 245, 245] }
+    })
+
+    doc.save(`vehicles_${new Date().toISOString().split('T')[0]}.pdf`)
+    addToast('PDF exported successfully', 'success')
+  } catch (e) {
+    addToast('Failed to export PDF', 'error')
+  }
 }
 
 const exportToExcel = async () => {
