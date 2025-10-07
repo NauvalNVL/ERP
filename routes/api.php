@@ -296,6 +296,14 @@ Route::get('/sales-orders', [App\Http\Controllers\SalesOrderController::class, '
 
 // Vehicle API routes
 Route::get('/vehicles', [VehicleController::class, 'apiIndex']);
+Route::post('/vehicles', [VehicleController::class, 'apiStore']);
+Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show']);
+Route::put('/vehicles/{vehicle}', [VehicleController::class, 'apiUpdate']);
+Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'apiDestroy']);
+Route::get('/vehicle-classes', [\App\Http\Controllers\VehicleClassController::class, 'apiIndex']);
+Route::post('/vehicle-classes', [\App\Http\Controllers\VehicleClassController::class, 'apiStore']);
+Route::put('/vehicle-classes/{vehicleClass}', [\App\Http\Controllers\VehicleClassController::class, 'apiUpdate']);
+Route::delete('/vehicle-classes/{vehicleClass}', [\App\Http\Controllers\VehicleClassController::class, 'apiDestroy']);
 
 // Delivery Order API routes
 Route::post('/delivery-orders', [DeliveryOrderController::class, 'store']);
