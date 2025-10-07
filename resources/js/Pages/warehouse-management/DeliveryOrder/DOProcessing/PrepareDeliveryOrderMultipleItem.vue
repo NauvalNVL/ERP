@@ -214,21 +214,35 @@
         </div>
 
         <!-- Action Buttons -->
-        <div v-if="selectedCustomer.code" class="mt-6 flex items-center justify-end space-x-4">
-          <button 
-            @click="refreshPage" 
-            class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center"
-          >
-            <i class="fas fa-sync-alt mr-2"></i>
-            Refresh
-          </button>
-          <button 
-            @click="saveDeliveryOrder" 
-            class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center"
-          >
-            <i class="fas fa-save mr-2"></i>
-            Save Delivery Order
-          </button>
+        <div v-if="selectedCustomer.code" class="mt-6 flex items-center justify-between">
+          <!-- Left side buttons -->
+          <div class="flex items-center space-x-4">
+            <button 
+              @click="openSalesOrderScreen" 
+              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+            >
+              <i class="fas fa-file-invoice mr-2"></i>
+              Sales Order Screen
+            </button>
+          </div>
+          
+          <!-- Right side buttons -->
+          <div class="flex items-center space-x-4">
+            <button 
+              @click="refreshPage" 
+              class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center"
+            >
+              <i class="fas fa-sync-alt mr-2"></i>
+              Refresh
+            </button>
+            <button 
+              @click="saveDeliveryOrder" 
+              class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center"
+            >
+              <i class="fas fa-save mr-2"></i>
+              Save Delivery Order
+            </button>
+          </div>
         </div>
 
         <!-- Form validation summary -->
@@ -257,6 +271,14 @@
       @close="showVehicleModal = false" 
       @select="selectVehicle"
     />
+
+    <!-- Sales Order Screen Modal -->
+    <SalesOrderScreenModal 
+      :is-open="showSalesOrderModal" 
+      :customer-data="selectedCustomer"
+      @close="showSalesOrderModal = false" 
+      @save="handleSalesOrderSave"
+    />
   </AppLayout>
 </template>
 
@@ -265,6 +287,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
 import VehicleLookupModal from '@/Components/VehicleLookupModal.vue'
+import SalesOrderScreenModal from '@/Components/SalesOrderScreenModal.vue'
 import { useToast } from '@/Composables/useToast'
 import axios from 'axios'
 
@@ -299,6 +322,7 @@ const deliveryOrder = reactive({
 // Modal visibility
 const showCustomerModal = ref(false)
 const showVehicleModal = ref(false)
+const showSalesOrderModal = ref(false)
 
 // Selected Vehicle
 const selectedVehicle = reactive({
@@ -392,6 +416,21 @@ const selectVehicle = (vehicle) => {
 const openDatePicker = () => {
   // TODO: Implement date picker modal
   info('Date picker functionality will be implemented')
+}
+
+const openSalesOrderScreen = () => {
+  if (!selectedCustomer.code) {
+    error('Please select a customer first')
+    return
+  }
+  
+  showSalesOrderModal.value = true
+}
+
+const handleSalesOrderSave = (salesOrderData) => {
+  console.log('Sales Order Data:', salesOrderData)
+  success('Sales order data saved successfully')
+  showSalesOrderModal.value = false
 }
 
 const saveDeliveryOrder = async () => {

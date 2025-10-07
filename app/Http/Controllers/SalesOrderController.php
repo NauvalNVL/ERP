@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Models\UpdateCustomerAccount;
 use App\Models\Customer;
-use App\Models\MasterCard;
-use App\Models\SalesOrder;
-use App\Models\SalesOrderDetail;
 use App\Models\DeliverySchedule;
 use App\Models\Salesperson;
 use Inertia\Inertia;
@@ -72,7 +69,7 @@ class SalesOrderController extends Controller
             
             // Pull related entities
             $customer = Customer::where('CODE', $request->customer_code)->first();
-            $mc = MasterCard::where('mc_seq', $request->master_card_seq)->first();
+            $mc = DB::table('MC')->where('MCS_Num', $request->master_card_seq)->first();
 
             if (!$customer) {
                 Log::error('Customer not found: ' . $request->customer_code);
@@ -83,158 +80,58 @@ class SalesOrderController extends Controller
                 return response()->json(['success' => false, 'message' => 'Master Card not found'], 404);
             }
 
-            Log::info('Creating sales order for customer: ' . $request->customer_code . ' with MC: ' . $request->master_card_seq);
+            // Generate SO number
+            $soNumber = $this->generateSONumber();
+            Log::info('Generated SO number: ' . $soNumber);
 
-            // Instead of using SalesOrder model, save directly to 'so' table
-            $poDate = \Carbon\Carbon::parse($request->po_date);
-            $mm = $poDate->format('m');
-            $yyyy = $poDate->format('Y');
+            // Prepare data for creation
+            $salesOrderData = [
+                'so_number' => $soNumber,
+                'customer_code' => $customer->CODE,
+                'customer_name' => $customer->NAME ?? null,
+                'customer_address' => $customer->ADDRESS1 ?? null,
+                'credit_terms' => $customer->TERM ? (int) $customer->TERM : null,
+                'credit_limit' => $customer->CREDIT_LIMIT ?? null,
+                'salesperson_code' => $request->salesperson_code ?: ($customer->SLM ?? null),
+                'currency' => $request->currency,
+                'exchange_rate' => $request->exchange_rate ?? 0,
 
-            // Generate SO number in format MM-YYYY-#####
-            $prefix = $mm . '-' . $yyyy . '-';
-            $last = DB::table('so')
-                ->where('SO_Num', 'like', $prefix . '%')
-                ->orderBy('SO_Num', 'desc')
-                ->value('SO_Num');
-            $seq = 1;
-            if ($last) {
-                $parts = explode('-', $last);
-                $seq = isset($parts[2]) ? ((int) $parts[2]) + 1 : 1;
-            }
-            $soNum = $prefix . str_pad($seq, 5, '0', STR_PAD_LEFT);
+                'master_card_seq' => $mc->MCS_Num,
+                'master_card_model' => $mc->MODEL ?? null,
+                'p_design' => $mc->P_DESIGN ?? null,
+                'uom' => 'PCS',
 
-            $first = $request->details[0];
-            $qty = (float) ($first['order_quantity'] ?? 0);
-            $unitPrice = (float) ($first['unit_price'] ?? 0);
-            $amount = $qty * $unitPrice;
-
-            // Map into legacy columns - provide all required fields
-            $row = [
-                'YYYY' => $yyyy,
-                'MM' => $mm,
-                'SO_Num' => $soNum,
-                'STS' => 'Draft',
-                'TYPE' => $request->order_type,
-                'SO_DMY' => $poDate->format('d/m/Y'),
-                'AC_Num' => $request->customer_code,
-                'AC_NAME' => $customer->NAME ?? '',
-                'SLM' => $request->salesperson_code ?? '',
-                'IND' => $customer->IND ?? '', // Required field
-                'AREA' => $customer->AREA ?? '', // Required field
-                'GROUP_' => $request->order_group,
-                'PO_Num' => $request->customer_po_number ?? '',
-                'PO_DATE' => $poDate->format('d/m/Y'),
-                'LOT_Num' => $request->lot_number ?? '',
-                'MCS_Num' => $request->master_card_seq,
-                'MODEL' => $mc->mc_model ?? '',
-                'PRODUCT' => $first['item_code'] ?? '',
-                'COMP_Num' => $customer->CODE ?? '', // Required field
-                'P_DESIGN' => $mc->p_design ?? '',
-                'PER_SET' => 1.0, // Required field
-                'UNIT' => $first['uom'] ?? 'PCS',
-                'PART_NUMBER' => $first['item_code'] ?? '', // Required field
-                'INT_L' => $mc->int_dim_1 ?? 0.0, // Required field
-                'INT_W' => $mc->int_dim_2 ?? 0.0, // Required field
-                'INT_H' => $mc->int_dim_3 ?? 0.0, // Required field
-                'EXT_L' => $mc->ext_dim_1 ?? 0.0, // Required field
-                'EXT_W' => $mc->ext_dim_2 ?? 0.0, // Required field
-                'EXT_H' => $mc->ext_dim_3 ?? 0.0, // Required field
-                'FLUTE' => $mc->flute ?? '', // Required field
-                'PQ1' => $mc->pq1 ?? '', // Required field
-                'PQ2' => $mc->pq2 ?? '', // Required field
-                'PQ3' => $mc->pq3 ?? '', // Required field
-                'PQ4' => $mc->pq4 ?? '', // Required field
-                'PQ5' => $mc->pq5 ?? '', // Required field
-                'SO_QTY' => $qty,
-                'UNIT_PRICE' => $unitPrice,
-                'CURR' => $request->currency,
-                'EX_RATE' => $request->exchange_rate ?? 0,
-                'AMOUNT' => $amount,
-                'BASE_AMOUNT' => $amount, // Required field
-                'MC_GROSS_M2_PER_PCS' => $mc->mc_gross_m2_per_pcs ?? 0.0, // Required field
-                'MC_NET_M2_PER_PCS' => $mc->mc_net_m2_per_pcs ?? 0.0, // Required field
-                'TOTAL_SO_GROSS_M2' => $mc->total_so_gross_m2 ?? 0.0, // Required field
-                'TOTAL_SO_NET_M2' => $mc->total_so_net_m2 ?? 0.0, // Required field
-                'TOTAL_LM' => $mc->total_lm ?? '', // Required field
-                'TOTAL_M3' => $mc->total_m3 ?? 0, // Required field
-                'MC_GROSS_KG_PER_PCS' => $mc->mc_gross_kg_per_pcs ?? 0.0, // Required field
-                'MC_NET_KG_PER_PCS' => $mc->mc_net_kg_per_pcs ?? 0.0, // Required field
-                'TOTAL_SO_GROSS_KG' => $mc->total_so_gross_kg ?? 0.0, // Required field
-                'TOTAL_SO_NET_KG' => $mc->total_so_net_kg ?? 0.0, // Required field
-                'SO_REMARK' => $request->remark ?? '',
-                'SO_INSTRUCTION_1' => $request->instruction1 ?? '',
-                'SO_INSTRUCTION_2' => $request->instruction2 ?? '',
-                'D_LOC_Num' => '', // Required field
-                'DELIVERY_TO' => '', // Required field
-                'DELIVERY_ADD_1' => '', // Required field
-                'DELIVERY_ADD_2' => '', // Required field
-                'DELIVERY_ADD_3' => '', // Required field
-                'D_DATE_1' => '', // Required field
-                'D_TIME_1' => '', // Required field
-                'D_DUE_1' => '', // Required field
-                'D_QTY_1' => 0.0, // Required field
-                'D_DATE_2' => '', // Required field
-                'D_TIME_2' => '', // Required field
-                'D_DUE_2' => '', // Required field
-                'D_QTY_2' => 0.0, // Required field
-                'D_DATE_3' => '', // Required field
-                'D_TIME_3' => '', // Required field
-                'D_DUE_3' => '', // Required field
-                'D_QTY_3' => 0.0, // Required field
-                'D_DATE_4' => '', // Required field
-                'D_TIME_4' => '', // Required field
-                'D_DUE_4' => '', // Required field
-                'D_QTY_4' => 0.0, // Required field
-                'D_DATE_5' => '', // Required field
-                'D_TIME_5' => '', // Required field
-                'D_DUE_5' => '', // Required field
-                'D_QTY_5' => 0.0, // Required field
-                'D_DATE_6' => '', // Required field
-                'D_TIME_6' => '', // Required field
-                'D_DUE_6' => '', // Required field
-                'D_QTY_6' => 0.0, // Required field
-                'D_DATE_7' => '', // Required field
-                'D_TIME_7' => '', // Required field
-                'D_DUE_7' => '', // Required field
-                'D_QTY_7' => 0.0, // Required field
-                'D_DATE_8' => '', // Required field
-                'D_TIME_8' => '', // Required field
-                'D_DUE_8' => '', // Required field
-                'D_QTY_8' => 0.0, // Required field
-                'D_DATE_9' => '', // Required field
-                'D_TIME_9' => '', // Required field
-                'D_DUE_9' => '', // Required field
-                'D_QTY_9' => 0.0, // Required field
-                'D_DATE10' => '', // Required field
-                'D_TIME10' => '', // Required field
-                'D_DUE10' => '', // Required field
-                'D_QTY_10' => 0.0, // Required field
-                'NW_UID' => Auth::user()->name ?? 'system',
-                'NW_DATE' => now()->format('d/m/Y'),
-                'NW_TIME' => now()->format('H:i'),
-                'AM_UID' => '', // Required field
-                'AM_DATE' => '', // Required field
-                'AM_TIME' => '', // Required field
-                'CX_UID' => '', // Required field
-                'CX_DATE' => '', // Required field
-                'CX_TIME' => '', // Required field
-                'PT_UID' => '', // Required field
-                'PT_DATE' => '', // Required field
-                'PT_TIME' => '', // Required field
-                'SODateSK' => $poDate->format('Ymd'), // Required field
-                'PODateSK' => $poDate->format('Ymd'), // Required field
+                'order_mode' => $request->order_mode,
+                'product_code' => $request->product_code,
+                'order_group' => $request->order_group,
+                'order_type' => $request->order_type,
+                'sales_tax' => (bool)($request->sales_tax ?? false),
+                'lot_number' => $request->lot_number,
+                'customer_po_number' => $request->customer_po_number,
+                'po_date' => $request->po_date,
+                'remark' => $request->remark,
+                'instruction1' => $request->instruction1,
+                'instruction2' => $request->instruction2,
+                'status' => 'Draft',
+                // In SQL Server, created_by is BIGINT; avoid inserting non-numeric IDs
+                'created_by' => is_numeric(Auth::id()) ? (int) Auth::id() : null,
             ];
 
-            DB::table('so')->insert($row);
+            Log::info('Sales order data prepared:', $salesOrderData);
 
-            Log::info('Sales order created successfully with SO Number: ' . $soNum);
+            // Skip creating in sales_orders table and go directly to SO table
+            // This is because we're using the legacy SO table approach
+            Log::info('Skipping sales_orders table creation, using legacy SO table approach');
 
             return response()->json([
                 'success' => true,
                 'message' => 'Sales order created successfully',
                 'data' => [
-                    'so_number' => $soNum,
-                    'sales_order' => $row
+                    'so_number' => $soNumber,
+                    'customer_code' => $customer->CODE,
+                    'master_card_seq' => $mc->MCS_Num,
+                    'order_type' => $request->order_type,
+                    'status' => 'Draft'
                 ]
             ]);
 
@@ -255,22 +152,25 @@ class SalesOrderController extends Controller
     private function generateSONumber()
     {
         $year = date('Y');
-        $prefix = 'SO';
+        $month = date('m');
+        $prefix = $month . '-' . $year . '-';
         
-        // Get the last SO number for this year
-        $lastSO = SalesOrder::where('so_number', 'like', $prefix . $year . '%')
-            ->orderBy('so_number', 'desc')
-            ->first();
+        // Get the last SO number for this month/year
+        $lastSO = DB::table('so')
+            ->where('SO_Num', 'like', $prefix . '%')
+            ->orderBy('SO_Num', 'desc')
+            ->value('SO_Num');
         
         if ($lastSO) {
-            // Extract the number part and increment
-            $lastNumber = (int) substr($lastSO->so_number, -4);
+            // Extract the sequence part and increment
+            $parts = explode('-', $lastSO);
+            $lastNumber = isset($parts[2]) ? (int) $parts[2] : 0;
             $newNumber = $lastNumber + 1;
         } else {
             $newNumber = 1;
         }
         
-        return $prefix . $year . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        return $prefix . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -335,7 +235,7 @@ class SalesOrderController extends Controller
     public function getMasterCard($mcSeq)
     {
         try {
-            $masterCard = MasterCard::where('mc_seq', $mcSeq)->first();
+            $masterCard = DB::table('MC')->where('MCS_Num', $mcSeq)->first();
 
             if (!$masterCard) {
                 return response()->json([
@@ -395,7 +295,7 @@ class SalesOrderController extends Controller
     public function getProductDesignData($masterCardSeq)
     {
         try {
-            $masterCard = MasterCard::where('mc_seq', $masterCardSeq)->first();
+            $masterCard = DB::table('MC')->where('MCS_Num', $masterCardSeq)->first();
             
             if (!$masterCard) {
                 return response()->json([
@@ -410,7 +310,7 @@ class SalesOrderController extends Controller
                 'items' => [
                     [
                         'name' => 'Main',
-                        'design' => $masterCard->p_design ?? 'B1',
+                        'design' => $masterCard->P_DESIGN ?? 'B1',
                         'pcs' => 1,
                         'quantity' => 50,
                         'unit_price' => 3036.3600,
@@ -422,9 +322,9 @@ class SalesOrderController extends Controller
                 'dimensions' => [
                     [
                         'name' => 'Main',
-                        'ext_dimension' => $masterCard->ext_dim_1 . ' x ' . $masterCard->ext_dim_2 . ' x ' . $masterCard->ext_dim_3,
-                        'int_dimension' => $masterCard->int_dim_1 . ' x ' . $masterCard->int_dim_2 . ' x ' . $masterCard->int_dim_3,
-                        'part_number' => $masterCard->part_no ?? 'BOX',
+                        'ext_dimension' => $masterCard->EXT_LENGTH . ' x ' . $masterCard->EXT_WIDTH . ' x ' . $masterCard->EXT_HEIGHT,
+                        'int_dimension' => $masterCard->INT_LENGTH . ' x ' . $masterCard->INT_WIDTH . ' x ' . $masterCard->INT_HEIGHT,
+                        'part_number' => $masterCard->PART_NO ?? 'BOX',
                         'total_gross_kg' => '3.0620',
                         'packing' => '',
                         'moq' => ''
@@ -518,7 +418,7 @@ class SalesOrderController extends Controller
             $soNumber = $request->so_number;
             $entries = $request->entries;
 
-            // Get the sales order from 'so' table to validate it exists
+            // Get the sales order to validate it exists
             $salesOrder = DB::table('so')->where('SO_Num', $soNumber)->first();
             if (!$salesOrder) {
                 return response()->json([
@@ -527,56 +427,55 @@ class SalesOrderController extends Controller
                 ], 404);
             }
 
-            // For simplicity, we'll just save the delivery schedule entries
-            // Since we're using the 'so' table, we don't need to validate line numbers
-            // as the 'so' table contains all the order information in a single row
+            // For legacy SO table, we don't have separate details table
+            // All data is in the main SO record
+            $existingLineNumbers = [1]; // Legacy SO table only has one line
 
-            // Save delivery schedule entries to 'so' table
+            foreach ($entries as $entry) {
+                if (!in_array($entry['line_number'], $existingLineNumbers)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Line number {$entry['line_number']} not found in Sales Order"
+                    ], 422);
+                }
+            }
+
+            // For legacy SO table, we only have one line item
+            // Validate quantities don't exceed order quantities
+            foreach ($entries as $entry) {
+                $salesOrder = DB::table('so')->where('SO_Num', $soNumber)->first();
+                $orderQuantity = $salesOrder->SO_QTY;
+
+                $existingScheduledQty = 0; // Legacy system doesn't track scheduled quantities separately
+
+                $newScheduledQty = $existingScheduledQty + $entry['delivery_quantity'];
+
+                if ($newScheduledQty > $orderQuantity) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Scheduled quantity for line {$entry['line_number']} exceeds order quantity"
+                    ], 422);
+                }
+            }
+
+            // Save delivery schedule entries
             $savedEntries = [];
-            $updateData = [];
-            
-            // Map delivery schedule entries to 'so' table columns
-            foreach ($entries as $index => $entry) {
-                $scheduleDate = \Carbon\Carbon::parse($entry['schedule_date']);
-                $scheduleTime = $entry['schedule_time'] ?? '00:00';
-                $dueStatus = $entry['due_status'] ?? 'TBA';
-                $quantity = (float) $entry['delivery_quantity'];
-                
-                // Map to D_DATE_X, D_TIME_X, D_DUE_X, D_QTY_X columns
-                $dateKey = 'D_DATE_' . ($index + 1);
-                $timeKey = 'D_TIME_' . ($index + 1);
-                $dueKey = 'D_DUE_' . ($index + 1);
-                $qtyKey = 'D_QTY_' . ($index + 1);
-                
-                $updateData[$dateKey] = $scheduleDate->format('d/m/Y');
-                $updateData[$timeKey] = $scheduleTime;
-                $updateData[$dueKey] = $dueStatus;
-                $updateData[$qtyKey] = $quantity;
-                
-                // Also update delivery location info if provided
-                if ($entry['delivery_code']) {
-                    $updateData['D_LOC_Num'] = $entry['delivery_code'];
-                }
-                if ($entry['delivery_location']) {
-                    $updateData['DELIVERY_TO'] = $entry['delivery_location'];
-                }
-                
-                $savedEntries[] = [
+            foreach ($entries as $entry) {
+                $schedule = DeliverySchedule::create([
+                    'so_number' => $soNumber,
                     'line_number' => $entry['line_number'],
+                    'schedule_sequence' => $this->getNextScheduleSequence($soNumber, $entry['line_number']),
                     'schedule_date' => $entry['schedule_date'],
-                    'schedule_time' => $entry['schedule_time'],
+                    'schedule_time' => $entry['schedule_time'] ?? null,
                     'delivery_quantity' => $entry['delivery_quantity'],
                     'due_status' => $entry['due_status'],
                     'remark' => $entry['remark'] ?? null,
                     'delivery_code' => $entry['delivery_code'] ?? null,
                     'delivery_location' => $entry['delivery_location'] ?? null,
-                ];
+                ]);
+
+                $savedEntries[] = $schedule;
             }
-            
-            // Update the 'so' table with delivery schedule data
-            DB::table('so')
-                ->where('SO_Num', $soNumber)
-                ->update($updateData);
 
             DB::commit();
 
@@ -607,6 +506,17 @@ class SalesOrderController extends Controller
         }
     }
 
+    /**
+     * Get the next schedule sequence for a line item
+     */
+    private function getNextScheduleSequence($soNumber, $lineNumber)
+    {
+        $maxSequence = DeliverySchedule::where('so_number', $soNumber)
+            ->where('line_number', $lineNumber)
+            ->max('schedule_sequence');
+
+        return ($maxSequence ?? 0) + 1;
+    }
 
     /**
      * Get delivery schedules for a sales order
@@ -614,9 +524,7 @@ class SalesOrderController extends Controller
     public function getDeliverySchedules(Request $request, $soNumber)
     {
         try {
-            $salesOrder = SalesOrder::with(['details', 'deliverySchedules'])
-                ->where('so_number', $soNumber)
-                ->first();
+            $salesOrder = DB::table('so')->where('SO_Num', $soNumber)->first();
 
             if (!$salesOrder) {
                 return response()->json([
@@ -625,11 +533,9 @@ class SalesOrderController extends Controller
                 ], 404);
             }
 
-            $deliverySchedules = DeliverySchedule::where('so_number', $soNumber)
-                ->with('salesOrderDetail')
-                ->orderBy('line_number')
-                ->orderBy('schedule_sequence')
-                ->get();
+            // For legacy SO table, delivery schedules are stored in the main record
+            // We'll return empty array for now as legacy system doesn't have separate schedules table
+            $deliverySchedules = [];
 
             return response()->json([
                 'success' => true,
@@ -661,7 +567,7 @@ class SalesOrderController extends Controller
     public function getDeliveryScheduleSummary(Request $request, $soNumber)
     {
         try {
-            $salesOrder = SalesOrder::where('so_number', $soNumber)->first();
+            $salesOrder = DB::table('so')->where('SO_Num', $soNumber)->first();
             
             if (!$salesOrder) {
                 return response()->json([
@@ -670,23 +576,17 @@ class SalesOrderController extends Controller
                 ], 404);
             }
 
-            $details = SalesOrderDetail::where('so_number', $soNumber)->get();
-            $summary = [];
-
-            foreach ($details as $detail) {
-                $scheduledQty = DeliverySchedule::where('so_number', $soNumber)
-                    ->where('line_number', $detail->line_number)
-                    ->sum('delivery_quantity');
-
-                $summary[] = [
-                    'line_number' => $detail->line_number,
-                    'item_code' => $detail->item_code,
-                    'order_quantity' => $detail->order_quantity,
-                    'scheduled_quantity' => $scheduledQty,
-                    'remaining_quantity' => $detail->order_quantity - $scheduledQty,
-                    'is_fully_scheduled' => $scheduledQty >= $detail->order_quantity,
-                ];
-            }
+            // For legacy SO table, we only have one line item
+            $summary = [
+                [
+                    'line_number' => 1,
+                    'item_code' => $salesOrder->PRODUCT,
+                    'order_quantity' => $salesOrder->SO_QTY,
+                    'scheduled_quantity' => 0, // Legacy system doesn't track scheduled quantities separately
+                    'remaining_quantity' => $salesOrder->SO_QTY,
+                    'is_fully_scheduled' => false,
+                ]
+            ];
 
             return response()->json([
                 'success' => true,
@@ -739,48 +639,6 @@ class SalesOrderController extends Controller
                 'generated_by' => Auth::user()->name ?? 'System'
             ]
         ]);
-    }
-
-    /**
-     * Get sales orders from legacy 'so' table for Print SO
-     */
-    public function getSalesOrders(Request $request)
-    {
-        try {
-            $query = DB::table('so');
-            
-            // Apply filters
-            if ($request->has('month') && $request->has('year')) {
-                $query->where('MM', $request->month)
-                      ->where('YYYY', $request->year);
-            }
-            
-            if ($request->has('from_so') && $request->has('to_so')) {
-                $query->whereBetween('SO_Num', [$request->from_so, $request->to_so]);
-            }
-            
-            if ($request->has('status') && is_array($request->status)) {
-                $query->whereIn('STS', $request->status);
-            }
-            
-            // Order by SO number
-            $query->orderBy('SO_Num', 'desc');
-            
-            $salesOrders = $query->get();
-            
-            return response()->json([
-                'success' => true,
-                'data' => $salesOrders
-            ]);
-            
-        } catch (\Exception $e) {
-            Log::error('Error fetching sales orders: ' . $e->getMessage());
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Error fetching sales orders'
-            ], 500);
-        }
     }
 
     /**
