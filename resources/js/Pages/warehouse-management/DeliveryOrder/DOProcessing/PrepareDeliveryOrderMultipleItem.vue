@@ -203,6 +203,7 @@
           </div>
         </div>
 
+
         <!-- Notes Section -->
         <div v-if="selectedCustomer.code" class="mt-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
           <h3 class="text-sm font-medium text-gray-700 mb-3">Notes</h3>
@@ -265,6 +266,7 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
 import VehicleLookupModal from '@/Components/VehicleLookupModal.vue'
 import { useToast } from '@/Composables/useToast'
+import axios from 'axios'
 
 const { success, error, info } = useToast()
 
@@ -283,8 +285,6 @@ const selectedCustomer = reactive({
   currency: 'IDR'
 })
 
-// Delivery Order Items
-const deliveryItems = ref([])
 
 // Delivery Order Details
 const deliveryOrder = reactive({
@@ -315,7 +315,7 @@ const deliveryOrderStatus = ref('Draft')
 
 // Computed properties
 const canProceed = computed(() => {
-  return selectedCustomer.code && deliveryItems.value.length > 0
+  return selectedCustomer.code && selectedVehicle.vehicleNo
 })
 
 // Day of week computed property
@@ -370,18 +370,6 @@ const validateCustomer = async () => {
   }
 }
 
-const addNewItem = () => {
-  deliveryItems.value.push({
-    itemCode: '',
-    description: '',
-    quantity: 0,
-    uom: 'PCS'
-  })
-}
-
-const removeItem = (index) => {
-  deliveryItems.value.splice(index, 1)
-}
 
 const openVehicleLookup = () => {
   showVehicleModal.value = true
@@ -407,27 +395,47 @@ const openDatePicker = () => {
 }
 
 const saveDeliveryOrder = async () => {
-  if (!canProceed.value) {
-    error('Please select customer and add items first')
+  if (!selectedCustomer.code) {
+    error('Please select a customer first')
+    return
+  }
+  
+  if (!selectedVehicle.vehicleNo) {
+    error('Please select a vehicle first')
     return
   }
   
   try {
     const deliveryOrderData = {
       customer_code: selectedCustomer.code,
-      period: currentPeriod,
-      items: deliveryItems.value,
-      status: 'Draft'
+      vehicle_number: selectedVehicle.vehicleNo,
+      order_date: deliveryOrder.orderDate,
+      cust_remark: deliveryOrder.custRemark,
+      remark1: deliveryOrder.remark1,
+      remark2: deliveryOrder.remark2,
+      unapply_fg: deliveryOrder.unapplyFG
     }
     
-    // Here you would typically send the data to your API
     console.log('Saving delivery order:', deliveryOrderData)
     
-    success('Delivery order saved successfully')
-    deliveryOrderStatus.value = 'Saved'
+    const response = await axios.post('/api/delivery-orders', deliveryOrderData)
+    
+    if (response.data.success) {
+      success(`Delivery order ${response.data.data.do_number} saved successfully`)
+      deliveryOrderStatus.value = 'Saved'
+      
+      // Reset form after successful save
+      refreshPage()
+    } else {
+      error(response.data.message || 'Failed to save delivery order')
+    }
   } catch (err) {
     console.error('Error saving delivery order:', err)
-    error('Error saving delivery order')
+    if (err.response?.data?.message) {
+      error(err.response.data.message)
+    } else {
+      error('Error saving delivery order')
+    }
   }
 }
 
@@ -439,7 +447,6 @@ const refreshPage = () => {
   selectedCustomer.salesperson = ''
   selectedCustomer.currency = 'IDR'
   
-  deliveryItems.value = []
   deliveryOrderStatus.value = 'Draft'
   
   // Reset delivery order details
@@ -466,7 +473,7 @@ const refreshPage = () => {
 }
 
 const exitPage = () => {
-  if (deliveryItems.value.length > 0) {
+  if (selectedCustomer.code || selectedVehicle.vehicleNo) {
     if (confirm('You have unsaved changes. Are you sure you want to exit?')) {
       // Navigate back or close
       window.history.back()

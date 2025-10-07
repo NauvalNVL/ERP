@@ -41,6 +41,7 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionCo
 use App\Http\Controllers\CustomerWarehouseRequirementController;
 use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\DeliveryOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -295,6 +296,11 @@ Route::get('/sales-orders', [App\Http\Controllers\SalesOrderController::class, '
 
 // Vehicle API routes
 Route::get('/vehicles', [VehicleController::class, 'apiIndex']);
+
+// Delivery Order API routes
+Route::post('/delivery-orders', [DeliveryOrderController::class, 'store']);
+Route::get('/delivery-orders', [DeliveryOrderController::class, 'index']);
+Route::get('/delivery-orders/{doNumber}', [DeliveryOrderController::class, 'show']);
 
 // New: Placeholder API routes for Sales Order Delivery Schedule Modals
 Route::get('/po-refs', function() {
