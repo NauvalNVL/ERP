@@ -21,13 +21,6 @@
                 <i class="fas fa-plus"></i>
                 Add Vehicle Class
               </button>
-              <button
-                @click="exportData"
-                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm"
-              >
-                <i class="fas fa-download"></i>
-                Export
-              </button>
             </div>
           </div>
         </div>
@@ -454,26 +447,6 @@ const deleteVehicleClass = async (vehicleClass) => {
   }
 }
 
-const exportData = () => {
-  const csvContent = [
-    ['No.', 'Vehicle Class Code', 'Description'],
-    ...vehicleClasses.value.map((vc, index) => [
-      index + 1,
-      vc.VEHICLE_CLASS_CODE,
-      vc.DESCRIPTION
-    ])
-  ].map(row => row.join(',')).join('\n')
-  
-  const blob = new Blob([csvContent], { type: 'text/csv' })
-  const url = window.URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'vehicle-classes.csv'
-  a.click()
-  window.URL.revokeObjectURL(url)
-  
-  addToast('Vehicle classes exported successfully', 'success')
-}
 
 const formatNumber = (number) => {
   return parseFloat(number).toFixed(2)

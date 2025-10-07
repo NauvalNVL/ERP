@@ -48,6 +48,8 @@ use App\Http\Controllers\SideTrimByProductDesignController;
 use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\BundlingComputationMethodController;
 use App\Http\Controllers\ComputationFormulaController;
+use App\Http\Controllers\VehicleClassController;
+use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmConfigController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController;
@@ -659,6 +661,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehouse-management/accounts', function () {
         return Inertia::render('warehouse-management/Accounts/index');
     })->name('vue.warehouse-management.accounts');
+
+    // Warehouse Management - Delivery Order - Setup
+    Route::get('/warehouse-management/delivery-order/setup/vehicle-class', [VehicleClassController::class, 'index'])->name('vue.warehouse-management.delivery-order.setup.vehicle-class');
+
+    Route::get('/warehouse-management/delivery-order/setup/vehicle-class/view-print', [VehicleClassController::class, 'viewPrint'])->name('vue.warehouse-management.delivery-order.setup.vehicle-class.view-print');
+
+    Route::get('/warehouse-management/delivery-order/setup/vehicle', [VehicleController::class, 'index'])->name('vue.warehouse-management.delivery-order.setup.vehicle');
+
+    Route::get('/warehouse-management/delivery-order/setup/vehicle/view-print', [VehicleController::class, 'viewPrint'])->name('vue.warehouse-management.delivery-order.setup.vehicle.view-print');
 
     Route::get('/warehouse-management/finished-goods/setup-maintenance/fg-do-configuration', function () {
         return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/fg-do-configuration');

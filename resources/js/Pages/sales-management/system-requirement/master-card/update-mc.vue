@@ -1211,34 +1211,27 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         ...pdRoot,
         };
 
-        const res = await fetch('/api/update-mc/master-cards', {
-            method: 'POST',
+        const res = await axios.post('/api/update-mc/master-cards', payload, {
             headers: { 
                 'Content-Type': 'application/json', 
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify(payload),
+            }
         });
 
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.message || `Failed to save: ${res.status}`);
-        }
-
+        if (res.data) {
         toast.success('Master Card saved');
+        }
         // Refresh full MC so subsequent openings have the latest pd_setup
         try {
             if (form.value.mcs && form.value.ac) {
                 const mcsSeqEnc = encodeURIComponent(form.value.mcs);
                 const custEnc = encodeURIComponent(form.value.ac);
-                const refRes = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`, {
-                    headers: { 'Accept': 'application/json' },
-                    credentials: 'same-origin'
+                const refRes = await axios.get(`/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`, {
+                    headers: { 'Accept': 'application/json' }
                 });
-                if (refRes.ok) {
-                    selectedMcsFull.value = await refRes.json();
+                if (refRes.data) {
+                    selectedMcsFull.value = refRes.data;
                 }
             }
         } catch (e) {
@@ -2102,8 +2095,15 @@ const handleMcsInput = () => {
     if (form.value.mcs && !selectedMcs.value) {
         recordMode.value = "new";
         form.value.mc_approval = "No";
-        // Show detailed MC info when user enters MCS number
+        // Require AC selection before showing detailed form for a new MC
+        if (!form.value.ac) {
+            showDetailedMcInfo.value = false;
+            toast.error("Please select Customer Account (AC#) first before creating a new Master Card");
+            openCustomerAccountModal();
+        } else {
+            // Only then allow the detailed form to open
         showDetailedMcInfo.value = true;
+        }
     } else if (!form.value.mcs) {
         // Hide detailed MC info when MCS input is cleared
         showDetailedMcInfo.value = false;
@@ -2146,6 +2146,12 @@ const handleAcInput = () => {
 };
 
 const addNewRecord = () => {
+    // Guard: AC must be selected first
+    if (!form.value.ac) {
+        toast.error("Please select Customer Account (AC#) first before creating a new Master Card");
+        openCustomerAccountModal();
+        return;
+    }
     recordMode.value = "new";
     form.value.mc_approval = "No";
     recordSelected.value = true;
@@ -2187,14 +2193,70 @@ const selectRecord = () => {
     isProgrammaticUpdate.value = false; // Re-enable input handlers
 };
 
-const saveRecord = () => {
+const saveRecord = async () => {
     console.log("Save record clicked");
     if (!recordSelected.value) {
-        alert("No record selected to save");
+        toast.error("No record selected to save");
         return;
     }
 
-    console.log(`Saving record: ${JSON.stringify(form)}`);
+    if (!form.value.ac) {
+        toast.error("Please select customer account (AC#) first");
+        return;
+    }
+
+    if (!form.value.mcs) {
+        toast.error("Please enter MCS# to save");
+        return;
+    }
+
+    try {
+        const loadingToast = toast.loading("Saving master card...");
+        
+        const payload = {
+            mc_seq: form.value.mcs,
+            customer_code: form.value.ac,
+            mc_model: form.value.mc_model || '',
+            mc_short_model: form.value.mc_short_model || '',
+            status: form.value.mc_status || 'Active',
+            mc_approval: form.value.mc_approval || 'No',
+            part_no: '',
+            comp_no: '',
+            p_design: '',
+            ext_dim_1: mcDetails.value.ext_dim_1 || '',
+            ext_dim_2: mcDetails.value.ext_dim_2 || '',
+            ext_dim_3: mcDetails.value.ext_dim_3 || '',
+            int_dim_1: mcDetails.value.int_dim_1 || '',
+            int_dim_2: mcDetails.value.int_dim_2 || '',
+            int_dim_3: mcDetails.value.int_dim_3 || '',
+            detailed_master_card: {
+                mc_details: mcDetails.value,
+            },
+            pd_setup: {},
+        };
+
+        const response = await axios.post('/api/update-mc/master-cards', payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            }
+        });
+
+        if (response.data) {
+            toast.success('Master Card saved successfully');
+            console.log('Master Card saved:', response.data);
+        }
+    } catch (error) {
+        console.error('Error saving master card:', error);
+        if (error.response?.data?.message) {
+            toast.error(error.response.data.message);
+        } else if (error.response?.status === 419) {
+            toast.error('CSRF token mismatch. Please refresh the page and try again.');
+        } else {
+            toast.error('Failed to save master card. Please try again.');
+        }
+    }
 };
 
 const deleteRecord = () => {

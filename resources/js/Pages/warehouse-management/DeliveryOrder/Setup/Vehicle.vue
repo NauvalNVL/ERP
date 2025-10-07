@@ -133,7 +133,7 @@
               <tr v-if="loading" class="animate-pulse">
                 <td colspan="9" class="px-6 py-4 text-center">
                   <div class="flex items-center justify-center">
-                    <ArrowPathIcon class="w-5 h-5 text-blue-600 animate-spin mr-2" />
+                    <RefreshIcon class="w-5 h-5 text-blue-600 animate-spin mr-2" />
                     Loading vehicles...
                   </div>
                 </td>
@@ -458,6 +458,9 @@
 import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { useToast } from '@/Composables/useToast'
 import AppLayout from '@/Layouts/AppLayout.vue'
+// Use v1 heroicons path (package.json has @heroicons/vue ^1.x)
+// ArrowPathIcon is v2; in v1 the equivalent spinner is RefreshIcon
+import { RefreshIcon } from '@heroicons/vue/outline'
 
 const { addToast } = useToast()
 

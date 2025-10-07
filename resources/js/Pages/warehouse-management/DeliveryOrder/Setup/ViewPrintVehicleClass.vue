@@ -3,45 +3,45 @@
     <div class="p-6">
       <!-- Header Section -->
       <div class="mb-8">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900">View & Print Vehicle Classes</h1>
-            <p class="mt-2 text-gray-600">View and print vehicle class definitions and specifications</p>
-          </div>
-          <div class="flex space-x-3">
-            <button
-              @click="printReport"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-              </svg>
-              <span>Print Report</span>
-            </button>
-            <button
-              @click="exportToPDF"
-              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-              <span>Export PDF</span>
-            </button>
-            <button
-              @click="exportToExcel"
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-              <span>Export Excel</span>
-            </button>
+        <div class="relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600">
+          <div class="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,white,transparent_50%)]"></div>
+          <div class="flex items-center justify-between p-5">
+            <div class="flex items-center gap-3 text-white">
+              <i class="fas fa-clipboard-list text-2xl"></i>
+              <div>
+                <h1 class="text-2xl font-semibold">View & Print Vehicle Classes</h1>
+                <p class="text-white/80 text-sm">Print or export vehicle class definitions</p>
+              </div>
+            </div>
+            <div class="hidden sm:flex items-center gap-2">
+              <button
+                @click="printReport"
+                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm"
+              >
+                <i class="fas fa-print"></i>
+                Print
+              </button>
+              <button
+                @click="exportToPDF"
+                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm"
+              >
+                <i class="fas fa-file-pdf"></i>
+                PDF
+              </button>
+              <button
+                @click="exportToExcel"
+                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm"
+              >
+                <i class="fas fa-file-csv"></i>
+                CSV
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Report Information -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700">Report Date</label>
@@ -59,7 +59,7 @@
       </div>
 
       <!-- Vehicle Classes Report Table -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -140,7 +140,7 @@
 
       <!-- Summary Statistics -->
       <div v-if="vehicleClasses.length > 0" class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div class="flex items-center">
             <div class="flex-shrink-0">
               <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +156,7 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div class="flex items-center">
             <div class="flex-shrink-0">
               <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +172,7 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div class="flex items-center">
             <div class="flex-shrink-0">
               <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,6 +233,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useToast } from '@/Composables/useToast'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import ToastContainer from '@/Components/ToastContainer.vue'
+import jsPDF from 'jspdf'
+import 'jspdf-autotable'
 
 const { addToast } = useToast()
 
@@ -294,8 +296,37 @@ const printReport = () => {
 }
 
 const exportToPDF = () => {
-  // This would typically use a library like jsPDF or send a request to generate PDF
-  addToast('PDF export functionality would be implemented here', 'info')
+  try {
+    const doc = new jsPDF({ orientation: 'landscape' })
+    const title = 'Vehicle Classes Report'
+    doc.setFontSize(14)
+    doc.text(title, 14, 14)
+
+    const headers = [['No.', 'Vehicle Class Code', 'Description', 'Standard Class Code', 'Volume (M³)', 'Capacity Weight (MT)', 'Created Date']]
+    const rows = vehicleClasses.value.map((vc, idx) => [
+      idx + 1,
+      vc.VEHICLE_CLASS_CODE,
+      vc.DESCRIPTION,
+      vc.STANDART_CLASS_CODE ?? '',
+      formatNumber(vc.VOLUME_M3 ?? 0),
+      formatNumber(vc.CAPACITY_WGT_MT ?? 0),
+      formatDate(vc.created_at ?? new Date())
+    ])
+
+    doc.autoTable({
+      head: headers,
+      body: rows,
+      startY: 20,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [79, 70, 229] },
+      alternateRowStyles: { fillColor: [245, 245, 245] }
+    })
+
+    doc.save(`vehicle-classes_${new Date().toISOString().split('T')[0]}.pdf`)
+    addToast('PDF exported successfully', 'success')
+  } catch (e) {
+    addToast('Failed to export PDF', 'error')
+  }
 }
 
 const exportToExcel = () => {
