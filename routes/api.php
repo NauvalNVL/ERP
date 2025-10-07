@@ -40,6 +40,7 @@ use App\Http\Controllers\DeliveryOrderFormatController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
 use App\Http\Controllers\CustomerWarehouseRequirementController;
 use App\Http\Controllers\UpdateMcController;
+use App\Http\Controllers\VehicleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -291,6 +292,9 @@ Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderContr
 Route::post('/sales-order/save-to-so', [App\Http\Controllers\SalesOrderController::class, 'apiStoreToSo']);
 // Get sales orders for Print SO
 Route::get('/sales-orders', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrders']);
+
+// Vehicle API routes
+Route::get('/vehicles', [VehicleController::class, 'apiIndex']);
 
 // New: Placeholder API routes for Sales Order Delivery Schedule Modals
 Route::get('/po-refs', function() {

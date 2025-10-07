@@ -111,6 +111,7 @@
                   type="text"
                   class="w-32 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter vehicle number"
+                  readonly
                 >
                 <button 
                   @click="openVehicleLookup"
@@ -119,6 +120,27 @@
                 >
                   <i class="fas fa-th"></i>
                 </button>
+              </div>
+              <!-- Vehicle Information Display -->
+              <div v-if="selectedVehicle.vehicleNo" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span class="font-medium text-blue-800">Driver:</span>
+                    <span class="text-blue-700">{{ selectedVehicle.driverName }}</span>
+                  </div>
+                  <div>
+                    <span class="font-medium text-blue-800">Phone:</span>
+                    <span class="text-blue-700">{{ selectedVehicle.driverPhone }}</span>
+                  </div>
+                  <div>
+                    <span class="font-medium text-blue-800">Class:</span>
+                    <span class="text-blue-700">{{ selectedVehicle.vehicleClass }}</span>
+                  </div>
+                  <div>
+                    <span class="font-medium text-blue-800">Company:</span>
+                    <span class="text-blue-700">{{ selectedVehicle.vehicleCompany }}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -227,6 +249,13 @@
       @select="selectCustomer"
       :initial-sort-by="'customer_code'"
     />
+
+    <!-- Vehicle Lookup Modal -->
+    <VehicleLookupModal 
+      :is-open="showVehicleModal" 
+      @close="showVehicleModal = false" 
+      @select="selectVehicle"
+    />
   </AppLayout>
 </template>
 
@@ -234,6 +263,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
+import VehicleLookupModal from '@/Components/VehicleLookupModal.vue'
 import { useToast } from '@/Composables/useToast'
 
 const { success, error, info } = useToast()
@@ -268,6 +298,17 @@ const deliveryOrder = reactive({
 
 // Modal visibility
 const showCustomerModal = ref(false)
+const showVehicleModal = ref(false)
+
+// Selected Vehicle
+const selectedVehicle = reactive({
+  id: null,
+  vehicleNo: '',
+  driverName: '',
+  driverPhone: '',
+  vehicleClass: '',
+  vehicleCompany: ''
+})
 
 // Delivery Order Status
 const deliveryOrderStatus = ref('Draft')
@@ -343,8 +384,21 @@ const removeItem = (index) => {
 }
 
 const openVehicleLookup = () => {
-  // TODO: Implement vehicle lookup modal
-  info('Vehicle lookup functionality will be implemented')
+  showVehicleModal.value = true
+}
+
+const selectVehicle = (vehicle) => {
+  selectedVehicle.id = vehicle.id
+  selectedVehicle.vehicleNo = vehicle.VEHICLE_NO
+  selectedVehicle.driverName = vehicle.DRIVER_NAME
+  selectedVehicle.driverPhone = vehicle.DRIVER_PHONE
+  selectedVehicle.vehicleClass = vehicle.VEHICLE_CLASS
+  selectedVehicle.vehicleCompany = vehicle.VEHICLE_COMPANY
+  
+  // Update the delivery order vehicle number
+  deliveryOrder.vehicleNumber = vehicle.VEHICLE_NO
+  
+  success(`Vehicle ${vehicle.VEHICLE_NO} selected successfully`)
 }
 
 const openDatePicker = () => {
@@ -396,6 +450,16 @@ const refreshPage = () => {
     unapplyFG: false,
     remark1: '',
     remark2: ''
+  })
+  
+  // Reset selected vehicle
+  Object.assign(selectedVehicle, {
+    id: null,
+    vehicleNo: '',
+    driverName: '',
+    driverPhone: '',
+    vehicleClass: '',
+    vehicleCompany: ''
   })
   
   success('Form reset successfully')
