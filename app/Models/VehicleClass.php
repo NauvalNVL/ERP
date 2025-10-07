@@ -33,8 +33,7 @@ class VehicleClass extends Model
     {
         return $query->where(function ($q) use ($search) {
             $q->where('VEHICLE_CLASS_CODE', 'like', "%{$search}%")
-              ->orWhere('DESCRIPTION', 'like', "%{$search}%")
-              ->orWhere('STANDART_CLASS_CODE', 'like', "%{$search}%");
+              ->orWhere('DESCRIPTION', 'like', "%{$search}%");
         });
     }
 }

@@ -36,10 +36,7 @@ class VehicleClassController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'VEHICLE_CLASS_CODE' => 'required|string|max:50|unique:vehicleclass,VEHICLE_CLASS_CODE',
-            'DESCRIPTION' => 'required|string|max:50',
-            'STANDART_CLASS_CODE' => 'required|string|max:50',
-            'VOLUME_M3' => 'required|numeric|min:0',
-            'CAPACITY_WGT_MT' => 'required|numeric|min:0'
+            'DESCRIPTION' => 'required|string|max:50'
         ]);
 
         if ($validator->fails()) {
@@ -55,9 +52,9 @@ class VehicleClassController extends Controller
                 'NO_' => VehicleClass::count() + 1,
                 'VEHICLE_CLASS_CODE' => $request->VEHICLE_CLASS_CODE,
                 'DESCRIPTION' => $request->DESCRIPTION,
-                'STANDART_CLASS_CODE' => $request->STANDART_CLASS_CODE,
-                'VOLUME_M3' => $request->VOLUME_M3,
-                'CAPACITY_WGT_MT' => $request->CAPACITY_WGT_MT
+                'STANDART_CLASS_CODE' => '', // Default empty value
+                'VOLUME_M3' => 0.0, // Default value
+                'CAPACITY_WGT_MT' => 0.0 // Default value
             ]);
 
             return response()->json([
@@ -90,11 +87,7 @@ class VehicleClassController extends Controller
     public function update(Request $request, VehicleClass $vehicleClass)
     {
         $validator = Validator::make($request->all(), [
-            'VEHICLE_CLASS_CODE' => 'required|string|max:50|unique:vehicleclass,VEHICLE_CLASS_CODE,' . $vehicleClass->id,
-            'DESCRIPTION' => 'required|string|max:50',
-            'STANDART_CLASS_CODE' => 'required|string|max:50',
-            'VOLUME_M3' => 'required|numeric|min:0',
-            'CAPACITY_WGT_MT' => 'required|numeric|min:0'
+            'DESCRIPTION' => 'required|string|max:50'
         ]);
 
         if ($validator->fails()) {
@@ -107,11 +100,7 @@ class VehicleClassController extends Controller
 
         try {
             $vehicleClass->update([
-                'VEHICLE_CLASS_CODE' => $request->VEHICLE_CLASS_CODE,
-                'DESCRIPTION' => $request->DESCRIPTION,
-                'STANDART_CLASS_CODE' => $request->STANDART_CLASS_CODE,
-                'VOLUME_M3' => $request->VOLUME_M3,
-                'CAPACITY_WGT_MT' => $request->CAPACITY_WGT_MT
+                'DESCRIPTION' => $request->DESCRIPTION
             ]);
 
             return response()->json([

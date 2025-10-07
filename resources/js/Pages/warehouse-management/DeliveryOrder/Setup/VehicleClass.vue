@@ -199,11 +199,20 @@
                   v-model="form.VEHICLE_CLASS_CODE"
                   type="text"
                   required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  :readonly="modalMode === 'edit'"
+                  :class="[
+                    'w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                    modalMode === 'edit' 
+                      ? 'bg-gray-100 text-gray-600 cursor-not-allowed border-gray-200' 
+                      : 'border-gray-300'
+                  ]"
                   placeholder="e.g., BE, DB, GM"
                 />
                 <div v-if="errors.VEHICLE_CLASS_CODE" class="mt-1 text-sm text-red-600">
                   {{ errors.VEHICLE_CLASS_CODE[0] }}
+                </div>
+                <div v-if="modalMode === 'edit'" class="mt-1 text-xs text-gray-500">
+                  Vehicle class code cannot be changed
                 </div>
               </div>
 
@@ -239,7 +248,7 @@
                 class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
                 <span v-if="saving" class="flex items-center">
-                  <ArrowPathIcon class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
+                  <i class="fas fa-spinner fa-spin -ml-1 mr-2"></i>
                   Saving...
                 </span>
                 <span v-else>{{ modalMode === 'add' ? 'Add Vehicle Class' : 'Update Vehicle Class' }}</span>
@@ -276,6 +285,7 @@ const errors = ref({})
 
 // Form data
 const form = ref({
+  id: null,
   VEHICLE_CLASS_CODE: '',
   DESCRIPTION: ''
 })
@@ -288,8 +298,7 @@ const filteredVehicleClasses = computed(() => {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(vc => 
       vc.VEHICLE_CLASS_CODE.toLowerCase().includes(query) ||
-      vc.DESCRIPTION.toLowerCase().includes(query) ||
-      vc.STANDART_CLASS_CODE.toLowerCase().includes(query)
+      vc.DESCRIPTION.toLowerCase().includes(query)
     )
   }
 
@@ -303,8 +312,7 @@ const totalItems = computed(() => {
     const query = searchQuery.value.toLowerCase()
     return vehicleClasses.value.filter(vc => 
       vc.VEHICLE_CLASS_CODE.toLowerCase().includes(query) ||
-      vc.DESCRIPTION.toLowerCase().includes(query) ||
-      vc.STANDART_CLASS_CODE.toLowerCase().includes(query)
+      vc.DESCRIPTION.toLowerCase().includes(query)
     ).length
   }
   return vehicleClasses.value.length
@@ -358,11 +366,13 @@ const openModal = (mode, vehicleClass = null) => {
   
   if (mode === 'edit' && vehicleClass) {
     form.value = {
+      id: vehicleClass.id,
       VEHICLE_CLASS_CODE: vehicleClass.VEHICLE_CLASS_CODE,
       DESCRIPTION: vehicleClass.DESCRIPTION
     }
   } else {
     form.value = {
+      id: null,
       VEHICLE_CLASS_CODE: '',
       DESCRIPTION: ''
     }
@@ -373,6 +383,7 @@ const closeModal = () => {
   showModal.value = false
   errors.value = {}
   form.value = {
+    id: null,
     VEHICLE_CLASS_CODE: '',
     DESCRIPTION: ''
   }
@@ -445,14 +456,11 @@ const deleteVehicleClass = async (vehicleClass) => {
 
 const exportData = () => {
   const csvContent = [
-    ['No.', 'Vehicle Class Code', 'Description', 'Standard Class Code', 'Volume (M³)', 'Capacity Weight (MT)'],
+    ['No.', 'Vehicle Class Code', 'Description'],
     ...vehicleClasses.value.map((vc, index) => [
       index + 1,
       vc.VEHICLE_CLASS_CODE,
-      vc.DESCRIPTION,
-      vc.STANDART_CLASS_CODE,
-      vc.VOLUME_M3,
-      vc.CAPACITY_WGT_MT
+      vc.DESCRIPTION
     ])
   ].map(row => row.join(',')).join('\n')
   
