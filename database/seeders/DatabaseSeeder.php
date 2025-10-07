@@ -65,6 +65,7 @@ class DatabaseSeeder extends Seeder
             StandardFormulaSeeder::class,
             // UpdateMcSeeder::class, // disabled per request
             MasterCardSeeder::class,
+            McTableSeeder::class, // New seeder for MC table
             VendorSeeder::class,
             SalesTeamSeeder::class,
             SalespersonSeeder::class,

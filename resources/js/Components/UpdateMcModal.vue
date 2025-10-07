@@ -64,19 +64,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Field Descriptions -->
-                <div class="mb-4 text-sm text-gray-600">
-                    <p><strong>Field Descriptions:</strong></p>
-                    <ul class="list-disc list-inside mt-2 space-y-1">
-                        <li><strong>NO</strong> - Component Number (Sequential numbering)</li>
-                        <li><strong>C#</strong> - Component Code (Main, Fit1, Fit2, etc.)</li>
-                        <li><strong>PD</strong> - Product Description</li>
-                        <li><strong>PCS/SET</strong> - Pieces per Set</li>
-                        <li><strong>PART#</strong> - Part Number</li>
-                    </ul>
-                </div>
-
                 <!-- Component Table -->
                 <div class="mb-6">
                     <table class="min-w-full text-sm border border-gray-300">
@@ -562,23 +549,23 @@
                                 <div class="flex items-center justify-between w-full">
                                     <div class="flex items-center space-x-1">
                                         <label class="text-xs font-bold w-16">SO:</label>
-                                        <input type="text" :value="displaySoValues[0]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="getSoDisplay(0)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openPaperQualityModal', 0)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="displaySoValues[1]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="getSoDisplay(1)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openPaperQualityModal', 1)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="displaySoValues[2]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="getSoDisplay(2)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openPaperQualityModal', 2)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="displaySoValues[3]" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="getSoDisplay(3)" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openPaperQualityModal', 3)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="displaySoValues[4]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="getSoDisplay(4)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openPaperQualityModal', 4)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
@@ -603,23 +590,23 @@
                                 <div class="flex items-center justify-between w-full">
                                     <div class="flex items-center space-x-1">
                                         <label class="text-xs font-bold w-16">WO:</label>
-                                        <input type="text" :value="displayWoValues[0]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="getWoDisplay(0)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openWoPaperQualityModal', 0)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="displayWoValues[1]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="getWoDisplay(1)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openWoPaperQualityModal', 1)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="displayWoValues[2]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="getWoDisplay(2)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openWoPaperQualityModal', 2)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="displayWoValues[3]" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="getWoDisplay(3)" readonly class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openWoPaperQualityModal', 3)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <input type="text" :value="displayWoValues[4]" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
+                                        <input type="text" :value="getWoDisplay(4)" readonly class="w-12 px-1 py-1 border border-gray-400 text-xs text-center bg-gray-50">
                                         <button @click="emit('openWoPaperQualityModal', 4)" class="px-1 py-1 bg-blue-500 border border-blue-600 text-xs hover:bg-blue-600 text-white" title="Select Paper Quality">
                                             <i class="fas fa-search"></i>
                                         </button>
@@ -790,8 +777,10 @@
                                 </button>
                             </div>
                             <div class="flex items-center">
-                                <label class="text-xs font-medium w-20">Conv. Duct x 2:</label>
-                                <input type="text" v-model="convDuctX2" class="w-16 px-2 py-1 border border-gray-400 text-xs">
+                                <label class="text-xs font-medium w-24">Conv. Out 1 x 2:</label>
+                                <input type="text" v-model="convDuctX2A" class="w-12 px-2 py-1 border border-gray-400 text-xs text-center">
+                                <span class="mx-1 text-xs font-bold">x</span>
+                                <input type="text" v-model="convDuctX2B" class="w-12 px-2 py-1 border border-gray-400 text-xs text-center">
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-20">Pcs-to-Joint:</label>
@@ -832,12 +821,12 @@
                             <div class="flex items-center w-80">
                                 <label class="text-xs font-medium w-20">Print Area(%):</label>
                                 <div class="flex space-x-1">
-                                    <input type="text" value="0.00" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center" v-for="i in 7" :key="'area'+i">
+                                    <input type="text" v-model="colorAreaPercents[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center" v-for="i in 7" :key="'area'+i">
                                 </div>
                             </div>
                             <div class="w-64"></div>
                             <div class="flex items-center w-64">
-                                <label class="text-xs font-medium w-24">Pit Block#:</label>
+                                <label class="text-xs font-medium w-24">Prt Block#:</label>
                                 <input type="text" v-model="pitBlockNo" class="w-24 px-2 py-1 border border-gray-400 text-xs">
                             </div>
                         </div>
@@ -1092,9 +1081,54 @@ const normalizeDisplay = (vals) => {
     return [0,1,2,3,4].map(i => toStringVal(arr[i]));
 };
 
-// These reflect what parent passes, but coerced to string for UI display-only
-const displaySoValues = computed(() => normalizeDisplay(props.soValues));
-const displayWoValues = computed(() => normalizeDisplay(props.woValues));
+// Helper: normalize any array-like into fixed 5-length string array
+const normalizeFive = (arr) => {
+    const base = Array.isArray(arr) ? arr : [];
+    const asStrings = base.map(v => (v ?? '') + '');
+    return asStrings.concat(['', '', '', '', '']).slice(0, 5);
+};
+
+// Display helpers for SO/WO values shown in the UI: prefer component state, fallback to props
+const displaySoValues = computed(() => {
+    try {
+        const idx = selectedComponentIndex.value ?? 0;
+        const vals = componentForms.value[idx]?.soValues ?? props.soValues;
+        return normalizeFive(vals);
+    } catch (e) {
+        return ['', '', '', '', ''];
+    }
+});
+
+const displayWoValues = computed(() => {
+    try {
+        const idx = selectedComponentIndex.value ?? 0;
+        const vals = componentForms.value[idx]?.woValues ?? props.woValues;
+        return normalizeFive(vals);
+    } catch (e) {
+        return ['', '', '', '', ''];
+    }
+});
+
+// Helper getters for template bindings to ensure immediate reflection from local state
+const getSoDisplay = (index) => {
+    try {
+        const idx = selectedComponentIndex.value ?? 0;
+        const arr = componentForms.value[idx]?.soValues ?? props.soValues ?? [];
+        return ((Array.isArray(arr) ? arr[index] : '') ?? '') + '';
+    } catch (e) {
+        return '';
+    }
+};
+
+const getWoDisplay = (index) => {
+    try {
+        const idx = selectedComponentIndex.value ?? 0;
+        const arr = componentForms.value[idx]?.woValues ?? props.woValues ?? [];
+        return ((Array.isArray(arr) ? arr[index] : '') ?? '') + '';
+    } catch (e) {
+        return '';
+    }
+};
 import { defineEmits, defineProps, ref, computed, watch, onMounted } from 'vue';
 import ProductDesignModal from '@/Components/product-design-modal.vue';
 import PaperFluteModal from '@/Components/paper-flute-selector-modal.vue';
@@ -1367,6 +1401,9 @@ const itemRemark = ref('');
 const handHole = ref(false);
 const rotaryDCut = ref(false);
 const fullBlockPrint = ref(false);
+// Conv. Out 1x2 split inputs
+const convDuctX2A = ref('');
+const convDuctX2B = ref('');
 
 const handleSortOptionChange = (event) => {
     const newSortOption = event.target.value;
@@ -1450,6 +1487,9 @@ const emit = defineEmits([
     'requestSetSoWo'
 ]);
 
+// 7-slot array for print color area percent inputs (must be declared before use)
+const colorAreaPercents = ref(['', '', '', '', '', '', '']);
+
 // Clear all PD form fields
 const clearPdFields = () => {
     partNo.value = '';
@@ -1460,12 +1500,16 @@ const clearPdFields = () => {
     selectedPaperSize.value = '';
     selectedScoringToolCode.value = '';
     printColorCodes.value = ['', '', '', '', '', '', ''];
+    // Color area percents (7 slots)
+    colorAreaPercents.value = ['','', '', '', '', '', ''];
     scoreL.value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     scoreW.value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     sheetLength.value = '';
     sheetWidth.value = '';
     conOut.value = '';
     convDuctX2.value = '';
+    convDuctX2A.value = '';
+    convDuctX2B.value = '';
     pcsToJoint.value = '';
     idL.value = '';
     idW.value = '';
@@ -1502,33 +1546,141 @@ const clearPdFields = () => {
 
 // When mcLoaded is provided, hydrate PD form fields
 const hydratePdFromLoaded = () => {
-    const pd = props.mcLoaded?.pd_setup || {};
+    const loaded = props.mcLoaded || {};
+    const pd = loaded?.pd_setup || null;
+
+    // Helper to coerce Yes/No strings into booleans
+    const toBool = (v) => {
+        if (v === true || v === false) return !!v;
+        if (v === null || v === undefined) return false;
+        const s = String(v).toLowerCase();
+        return s === 'y' || s === 'yes' || s === 'true' || s === '1';
+    };
+
     if (!pd) {
-        // If no loaded data, clear all fields for new MC
+        // Fallback: hydrate directly from MC table columns
+        // Clear first
         clearPdFields();
+        // Map core PD fields
+        partNo.value = loaded.PART_NO || loaded.part_no || '';
+        selectedProductDesign.value = loaded.P_DESIGN || loaded.p_design || '';
+        pcsPerSet.value = (loaded.PCS_SET ?? loaded.pcs_set ?? '') + '';
+        // Paper flute / scoring / coat / tape
+        selectedPaperFlute.value = loaded.FLUTE || '';
+        selectedScoringToolCode.value = loaded.S_TOOL || '';
+        selectedChemicalCoat.value = loaded.COAT || '';
+        selectedReinforcementTape.value = loaded.TAPE || '';
+        // Sheet dims
+        sheetLength.value = (loaded.SHEET_LENGTH ?? '') + '';
+        sheetWidth.value = (loaded.SHEET_WIDTH ?? '') + '';
+        // Paper size (store as string for UI)
+        selectedPaperSize.value = (loaded.PAPER_SIZE ?? '') + '';
+        // Score arrays SL1..SL8 and SW1..SW8
+        scoreL.value = [loaded.SL1, loaded.SL2, loaded.SL3, loaded.SL4, loaded.SL5, loaded.SL6, loaded.SL7, loaded.SL8]
+            .map(v => (v ?? '') + '');
+        scoreW.value = [loaded.SW1, loaded.SW2, loaded.SW3, loaded.SW4, loaded.SW5, loaded.SW6, loaded.SW7, loaded.SW8]
+            .map(v => (v ?? '') + '');
+        // ID / ED
+        idL.value = (loaded.INT_LENGTH ?? '') + '';
+        idW.value = (loaded.INT_WIDTH ?? '') + '';
+        idH.value = (loaded.INT_HEIGHT ?? '') + '';
+        edL.value = (loaded.EXT_LENGTH ?? '') + '';
+        edW.value = (loaded.EXT_WIDTH ?? '') + '';
+        edH.value = (loaded.EXT_HEIGHT ?? '') + '';
+        // Diecut
+        dcutSheetL.value = (loaded.DC_SHT_L ?? '') + '';
+        dcutSheetW.value = (loaded.DC_SHT_W ?? '') + '';
+        dcutMouldL.value = (loaded.DC_MOULD_L ?? '') + '';
+        dcutMouldW.value = (loaded.DC_MOULD_W ?? '') + '';
+        // Conv. Out 1x2: map to SLIT_OUT and DIE_OUT as A x B
+        convDuctX2A.value = (loaded.SLIT_OUT ?? '') + '';
+        convDuctX2B.value = (loaded.DIE_OUT ?? '') + '';
+        // Con. Out
+        conOut.value = (loaded.CORR_OUT ?? '') + '';
+        // Pcs-to-Joint
+        pcsToJoint.value = (loaded.JOIN_ ?? '') + '';
+        // Finishing/Glueing/Wrapping codes or Yes/No
+        selectedFinishingCode.value = (loaded.FSH ?? '') + '';
+        selectedGlueingCode.value = (loaded.GLUEING ?? '') + '';
+        selectedWrappingCode.value = (loaded.WRAPPING ?? '') + '';
+        // Item remark
+        itemRemark.value = (loaded.ITEM_REMARK ?? '') + '';
+        // Blocks
+        dcutBlockNo.value = (loaded.DIECUT_MOULD_NO ?? '') + '';
+        pitBlockNo.value = (loaded.PRINTING_BLOCK_NO ?? '') + '';
+        // Stitch wire code and pieces
+        selectedStitchWireCode.value = (loaded.SWIRE ?? '') + '';
+        stitchWirePieces.value = (loaded.SWIRE_PCS ?? '') + '';
+        // Bundle string type
+        selectedBundlingStringCode.value = (loaded.STRING_TYPE ?? '') + '';
+        bundlingStringQty.value = (loaded.STRING_TYPE_VALUE ?? '') + '';
+        // Packs and process flags
+        bdlPerPallet.value = (loaded.BLD_PER_PLD ?? '') + '';
+        peelOffPercent.value = (loaded.PEEL_OFF_PERCENT ?? '') + '';
+        handHole.value = toBool(loaded.HAND_HOLE);
+        rotaryDCut.value = toBool(loaded.ROTARY_DC);
+        fullBlockPrint.value = toBool(loaded.FB_PRINTING);
+        // Colors
+        const colors = [loaded.COLOR1, loaded.COLOR2, loaded.COLOR3, loaded.COLOR4, loaded.COLOR5, loaded.COLOR6, loaded.COLOR7]
+            .map(v => (v ?? ''));
+        printColorCodes.value = colors;
+        // Color area percents (map to 7 inputs)
+        colorAreaPercents.value = [
+            loaded.COLOR1_AREA_PERCENT,
+            loaded.COLOR2_AREA_PERCENT,
+            loaded.COLOR3_AREA_PERCENT,
+            loaded.COLOR4_AREA_PERCENT,
+            loaded.COLOR5_AREA_PERCENT,
+            loaded.COLOR6_AREA_PERCENT,
+            loaded.COLOR7_AREA_PERCENT,
+        ].map(v => (v ?? '') + '');
+        // SO/WO root values from MC to selected component (Main)
+        try {
+            const cf0 = componentForms.value[0] || makeEmptyPdState();
+            const soArr = [loaded.SO_PQ1, loaded.SO_PQ2, loaded.SO_PQ3, loaded.SO_PQ4, loaded.SO_PQ5].map(v => (v ?? '') + '');
+            const woArr = [loaded.WO_PQ1, loaded.WO_PQ2, loaded.WO_PQ3, loaded.WO_PQ4, loaded.WO_PQ5].map(v => (v ?? '') + '');
+            cf0.soValues = soArr;
+            cf0.woValues = woArr;
+            componentForms.value[0] = { ...makeEmptyPdState(), ...cf0 };
+            // Reflect SO/WO to parent so global buttons display values
+            emit('requestSetSoWo', {
+                so: soArr,
+                wo: woArr,
+            });
+        } catch (e) {}
+        // Optional fields
+        creaseValue.value = (loaded.CREASE ?? '') + '';
+        nestSlot.value = (loaded.NEST_SLOT ?? '') + '';
+        // Done
         return;
     }
-    partNo.value = pd.partNo || '';
-    selectedProductDesign.value = pd.selectedProductDesign || '';
-    selectedPaperFlute.value = pd.selectedPaperFlute || '';
-    selectedChemicalCoat.value = pd.selectedChemicalCoat || '';
-    selectedReinforcementTape.value = pd.selectedReinforcementTape || '';
-    selectedPaperSize.value = pd.selectedPaperSize || '';
-    selectedScoringToolCode.value = pd.selectedScoringToolCode || '';
+
+    // Default behavior when pd_setup exists (with fallback to MC loaded fields if missing)
+    partNo.value = pd.partNo || loaded.PART_NO || loaded.part_no || '';
+    selectedProductDesign.value = pd.selectedProductDesign || loaded.P_DESIGN || loaded.p_design || '';
+    selectedPaperFlute.value = pd.selectedPaperFlute || loaded.FLUTE || '';
+    selectedChemicalCoat.value = pd.selectedChemicalCoat || loaded.COAT || '';
+    selectedReinforcementTape.value = pd.selectedReinforcementTape || loaded.TAPE || '';
+    selectedPaperSize.value = (pd.selectedPaperSize || (loaded.PAPER_SIZE ?? '')) + '';
+    selectedScoringToolCode.value = pd.selectedScoringToolCode || loaded.S_TOOL || '';
     printColorCodes.value = Array.isArray(pd.printColorCodes) ? pd.printColorCodes : printColorCodes.value;
+    colorAreaPercents.value = Array.isArray(pd.colorAreaPercents) ? pd.colorAreaPercents : colorAreaPercents.value;
     scoreL.value = Array.isArray(pd.scoreL) ? pd.scoreL : scoreL.value;
     scoreW.value = Array.isArray(pd.scoreW) ? pd.scoreW : scoreW.value;
-    sheetLength.value = pd.sheetLength || '';
-    sheetWidth.value = pd.sheetWidth || '';
-    conOut.value = pd.conOut || '';
+    sheetLength.value = pd.sheetLength || (loaded.SHEET_LENGTH ?? '') + '';
+    sheetWidth.value = pd.sheetWidth || (loaded.SHEET_WIDTH ?? '') + '';
+    conOut.value = pd.conOut || (loaded.CORR_OUT ?? '') + '';
     convDuctX2.value = pd.convDuctX2 || '';
-    pcsToJoint.value = pd.pcsToJoint || '';
-    idL.value = pd.id?.L || '';
-    idW.value = pd.id?.W || '';
-    idH.value = pd.id?.H || '';
-    edL.value = pd.ed?.L || '';
-    edW.value = pd.ed?.W || '';
-    edH.value = pd.ed?.H || '';
+    // If pd_setup provides explicit slit/die parts, prefer them
+    convDuctX2A.value = (pd.slitOut ?? convDuctX2A.value ?? '') + '';
+    convDuctX2B.value = (pd.dieOut ?? convDuctX2B.value ?? '') + '';
+    pcsToJoint.value = pd.pcsToJoint || (loaded.JOIN_ ?? '') + '';
+    idL.value = (pd.id?.L || (loaded.INT_LENGTH ?? '')) + '';
+    idW.value = (pd.id?.W || (loaded.INT_WIDTH ?? '')) + '';
+    idH.value = (pd.id?.H || (loaded.INT_HEIGHT ?? '')) + '';
+    edL.value = (pd.ed?.L || (loaded.EXT_LENGTH ?? '')) + '';
+    edW.value = (pd.ed?.W || (loaded.EXT_WIDTH ?? '')) + '';
+    edH.value = (pd.ed?.H || (loaded.EXT_HEIGHT ?? '')) + '';
     pcsPerSet.value = pd.pcsPerSet || '';
     creaseValue.value = pd.creaseValue || '';
     nestSlot.value = pd.nestSlot || '';
@@ -1536,27 +1688,27 @@ const hydratePdFromLoaded = () => {
     dcutSheetW.value = pd.dcutSheet?.W || '';
     dcutMouldL.value = pd.dcutMould?.L || '';
     dcutMouldW.value = pd.dcutMould?.W || '';
-    dcutBlockNo.value = pd.dcutBlockNo || '';
-    pitBlockNo.value = pd.pitBlockNo || '';
-    stitchWirePieces.value = pd.stitchWirePieces || '';
+    dcutBlockNo.value = pd.dcutBlockNo || loaded.DIECUT_MOULD_NO || '';
+    pitBlockNo.value = pd.pitBlockNo || loaded.PRINTING_BLOCK_NO || '';
+    stitchWirePieces.value = (pd.stitchWirePieces || (loaded.SWIRE_PCS ?? '')) + '';
     bdlPerPallet.value = pd.bdlPerPallet || '';
     peelOffPercent.value = pd.peelOffPercent || '';
-    itemRemark.value = pd.itemRemark || '';
+    itemRemark.value = pd.itemRemark || loaded.ITEM_REMARK || '';
     handHole.value = !!pd.handHole;
     rotaryDCut.value = !!pd.rotaryDCut;
     fullBlockPrint.value = !!pd.fullBlockPrint;
     selectedFinishingCode.value = pd.selectedFinishingCode || '';
-    selectedStitchWireCode.value = pd.selectedStitchWireCode || '';
+    selectedStitchWireCode.value = pd.selectedStitchWireCode || loaded.SWIRE || '';
     stitchWirePieces.value = pd.stitchWirePieces || '';
-    selectedBundlingStringCode.value = pd.selectedBundlingStringCode || '';
-    bundlingStringQty.value = pd.bundlingStringQty || '';
+    selectedBundlingStringCode.value = pd.selectedBundlingStringCode || loaded.STRING_TYPE || '';
+    bundlingStringQty.value = (pd.bundlingStringQty || (loaded.STRING_TYPE_VALUE ?? '')) + '';
     selectedGlueingCode.value = pd.selectedGlueingCode || '';
     selectedWrappingCode.value = pd.selectedWrappingCode || '';
     moreDescriptions.value = Array.isArray(pd.moreDescriptions) ? pd.moreDescriptions : [];
     subMaterials.value = Array.isArray(pd.subMaterials) ? pd.subMaterials : [];
 };
 
-watch(() => props.mcLoaded, hydratePdFromLoaded, { immediate: true });
+// (moved below after refs are declared to avoid early access issues)
 
 // Clear PD fields when Setup PD modal is opened for new MC
 watch(() => props.showSetupPdModal, (newVal) => {
@@ -1580,6 +1732,8 @@ const makeEmptyPdState = () => ({
     printColorCodes: ['', '', '', '', '', '', ''],
 });
 const componentForms = ref(Array.from({ length: 10 }, () => makeEmptyPdState()));
+// Now safe to hydrate PD from loaded MC/PD data
+watch(() => props.mcLoaded, hydratePdFromLoaded, { immediate: true });
 
 // Prefer loaded components when available, else fallback to props.mcComponents
 // Always render exactly 10 rows with C# labels: Main, Fit1..Fit9
@@ -1618,6 +1772,19 @@ const mcComponentsToRender = computed(() => {
             index: i,
         });
     }
+    // Fallback: if no components provided, derive Main row from MC table columns
+    try {
+        const loaded = props.mcLoaded || {};
+        const hasNoComponents = !Array.isArray(fromLoaded) || fromLoaded.length === 0;
+        if (hasNoComponents && rows[0]) {
+            const mcPd = loaded.P_DESIGN || loaded.p_design || '';
+            const mcPcsSet = (loaded.PCS_SET ?? loaded.pcs_set ?? '');
+            const mcPart = loaded.PART_NO || loaded.part_no || '';
+            if (!rows[0].pd && mcPd) rows[0].pd = mcPd;
+            if (!rows[0].pcs_set && (mcPcsSet !== '')) rows[0].pcs_set = mcPcsSet;
+            if (!rows[0].part_num && mcPart) rows[0].part_num = mcPart;
+        }
+    } catch (e) {}
     return rows;
 });
 
@@ -1631,6 +1798,54 @@ watch(mcComponentsToRender, (rows) => {
     }));
     localComponents.value = next;
 }, { immediate: true });
+
+// Sync incoming SO/WO props into current component form so textboxes reflect selections
+watch(() => props.soValues, (vals) => {
+    try {
+        const idx = selectedComponentIndex.value ?? 0;
+        const current = (componentForms.value[idx] || makeEmptyPdState());
+        const base = Array.isArray(current.soValues) ? current.soValues.slice(0, 5) : ['', '', '', '', ''];
+        const incoming = Array.isArray(vals) ? vals : [];
+        const merged = base.map((v, i) => {
+            const nv = incoming[i];
+            return (nv !== undefined && nv !== null && nv !== '') ? (nv + '') : (v ?? '');
+        });
+        componentForms.value[idx] = { ...current, soValues: merged };
+    } catch (e) {}
+}, { deep: true });
+
+watch(() => props.woValues, (vals) => {
+    try {
+        const idx = selectedComponentIndex.value ?? 0;
+        const current = (componentForms.value[idx] || makeEmptyPdState());
+        const base = Array.isArray(current.woValues) ? current.woValues.slice(0, 5) : ['', '', '', '', ''];
+        const incoming = Array.isArray(vals) ? vals : [];
+        const merged = base.map((v, i) => {
+            const nv = incoming[i];
+            return (nv !== undefined && nv !== null && nv !== '') ? (nv + '') : (v ?? '');
+        });
+        componentForms.value[idx] = { ...current, woValues: merged };
+    } catch (e) {}
+}, { deep: true });
+
+// Reflect current component SO/WO to parent whenever they change so UI stays in sync
+watch(
+    () => {
+        const idx = selectedComponentIndex.value ?? 0;
+        return {
+            so: componentForms.value[idx]?.soValues || [],
+            wo: componentForms.value[idx]?.woValues || [],
+        };
+    },
+    (val) => {
+        try {
+            const so = normalizeFive(val.so);
+            const wo = normalizeFive(val.wo);
+            emit('requestSetSoWo', { so, wo });
+        } catch (e) {}
+    },
+    { deep: true }
+);
 
 // Initialize componentForms basic fields from loaded components (pd/pcs_set/part_num)
 watch(() => props.mcLoaded, (loaded) => {
@@ -1688,6 +1903,17 @@ watch(() => props.mcLoaded, (loaded) => {
             componentForms.value[idx] = { ...makeEmptyPdState(), ...cf };
         }
     }
+    // Fallback hydration from MC table fields for Main row when no components exist
+    try {
+        const noComp = !loaded?.pd_setup || !Array.isArray(loaded.pd_setup?.components) || loaded.pd_setup.components.length === 0;
+        if (noComp) {
+            const cf0 = componentForms.value[0] || makeEmptyPdState();
+            cf0.selectedProductDesign = cf0.selectedProductDesign || loaded.P_DESIGN || loaded.p_design || '';
+            cf0.pcsPerSet = cf0.pcsPerSet || (loaded.PCS_SET ?? loaded.pcs_set ?? '');
+            cf0.partNo = cf0.partNo || loaded.PART_NO || loaded.part_no || '';
+            componentForms.value[0] = { ...makeEmptyPdState(), ...cf0 };
+        }
+    } catch (e) {}
     // Reflect selected component SO/WO into parent UI so paper quality buttons/editors work per C#
     try {
         const cf = componentForms.value[selectedComponentIndex.value] || makeEmptyPdState();
@@ -1774,6 +2000,17 @@ const applyPdToSelectedComponent = () => {
 const buildPdSetupPayload = () => {
     // Ensure current PD inputs are applied to the currently selected component row
     try { applyPdToSelectedComponent(); } catch (e) {}
+    // Root SO/WO: persist Main component SO/WO; fallback to props; fallback to mcLoaded (SO_PQ/WO_PQ)
+    const mainIdx = 0;
+    const soFromMain = componentForms.value[mainIdx]?.soValues || [];
+    const woFromMain = componentForms.value[mainIdx]?.woValues || [];
+    const soFromProps = props.soValues || [];
+    const woFromProps = props.woValues || [];
+    const loaded = props.mcLoaded || {};
+    const soFromMc = [loaded.SO_PQ1, loaded.SO_PQ2, loaded.SO_PQ3, loaded.SO_PQ4, loaded.SO_PQ5];
+    const woFromMc = [loaded.WO_PQ1, loaded.WO_PQ2, loaded.WO_PQ3, loaded.WO_PQ4, loaded.WO_PQ5];
+    const rootSo = normalizeFive((soFromMain && soFromMain.some(v => v)) ? soFromMain : (soFromProps && soFromProps.some?.(v => v)) ? soFromProps : soFromMc);
+    const rootWo = normalizeFive((woFromMain && woFromMain.some(v => v)) ? woFromMain : (woFromProps && woFromProps.some?.(v => v)) ? woFromProps : woFromMc);
     return {
         partNo: partNo.value,
         selectedProductDesign: selectedProductDesign.value,
@@ -1784,13 +2021,25 @@ const buildPdSetupPayload = () => {
         selectedScoringToolCode: selectedScoringToolCode.value,
         // Root printColorCodes kept as a summary of selected component for compatibility
         printColorCodes: printColorCodes.value,
+        colorAreaPercents: colorAreaPercents.value,
         scoreL: scoreL.value,
         scoreW: scoreW.value,
         sheetLength: sheetLength.value,
         sheetWidth: sheetWidth.value,
         conOut: conOut.value,
         convDuctX2: convDuctX2.value,
+        slitOut: convDuctX2A.value,
+        dieOut: convDuctX2B.value,
         pcsToJoint: pcsToJoint.value,
+        // Provide top-level ID/ED so backend numeric map can persist them
+        int_dim_1: idL.value,
+        int_dim_2: idW.value,
+        int_dim_3: idH.value,
+        ext_dim_1: edL.value,
+        ext_dim_2: edW.value,
+        ext_dim_3: edH.value,
+        // Provide top-level part_no for MC.PART_NO persistence
+        part_no: partNo.value,
         id: { L: idL.value, W: idW.value, H: idH.value },
         ed: { L: edL.value, W: edW.value, H: edH.value },
         pcsPerSet: pcsPerSet.value,
@@ -1816,6 +2065,9 @@ const buildPdSetupPayload = () => {
         selectedWrappingCode: selectedWrappingCode.value,
         moreDescriptions: moreDescriptions.value,
         subMaterials: subMaterials.value,
+        // Legacy root arrays for controller mapping
+        soValues: rootSo,
+        woValues: rootWo,
         // No global SO/WO; store them per component instead
         components: (localComponents?.value || []).map((c, idx) => ({
             c_num: c.c_num,

@@ -57,20 +57,13 @@ class UpdateMcController extends Controller
         Log::info('apiIndex request', $request->all());
 
         $query = $request->input('query');
-        $sortBy = $request->input('sortBy', 'mc_seq'); // Default sort by 'mc_seq'
-        $sortOrder = $request->input('sortOrder', 'asc'); // Default sort order 'asc'
-        $statuses = $request->input('status', ['Act']); // Default to 'Act' status
-        $customerCode = $request->input('customer_code'); // Customer filter
-        $perPage = $request->input('per_page', 10); // Items per page
+        $sortBy = $request->input('sortBy', 'mc_seq');
+        $sortOrder = $request->input('sortOrder', 'asc');
+        $statuses = $request->input('status', ['Act']);
+        $customerCode = $request->input('customer_code');
+        $perPage = (int) $request->input('per_page', 10);
 
-        // Build the query using Eloquent
-        $masterCards = MasterCard::query();
-
-        // MANDATORY: Filter by customer_code if provided
-        if ($customerCode) {
-            $masterCards->where('customer_code', $customerCode);
-        } else {
-            // If no customer_code provided, return empty result for security
+        if (!$customerCode) {
             return response()->json([
                 'current_page' => 1,
                 'last_page' => 1,
@@ -80,90 +73,77 @@ class UpdateMcController extends Controller
             ]);
         }
 
-        // Apply search query if provided
+        $mcQuery = DB::table('MC')->where('AC_NUM', $customerCode);
+
         if ($query) {
-            $masterCards->where(function ($q) use ($query) {
-                $q->where('mc_seq', 'like', '%' . $query . '%')
-                  ->orWhere('mc_model', 'like', '%' . $query . '%');
+            $mcQuery->where(function ($q) use ($query) {
+                $q->where('MCS_Num', 'like', '%' . $query . '%')
+                  ->orWhere('MODEL', 'like', '%' . $query . '%');
             });
         }
 
-        // Apply status filter - handle both 'Act' and 'Active' status values
-        $validStatuses = ['Act', 'Active', 'Obsolete']; // Define expected database status values
+        $validStatuses = ['Act', 'Active', 'Obsolete'];
         $filteredStatuses = array_intersect($statuses, $validStatuses);
-
         if (!empty($filteredStatuses)) {
-            // Map 'Act' to also include 'Active' for compatibility
             $dbStatuses = [];
             foreach ($filteredStatuses as $status) {
-                if ($status === 'Act') {
-                    $dbStatuses[] = 'Active'; // Map 'Act' to 'Active' in database
-                } else {
-                    $dbStatuses[] = $status;
-                }
+                $dbStatuses[] = $status === 'Act' ? 'Active' : $status;
             }
-            $masterCards->whereIn('status', $dbStatuses);
+            $mcQuery->whereIn('STS', $dbStatuses);
         } else {
-            // If no valid status is provided, default to active
-            $masterCards->where('status', 'Active');
+            $mcQuery->where('STS', 'Active');
         }
 
-        // Apply sorting
-        $validSortColumns = ['mc_seq', 'mc_model', 'part_no', 'comp_no', 'status', 'ext_dim_1', 'int_dim_1', 'customer_code'];
-        if (!in_array($sortBy, $validSortColumns)) {
-            $sortBy = 'mc_seq'; // Fallback to a safe default
-        }
-        
-        $masterCards->orderBy($sortBy, $sortOrder);
+        $sortMap = [
+            'mc_seq' => 'MCS_Num',
+            'mc_model' => 'MODEL',
+            'part_no' => 'PART_NO',
+            'comp_no' => 'COMP',
+            'status' => 'STS',
+            'ext_dim_1' => 'EXT_LENGTH',
+            'int_dim_1' => 'INT_LENGTH',
+            'customer_code' => 'AC_NUM',
+        ];
+        $sortCol = $sortMap[$sortBy] ?? 'MCS_Num';
+        $mcQuery->orderBy($sortCol, $sortOrder === 'desc' ? 'desc' : 'asc');
 
-        // Paginate the results
-        $paginatedMasterCards = $masterCards->paginate($perPage);
+        $paginated = $mcQuery->paginate($perPage);
 
-        // Transform the data to match the frontend expectations
-        $transformedData = $paginatedMasterCards->getCollection()->map(function ($item) {
-            // Derive approval status: either explicit 'Yes' on master_cards or active in approve_mcs
-            try {
-                $isApproved = ($item->mc_approval === 'Yes') || \App\Models\ApproveMC::where('mc_seq', $item->mc_seq)
-                    ->where('status', 'active')
-                    ->exists();
-            } catch (\Throwable $e) {
-                $isApproved = ($item->mc_approval === 'Yes');
-            }
-
+        $transformed = collect($paginated->items())->map(function ($item) {
+            $isApproved = false; // MC table does not store approval; default false
             return [
-                'seq' => $item->mc_seq,
-                'model' => $item->mc_model,
-                'short_model' => $item->mc_short_model,
-                'part' => $item->part_no,
-                'comp' => $item->comp_no,
-                'status' => $item->status,
+                'seq' => $item->MCS_Num,
+                'model' => $item->MODEL,
+                'short_model' => null,
+                'part' => $item->PART_NO,
+                'comp' => $item->COMP,
+                'status' => $item->STS,
                 'mc_approval' => $isApproved ? 'Yes' : 'No',
-                'p_design' => $item->p_design,
-                'customer_code' => $item->customer_code,
-                'customer_name' => $item->customer_code, // Use customer_code for now
-                'ext_dim_1' => $item->ext_dim_1,
-                'ext_dim_2' => $item->ext_dim_2,
-                'ext_dim_3' => $item->ext_dim_3,
-                'int_dim_1' => $item->int_dim_1,
-                'int_dim_2' => $item->int_dim_2,
-                'int_dim_3' => $item->int_dim_3,
-                'last_mcs' => $item->mc_seq,
-                'last_updated_seq' => $item->mc_seq,
+                'p_design' => $item->P_DESIGN,
+                'customer_code' => $item->AC_NUM,
+                'customer_name' => $item->AC_NAME ?? $item->AC_NUM,
+                'ext_dim_1' => $item->EXT_LENGTH,
+                'ext_dim_2' => $item->EXT_WIDTH,
+                'ext_dim_3' => $item->EXT_HEIGHT,
+                'int_dim_1' => $item->INT_LENGTH,
+                'int_dim_2' => $item->INT_WIDTH,
+                'int_dim_3' => $item->INT_HEIGHT,
+                'last_mcs' => $item->MCS_Num,
+                'last_updated_seq' => $item->MCS_Num,
             ];
         });
 
         $result = [
-            'current_page' => $paginatedMasterCards->currentPage(),
-            'last_page' => $paginatedMasterCards->lastPage(),
-            'per_page' => $paginatedMasterCards->perPage(),
-            'total' => $paginatedMasterCards->total(),
-            'data' => $transformedData,
+            'current_page' => $paginated->currentPage(),
+            'last_page' => $paginated->lastPage(),
+            'per_page' => $paginated->perPage(),
+            'total' => $paginated->total(),
+            'data' => $transformed,
         ];
 
-        Log::info('Master Card Query Results:', [
+        Log::info('MC Query Results:', [
             'customer_code' => $customerCode,
             'count' => $result['total'], 
-            'data_sample' => $transformedData->take(2)->toArray()
         ]);
 
         return response()->json($result);
@@ -175,11 +155,11 @@ class UpdateMcController extends Controller
     public function apiShow($mcSeq, Request $request)
     {
         $customerCode = $request->input('customer_code');
-        $query = MasterCard::where('mc_seq', $mcSeq);
+        $q = DB::table('MC')->where('MCS_Num', $mcSeq);
         if ($customerCode) {
-            $query->where('customer_code', $customerCode);
+            $q->where('AC_NUM', $customerCode);
         }
-        $mc = $query->first();
+        $mc = $q->first();
         if (!$mc) {
             return response()->json(['message' => 'Not found'], 404);
         }
@@ -198,53 +178,37 @@ class UpdateMcController extends Controller
         try {
             $customerCode = $request->input('customer_code');
             
-            // Build query with customer validation
-            $query = MasterCard::where('mc_seq', $mcsNumber);
-            
-            // If customer_code is provided, validate ownership
+            $q = DB::table('MC')->where('MCS_Num', $mcsNumber);
             if ($customerCode) {
-                $query->where('customer_code', $customerCode);
+                $q->where('AC_NUM', $customerCode);
             }
-            
-            $masterCard = $query->first();
-            
-            if ($masterCard) {
-                // Derive approval from both sources
-                try {
-                    $isApproved = ($masterCard->mc_approval === 'Yes') || \App\Models\ApproveMC::where('mc_seq', $masterCard->mc_seq)
-                        ->where('status', 'active')
-                        ->exists();
-                } catch (\Throwable $e) {
-                    $isApproved = ($masterCard->mc_approval === 'Yes');
-                }
+            $row = $q->first();
 
+            if ($row) {
                 return response()->json([
                     'exists' => true,
                     'data' => [
-                        'mc_seq' => $masterCard->mc_seq,
-                        'customer_code' => $masterCard->customer_code,
-                        'mc_model' => $masterCard->mc_model,
-                        'mc_short_model' => $masterCard->mc_short_model ?? '',
-                        'status' => $masterCard->status,
-                        'mc_approval' => $isApproved ? 'Yes' : 'No',
-                        'part_no' => $masterCard->part_no,
-                        'comp_no' => $masterCard->comp_no,
-                        'p_design' => $masterCard->p_design,
-                        'ext_dim_1' => $masterCard->ext_dim_1,
-                        'ext_dim_2' => $masterCard->ext_dim_2,
-                        'ext_dim_3' => $masterCard->ext_dim_3,
-                        'int_dim_1' => $masterCard->int_dim_1,
-                        'int_dim_2' => $masterCard->int_dim_2,
-                        'int_dim_3' => $masterCard->int_dim_3,
-                        'customer_name' => $masterCard->customer_code, // Use customer_code for now
-                        'created_at' => $masterCard->created_at,
-                        'updated_at' => $masterCard->updated_at,
+                        'mc_seq' => $row->MCS_Num,
+                        'customer_code' => $row->AC_NUM,
+                        'mc_model' => $row->MODEL,
+                        'mc_short_model' => '',
+                        'status' => $row->STS,
+                        'mc_approval' => 'No',
+                        'part_no' => $row->PART_NO,
+                        'comp_no' => $row->COMP,
+                        'p_design' => $row->P_DESIGN,
+                        'ext_dim_1' => $row->EXT_LENGTH,
+                        'ext_dim_2' => $row->EXT_WIDTH,
+                        'ext_dim_3' => $row->EXT_HEIGHT,
+                        'int_dim_1' => $row->INT_LENGTH,
+                        'int_dim_2' => $row->INT_WIDTH,
+                        'int_dim_3' => $row->INT_HEIGHT,
+                        'customer_name' => $row->AC_NAME ?? $row->AC_NUM,
                     ]
                 ]);
             } else {
-                // Check if MCS exists but belongs to different customer
                 if ($customerCode) {
-                    $existsElsewhere = MasterCard::where('mc_seq', $mcsNumber)->exists();
+                    $existsElsewhere = DB::table('MC')->where('MCS_Num', $mcsNumber)->exists();
                     if ($existsElsewhere) {
                         return response()->json([
                             'exists' => false,
@@ -260,7 +224,7 @@ class UpdateMcController extends Controller
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error('Error checking MCS: ' . $e->getMessage());
+            Log::error('Error checking MCS (MC table): ' . $e->getMessage());
             return response()->json([
                 'exists' => false,
                 'error' => 'Database error occurred'
@@ -334,29 +298,19 @@ class UpdateMcController extends Controller
 
         try {
             return DB::transaction(function () use ($validated) {
-            $mc = MasterCard::updateOrCreate(
-                [
-                    'mc_seq' => $validated['mc_seq'],
-                    'customer_code' => $validated['customer_code'],
-                ],
-                [
-                    'mc_model' => $validated['mc_model'] ?? null,
-                    'mc_short_model' => $validated['mc_short_model'] ?? null,
-                    'status' => $validated['status'],
-                    'mc_approval' => $validated['mc_approval'],
-                    'part_no' => $validated['part_no'] ?? null,
-                    'comp_no' => $validated['comp_no'] ?? null,
-                    'p_design' => $validated['p_design'] ?? null,
-                    'ext_dim_1' => $validated['ext_dim_1'] ?? null,
-                    'ext_dim_2' => $validated['ext_dim_2'] ?? null,
-                    'ext_dim_3' => $validated['ext_dim_3'] ?? null,
-                    'int_dim_1' => $validated['int_dim_1'] ?? null,
-                    'int_dim_2' => $validated['int_dim_2'] ?? null,
-                    'int_dim_3' => $validated['int_dim_3'] ?? null,
-                    'detailed_master_card' => $validated['detailed_master_card'] ?? null,
-                    'pd_setup' => $validated['pd_setup'] ?? null,
-                ]
-            );
+            // Load existing MC row to preserve unchanged fields on partial updates
+            $existing = DB::table('MC')
+                ->where('MCS_Num', $validated['mc_seq'])
+                ->where('AC_NUM', $validated['customer_code'])
+                ->first();
+
+            // Helper to keep existing value when incoming is empty
+            $keep = function ($key, $incoming) use ($existing) {
+                if (($incoming === null || $incoming === '') && $existing) {
+                    return $existing->{$key} ?? null;
+                }
+                return $incoming;
+            };
 
             // Map and upsert to legacy MC table for reporting/compatibility
             $legacy = [
@@ -383,10 +337,17 @@ class UpdateMcController extends Controller
                 'INT_HEIGHT' => 'int_dim_3',
             ];
             foreach ($mapDecimals as $col => $src) {
+                $incoming = null;
                 if (!empty($validated[$src])) {
-                    $legacy[$col] = is_numeric($validated[$src]) ? $validated[$src] : null;
+                    $incoming = is_numeric($validated[$src]) ? $validated[$src] : null;
                 } elseif (is_array($details) && isset($details[$src]) && $details[$src] !== '') {
-                    $legacy[$col] = is_numeric($details[$src]) ? $details[$src] : null;
+                    $incoming = is_numeric($details[$src]) ? $details[$src] : null;
+                }
+                // Preserve existing value when incoming is empty
+                if (!isset($legacy[$col])) {
+                    $legacy[$col] = $incoming;
+                } else {
+                    $legacy[$col] = ($incoming === null && isset($existing->{$col})) ? $existing->{$col} : $incoming;
                 }
             }
 
@@ -453,7 +414,7 @@ class UpdateMcController extends Controller
                         if (is_array($colorVal)) {
                             $colorVal = $colorVal['code'] ?? $colorVal['value'] ?? null;
                         }
-                        $legacy['COLOR' . $i] = $colorVal;
+                        $legacy['COLOR' . $i] = $keep('COLOR' . $i, $colorVal);
                     }
                 }
                 // Optional: color area percentages
@@ -461,7 +422,9 @@ class UpdateMcController extends Controller
                 if (is_array($colorAreas)) {
                     for ($i = 1; $i <= 7; $i++) {
                         $key = 'COLOR' . $i . '_AREA_PERCENT';
-                        $legacy[$key] = isset($colorAreas[$i - 1]) ? $num($colorAreas[$i - 1]) : null;
+                        // Preserve existing value if incoming is empty
+                        $incoming = isset($colorAreas[$i - 1]) ? $num($colorAreas[$i - 1]) : null;
+                        $legacy[$key] = $keep($key, $incoming);
                     }
                 }
                 // SO/WO pack qtys if present
@@ -470,12 +433,16 @@ class UpdateMcController extends Controller
                 $wo = $pd['woValues'] ?? $pd['wo_pq'] ?? $pd['wo'] ?? [];
                 if (is_array($so)) {
                     for ($i = 1; $i <= 5; $i++) {
-                        $legacy['SO_PQ' . $i] = $so[$i - 1] ?? null;
+                        $key = 'SO_PQ' . $i;
+                        $incoming = $so[$i - 1] ?? null;
+                        $legacy[$key] = $keep($key, $incoming);
                     }
                 }
                 if (is_array($wo)) {
                     for ($i = 1; $i <= 5; $i++) {
-                        $legacy['WO_PQ' . $i] = $wo[$i - 1] ?? null;
+                        $key = 'WO_PQ' . $i;
+                        $incoming = $wo[$i - 1] ?? null;
+                        $legacy[$key] = $keep($key, $incoming);
                     }
                 }
 
@@ -506,16 +473,19 @@ class UpdateMcController extends Controller
                     return null;
                 };
 
+                // Map PART_NO from PD if provided
+                $legacy['PART_NO'] = $keep('PART_NO', $alias($pd, ['partNo','part_no']));
+
                 // Core product attributes
-                $legacy['P_DESIGN'] = $alias($pd, ['pDesign','p_design','productDesign','pdCode','pd','selectedProductDesign']);
-                $legacy['FLUTE'] = $alias($pd, ['flute','paperFlute','flute_code','paper_flute','selectedPaperFlute']);
-                $legacy['S_TOOL'] = $alias($pd, ['scoringTool','scoreTool','sTool','S_TOOL','selectedScoringToolCode']);
-                $legacy['COAT'] = $alias($pd, ['chemicalCoat','chemCoat','coat','selectedChemicalCoat']);
-                $legacy['TAPE'] = $alias($pd, ['reinforcementTape','rfTape','r_f_tape','rftape','RF_Tape','selectedReinforcementTape']);
+                $legacy['P_DESIGN'] = $keep('P_DESIGN', $alias($pd, ['pDesign','p_design','productDesign','pdCode','pd','selectedProductDesign']));
+                $legacy['FLUTE'] = $keep('FLUTE', $alias($pd, ['flute','paperFlute','flute_code','paper_flute','selectedPaperFlute']));
+                $legacy['S_TOOL'] = $keep('S_TOOL', $alias($pd, ['scoringTool','scoreTool','sTool','S_TOOL','selectedScoringToolCode']));
+                $legacy['COAT'] = $keep('COAT', $alias($pd, ['chemicalCoat','chemCoat','coat','selectedChemicalCoat']));
+                $legacy['TAPE'] = $keep('TAPE', $alias($pd, ['reinforcementTape','rfTape','r_f_tape','rftape','RF_Tape','selectedReinforcementTape']));
 
                 // Block / mould
-                $legacy['PRINTING_BLOCK_NO'] = $alias($pd, ['printingBlockNo','printing_block_no','printBlockNo','pitBlockNo']);
-                $legacy['DIECUT_MOULD_NO'] = $alias($pd, ['diecutMouldNo','diecut_mould_no','dcMouldNo','dcutBlockNo']);
+                $legacy['PRINTING_BLOCK_NO'] = $keep('PRINTING_BLOCK_NO', $alias($pd, ['printingBlockNo','printing_block_no','printBlockNo','pitBlockNo']));
+                $legacy['DIECUT_MOULD_NO'] = $keep('DIECUT_MOULD_NO', $alias($pd, ['diecutMouldNo','diecut_mould_no','dcMouldNo','dcutBlockNo']));
 
                 // Process flags to Yes/No strings
                 $toYesNo = function ($v) {
@@ -524,15 +494,15 @@ class UpdateMcController extends Controller
                 };
 
                 // Prefer coded values if provided, otherwise map booleans to Yes/No
-                $legacy['FSH'] = $alias($pd, ['finishing','finishingCode','FSH','selectedFinishingCode']) ?? $toYesNo($alias($pd, ['hasFinishing']));
-                $legacy['SWIRE'] = $alias($pd, ['stitchWire','swire','selectedStitchWireCode']) ?? $toYesNo($alias($pd, ['hasSwire']));
-                $legacy['GLUEING'] = $alias($pd, ['glueing','gluing','glueingCode','selectedGlueingCode']) ?? $toYesNo($alias($pd, ['hasGlueing']));
-                $legacy['WRAPPING'] = $alias($pd, ['wrapping','wrappingCode','selectedWrappingCode']) ?? $toYesNo($alias($pd, ['hasWrapping']));
+                $legacy['FSH'] = $keep('FSH', $alias($pd, ['finishing','finishingCode','FSH','selectedFinishingCode']) ?? $toYesNo($alias($pd, ['hasFinishing'])));
+                $legacy['SWIRE'] = $keep('SWIRE', $alias($pd, ['stitchWire','swire','selectedStitchWireCode']) ?? $toYesNo($alias($pd, ['hasSwire'])));
+                $legacy['GLUEING'] = $keep('GLUEING', $alias($pd, ['glueing','gluing','glueingCode','selectedGlueingCode']) ?? $toYesNo($alias($pd, ['hasGlueing'])));
+                $legacy['WRAPPING'] = $keep('WRAPPING', $alias($pd, ['wrapping','wrappingCode','selectedWrappingCode']) ?? $toYesNo($alias($pd, ['hasWrapping'])));
                 $legacy['HAND_HOLE'] = $toYesNo($alias($pd, ['handHole','hand_hole'])) ;
                 $legacy['ROTARY_DC'] = $toYesNo($alias($pd, ['rotaryDc','rotary_dc','rotaryDCut'])) ;
                 $legacy['FB_PRINTING'] = $toYesNo($alias($pd, ['fbPrinting','fb_printing','fullBlockPrint'])) ;
-                $legacy['STRING_TYPE'] = $alias($pd, ['stringType','string_type']);
-                $legacy['ITEM_REMARK'] = $alias($pd, ['itemRemark','item_remark']);
+                $legacy['STRING_TYPE'] = $keep('STRING_TYPE', $alias($pd, ['stringType','string_type','selectedBundlingStringCode']));
+                $legacy['ITEM_REMARK'] = $keep('ITEM_REMARK', $alias($pd, ['itemRemark','item_remark']));
                 $legacy['UNIT'] = $alias($pd, ['unit','uom']);
                 $legacy['CURRENCY'] = $alias($pd, ['currency']);
                 // Already set S_TOOL/COAT/TAPE above, keep backward aliases too
@@ -570,15 +540,15 @@ class UpdateMcController extends Controller
                 $legacy['DC_SHT_W'] = $num($dcShtW);
                 $legacy['DC_MOULD_L'] = $num($dcMouldL);
                 $legacy['DC_MOULD_W'] = $num($dcMouldW);
-                $legacy['PCS_PER_BLD'] = $num($alias($pd, ['pcsPerBld','pcs_per_bld']));
-                $legacy['BLD_PER_PLD'] = $num($alias($pd, ['bldPerPld','bld_per_pld','bdlPerPallet']));
-                $legacy['PCS_SET'] = $num($alias($pd, ['pcsSet','pcs_set','pcsPerSet']));
-                $legacy['UNIT_PRICE'] = $num($alias($pd, ['unitPrice','unit_price']));
+                $legacy['PCS_PER_BLD'] = $keep('PCS_PER_BLD', $num($alias($pd, ['pcsPerBld','pcs_per_bld'])));
+                $legacy['BLD_PER_PLD'] = $keep('BLD_PER_PLD', $num($alias($pd, ['bldPerPld','bld_per_pld','bdlPerPallet'])));
+                $legacy['PCS_SET'] = $keep('PCS_SET', $num($alias($pd, ['pcsSet','pcs_set','pcsPerSet'])));
+                $legacy['UNIT_PRICE'] = $keep('UNIT_PRICE', $num($alias($pd, ['unitPrice','unit_price'])));
 
                 // Additional numeric fields commonly used in MC
-                $legacy['SWIRE_PCS'] = $num($alias($pd, ['swirePcs','swire_pcs']));
-                $legacy['PEEL_OFF_PERCENT'] = $num($alias($pd, ['peelOffPercent','peel_off_percent']));
-                $legacy['STRING_TYPE_VALUE'] = $num($alias($pd, ['stringTypeValue','string_type_value']));
+                $legacy['SWIRE_PCS'] = $keep('SWIRE_PCS', $num($alias($pd, ['swirePcs','swire_pcs','stitchWirePieces'])));
+                $legacy['PEEL_OFF_PERCENT'] = $keep('PEEL_OFF_PERCENT', $num($alias($pd, ['peelOffPercent','peel_off_percent'])));
+                $legacy['STRING_TYPE_VALUE'] = $keep('STRING_TYPE_VALUE', $num($alias($pd, ['stringTypeValue','string_type_value','bundlingStringQty'])));
                 $legacy['MC_GROSS_M2_PER_PCS'] = $num($alias($pd, ['mcGrossM2PerPcs','mc_gross_m2_per_pcs']));
                 $legacy['MC_NET_M2_PER_PCS'] = $num($alias($pd, ['mcNetM2PerPcs','mc_net_m2_per_pcs']));
                 $legacy['MC_GROSS_KG_PER_SET'] = $num($alias($pd, ['mcGrossKgPerSet','mc_gross_kg_per_set']));
@@ -586,13 +556,13 @@ class UpdateMcController extends Controller
                 $legacy['TOTAL_COLOR'] = $num($alias($pd, ['totalColor','total_color']));
 
                 // Sheet and cut metrics
-                $legacy['SHEET_LENGTH'] = $num($alias($pd, ['sheetLength','sheet_length']));
-                $legacy['SHEET_WIDTH'] = $num($alias($pd, ['sheetWidth','sheet_width']));
-                $legacy['PAPER_SIZE'] = $num($alias($pd, ['paperSize','paper_size','selectedPaperSize']));
-                $legacy['CORR_OUT'] = $num($alias($pd, ['corrOut','corr_out','conOut']));
-                $legacy['SLIT_OUT'] = $num($alias($pd, ['slitOut','slit_out']));
-                $legacy['DIE_OUT'] = $num($alias($pd, ['dieOut','die_out']));
-                $legacy['JOIN_'] = $num($alias($pd, ['join','join_','pcsToJoint']));
+                $legacy['SHEET_LENGTH'] = $keep('SHEET_LENGTH', $num($alias($pd, ['sheetLength','sheet_length'])));
+                $legacy['SHEET_WIDTH'] = $keep('SHEET_WIDTH', $num($alias($pd, ['sheetWidth','sheet_width'])));
+                $legacy['PAPER_SIZE'] = $keep('PAPER_SIZE', $num($alias($pd, ['paperSize','paper_size','selectedPaperSize'])));
+                $legacy['CORR_OUT'] = $keep('CORR_OUT', $num($alias($pd, ['corrOut','corr_out','conOut'])));
+                $legacy['SLIT_OUT'] = $keep('SLIT_OUT', $num($alias($pd, ['slitOut','slit_out'])));
+                $legacy['DIE_OUT'] = $keep('DIE_OUT', $num($alias($pd, ['dieOut','die_out'])));
+                $legacy['JOIN_'] = $keep('JOIN_', $num($alias($pd, ['join','join_','pcsToJoint'])));
                 $legacy['NEST_SLOT'] = $num($alias($pd, ['nestSlot','nest_slot']));
                 $legacy['CREASE'] = $num($alias($pd, ['crease','creaseValue']));
 
@@ -634,9 +604,23 @@ class UpdateMcController extends Controller
                 $normalized
             );
 
+            // Build a minimal response reflecting MC values stored
+            $responseData = [
+                'mc_seq' => $validated['mc_seq'],
+                'customer_code' => $validated['customer_code'],
+                'mc_model' => $validated['mc_model'] ?? null,
+                'status' => $validated['status'],
+                'ext_dim_1' => $validated['ext_dim_1'] ?? null,
+                'ext_dim_2' => $validated['ext_dim_2'] ?? null,
+                'ext_dim_3' => $validated['ext_dim_3'] ?? null,
+                'int_dim_1' => $validated['int_dim_1'] ?? null,
+                'int_dim_2' => $validated['int_dim_2'] ?? null,
+                'int_dim_3' => $validated['int_dim_3'] ?? null,
+            ];
+
             return response()->json([
-                'message' => 'Master Card saved successfully',
-                'data' => $mc,
+                'message' => 'Master Card saved successfully (MC table only)',
+                'data' => $responseData,
             ], 201);
             });
         } catch (\Throwable $e) {
