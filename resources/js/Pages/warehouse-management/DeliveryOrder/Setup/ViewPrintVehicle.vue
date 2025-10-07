@@ -356,8 +356,8 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useToast } from '@/Composables/useToast'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import jsPDF from 'jspdf'
-import 'jspdf-autotable'
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 const { addToast } = useToast()
 
@@ -503,7 +503,7 @@ const exportToPDF = () => {
       new Date(v.created_at).toLocaleDateString()
     ])
 
-    doc.autoTable({
+    autoTable(doc, {
       head: headers,
       body: rows,
       startY: 20,

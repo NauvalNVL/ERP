@@ -233,8 +233,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useToast } from '@/Composables/useToast'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import ToastContainer from '@/Components/ToastContainer.vue'
-import jsPDF from 'jspdf'
-import 'jspdf-autotable'
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 const { addToast } = useToast()
 
@@ -303,7 +303,7 @@ const exportToPDF = () => {
     doc.text(title, 14, 14)
 
     const headers = [['No.', 'Vehicle Class Code', 'Description', 'Standard Class Code', 'Volume (M³)', 'Capacity Weight (MT)', 'Created Date']]
-    const rows = vehicleClasses.value.map((vc, idx) => [
+    const rows = props.vehicleClasses.map((vc, idx) => [
       idx + 1,
       vc.VEHICLE_CLASS_CODE,
       vc.DESCRIPTION,
@@ -313,7 +313,7 @@ const exportToPDF = () => {
       formatDate(vc.created_at ?? new Date())
     ])
 
-    doc.autoTable({
+    autoTable(doc, {
       head: headers,
       body: rows,
       startY: 20,

@@ -51,10 +51,7 @@ class VehicleClassController extends Controller
             $vehicleClass = VehicleClass::create([
                 'NO_' => VehicleClass::count() + 1,
                 'VEHICLE_CLASS_CODE' => $request->VEHICLE_CLASS_CODE,
-                'DESCRIPTION' => $request->DESCRIPTION,
-                'STANDART_CLASS_CODE' => '', // Default empty value
-                'VOLUME_M3' => 0.0, // Default value
-                'CAPACITY_WGT_MT' => 0.0 // Default value
+                'DESCRIPTION' => $request->DESCRIPTION
             ]);
 
             return response()->json([

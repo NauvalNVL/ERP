@@ -16,9 +16,6 @@ return new class extends Migration
             $table->string('NO_', 50);
             $table->string('VEHICLE_CLASS_CODE', 50);
             $table->string('DESCRIPTION', 50);
-            $table->string('STANDART_CLASS_CODE', 50);
-            $table->float('VOLUME_M3');
-            $table->float('CAPACITY_WGT_MT');
             $table->timestamps();
         });
     }
