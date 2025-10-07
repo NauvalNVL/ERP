@@ -63,8 +63,6 @@ use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionCo
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController;
 use App\Http\Controllers\CustomerWarehouseRequirementController;
 use App\Http\Controllers\SalesOrderController;
-use App\Http\Controllers\VehicleClassController;
-use App\Http\Controllers\VehicleController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -261,6 +259,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/api/sales-order/delivery-schedule', [SalesOrderController::class, 'saveDeliverySchedule']);
         Route::get('/api/sales-order/{soNumber}/delivery-schedules', [SalesOrderController::class, 'getDeliverySchedules']);
         Route::get('/api/sales-order/{soNumber}/delivery-schedule-summary', [SalesOrderController::class, 'getDeliveryScheduleSummary']);
+
+        // Delivery Order Transaction - Prepare Delivery Order (Multiple Item)
+        Route::get('/delivery-order/transaction/prepare-delivery-order-multiple-item', function () {
+            return Inertia::render('sales-management/delivery-order/Transaction/PrepareDeliveryOrderMultipleItem');
+        })->name('vue.delivery-order.transaction.prepare-delivery-order-multiple-item');
 
          // Sales Order Report - Rough Cut Report - Define Report Format
          Route::get('/sales-order/report/rough-cut-report/define-report-format', function () {
@@ -628,17 +631,14 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('warehouse-management/FinishedGoods/SetupMaintenance/view-print-analysis-code');
     })->name('vue.warehouse-management.finished-goods.setup-maintenance.view-print-analysis-code');
 
-    // Vehicle Class Routes
-    Route::get('/warehouse-management/delivery-order/setup/vehicle-class', [VehicleClassController::class, 'index'])->name('vue.warehouse-management.delivery-order.setup.vehicle-class');
-    Route::get('/warehouse-management/delivery-order/setup/vehicle-class/view-print', [VehicleClassController::class, 'viewPrint'])->name('vue.warehouse-management.delivery-order.setup.vehicle-class.view-print');
-
-    // Vehicle Routes
-    Route::get('/warehouse-management/delivery-order/setup/vehicle', [VehicleController::class, 'index'])->name('vue.warehouse-management.delivery-order.setup.vehicle');
-    Route::get('/warehouse-management/delivery-order/setup/vehicle/view-print', [VehicleController::class, 'viewPrint'])->name('vue.warehouse-management.delivery-order.setup.vehicle.view-print');
-
     Route::get('/warehouse-management/delivery-order', function () {
         return Inertia::render('warehouse-management/DeliveryOrder/index');
     })->name('vue.warehouse-management.delivery-order');
+
+    // Warehouse Management - Delivery Order - DO Processing
+    Route::get('/warehouse-management/delivery-order/do-processing/prepare-multiple', function () {
+        return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/PrepareDeliveryOrderMultipleItem');
+    })->name('vue.warehouse-management.delivery-order.do-processing.prepare-multiple');
 
     Route::get('/warehouse-management/invoice', function () {
         return Inertia::render('warehouse-management/Invoice/index');
@@ -1146,7 +1146,6 @@ Route::prefix('api')->group(function () {
     Route::get('/material-management/skus/types', [MmSkuController::class, 'getTypes']);
 
 
-
     // Expose a concise list of navigable menu routes for header search
     Route::get('/menu-routes', function () {
         $routes = [];
@@ -1168,8 +1167,6 @@ Route::prefix('api')->group(function () {
             'wo' => 'Work Order',
             'po' => 'Purchase Order',
             'pr' => 'Purchase Requisition',
-            'vc' => 'Vehicle Class',
-            'v' => 'Vehicle',
         ];
         $crudExclude = ['index', 'create', 'edit'];
         $genericView = ['view', 'view-print', 'viewandprint', 'view-printing', 'viewandprinting', 'view_print'];
