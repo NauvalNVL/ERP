@@ -231,11 +231,14 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Created Date
                 </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Updated Date
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-if="loading" class="animate-pulse">
-                <td colspan="12" class="px-6 py-4 text-center">
+                <td colspan="13" class="px-6 py-4 text-center">
                   <div class="flex items-center justify-center">
                     <i class="fas fa-spinner fa-spin text-blue-500 mr-2"></i>
                     Loading vehicles...
@@ -243,7 +246,7 @@
                 </td>
               </tr>
               <tr v-else-if="vehicles.length === 0">
-                <td colspan="12" class="px-6 py-4 text-center text-gray-500">
+                <td colspan="13" class="px-6 py-4 text-center text-gray-500">
                   No vehicles found
                 </td>
               </tr>
@@ -290,6 +293,9 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {{ new Date(vehicle.created_at).toLocaleDateString() }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ new Date(vehicle.updated_at).toLocaleDateString() }}
                 </td>
               </tr>
             </tbody>
@@ -487,7 +493,7 @@ const exportToPDF = () => {
     doc.setFontSize(14)
     doc.text(title, 14, 14)
 
-    const headers = [['No.', 'Vehicle #', 'Status', 'Class', 'Description', 'Company', 'Driver Code', 'Driver Name', 'Driver ID', 'Driver Phone', 'Note', 'Created Date']]
+    const headers = [['No.', 'Vehicle #', 'Status', 'Class', 'Description', 'Company', 'Driver Code', 'Driver Name', 'Driver ID', 'Driver Phone', 'Note', 'Created Date', 'Updated Date']]
     const rows = vehicles.value.map((v, idx) => [
       idx + 1,
       v.VEHICLE_NO,
@@ -500,7 +506,8 @@ const exportToPDF = () => {
       v.DRIVER_ID || '-',
       v.DRIVER_PHONE || '-',
       v.NOTE || '-',
-      new Date(v.created_at).toLocaleDateString()
+      new Date(v.created_at).toLocaleDateString(),
+      v.updated_at ? new Date(v.updated_at).toLocaleDateString() : ''
     ])
 
     autoTable(doc, {

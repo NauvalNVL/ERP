@@ -74,22 +74,16 @@
                   Description
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Standard Class Code
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Volume (M³)
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Capacity Weight (MT)
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Created Date
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Updated Date
                 </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-if="loading" class="animate-pulse">
-                <td colspan="7" class="px-6 py-4 text-center">
+                <td colspan="5" class="px-6 py-4 text-center">
                   <div class="flex items-center justify-center">
                     <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -100,7 +94,7 @@
                 </td>
               </tr>
               <tr v-else-if="vehicleClasses.length === 0" class="text-center">
-                <td colspan="7" class="px-6 py-8 text-gray-500">
+                <td colspan="5" class="px-6 py-8 text-gray-500">
                   <div class="flex flex-col items-center">
                     <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
@@ -121,71 +115,14 @@
                   <div class="text-sm text-gray-900">{{ vehicleClass.DESCRIPTION }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ vehicleClass.STANDART_CLASS_CODE }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ formatNumber(vehicleClass.VOLUME_M3) }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ formatNumber(vehicleClass.CAPACITY_WGT_MT) }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900">{{ formatDate(vehicleClass.created_at) }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ formatDate(vehicleClass.updated_at) }}</div>
                 </td>
               </tr>
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <!-- Summary Statistics -->
-      <div v-if="vehicleClasses.length > 0" class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Total Vehicle Classes</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ vehicleClasses.length }}</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Average Volume</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ formatNumber(averageVolume) }} M³</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Average Capacity</dt>
-                <dd class="text-lg font-medium text-gray-900">{{ formatNumber(averageCapacity) }} MT</dd>
-              </dl>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -204,9 +141,8 @@
               <th class="border border-gray-400 px-2 py-1 text-left">No.</th>
               <th class="border border-gray-400 px-2 py-1 text-left">Vehicle Class Code</th>
               <th class="border border-gray-400 px-2 py-1 text-left">Description</th>
-              <th class="border border-gray-400 px-2 py-1 text-left">Standard Class Code</th>
-              <th class="border border-gray-400 px-2 py-1 text-left">Volume (M³)</th>
-              <th class="border border-gray-400 px-2 py-1 text-left">Capacity Weight (MT)</th>
+              <th class="border border-gray-400 px-2 py-1 text-left">Created Date</th>
+              <th class="border border-gray-400 px-2 py-1 text-left">Updated Date</th>
             </tr>
           </thead>
           <tbody>
@@ -214,9 +150,8 @@
               <td class="border border-gray-400 px-2 py-1">{{ index + 1 }}</td>
               <td class="border border-gray-400 px-2 py-1">{{ vehicleClass.VEHICLE_CLASS_CODE }}</td>
               <td class="border border-gray-400 px-2 py-1">{{ vehicleClass.DESCRIPTION }}</td>
-              <td class="border border-gray-400 px-2 py-1">{{ vehicleClass.STANDART_CLASS_CODE }}</td>
-              <td class="border border-gray-400 px-2 py-1">{{ formatNumber(vehicleClass.VOLUME_M3) }}</td>
-              <td class="border border-gray-400 px-2 py-1">{{ formatNumber(vehicleClass.CAPACITY_WGT_MT) }}</td>
+              <td class="border border-gray-400 px-2 py-1">{{ formatDate(vehicleClass.created_at) }}</td>
+              <td class="border border-gray-400 px-2 py-1">{{ formatDate(vehicleClass.updated_at) }}</td>
             </tr>
           </tbody>
         </table>
@@ -254,17 +189,7 @@ const props = defineProps({
 const loading = ref(false)
 
 // Computed properties
-const averageVolume = computed(() => {
-  if (props.vehicleClasses.length === 0) return 0
-  const total = props.vehicleClasses.reduce((sum, vc) => sum + parseFloat(vc.VOLUME_M3), 0)
-  return total / props.vehicleClasses.length
-})
-
-const averageCapacity = computed(() => {
-  if (props.vehicleClasses.length === 0) return 0
-  const total = props.vehicleClasses.reduce((sum, vc) => sum + parseFloat(vc.CAPACITY_WGT_MT), 0)
-  return total / props.vehicleClasses.length
-})
+// Removed average calculations as volume and capacity fields no longer exist
 
 // Methods
 const formatNumber = (number) => {
@@ -302,16 +227,14 @@ const exportToPDF = () => {
     doc.setFontSize(14)
     doc.text(title, 14, 14)
 
-    const headers = [['No.', 'Vehicle Class Code', 'Description', 'Standard Class Code', 'Volume (M³)', 'Capacity Weight (MT)', 'Created Date']]
-    const rows = props.vehicleClasses.map((vc, idx) => [
-      idx + 1,
-      vc.VEHICLE_CLASS_CODE,
-      vc.DESCRIPTION,
-      vc.STANDART_CLASS_CODE ?? '',
-      formatNumber(vc.VOLUME_M3 ?? 0),
-      formatNumber(vc.CAPACITY_WGT_MT ?? 0),
-      formatDate(vc.created_at ?? new Date())
-    ])
+  const headers = [['No.', 'Vehicle Class Code', 'Description', 'Created Date', 'Updated Date']]
+  const rows = props.vehicleClasses.map((vc, idx) => [
+    idx + 1,
+    vc.VEHICLE_CLASS_CODE,
+    vc.DESCRIPTION,
+    formatDate(vc.created_at ?? new Date()),
+    formatDate(vc.updated_at ?? new Date())
+  ])
 
     autoTable(doc, {
       head: headers,
@@ -331,15 +254,13 @@ const exportToPDF = () => {
 
 const exportToExcel = () => {
   const csvContent = [
-    ['No.', 'Vehicle Class Code', 'Description', 'Standard Class Code', 'Volume (M³)', 'Capacity Weight (MT)', 'Created Date'],
+    ['No.', 'Vehicle Class Code', 'Description', 'Created Date', 'Updated Date'],
     ...props.vehicleClasses.map((vc, index) => [
       index + 1,
       vc.VEHICLE_CLASS_CODE,
       vc.DESCRIPTION,
-      vc.STANDART_CLASS_CODE,
-      vc.VOLUME_M3,
-      vc.CAPACITY_WGT_MT,
-      formatDate(vc.created_at)
+      formatDate(vc.created_at),
+      formatDate(vc.updated_at)
     ])
   ].map(row => row.join(',')).join('\n')
   
