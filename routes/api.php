@@ -40,8 +40,8 @@ use App\Http\Controllers\DeliveryOrderFormatController;
 use App\Http\Controllers\MaterialManagement\SystemRequirement\MmGlDistributionController;
 use App\Http\Controllers\CustomerWarehouseRequirementController;
 use App\Http\Controllers\UpdateMcController;
-use App\Http\Controllers\VehicleClassController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\DeliveryOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -293,6 +293,14 @@ Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderContr
 Route::post('/sales-order/save-to-so', [App\Http\Controllers\SalesOrderController::class, 'apiStoreToSo']);
 // Get sales orders for Print SO
 Route::get('/sales-orders', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrders']);
+
+// Vehicle API routes
+Route::get('/vehicles', [VehicleController::class, 'apiIndex']);
+
+// Delivery Order API routes
+Route::post('/delivery-orders', [DeliveryOrderController::class, 'store']);
+Route::get('/delivery-orders', [DeliveryOrderController::class, 'index']);
+Route::get('/delivery-orders/{doNumber}', [DeliveryOrderController::class, 'show']);
 
 // New: Placeholder API routes for Sales Order Delivery Schedule Modals
 Route::get('/po-refs', function() {
@@ -668,40 +676,6 @@ Route::prefix('material-management/config-data')->group(function () {
     Route::get('source-codes', [MmConfigController::class, 'getSourceCodes']); // Placeholder, assuming it's simple
     Route::get('gl-distributions', [MmConfigController::class, 'getGlDistributions']); // Placeholder
 });
-
-// Warehouse Management - Delivery Order - Setup - Vehicle Class & Vehicle APIs
-Route::prefix('warehouse-management/delivery-order/setup')->group(function () {
-    // Vehicle Classes
-    Route::get('/vehicle-classes', [VehicleClassController::class, 'apiIndex']);
-    Route::post('/vehicle-classes', [VehicleClassController::class, 'apiStore']);
-    Route::get('/vehicle-classes/{vehicleClass}', [VehicleClassController::class, 'show']);
-    Route::put('/vehicle-classes/{vehicleClass}', [VehicleClassController::class, 'apiUpdate']);
-    Route::delete('/vehicle-classes/{vehicleClass}', [VehicleClassController::class, 'apiDestroy']);
-
-    // Vehicles
-    Route::get('/vehicles', [VehicleController::class, 'apiIndex']);
-    Route::post('/vehicles', [VehicleController::class, 'apiStore']);
-    Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show']);
-    Route::put('/vehicles/{vehicle}', [VehicleController::class, 'apiUpdate']);
-    Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'apiDestroy']);
-
-    // Helpers for dropdowns
-    Route::get('/vehicles/helpers/vehicle-classes', [VehicleController::class, 'getVehicleClasses']);
-    Route::get('/vehicles/helpers/companies', [VehicleController::class, 'getCompanies']);
-});
-
-// Backward-compatible short aliases used by some Vue pages
-Route::get('/vehicles', [VehicleController::class, 'apiIndex']);
-Route::post('/vehicles', [VehicleController::class, 'apiStore']);
-Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show']);
-Route::put('/vehicles/{vehicle}', [VehicleController::class, 'apiUpdate']);
-Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'apiDestroy']);
-
-Route::get('/vehicle-classes', [VehicleClassController::class, 'apiIndex']);
-Route::post('/vehicle-classes', [VehicleClassController::class, 'apiStore']);
-Route::get('/vehicle-classes/{vehicleClass}', [VehicleClassController::class, 'show']);
-Route::put('/vehicle-classes/{vehicleClass}', [VehicleClassController::class, 'apiUpdate']);
-Route::delete('/vehicle-classes/{vehicleClass}', [VehicleClassController::class, 'apiDestroy']);
 
 Route::prefix('delivery-order-formats')->group(function () {
     Route::get('/', [DeliveryOrderFormatController::class, 'getFormatsJson'])->name('delivery-order-formats.index');

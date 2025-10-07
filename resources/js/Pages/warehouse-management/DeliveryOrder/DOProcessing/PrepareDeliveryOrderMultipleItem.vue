@@ -111,6 +111,7 @@
                   type="text"
                   class="w-32 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter vehicle number"
+                  readonly
                 >
                 <button 
                   @click="openVehicleLookup"
@@ -119,6 +120,27 @@
                 >
                   <i class="fas fa-th"></i>
                 </button>
+              </div>
+              <!-- Vehicle Information Display -->
+              <div v-if="selectedVehicle.vehicleNo" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span class="font-medium text-blue-800">Driver:</span>
+                    <span class="text-blue-700">{{ selectedVehicle.driverName }}</span>
+                  </div>
+                  <div>
+                    <span class="font-medium text-blue-800">Phone:</span>
+                    <span class="text-blue-700">{{ selectedVehicle.driverPhone }}</span>
+                  </div>
+                  <div>
+                    <span class="font-medium text-blue-800">Class:</span>
+                    <span class="text-blue-700">{{ selectedVehicle.vehicleClass }}</span>
+                  </div>
+                  <div>
+                    <span class="font-medium text-blue-800">Company:</span>
+                    <span class="text-blue-700">{{ selectedVehicle.vehicleCompany }}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -181,6 +203,7 @@
           </div>
         </div>
 
+
         <!-- Notes Section -->
         <div v-if="selectedCustomer.code" class="mt-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
           <h3 class="text-sm font-medium text-gray-700 mb-3">Notes</h3>
@@ -227,6 +250,13 @@
       @select="selectCustomer"
       :initial-sort-by="'customer_code'"
     />
+
+    <!-- Vehicle Lookup Modal -->
+    <VehicleLookupModal 
+      :is-open="showVehicleModal" 
+      @close="showVehicleModal = false" 
+      @select="selectVehicle"
+    />
   </AppLayout>
 </template>
 
@@ -234,7 +264,9 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
+import VehicleLookupModal from '@/Components/VehicleLookupModal.vue'
 import { useToast } from '@/Composables/useToast'
+import axios from 'axios'
 
 const { success, error, info } = useToast()
 
@@ -253,8 +285,6 @@ const selectedCustomer = reactive({
   currency: 'IDR'
 })
 
-// Delivery Order Items
-const deliveryItems = ref([])
 
 // Delivery Order Details
 const deliveryOrder = reactive({
@@ -268,13 +298,24 @@ const deliveryOrder = reactive({
 
 // Modal visibility
 const showCustomerModal = ref(false)
+const showVehicleModal = ref(false)
+
+// Selected Vehicle
+const selectedVehicle = reactive({
+  id: null,
+  vehicleNo: '',
+  driverName: '',
+  driverPhone: '',
+  vehicleClass: '',
+  vehicleCompany: ''
+})
 
 // Delivery Order Status
 const deliveryOrderStatus = ref('Draft')
 
 // Computed properties
 const canProceed = computed(() => {
-  return selectedCustomer.code && deliveryItems.value.length > 0
+  return selectedCustomer.code && selectedVehicle.vehicleNo
 })
 
 // Day of week computed property
@@ -329,22 +370,23 @@ const validateCustomer = async () => {
   }
 }
 
-const addNewItem = () => {
-  deliveryItems.value.push({
-    itemCode: '',
-    description: '',
-    quantity: 0,
-    uom: 'PCS'
-  })
-}
-
-const removeItem = (index) => {
-  deliveryItems.value.splice(index, 1)
-}
 
 const openVehicleLookup = () => {
-  // TODO: Implement vehicle lookup modal
-  info('Vehicle lookup functionality will be implemented')
+  showVehicleModal.value = true
+}
+
+const selectVehicle = (vehicle) => {
+  selectedVehicle.id = vehicle.id
+  selectedVehicle.vehicleNo = vehicle.VEHICLE_NO
+  selectedVehicle.driverName = vehicle.DRIVER_NAME
+  selectedVehicle.driverPhone = vehicle.DRIVER_PHONE
+  selectedVehicle.vehicleClass = vehicle.VEHICLE_CLASS
+  selectedVehicle.vehicleCompany = vehicle.VEHICLE_COMPANY
+  
+  // Update the delivery order vehicle number
+  deliveryOrder.vehicleNumber = vehicle.VEHICLE_NO
+  
+  success(`Vehicle ${vehicle.VEHICLE_NO} selected successfully`)
 }
 
 const openDatePicker = () => {
@@ -353,27 +395,47 @@ const openDatePicker = () => {
 }
 
 const saveDeliveryOrder = async () => {
-  if (!canProceed.value) {
-    error('Please select customer and add items first')
+  if (!selectedCustomer.code) {
+    error('Please select a customer first')
+    return
+  }
+  
+  if (!selectedVehicle.vehicleNo) {
+    error('Please select a vehicle first')
     return
   }
   
   try {
     const deliveryOrderData = {
       customer_code: selectedCustomer.code,
-      period: currentPeriod,
-      items: deliveryItems.value,
-      status: 'Draft'
+      vehicle_number: selectedVehicle.vehicleNo,
+      order_date: deliveryOrder.orderDate,
+      cust_remark: deliveryOrder.custRemark,
+      remark1: deliveryOrder.remark1,
+      remark2: deliveryOrder.remark2,
+      unapply_fg: deliveryOrder.unapplyFG
     }
     
-    // Here you would typically send the data to your API
     console.log('Saving delivery order:', deliveryOrderData)
     
-    success('Delivery order saved successfully')
-    deliveryOrderStatus.value = 'Saved'
+    const response = await axios.post('/api/delivery-orders', deliveryOrderData)
+    
+    if (response.data.success) {
+      success(`Delivery order ${response.data.data.do_number} saved successfully`)
+      deliveryOrderStatus.value = 'Saved'
+      
+      // Reset form after successful save
+      refreshPage()
+    } else {
+      error(response.data.message || 'Failed to save delivery order')
+    }
   } catch (err) {
     console.error('Error saving delivery order:', err)
-    error('Error saving delivery order')
+    if (err.response?.data?.message) {
+      error(err.response.data.message)
+    } else {
+      error('Error saving delivery order')
+    }
   }
 }
 
@@ -385,7 +447,6 @@ const refreshPage = () => {
   selectedCustomer.salesperson = ''
   selectedCustomer.currency = 'IDR'
   
-  deliveryItems.value = []
   deliveryOrderStatus.value = 'Draft'
   
   // Reset delivery order details
@@ -398,11 +459,21 @@ const refreshPage = () => {
     remark2: ''
   })
   
+  // Reset selected vehicle
+  Object.assign(selectedVehicle, {
+    id: null,
+    vehicleNo: '',
+    driverName: '',
+    driverPhone: '',
+    vehicleClass: '',
+    vehicleCompany: ''
+  })
+  
   success('Form reset successfully')
 }
 
 const exitPage = () => {
-  if (deliveryItems.value.length > 0) {
+  if (selectedCustomer.code || selectedVehicle.vehicleNo) {
     if (confirm('You have unsaved changes. Are you sure you want to exit?')) {
       // Navigate back or close
       window.history.back()
