@@ -1544,15 +1544,15 @@ const clearPdFields = () => {
     subMaterials.value = [];
 };
 
-// Display helper: show only the integer part (strip decimals) for numeric-looking inputs
-const stripDecimals = (value) => {
+// Display helper: trim trailing zeros in decimals; keep fraction if non-zero
+const formatTrimZeros = (value) => {
     if (value === null || value === undefined) return '';
-    const s = String(value);
-    if (!s) return '';
-    // normalize comma to dot for decimal separator, then take leading integer part (with optional sign)
-    const normalized = s.replace(/,/g, '.');
-    const match = normalized.match(/^\s*([+-]?\d+)/);
-    return match ? match[1] : normalized.split('.')[0];
+    const s = String(value).replace(/,/g, '.').trim();
+    if (s === '') return '';
+    if (!s.includes('.')) return s; // no decimal part
+    // remove trailing zeros in fractional part; remove dot if becomes integer
+    const trimmed = s.replace(/(\.\d*?[1-9])0+$/, '$1').replace(/\.0+$/, '');
+    return trimmed;
 };
 
 // When mcLoaded is provided, hydrate PD form fields
@@ -1575,41 +1575,41 @@ const hydratePdFromLoaded = () => {
         // Map core PD fields
         partNo.value = loaded.PART_NO || loaded.part_no || '';
         selectedProductDesign.value = loaded.P_DESIGN || loaded.p_design || '';
-        pcsPerSet.value = stripDecimals(loaded.PCS_SET ?? loaded.pcs_set ?? '');
+        pcsPerSet.value = formatTrimZeros(loaded.PCS_SET ?? loaded.pcs_set ?? '');
         // Paper flute / scoring / coat / tape
         selectedPaperFlute.value = loaded.FLUTE || '';
         selectedScoringToolCode.value = loaded.S_TOOL || '';
         selectedChemicalCoat.value = loaded.COAT || '';
         selectedReinforcementTape.value = loaded.TAPE || '';
         // Sheet dims
-        sheetLength.value = stripDecimals(loaded.SHEET_LENGTH ?? '');
-        sheetWidth.value = stripDecimals(loaded.SHEET_WIDTH ?? '');
+        sheetLength.value = formatTrimZeros(loaded.SHEET_LENGTH ?? '');
+        sheetWidth.value = formatTrimZeros(loaded.SHEET_WIDTH ?? '');
         // Paper size (store as string for UI)
-        selectedPaperSize.value = stripDecimals(loaded.PAPER_SIZE ?? '');
+        selectedPaperSize.value = formatTrimZeros(loaded.PAPER_SIZE ?? '');
         // Score arrays SL1..SL8 and SW1..SW8
         scoreL.value = [loaded.SL1, loaded.SL2, loaded.SL3, loaded.SL4, loaded.SL5, loaded.SL6, loaded.SL7, loaded.SL8]
-            .map(v => stripDecimals(v ?? ''));
+            .map(v => formatTrimZeros(v ?? ''));
         scoreW.value = [loaded.SW1, loaded.SW2, loaded.SW3, loaded.SW4, loaded.SW5, loaded.SW6, loaded.SW7, loaded.SW8]
-            .map(v => stripDecimals(v ?? ''));
+            .map(v => formatTrimZeros(v ?? ''));
         // ID / ED
-        idL.value = stripDecimals(loaded.INT_LENGTH ?? '');
-        idW.value = stripDecimals(loaded.INT_WIDTH ?? '');
-        idH.value = stripDecimals(loaded.INT_HEIGHT ?? '');
-        edL.value = stripDecimals(loaded.EXT_LENGTH ?? '');
-        edW.value = stripDecimals(loaded.EXT_WIDTH ?? '');
-        edH.value = stripDecimals(loaded.EXT_HEIGHT ?? '');
+        idL.value = formatTrimZeros(loaded.INT_LENGTH ?? '');
+        idW.value = formatTrimZeros(loaded.INT_WIDTH ?? '');
+        idH.value = formatTrimZeros(loaded.INT_HEIGHT ?? '');
+        edL.value = formatTrimZeros(loaded.EXT_LENGTH ?? '');
+        edW.value = formatTrimZeros(loaded.EXT_WIDTH ?? '');
+        edH.value = formatTrimZeros(loaded.EXT_HEIGHT ?? '');
         // Diecut
-        dcutSheetL.value = stripDecimals(loaded.DC_SHT_L ?? '');
-        dcutSheetW.value = stripDecimals(loaded.DC_SHT_W ?? '');
-        dcutMouldL.value = stripDecimals(loaded.DC_MOULD_L ?? '');
-        dcutMouldW.value = stripDecimals(loaded.DC_MOULD_W ?? '');
+        dcutSheetL.value = formatTrimZeros(loaded.DC_SHT_L ?? '');
+        dcutSheetW.value = formatTrimZeros(loaded.DC_SHT_W ?? '');
+        dcutMouldL.value = formatTrimZeros(loaded.DC_MOULD_L ?? '');
+        dcutMouldW.value = formatTrimZeros(loaded.DC_MOULD_W ?? '');
         // Conv. Out 1x2: map to SLIT_OUT and DIE_OUT as A x B
-        convDuctX2A.value = stripDecimals(loaded.SLIT_OUT ?? '');
-        convDuctX2B.value = stripDecimals(loaded.DIE_OUT ?? '');
+        convDuctX2A.value = formatTrimZeros(loaded.SLIT_OUT ?? '');
+        convDuctX2B.value = formatTrimZeros(loaded.DIE_OUT ?? '');
         // Con. Out
-        conOut.value = stripDecimals(loaded.CORR_OUT ?? '');
+        conOut.value = formatTrimZeros(loaded.CORR_OUT ?? '');
         // Pcs-to-Joint
-        pcsToJoint.value = stripDecimals(loaded.JOIN_ ?? '');
+        pcsToJoint.value = formatTrimZeros(loaded.JOIN_ ?? '');
         // Finishing/Glueing/Wrapping codes or Yes/No
         selectedFinishingCode.value = (loaded.FSH ?? '') + '';
         selectedGlueingCode.value = (loaded.GLUEING ?? '') + '';
@@ -1621,13 +1621,13 @@ const hydratePdFromLoaded = () => {
         pitBlockNo.value = (loaded.PRINTING_BLOCK_NO ?? '') + '';
         // Stitch wire code and pieces
         selectedStitchWireCode.value = (loaded.SWIRE ?? '') + '';
-        stitchWirePieces.value = stripDecimals(loaded.SWIRE_PCS ?? '');
+        stitchWirePieces.value = formatTrimZeros(loaded.SWIRE_PCS ?? '');
         // Bundle string type
         selectedBundlingStringCode.value = (loaded.STRING_TYPE ?? '') + '';
-        bundlingStringQty.value = stripDecimals(loaded.STRING_TYPE_VALUE ?? '');
+        bundlingStringQty.value = formatTrimZeros(loaded.STRING_TYPE_VALUE ?? '');
         // Packs and process flags
         bdlPerPallet.value = (loaded.BLD_PER_PLD ?? '') + '';
-        peelOffPercent.value = stripDecimals(loaded.PEEL_OFF_PERCENT ?? '');
+        peelOffPercent.value = formatTrimZeros(loaded.PEEL_OFF_PERCENT ?? '');
         handHole.value = toBool(loaded.HAND_HOLE);
         rotaryDCut.value = toBool(loaded.ROTARY_DC);
         fullBlockPrint.value = toBool(loaded.FB_PRINTING);
@@ -1644,7 +1644,7 @@ const hydratePdFromLoaded = () => {
             loaded.COLOR5_AREA_PERCENT,
             loaded.COLOR6_AREA_PERCENT,
             loaded.COLOR7_AREA_PERCENT,
-        ].map(v => stripDecimals(v ?? ''));
+        ].map(v => formatTrimZeros(v ?? ''));
         // SO/WO root values from MC to selected component (Main)
         try {
             const cf0 = componentForms.value[0] || makeEmptyPdState();
@@ -1660,8 +1660,8 @@ const hydratePdFromLoaded = () => {
             });
         } catch (e) {}
         // Optional fields
-        creaseValue.value = stripDecimals(loaded.CREASE ?? '');
-        nestSlot.value = stripDecimals(loaded.NEST_SLOT ?? '');
+        creaseValue.value = formatTrimZeros(loaded.CREASE ?? '');
+        nestSlot.value = formatTrimZeros(loaded.NEST_SLOT ?? '');
         // Done
         return;
     }
@@ -1701,9 +1701,9 @@ const hydratePdFromLoaded = () => {
     dcutMouldW.value = pd.dcutMould?.W || '';
     dcutBlockNo.value = pd.dcutBlockNo || loaded.DIECUT_MOULD_NO || '';
     pitBlockNo.value = pd.pitBlockNo || loaded.PRINTING_BLOCK_NO || '';
-    stitchWirePieces.value = stripDecimals(pd.stitchWirePieces || (loaded.SWIRE_PCS ?? ''));
+    stitchWirePieces.value = formatTrimZeros(pd.stitchWirePieces || (loaded.SWIRE_PCS ?? ''));
     bdlPerPallet.value = pd.bdlPerPallet || '';
-    peelOffPercent.value = stripDecimals(pd.peelOffPercent || '');
+    peelOffPercent.value = formatTrimZeros(pd.peelOffPercent || '');
     itemRemark.value = pd.itemRemark || loaded.ITEM_REMARK || '';
     handHole.value = !!pd.handHole;
     rotaryDCut.value = !!pd.rotaryDCut;
@@ -1712,7 +1712,7 @@ const hydratePdFromLoaded = () => {
     selectedStitchWireCode.value = pd.selectedStitchWireCode || loaded.SWIRE || '';
     stitchWirePieces.value = pd.stitchWirePieces || '';
     selectedBundlingStringCode.value = pd.selectedBundlingStringCode || loaded.STRING_TYPE || '';
-    bundlingStringQty.value = stripDecimals(pd.bundlingStringQty || (loaded.STRING_TYPE_VALUE ?? ''));
+    bundlingStringQty.value = formatTrimZeros(pd.bundlingStringQty || (loaded.STRING_TYPE_VALUE ?? ''));
     selectedGlueingCode.value = pd.selectedGlueingCode || '';
     selectedWrappingCode.value = pd.selectedWrappingCode || '';
     moreDescriptions.value = Array.isArray(pd.moreDescriptions) ? pd.moreDescriptions : [];

@@ -1214,8 +1214,7 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         const res = await axios.post('/api/update-mc/master-cards', payload, {
             headers: { 
                 'Content-Type': 'application/json', 
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                'Accept': 'application/json'
             }
         });
 
@@ -2238,8 +2237,7 @@ const saveRecord = async () => {
         const response = await axios.post('/api/update-mc/master-cards', payload, {
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                'Accept': 'application/json'
             }
         });
 
