@@ -669,21 +669,6 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('warehouse-management/Invoice/index');
     })->name('vue.warehouse-management.invoice');
 
-    // Invoice → Setup → Define Tax Group (Vue page)
-    Route::get('/warehouse-management/invoice/setup/define-tax-group', function () {
-        return Inertia::render('warehouse-management/Invoice/Setup/DefineTaxGroup');
-    })->name('vue.warehouse-management.invoice.setup.define-tax-group');
-
-    // Invoice → Setup → Define Tax Type (Vue page)
-    Route::get('/warehouse-management/invoice/setup/define-tax-type', function () {
-        return Inertia::render('warehouse-management/Invoice/Setup/DefineTaxType');
-    })->name('vue.warehouse-management.invoice.setup.define-tax-type');
-
-    // Invoice → Setup → Configuration (Vue page)
-    Route::get('/warehouse-management/invoice/setup/invoice-configuration', function () {
-        return Inertia::render('warehouse-management/Invoice/Setup/SetupInvoiceConfiguration');
-    })->name('vue.warehouse-management.invoice.setup.invoice-configuration');
-
     Route::get('/warehouse-management/debit-credit-note', function () {
         return Inertia::render('warehouse-management/DebitCreditNote/index');
     })->name('vue.warehouse-management.debit-credit-note');

@@ -291,46 +291,44 @@ const updateOrderInfo = () => {
 
 const searchOrders = async () => {
   try {
-    console.log('Searching orders with terms:', searchTerm1.value, searchTerm2.value, searchTerm3.value, soNumberFilter.value)
-    
-    // Call API to fetch sales orders from backend
+    // Fetch sales orders from API based on customer code
     const response = await axios.get('/api/sales-orders', {
       params: {
-        month: searchTerm1.value || null,
-        year: searchTerm2.value || null,
-        from_so: soNumberFilter.value || null,
-        status: searchTerm3.value || null,
-        customer_code: props.customerData?.code || null
+        customer_code: props.customerData?.code,
+        month: searchTerm1.value,
+        year: searchTerm2.value,
+        sequence: searchTerm3.value,
+        so_number: soNumberFilter.value
       }
     })
     
     if (response.data.success) {
-      // Map API response to component format
+      // Map API data to component format
       salesOrders.value = response.data.data.map(order => ({
         soNumber: order.SO_Num,
-        customerPo: order.PO_Num || '',
-        acNumber: order.AC_Num || '',
-        mcsNumber: order.MCS_Num || '',
-        statusLocation: order.STS || '',
-        customerName: order.AC_NAME || '',
-        model: order.MODEL || '',
-        salespersonCode: order.SLM || '',
-        salespersonName: order.SLM || '', // Using SLM for both code and name
+        customerPo: order.PO_Num,
+        acNumber: order.AC_Num,
+        mcsNumber: order.MCS_Num,
+        statusLocation: order.STS,
+        customerName: order.AC_NAME,
+        model: order.MODEL,
+        salespersonCode: order.SLM,
+        salespersonName: order.SLM, // Assuming SLM contains salesperson name
         orderGroup: order.GROUP_ || 'Sales',
         orderType: order.TYPE || 'S1'
       }))
       
-      // Select first order by default if available
+      // Select first order by default
       if (salesOrders.value.length > 0) {
         selectedOrderIndex.value = 0
         updateOrderInfo()
       }
     } else {
-      console.error('API returned error:', response.data.message)
+      console.error('API Error:', response.data.message)
       salesOrders.value = []
     }
   } catch (error) {
-    console.error('Error searching orders:', error)
+    console.error('Error fetching sales orders:', error)
     salesOrders.value = []
   }
 }
@@ -353,10 +351,10 @@ const loadSalesOrders = async () => {
   try {
     // Load sales orders for the customer
     if (props.customerData && props.customerData.code) {
-      // Fetch from API with customer filter
+      console.log('Loading sales orders for customer:', props.customerData.code)
       await searchOrders()
     } else {
-      // Load all sales orders if no customer specified
+      console.log('No customer selected, loading all sales orders')
       await searchOrders()
     }
   } catch (error) {

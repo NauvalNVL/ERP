@@ -1515,6 +1515,25 @@ const saveProductDesign = async (designData) => {
     
     if (data.success) {
   console.log('Product design saved:', designData)
+
+  // Persist key values from design to order details for SO creation
+  try {
+    const mainItem = Array.isArray(designData.items) ? designData.items[0] : null
+    if (mainItem) {
+      if (mainItem.unitPrice != null) {
+        orderDetails.unitPrice = Number(mainItem.unitPrice) || 0
+      }
+      if (mainItem.quantity != null) {
+        orderDetails.setQuantity = Number(mainItem.quantity) || 0
+      }
+      if (mainItem.unit) {
+        orderDetails.uom = mainItem.unit
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to map product design values to order details:', e)
+  }
+
   showProductDesignModal.value = false
   success('Product design saved successfully')
   
@@ -1810,7 +1829,9 @@ const createSalesOrder = async () => {
       remark: orderDetails.remark,
       instruction1: orderDetails.instruction1,
       instruction2: orderDetails.instruction2,
-      set_quantity: orderDetails.setQuantity,
+      set_quantity: (orderDetails.setQuantity !== undefined && orderDetails.setQuantity !== null)
+        ? String(orderDetails.setQuantity)
+        : '',
       details: [
         {
           line_number: 1,

@@ -834,7 +834,7 @@ class SalesOrderController extends Controller
     }
 
     /**
-     * Get sales orders for Print SO menu
+     * Get sales orders for Print SO menu and Sales Order Table Modal
      */
     public function getSalesOrders(Request $request)
     {
@@ -879,6 +879,21 @@ class SalesOrderController extends Controller
             
             if ($request->has('status') && $request->status) {
                 $query->where('STS', $request->status);
+            }
+            
+            // Filter by customer code (for Sales Order Table Modal)
+            if ($request->has('customer_code') && $request->customer_code) {
+                $query->where('AC_Num', $request->customer_code);
+            }
+            
+            // Filter by SO number (for search functionality)
+            if ($request->has('so_number') && $request->so_number) {
+                $query->where('SO_Num', 'like', '%' . $request->so_number . '%');
+            }
+            
+            // Filter by sequence (for search functionality)
+            if ($request->has('sequence') && $request->sequence) {
+                $query->where('SO_Num', 'like', '%-' . $request->sequence);
             }
 
             $salesOrders = $query->get();
