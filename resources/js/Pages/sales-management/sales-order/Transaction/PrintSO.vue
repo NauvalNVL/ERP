@@ -358,15 +358,33 @@ function openSalesOrderLookup(type) {
 }
 
 function onSalesOrderSelect(selectedSo) {
-  if (salesOrderModal.type === 'from') {
-    form.from.month = parseInt(selectedSo.so_number.split('-')[0])
-    form.from.year = parseInt(selectedSo.so_number.split('-')[1])
-    form.from.seq = selectedSo.so_number.split('-')[2]
+  // Parse SO number format: MM-YYYY-SEQ (e.g., "06-2025-02264")
+  const soParts = selectedSo.so_number.split('-')
+  
+  if (soParts.length === 3) {
+    const month = parseInt(soParts[0])
+    const year = parseInt(soParts[1])
+    const seq = soParts[2]
+    
+    if (salesOrderModal.type === 'from') {
+      form.from.month = month
+      form.from.year = year
+      form.from.seq = seq
+    } else {
+      form.to.month = month
+      form.to.year = year
+      form.to.seq = seq
+    }
   } else {
-    form.to.month = parseInt(selectedSo.so_number.split('-')[0])
-    form.to.year = parseInt(selectedSo.so_number.split('-')[1])
-    form.to.seq = selectedSo.so_number.split('-')[2]
+    // Fallback: try to extract from different formats
+    console.warn('Unexpected SO number format:', selectedSo.so_number)
+    if (salesOrderModal.type === 'from') {
+      form.from.seq = selectedSo.so_number
+    } else {
+      form.to.seq = selectedSo.so_number
+    }
   }
+  
   closeSalesOrderModal()
 }
 

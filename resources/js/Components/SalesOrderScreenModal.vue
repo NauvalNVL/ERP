@@ -102,9 +102,6 @@
                           class="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                           placeholder="S/Order"
                         >
-                        <button class="p-1 text-blue-600 hover:bg-blue-100 rounded">
-                          <i class="fas fa-search text-xs"></i>
-                        </button>
                         <input 
                           v-model="entry.sOrder2"
                           type="text"
@@ -117,8 +114,12 @@
                           class="w-12 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                           placeholder="0"
                         >
-                        <button class="p-1 text-gray-600 hover:bg-gray-100 rounded">
-                          <i class="fas fa-th text-xs"></i>
+                        <button 
+                          @click="openSalesOrderTable"
+                          class="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                          title="Sales Order Table"
+                        >
+                          <i class="fas fa-table text-xs"></i>
                         </button>
                       </div>
                     </td>
@@ -275,12 +276,21 @@
         </div>
       </div>
     </div>
+
+    <!-- Sales Order Table Modal -->
+    <SalesOrderTableModal 
+      :is-open="showSalesOrderTableModal"
+      :customer-data="customerData"
+      @close="showSalesOrderTableModal = false"
+      @select="handleSalesOrderSelect"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useToast } from '@/Composables/useToast'
+import SalesOrderTableModal from './SalesOrderTableModal.vue'
 
 const { success, error, info } = useToast()
 
@@ -301,6 +311,7 @@ const emit = defineEmits(['close', 'save'])
 
 // Reactive data
 const selectedEntryIndex = ref(0)
+const showSalesOrderTableModal = ref(false)
 
 const orderInfo = reactive({
   orderGroup: '',
@@ -345,6 +356,40 @@ const selectEntry = (index) => {
 
 const handlePowerOff = () => {
   info('Power off functionality will be implemented')
+}
+
+const openSalesOrderTable = () => {
+  showSalesOrderTableModal.value = true
+}
+
+const handleSalesOrderSelect = (selectedOrder) => {
+  // Update the current sales order entry with selected order data
+  if (selectedEntryIndex.value >= 0 && selectedEntryIndex.value < salesOrderEntries.value.length) {
+    const entry = salesOrderEntries.value[selectedEntryIndex.value]
+    
+    // Parse SO number format: MM-YYYY-SEQ (e.g., "09-2025-03777")
+    const soParts = selectedOrder.soNumber.split('-')
+    
+    if (soParts.length === 3) {
+      // Split the SO number into parts
+      const month = soParts[0]  // MM (e.g., "09")
+      const year = soParts[1]   // YYYY (e.g., "2025")
+      const sequence = soParts[2] // SEQ (e.g., "03777")
+      
+      // Fill the three textboxes with parsed data
+      entry.sOrder = month      // First textbox: Month (MM)
+      entry.sOrder2 = year      // Second textbox: Year (YYYY)
+      entry.sOrder3 = sequence  // Third textbox: Sequence (SSSSS)
+    } else {
+      // Fallback: if format is unexpected, put full SO number in first textbox
+      console.warn('Unexpected SO number format:', selectedOrder.soNumber)
+      entry.sOrder = selectedOrder.soNumber
+      entry.sOrder2 = ''
+      entry.sOrder3 = ''
+    }
+  }
+  showSalesOrderTableModal.value = false
+  success('Sales order selected successfully')
 }
 
 const handleSave = () => {

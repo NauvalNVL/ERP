@@ -832,4 +832,68 @@ class SalesOrderController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get sales orders for Print SO menu
+     */
+    public function getSalesOrders(Request $request)
+    {
+        try {
+            $query = DB::table('so')
+                ->select([
+                    'SO_Num',
+                    'PO_Num',
+                    'AC_Num',
+                    'AC_NAME',
+                    'MCS_Num',
+                    'MODEL',
+                    'STS',
+                    'TYPE',
+                    'SLM',
+                    'GROUP_',
+                    'UNIT',
+                    'SO_QTY',
+                    'AMOUNT',
+                    'PO_DATE',
+                    'SO_DMY',
+                    'D_LOC_Num'
+                ])
+                ->orderBy('SO_Num', 'desc');
+
+            // Apply filters
+            if ($request->has('month') && $request->month) {
+                $query->where('MM', $request->month);
+            }
+            
+            if ($request->has('year') && $request->year) {
+                $query->where('YYYY', $request->year);
+            }
+            
+            if ($request->has('from_so') && $request->from_so) {
+                $query->where('SO_Num', '>=', $request->from_so);
+            }
+            
+            if ($request->has('to_so') && $request->to_so) {
+                $query->where('SO_Num', '<=', $request->to_so);
+            }
+            
+            if ($request->has('status') && $request->status) {
+                $query->where('STS', $request->status);
+            }
+
+            $salesOrders = $query->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $salesOrders
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching sales orders: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching sales orders: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
