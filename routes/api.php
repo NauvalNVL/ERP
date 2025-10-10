@@ -306,9 +306,7 @@ Route::put('/vehicle-classes/{vehicleClass}', [\App\Http\Controllers\VehicleClas
 Route::delete('/vehicle-classes/{vehicleClass}', [\App\Http\Controllers\VehicleClassController::class, 'apiDestroy']);
 
 // Delivery Order API routes
-Route::post('/delivery-orders', [DeliveryOrderController::class, 'store']);
-Route::get('/delivery-orders', [DeliveryOrderController::class, 'index']);
-Route::get('/delivery-orders/{doNumber}', [DeliveryOrderController::class, 'show']);
+// Delivery Order routes moved to web.php to avoid conflicts
 
 // New: Placeholder API routes for Sales Order Delivery Schedule Modals
 Route::get('/po-refs', function() {

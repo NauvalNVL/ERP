@@ -268,15 +268,7 @@ Route::middleware('auth')->group(function () {
             return Inertia::render('sales-management/delivery-order/Transaction/PrepareDeliveryOrderMultipleItem');
         })->name('vue.delivery-order.transaction.prepare-delivery-order-multiple-item');
 
-        // Delivery Order Transaction - Amend Delivery Order
-        Route::get('/delivery-order/transaction/amend-delivery-order', function () {
-            return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/AmendDeliveryOrder');
-        })->name('vue.delivery-order.transaction.amend-delivery-order');
-
-        // Delivery Order Transaction - Cancel Delivery Order
-        Route::get('/delivery-order/transaction/cancel-delivery-order', function () {
-            return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/CancelDeliveryOrder');
-        })->name('vue.delivery-order.transaction.cancel-delivery-order');
+        // Delivery Order Transaction routes moved to warehouse management section
 
          // Sales Order Report - Rough Cut Report - Define Report Format
          Route::get('/sales-order/report/rough-cut-report/define-report-format', function () {
@@ -664,6 +656,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehouse-management/delivery-order/do-processing/prepare-multiple', function () {
         return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/PrepareDeliveryOrderMultipleItem');
     })->name('vue.warehouse-management.delivery-order.do-processing.prepare-multiple');
+
+    Route::get('/warehouse-management/delivery-order/do-processing/amend-delivery-order', function () {
+        return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/AmendDeliveryOrder');
+    })->name('vue.warehouse-management.delivery-order.do-processing.amend-delivery-order');
+
+    Route::get('/warehouse-management/delivery-order/do-processing/cancel-delivery-order', function () {
+        return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/CancelDeliveryOrder');
+    })->name('vue.warehouse-management.delivery-order.do-processing.cancel-delivery-order');
 
     Route::get('/warehouse-management/invoice', function () {
         return Inertia::render('warehouse-management/Invoice/index');
