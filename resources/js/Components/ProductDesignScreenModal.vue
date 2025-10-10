@@ -7,7 +7,7 @@
     <div class="relative min-h-screen flex items-center justify-center p-4">
       <div class="relative bg-white rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] overflow-hidden">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div class="px-8 py-5 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-semibold text-gray-800 flex items-center">
               <i class="fas fa-cogs mr-2 text-green-600"></i>
@@ -23,7 +23,7 @@
         </div>
 
         <!-- Content -->
-        <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div class="px-8 py-6 overflow-y-auto max-h-[calc(90vh-140px)]">
           <!-- Item Details Table -->
           <div class="mb-6">
             <h4 class="text-md font-medium text-gray-800 mb-3">Item Details</h4>
@@ -63,7 +63,23 @@
                         @input="calculateAmount(item)"
                       >
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ item.unit }}</td>
+                    <td class="px-4 py-3">
+                      <select 
+                        v-model="item.unit" 
+                        class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      >
+                        <option value="Pcs">Pcs</option>
+                        <option value="Kilos">Kilos</option>
+                        <option value="KG">KG</option>
+                        <option value="Set">Set</option>
+                        <option value="Box">Box</option>
+                        <option value="Roll">Roll</option>
+                        <option value="Sheet">Sheet</option>
+                        <option value="Meter">Meter</option>
+                        <option value="Liter">Liter</option>
+                        <option value="Ton">Ton</option>
+                      </select>
+                    </td>
                     <td class="px-4 py-3 text-sm text-gray-900 font-medium">{{ formatCurrency(item.amount) }}</td>
                     <td class="px-4 py-3 text-sm text-gray-600">{{ item.fgBalance || '-' }}</td>
                   </tr>
@@ -152,7 +168,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+        <div class="px-8 py-6 bg-gray-50 border-t border-gray-200 flex justify-end space-x-4">
           <button 
             @click="$emit('close')"
             class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
