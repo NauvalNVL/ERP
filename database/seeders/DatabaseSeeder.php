@@ -79,6 +79,7 @@ class DatabaseSeeder extends Seeder
             ProductGroupSeeder::class,
             VehicleClassSeeder::class,
             VehicleSeeder::class,
+            McTableSeeder::class,
         ]);
     }
 }

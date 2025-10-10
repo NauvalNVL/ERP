@@ -1,4 +1,4 @@
-  <template>
+<template>
   <AppLayout header="Prepare MC SO">
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
       <!-- Header with controls -->
@@ -21,20 +21,16 @@
             </button>
               <button 
               @click="printLog" 
-              :disabled="!isSalesOrderRangeComplete"
-              class="px-3 py-1 text-white text-sm rounded transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-              :class="isSalesOrderRangeComplete ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400'"
-              :title="isSalesOrderRangeComplete ? 'Print SO Log (Ctrl+P)' : 'Please complete Sales Order Range first'"
+              class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+              title="Print SO Log (Ctrl+P)"
               >
               <i class="fas fa-print mr-1"></i>
               Print SO Log
               </button>
               <button 
               @click="printJitTracking" 
-              :disabled="!isSalesOrderRangeComplete"
-              class="px-3 py-1 text-white text-sm rounded transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-              :class="isSalesOrderRangeComplete ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400'"
-              :title="isSalesOrderRangeComplete ? 'Print SO JIT Tracking' : 'Please complete Sales Order Range first'"
+              class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+              title="Print JIT Tracking"
               >
               <i class="fas fa-print mr-1"></i>
               Print SO JIT Tracking
@@ -150,74 +146,6 @@
                   readonly
                   disabled
                 >
-                </div>
-              </div>
-            </div>
-
-            <!-- Sales Order Range for Print Functions -->
-            <div class="bg-gray-50 rounded-lg p-4">
-              <h3 class="text-sm font-medium text-gray-700 mb-3">Sales Order Range (Required for Print Functions)</h3>
-              <div class="space-y-4">
-                <!-- From Range -->
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">From S/Order#:</label>
-                  <div class="flex items-center space-x-2">
-                    <input 
-                      v-model.number="salesOrderRange.from.month" 
-                      type="number" 
-                      min="1" 
-                      max="12" 
-                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" 
-                      placeholder="MM" 
-                    >
-                    <span class="text-gray-400">/</span>
-                    <input 
-                      v-model.number="salesOrderRange.from.year" 
-                      type="number" 
-                      min="2000" 
-                      max="2099" 
-                      class="w-20 px-2 py-1 border border-gray-300 rounded text-sm" 
-                      placeholder="YYYY" 
-                    >
-                    <span class="text-gray-400">/</span>
-                    <input 
-                      v-model="salesOrderRange.from.seq" 
-                      type="text" 
-                      class="w-24 px-2 py-1 border border-gray-300 rounded text-sm" 
-                      placeholder="Seq" 
-                    >
-                  </div>
-                </div>
-                
-                <!-- To Range -->
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">To S/Order#:</label>
-                  <div class="flex items-center space-x-2">
-                    <input 
-                      v-model.number="salesOrderRange.to.month" 
-                      type="number" 
-                      min="1" 
-                      max="12" 
-                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" 
-                      placeholder="MM" 
-                    >
-                    <span class="text-gray-400">/</span>
-                    <input 
-                      v-model.number="salesOrderRange.to.year" 
-                      type="number" 
-                      min="2000" 
-                      max="2099" 
-                      class="w-20 px-2 py-1 border border-gray-300 rounded text-sm" 
-                      placeholder="YYYY" 
-                    >
-                    <span class="text-gray-400">/</span>
-                    <input 
-                      v-model="salesOrderRange.to.seq" 
-                      type="text" 
-                      class="w-24 px-2 py-1 border border-gray-300 rounded text-sm" 
-                      placeholder="Seq" 
-                    >
-                  </div>
                 </div>
               </div>
             </div>
@@ -754,20 +682,6 @@ const lastSOOrder = reactive({
   number: 640
 })
 
-// Sales Order Range for Print Functions
-const salesOrderRange = reactive({
-  from: {
-    month: null,
-    year: null,
-    seq: ''
-  },
-  to: {
-    month: null,
-    year: null,
-    seq: ''
-  }
-})
-
 // Customer Information
 const selectedCustomer = reactive({
   code: '',
@@ -805,14 +719,14 @@ const orderDetails = reactive({
   customerPOrder: '',
   pOrderDate: new Date().toISOString().split('T')[0],
   setQuantity: '',
-  mainQuantity: '', // Add mainQuantity for Delivery Schedule Modal
   orderGroup: 'Sales',
   orderType: 'S1-Sales',
   salesTax: false,
   lotNumber: '',
   remark: '',
   instruction1: '',
-  instruction2: '',
+  instruction2: ''
+  ,
   so_number: ''
 })
 
@@ -834,29 +748,9 @@ const normalizedSetQuantity = computed(() => {
 
 // Sync set quantity to Product Design modal when value changes while modal is open
 watch(() => normalizedSetQuantity.value, (qty) => {
-  console.log('normalizedSetQuantity changed to:', qty, 'modal open:', showProductDesignModal.value)
   if (showProductDesignModal.value && productDesignModalRef.value?.applyExternalQuantity) {
-    console.log('Applying quantity to Product Design modal:', qty)
     productDesignModalRef.value.applyExternalQuantity(qty)
   }
-})
-
-// Watch for modal open/close to sync quantity
-watch(() => showProductDesignModal.value, (isOpen) => {
-  if (isOpen) {
-    console.log('Product Design modal opened, syncing quantity:', normalizedSetQuantity.value)
-    nextTick(() => {
-      if (productDesignModalRef.value?.applyExternalQuantity) {
-        productDesignModalRef.value.applyExternalQuantity(normalizedSetQuantity.value)
-      }
-    })
-  }
-})
-
-// Sync mainQuantity with setQuantity
-watch(() => orderDetails.setQuantity, (newVal) => {
-  console.log('setQuantity changed to:', newVal)
-  orderDetails.mainQuantity = newVal
 })
 
 // New MCS Table Modal state and handlers
@@ -878,16 +772,6 @@ const canProceed = computed(() => {
   // Allow proceeding if customer and master card are selected
   // Approval status will be shown as warning but won't block the process
   return selectedCustomer.code && selectedMasterCard.seq
-})
-
-// Computed property to check if sales order range is complete for print functions
-const isSalesOrderRangeComplete = computed(() => {
-  return salesOrderRange.from.month && 
-         salesOrderRange.from.year && 
-         salesOrderRange.from.seq &&
-         salesOrderRange.to.month && 
-         salesOrderRange.to.year && 
-         salesOrderRange.to.seq
 })
 
 // Computed property to check if master card is approved
@@ -1183,8 +1067,7 @@ const refreshPage = () => {
     exchangeMethod: 'N/A',
     customerPOrder: '',
     pOrderDate: new Date().toISOString().split('T')[0],
-    setQuantity: '',
-    mainQuantity: '',
+    setQuantity: false,
     orderGroup: 'Sales',
     orderType: 'S1-Sales',
     salesTax: false,
@@ -1195,20 +1078,6 @@ const refreshPage = () => {
     so_number: ''
   })
   
-  // Reset sales order range
-  Object.assign(salesOrderRange, {
-    from: {
-      month: null,
-      year: null,
-      seq: ''
-    },
-    to: {
-      month: null,
-      year: null,
-      seq: ''
-    }
-  })
-  
   // Update UI after reset
   updateOrderTypeUI()
   
@@ -1216,12 +1085,6 @@ const refreshPage = () => {
 }
 
 const printLog = async () => {
-  // Validate sales order range first
-  if (!isSalesOrderRangeComplete.value) {
-    error('Please complete Sales Order Range (From and To) before printing')
-    return
-  }
-  
   try {
     const response = await fetch('/api/sales-order/print-log')
     const data = await response.json()
@@ -1234,12 +1097,6 @@ const printLog = async () => {
 }
 
 const printJitTracking = async () => {
-  // Validate sales order range first
-  if (!isSalesOrderRangeComplete.value) {
-    error('Please complete Sales Order Range (From and To) before printing')
-    return
-  }
-  
   try {
     const response = await fetch('/api/sales-order/print-jit-tracking')
     const data = await response.json()
@@ -1618,16 +1475,7 @@ const openProductDesignScreen = () => {
     error('Please select customer and master card first')
     return
   }
-  console.log('Opening Product Design Screen with quantity:', normalizedSetQuantity.value)
   showProductDesignModal.value = true
-  
-  // Ensure quantity is synced when modal opens
-  nextTick(() => {
-    if (productDesignModalRef.value?.applyExternalQuantity) {
-      console.log('Syncing quantity on modal open:', normalizedSetQuantity.value)
-      productDesignModalRef.value.applyExternalQuantity(normalizedSetQuantity.value)
-    }
-  })
 }
 
 const saveProductDesign = async (designData) => {
@@ -1637,10 +1485,6 @@ const saveProductDesign = async (designData) => {
       error('Master card is required for product design')
       return
     }
-    
-    console.log('Saving product design with data:', designData)
-    console.log('Current set quantity:', orderDetails.setQuantity)
-    console.log('Normalized set quantity:', normalizedSetQuantity.value)
     
     const requestData = {
       master_card_seq: selectedMasterCard.seq,
@@ -1670,28 +1514,17 @@ const saveProductDesign = async (designData) => {
     const data = await response.json()
     
     if (data.success) {
-      console.log('Product design saved:', designData)
-      
-      // Update orderDetails with quantity from Product Design Screen
-      if (designData.items && designData.items.length > 0) {
-        const mainItem = designData.items.find(item => item.name === 'Main')
-        if (mainItem && mainItem.quantity) {
-          console.log('Updating orderDetails.setQuantity from Product Design:', mainItem.quantity)
-          orderDetails.setQuantity = mainItem.quantity.toString()
-          orderDetails.mainQuantity = mainItem.quantity.toString()
-        }
-      }
-      
-      showProductDesignModal.value = false
-      success('Product design saved successfully')
-      
-      // Fetch customer alternate delivery location data and populate orderDetails
-      await fetchCustomerAlternateDeliveryData()
-      
-      // After saving product design, open Delivery Location modal
-      setTimeout(() => {
-        showDeliveryLocationModal.value = true
-      }, 400)
+  console.log('Product design saved:', designData)
+  showProductDesignModal.value = false
+  success('Product design saved successfully')
+  
+  // Fetch customer alternate delivery location data and populate orderDetails
+  await fetchCustomerAlternateDeliveryData()
+  
+  // After saving product design, open Delivery Location modal
+  setTimeout(() => {
+    showDeliveryLocationModal.value = true
+  }, 400)
     } else {
       throw new Error(data.message || 'Failed to save product design')
     }
@@ -1959,9 +1792,6 @@ const createSalesOrder = async () => {
       return
     }
     
-    console.log('Creating sales order with quantity:', orderDetails.setQuantity)
-    console.log('Normalized quantity:', normalizedSetQuantity.value)
-    
     const requestData = {
       customer_code: selectedCustomer.code,
       master_card_seq: selectedMasterCard.seq,
@@ -1986,9 +1816,9 @@ const createSalesOrder = async () => {
           line_number: 1,
           item_code: orderDetails.product.code,
           item_description: orderDetails.product.description,
-          order_quantity: normalizedSetQuantity.value || 0,
+          order_quantity: parseFloat(orderDetails.setQuantity) || 0,
           unit_price: parseFloat(orderDetails.unitPrice) || 0,
-          uom: orderDetails.uom || 'PCS',
+          uom: orderDetails.uom,
           remark: orderDetails.remark
         }
       ]

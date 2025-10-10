@@ -22,20 +22,20 @@
                 <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
                   <i class="fa-solid fa-print text-white text-lg"></i>
                 </div>
-                <div>
+            <div>
                   <h2 class="text-xl font-bold text-white">Print Configuration</h2>
                   <p class="text-blue-100 text-sm">Configure your sales order printing parameters</p>
-                </div>
-              </div>
-              <button
-                @click="resetForm"
-                class="modern-btn-secondary"
-              >
-                <i class="fa-solid fa-rotate-left mr-2"></i>
-                Reset Form
-              </button>
             </div>
           </div>
+          <button
+            @click="resetForm"
+                class="modern-btn-secondary"
+          >
+                <i class="fa-solid fa-rotate-left mr-2"></i>
+                Reset Form
+          </button>
+            </div>
+        </div>
 
           <!-- Card Content -->
           <div class="p-8">
@@ -73,8 +73,8 @@
                         />
                       </div>
                     </div>
-                  </div>
-                </div>
+              </div>
+            </div>
 
                 <!-- SO Range Section -->
                 <div class="modern-section">
@@ -87,7 +87,7 @@
                       <!-- From Range -->
                       <div>
                         <label class="modern-label">From S/Order#</label>
-                        <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2">
                           <input v-model.number="form.from.month" type="number" min="1" max="12" class="modern-input w-16 text-center" placeholder="MM" />
                           <span class="text-gray-400">/</span>
                             <input v-model.number="form.from.year" type="number" min="2000" max="2099" class="modern-input w-20 text-center" placeholder="YYYY" />
@@ -98,8 +98,8 @@
                               title="Lookup"
                               @click="openSalesOrderLookup('from')"
                             >
-                              <i class="fa-solid fa-magnifying-glass"></i>
-                            </button>
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                  </button>
                         </div>
                       </div>
                       
@@ -117,13 +117,13 @@
                               title="Lookup"
                               @click="openSalesOrderLookup('to')"
                             >
-                              <i class="fa-solid fa-magnifying-glass"></i>
-                            </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                  </button>
                 </div>
+                      </div>
+                </div>
+              </div>
+            </div>
 
                 <!-- Quick Print Section -->
                 <div class="modern-section">
@@ -141,10 +141,10 @@
                       <button class="modern-btn-primary" @click="quickPrint">
                         <i class="fa-solid fa-bolt mr-2"></i>Quick Print
                       </button>
-                    </div>
-                  </div>
-                </div>
+            </div>
               </div>
+            </div>
+          </div>
 
               <!-- Right Column -->
               <div class="space-y-6">
@@ -161,8 +161,8 @@
                         <option v-for="n in 9" :key="n" :value="n">{{ n }} {{ n === 1 ? 'Copy' : 'Copies' }}</option>
                       </select>
                     </div>
-                  </div>
-                </div>
+          </div>
+        </div>
 
                 <!-- Order Status Filter Section -->
                 <div class="modern-section">
@@ -202,9 +202,9 @@
                         <span class="label-text">Cancelled</span>
                         <span class="status-badge cancelled">Cancelled</span>
                       </label>
-                    </div>
-                  </div>
-                </div>
+            </div>
+          </div>
+              </div>
               </div>
             </div>
 
@@ -216,7 +216,7 @@
               </button>
             </div>
           </div>
-        </div>
+          </div>
 
         <!-- Preview Section -->
         <div v-if="preview" class="mt-8 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden border border-white/20">
@@ -229,22 +229,22 @@
                 <div>
                   <h3 class="text-lg font-bold text-white">Preview Report</h3>
                   <p class="text-green-100 text-sm">Review your sales order report before printing</p>
-                </div>
-              </div>
+            </div>
+          </div>
               <div class="flex gap-2">
                 <button class="modern-btn-download" @click="downloadPdf">
                   <i class="fa-solid fa-file-pdf mr-2"></i> PDF
                 </button>
                 <button class="modern-btn-download" @click="downloadExcel">
                   <i class="fa-solid fa-file-excel mr-2"></i> Excel
-                </button>
-              </div>
-            </div>
+            </button>
           </div>
+        </div>
+      </div>
           <div class="p-6 overflow-auto max-h-96">
             <div class="font-mono text-xs whitespace-pre leading-5 bg-white p-6 rounded-lg border shadow-sm" style="font-family: 'Courier New', monospace;">
               {{ previewText }}
-            </div>
+        </div>
           </div>
         </div>
       </div>
@@ -330,7 +330,7 @@ const form = reactive({
 const printer = reactive({ open: false, code: 'HPL-001', user: 'user2' })
 const preview = ref(false)
 const previewText = ref('')
-const quick = reactive({ so: '' })
+  const quick = reactive({ so: '' })
 
 // Sales Order Lookup Modal
 const salesOrderModal = reactive({ 
@@ -652,14 +652,14 @@ async function downloadExcel() {
     ].join('\r\n')
     
     const blob = new Blob([headerInfo], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
     a.download = `SalesOrder_${form.period.month}_${form.period.year}.csv`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
   } catch (error) {
     console.error('Error downloading Excel:', error)
     alert('Error downloading Excel file')
