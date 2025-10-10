@@ -250,4 +250,212 @@ class DeliveryOrderController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Update/Amend a delivery order
+     */
+    public function update(Request $request, $doNumber)
+    {
+        $validator = Validator::make($request->all(), [
+            'vehicle_number' => 'required|string|max:50',
+            'order_date' => 'required|date',
+            'remark1' => 'nullable|string|max:250',
+            'remark2' => 'nullable|string|max:250',
+            'unapply_fg' => 'boolean',
+            'cancelled_reason' => 'nullable|string|max:250'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Check if delivery order exists
+            $existingDO = DB::table('DO')
+                ->where('DO_Num', $doNumber)
+                ->first();
+
+            if (!$existingDO) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Delivery order not found'
+                ], 404);
+            }
+
+            // Check if delivery order can be amended
+            if (!in_array($existingDO->Status, ['Draft', 'Saved'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only Draft and Saved delivery orders can be amended'
+                ], 400);
+            }
+
+            // Get vehicle information
+            $vehicle = DB::table('vehicle')
+                ->where('VEHICLE_NO', $request->vehicle_number)
+                ->first();
+
+            if (!$vehicle) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vehicle not found'
+                ], 404);
+            }
+
+            $orderDate = Carbon::parse($request->order_date);
+
+            // Prepare updated data
+            $updateData = [
+                'DO_DMY' => $orderDate->format('d/m/Y'),
+                'DO_VHC_Num' => $request->vehicle_number,
+                'VHC_Class' => $vehicle->VEHICLE_CLASS ?? '',
+                'UNAPPLIED_FG' => $request->unapply_fg ? 'Y' : 'N',
+                'DO_Remark1' => $request->remark1 ?? '',
+                'DO_Remark2' => $request->remark2 ?? '',
+                'DODateSK' => $orderDate->format('Ymd'),
+            ];
+
+            // Add cancelled reason if provided
+            if ($request->has('cancelled_reason') && $request->cancelled_reason) {
+                $updateData['Cancelled_Reason'] = $request->cancelled_reason;
+            }
+
+            // Update the delivery order
+            DB::table('DO')
+                ->where('DO_Num', $doNumber)
+                ->update($updateData);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Delivery order amended successfully',
+                'data' => [
+                    'do_number' => $doNumber,
+                    'do_date' => $orderDate->format('d/m/Y'),
+                    'vehicle_number' => $request->vehicle_number
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Error amending delivery order: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error amending delivery order: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get vehicle information
+     */
+    public function getVehicle($vehicleNumber)
+    {
+        try {
+            $vehicle = DB::table('vehicle')
+                ->where('VEHICLE_NO', $vehicleNumber)
+                ->first();
+
+            if (!$vehicle) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vehicle not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $vehicle
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching vehicle: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching vehicle'
+            ], 500);
+        }
+    }
+
+    /**
+     * Cancel a delivery order
+     */
+    public function cancel(Request $request, $doNumber)
+    {
+        $validator = Validator::make($request->all(), [
+            'cancellation_reason' => 'required|string|max:250'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Check if delivery order exists
+            $existingDO = DB::table('DO')
+                ->where('DO_Num', $doNumber)
+                ->first();
+
+            if (!$existingDO) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Delivery order not found'
+                ], 404);
+            }
+
+            // Check if delivery order can be cancelled
+            if (!in_array($existingDO->Status, ['Draft', 'Saved'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only Draft and Saved delivery orders can be cancelled'
+                ], 400);
+            }
+
+            // Update the delivery order status and cancellation reason
+            DB::table('DO')
+                ->where('DO_Num', $doNumber)
+                ->update([
+                    'Status' => 'Cancelled',
+                    'Cancelled_Reason' => $request->cancellation_reason
+                ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Delivery order cancelled successfully',
+                'data' => [
+                    'do_number' => $doNumber,
+                    'status' => 'Cancelled',
+                    'cancellation_reason' => $request->cancellation_reason
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Error cancelling delivery order: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error cancelling delivery order: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

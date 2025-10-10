@@ -65,6 +65,7 @@ use App\Http\Controllers\CustomerWarehouseRequirementController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\VehicleClassController;
+use App\Http\Controllers\DeliveryOrderController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -266,6 +267,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/delivery-order/transaction/prepare-delivery-order-multiple-item', function () {
             return Inertia::render('sales-management/delivery-order/Transaction/PrepareDeliveryOrderMultipleItem');
         })->name('vue.delivery-order.transaction.prepare-delivery-order-multiple-item');
+
+        // Delivery Order Transaction - Amend Delivery Order
+        Route::get('/delivery-order/transaction/amend-delivery-order', function () {
+            return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/AmendDeliveryOrder');
+        })->name('vue.delivery-order.transaction.amend-delivery-order');
+
+        // Delivery Order Transaction - Cancel Delivery Order
+        Route::get('/delivery-order/transaction/cancel-delivery-order', function () {
+            return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/CancelDeliveryOrder');
+        })->name('vue.delivery-order.transaction.cancel-delivery-order');
 
          // Sales Order Report - Rough Cut Report - Define Report Format
          Route::get('/sales-order/report/rough-cut-report/define-report-format', function () {
@@ -1158,6 +1169,14 @@ Route::prefix('api')->group(function () {
     Route::get('/material-management/skus/categories', [MmSkuController::class, 'getCategories']);
     Route::get('/material-management/skus/units', [MmSkuController::class, 'getUnits']);
     Route::get('/material-management/skus/types', [MmSkuController::class, 'getTypes']);
+
+    // Delivery Order API routes
+    Route::get('/delivery-orders', [DeliveryOrderController::class, 'index']);
+    Route::post('/delivery-orders', [DeliveryOrderController::class, 'store']);
+    Route::get('/delivery-orders/{doNumber}', [DeliveryOrderController::class, 'show']);
+    Route::put('/delivery-orders/{doNumber}', [DeliveryOrderController::class, 'update']);
+    Route::post('/delivery-orders/{doNumber}/cancel', [DeliveryOrderController::class, 'cancel']);
+    Route::get('/vehicles/{vehicleNumber}', [DeliveryOrderController::class, 'getVehicle']);
 
 
     // Expose a concise list of navigable menu routes for header search
