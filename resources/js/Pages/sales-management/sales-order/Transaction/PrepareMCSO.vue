@@ -1495,13 +1495,17 @@ const saveProductDesign = async (designData) => {
       ...designData
     }
     
+    // Debug CSRF token
+    const csrfToken = (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+    console.log('CSRF Token:', csrfToken ? 'Found' : 'Missing')
+    
     const response = await fetch('/api/sales-order/product-design', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        'X-CSRF-TOKEN': csrfToken
       },
       credentials: 'same-origin',
       body: JSON.stringify(requestData)

@@ -287,7 +287,7 @@ Route::get('/customer-service/production-monitoring-data', [CustomerServiceContr
 Route::post('/sales-order', [App\Http\Controllers\SalesOrderController::class, 'store']);
 Route::post('/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
 Route::get('/sales-order/delivery-schedule/{soNumber}', [App\Http\Controllers\SalesOrderController::class, 'getDeliveryScheduleSummary']);
-Route::post('/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign']);
+Route::post('/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign'])->middleware('api.csrf');
 Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderController::class, 'getCustomer']); 
 // Save to legacy-style SO table (CPS compatibility)
 Route::post('/sales-order/save-to-so', [App\Http\Controllers\SalesOrderController::class, 'apiStoreToSo']);
