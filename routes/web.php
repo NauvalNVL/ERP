@@ -668,6 +668,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehouse-management/invoice', function () {
         return Inertia::render('warehouse-management/Invoice/index');
     })->name('vue.warehouse-management.invoice');
+    // Invoice → IV Processing → Amend Invoice (Vue page)
+    Route::get('/warehouse-management/invoice/iv-processing/amend-invoice', function () {
+        return Inertia::render('warehouse-management/Invoice/IV-Processing/AmendInvoice');
+    })->name('vue.warehouse-management.invoice.iv-processing.amend-invoice');
+
+    // Invoice → Setup pages (Vue)
+    Route::get('/warehouse-management/invoice/setup/define-tax-group', function () {
+        return Inertia::render('warehouse-management/Invoice/Setup/DefineTaxGroup');
+    })->name('vue.warehouse-management.invoice.setup.define-tax-group');
+
+    Route::get('/warehouse-management/invoice/setup/define-tax-type', function () {
+        return Inertia::render('warehouse-management/Invoice/Setup/DefineTaxType');
+    })->name('vue.warehouse-management.invoice.setup.define-tax-type');
+
+    Route::get('/warehouse-management/invoice/setup/invoice-configuration', function () {
+        return Inertia::render('warehouse-management/Invoice/Setup/SetupInvoiceConfiguration');
+    })->name('vue.warehouse-management.invoice.setup.invoice-configuration');
 
     Route::get('/warehouse-management/debit-credit-note', function () {
         return Inertia::render('warehouse-management/DebitCreditNote/index');
