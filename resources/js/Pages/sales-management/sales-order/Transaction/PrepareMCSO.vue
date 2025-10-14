@@ -1498,6 +1498,9 @@ const saveProductDesign = async (designData) => {
     // Debug CSRF token
     const csrfToken = (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
     console.log('CSRF Token:', csrfToken ? 'Found' : 'Missing')
+    console.log('CSRF Token Value:', csrfToken.substring(0, 20) + '...')
+    console.log('Request URL:', '/api/sales-order/product-design')
+    console.log('Request Method:', 'POST')
     
     const response = await fetch('/api/sales-order/product-design', {
       method: 'POST',
@@ -1510,6 +1513,9 @@ const saveProductDesign = async (designData) => {
       credentials: 'same-origin',
       body: JSON.stringify(requestData)
     })
+    
+    console.log('Response status:', response.status)
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()))
     
     if (!response.ok) {
       const text = await response.text()
@@ -1732,24 +1738,33 @@ const saveDeliveryLocation = async (locationData) => {
 
 const saveDeliverySchedule = async (scheduleData) => {
   try {
+    console.log('saveDeliverySchedule called with data:', scheduleData)
+    console.log('scheduleData.entries:', scheduleData.entries)
+    console.log('Array.isArray(scheduleData.entries):', Array.isArray(scheduleData.entries))
+    
     // Validate required data
     if (!scheduleData.entries || !Array.isArray(scheduleData.entries)) {
+      console.error('Validation failed: entries missing or not array')
       error('Delivery schedule entries are required')
       return
     }
     
     // First, we need to create the Sales Order if it doesn't exist
     let soNumber = orderDetails.so_number
+    console.log('Current SO number:', soNumber)
     
     if (!soNumber) {
+      console.log('No SO number found, creating new Sales Order...')
       // Create the Sales Order first
       const soResponse = await createSalesOrder()
+      console.log('SO creation response:', soResponse)
       if (!soResponse.success) {
         error('Failed to create Sales Order: ' + soResponse.message)
         return
       }
       soNumber = soResponse.so_number
       orderDetails.so_number = soNumber
+      console.log('New SO number:', soNumber)
     }
     
     // Now save the delivery schedule (entries already validated by modal)
@@ -1758,17 +1773,24 @@ const saveDeliverySchedule = async (scheduleData) => {
       entries: scheduleData.entries
     }
     
+    // Debug CSRF token for delivery schedule
+    const csrfToken = (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+    console.log('Delivery Schedule - CSRF Token:', csrfToken ? 'Found' : 'Missing')
+    console.log('Delivery Schedule - Request data:', requestData)
+    
     const response = await fetch('/api/sales-order/delivery-schedule', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        'X-CSRF-TOKEN': csrfToken
       },
       credentials: 'same-origin',
       body: JSON.stringify(requestData)
     })
+    
+    console.log('Delivery Schedule - Response status:', response.status)
     
     if (!response.ok) {
       const text = await response.text()

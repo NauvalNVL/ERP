@@ -238,6 +238,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/sales-order/transaction/prepare-mc-so', function () {
             return Inertia::render('sales-management/sales-order/Transaction/PrepareMCSO');
         })->name('vue.sales-order.transaction.prepare-mc-so');
+        
+        // Sales Order Product Design API (with CSRF protection)
+        Route::post('/api/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign']);
+        
+        // Sales Order Delivery Schedule API (with CSRF protection)
+        Route::post('/api/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
 
         // Sales Order Transaction - Prepare SB SO
         Route::get('/sales-order/transaction/prepare-sb-so', function () {

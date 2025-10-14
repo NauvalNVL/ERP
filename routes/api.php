@@ -284,10 +284,13 @@ Route::get('/customer-service/finished-goods-data', [CustomerServiceController::
 Route::get('/customer-service/production-monitoring-data', [CustomerServiceController::class, 'apiProductionMonitoringData']);
 
 // Sales Order API routes
-Route::post('/sales-order', [App\Http\Controllers\SalesOrderController::class, 'store']);
-Route::post('/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
+// Route moved to web.php for CSRF protection
+// Route::post('/sales-order', [App\Http\Controllers\SalesOrderController::class, 'store']);
+// Route moved to web.php for CSRF protection
+// Route::post('/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
 Route::get('/sales-order/delivery-schedule/{soNumber}', [App\Http\Controllers\SalesOrderController::class, 'getDeliveryScheduleSummary']);
-Route::post('/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign'])->middleware('api.csrf');
+// Route moved to web.php for CSRF protection
+// Route::post('/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign'])->middleware('api.csrf');
 Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderController::class, 'getCustomer']); 
 // Save to legacy-style SO table (CPS compatibility)
 Route::post('/sales-order/save-to-so', [App\Http\Controllers\SalesOrderController::class, 'apiStoreToSo']);
