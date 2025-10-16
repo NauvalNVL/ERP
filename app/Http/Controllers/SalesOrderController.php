@@ -56,11 +56,26 @@ class SalesOrderController extends Controller
         $randPart = str_pad((string) random_int(1, 9999), 4, '0', STR_PAD_LEFT);
         $soNumber = 'SO-' . $datePart . '-' . $randPart;
 
+        // Fetch customer data from database
+        $customerData = DB::table('CUSTOMER')->where('CODE', $validated['customer_code'])->first();
+        $customerName = $customerData ? $customerData->NAME : '';
+
+        // Fetch master card data from database
+        $masterCardData = DB::table('MC')
+            ->where('MCS_Num', $validated['master_card_seq'])
+            ->where('AC_NUM', $validated['customer_code'])
+            ->first();
+        $mcModel = $masterCardData ? $masterCardData->MODEL : '';
+        $mcPDesign = $masterCardData ? $masterCardData->P_DESIGN : '';
+        $mcPartNumber = $masterCardData ? $masterCardData->PART_NO : '';
+
         // Prepare minimal legacy SO row so schedule updates can find it
         $qty = (float) ($validated['details'][0]['order_quantity'] ?? 0);
         $price = (float) ($validated['details'][0]['unit_price'] ?? 0);
         $amount = $qty * $price;
-        $partNumber = (string) ($request->input('part_number') ?? $request->input('partNo') ?? $request->input('master_card_model') ?? '');
+        
+        // Use master card part number, fallback to request data
+        $partNumber = $mcPartNumber ?: (string) ($request->input('part_number') ?? $request->input('partNo') ?? $request->input('master_card_model') ?? '');
 
         $nowDate = date('Y-m-d');
         $nowTime = date('H:i');
@@ -73,7 +88,7 @@ class SalesOrderController extends Controller
             'TYPE' => (string) ($validated['order_type'] ?? 'S1'),
             'SO_DMY' => $nowDate,
             'AC_Num' => (string) $validated['customer_code'],
-            'AC_NAME' => '',
+            'AC_NAME' => $customerName,
             'SLM' => (string) ($validated['salesperson_code'] ?? ''),
             'IND' => '',
             'AREA' => '',
@@ -82,10 +97,10 @@ class SalesOrderController extends Controller
             'PO_DATE' => (string) ($validated['po_date'] ?? $nowDate),
             'LOT_Num' => (string) ($validated['lot_number'] ?? ''),
             'MCS_Num' => (string) $validated['master_card_seq'],
-            'MODEL' => '',
+            'MODEL' => $mcModel,
             'PRODUCT' => (string) ($validated['details'][0]['item_code'] ?? ''),
-            'COMP_Num' => '',
-            'P_DESIGN' => '',
+            'COMP_Num' => $masterCardData ? (string) ($masterCardData->COMP ?? '') : '',
+            'P_DESIGN' => $mcPDesign,
             'PER_SET' => 1,
             'UNIT' => (string) ($validated['details'][0]['uom'] ?? ''),
             'PART_NUMBER' => $partNumber,
