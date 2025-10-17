@@ -313,7 +313,8 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
+import axios from 'axios'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import SalesOrderLookupModal from '@/Components/SalesOrderLookupModal.vue'
@@ -330,7 +331,47 @@ const form = reactive({
 const printer = reactive({ open: false, code: 'HPL-001', user: 'user2' })
 const preview = ref(false)
 const previewText = ref('')
-  const quick = reactive({ so: '' })
+const quick = reactive({ so: '' })
+
+// Current user info
+const currentUser = ref({
+  user_id: '',
+  official_name: '',
+  username: ''
+})
+
+// Fetch current user info on component mount
+const fetchCurrentUser = async () => {
+  try {
+    console.log('Fetching current user...')
+    const response = await axios.get('/api/user/current')
+    console.log('User API response:', response.data)
+    if (response.data.success) {
+      currentUser.value = response.data.data
+      console.log('Current user loaded:', currentUser.value)
+    } else {
+      console.warn('Failed to fetch current user:', response.data.message)
+      currentUser.value = {
+        user_id: 'guest',
+        official_name: 'Guest User',
+        username: 'guest'
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching current user:', error)
+    // Fallback to default if user not authenticated
+    currentUser.value = {
+      user_id: 'guest',
+      official_name: 'Guest User',
+      username: 'guest'
+    }
+  }
+}
+
+// Call on component mount using Vue lifecycle hook
+onMounted(() => {
+  fetchCurrentUser()
+})
 
 // Sales Order Lookup Modal
 const salesOrderModal = reactive({ 
@@ -474,6 +515,14 @@ async function formatPreview(data) {
 
 async function fetchSalesOrdersData() {
   try {
+    console.log('Fetching sales orders with params:', {
+      month: form.period.month,
+      year: form.period.year,
+      from_so: formatSO(form.from.month, form.from.year, form.from.seq || '0'),
+      to_so: formatSO(form.to.month, form.to.year, form.to.seq || '99999'),
+      status: Object.keys(form.status).filter(k => form.status[k])
+    })
+    
     const response = await axios.get('/api/sales-orders', {
       params: {
         month: form.period.month,
@@ -484,13 +533,18 @@ async function fetchSalesOrdersData() {
       }
     })
     
+    console.log('API Response:', response.data)
+    
     if (response.data.success) {
       const salesOrders = response.data.data
+      console.log('Sales Orders Count:', salesOrders.length)
+      
       const tableData = [
         ['SO#', 'Customer PO#', 'Customer', 'Status', 'Amount', 'Date']
       ]
       
       salesOrders.forEach(order => {
+        console.log('Processing order:', order)
         tableData.push([
           order.SO_Num || order.so_number || '',
           order.PO_Num || order.customer_po_number || '',
@@ -501,8 +555,10 @@ async function fetchSalesOrdersData() {
         ])
       })
       
+      console.log('Table Data:', tableData)
       return tableData
     } else {
+      console.warn('API returned success=false')
       // Fallback to empty data
       return [
         ['SO#', 'Customer PO#', 'Customer', 'Status', 'Amount', 'Date'],
@@ -511,6 +567,7 @@ async function fetchSalesOrdersData() {
     }
   } catch (error) {
     console.error('Error fetching sales orders:', error)
+    console.error('Error details:', error.response?.data)
     // Fallback to empty data
     return [
       ['SO#', 'Customer PO#', 'Customer', 'Status', 'Amount', 'Date'],
@@ -520,130 +577,405 @@ async function fetchSalesOrdersData() {
 }
 
 async function downloadPdf() {
-  const doc = new jsPDF({ unit: 'pt', format: 'a4' })
-  
-  // Set up fonts and colors
-  doc.setFont('helvetica', 'normal')
-  
-  // Header Section
-  doc.setFontSize(20)
-  doc.setTextColor(0, 0, 0)
-  doc.text('PT. MULTIBOX INDAH', 50, 50)
-  
-  doc.setFontSize(16)
-  doc.setTextColor(0, 100, 200)
-  doc.text('SALES ORDER REPORT', 50, 70)
-  
-  // Line separator
-  doc.setDrawColor(0, 100, 200)
-  doc.setLineWidth(2)
-  doc.line(50, 80, 550, 80)
-  
-  // Report Information
-  doc.setFontSize(10)
-  doc.setTextColor(0, 0, 0)
-  doc.text(`Period: ${form.period.month}/${form.period.year}`, 50, 100)
-  doc.text(`Range: ${formatSO(form.from.month, form.from.year, form.from.seq || '0')} to ${formatSO(form.to.month, form.to.year, form.to.seq || '99999')}`, 50, 115)
-  doc.text(`Status: ${Object.keys(form.status).filter(k => form.status[k]).join(', ').toUpperCase()}`, 50, 130)
-  doc.text(`Printer: ${printer.code} | User: ${printer.user}`, 50, 145)
-  
-  // Fetch real sales orders data
-  const salesOrdersData = await fetchSalesOrdersData()
-  
-  // Create table using jspdf-autotable
-  autoTable(doc, {
-    head: [salesOrdersData[0]],
-    body: salesOrdersData.slice(1),
-    startY: 170,
-    styles: {
-      fontSize: 8,
-      cellPadding: 3,
-      overflow: 'linebreak',
-      halign: 'left'
-    },
-    headStyles: {
-      fillColor: [0, 100, 200],
-      textColor: 255,
-      fontStyle: 'bold',
-      fontSize: 8
-    },
-    alternateRowStyles: {
-      fillColor: [245, 245, 245]
-    },
-    columnStyles: {
-      0: { halign: 'center', cellWidth: 60 }, // SO#
-      1: { cellWidth: 100 }, // Customer PO#
-      2: { cellWidth: 120 }, // Customer
-      3: { halign: 'center', cellWidth: 50 }, // Status
-      4: { halign: 'right', cellWidth: 70 }, // Amount
-      5: { halign: 'center', cellWidth: 60 } // Date
-    },
-    margin: { left: 50, right: 50 },
-    tableWidth: 'wrap',
-    showHead: 'everyPage',
-    theme: 'grid',
-    didDrawPage: function (data) {
-      // Center the table on the page
-      const pageWidth = doc.internal.pageSize.width
-      const tableWidth = data.table.width
-      const leftMargin = (pageWidth - tableWidth) / 2
+  try {
+    // Ensure current user is loaded first
+    if (!currentUser.value.user_id || currentUser.value.user_id === '') {
+      console.log('User not loaded yet, fetching...')
+      await fetchCurrentUser()
+      // Wait a bit to ensure the ref is updated
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+    
+    console.log('Starting PDF generation with user:', currentUser.value)
+    
+    const doc = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' })
+    
+    // Fetch real sales orders data
+    const salesOrdersData = await fetchSalesOrdersData()
+    
+    console.log('Sales Orders Data:', salesOrdersData)
+    
+    // Check if we have data
+    if (!salesOrdersData || salesOrdersData.length <= 1) {
+      alert('No sales order data found for the selected period and range.')
+      return
+    }
+    
+    let processedCount = 0
+    
+    // Process each sales order
+    for (let i = 1; i < salesOrdersData.length; i++) {
+      const orderRow = salesOrdersData[i]
+      const soNumber = orderRow[0]
       
-      // Adjust table position to center
-      if (data.pageNumber === 1) {
-        data.cursor.x = leftMargin
+      console.log(`Processing SO #${i}:`, soNumber)
+      
+      if (!soNumber || soNumber === 'No data available' || soNumber === 'Error loading data') {
+        console.log('Skipping invalid SO number')
+        continue
       }
+      
+      // Fetch detailed SO data with better error handling
+      try {
+        console.log(`Fetching details for SO: ${soNumber}`)
+        const response = await fetch(`/api/sales-orders/${encodeURIComponent(soNumber)}/delivery-schedules`, {
+          headers: { 
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        })
+        
+        // Check if response is ok
+        if (!response.ok) {
+          console.error(`HTTP Error ${response.status} for SO ${soNumber}`)
+          continue
+        }
+        
+        // Get raw text first to check for BOM
+        const rawText = await response.text()
+        console.log(`Raw response for ${soNumber} (first 100 chars):`, rawText.substring(0, 100))
+        
+        // Remove BOM if present (BOM is \uFEFF)
+        const cleanText = rawText.replace(/^\uFEFF/, '').replace(/^\ufeff/, '').trim()
+        
+        // Try to parse JSON
+        let json
+        try {
+          json = JSON.parse(cleanText)
+        } catch (parseError) {
+          console.error(`JSON Parse Error for SO ${soNumber}:`, parseError)
+          console.error('Raw text (first 50 chars):', rawText.substring(0, 50).split('').map(c => c.charCodeAt(0).toString(16)).join(' '))
+          console.error('Clean text:', cleanText.substring(0, 200))
+          // Continue to next SO instead of breaking the entire process
+          continue
+        }
+        
+        console.log(`Response for ${soNumber}:`, json)
+        
+        if (!json.success) {
+          console.warn(`Failed to fetch SO ${soNumber}:`, json.message)
+          continue
+        }
+        
+        const so = json.data.sales_order
+        const schedules = json.data.delivery_schedules || []
+        const details = so.details || []
+        
+        console.log('SO Data:', so)
+        console.log('Details:', details)
+        console.log('Schedules:', schedules)
+        
+        // Add new page for each SO (except first)
+        if (processedCount > 0) {
+          doc.addPage()
+        }
+        
+        // Render SO in format similar to image
+        renderSalesOrderPdf(doc, so, details, schedules)
+        processedCount++
+        
+      } catch (error) {
+        console.error(`Error fetching SO ${soNumber}:`, error)
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack
+        })
+        // Continue to next SO instead of crashing
+      }
+    }
+    
+    if (processedCount === 0) {
+      alert('No valid sales orders found to generate PDF.')
+      return
+    }
+    
+    console.log(`Processed ${processedCount} sales orders`)
+    
+    // Save the PDF
+    doc.save(`SalesOrder_${form.period.month}_${form.period.year}.pdf`)
+  } catch (error) {
+    console.error('Error generating PDF:', error)
+    alert('Error generating PDF: ' + error.message)
+  }
+}
+
+function renderSalesOrderPdf(doc, so, details, schedules) {
+  const leftMargin = 50
+  const rightMargin = 545
+  const pageWidth = 595
+  let yPos = 60
+  
+  // Debug: Log current user data
+  console.log('renderSalesOrderPdf - currentUser:', currentUser.value)
+  
+  // Header
+  doc.setFont('courier', 'bold')
+  doc.setFontSize(9)
+  doc.text('PT. MULTIBOX INDAH', leftMargin, yPos)
+  doc.text(`S/ORDER# : ${so.so_number || ''}`, rightMargin, yPos, { align: 'right' })
+  yPos += 11
+  
+  doc.text('SALES ORDER', leftMargin, yPos)
+  doc.text(`S/O DATE : ${formatDate(so.po_date) || ''}`, rightMargin, yPos, { align: 'right' })
+  yPos += 11
+  
+  // Credit control line
+  doc.setFont('courier', 'normal')
+  doc.setFontSize(8)
+  const creditControl = 'Credit Control: System Approved'
+  const creditDate = new Date().toLocaleString('en-GB', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit'
+  })
+  // Use dynamic user_id instead of hardcoded 'mkt12'
+  const userId = currentUser.value.user_id || 'guest'
+  console.log('PDF - Using userId:', userId, 'from currentUser:', currentUser.value)
+  doc.text(`${creditControl}    , ${creditDate}, ${userId}`, leftMargin, yPos)
+  doc.text(`PAGE NO : 1`, rightMargin, yPos, { align: 'right' })
+  yPos += 3
+  
+  // Separator line
+  doc.setLineWidth(0.5)
+  doc.line(leftMargin, yPos, rightMargin, yPos)
+  yPos += 10
+  
+  // Customer section (left side)
+  doc.setFont('courier', 'bold')
+  doc.setFontSize(8)
+  doc.text('CUSTOMER:', leftMargin, yPos)
+  yPos += 10
+  
+  doc.setFont('courier', 'normal')
+  doc.text(so.customer_name || '', leftMargin, yPos)
+  
+  // Deliver To section (right side)
+  doc.setFont('courier', 'bold')
+  doc.text('DELIVER TO:', 300, yPos - 10)
+  doc.setFont('courier', 'normal')
+  
+  const deliverTo = so.delivery_location || so.customer_name || ''
+  doc.text(deliverTo, 300, yPos)
+  yPos += 10
+  
+  // Address
+  const addressLines = (so.customer_address || '').split(',').map(s => s.trim()).filter(Boolean)
+  addressLines.forEach((line, idx) => {
+    if (idx < 3) {
+      doc.text(line, leftMargin, yPos)
+      yPos += 9
     }
   })
   
-  // Summary Section (centered)
-  const finalY = doc.lastAutoTable.finalY + 20
-  const pageWidth = doc.internal.pageSize.width
-  
-  // Center the summary text
-  doc.setFontSize(12)
-  doc.setTextColor(0, 100, 200)
-  const summaryText = 'SUMMARY'
-  const summaryWidth = doc.getTextWidth(summaryText)
-  const summaryX = (pageWidth - summaryWidth) / 2
-  doc.text(summaryText, summaryX, finalY)
-  
-  doc.setFontSize(10)
-  doc.setTextColor(0, 0, 0)
-  
-  // Center each summary line
-  const summaryLines = [
-    `Total Sales Orders: ${salesOrdersData.length - 1}`,
-    `Outstanding: ${salesOrdersData.filter(row => row[3] === 'Outstanding').length}`,
-    `Partial: ${salesOrdersData.filter(row => row[3] === 'Partial').length}`,
-    `Completed: ${salesOrdersData.filter(row => row[3] === 'Completed').length}`
-  ]
-  
-  summaryLines.forEach((line, index) => {
-    const lineWidth = doc.getTextWidth(line)
-    const lineX = (pageWidth - lineWidth) / 2
-    doc.text(line, lineX, finalY + 20 + (index * 15))
+  // Delivery address (right side)
+  const deliveryAddressLines = (so.delivery_address || so.customer_address || '').split(',').map(s => s.trim()).filter(Boolean)
+  let deliveryYPos = yPos - (addressLines.length * 9)
+  deliveryAddressLines.forEach((line, idx) => {
+    if (idx < 3) {
+      doc.text(line, 300, deliveryYPos)
+      deliveryYPos += 9
+    }
   })
   
-  // Footer (centered)
-  const pageHeight = doc.internal.pageSize.height
-  doc.setFontSize(8)
-  doc.setTextColor(128, 128, 128)
+  yPos = Math.max(yPos, deliveryYPos) + 5
   
-  // Center footer text
-  const footerText1 = 'Generated by ERP System'
-  const footerText2 = `Generated on: ${new Date().toLocaleString()}`
+  // Contact info
+  doc.text(`TEL : ${so.customer_tel || ''}`, leftMargin, yPos)
+  doc.text(`TEL :`, 300, yPos)
+  yPos += 9
+  doc.text(`FAX :`, leftMargin, yPos)
+  doc.text(`FAX :`, 300, yPos)
+  yPos += 9
+  doc.text(`EMAIL :`, leftMargin, yPos)
+  doc.text(`EMAIL :`, 300, yPos)
+  yPos += 10
   
-  const footerWidth1 = doc.getTextWidth(footerText1)
-  const footerWidth2 = doc.getTextWidth(footerText2)
+  // Line separator
+  doc.setLineWidth(0.5)
+  doc.line(leftMargin, yPos, rightMargin, yPos)
+  yPos += 10
   
-  const footerX1 = (pageWidth - footerWidth1) / 2
-  const footerX2 = (pageWidth - footerWidth2) / 2
+  // Order details
+  doc.text(`P/ORDER      : ${so.customer_po_number || ''}`, leftMargin, yPos)
+  doc.text(`P/ORDER DATE : ${formatDate(so.po_date) || ''}`, 300, yPos)
+  yPos += 9
+  doc.text(`ACCOUNT NO   : ${so.customer_code || ''}`, leftMargin, yPos)
+  doc.text(`CURRENCY     : ${so.currency || 'IDR'}`, 300, yPos)
+  yPos += 9
+  doc.text(`M/CARD SEQ# : ${so.master_card_seq || ''}`, leftMargin, yPos)
+  doc.text(`PAYMENT TERM : ${so.credit_terms || '30 DAYS'}`, 300, yPos)
+  yPos += 9
+  doc.text(`MODEL        : ${so.master_card_model || ''}`, leftMargin, yPos)
+  doc.text(`PRINT. BLOCK#: 62`, 300, yPos)
+  yPos += 10
   
-  doc.text(footerText1, footerX1, pageHeight - 30)
-  doc.text(footerText2, footerX2, pageHeight - 15)
+  // Line separator
+  doc.setLineWidth(0.5)
+  doc.line(leftMargin, yPos, rightMargin, yPos)
+  yPos += 9
   
-  // Save the PDF
-  doc.save(`SalesOrder_${form.period.month}_${form.period.year}.pdf`)
+  // Table header - Adjusted to match data positions exactly
+  doc.setFont('courier', 'bold')
+  doc.setFontSize(7)
+  doc.text('TYPE', leftMargin, yPos)
+  doc.text('DESCRIPTION', leftMargin + 35, yPos)
+  doc.text('QTY', leftMargin + 315, yPos)         // Align above QTY data
+  doc.text('UOM', leftMargin + 360, yPos)         // Align above UOM data  
+  doc.text('PRICE', leftMargin + 385, yPos)       // Shortened label, align above price data
+  doc.text('AMOUNT', rightMargin - 50, yPos)      // Align above amount data
+  yPos += 3
+  
+  doc.setLineWidth(0.5)
+  doc.line(leftMargin, yPos, rightMargin, yPos)
+  yPos += 9
+  
+  // Detail rows
+  doc.setFont('courier', 'normal')
+  doc.setFontSize(7)
+  details.forEach((detail) => {
+    const qty = detail.order_quantity || 0
+    const price = detail.unit_price || 0
+    const amount = qty * price
+    
+    // Main line
+    doc.text('Main', leftMargin, yPos)
+    
+    // Part number and design info - Moved closer to TYPE column
+    const partNo = so.part_number || ''
+    const pDesign = detail.item_code || ''
+    doc.text(`PART NO      : ${partNo}`, leftMargin + 35, yPos)
+    yPos += 8
+    doc.text(`P/DESIGN     : ${pDesign} ( PCS/SET )`, leftMargin + 35, yPos)
+    yPos += 8
+    
+    // Flute and paper quality
+    const flute = detail.flute || ''
+    const pq1 = detail.paper_quality_1 || ''
+    const pq2 = detail.paper_quality_2 || ''
+    const pq3 = detail.paper_quality_3 || ''
+    doc.text(`B/QUALITY    : ${pq1}125  /${pq2}125  /${pq3}125  /`, leftMargin + 35, yPos)
+    yPos += 8
+    
+    // Measurement
+    const dims = detail.dimensions || {}
+    const measurement = `${dims.int_l || 460} L x  ${dims.int_w || 270} W x  ${dims.int_h || 260} H    (Int)`
+    doc.text(`MEASUREMENT  : ${measurement}`, leftMargin + 35, yPos)
+    yPos += 8
+    
+    // Roll size
+    const rollSize = detail.roll_size || '220 cm'
+    doc.text(`ROLL SIZE    : ${rollSize}`, leftMargin + 35, yPos)
+    
+    // Quantity, UOM, Price, Amount - MAXIMUM spacing to avoid overlap completely
+    const qtyText = qty.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+    // Use 0 decimals for price to make it shorter and prevent overlap
+    const priceText = price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+    const amountText = amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+    
+    // Positions: QTY(340→390), UOM(360), PRICE(410→max415), AMOUNT(480→540) = 65px gap!
+    doc.text(qtyText, leftMargin + 340, yPos - 24, { align: 'right' })      // QTY right-aligned
+    doc.text(detail.uom || 'PCS', leftMargin + 360, yPos - 24)              // UOM left-aligned
+    doc.text(priceText, leftMargin + 410, yPos - 24, { align: 'right' })    // PRICE: max width ~50px
+    doc.text(amountText, rightMargin - 5, yPos - 24, { align: 'right' })    // AMOUNT: 65px+ gap!
+    
+    yPos += 12
+    
+    // Additional details
+    const grossKg = detail.gross_kg || 0
+    const pricePerM2 = detail.price_per_m2 || 0
+    doc.text(`Sales Order KG       :  ${grossKg.toFixed(3)}`, leftMargin + 35, yPos)
+    yPos += 8
+    doc.text(`Price Per M2         :  ${pricePerM2.toFixed(3)}`, leftMargin + 35, yPos)
+    yPos += 8
+    doc.text(`Exclusive PPn 10%`, leftMargin + 35, yPos)
+    yPos += 12
+  })
+  
+  // Delivery schedule
+  doc.setFont('courier', 'bold')
+  doc.setFontSize(7)
+  doc.text('DELIVERY SCHEDULE :', leftMargin, yPos)
+  yPos += 9
+  
+  doc.text('DATE', leftMargin, yPos)
+  doc.text('MAIN', leftMargin + 85, yPos)
+  doc.text('F1', leftMargin + 120, yPos)
+  doc.text('F2', leftMargin + 145, yPos)
+  doc.text('F3', leftMargin + 170, yPos)
+  doc.text('F4', leftMargin + 195, yPos)
+  doc.text('F5', leftMargin + 220, yPos)
+  doc.text('F6', leftMargin + 245, yPos)
+  doc.text('F7', leftMargin + 270, yPos)
+  doc.text('F8', leftMargin + 295, yPos)
+  doc.text('F9', leftMargin + 320, yPos)
+  doc.text('REMARKS', leftMargin + 345, yPos)
+  yPos += 9
+  
+  doc.setFont('courier', 'normal')
+  doc.setFontSize(7)
+  schedules.forEach((schedule) => {
+    const dateStr = formatDate(schedule.schedule_date)
+    const qty = schedule.delivery_quantity || 0
+    const qtyText = qty.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+    
+    doc.text(dateStr, leftMargin, yPos)
+    doc.text(qtyText, leftMargin + 110, yPos, { align: 'right' })
+    doc.text(schedule.remark || '', leftMargin + 345, yPos)
+    yPos += 8
+  })
+  
+  yPos += 9
+  
+  // SO Remark
+  doc.setFont('courier', 'bold')
+  doc.setFontSize(7)
+  doc.text('SO Remark :', leftMargin, yPos)
+  doc.setFont('courier', 'normal')
+  doc.text(so.remark || '', leftMargin + 65, yPos)
+  yPos += 12
+  
+  // Order instructions
+  doc.setFont('courier', 'bold')
+  doc.text('ORDER INSTRUCTION :', leftMargin, yPos)
+  yPos += 9
+  doc.setFont('courier', 'normal')
+  doc.text(`1. ${so.instruction1 || 'TOL +10%'}`, leftMargin, yPos)
+  yPos += 8
+  doc.text(`2. ${so.instruction2 || 'OO'}`, leftMargin, yPos)
+  yPos += 15
+  
+  // Footer signatures
+  doc.setLineWidth(0.5)
+  doc.line(leftMargin, yPos, rightMargin, yPos)
+  yPos += 12
+  
+  doc.setFont('courier', 'bold')
+  doc.setFontSize(7)
+  doc.text('CHECKED BY : .', leftMargin, yPos)
+  doc.text('APPROVED BY : .', 300, yPos)
+  yPos += 25
+  
+  doc.setLineWidth(0.5)
+  doc.line(leftMargin, yPos, leftMargin + 150, yPos)
+  doc.line(300, yPos, 450, yPos)
+  yPos += 12
+  
+  // Print info
+  doc.setFont('courier', 'normal')
+  doc.setFontSize(7)
+  const issuedBy = currentUser.value.official_name || 'Unknown User'
+  const issuedDate = new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+  const printedBy = currentUser.value.user_id || 'guest'
+  console.log('PDF Footer - issuedBy:', issuedBy, 'printedBy:', printedBy)
+  doc.text(`ISSUED BY : ${issuedBy}      ${issuedDate}`, leftMargin, yPos)
+  yPos += 8
+  doc.text(`PRINTED BY: ${printedBy}      ${issuedDate}`, leftMargin, yPos)
+  yPos += 8
+  doc.text(`Dok. No : MBI-FM-MKT-015   Rev : 00`, leftMargin, yPos)
+  
+  doc.text('*** End of Page ***', rightMargin, yPos, { align: 'right' })
 }
 
 async function downloadExcel() {
@@ -691,10 +1023,27 @@ function formatSO(m, y, s) {
   return `${mm}-${yyyy}-${seq}`
 }
 
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return dateStr
+  return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+
 // Quick print by SO number, using data created from PrepareMCSO
 async function quickPrint() {
   if (!quick.so) return
   try {
+    // Ensure current user is loaded first
+    if (!currentUser.value.user_id || currentUser.value.user_id === '') {
+      console.log('quickPrint: User not loaded yet, fetching...')
+      await fetchCurrentUser()
+      // Wait a bit to ensure the ref is updated
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+    
+    console.log('quickPrint: Starting with user:', currentUser.value)
+    
     const res = await fetch(`/api/sales-order/${encodeURIComponent(quick.so)}/delivery-schedules`, {
       headers: { Accept: 'application/json' },
     })
@@ -709,6 +1058,11 @@ async function quickPrint() {
     const schedules = json.data.delivery_schedules || []
     preview.value = true
     previewText.value = renderSoReport(so, details, schedules)
+    
+    // Also generate PDF for quick print
+    const doc = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' })
+    renderSalesOrderPdf(doc, so, details, schedules)
+    doc.save(`SalesOrder_${quick.so}.pdf`)
   } catch (e) {
     preview.value = true
     previewText.value = `Error fetching SO ${quick.so}: ${e?.message || e}`
@@ -718,43 +1072,120 @@ async function quickPrint() {
 function renderSoReport(so, details, schedules) {
   const lines = []
   const pad = (t, n) => String(t ?? '').padEnd(n)
-  const num = (v) => (v == null ? '' : Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
+  const padL = (t, n) => String(t ?? '').padStart(n)
+  const num = (v, decimals = 2) => {
+    if (v == null) return ''
+    return Number(v).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+  }
 
-  lines.push('PT. MULTIBOX INDAH'.padEnd(60) + `S/ORDER#: ${so.so_number || ''}`)
-  lines.push('SALES ORDER'.padEnd(60) + `S/O DATE : ${so.po_date || ''}`)
-  lines.push('-'.repeat(100))
-  lines.push(`CUSTOMER: ${so.customer_name || so.customer_code}`)
-  lines.push(`ADDRESS : ${so.customer_address || ''}`)
-  lines.push('')
-  lines.push(`P/ORDER  : ${so.customer_po_number || ''}    CURRENCY : ${so.currency || ''}`)
-  lines.push(`M/CARD SEQ: ${so.master_card_seq || ''}        PAYMENT TERM : ${so.credit_terms || ''}`)
-  lines.push(`MODEL    : ${so.master_card_model || ''}`)
-  lines.push('-'.repeat(100))
-  lines.push(pad('TYPE', 15) + pad('DESCRIPTION', 35) + pad('QUANTITY', 12) + pad('UOM', 6) + pad('UNIT PRICE', 12) + pad('AMOUNT', 12))
-  lines.push('-'.repeat(100))
-  details.forEach((d) => {
-    lines.push(
-      pad('Main', 15) +
-        pad(d.item_description || d.item_code || '', 35) +
-        pad(num(d.order_quantity), 12) +
-        pad(d.uom || 'PCS', 6) +
-        pad(num(d.unit_price), 12) +
-        pad(num((Number(d.order_quantity) || 0) * (Number(d.unit_price) || 0)), 12)
-    )
+  // Header
+  lines.push(pad('PT. MULTIBOX INDAH', 60) + `S/ORDER# : ${so.so_number || ''}`)
+  lines.push(pad('SALES ORDER', 60) + `S/O DATE : ${formatDate(so.po_date) || ''}`)
+  
+  const creditDate = new Date().toLocaleString('en-GB', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit'
   })
+  const userId = currentUser.value.user_id || 'guest'
+  console.log('Text Report - Using userId:', userId, 'from currentUser:', currentUser.value)
+  lines.push(`Credit Control: System Approved    , ${creditDate}, ${userId}` + padL('PAGE NO : 1', 20))
+  lines.push('-'.repeat(100))
+  
+  // Customer section
+  lines.push('CUSTOMER:' + pad('', 51) + 'DELIVER TO:')
+  lines.push(pad(so.customer_name || '', 60) + (so.delivery_location || so.customer_name || ''))
+  
+  const addressLines = (so.customer_address || '').split(',').map(s => s.trim())
+  const deliveryLines = (so.delivery_address || so.customer_address || '').split(',').map(s => s.trim())
+  const maxLines = Math.max(addressLines.length, deliveryLines.length)
+  
+  for (let i = 0; i < maxLines && i < 3; i++) {
+    lines.push(pad(addressLines[i] || '', 60) + (deliveryLines[i] || ''))
+  }
+  
   lines.push('')
-  lines.push('DELIVERY SCHEDULE:')
-  lines.push(pad('DATE', 14) + pad('MAIN', 10) + 'REMARKS')
+  lines.push(`TEL :` + pad('', 55) + 'TEL :')
+  lines.push(`FAX :` + pad('', 55) + 'FAX :')
+  lines.push(`EMAIL :` + pad('', 53) + 'EMAIL :')
+  lines.push('-'.repeat(100))
+  
+  // Order info
+  lines.push(`P/ORDER      : ${pad(so.customer_po_number || '', 40)}P/ORDER DATE : ${formatDate(so.po_date) || ''}`)
+  lines.push(`ACCOUNT NO   : ${pad(so.customer_code || '', 40)}CURRENCY     : ${so.currency || 'IDR'}`)
+  lines.push(`M/CARD SEQ# : ${pad(so.master_card_seq || '', 41)}PAYMENT TERM : ${so.credit_terms || '30 DAYS'}`)
+  lines.push(`MODEL        : ${pad(so.master_card_model || '', 40)}PRINT. BLOCK#: 62`)
+  lines.push('-'.repeat(100))
+  
+  // Table header
+  lines.push(pad('TYPE', 15) + pad('DESCRIPTION', 35) + pad('QUANTITY', 12) + pad('UOM', 8) + pad('UNIT PRICE', 14) + 'AMOUNT')
+  lines.push('-'.repeat(100))
+  
+  // Details
+  details.forEach((detail) => {
+    const qty = detail.order_quantity || 0
+    const price = detail.unit_price || 0
+    const amount = qty * price
+    
+    lines.push(pad('Main', 15) + pad(`PART NO      : ${so.part_number || ''}`, 35) + padL(num(qty, 0), 12) + pad(detail.uom || 'PCS', 8) + padL(num(price, 4), 14) + padL(num(amount, 2), 15))
+    lines.push(pad('', 15) + `P/DESIGN     : ${detail.item_code || ''} ( PCS/SET )`)
+    
+    const flute = detail.flute || ''
+    const pq1 = detail.paper_quality_1 || ''
+    const pq2 = detail.paper_quality_2 || ''
+    const pq3 = detail.paper_quality_3 || ''
+    lines.push(pad('', 15) + `B/QUALITY    : ${pq1}125  /${pq2}125  /${pq3}125  /                      BF`)
+    
+    const dims = detail.dimensions || {}
+    const measurement = `${dims.int_l || 460} L x  ${dims.int_w || 270} W x  ${dims.int_h || 260} H    (Int)`
+    lines.push(pad('', 15) + `MEASUREMENT  : ${measurement}`)
+    lines.push(pad('', 15) + `ROLL SIZE    : ${detail.roll_size || '220 cm'}`)
+    lines.push('')
+    lines.push(pad('', 15) + `Sales Order KG       :  ${num(detail.gross_kg || 0, 3)}`)
+    lines.push(pad('', 15) + `Price Per M2         :  ${num(detail.price_per_m2 || 0, 3)}`)
+    lines.push(pad('', 15) + `Exclusive PPn 10%`)
+  })
+  
+  lines.push('')
+  
+  // Delivery schedule
+  lines.push('DELIVERY SCHEDULE :')
+  lines.push(pad('DATE', 14) + pad('MAIN', 10) + pad('F1', 6) + pad('F2', 6) + pad('F3', 6) + pad('F4', 6) + pad('F5', 6) + pad('F6', 6) + pad('F7', 6) + pad('F8', 6) + pad('F9', 6) + 'REMARKS')
+  
   schedules.forEach((s) => {
-    const date = (s.schedule_date || '').toString()
-    lines.push(pad(date, 14) + pad(String(s.delivery_quantity || ''), 10) + (s.remark || ''))
+    const dateStr = formatDate(s.schedule_date)
+    const qtyText = padL(num(s.delivery_quantity || 0, 0), 8)
+    lines.push(pad(dateStr, 14) + pad(qtyText, 10) + (s.remark || ''))
   })
+  
   lines.push('')
   lines.push('SO Remark : ' + (so.remark || ''))
   lines.push('')
   lines.push('ORDER INSTRUCTION :')
-  lines.push((so.instruction1 || '').toString())
-  lines.push((so.instruction2 || '').toString())
+  lines.push(`1. ${so.instruction1 || 'TOL +10%'}`)
+  lines.push(`2. ${so.instruction2 || 'OO'}`)
+  lines.push('')
+  lines.push('-'.repeat(100))
+  lines.push('CHECKED BY : .' + pad('', 40) + 'APPROVED BY : .')
+  lines.push('')
+  lines.push('_________________________' + pad('', 30) + '_________________________')
+  lines.push('')
+  
+  const issuedDate = new Date().toLocaleString('en-GB', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit'
+  })
+  const issuedBy = currentUser.value.official_name || 'Unknown User'
+  const printedBy = currentUser.value.user_id || 'guest'
+  lines.push(`ISSUED BY : ${issuedBy}      ${issuedDate}`)
+  lines.push(`PRINTED BY: ${printedBy}      ${issuedDate}`)
+  lines.push(`Dok. No : MBI-FM-MKT-015   Rev : 00` + pad('', 30) + '*** End of Page ***')
+  
   return lines.join('\n')
 }
 </script>

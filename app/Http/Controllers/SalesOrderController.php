@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Customer;
 use App\Models\Salesperson;
 
@@ -51,10 +52,28 @@ class SalesOrderController extends Controller
             $salesTax = in_array($upper, ['Y', 'YES', 'Y-YES', 'TRUE'], true) ? 'Y' : 'N';
         }
 
-        // Generate a dummy SO number: e.g., SO-YYYYMMDD-XXXX
-        $datePart = date('Ymd');
-        $randPart = str_pad((string) random_int(1, 9999), 4, '0', STR_PAD_LEFT);
-        $soNumber = 'SO-' . $datePart . '-' . $randPart;
+        // Generate SO number in format: MM-YYYY-XXXXX (matching the filter format)
+        $month = date('m');
+        $year = date('Y');
+        
+        // Get the last SO number for this period
+        $lastSO = DB::table('so')
+            ->where('MM', $month)
+            ->where('YYYY', $year)
+            ->orderBy('SO_Num', 'desc')
+            ->first();
+        
+        $sequence = 1;
+        if ($lastSO && $lastSO->SO_Num) {
+            // Extract sequence from format MM-YYYY-XXXXX
+            $parts = explode('-', $lastSO->SO_Num);
+            if (count($parts) === 3) {
+                $sequence = intval($parts[2]) + 1;
+            }
+        }
+        
+        $seqPart = str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
+        $soNumber = $month . '-' . $year . '-' . $seqPart;
 
         // Fetch customer data from database
         $customerData = DB::table('CUSTOMER')->where('CODE', $validated['customer_code'])->first();
@@ -296,7 +315,119 @@ class SalesOrderController extends Controller
 
     public function getDeliverySchedules(string $soNumber): JsonResponse
     {
-        return response()->json(['message' => 'getDeliverySchedules not yet implemented', 'soNumber' => $soNumber], 200);
+        // Clean any output buffers to prevent BOM issues
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        // Get sales order from SO table
+        $so = DB::table('so')->where('SO_Num', $soNumber)->first();
+        
+        if (!$so) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sales Order not found'
+            ], 404);
+        }
+
+        // Extract delivery schedules from D_DATE_1..10, D_QTY_1..10, etc.
+        $schedules = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $dateCol = $i === 10 ? 'D_DATE10' : 'D_DATE_' . $i;
+            $timeCol = $i === 10 ? 'D_TIME10' : 'D_TIME_' . $i;
+            $dueCol  = $i === 10 ? 'D_DUE10'  : 'D_DUE_' . $i;
+            $qtyCol  = $i === 10 ? 'D_QTY_10' : 'D_QTY_' . $i;
+            
+            $date = $so->$dateCol ?? '';
+            $time = $so->$timeCol ?? '';
+            $due = $so->$dueCol ?? '';
+            $qty = $so->$qtyCol ?? 0;
+            
+            if ($date || $qty > 0) {
+                $schedules[] = [
+                    'schedule_date' => $date,
+                    'schedule_time' => $time,
+                    'delivery_quantity' => (float) $qty,
+                    'due_status' => $due,
+                    'remark' => ''
+                ];
+            }
+        }
+
+        // Get customer address
+        $customer = DB::table('CUSTOMER')->where('CODE', $so->AC_Num)->first();
+        $customerAddress = '';
+        if ($customer) {
+            $addressParts = array_filter([
+                $customer->ADDRESS1 ?? '',
+                $customer->ADDRESS2 ?? '',
+                $customer->ADDRESS3 ?? ''
+            ]);
+            $customerAddress = implode(', ', $addressParts);
+        }
+
+        // Get delivery address
+        $deliveryAddress = '';
+        if ($so->DELIVERY_TO) {
+            $addressParts = array_filter([
+                $so->DELIVERY_ADD_1 ?? '',
+                $so->DELIVERY_ADD_2 ?? '',
+                $so->DELIVERY_ADD_3 ?? ''
+            ]);
+            $deliveryAddress = implode(', ', $addressParts);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'sales_order' => [
+                    'so_number' => $so->SO_Num,
+                    'customer_code' => $so->AC_Num,
+                    'customer_name' => $so->AC_NAME,
+                    'customer_address' => $customerAddress,
+                    'customer_po_number' => $so->PO_Num,
+                    'po_date' => $so->PO_DATE,
+                    'master_card_seq' => $so->MCS_Num,
+                    'master_card_model' => $so->MODEL,
+                    'part_number' => $so->PART_NUMBER,
+                    'p_design' => $so->P_DESIGN,
+                    'currency' => $so->CURR,
+                    'credit_terms' => '',
+                    'remark' => $so->SO_REMARK,
+                    'instruction1' => $so->SO_INSTRUCTION_1,
+                    'instruction2' => $so->SO_INSTRUCTION_2,
+                    'status' => $so->STS,
+                    'delivery_location' => $so->DELIVERY_TO,
+                    'delivery_address' => $deliveryAddress,
+                    'details' => [[
+                        'item_code' => $so->PRODUCT,
+                        'item_description' => $so->MODEL . ' - ' . $so->P_DESIGN,
+                        'order_quantity' => (float) $so->SO_QTY,
+                        'unit_price' => (float) $so->UNIT_PRICE,
+                        'uom' => $so->UNIT,
+                        'flute' => $so->FLUTE,
+                        'paper_quality_1' => $so->PQ1,
+                        'paper_quality_2' => $so->PQ2,
+                        'paper_quality_3' => $so->PQ3,
+                        'dimensions' => [
+                            'int_l' => (float) $so->INT_L,
+                            'int_w' => (float) $so->INT_W,
+                            'int_h' => (float) $so->INT_H,
+                            'ext_l' => (float) $so->EXT_L,
+                            'ext_w' => (float) $so->EXT_W,
+                            'ext_h' => (float) $so->EXT_H,
+                        ],
+                        'measurement' => $so->P_DESIGN,
+                        'roll_size' => '',
+                        'gross_kg' => (float) $so->MC_GROSS_KG_PER_PCS,
+                        'price_per_m2' => 0,
+                        'ppn_percentage' => 0,
+                        'line_total' => (float) $so->AMOUNT
+                    ]]
+                ],
+                'delivery_schedules' => $schedules
+            ]
+        ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
     }
 
     public function getDeliveryScheduleSummary(string $soNumber): JsonResponse
@@ -366,7 +497,33 @@ class SalesOrderController extends Controller
             'so_number' => 'nullable|string'
         ]);
 
-        $soNumber = $validated['so_number'] ?? ('SO-' . date('Ymd') . '-' . str_pad((string) random_int(1, 9999), 4, '0', STR_PAD_LEFT));
+        // Generate SO number in format: MM-YYYY-XXXXX (if not provided)
+        if (!isset($validated['so_number'])) {
+            $month = date('m');
+            $year = date('Y');
+            
+            // Get the last SO number for this period
+            $lastSO = DB::table('so')
+                ->where('MM', $month)
+                ->where('YYYY', $year)
+                ->orderBy('SO_Num', 'desc')
+                ->first();
+            
+            $sequence = 1;
+            if ($lastSO && $lastSO->SO_Num) {
+                // Extract sequence from format MM-YYYY-XXXXX
+                $parts = explode('-', $lastSO->SO_Num);
+                if (count($parts) === 3) {
+                    $sequence = intval($parts[2]) + 1;
+                }
+            }
+            
+            $seqPart = str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
+            $soNumber = $month . '-' . $year . '-' . $seqPart;
+        } else {
+            $soNumber = $validated['so_number'];
+        }
+        
         $qty = (float) ($validated['details'][0]['order_quantity'] ?? 0);
         $price = (float) ($validated['details'][0]['unit_price'] ?? 0);
         $amount = $qty * $price;
@@ -474,6 +631,97 @@ class SalesOrderController extends Controller
 
     public function getSalesOrders(Request $request): JsonResponse
     {
-        return response()->json(['message' => 'getSalesOrders not yet implemented'], 200);
+        Log::info('getSalesOrders called with params:', $request->all());
+        
+        $query = DB::table('so');
+
+        // Filter by month and year
+        if ($request->has('month') && $request->has('year')) {
+            $month = str_pad($request->input('month'), 2, '0', STR_PAD_LEFT);
+            $year = $request->input('year');
+            Log::info('Filtering by month/year:', ['month' => $month, 'year' => $year]);
+            $query->where('MM', $month)
+                  ->where('YYYY', $year);
+        }
+
+        // Filter by SO number range - Support both old and new format
+        if ($request->has('from_so') && $request->has('to_so')) {
+            $fromSO = $request->input('from_so');
+            $toSO = $request->input('to_so');
+            
+            Log::info('Filtering SO range:', ['from_so' => $fromSO, 'to_so' => $toSO]);
+            
+            // Check if we need to support old format (SO-YYYYMMDD-XXXX)
+            // For backward compatibility, also search old format
+            $query->where(function($q) use ($fromSO, $toSO) {
+                // New format: MM-YYYY-XXXXX
+                $q->whereBetween('SO_Num', [$fromSO, $toSO]);
+                
+                // Old format: SO-YYYYMMDD-XXXX (always include for backward compatibility)
+                $q->orWhere('SO_Num', 'like', 'SO-%');
+            });
+        }
+
+        // Filter by status
+        if ($request->has('status')) {
+            $statuses = $request->input('status');
+            Log::info('Filtering by status:', ['status' => $statuses]);
+            if (is_array($statuses) && !empty($statuses)) {
+                $statusMap = [
+                    'outstanding' => 'OPEN',
+                    'partial' => 'PARTIAL',
+                    'completed' => 'COMPLETED',
+                    'closed' => 'CLOSED',
+                    'cancelled' => 'CANCELLED'
+                ];
+                $dbStatuses = [];
+                foreach ($statuses as $status) {
+                    if (isset($statusMap[$status])) {
+                        $dbStatuses[] = $statusMap[$status];
+                    }
+                }
+                if (!empty($dbStatuses)) {
+                    Log::info('Mapped DB statuses:', ['dbStatuses' => $dbStatuses]);
+                    $query->whereIn('STS', $dbStatuses);
+                }
+            }
+        }
+
+        // Get SQL query for debugging
+        $sql = $query->toSql();
+        $bindings = $query->getBindings();
+        Log::info('SQL Query:', ['sql' => $sql, 'bindings' => $bindings]);
+
+        $salesOrders = $query->orderBy('SO_Num', 'desc')
+                            ->limit(100)
+                            ->get();
+
+        Log::info('Query result count:', ['count' => $salesOrders->count()]);
+        if ($salesOrders->count() > 0) {
+            Log::info('First result:', ['first' => $salesOrders->first()]);
+            Log::info('Last result:', ['last' => $salesOrders->last()]);
+        } else {
+            Log::warning('No sales orders found with current filters');
+            
+            // Check if there are any records in the table at all
+            $totalCount = DB::table('so')->count();
+            Log::info('Total SO records in database:', ['total' => $totalCount]);
+            
+            if ($totalCount > 0) {
+                // Get some sample records
+                $samples = DB::table('so')->limit(5)->get(['SO_Num', 'MM', 'YYYY', 'STS']);
+                Log::info('Sample SO records:', ['samples' => $samples]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $salesOrders,
+            'debug' => [
+                'sql' => $sql,
+                'bindings' => $bindings,
+                'count' => $salesOrders->count()
+            ]
+        ]);
     }
 }
