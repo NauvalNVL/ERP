@@ -1,6 +1,7 @@
 <template>
-  <div v-if="show" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-3/4 max-w-4xl mx-auto">
+  <Teleport to="body">
+    <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style="z-index: 99999 !important; position: fixed !important;">
+      <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-3/4 max-w-4xl mx-auto relative" style="z-index: 100000 !important;">
       <!-- Modal Header -->
       <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
         <h3 class="text-xl font-semibold flex items-center">
@@ -101,7 +102,6 @@
         <button type="button" @click="$emit('close')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">Exit</button>
       </div>
     </div>
-  </div>
 
     <!-- Customer Account Zoom Modal -->
     <CustomerAccountZoomModal
@@ -109,6 +109,8 @@
         @close="showCustomerAccountZoomModal = false"
         :customerAccountData="selectedAccount"
     />
+  </div>
+  </Teleport>
 </template>
 
 <script>

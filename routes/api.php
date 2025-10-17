@@ -1,8 +1,9 @@
-﻿<?php
+<?php
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\StandardFormulaController;
 use App\Http\Controllers\SOConfigController;
 use App\Http\Controllers\UpdateCustomerAccountController;
@@ -42,6 +43,7 @@ use App\Http\Controllers\CustomerWarehouseRequirementController;
 use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\DeliveryOrderController;
+use App\Http\Controllers\WarehouseManagement\Invoice\InvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -154,6 +156,59 @@ Route::get('/products', [ProductController::class, 'getProductsJson']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+// Invoice preparation endpoints (current-period DO listing + prepare)
+Route::prefix('invoices')->group(function () {
+    Route::get('/current-period-do', [InvoiceController::class, 'currentPeriodDo']);
+    Route::post('/prepare', [InvoiceController::class, 'prepare']);
+    Route::get('/customer-details', [InvoiceController::class, 'getCustomerDetails']);
+    Route::get('/sales-tax-options', [InvoiceController::class, 'getSalesTaxOptions']);
+    Route::post('/cancel', [InvoiceController::class, 'cancelInvoice']);
+    Route::get('/log', [InvoiceController::class, 'getInvoiceLog']);
+    Route::post('/calculate-total', [InvoiceController::class, 'calculateTotal']);
+    Route::get('/do-items', [InvoiceController::class, 'getDoItems']);
+});
+
+// Debug endpoint to check customer tables
+Route::get('/debug/customer-tables', function() {
+    try {
+        $tables = ['CUSTOMER', 'Customer_Account', 'customer_account', 'update_customer_accounts'];
+        $result = [];
+        
+        foreach ($tables as $table) {
+            try {
+                $count = DB::table($table)->count();
+                $sample = DB::table($table)->first();
+                $result[$table] = [
+                    'exists' => true,
+                    'count' => $count,
+                    'columns' => $sample ? array_keys((array)$sample) : [],
+                    'sample' => $sample
+                ];
+            } catch (\Exception $e) {
+                $result[$table] = [
+                    'exists' => false,
+                    'error' => $e->getMessage()
+                ];
+            }
+        }
+        
+        // Try to find specific customer
+        try {
+            $testCustomer = DB::table('CUSTOMER')->where('CODE', '000283')->first();
+            $result['test_query'] = [
+                'found' => $testCustomer ? true : false,
+                'data' => $testCustomer
+            ];
+        } catch (\Exception $e) {
+            $result['test_query'] = ['error' => $e->getMessage()];
+        }
+        
+        return response()->json($result);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
 });
 
 // Customer Accounts API routes for status change

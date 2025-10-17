@@ -673,6 +673,16 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('warehouse-management/DebitCreditNote/index');
     })->name('vue.warehouse-management.debit-credit-note');
 
+    // Warehouse Management - Invoice - IV Processing - Prepare by DO (Current Period)
+    Route::get('/warehouse-management/invoice/iv-processing/prepare-by-do-current-period', function () {
+        return Inertia::render('warehouse-management/Invoice/IVProcessing/PrepareInvoicebyDOCurrentPeriod');
+    })->name('vue.warehouse-management.invoice.iv-processing.prepare-by-do-current-period');
+
+    // Backward-compatibility alias (old menu path)
+    Route::get('/warehouse-management/invoice/iv-processing/prepare-do-current', function () {
+        return redirect()->route('vue.warehouse-management.invoice.iv-processing.prepare-by-do-current-period');
+    });
+
     Route::get('/warehouse-management/warehouse-analysis', function () {
         return Inertia::render('warehouse-management/WarehouseAnalysis/index');
     })->name('vue.warehouse-management.warehouse-analysis');
