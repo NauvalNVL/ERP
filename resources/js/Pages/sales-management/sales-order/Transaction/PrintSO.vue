@@ -399,26 +399,42 @@ function closeSalesOrderModal() {
 
 async function proceedPrint() {
   printer.open = false
-  // Compose payload similar to desktop filters
-  const payload = {
-    period: `${form.period.month} ${form.period.year}`,
-    range: {
-      from: formatSO(form.from.month, form.from.year, form.from.seq || '0'),
-      to: formatSO(form.to.month, form.to.year, form.to.seq || '99999'),
-    },
-    copies: form.copies,
-    status: Object.keys(form.status).filter(k => form.status[k]),
-    printer: { code: printer.code, user: printer.user },
-  }
+  
+  try {
+    // Compose payload similar to desktop filters
+    const payload = {
+      period: `${form.period.month} ${form.period.year}`,
+      range: {
+        from: form.from.seq || formatSO(form.from.month, form.from.year, '00001'),
+        to: form.to.seq || formatSO(form.to.month, form.to.year, '99999'),
+      },
+      copies: form.copies,
+      status: Object.keys(form.status).filter(k => form.status[k]),
+      printer: { code: printer.code, user: printer.user },
+    }
 
-  const res = await fetch('/api/so-report', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify(payload),
-  })
-  const json = await res.json()
-  preview.value = true
-  previewText.value = await formatPreview(json)
+    console.log('Proceed print payload:', payload)
+
+    const res = await fetch('/api/so-report', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json', 
+        'Accept': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+      },
+      body: JSON.stringify(payload),
+    })
+    
+    const json = await res.json()
+    console.log('SO report response:', json)
+    
+    preview.value = true
+    previewText.value = await formatPreview(json)
+  } catch (error) {
+    console.error('Error in proceedPrint:', error)
+    preview.value = true
+    previewText.value = 'Error generating report: ' + (error.message || error)
+  }
 }
 
 async function formatPreview(data) {
@@ -430,39 +446,81 @@ async function formatPreview(data) {
   lines.push(''.padEnd(80, '-'))
   
   // Report Information
+  const fromRange = form.from.seq || formatSO(form.from.month, form.from.year, '00001')
+  const toRange = form.to.seq || formatSO(form.to.month, form.to.year, '99999')
+  
   lines.push(`Period: ${form.period.month}/${form.period.year}`)
-  lines.push(`Range: ${formatSO(form.from.month, form.from.year, form.from.seq || '0')} to ${formatSO(form.to.month, form.to.year, form.to.seq || '99999')}`)
+  lines.push(`Range: ${fromRange} to ${toRange}`)
   lines.push(`Status: ${Object.keys(form.status).filter(k => form.status[k]).join(', ').toUpperCase()}`)
   lines.push(`Printer: ${printer.code} | User: ${printer.user}`)
   lines.push('')
   
-  // Fetch real sales orders data
-  const salesOrdersData = await fetchSalesOrdersData()
+  // Use data from API response if available, otherwise fetch fresh data
+  let salesOrdersData
+  if (data && data.success && data.data && data.data.sales_orders) {
+    // Use data from API response
+    const salesOrders = data.data.sales_orders
+    salesOrdersData = [
+      ['SO#', 'Customer PO#', 'Customer', 'Status', 'Amount', 'Date']
+    ]
+    
+    if (salesOrders.length > 0) {
+      salesOrders.forEach(order => {
+        salesOrdersData.push([
+          order.SO_Num || '',
+          order.PO_Num || '',
+          order.AC_NAME || '',
+          order.STS || 'OPEN',
+          order.AMOUNT ? `Rp ${Number(order.AMOUNT).toLocaleString('id-ID')}` : 'Rp 0',
+          order.SO_DMY || order.PO_DATE || ''
+        ])
+      })
+    } else {
+      salesOrdersData.push(['No sales orders found for the selected criteria', '', '', '', '', ''])
+    }
+  } else {
+    // Fallback: fetch fresh data
+    salesOrdersData = await fetchSalesOrdersData()
+  }
   
   // Create table header
   const headerRow = salesOrdersData[0]
   lines.push(headerRow.map((col, index) => {
     const widths = [12, 15, 30, 12, 15, 12] // Column widths
-    return col.padEnd(widths[index])
+    return String(col).padEnd(widths[index])
   }).join(' | '))
-  lines.push(''.padEnd(80, '-'))
+  lines.push(''.padEnd(100, '-'))
   
   // Create table rows
   salesOrdersData.slice(1).forEach(row => {
     lines.push(row.map((col, index) => {
       const widths = [12, 15, 30, 12, 15, 12] // Column widths
-      return col.padEnd(widths[index])
+      return String(col).padEnd(widths[index])
     }).join(' | '))
   })
   
   lines.push('')
   
   // Summary Section
+  const dataRows = salesOrdersData.slice(1)
+  const totalOrders = dataRows.length
+  
   lines.push('SUMMARY')
-  lines.push(`Total Sales Orders: ${salesOrdersData.length - 1}`)
-  lines.push(`Outstanding: ${salesOrdersData.filter(row => row[3] === 'Outstanding').length}`)
-  lines.push(`Partial: ${salesOrdersData.filter(row => row[3] === 'Partial').length}`)
-  lines.push(`Completed: ${salesOrdersData.filter(row => row[3] === 'Completed').length}`)
+  lines.push(`Total Sales Orders: ${totalOrders}`)
+  
+  if (data && data.data && data.data.summary) {
+    const summary = data.data.summary
+    lines.push(`Outstanding: ${summary.outstanding || 0}`)
+    lines.push(`Partial: ${summary.partial || 0}`)
+    lines.push(`Completed: ${summary.completed || 0}`)
+    lines.push(`Closed: ${summary.closed || 0}`)
+    lines.push(`Cancelled: ${summary.cancelled || 0}`)
+  } else {
+    lines.push(`Outstanding: ${dataRows.filter(row => row[3] === 'OPEN').length}`)
+    lines.push(`Partial: ${dataRows.filter(row => row[3] === 'PARTIAL').length}`)
+    lines.push(`Completed: ${dataRows.filter(row => row[3] === 'COMPLETED').length}`)
+  }
+  
   lines.push('')
   
   // Footer
@@ -474,32 +532,45 @@ async function formatPreview(data) {
 
 async function fetchSalesOrdersData() {
   try {
-    const response = await axios.get('/api/sales-orders', {
-      params: {
-        month: form.period.month,
-        year: form.period.year,
-        from_so: formatSO(form.from.month, form.from.year, form.from.seq || '0'),
-        to_so: formatSO(form.to.month, form.to.year, form.to.seq || '99999'),
-        status: Object.keys(form.status).filter(k => form.status[k])
-      }
-    })
+    // Prepare parameters
+    const params = {
+      month: form.period.month,
+      year: form.period.year,
+      status: Object.keys(form.status).filter(k => form.status[k])
+    }
     
-    if (response.data.success) {
+    // Add SO range if specified
+    if (form.from.seq || form.to.seq) {
+      params.from_so = form.from.seq || formatSO(form.from.month, form.from.year, '00001')
+      params.to_so = form.to.seq || formatSO(form.to.month, form.to.year, '99999')
+    }
+    
+    console.log('Fetching sales orders with params:', params)
+    
+    const response = await axios.get('/api/sales-orders', { params })
+    
+    console.log('Sales orders response:', response.data)
+    
+    if (response.data.success && response.data.data) {
       const salesOrders = response.data.data
       const tableData = [
         ['SO#', 'Customer PO#', 'Customer', 'Status', 'Amount', 'Date']
       ]
       
-      salesOrders.forEach(order => {
-        tableData.push([
-          order.SO_Num || order.so_number || '',
-          order.PO_Num || order.customer_po_number || '',
-          order.AC_NAME || order.customer_name || '',
-          order.STS || order.status || 'Draft',
-          `Rp ${(order.AMOUNT || order.total_amount || 0).toLocaleString('id-ID')}`,
-          order.SO_DMY || order.po_date || ''
-        ])
-      })
+      if (salesOrders.length > 0) {
+        salesOrders.forEach(order => {
+          tableData.push([
+            order.SO_Num || '',
+            order.PO_Num || '',
+            order.AC_NAME || '',
+            order.STS || 'OPEN',
+            order.AMOUNT ? `Rp ${Number(order.AMOUNT).toLocaleString('id-ID')}` : 'Rp 0',
+            order.SO_DMY || order.PO_DATE || ''
+          ])
+        })
+      } else {
+        tableData.push(['No sales orders found for the selected criteria', '', '', '', '', ''])
+      }
       
       return tableData
     } else {
@@ -514,136 +585,251 @@ async function fetchSalesOrdersData() {
     // Fallback to empty data
     return [
       ['SO#', 'Customer PO#', 'Customer', 'Status', 'Amount', 'Date'],
-      ['Error loading data', '', '', '', '', '']
+      ['Error loading data: ' + (error.response?.data?.message || error.message), '', '', '', '', '']
     ]
   }
 }
 
 async function downloadPdf() {
-  const doc = new jsPDF({ unit: 'pt', format: 'a4' })
+  try {
+    // Fetch sales orders data first
+    const salesOrdersData = await fetchSalesOrdersData()
+    
+    if (salesOrdersData.length <= 1) {
+      alert('No sales orders found for the selected criteria')
+      return
+    }
+    
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' })
+    const pageWidth = doc.internal.pageSize.width
+    const pageHeight = doc.internal.pageSize.height
+    
+    // Process each sales order (skip header row)
+    const salesOrders = salesOrdersData.slice(1)
+    let pageCount = 0
+    
+    for (let i = 0; i < salesOrders.length; i++) {
+      const orderRow = salesOrders[i]
+      const soNumber = orderRow[0]
+      
+      // Skip if no SO number
+      if (!soNumber || soNumber === 'No sales orders found for the selected criteria' || soNumber === 'Error loading data') {
+        continue
+      }
+      
+      if (pageCount > 0) {
+        doc.addPage()
+      }
+      pageCount++
+      
+      // Fetch detailed SO data
+      let soDetails = null
+      try {
+        const response = await fetch(`/api/sales-order/${encodeURIComponent(soNumber)}/delivery-schedules`)
+        const json = await response.json()
+        if (json.success) {
+          soDetails = json.data
+        }
+      } catch (error) {
+        console.error('Error fetching SO details:', error)
+      }
+      
+      // Generate individual SO format
+      await generateIndividualSO(doc, soDetails || {
+        sales_order: {
+          so_number: orderRow[0],
+          customer_po_number: orderRow[1],
+          customer_name: orderRow[2],
+          status: orderRow[3],
+          total_amount: orderRow[4],
+          po_date: orderRow[5]
+        },
+        delivery_schedules: []
+      }, printer)
+    }
+    
+    // Check if any valid SO was processed
+    if (pageCount === 0) {
+      alert('No valid sales orders found to generate PDF')
+      return
+    }
+    
+    // Save the PDF
+    const fromRange = form.from.seq || formatSO(form.from.month, form.from.year, '00001')
+    const toRange = form.to.seq || formatSO(form.to.month, form.to.year, '99999')
+    const fileName = pageCount === 1 ? 
+      `SO_${salesOrders.find(row => row[0] && !row[0].includes('No sales orders') && !row[0].includes('Error'))?.[0] || 'Unknown'}.pdf` : 
+      `SO_${fromRange}_to_${toRange}.pdf`
+    
+    doc.save(fileName)
+  } catch (error) {
+    console.error('Error generating PDF:', error)
+    console.error('Error stack:', error.stack)
+    alert('Error generating PDF: ' + (error.message || error.toString()))
+  }
+}
+
+async function generateIndividualSO(doc, soData, printerInfo) {
+  const so = soData.sales_order || {}
+  const schedules = soData.delivery_schedules || []
   
-  // Set up fonts and colors
+  // Get page dimensions
+  const pageWidth = doc.internal.pageSize.width
+  const pageHeight = doc.internal.pageSize.height
+  
+  // Set up fonts
   doc.setFont('helvetica', 'normal')
   
   // Header Section
-  doc.setFontSize(20)
-  doc.setTextColor(0, 0, 0)
-  doc.text('PT. MULTIBOX INDAH', 50, 50)
-  
   doc.setFontSize(16)
-  doc.setTextColor(0, 100, 200)
-  doc.text('SALES ORDER REPORT', 50, 70)
+  doc.setTextColor(0, 0, 0)
+  doc.text('PT. MULTIBOX INDAH', 50, 40)
+  doc.text('SALES ORDER', 50, 60)
   
-  // Line separator
-  doc.setDrawColor(0, 100, 200)
-  doc.setLineWidth(2)
+  // SO Info (right side)
+  doc.setFontSize(10)
+  doc.text(`S/ORDER# : ${so.so_number || ''}`, 400, 40)
+  doc.text(`S/O DATE : ${so.po_date || ''}`, 400, 55)
+  doc.text('PAGE NO  : 1', 400, 70)
+  
+  // Separator line
+  doc.setDrawColor(0, 0, 0)
+  doc.setLineWidth(1)
   doc.line(50, 80, 550, 80)
   
-  // Report Information
-  doc.setFontSize(10)
-  doc.setTextColor(0, 0, 0)
-  doc.text(`Period: ${form.period.month}/${form.period.year}`, 50, 100)
-  doc.text(`Range: ${formatSO(form.from.month, form.from.year, form.from.seq || '0')} to ${formatSO(form.to.month, form.to.year, form.to.seq || '99999')}`, 50, 115)
-  doc.text(`Status: ${Object.keys(form.status).filter(k => form.status[k]).join(', ').toUpperCase()}`, 50, 130)
-  doc.text(`Printer: ${printer.code} | User: ${printer.user}`, 50, 145)
+  let currentY = 100
   
-  // Fetch real sales orders data
-  const salesOrdersData = await fetchSalesOrdersData()
+  // Customer Information Section
+  doc.setFontSize(9)
+  doc.text('CUSTOMER:', 50, currentY)
+  doc.text('DELIVER TO:', 300, currentY)
   
-  // Create table using jspdf-autotable
-  autoTable(doc, {
-    head: [salesOrdersData[0]],
-    body: salesOrdersData.slice(1),
-    startY: 170,
-    styles: {
-      fontSize: 8,
-      cellPadding: 3,
-      overflow: 'linebreak',
-      halign: 'left'
-    },
-    headStyles: {
-      fillColor: [0, 100, 200],
-      textColor: 255,
-      fontStyle: 'bold',
-      fontSize: 8
-    },
-    alternateRowStyles: {
-      fillColor: [245, 245, 245]
-    },
-    columnStyles: {
-      0: { halign: 'center', cellWidth: 60 }, // SO#
-      1: { cellWidth: 100 }, // Customer PO#
-      2: { cellWidth: 120 }, // Customer
-      3: { halign: 'center', cellWidth: 50 }, // Status
-      4: { halign: 'right', cellWidth: 70 }, // Amount
-      5: { halign: 'center', cellWidth: 60 } // Date
-    },
-    margin: { left: 50, right: 50 },
-    tableWidth: 'wrap',
-    showHead: 'everyPage',
-    theme: 'grid',
-    didDrawPage: function (data) {
-      // Center the table on the page
-      const pageWidth = doc.internal.pageSize.width
-      const tableWidth = data.table.width
-      const leftMargin = (pageWidth - tableWidth) / 2
-      
-      // Adjust table position to center
-      if (data.pageNumber === 1) {
-        data.cursor.x = leftMargin
-      }
-    }
-  })
+  currentY += 15
+  doc.text(so.customer_name || '', 50, currentY)
+  doc.text(so.customer_name || '', 300, currentY)
   
-  // Summary Section (centered)
-  const finalY = doc.lastAutoTable.finalY + 20
-  const pageWidth = doc.internal.pageSize.width
+  currentY += 15
+  doc.text(so.customer_address || '', 50, currentY)
+  doc.text(so.delivery_address || '', 300, currentY)
   
-  // Center the summary text
-  doc.setFontSize(12)
-  doc.setTextColor(0, 100, 200)
-  const summaryText = 'SUMMARY'
-  const summaryWidth = doc.getTextWidth(summaryText)
-  const summaryX = (pageWidth - summaryWidth) / 2
-  doc.text(summaryText, summaryX, finalY)
+  currentY += 30
   
-  doc.setFontSize(10)
-  doc.setTextColor(0, 0, 0)
+  // Order Details Section
+  doc.text(`P/ORDER    : ${so.customer_po_number || ''}`, 50, currentY)
+  doc.text(`P/ORDER DATE : ${so.po_date || ''}`, 300, currentY)
   
-  // Center each summary line
-  const summaryLines = [
-    `Total Sales Orders: ${salesOrdersData.length - 1}`,
-    `Outstanding: ${salesOrdersData.filter(row => row[3] === 'Outstanding').length}`,
-    `Partial: ${salesOrdersData.filter(row => row[3] === 'Partial').length}`,
-    `Completed: ${salesOrdersData.filter(row => row[3] === 'Completed').length}`
-  ]
+  currentY += 15
+  doc.text(`ACCOUNT NO : ${so.customer_code || ''}`, 50, currentY)
+  doc.text(`CURRENCY     : ${so.currency || 'IDR'}`, 300, currentY)
   
-  summaryLines.forEach((line, index) => {
-    const lineWidth = doc.getTextWidth(line)
-    const lineX = (pageWidth - lineWidth) / 2
-    doc.text(line, lineX, finalY + 20 + (index * 15))
-  })
+  currentY += 15
+  doc.text(`M/CARD SEQ : ${so.master_card_seq || ''}`, 50, currentY)
+  doc.text(`PAYMENT TERM : ${so.credit_terms || '30 DAYS'}`, 300, currentY)
   
-  // Footer (centered)
-  const pageHeight = doc.internal.pageSize.height
+  currentY += 15
+  doc.text(`MODEL      : ${so.master_card_model || ''}`, 50, currentY)
+  
+  currentY += 30
+  
+  // Item Details Table
+  doc.setDrawColor(0, 0, 0)
+  doc.setLineWidth(1)
+  doc.line(50, currentY, 550, currentY)
+  
+  currentY += 15
+  
+  // Table Headers
   doc.setFontSize(8)
-  doc.setTextColor(128, 128, 128)
+  doc.text('TYPE', 60, currentY)
+  doc.text('DESCRIPTION', 120, currentY)
+  doc.text('QUANTITY', 350, currentY)
+  doc.text('UOM', 410, currentY)
+  doc.text('UNIT PRICE', 450, currentY)
+  doc.text('AMOUNT', 510, currentY)
   
-  // Center footer text
-  const footerText1 = 'Generated by ERP System'
-  const footerText2 = `Generated on: ${new Date().toLocaleString()}`
+  currentY += 5
+  doc.line(50, currentY, 550, currentY)
+  currentY += 15
   
-  const footerWidth1 = doc.getTextWidth(footerText1)
-  const footerWidth2 = doc.getTextWidth(footerText2)
+  // Item Details
+  const details = so.details || [{}]
+  details.forEach((detail, index) => {
+    doc.text('Main', 60, currentY)
+    doc.text(detail.item_description || detail.item_code || so.master_card_model || '', 120, currentY)
+    doc.text(String(detail.order_quantity || ''), 350, currentY)
+    doc.text(detail.uom || 'PCS', 410, currentY)
+    doc.text(formatCurrency(detail.unit_price || 0), 450, currentY)
+    doc.text(formatCurrency((detail.order_quantity || 0) * (detail.unit_price || 0)), 510, currentY)
+    currentY += 15
+  })
   
-  const footerX1 = (pageWidth - footerWidth1) / 2
-  const footerX2 = (pageWidth - footerWidth2) / 2
+  currentY += 15
   
-  doc.text(footerText1, footerX1, pageHeight - 30)
-  doc.text(footerText2, footerX2, pageHeight - 15)
+  // Delivery Schedule Section
+  doc.setFontSize(9)
+  doc.text('DELIVERY SCHEDULE :', 50, currentY)
+  currentY += 20
   
-  // Save the PDF
-  doc.save(`SalesOrder_${form.period.month}_${form.period.year}.pdf`)
+  doc.setFontSize(8)
+  doc.text('DATE', 60, currentY)
+  doc.text('MAIN', 120, currentY)
+  doc.text('F1', 160, currentY)
+  doc.text('F2', 180, currentY)
+  doc.text('F3', 200, currentY)
+  doc.text('F4', 220, currentY)
+  doc.text('F5', 240, currentY)
+  doc.text('F6', 260, currentY)
+  doc.text('F7', 280, currentY)
+  doc.text('F8', 300, currentY)
+  doc.text('F9', 320, currentY)
+  doc.text('REMARKS', 350, currentY)
+  
+  currentY += 15
+  
+  if (schedules.length > 0) {
+    schedules.forEach(schedule => {
+      doc.text(schedule.schedule_date || '', 60, currentY)
+      doc.text(String(schedule.delivery_quantity || ''), 120, currentY)
+      doc.text(schedule.remark || '', 350, currentY)
+      currentY += 15
+    })
+  } else {
+    currentY += 15
+  }
+  
+  currentY += 20
+  
+  // SO Remark
+  doc.setFontSize(9)
+  doc.text(`SO Remark : ${so.remark || ''}`, 50, currentY)
+  currentY += 30
+  
+  // Order Instructions
+  doc.text('ORDER INSTRUCTION :', 50, currentY)
+  currentY += 15
+  doc.text(so.instruction1 || '', 50, currentY)
+  currentY += 15
+  doc.text(so.instruction2 || '', 50, currentY)
+  
+  // Footer Section
+  const footerY = pageHeight - 100
+  
+  doc.text('CHECKED BY : ___________________', 50, footerY)
+  doc.text('APPROVED BY : ___________________', 300, footerY)
+  
+  doc.setFontSize(8)
+  doc.text(`ISSUED BY  : ${printerInfo?.user || 'user2'}`, 50, footerY + 30)
+  doc.text(`PRINTED BY: ${printerInfo?.code || 'HPL-001'}`, 300, footerY + 30)
+  doc.text(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 50, footerY + 45)
+  doc.text('*** End of Page ***', 450, footerY + 45)
+}
+
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(amount || 0)
 }
 
 async function downloadExcel() {
@@ -657,12 +843,15 @@ async function downloadExcel() {
     ).join('\r\n')
     
     // Add header information
+    const fromRange = form.from.seq || formatSO(form.from.month, form.from.year, '00001')
+    const toRange = form.to.seq || formatSO(form.to.month, form.to.year, '99999')
+    
     const headerInfo = [
       'PT. MULTIBOX INDAH',
       'SALES ORDER REPORT',
       '',
       `Period: ${form.period.month}/${form.period.year}`,
-      `Range: ${formatSO(form.from.month, form.from.year, form.from.seq || '0')} to ${formatSO(form.to.month, form.to.year, form.to.seq || '99999')}`,
+      `Range: ${fromRange} to ${toRange}`,
       `Status: ${Object.keys(form.status).filter(k => form.status[k]).join(', ').toUpperCase()}`,
       `Printer: ${printer.code} | User: ${printer.user}`,
       '',

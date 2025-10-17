@@ -259,6 +259,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/api/sales-order/print-log', [SalesOrderController::class, 'printLog']);
         Route::get('/api/sales-order/print-jit-tracking', [SalesOrderController::class, 'printJitTracking']);
         
+        // Print SO API routes
+        Route::post('/api/so-report', [SalesOrderController::class, 'getSalesOrderReport']);
+        Route::get('/api/sales-order/{soNumber}/delivery-schedules', [SalesOrderController::class, 'getSalesOrderWithSchedules']);
+        
         // Sales Order API routes
         Route::post('/api/sales-order', [SalesOrderController::class, 'store']);
         Route::get('/api/sales-order/master-card/{mcSeq}', [SalesOrderController::class, 'getMasterCard']);
@@ -266,7 +270,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/api/sales-order/salesperson/{salespersonCode}', [SalesOrderController::class, 'getSalesperson']);
         Route::post('/api/sales-order/product-design', [SalesOrderController::class, 'saveProductDesign']);
         Route::post('/api/sales-order/delivery-schedule', [SalesOrderController::class, 'saveDeliverySchedule']);
-        Route::get('/api/sales-order/{soNumber}/delivery-schedules', [SalesOrderController::class, 'getDeliverySchedules']);
         Route::get('/api/sales-order/{soNumber}/delivery-schedule-summary', [SalesOrderController::class, 'getDeliveryScheduleSummary']);
 
         // Delivery Order Transaction - Prepare Delivery Order (Multiple Item)

@@ -474,6 +474,278 @@ class SalesOrderController extends Controller
 
     public function getSalesOrders(Request $request): JsonResponse
     {
-        return response()->json(['message' => 'getSalesOrders not yet implemented'], 200);
+        try {
+            $month = $request->input('month');
+            $year = $request->input('year');
+            $fromSo = $request->input('from_so');
+            $toSo = $request->input('to_so');
+            $status = $request->input('status', []);
+
+            $query = DB::table('so');
+
+            // Filter by period if provided
+            if ($month && $year) {
+                $query->where('MM', str_pad($month, 2, '0', STR_PAD_LEFT))
+                      ->where('YYYY', $year);
+            }
+
+            // Filter by SO number range if provided
+            if ($fromSo && $toSo) {
+                // Handle different SO number formats
+                if ($fromSo === $toSo) {
+                    // Single SO number - use LIKE for flexible matching
+                    $query->where('SO_Num', 'LIKE', '%' . $fromSo . '%');
+                } else {
+                    // Range of SO numbers - handle both numeric and string formats
+                    if (is_numeric($fromSo) && is_numeric($toSo)) {
+                        // If input is numeric, try different approaches
+                        $fromNum = (int)$fromSo;
+                        $toNum = (int)$toSo;
+                        
+                        // Limit range to prevent performance issues
+                        if (($toNum - $fromNum) <= 100) {
+                            // For small ranges, use LIKE pattern matching
+                            $query->where(function($q) use ($fromNum, $toNum) {
+                                for ($i = $fromNum; $i <= $toNum; $i++) {
+                                    $q->orWhere('SO_Num', 'LIKE', '%' . str_pad($i, 4, '0', STR_PAD_LEFT) . '%');
+                                }
+                            });
+                        } else {
+                            // For large ranges, use simple BETWEEN on string
+                            $query->whereBetween('SO_Num', [$fromSo, $toSo]);
+                        }
+                    } else {
+                        // String comparison for non-numeric SO numbers
+                        $query->whereBetween('SO_Num', [$fromSo, $toSo]);
+                    }
+                }
+            }
+
+            // Filter by status if provided
+            if (!empty($status)) {
+                $statusMap = [
+                    'outstanding' => 'OPEN',
+                    'partial' => 'PARTIAL',
+                    'completed' => 'COMPLETED',
+                    'closed' => 'CLOSED',
+                    'cancelled' => 'CANCELLED'
+                ];
+                
+                $mappedStatus = array_map(function($s) use ($statusMap) {
+                    return $statusMap[$s] ?? strtoupper($s);
+                }, $status);
+                
+                $query->whereIn('STS', $mappedStatus);
+            }
+
+            // Order by SO number
+            $query->orderBy('SO_Num', 'asc');
+
+            $salesOrders = $query->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $salesOrders,
+                'count' => $salesOrders->count()
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching sales orders: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getSalesOrderReport(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'period' => 'nullable|string',
+                'range.from' => 'nullable|string',
+                'range.to' => 'nullable|string',
+                'copies' => 'nullable|integer|min:1|max:9',
+                'status' => 'nullable|array',
+                'printer.code' => 'nullable|string',
+                'printer.user' => 'nullable|string'
+            ]);
+
+            // Parse period (e.g., "8 2025")
+            $periodParts = explode(' ', $validated['period'] ?? '');
+            $month = $periodParts[0] ?? date('n');
+            $year = $periodParts[1] ?? date('Y');
+
+            $query = DB::table('so');
+
+            // Filter by period
+            $query->where('MM', str_pad($month, 2, '0', STR_PAD_LEFT))
+                  ->where('YYYY', $year);
+
+            // Filter by SO range
+            if (!empty($validated['range']['from']) && !empty($validated['range']['to'])) {
+                $fromSo = $validated['range']['from'];
+                $toSo = $validated['range']['to'];
+                
+                if ($fromSo === $toSo) {
+                    // Single SO number - use LIKE for flexible matching
+                    $query->where('SO_Num', 'LIKE', '%' . $fromSo . '%');
+                } else {
+                    // Range of SO numbers - handle both numeric and string formats
+                    if (is_numeric($fromSo) && is_numeric($toSo)) {
+                        // If input is numeric, try different approaches
+                        $fromNum = (int)$fromSo;
+                        $toNum = (int)$toSo;
+                        
+                        // Limit range to prevent performance issues
+                        if (($toNum - $fromNum) <= 100) {
+                            // For small ranges, use LIKE pattern matching
+                            $query->where(function($q) use ($fromNum, $toNum) {
+                                for ($i = $fromNum; $i <= $toNum; $i++) {
+                                    $q->orWhere('SO_Num', 'LIKE', '%' . str_pad($i, 4, '0', STR_PAD_LEFT) . '%');
+                                }
+                            });
+                        } else {
+                            // For large ranges, use simple BETWEEN on string
+                            $query->whereBetween('SO_Num', [$fromSo, $toSo]);
+                        }
+                    } else {
+                        // String comparison for non-numeric SO numbers
+                        $query->whereBetween('SO_Num', [$fromSo, $toSo]);
+                    }
+                }
+            }
+
+            // Filter by status
+            if (!empty($validated['status'])) {
+                $statusMap = [
+                    'outstanding' => 'OPEN',
+                    'partial' => 'PARTIAL',
+                    'completed' => 'COMPLETED',
+                    'closed' => 'CLOSED',
+                    'cancelled' => 'CANCELLED'
+                ];
+                
+                $mappedStatus = array_map(function($s) use ($statusMap) {
+                    return $statusMap[$s] ?? strtoupper($s);
+                }, $validated['status']);
+                
+                $query->whereIn('STS', $mappedStatus);
+            }
+
+            $salesOrders = $query->orderBy('SO_Num', 'asc')->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'sales_orders' => $salesOrders,
+                    'summary' => [
+                        'total' => $salesOrders->count(),
+                        'outstanding' => $salesOrders->where('STS', 'OPEN')->count(),
+                        'partial' => $salesOrders->where('STS', 'PARTIAL')->count(),
+                        'completed' => $salesOrders->where('STS', 'COMPLETED')->count(),
+                        'closed' => $salesOrders->where('STS', 'CLOSED')->count(),
+                        'cancelled' => $salesOrders->where('STS', 'CANCELLED')->count(),
+                    ],
+                    'filters' => [
+                        'period' => $validated['period'] ?? '',
+                        'range' => $validated['range'] ?? [],
+                        'status' => $validated['status'] ?? [],
+                        'copies' => $validated['copies'] ?? 1,
+                        'printer' => $validated['printer'] ?? []
+                    ]
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error generating report: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getSalesOrderWithSchedules(string $soNumber): JsonResponse
+    {
+        try {
+            // Get sales order from SO table
+            $salesOrder = DB::table('so')->where('SO_Num', $soNumber)->first();
+
+            if (!$salesOrder) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sales Order not found'
+                ], 404);
+            }
+
+            // Extract delivery schedules from SO table columns
+            $deliverySchedules = [];
+            for ($i = 1; $i <= 10; $i++) {
+                $dateCol = $i === 10 ? 'D_DATE10' : 'D_DATE_' . $i;
+                $timeCol = $i === 10 ? 'D_TIME10' : 'D_TIME_' . $i;
+                $dueCol = $i === 10 ? 'D_DUE10' : 'D_DUE_' . $i;
+                $qtyCol = $i === 10 ? 'D_QTY_10' : 'D_QTY_' . $i;
+
+                if (!empty($salesOrder->$dateCol)) {
+                    $deliverySchedules[] = [
+                        'line_number' => $i,
+                        'schedule_date' => $salesOrder->$dateCol,
+                        'schedule_time' => $salesOrder->$timeCol ?? '',
+                        'due_status' => $salesOrder->$dueCol ?? '',
+                        'delivery_quantity' => $salesOrder->$qtyCol ?? 0,
+                        'remark' => ''
+                    ];
+                }
+            }
+
+            // Get customer address from CUSTOMER table
+            $customerAddress = '';
+            if (!empty($salesOrder->AC_Num)) {
+                $customerData = DB::table('CUSTOMER')->where('CODE', $salesOrder->AC_Num)->first();
+                $customerAddress = $customerData ? ($customerData->ADDRESS ?? '') : '';
+            }
+
+            // Format sales order data
+            $formattedSO = [
+                'so_number' => $salesOrder->SO_Num,
+                'customer_code' => $salesOrder->AC_Num,
+                'customer_name' => $salesOrder->AC_NAME,
+                'customer_address' => $customerAddress,
+                'delivery_address' => $customerAddress, // Same as customer address for now
+                'master_card_seq' => $salesOrder->MCS_Num,
+                'master_card_model' => $salesOrder->MODEL,
+                'customer_po_number' => $salesOrder->PO_Num,
+                'po_date' => $salesOrder->PO_DATE,
+                'currency' => $salesOrder->CURR ?? 'IDR',
+                'credit_terms' => $salesOrder->CREDIT_TERMS ?? '30 DAYS',
+                'status' => $salesOrder->STS,
+                'remark' => $salesOrder->SO_REMARK ?? '',
+                'instruction1' => $salesOrder->SO_INSTRUCTION_1 ?? '',
+                'instruction2' => $salesOrder->SO_INSTRUCTION_2 ?? '',
+                'total_amount' => $salesOrder->AMOUNT ?? 0,
+                'details' => [
+                    [
+                        'item_code' => $salesOrder->PRODUCT,
+                        'item_description' => $salesOrder->P_DESIGN ?? $salesOrder->MODEL, // Use P_DESIGN if available
+                        'order_quantity' => $salesOrder->SO_QTY,
+                        'unit_price' => $salesOrder->UNIT_PRICE,
+                        'uom' => $salesOrder->UNIT ?? 'PCS'
+                    ]
+                ]
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'sales_order' => $formattedSO,
+                    'delivery_schedules' => $deliverySchedules
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching sales order: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
