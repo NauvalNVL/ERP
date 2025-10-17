@@ -284,6 +284,14 @@
       @close="showSalesOrderTableModal = false"
       @select="handleSalesOrderSelect"
     />
+
+    <!-- Sales Order Detail Modal -->
+    <SalesOrderDetailModal 
+      :is-open="showSalesOrderDetailModal"
+      :sales-order-data="currentSalesOrderData"
+      @close="showSalesOrderDetailModal = false"
+      @save="handleSalesOrderDetailSave"
+    />
   </div>
 </template>
 
@@ -291,6 +299,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useToast } from '@/Composables/useToast'
 import SalesOrderTableModal from './SalesOrderTableModal.vue'
+import SalesOrderDetailModal from './SalesOrderDetailModal.vue'
 
 const { success, error, info } = useToast()
 
@@ -312,6 +321,7 @@ const emit = defineEmits(['close', 'save'])
 // Reactive data
 const selectedEntryIndex = ref(0)
 const showSalesOrderTableModal = ref(false)
+const showSalesOrderDetailModal = ref(false)
 
 const orderInfo = reactive({
   orderGroup: '',
@@ -392,17 +402,47 @@ const handleSalesOrderSelect = (selectedOrder) => {
   success('Sales order selected successfully')
 }
 
+// Store current sales order data for detail modal
+const currentSalesOrderData = ref({})
+
 const handleSave = () => {
-  const data = {
+  // Check if any sales order entry is filled
+  const hasValidEntry = salesOrderEntries.value.some(entry => 
+    entry.sOrder && entry.sOrder2 && entry.sOrder3
+  )
+  
+  if (!hasValidEntry) {
+    error('Please select a sales order entry first')
+    return
+  }
+  
+  // Get the selected entry data
+  const selectedEntry = salesOrderEntries.value[selectedEntryIndex.value]
+  currentSalesOrderData.value = {
+    soNumber: `${selectedEntry.sOrder}-${selectedEntry.sOrder2}-${selectedEntry.sOrder3}`,
+    mcardSeq: selectedEntry.mcardSeq || '',
+    pOrderRef: selectedEntry.pOrderRef || '',
     orderInfo,
-    salesOrderEntries: salesOrderEntries.value,
     itemDetails: itemDetails.value,
-    bottomInfo,
+    bottomInfo
+  }
+  
+  // Close current modal and open Sales Order Detail Modal
+  showSalesOrderDetailModal.value = true
+  success('Opening Sales Order Detail Screen')
+}
+
+const handleSalesOrderDetailSave = (detailData) => {
+  // Combine all data and emit to parent
+  const completeData = {
+    salesOrderData: currentSalesOrderData.value,
+    detailData: detailData,
     selectedEntryIndex: selectedEntryIndex.value
   }
   
-  emit('save', data)
-  success('Sales order data saved successfully')
+  emit('save', completeData)
+  showSalesOrderDetailModal.value = false
+  success('Sales order detail saved successfully')
 }
 
 const handleRefresh = () => {
