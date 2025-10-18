@@ -440,26 +440,42 @@ function closeSalesOrderModal() {
 
 async function proceedPrint() {
   printer.open = false
-  // Compose payload similar to desktop filters
-  const payload = {
-    period: `${form.period.month} ${form.period.year}`,
-    range: {
-      from: formatSO(form.from.month, form.from.year, form.from.seq || '0'),
-      to: formatSO(form.to.month, form.to.year, form.to.seq || '99999'),
-    },
-    copies: form.copies,
-    status: Object.keys(form.status).filter(k => form.status[k]),
-    printer: { code: printer.code, user: printer.user },
-  }
+  
+  try {
+    // Compose payload similar to desktop filters
+    const payload = {
+      period: `${form.period.month} ${form.period.year}`,
+      range: {
+        from: form.from.seq || formatSO(form.from.month, form.from.year, '00001'),
+        to: form.to.seq || formatSO(form.to.month, form.to.year, '99999'),
+      },
+      copies: form.copies,
+      status: Object.keys(form.status).filter(k => form.status[k]),
+      printer: { code: printer.code, user: printer.user },
+    }
 
-  const res = await fetch('/api/so-report', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify(payload),
-  })
-  const json = await res.json()
-  preview.value = true
-  previewText.value = await formatPreview(json)
+    console.log('Proceed print payload:', payload)
+
+    const res = await fetch('/api/so-report', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json', 
+        'Accept': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+      },
+      body: JSON.stringify(payload),
+    })
+    
+    const json = await res.json()
+    console.log('SO report response:', json)
+    
+    preview.value = true
+    previewText.value = await formatPreview(json)
+  } catch (error) {
+    console.error('Error in proceedPrint:', error)
+    preview.value = true
+    previewText.value = 'Error generating report: ' + (error.message || error)
+  }
 }
 
 async function formatPreview(data) {
@@ -471,39 +487,81 @@ async function formatPreview(data) {
   lines.push(''.padEnd(80, '-'))
   
   // Report Information
+  const fromRange = form.from.seq || formatSO(form.from.month, form.from.year, '00001')
+  const toRange = form.to.seq || formatSO(form.to.month, form.to.year, '99999')
+  
   lines.push(`Period: ${form.period.month}/${form.period.year}`)
-  lines.push(`Range: ${formatSO(form.from.month, form.from.year, form.from.seq || '0')} to ${formatSO(form.to.month, form.to.year, form.to.seq || '99999')}`)
+  lines.push(`Range: ${fromRange} to ${toRange}`)
   lines.push(`Status: ${Object.keys(form.status).filter(k => form.status[k]).join(', ').toUpperCase()}`)
   lines.push(`Printer: ${printer.code} | User: ${printer.user}`)
   lines.push('')
   
-  // Fetch real sales orders data
-  const salesOrdersData = await fetchSalesOrdersData()
+  // Use data from API response if available, otherwise fetch fresh data
+  let salesOrdersData
+  if (data && data.success && data.data && data.data.sales_orders) {
+    // Use data from API response
+    const salesOrders = data.data.sales_orders
+    salesOrdersData = [
+      ['SO#', 'Customer PO#', 'Customer', 'Status', 'Amount', 'Date']
+    ]
+    
+    if (salesOrders.length > 0) {
+      salesOrders.forEach(order => {
+        salesOrdersData.push([
+          order.SO_Num || '',
+          order.PO_Num || '',
+          order.AC_NAME || '',
+          order.STS || 'OPEN',
+          order.AMOUNT ? `Rp ${Number(order.AMOUNT).toLocaleString('id-ID')}` : 'Rp 0',
+          order.SO_DMY || order.PO_DATE || ''
+        ])
+      })
+    } else {
+      salesOrdersData.push(['No sales orders found for the selected criteria', '', '', '', '', ''])
+    }
+  } else {
+    // Fallback: fetch fresh data
+    salesOrdersData = await fetchSalesOrdersData()
+  }
   
   // Create table header
   const headerRow = salesOrdersData[0]
   lines.push(headerRow.map((col, index) => {
     const widths = [12, 15, 30, 12, 15, 12] // Column widths
-    return col.padEnd(widths[index])
+    return String(col).padEnd(widths[index])
   }).join(' | '))
-  lines.push(''.padEnd(80, '-'))
+  lines.push(''.padEnd(100, '-'))
   
   // Create table rows
   salesOrdersData.slice(1).forEach(row => {
     lines.push(row.map((col, index) => {
       const widths = [12, 15, 30, 12, 15, 12] // Column widths
-      return col.padEnd(widths[index])
+      return String(col).padEnd(widths[index])
     }).join(' | '))
   })
   
   lines.push('')
   
   // Summary Section
+  const dataRows = salesOrdersData.slice(1)
+  const totalOrders = dataRows.length
+  
   lines.push('SUMMARY')
-  lines.push(`Total Sales Orders: ${salesOrdersData.length - 1}`)
-  lines.push(`Outstanding: ${salesOrdersData.filter(row => row[3] === 'Outstanding').length}`)
-  lines.push(`Partial: ${salesOrdersData.filter(row => row[3] === 'Partial').length}`)
-  lines.push(`Completed: ${salesOrdersData.filter(row => row[3] === 'Completed').length}`)
+  lines.push(`Total Sales Orders: ${totalOrders}`)
+  
+  if (data && data.data && data.data.summary) {
+    const summary = data.data.summary
+    lines.push(`Outstanding: ${summary.outstanding || 0}`)
+    lines.push(`Partial: ${summary.partial || 0}`)
+    lines.push(`Completed: ${summary.completed || 0}`)
+    lines.push(`Closed: ${summary.closed || 0}`)
+    lines.push(`Cancelled: ${summary.cancelled || 0}`)
+  } else {
+    lines.push(`Outstanding: ${dataRows.filter(row => row[3] === 'OPEN').length}`)
+    lines.push(`Partial: ${dataRows.filter(row => row[3] === 'PARTIAL').length}`)
+    lines.push(`Completed: ${dataRows.filter(row => row[3] === 'COMPLETED').length}`)
+  }
+  
   lines.push('')
   
   // Footer
@@ -571,7 +629,7 @@ async function fetchSalesOrdersData() {
     // Fallback to empty data
     return [
       ['SO#', 'Customer PO#', 'Customer', 'Status', 'Amount', 'Date'],
-      ['Error loading data', '', '', '', '', '']
+      ['Error loading data: ' + (error.response?.data?.message || error.message), '', '', '', '', '']
     ]
   }
 }
@@ -618,7 +676,7 @@ async function downloadPdf() {
       // Fetch detailed SO data with better error handling
       try {
         console.log(`Fetching details for SO: ${soNumber}`)
-        const response = await fetch(`/api/sales-orders/${encodeURIComponent(soNumber)}/delivery-schedules`, {
+        const response = await fetch(`/api/sales-order/${encodeURIComponent(soNumber)}/delivery-schedules`, {
           headers: { 
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -989,12 +1047,15 @@ async function downloadExcel() {
     ).join('\r\n')
     
     // Add header information
+    const fromRange = form.from.seq || formatSO(form.from.month, form.from.year, '00001')
+    const toRange = form.to.seq || formatSO(form.to.month, form.to.year, '99999')
+    
     const headerInfo = [
       'PT. MULTIBOX INDAH',
       'SALES ORDER REPORT',
       '',
       `Period: ${form.period.month}/${form.period.year}`,
-      `Range: ${formatSO(form.from.month, form.from.year, form.from.seq || '0')} to ${formatSO(form.to.month, form.to.year, form.to.seq || '99999')}`,
+      `Range: ${fromRange} to ${toRange}`,
       `Status: ${Object.keys(form.status).filter(k => form.status[k]).join(', ').toUpperCase()}`,
       `Printer: ${printer.code} | User: ${printer.user}`,
       '',

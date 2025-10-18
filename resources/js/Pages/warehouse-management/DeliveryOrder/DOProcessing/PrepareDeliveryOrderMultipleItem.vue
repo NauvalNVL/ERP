@@ -195,6 +195,41 @@
                 placeholder="Enter remark 2"
               >
             </div>
+
+            <!-- Selected SO Information -->
+            <div v-if="deliveryOrder.soNumber" class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <h4 class="text-sm font-medium text-green-800 mb-2">Selected Sales Order:</h4>
+              <div class="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span class="font-medium text-green-700">SO Number:</span>
+                  <span class="text-green-600 ml-2">{{ deliveryOrder.soNumber }}</span>
+                </div>
+                <div>
+                  <span class="font-medium text-green-700">M/Card Seq:</span>
+                  <span class="text-green-600 ml-2">{{ deliveryOrder.mcardSeq }}</span>
+                </div>
+                <div class="col-span-2">
+                  <span class="font-medium text-green-700">P/Order Ref:</span>
+                  <span class="text-green-600 ml-2">{{ deliveryOrder.pOrderRef }}</span>
+                </div>
+                <div class="col-span-2">
+                  <span class="font-medium text-green-700">Items:</span>
+                  <span class="text-green-600 ml-2">{{ deliveryOrder.itemDetails.filter(item => item.toDeliver).length }} item(s) to deliver</span>
+                </div>
+                <div v-if="deliveryOrder.packingItems && deliveryOrder.packingItems.length > 0" class="col-span-2">
+                  <span class="font-medium text-green-700">Packing:</span>
+                  <span class="text-green-600 ml-2">{{ deliveryOrder.packingItems.filter(item => item.rolls || item.qty).length }} item(s) packed</span>
+                </div>
+                <div v-if="deliveryOrder.offsetItems && deliveryOrder.offsetItems.length > 0" class="col-span-2">
+                  <span class="font-medium text-green-700">Offsets:</span>
+                  <span class="text-green-600 ml-2">{{ deliveryOrder.offsetItems.filter(item => item.toOffset).length }} item(s) with offsets</span>
+                </div>
+                <div v-if="deliveryOrder.salesOrderData && deliveryOrder.salesOrderData.length > 0" class="col-span-2">
+                  <span class="font-medium text-green-700">SO Records:</span>
+                  <span class="text-green-600 ml-2">{{ deliveryOrder.salesOrderData.length }} SO record(s)</span>
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -312,7 +347,15 @@ const deliveryOrder = reactive({
   orderDate: new Date().toISOString().split('T')[0],
   unapplyFG: false,
   remark1: '',
-  remark2: ''
+  remark2: '',
+  soNumber: '',
+  mcardSeq: '',
+  pOrderRef: '',
+  itemDetails: [],
+  packingItems: [],
+  offsetDetails: {},
+  offsetItems: [],
+  salesOrderData: []
 })
 
 // Modal visibility
@@ -424,8 +467,50 @@ const openSalesOrderScreen = () => {
 }
 
 const handleSalesOrderSave = (salesOrderData) => {
-  console.log('Sales Order Data:', salesOrderData)
-  success('Sales order data saved successfully')
+  console.log('Complete Sales Order Data:', salesOrderData)
+  
+  // Process the complete data from Sales Order Detail + Packing Details
+  if (salesOrderData.salesOrderDetail) {
+    const detailData = salesOrderData.salesOrderDetail
+    console.log('Order Detail:', detailData.orderDetail)
+    console.log('Item Rows:', detailData.itemRows)
+    
+    // Update delivery order with SO details
+    if (detailData.orderDetail.sOrderMonth && detailData.orderDetail.sOrderYear && detailData.orderDetail.sOrderSeq) {
+      const soNumber = `${detailData.orderDetail.sOrderMonth}-${detailData.orderDetail.sOrderYear}-${detailData.orderDetail.sOrderSeq}`
+      console.log('Processing SO Number:', soNumber)
+      
+      // Store the SO data for further processing
+      deliveryOrder.soNumber = soNumber
+      deliveryOrder.mcardSeq = detailData.orderDetail.mcardSeq
+      deliveryOrder.pOrderRef = detailData.orderDetail.pOrderRef
+      deliveryOrder.itemDetails = detailData.itemRows
+    }
+  }
+  
+  // Process packing details if available
+  if (salesOrderData.packingDetails) {
+    const packingData = salesOrderData.packingDetails
+    console.log('Packing Items:', packingData.packingItems)
+    
+    // Store packing data
+    deliveryOrder.packingItems = packingData.packingItems
+  }
+  
+  // Process finished goods offsets if available
+  if (salesOrderData.finishedGoodsOffsets) {
+    const offsetsData = salesOrderData.finishedGoodsOffsets
+    console.log('Offset Details:', offsetsData.offsetDetails)
+    console.log('Offset Items:', offsetsData.offsetItems)
+    console.log('Sales Order Data:', offsetsData.salesOrderData)
+    
+    // Store offsets data
+    deliveryOrder.offsetDetails = offsetsData.offsetDetails
+    deliveryOrder.offsetItems = offsetsData.offsetItems
+    deliveryOrder.salesOrderData = offsetsData.salesOrderData
+  }
+  
+  success('Sales order and packing details saved successfully')
   showSalesOrderModal.value = false
 }
 
@@ -491,7 +576,15 @@ const refreshPage = () => {
     orderDate: new Date().toISOString().split('T')[0],
     unapplyFG: false,
     remark1: '',
-    remark2: ''
+    remark2: '',
+    soNumber: '',
+    mcardSeq: '',
+    pOrderRef: '',
+    itemDetails: [],
+    packingItems: [],
+    offsetDetails: {},
+    offsetItems: [],
+    salesOrderData: []
   })
   
   // Reset selected vehicle

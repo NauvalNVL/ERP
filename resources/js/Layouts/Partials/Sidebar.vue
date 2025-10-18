@@ -1042,7 +1042,7 @@ const warehouseManagementItems = [
         title: 'IV Processing',
         icon: 'fas fa-tasks',
         children: [
-          { title: 'Prepare Invoice by D/Order (Current Period)', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice/iv-processing/prepare-do-current' },
+          { title: 'Prepare Invoice by D/Order (Current Period)', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice/iv-processing/prepare-by-do-current-period' },
           { title: 'Prepare Invoice by D/Order (Open Period)', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice/iv-processing/prepare-do-open' },
           { title: 'Prepare Invoice by S/Order (Current Period)', icon: 'fas fa-file-invoice-dollar', route: '/warehouse-management/invoice/iv-processing/prepare-so-current' },
           { title: 'Prepare Invoice by S/Order (Open Period)', icon: 'fas fa-file-invoice-dollar', route: '/warehouse-management/invoice/iv-processing/prepare-so-open' },

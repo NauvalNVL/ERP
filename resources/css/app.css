@@ -6,6 +6,147 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Cross-Browser Scrollbar Compatibility */
+@layer base {
+  /* Global scrollbar styling with progressive enhancement */
+  * {
+    /* Firefox modern browsers only - graceful degradation */
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+  }
+  
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+  
+  /* Thin scrollbar variant - Firefox only, fallback to webkit */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+  
+  /* Custom scrollbar variant - Firefox only, fallback to webkit */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  
+  /* Form elements appearance fix - correct vendor prefix order */
+  input[type="radio"],
+  input[type="checkbox"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  
+  /* Ensure radio buttons display correctly */
+  input[type="radio"] {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 50%;
+    background: white;
+    position: relative;
+  }
+  
+  input[type="radio"]:checked {
+    border-color: #3b82f6;
+    background: #3b82f6;
+  }
+  
+  input[type="radio"]:checked::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+  }
+  
+  /* Ensure checkboxes display correctly */
+  input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.25rem;
+    background: white;
+    position: relative;
+  }
+  
+  input[type="checkbox"]:checked {
+    border-color: #3b82f6;
+    background: #3b82f6;
+  }
+  
+  input[type="checkbox"]:checked::before {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+  }
+}
+
 /* Font Awesome Fallback */
 .fas, .fa {
   font-family: 'Font Awesome 6 Free' !important;
@@ -134,6 +275,37 @@ nav i {
     .hover-float:hover {
         transform: translateY(-5px);
     }
+}
+
+/* Browser-specific fixes */
+@layer utilities {
+  /* Hide scrollbar for IE and Firefox - progressive enhancement */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Focus styles for better accessibility */
+  .focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+  
+  /* Backdrop blur fallback */
+  .backdrop-blur-fallback {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  @supports (backdrop-filter: blur(8px)) {
+    .backdrop-blur-fallback {
+      backdrop-filter: blur(8px);
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+  }
 }
 
 /* Animation Keyframes */
