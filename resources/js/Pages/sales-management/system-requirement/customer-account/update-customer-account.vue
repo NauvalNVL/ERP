@@ -298,7 +298,11 @@
                                 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Currency Code</label>
-                                    <input type="text" v-model="newCustomerForm.currency_code" class="form-input">
+                                    <select v-model="newCustomerForm.currency_code" class="form-input">
+                                        <option value="">-- Select Currency --</option>
+                                        <option value="IDR">IDR</option>
+                                        <option value="USD">USD</option>
+                                    </select>
                                     <span class="text-xs text-gray-500">Leave blank if Local Account</span>
                                 </div>
                                 
@@ -557,7 +561,11 @@
                                 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Currency Code</label>
-                                    <input type="text" v-model="form.currency_code" class="form-input">
+                                    <select v-model="form.currency_code" class="form-input">
+                                        <option value="">-- Select Currency --</option>
+                                        <option value="IDR">IDR</option>
+                                        <option value="USD">USD</option>
+                                    </select>
                                     <span class="text-xs text-gray-500">Leave blank if Local Account</span>
                                 </div>
                                 

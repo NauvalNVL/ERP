@@ -228,51 +228,67 @@
           </div>
 
           <!-- Bottom Information Section -->
-          <div class="grid grid-cols-3 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Model:</label>
-              <input 
-                v-model="bottomInfo.model"
-                type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter model"
-              >
+          <div class="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl p-5 border border-orange-200">
+            <div class="flex items-center mb-4">
+              <div class="p-2 bg-orange-600 rounded-lg">
+                <i class="fas fa-clipboard-list text-white"></i>
+              </div>
+              <h4 class="ml-3 text-md font-semibold text-gray-800">Additional Information</h4>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">S/O Ins1:</label>
-              <input 
-                v-model="bottomInfo.soIns1"
-                type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter S/O instruction 1"
-              >
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">S/O Ins2:</label>
-              <input 
-                v-model="bottomInfo.soIns2"
-                type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter S/O instruction 2"
-              >
+            <div class="grid grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Model:</label>
+                <input 
+                  v-model="bottomInfo.model"
+                  type="text"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white shadow-sm"
+                  placeholder="Enter model"
+                >
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">S/O Ins1:</label>
+                <input 
+                  v-model="bottomInfo.soIns1"
+                  type="text"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white shadow-sm"
+                  placeholder="Enter S/O instruction 1"
+                >
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">S/O Ins2:</label>
+                <input 
+                  v-model="bottomInfo.soIns2"
+                  type="text"
+                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white shadow-sm"
+                  placeholder="Enter S/O instruction 2"
+                >
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Footer -->
-        <div class="flex items-center justify-end space-x-4 p-4 border-t border-gray-200 bg-gray-50">
-          <button 
-            @click="closeModal"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Cancel
-          </button>
-          <button 
-            @click="handleSave"
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Save Changes
-          </button>
+        <div class="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+          <div class="text-sm text-gray-600">
+            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+            Select sales order and configure items for delivery
+          </div>
+          <div class="flex items-center space-x-3">
+            <button 
+              @click="closeModal"
+              class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all shadow-sm"
+            >
+              <i class="fas fa-times mr-2"></i>
+              Cancel
+            </button>
+            <button 
+              @click="handleSave"
+              class="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 border border-transparent rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-lg"
+            >
+              <i class="fas fa-check mr-2"></i>
+              Proceed to Details
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -364,10 +380,6 @@ const selectEntry = (index) => {
   selectedEntryIndex.value = index
 }
 
-const handlePowerOff = () => {
-  info('Power off functionality will be implemented')
-}
-
 const openSalesOrderTable = () => {
   showSalesOrderTableModal.value = true
 }
@@ -445,38 +457,6 @@ const handleSalesOrderDetailSave = (detailData) => {
   success('Sales order detail saved successfully')
 }
 
-const handleRefresh = () => {
-  // Reset form data
-  Object.assign(orderInfo, {
-    orderGroup: '',
-    orderMode: ''
-  })
-  
-  salesOrderEntries.value.forEach(entry => {
-    entry.sOrder = ''
-    entry.sOrder2 = '0'
-    entry.sOrder3 = '0'
-  })
-  
-  itemDetails.value.forEach(item => {
-    item.pDesign = ''
-    item.pcs = ''
-    item.unit = ''
-    item.partNumber = ''
-    item.doQty = ''
-    item.doKg = ''
-  })
-  
-  Object.assign(bottomInfo, {
-    model: '',
-    soIns1: '',
-    soIns2: ''
-  })
-  
-  selectedEntryIndex.value = 0
-  success('Form refreshed successfully')
-}
-
 // Initialize with customer data if available
 onMounted(() => {
   if (props.customerData && props.customerData.code) {
@@ -486,22 +466,61 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Modal Animation */
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-appear {
+  animation: modalAppear 0.3s ease-out;
+}
+
 /* Custom scrollbar for better UX */
 .overflow-y-auto::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
+  background: linear-gradient(to bottom, #f1f5f9, #e2e8f0);
+  border-radius: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: linear-gradient(to bottom, #94a3b8, #64748b);
+  border-radius: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: linear-gradient(to bottom, #64748b, #475569);
+}
+
+/* Input focus effects */
+input:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Table row hover effect */
+tr:hover {
+  transform: scale(1.001);
+}
+
+/* Button hover effects */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
 }
 </style>
