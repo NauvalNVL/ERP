@@ -356,40 +356,8 @@ Route::get('/sales-orders', [App\Http\Controllers\SalesOrderController::class, '
 // Alternative route with /api prefix for consistency
 Route::get('/api/sales-orders', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrders']);
 
-// Get current authenticated user info
-Route::get('/user/current', function() {
-    // Clean any output buffers to prevent BOM issues
-    while (ob_get_level()) {
-        ob_end_clean();
-    }
-    
-    $user = Auth::user();
-    if (!$user) {
-        return response()->json([
-            'success' => false,
-            'message' => 'User not authenticated'
-        ], 401, ['Content-Type' => 'application/json; charset=utf-8']);
-    }
-    
-    // Log user data for debugging
-    Log::info('Current user data:', [
-        'user_id' => $user->user_id,
-        'username' => $user->username,
-        'official_name' => $user->official_name,
-        'official_title' => $user->official_title,
-        'all_attributes' => $user->toArray()
-    ]);
-    
-    return response()->json([
-        'success' => true,
-        'data' => [
-            'user_id' => $user->user_id ?? $user->username ?? 'N/A',
-            'username' => $user->username ?? 'N/A',
-            'official_name' => $user->official_name ?? $user->name ?? 'N/A',
-            'official_title' => $user->official_title ?? 'N/A'
-        ]
-    ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
-});
+// Note: /api/user/current route moved to web.php for proper session authentication
+// See routes/web.php line ~258 for the authenticated user endpoint
 
 // Vehicle API routes
 Route::get('/vehicles', [VehicleController::class, 'apiIndex']);

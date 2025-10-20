@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
@@ -258,6 +260,41 @@ Route::middleware('auth')->group(function () {
         // Sales Order API routes for reports
         Route::get('/api/sales-order/print-log', [SalesOrderController::class, 'printLog']);
         Route::get('/api/sales-order/print-jit-tracking', [SalesOrderController::class, 'printJitTracking']);
+        
+        // Get current authenticated user info (for PrintSO.vue)
+        Route::get('/api/user/current', function() {
+            // Clean any output buffers to prevent BOM issues
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            
+            $user = Auth::user();
+            if (!$user) {
+                Log::warning('User not authenticated in /api/user/current');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401, ['Content-Type' => 'application/json; charset=utf-8']);
+            }
+            
+            // Log user data for debugging
+            Log::info('Web /api/user/current - Current user data:', [
+                'user_id' => $user->user_id,
+                'username' => $user->username,
+                'official_name' => $user->official_name,
+                'official_title' => $user->official_title
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'user_id' => $user->user_id ?? $user->username ?? 'N/A',
+                    'username' => $user->username ?? 'N/A',
+                    'official_name' => $user->official_name ?? $user->name ?? 'N/A',
+                    'official_title' => $user->official_title ?? 'N/A'
+                ]
+            ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
+        });
         
         // Print SO API routes
         Route::post('/api/so-report', [SalesOrderController::class, 'getSalesOrderReport']);
