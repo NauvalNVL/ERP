@@ -23,41 +23,171 @@
             <div class="text-xs text-gray-500">All fields are required</div>
           </div>
 
-          <div class="p-6 grid grid-cols-12 gap-5">
-            <!-- Current Period -->
-            <div class="col-span-12 md:col-span-6 lg:col-span-4">
-              <label class="block text-xs font-medium text-gray-700 mb-1">Current Period</label>
-              <div class="flex items-stretch rounded-md shadow-sm ring-1 ring-inset ring-gray-200 overflow-hidden bg-gray-50">
-                <input v-model="currentMonth" type="text" readonly class="w-16 px-2 py-2 text-sm outline-none border-0 bg-gray-50 cursor-not-allowed" placeholder="MM" />
-                <div class="px-2 py-2 text-gray-400 text-sm border-l">/</div>
-                <input v-model="currentYear" type="text" readonly class="w-24 px-2 py-2 text-sm outline-none border-0 bg-gray-50 cursor-not-allowed" placeholder="YYYY" />
+          <div class="p-6">
+            <!-- Modern Attractive Period Selection -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 pb-8 border-b border-gradient-to-r from-blue-100 to-purple-100">
+              
+              <!-- Current Period Card -->
+              <div class="group relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
+                <div class="relative bg-gradient-to-br from-blue-50 via-white to-indigo-50 border-2 border-blue-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:border-blue-300">
+                  <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
+                      <i class="fa fa-calendar-alt text-white text-sm"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-bold text-gray-800">Current Period</h3>
+                      <p class="text-xs text-gray-500">Active posting period</p>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center justify-center space-x-2 bg-white/70 backdrop-blur rounded-xl border border-blue-100 p-4 shadow-inner">
+                    <div class="relative">
+                      <input 
+                        v-model="currentMonth" 
+                        type="text" 
+                        readonly
+                        class="w-12 h-12 text-center text-lg font-bold bg-gray-100 border-2 border-gray-300 text-gray-700 rounded-lg cursor-not-allowed"
+                        placeholder="MM" 
+                      />
+                      <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-blue-400 font-medium">Month</div>
+                      <div v-if="currentMonth && currentPeriodValid" class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                        <i class="fa fa-check text-white text-xs"></i>
+                      </div>
+                    </div>
+                    
+                    <div :class="[
+                      'w-8 h-1 rounded-full',
+                      currentPeriodValid ? 'bg-gradient-to-r from-green-400 to-emerald-500' : 'bg-gradient-to-r from-blue-400 to-indigo-500'
+                    ]"></div>
+                    
+                    <div class="relative">
+                      <input 
+                        v-model="currentYear" 
+                        type="text" 
+                        readonly
+                        class="w-16 h-12 text-center text-lg font-bold bg-gray-100 border-2 border-gray-300 text-gray-700 rounded-lg cursor-not-allowed"
+                        placeholder="YYYY" 
+                      />
+                      <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-blue-400 font-medium">Year</div>
+                      <div v-if="currentYear && currentPeriodValid" class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                        <i class="fa fa-check text-white text-xs"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p class="mt-1 text-[11px] text-gray-500">Use posting month for current DO period.</p>
+
+              <!-- Update Period Card -->
+              <div class="group relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
+                <div class="relative bg-gradient-to-br from-purple-50 via-white to-pink-50 border-2 border-purple-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:border-purple-300">
+                  <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-md">
+                      <i class="fa fa-sync-alt text-white text-sm"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-bold text-gray-800">Update Period</h3>
+                      <p class="text-xs text-gray-500">Invoice processing period</p>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center justify-center space-x-2 bg-white/70 backdrop-blur rounded-xl border border-purple-100 p-4 shadow-inner">
+                    <div class="relative">
+                      <input 
+                        v-model="updateMonth" 
+                        type="text" 
+                        readonly
+                        class="w-12 h-12 text-center text-lg font-bold bg-gray-100 border-2 border-gray-300 text-gray-700 rounded-lg cursor-not-allowed"
+                        placeholder="MM" 
+                      />
+                      <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 font-medium">Month</div>
+                      <div v-if="updateMonth && updatePeriodValid" class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                        <i class="fa fa-check text-white text-xs"></i>
+                      </div>
+                    </div>
+                    
+                    <div :class="[
+                      'w-8 h-1 rounded-full',
+                      updatePeriodValid ? 'bg-gradient-to-r from-green-400 to-emerald-500' : 'bg-gradient-to-r from-purple-400 to-pink-500'
+                    ]"></div>
+                    
+                    <div class="relative">
+                      <input 
+                        v-model="updateYear" 
+                        type="text" 
+                        readonly
+                        class="w-16 h-12 text-center text-lg font-bold bg-gray-100 border-2 border-gray-300 text-gray-700 rounded-lg cursor-not-allowed"
+                        placeholder="YYYY" 
+                      />
+                      <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 font-medium">Year</div>
+                      <div v-if="updateYear && updatePeriodValid" class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                        <i class="fa fa-check text-white text-xs"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Customer Selection Card -->
+              <div class="group relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
+                <div class="relative bg-gradient-to-br from-emerald-50 via-white to-teal-50 border-2 border-emerald-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:border-emerald-300">
+                  <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-md">
+                      <i class="fa fa-building text-white text-sm"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-bold text-gray-800">Customer</h3>
+                      <p class="text-xs text-gray-500">{{ hasCustomer ? 'Customer selected' : 'Select target customer' }}</p>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center justify-center bg-white/70 backdrop-blur rounded-xl border border-emerald-100 p-4 shadow-inner">
+                    <div class="relative w-full max-w-none">
+                      <div class="flex items-stretch bg-white rounded-lg border-2 border-emerald-200 shadow-sm h-12">
+                        <!-- Icon Section -->
+                        <div class="flex items-center justify-center w-12 bg-gradient-to-r from-emerald-100 to-teal-100 border-r border-emerald-200">
+                          <i :class="[
+                            'text-lg transition-colors duration-200',
+                            hasCustomer ? 'fa fa-check-circle text-green-600' : 'fa fa-user text-emerald-600'
+                          ]"></i>
+                        </div>
+                        
+                        <!-- Input Field -->
+                        <input 
+                          v-model="customerCode" 
+                          type="text" 
+                          :class="[
+                            'flex-grow min-w-0 px-4 text-sm font-medium outline-none border-0 bg-white transition-colors duration-200',
+                            hasCustomer ? 'text-green-700' : 'text-gray-900'
+                          ]"
+                          placeholder="Type customer code (e.g. 000004)"
+                          @input="onCustomerCodeInput"
+                        />
+                        
+                        <!-- Search Button -->
+                        <button 
+                          @click="showCustomerModal = true" 
+                          type="button"
+                          class="flex items-center justify-center w-12 bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 transition-all duration-200 border-l border-emerald-400"
+                        >
+                          <i class="fa fa-search text-sm"></i>
+                        </button>
+                      </div>
+                      
+                      <!-- Success indicator -->
+                      <div v-if="hasCustomer" class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center shadow-md">
+                        <i class="fa fa-check text-white text-xs"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Update Period -->
-            <div class="col-span-12 md:col-span-6 lg:col-span-4">
-              <label class="block text-xs font-medium text-gray-700 mb-1">Update Period</label>
-              <div class="flex items-stretch rounded-md shadow-sm ring-1 ring-inset ring-gray-200 overflow-hidden bg-gray-50">
-                <input v-model="updateMonth" type="text" readonly class="w-16 px-2 py-2 text-sm outline-none border-0 bg-gray-50 cursor-not-allowed" placeholder="MM" />
-                <div class="px-2 py-2 text-gray-400 text-sm border-l">/</div>
-                <input v-model="updateYear" type="text" readonly class="w-24 px-2 py-2 text-sm outline-none border-0 bg-gray-50 cursor-not-allowed" placeholder="YYYY" />
-              </div>
-              <p class="mt-1 text-[11px] text-gray-500">Invoices will be prepared into this period.</p>
-            </div>
-
-            <!-- Customer Code with lookup -->
-            <div class="col-span-12 md:col-span-6 lg:col-span-4">
-              <label class="block text-xs font-medium text-gray-700 mb-1">Customer Code</label>
-              <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-blue-500 overflow-hidden">
-                <div class="px-2 py-2 text-gray-400 text-sm bg-gray-50 border-r"><i class="fa fa-user"></i></div>
-                <input v-model="customerCode" type="text" class="flex-1 px-3 py-2 text-sm outline-none border-0" placeholder="Type or pick customer code" />
-                <button @click="showCustomerModal = true" class="px-3 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700">
-                  <i class="fa fa-search"></i>
-                </button>
-              </div>
-              <p class="mt-1 text-[11px] text-gray-500">Leave blank to include all customers.</p>
-            </div>
+            <!-- Additional Fields Grid -->
+            <div class="grid grid-cols-12 gap-5">
 
             <!-- Customer name (readonly) -->
             <div v-if="hasCustomer" class="col-span-12 lg:col-span-8">
@@ -105,18 +235,18 @@
 
             <!-- Actions -->
             <div class="col-span-12 flex flex-wrap items-center gap-3 pt-2">
-              <button 
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" 
-                :disabled="!hasCustomer" 
+              <button
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                :disabled="!hasCustomer"
                 @click="refreshPeriodData"
               >
                 <i class="fa fa-sync"></i>
                 Refresh Period Data
               </button>
-              <button 
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-emerald-600 text-white text-sm hover:bg-emerald-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" 
-                :disabled="!hasCustomer || preparing" 
-                @click="openFlow" 
+              <button
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-emerald-600 text-white text-sm hover:bg-emerald-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                :disabled="!hasCustomer || preparing"
+                @click="openFlow"
                 @keyup.enter.stop.prevent="openFlow"
               >
                 <i v-if="!preparing" class="fa fa-arrow-right"></i>
@@ -138,8 +268,8 @@
                 <i class="fa fa-sync-alt"></i>
                 Refresh
               </button>
-              <button 
-                @click="openFlow" 
+              <button
+                @click="openFlow"
                 :disabled="preparing"
                 class="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
               >
@@ -147,6 +277,7 @@
                 <i v-else class="fa fa-spinner fa-spin"></i>
                 {{ preparing ? 'Processing...' : 'Continue to Prepare' }}
               </button>
+            </div>
             </div>
           </div>
         </div>
@@ -248,20 +379,37 @@ const currentYear = ref(String(now.getFullYear()))
 const updateMonth = ref(String(now.getMonth()+1).padStart(2,'0'))
 const updateYear = ref(String(now.getFullYear()))
 
+// Validation status tracking
+const currentPeriodValid = computed(() => {
+  const month = parseInt(currentMonth.value)
+  const year = parseInt(currentYear.value)
+  return month >= 1 && month <= 12 && year >= 2000 && year <= new Date().getFullYear() + 5
+})
+
+const updatePeriodValid = computed(() => {
+  const month = parseInt(updateMonth.value)
+  const year = parseInt(updateYear.value)
+  return month >= 1 && month <= 12 && year >= 2000 && year <= new Date().getFullYear() + 5
+})
+
 // Customer
 const customerCode = ref('')
 const showCustomerModal = ref(false)
 async function selectCustomer(customer){
   customerCode.value = customer?.customer_code || customer?.code || ''
   customerName.value = customer?.customer_name || ''
-  
+
   // Store the currency from modal selection (this is the correct currency)
   const modalCurrency = customer?.currency || customer?.currency_code || 'IDR'
+
+  // Extract only currency code (remove full names like "INDONESIA")
+  currency.value = extractCurrencyCode(modalCurrency)
   
-  currency.value = modalCurrency
-  
+  // Track the selected customer code to detect manual changes later
+  lastSelectedCustomerCode.value = customerCode.value
+
   showCustomerModal.value = false
-  
+
   // Try to fetch more details from API (optional enhancement)
   if (customerCode.value) {
     try {
@@ -276,15 +424,18 @@ async function selectCustomer(customer){
         }
         // PRESERVE currency from modal selection - only update if API returns valid currency data
         if (data.currency && data.currency !== modalCurrency && data.currency !== null) {
-          // Only update if API has different valid currency (not null, not default IDR)
-          if (data.currency !== 'IDR' || modalCurrency === 'IDR') {
-            currency.value = data.currency
-            console.log(`Currency updated from API: ${modalCurrency} -> ${data.currency}`)
+          // Extract currency code and update
+          const apiCurrencyCode = extractCurrencyCode(data.currency)
+          const modalCurrencyCode = extractCurrencyCode(modalCurrency)
+          
+          if (apiCurrencyCode !== modalCurrencyCode) {
+            currency.value = apiCurrencyCode
+            console.log(`Currency updated from API: ${modalCurrencyCode} -> ${apiCurrencyCode}`)
           } else {
-            console.log(`Keeping modal currency: ${modalCurrency} (API returned IDR default)`)
+            console.log(`Currency codes match: ${modalCurrencyCode}`)
           }
         } else {
-          console.log(`Keeping modal currency: ${modalCurrency} (API returned null/same currency)`)
+          console.log(`Keeping modal currency code: ${extractCurrencyCode(modalCurrency)}`)
         }
         // Update other fields that don't conflict
         if (data.tax_index_no) taxIndexNo.value = data.tax_index_no
@@ -294,7 +445,7 @@ async function selectCustomer(customer){
       // Already populated from modal data above, so no problem
     }
   }
-  
+
   console.log(`Customer selected: ${customerName.value}, Currency: ${currency.value}`)
 }
 
@@ -353,7 +504,7 @@ function selectTaxIndex(row){
  */
 function openFlow(){
   if (!hasCustomer.value) return
-  
+
   // Fetch tax options first
   fetchTaxOptions().then(() => {
     // Show Check Sales Tax Screen (CPS workflow)
@@ -385,7 +536,7 @@ function onTaxConfirmed(selectedTax){
   // Update tax information from confirmed selection
   taxIndexNo.value = selectedTax.code
   checkTaxModalOpen.value = false
-  
+
   // Open Delivery Order List Modal (CPS workflow - simple list first)
   doListModalOpen.value = true
 }
@@ -416,10 +567,10 @@ function handleDetailedDOClose(){
 function onDOsSelectedFromTable(dos){
   // Close the detailed table modal
   doSelectionModalOpen.value = false
-  
+
   // Store selected DOs - they will be displayed in the simple list
   selectedDOs.value = dos
-  
+
   // Keep the simple list modal open to show selected data
   // User can then click Select button to continue
 }
@@ -440,15 +591,15 @@ function openSalesOrderItems(order){
 async function onDOsSelected(dos){
   // Close the simple list modal
   doListModalOpen.value = false
-  
+
   if (dos.length === 0) {
     alert('No delivery orders selected')
     return
   }
-  
+
   // Calculate total amount
   await calculateTotalAmount(dos)
-  
+
   // Open Final Tax Calculation Modal
   finalTaxModalOpen.value = true
 }
@@ -468,7 +619,7 @@ async function calculateTotalAmount(dos){
       },
       body: JSON.stringify({ do_numbers: doNumbers })
     })
-    
+
     if (res.ok) {
       const data = await res.json()
       totalAmount.value = data.total_amount || 0
@@ -487,7 +638,7 @@ function onFinalTaxConfirmed(taxData){
   // Store final tax data
   finalTaxData.value = taxData
   finalTaxModalOpen.value = false
-  
+
   // Open Invoice Number Option Modal
   invoiceNumberModalOpen.value = true
 }
@@ -500,7 +651,7 @@ async function onInvoiceNumberConfirmed(option){
   invoiceNumberMode.value = option.mode
   manualInvoiceNumber.value = option.invoiceNumber || ''
   invoiceNumberModalOpen.value = false
-  
+
   // Prepare invoices
   await prepareInvoices()
 }
@@ -510,13 +661,13 @@ async function onInvoiceNumberConfirmed(option){
  */
 async function prepareInvoices(){
   if (preparing.value) return
-  
+
   preparing.value = true
-  
+
   try {
     // Get DO numbers
     const doNumbers = selectedDOs.value.map(d => d.do_number)
-    
+
     // Prepare invoices
     const prepareRes = await fetch('/api/invoices/prepare', {
       method: 'POST',
@@ -539,13 +690,13 @@ async function prepareInvoices(){
         month: updateMonth.value,
       })
     })
-    
+
     const result = await prepareRes.json()
-    
+
     if (result.success) {
       const invoiceNumbers = result.data.map(d => d.invoice_number).join('\n')
       alert(`Success! ${result.data.length} invoice(s) prepared:\n${invoiceNumbers}`)
-      
+
       // Reset form
       resetForm()
     } else {
@@ -585,5 +736,177 @@ function resetForm(){
 function refreshPeriodData(){
   if (!hasCustomer.value) return
   alert('Period data will be refreshed when you continue to prepare')
+}
+
+// Handle customer code input changes
+async function onCustomerCodeInput() {
+  // Clear previous timeout
+  if (customerLookupTimeout) {
+    clearTimeout(customerLookupTimeout)
+  }
+  
+  // Clear customer name and currency if code is changed manually
+  if (customerCode.value !== lastSelectedCustomerCode.value) {
+    customerName.value = ''
+    currency.value = ''
+  }
+  
+  // Auto-lookup customer details when code is entered (debounced)
+  const code = customerCode.value?.trim()
+  if (code && code.length >= 4) { // Check for codes with 4 or more characters (like "000004" or "000211-08")
+    customerLookupTimeout = setTimeout(async () => {
+      try {
+        // Show loading state
+        customerName.value = 'Loading...'
+        
+        console.log(`Attempting customer lookup for code: ${code}`)
+        
+        // Use the proper InvoiceController endpoint
+        const res = await fetch(`/api/invoices/customer-details?customer_code=${encodeURIComponent(code)}`, {
+          headers: { 
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json'
+          }
+        })
+        
+        console.log(`API response status: ${res.status}`)
+        
+        if (res.ok) {
+          const data = await res.json()
+          console.log('API Response data:', data)
+          
+          // The InvoiceController returns a single customer object with debug info
+          if (data) {
+            console.log('Debug info from backend:', data.debug_info)
+            
+            if (data.customer_name && data.customer_name.trim() !== '') {
+              customerName.value = data.customer_name
+              // Extract only currency code (3 letters)
+              currency.value = extractCurrencyCode(data.currency)
+              lastSelectedCustomerCode.value = code
+              
+              console.log(`Auto-lookup successful: ${data.customer_name}, Currency: ${currency.value}`)
+              console.log(`Found in table: ${data.debug_info?.found_in_table}`)
+            } else {
+              console.log(`Customer with code "${code}" not found or has empty name`)
+              if (data.debug_info) {
+                console.log(`Searched tables: ${data.debug_info.searched_tables?.join(', ')}`)
+                console.log(`Found in table: ${data.debug_info.found_in_table || 'none'}`)
+              }
+              if (data.error) {
+                console.error(`Backend error: ${data.error}`)
+                console.error(`Error details: ${data.debug_info?.error_message}`)
+              }
+              customerName.value = ''
+              currency.value = ''
+            }
+          } else {
+            console.log('No data returned from API')
+            customerName.value = ''
+            currency.value = ''
+          }
+        } else {
+          console.log(`API error: ${res.status} ${res.statusText}`)
+          const errorText = await res.text()
+          console.log('Error response:', errorText)
+          customerName.value = ''
+          currency.value = ''
+        }
+      } catch (error) {
+        console.error('Customer lookup failed:', error)
+        customerName.value = ''
+        currency.value = ''
+      }
+    }, 500) // Wait 500ms after user stops typing
+  } else if (code.length === 0) {
+    // Clear fields when input is empty
+    customerName.value = ''
+    currency.value = ''
+  }
+}
+
+// Track last selected customer code to detect manual changes
+const lastSelectedCustomerCode = ref('')
+
+// Debounce timeout for customer lookup
+let customerLookupTimeout = null
+
+/**
+ * Extract currency code only (3-letter uppercase)
+ * Handles cases where database stores "IDR" or "IDR - INDONESIA" or "INDONESIA"
+ */
+function extractCurrencyCode(currencyString) {
+  if (!currencyString) return 'IDR' // Default
+  
+  const str = String(currencyString).trim().toUpperCase()
+  
+  // If it's already 3 letters, return it
+  if (str.length === 3 && /^[A-Z]{3}$/.test(str)) {
+    return str
+  }
+  
+  // Extract first 3-letter word (currency code)
+  const match = str.match(/\b([A-Z]{3})\b/)
+  if (match) {
+    return match[1]
+  }
+  
+  // Map common currency names to codes
+  const currencyMap = {
+    'INDONESIA': 'IDR',
+    'RUPIAH': 'IDR',
+    'DOLLAR': 'USD',
+    'SINGAPORE': 'SGD',
+    'EURO': 'EUR',
+    'YEN': 'JPY',
+    'YUAN': 'CNY',
+    'RINGGIT': 'MYR'
+  }
+  
+  // Check if string contains any mapped currency name
+  for (const [name, code] of Object.entries(currencyMap)) {
+    if (str.includes(name)) {
+      return code
+    }
+  }
+  
+  // If nothing matches, take first 3 characters
+  return str.substring(0, 3) || 'IDR'
+}
+
+// Input validation functions for period fields
+function validateMonth(event, type) {
+  const value = event.target.value.replace(/\D/g, '') // Only numbers
+  const numValue = parseInt(value)
+  
+  if (value.length <= 2 && (!numValue || (numValue >= 1 && numValue <= 12))) {
+    const formattedValue = value.length === 1 && numValue > 0 ? value : (value.length === 2 ? value.padStart(2, '0') : value)
+    if (type === 'current') {
+      currentMonth.value = formattedValue
+    } else {
+      updateMonth.value = formattedValue
+    }
+  } else if (value === '') {
+    // Allow empty value
+    if (type === 'current') {
+      currentMonth.value = ''
+    } else {
+      updateMonth.value = ''
+    }
+  }
+}
+
+function validateYear(event, type) {
+  const value = event.target.value.replace(/\D/g, '') // Only numbers
+  const thisYear = new Date().getFullYear()
+  
+  if (value.length <= 4 && (!value || (parseInt(value) >= 2000 && parseInt(value) <= thisYear + 5))) {
+    if (type === 'current') {
+      currentYear.value = value
+    } else {
+      updateYear.value = value
+    }
+  }
 }
 </script>

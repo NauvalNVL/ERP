@@ -57,18 +57,8 @@ use App\Http\Controllers\WarehouseManagement\Invoice\InvoiceController;
 |
 */
 
-// Direct route for ObsoleteReactiveSku.vue component
-Route::get('/material-management/skus/categories', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'getCategories']);
-Route::get('/material-management/skus/for-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'getSkusForPrint']);
-Route::get('/material-management/skus', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'index']);
-Route::post('/material-management/skus/bulk-toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'bulkToggleActive']);
-Route::get('/material-management/skus/{sku}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'show']);
-Route::put('/material-management/skus/{sku}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'update']);
-Route::patch('/material-management/skus/{sku}/toggle-active', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'toggleActive']);
-Route::post('/material-management/skus/{sku}/change-code', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'changeSkuCode']);
-Route::get('/material-management/skus/{sku_id}/balance', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'getSkuBalance']);
-Route::post('/material-management/skus', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'store']);
-Route::get('/material-management/types', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmSkuController::class, 'getTypes']);
+// NOTE: Material Management SKU routes are now defined in the material-management prefix group below (around line 1104)
+// to avoid duplication and ensure proper route ordering
 
 // Purchaser API routes
 Route::get('/purchasers', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'index']);
@@ -164,6 +154,7 @@ Route::prefix('invoices')->group(function () {
     Route::get('/current-period-do', [InvoiceController::class, 'currentPeriodDo']);
     Route::post('/prepare', [InvoiceController::class, 'prepare']);
     Route::get('/customer-details', [InvoiceController::class, 'getCustomerDetails']);
+    Route::post('/seed-test-customers', [InvoiceController::class, 'seedTestCustomers']);
     Route::get('/sales-tax-options', [InvoiceController::class, 'getSalesTaxOptions']);
     Route::post('/cancel', [InvoiceController::class, 'cancelInvoice']);
     Route::get('/log', [InvoiceController::class, 'getInvoiceLog']);
@@ -372,13 +363,16 @@ Route::get('/user/current', function() {
     }
     
     // Log user data for debugging
-    Log::info('Current user data:', [
-        'user_id' => $user->user_id,
-        'username' => $user->username,
-        'official_name' => $user->official_name,
-        'official_title' => $user->official_title,
-        'all_attributes' => $user->toArray()
-    ]);
+    try {
+        Log::info('Current user data:', [
+            'user_id' => $user->user_id ?? null,
+            'username' => $user->username ?? null,
+            'official_name' => $user->official_name ?? null,
+            'official_title' => $user->official_title ?? null,
+        ]);
+    } catch (\Exception $e) {
+        Log::warning('Unable to log user data: ' . $e->getMessage());
+    }
     
     return response()->json([
         'success' => true,
@@ -752,11 +746,11 @@ Route::prefix('fg-do-config')->group(function () {
 // Warehouse Location API routes
 Route::prefix('warehouse-locations')->group(function () {
     Route::get('/', [WarehouseLocationController::class, 'index']);
+    Route::get('/json', [WarehouseLocationController::class, 'getWarehouseLocationsJson'])->name('warehouse-locations.json'); // For search/listing in modal - MUST BE BEFORE /{code}
     Route::post('/', [WarehouseLocationController::class, 'store']);
     Route::get('/{code}', [WarehouseLocationController::class, 'show']);
     Route::put('/{code}', [WarehouseLocationController::class, 'update']);
     Route::delete('/{code}', [WarehouseLocationController::class, 'destroy']);
-    Route::get('/json', [WarehouseLocationController::class, 'getWarehouseLocationsJson'])->name('warehouse-locations.json'); // For search/listing in modal
 }); 
 
 Route::get('/customer-sales-types', [CustomerSalesTypeController::class, 'index']);
@@ -792,7 +786,6 @@ Route::prefix('delivery-order-formats')->group(function () {
 Route::get('/industries', [App\Http\Controllers\IndustryController::class, 'apiIndex']);
 Route::get('/geos', [App\Http\Controllers\GeoController::class, 'apiIndex']);
 Route::get('/salespersons', [App\Http\Controllers\SalespersonController::class, 'apiIndex']);
-Route::get('/customer-groups', [App\Http\Controllers\CustomerGroupController::class, 'apiIndex']);
 
 // Customer Group API routes
 Route::get('/customer-groups', [App\Http\Controllers\CustomerGroupController::class, 'apiIndex'])->name('api.customer-groups.index');
@@ -1102,18 +1095,19 @@ Route::get('test-sku-reorder-level-controller', function() {
 
 // GL Distribution API routes
 Route::prefix('material-management')->group(function () {
-    // SKU Routes
+    // SKU Routes - specific paths MUST come before parameter routes
     Route::get('/skus', [MmSkuController::class, 'index']);
+    Route::get('/skus/categories', [MmSkuController::class, 'getCategories']);
+    Route::get('/skus/for-print', [MmSkuController::class, 'getSkusForPrint']);
+    Route::get('/skus/units', [MmSkuController::class, 'getUnits']);
+    Route::get('/skus/types', [MmSkuController::class, 'getTypes']);
     Route::post('/skus', [MmSkuController::class, 'store']);
+    Route::post('/skus/bulk-toggle-active', [MmSkuController::class, 'bulkToggleActive']);
     Route::get('/skus/{sku}', [MmSkuController::class, 'show']);
     Route::put('/skus/{sku}', [MmSkuController::class, 'update']);
     Route::delete('/skus/{sku}', [MmSkuController::class, 'destroy']);
     Route::post('/skus/{sku}/change-code', [MmSkuController::class, 'changeSkuCode']);
     Route::patch('/skus/{sku}/toggle-active', [MmSkuController::class, 'toggleActive']);
-    Route::post('/skus/bulk-toggle-active', [MmSkuController::class, 'bulkToggleActive']);
-    Route::get('/skus/categories', [MmSkuController::class, 'getCategories']);
-    Route::get('/skus/units', [MmSkuController::class, 'getUnits']);
-    Route::get('/skus/types', [MmSkuController::class, 'getTypes']);
     Route::get('/skus/{sku_id}/balance', [MmSkuController::class, 'getSkuBalance']);
 
     // GL Distribution Routes

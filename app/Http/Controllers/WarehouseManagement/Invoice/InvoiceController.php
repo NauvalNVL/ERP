@@ -6,10 +6,57 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\Invoice;
+use App\Models\Customer;
 
 class InvoiceController extends Controller
 {
+    /**
+     * Extract currency code only (3-letter uppercase)
+     * Handles cases where database stores "IDR" or "IDR - INDONESIA" or "INDONESIA"
+     */
+    private function extractCurrencyCode($currencyString)
+    {
+        if (empty($currencyString)) {
+            return 'IDR'; // Default
+        }
+
+        $str = strtoupper(trim($currencyString));
+
+        // If it's already 3 letters, return it
+        if (strlen($str) === 3 && preg_match('/^[A-Z]{3}$/', $str)) {
+            return $str;
+        }
+
+        // Extract first 3-letter word (currency code)
+        if (preg_match('/\b([A-Z]{3})\b/', $str, $matches)) {
+            return $matches[1];
+        }
+
+        // Map common currency names to codes
+        $currencyMap = [
+            'INDONESIA' => 'IDR',
+            'RUPIAH' => 'IDR',
+            'DOLLAR' => 'USD',
+            'SINGAPORE' => 'SGD',
+            'EURO' => 'EUR',
+            'YEN' => 'JPY',
+            'YUAN' => 'CNY',
+            'RINGGIT' => 'MYR',
+        ];
+
+        // Check if string contains any mapped currency name
+        foreach ($currencyMap as $name => $code) {
+            if (strpos($str, $name) !== false) {
+                return $code;
+            }
+        }
+
+        // If nothing matches, take first 3 characters
+        return substr($str, 0, 3) ?: 'IDR';
+    }
+
     /**
      * Get current period delivery orders for invoice preparation
      * Supports customer filtering
@@ -49,9 +96,15 @@ class InvoiceController extends Controller
 
             $dos = $query->orderBy('DO_Num')->get();
 
+            // Extract currency codes only (remove full names)
+            $dos = $dos->map(function ($do) {
+                $do->currency = $this->extractCurrencyCode($do->currency);
+                return $do;
+            });
+
             return response()->json($dos);
         } catch (\Exception $e) {
-            \Log::error('Error fetching current period DOs: ' . $e->getMessage());
+            Log::error('Error fetching current period DOs: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Failed to fetch delivery orders',
                 'message' => $e->getMessage()
@@ -64,9 +117,12 @@ class InvoiceController extends Controller
      */
     public function getCustomerDetails(Request $request)
     {
-        $customerCode = $request->input('customer_code');
-        
+        $customerCode = trim((string) $request->input('customer_code'));
+
+        Log::info("Customer lookup request for code: {$customerCode}");
+
         if (!$customerCode) {
+            Log::info("No customer code provided, returning empty data");
             return response()->json([
                 'customer_code' => '',
                 'customer_name' => '',
@@ -78,13 +134,74 @@ class InvoiceController extends Controller
         }
 
         try {
+            // First try to get customer info from Customer model (most reliable)
             $customer = null;
+            try {
+                $customer = Customer::where('CODE', $customerCode)->first();
+            } catch (\Exception $e) {
+                Log::warning('Unable to query Customer model for customer lookup', [
+                    'customer_code' => $customerCode,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            if ($customer) {
+                Log::info("Customer found in Customer model: {$customerCode}", ['customer' => $customer->toArray()]);
+
+                return response()->json([
+                    'customer_code' => $customer->CODE,
+                    'customer_name' => $customer->NAME,
+                    'currency' => $this->extractCurrencyCode($customer->CURRENCY),
+                    'tax_index_no' => '',
+                    'salesperson' => $customer->SLM ?? '',
+                    'area' => $customer->AREA ?? '',
+                    'debug_info' => [
+                        'found_in_table' => 'Customer Model',
+                        'search_code' => $customerCode
+                    ]
+                ]);
+            }
             
-            // Try different table names (SQL Server uses dbo.CUSTOMER)
+            // Fallback: Try DO table if Customer model doesn't work
+            $doCustomer = null;
+            try {
+                $doCustomer = DB::table('DO')
+                    ->where('AC_Num', $customerCode)
+                    ->select(['AC_Num as customer_code', 'AC_Name as customer_name', 'Curr as currency'])
+                    ->first();
+            } catch (\Exception $e) {
+                Log::warning('Unable to query DO table for customer lookup', [
+                    'customer_code' => $customerCode,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            if ($doCustomer && !empty($doCustomer->customer_name)) {
+                Log::info("Customer found in DO table: {$customerCode}", ['customer' => $doCustomer]);
+
+                return response()->json([
+                    'customer_code' => $doCustomer->customer_code,
+                    'customer_name' => $doCustomer->customer_name,
+                    'currency' => $this->extractCurrencyCode($doCustomer->currency),
+                    'tax_index_no' => '',
+                    'salesperson' => '',
+                    'area' => '',
+                    'debug_info' => [
+                        'found_in_table' => 'DO',
+                        'search_code' => $customerCode
+                    ]
+                ]);
+            }
+
+            // Fallback: Try dedicated customer tables
+            $customer = null;
+            $usedTable = null;
             $tables = ['CUSTOMER', 'Customer_Account', 'customer_account', 'update_customer_accounts'];
-            
+
             foreach ($tables as $table) {
                 try {
+                    Log::info("Trying table: {$table} for customer code: {$customerCode}");
+
                     $customer = DB::table($table)
                         ->where(function($query) use ($customerCode) {
                             $query->where('CODE', $customerCode)
@@ -92,52 +209,182 @@ class InvoiceController extends Controller
                                   ->orWhere('Customer_Code', $customerCode);
                         })
                         ->first();
-                    
+
                     if ($customer) {
+                        $usedTable = $table;
+                        Log::info("Customer found in table: {$table}", ['customer' => $customer]);
                         break;
                     }
                 } catch (\Exception $e) {
-                    // Table doesn't exist, try next
+                    Log::info("Table {$table} doesn't exist or query failed: " . $e->getMessage());
                     continue;
                 }
             }
 
-            // If customer not found, return minimal data without overriding currency
-            if (!$customer) {
-                \Log::info("Customer not found in database: {$customerCode}, returning minimal data");
+            if ($customer) {
+                $currency = $customer->CURRENCY ?? $customer->currency ?? $customer->Currency ?? $customer->currency_code ?? 'IDR';
+                $customerName = $customer->NAME ?? $customer->customer_name ?? $customer->Customer_Name ?? '';
+                $customerCodeResult = $customer->CODE ?? $customer->customer_code ?? $customer->Customer_Code ?? '';
+
                 return response()->json([
-                    'customer_code' => $customerCode,
-                    'customer_name' => '',
-                    'currency' => null, // Don't override with IDR default
-                    'tax_index_no' => '',
-                    'salesperson' => '',
-                    'area' => '',
+                    'customer_code' => $customerCodeResult,
+                    'customer_name' => $customerName,
+                    'currency' => $this->extractCurrencyCode($currency),
+                    'tax_index_no' => $customer->tax_index_no ?? $customer->Tax_Index_No ?? '',
+                    'salesperson' => $customer->SLM ?? $customer->salesperson ?? $customer->Salesperson ?? $customer->salesperson_code ?? '',
+                    'area' => $customer->AREA ?? $customer->area ?? $customer->Area ?? $customer->geographical ?? '',
+                    'debug_info' => [
+                        'found_in_table' => $usedTable,
+                        'search_code' => $customerCode
+                    ]
                 ]);
             }
 
-            // Get customer's currency and tax information with multiple fallbacks
-            // SQL Server columns: CODE, NAME, CURRENCY, SLM (salesperson), AREA
-            $currency = $customer->CURRENCY ?? $customer->currency ?? $customer->Currency ?? $customer->currency_code ?? 'IDR';
-            
-            return response()->json([
-                'customer_code' => $customer->CODE ?? $customer->customer_code ?? $customer->Customer_Code ?? '',
-                'customer_name' => $customer->NAME ?? $customer->customer_name ?? $customer->Customer_Name ?? '',
-                'currency' => $currency,
-                'tax_index_no' => $customer->tax_index_no ?? $customer->Tax_Index_No ?? '',
-                'salesperson' => $customer->SLM ?? $customer->salesperson ?? $customer->Salesperson ?? $customer->salesperson_code ?? '',
-                'area' => $customer->AREA ?? $customer->area ?? $customer->Area ?? $customer->geographical ?? '',
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Error fetching customer details: ' . $e->getMessage());
-            
-            // Return minimal values on error without overriding currency
+            // Customer not found anywhere
+            Log::warning("Customer not found in any table: {$customerCode}");
             return response()->json([
                 'customer_code' => $customerCode,
                 'customer_name' => '',
-                'currency' => null, // Don't override with IDR default
+                'currency' => 'IDR',
                 'tax_index_no' => '',
                 'salesperson' => '',
                 'area' => '',
+                'debug_info' => [
+                    'searched_tables' => array_merge(['DO'], $tables),
+                    'found_in_table' => null,
+                    'search_code' => $customerCode
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching customer details: ' . $e->getMessage(), [
+                'customer_code' => $customerCode,
+                'exception' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'customer_code' => $customerCode,
+                'customer_name' => '',
+                'currency' => 'IDR',
+                'tax_index_no' => '',
+                'salesperson' => '',
+                'area' => '',
+                'error' => 'Database error occurred',
+                'debug_info' => [
+                    'error_message' => $e->getMessage(),
+                    'search_code' => $customerCode
+                ]
+            ]);
+        }
+    }
+
+    /**
+     * Test/seed sample customers for development
+     */
+    public function seedTestCustomers(Request $request)
+    {
+        try {
+            // Insert sample customers directly (table should exist)
+            $sampleCustomers = [
+                ['code' => '000004', 'name' => 'AGILITY INTERNATIONAL, PT.', 'currency' => 'USD', 'salesperson' => 'S001', 'area' => 'Jakarta'],
+                ['code' => '000211-08', 'name' => 'TEST CUSTOMER COMPANY', 'currency' => 'IDR', 'salesperson' => 'S002', 'area' => 'Surabaya'],
+                ['code' => '000283', 'name' => 'SAMPLE CORPORATION', 'currency' => 'USD', 'salesperson' => 'S003', 'area' => 'Bandung'],
+            ];
+
+            // Table/column mappings to accommodate varied schemas
+            $tables = [
+                'CUSTOMER' => [
+                    'code' => 'CODE',
+                    'name' => 'NAME',
+                    'currency' => 'CURRENCY',
+                    'salesperson' => 'SLM',
+                    'area' => 'AREA',
+                ],
+                'Customer_Account' => [
+                    'code' => 'customer_code',
+                    'name' => 'customer_name',
+                    'currency' => 'currency',
+                    'salesperson' => 'salesperson_code',
+                    'area' => 'area',
+                ],
+                'customer_account' => [
+                    'code' => 'customer_code',
+                    'name' => 'customer_name',
+                    'currency' => 'currency',
+                    'salesperson' => 'salesperson_code',
+                    'area' => 'area',
+                ],
+                'update_customer_accounts' => [
+                    'code' => 'customer_code',
+                    'name' => 'customer_name',
+                    'currency' => 'currency',
+                    'salesperson' => 'salesperson_code',
+                    'area' => 'area',
+                ],
+            ];
+            $insertedCount = 0;
+            $usedTable = null;
+
+            foreach ($tables as $table => $columns) {
+                try {
+                    // Test if table exists by trying to select from it
+                    DB::table($table)->limit(1)->get();
+
+                    // If no exception, table exists - insert data
+                    foreach ($sampleCustomers as $customer) {
+                        $payload = [];
+                        $payload[$columns['code']] = $customer['code'];
+                        $payload[$columns['name']] = $customer['name'];
+                        $payload[$columns['currency']] = $customer['currency'];
+
+                        if (!empty($columns['salesperson'])) {
+                            $payload[$columns['salesperson']] = $customer['salesperson'];
+                        }
+                        if (!empty($columns['area'])) {
+                            $payload[$columns['area']] = $customer['area'];
+                        }
+
+                        DB::table($table)->updateOrInsert(
+                            [$columns['code'] => $customer['code']],
+                            $payload
+                        );
+                        $insertedCount++;
+                    }
+
+                    // If we've inserted data, we can stop looking for tables
+                    $usedTable = $table;
+                    Log::info("Sample customers inserted into table: {$table}");
+                    break;
+
+                } catch (\Exception $e) {
+                    Log::info("Table {$table} doesn't exist or is not accessible: " . $e->getMessage());
+                    continue;
+                }
+            }
+
+            if ($usedTable) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Sample customers created successfully',
+                    'table_used' => $usedTable,
+                    'customers_inserted' => $insertedCount,
+                    'customers' => $sampleCustomers
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No accessible customer table found',
+                    'searched_tables' => $tables
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error creating sample customers: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'message' => 'Failed to create sample customers'
             ]);
         }
     }
@@ -214,7 +461,7 @@ class InvoiceController extends Controller
 
             $existingCount = (int) DB::table('INV')->where('YYYY', $yyyy)->where('MM', $mm)->count();
             $seq = $existingCount + 1;
-            
+
             $generateNumber = function (int $seq) use ($yyyy, $mm) {
                 return sprintf('IV-%s%s-%04d', $yyyy, $mm, $seq);
             };
@@ -222,7 +469,7 @@ class InvoiceController extends Controller
             $created = [];
 
             DB::beginTransaction();
-            
+
             foreach ($payload['do_numbers'] as $doNumber) {
                 $do = DB::table('DO')->where('DO_Num', $doNumber)->first();
                 if (!$do) {
@@ -249,7 +496,7 @@ class InvoiceController extends Controller
                 // Calculate tax amounts if tax is applied
                 $tranAmount = $do->DO_Tran_Amt ?? 0;
                 $baseAmount = $do->DO_Base_Amt ?? 0;
-                
+
                 DB::table('INV')->insert([
                     'YYYY' => $yyyy,
                     'MM' => $mm,
@@ -329,7 +576,7 @@ class InvoiceController extends Controller
                     'tax_amount' => $taxPercent ? ($tranAmount * $taxPercent / 100) : 0,
                 ];
             }
-            
+
             DB::commit();
 
             return response()->json([
@@ -360,7 +607,7 @@ class InvoiceController extends Controller
             DB::beginTransaction();
 
             $invoice = DB::table('INV')->where('IV_NUM', $payload['invoice_number'])->first();
-            
+
             if (!$invoice) {
                 throw new \RuntimeException("Invoice not found");
             }
@@ -445,7 +692,7 @@ class InvoiceController extends Controller
     public function calculateTotal(Request $request)
     {
         $doNumbers = $request->input('do_numbers', []);
-        
+
         if (empty($doNumbers)) {
             return response()->json([
                 'total_amount' => 0,
@@ -469,7 +716,7 @@ class InvoiceController extends Controller
     public function getDoItems(Request $request)
     {
         $doNumber = $request->input('do_number');
-        
+
         if (!$doNumber) {
             return response()->json(['error' => 'DO number is required'], 400);
         }
