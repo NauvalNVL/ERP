@@ -397,7 +397,14 @@ const handleSelect = () => {
     // Single selection - emit only the first (and only) selected item
     const selectedDO = selectedDOs.value[0]
     console.log('📤 Emitting selected DO:', selectedDO.do_number)
+    console.log('📋 Table modal will close, Screen modal stays open')
+    
+    // Emit selection to parent - parent will handle closing this modal
     emit('select', selectedDO)  // Emit single object, not array
+    
+    // Note: We DO NOT call handleClose() here
+    // Parent component (PrepareInvoicebyDOCurrentPeriod) will close this modal
+    // via onDOsSelectedFromTable() function while keeping Screen modal open
   } else {
     console.warn('⚠️ No delivery order selected')
   }

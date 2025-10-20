@@ -42,28 +42,43 @@
               </div>
 
               <!-- Toolbar - CPS Style -->
-              <div class="px-3 py-2 bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-300 flex items-center gap-1.5 shadow-sm">
-                <button @click="handleClose" class="p-1.5 hover:bg-red-50 rounded border border-gray-300 bg-white transition-all shadow-sm" title="Power Off">
-                  <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              <div class="px-3 py-2 bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-300 shadow-sm">
+                <div class="flex items-center gap-1.5 mb-2">
+                  <button @click="handleClose" class="p-1.5 hover:bg-red-50 rounded border border-gray-300 bg-white transition-all shadow-sm" title="Power Off">
+                    <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                  </button>
+                  <button @click="openBrowseModal" class="p-1.5 hover:bg-blue-50 rounded border border-gray-300 bg-white transition-all shadow-sm" title="Browse">
+                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                      <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                  </button>
+                  <button @click="refreshData" class="p-1.5 hover:bg-green-50 rounded border border-gray-300 bg-white transition-all shadow-sm" title="Refresh">
+                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                    </svg>
+                  </button>
+                  <button @click="handleClose" class="p-1.5 hover:bg-red-50 rounded border border-gray-300 bg-white transition-all shadow-sm" title="Close">
+                    <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                  </button>
+                </div>
+                <!-- Search Bar -->
+                <div class="flex items-center gap-2 bg-white rounded border border-gray-300 px-2 py-1 shadow-sm">
+                  <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
                   </svg>
-                </button>
-                <button @click="openBrowseModal" class="p-1.5 hover:bg-blue-50 rounded border border-gray-300 bg-white transition-all shadow-sm" title="Browse">
-                  <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                  </svg>
-                </button>
-                <button @click="refreshData" class="p-1.5 hover:bg-green-50 rounded border border-gray-300 bg-white transition-all shadow-sm" title="Refresh">
-                  <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
-                  </svg>
-                </button>
-                <button @click="handleClose" class="p-1.5 hover:bg-red-50 rounded border border-gray-300 bg-white transition-all shadow-sm" title="Close">
-                  <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                  </svg>
-                </button>
+                  <input
+                    v-model="searchQuery"
+                    type="text"
+                    placeholder="Search D/Order#..."
+                    @keyup.enter="searchDeliveryOrder"
+                    class="flex-1 text-sm border-0 focus:outline-none focus:ring-0 p-0"
+                  />
+                </div>
               </div>
 
               <!-- Content -->
@@ -106,22 +121,20 @@
                         ]">
                           {{ String(index).padStart(2, '0') }}
                         </td>
-                        <td :class="[
-                          'px-2 py-2 text-sm border-r border-gray-200',
-                          selectedOrders[index-1] && isSelected(selectedOrders[index-1].do_number) ? 'text-blue-900' : 'text-gray-900'
-                        ]">
-                          <!-- First Row: Search Input + Browse Button -->
-                          <div v-if="index === 1" class="flex items-center gap-1">
+                        <td class="px-2 py-2 border-r border-gray-200">
+                          <!-- Input + Browse Button for each row -->
+                          <div class="flex items-center gap-1">
                             <input
-                              v-model="searchQuery"
+                              :value="selectedOrders[index-1]?.do_number || ''"
                               type="text"
-                              placeholder="Search D/O..."
+                              :placeholder="'D/Order# ' + String(index).padStart(2, '0')"
                               @keyup.enter="searchDeliveryOrder"
                               class="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                              :class="selectedOrders[index-1] ? 'text-blue-600 font-semibold' : 'text-gray-900'"
                             />
                             <button 
                               @click="openBrowseModal" 
-                              class="p-1.5 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-all" 
+                              class="p-1.5 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-all flex-shrink-0" 
                               title="Browse"
                             >
                               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -129,17 +142,6 @@
                                 <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                               </svg>
                             </button>
-                          </div>
-                          <!-- Other Rows: Display DO Number -->
-                          <div v-else class="flex items-center gap-2 px-2">
-                            <span 
-                              v-if="selectedOrders[index-1]" 
-                              class="font-semibold cursor-pointer text-blue-600 hover:text-blue-800 hover:underline transition-all" 
-                              @click="viewOrderItems(selectedOrders[index-1])"
-                            >
-                              {{ selectedOrders[index-1].do_number }}
-                            </span>
-                            <span v-else class="text-gray-400">-</span>
                           </div>
                         </td>
                         <td :class="[
@@ -223,19 +225,27 @@ const selectedOrders = computed(() => {
 const selectedCount = computed(() => selectedDOs.value.length)
 
 // Watch for prop changes
-watch(() => props.open, (isOpen) => {
+watch(() => props.open, (isOpen, wasOpen) => {
+  console.log('🎭 [Screen Modal] props.open changed:', wasOpen, '→', isOpen)
   if (isOpen) {
+    console.log('✅ [Screen Modal] Opening - initializing with', props.selectedDeliveryOrders?.length || 0, 'orders')
     // Initialize selectedDOs with all orders from props
     selectedDOs.value = [...(props.selectedDeliveryOrders || [])]
   } else {
+    console.log('❌ [Screen Modal] Closing - clearing selection')
     selectedDOs.value = []
   }
 })
 
 // Watch for changes in selectedDeliveryOrders
-watch(() => props.selectedDeliveryOrders, (newOrders) => {
+watch(() => props.selectedDeliveryOrders, (newOrders, oldOrders) => {
+  console.log('📦 [Screen Modal] selectedDeliveryOrders updated:', oldOrders?.length || 0, '→', newOrders?.length || 0)
+  console.log('📊 [Screen Modal] Current modal state - props.open:', props.open)
   if (props.open && newOrders) {
+    console.log('🔄 [Screen Modal] Updating internal selectedDOs with new orders')
     selectedDOs.value = [...newOrders]
+  } else {
+    console.log('⏭️ [Screen Modal] Skipping update - modal closed or no orders')
   }
 })
 
@@ -298,6 +308,8 @@ const viewOrderItems = (order) => {
 }
 
 const handleClose = () => {
+  console.log('🚪 [Screen Modal] handleClose called - emitting close event')
+  console.trace('Close triggered from:')
   emit('close')
 }
 
