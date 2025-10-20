@@ -6,7 +6,18 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <i class="fas fa-search text-xl text-orange-600"></i>
-            <h2 class="text-lg font-semibold text-gray-800">Delivery Order Lookup</h2>
+            <div>
+              <h2 class="text-lg font-semibold text-gray-800">Delivery Order Lookup</h2>
+              <p v-if="context === 'amend'" class="text-xs text-orange-600">
+                Showing only Draft and Saved orders (amendable)
+              </p>
+              <p v-else-if="context === 'cancel'" class="text-xs text-red-600">
+                Showing only Draft and Saved orders (cancellable)
+              </p>
+              <p v-else-if="context === 'print'" class="text-xs text-blue-600">
+                Showing only Saved and Completed orders (printable)
+              </p>
+            </div>
           </div>
           <button 
             @click="$emit('close')"
@@ -161,7 +172,12 @@
               <tr 
                 v-for="deliveryOrder in deliveryOrders" 
                 :key="deliveryOrder.DO_Num"
-                class="hover:bg-gray-50 cursor-pointer"
+                :class="[
+                  isSelectableDeliveryOrder(deliveryOrder) 
+                    ? 'hover:bg-gray-50 cursor-pointer' 
+                    : 'bg-gray-100 cursor-not-allowed opacity-60',
+                  !isSelectableDeliveryOrder(deliveryOrder) ? 'text-gray-500' : ''
+                ]"
                 @click="selectDeliveryOrder(deliveryOrder)"
               >
                 <td class="px-4 py-3 text-sm text-gray-900 font-medium">
@@ -188,9 +204,15 @@
                 <td class="px-4 py-3 text-sm text-gray-900">
                   <button 
                     @click.stop="selectDeliveryOrder(deliveryOrder)"
-                    class="px-3 py-1 bg-orange-600 text-white rounded text-xs hover:bg-orange-700 transition-colors"
+                    :disabled="!isSelectableDeliveryOrder(deliveryOrder)"
+                    :class="[
+                      'px-3 py-1 rounded text-xs transition-colors',
+                      isSelectableDeliveryOrder(deliveryOrder)
+                        ? 'bg-orange-600 text-white hover:bg-orange-700'
+                        : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    ]"
                   >
-                    Select
+                    {{ isSelectableDeliveryOrder(deliveryOrder) ? 'Select' : 'Cannot Select' }}
                   </button>
                 </td>
               </tr>
@@ -213,13 +235,21 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import axios from 'axios'
+import { useToast } from '@/Composables/useToast'
+
+const { error } = useToast()
 
 const props = defineProps({
   show: {
     type: Boolean,
     default: false
+  },
+  context: {
+    type: String,
+    default: 'general', // 'amend', 'cancel', 'print', 'general'
+    validator: (value) => ['amend', 'cancel', 'print', 'general'].includes(value)
   }
 })
 
@@ -240,6 +270,24 @@ const filters = reactive({
   toDate: ''
 })
 
+// Computed properties
+const isSelectableDeliveryOrder = computed(() => {
+  return (deliveryOrder) => {
+    if (props.context === 'amend') {
+      // For amend context, only Draft and Saved orders can be selected
+      return ['Draft', 'Saved'].includes(deliveryOrder.Status)
+    } else if (props.context === 'cancel') {
+      // For cancel context, only Draft and Saved orders can be selected
+      return ['Draft', 'Saved'].includes(deliveryOrder.Status)
+    } else if (props.context === 'print') {
+      // For print context, only Saved and Completed orders can be selected
+      return ['Saved', 'Completed'].includes(deliveryOrder.Status)
+    }
+    // For general context, all orders can be selected
+    return true
+  }
+})
+
 // Methods
 const searchDeliveryOrders = async () => {
   loading.value = true
@@ -252,6 +300,19 @@ const searchDeliveryOrders = async () => {
     if (filters.status) params.append('status', filters.status)
     if (filters.fromDate) params.append('from_date', filters.fromDate)
     if (filters.toDate) params.append('to_date', filters.toDate)
+    
+    // Add context-based filtering
+    if (props.context === 'amend' || props.context === 'cancel') {
+      // Only fetch Draft and Saved orders for amend/cancel context
+      if (!filters.status) {
+        params.append('status_in', 'Draft,Saved')
+      }
+    } else if (props.context === 'print') {
+      // Only fetch Saved and Completed orders for print context
+      if (!filters.status) {
+        params.append('status_in', 'Saved,Completed')
+      }
+    }
     
     const response = await axios.get(`/api/delivery-orders?${params.toString()}`)
     
@@ -306,6 +367,23 @@ const sortBy = (field) => {
 }
 
 const selectDeliveryOrder = (deliveryOrder) => {
+  if (!isSelectableDeliveryOrder.value(deliveryOrder)) {
+    // Show warning message based on context
+    let message = ''
+    if (props.context === 'amend') {
+      message = `Cannot select delivery order ${deliveryOrder.DO_Num}. Only Draft and Saved orders can be amended.`
+    } else if (props.context === 'cancel') {
+      message = `Cannot select delivery order ${deliveryOrder.DO_Num}. Only Draft and Saved orders can be cancelled.`
+    } else if (props.context === 'print') {
+      message = `Cannot select delivery order ${deliveryOrder.DO_Num}. Only Saved and Completed orders can be printed.`
+    }
+    
+    if (message) {
+      error(message)
+    }
+    return
+  }
+  
   emit('select', deliveryOrder)
 }
 

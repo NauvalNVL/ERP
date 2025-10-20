@@ -112,7 +112,7 @@
             </div>
 
             <!-- Vehicle Information -->
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Vehicle#:</label>
                 <div class="flex items-center space-x-2">
@@ -129,12 +129,6 @@
                   >
                     <i class="fas fa-th"></i>
                   </button>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Vehicle Class:</label>
-                <div class="px-3 py-2 bg-gray-100 border border-gray-300 rounded text-sm text-gray-700">
-                  {{ selectedVehicle.vehicleClass }}
                 </div>
               </div>
             </div>
@@ -224,11 +218,6 @@
               >
             </div>
           </div>
-
-          <!-- TT Activated Status -->
-          <div class="absolute top-4 right-4">
-            <span class="text-sm text-red-600 font-medium">TT Activated: No</span>
-          </div>
         </div>
 
         <!-- Notes Section -->
@@ -285,6 +274,7 @@
     <!-- Delivery Order Lookup Modal -->
     <DeliveryOrderLookupModal 
       :show="showDeliveryOrderModal" 
+      context="amend"
       @close="showDeliveryOrderModal = false" 
       @select="selectDeliveryOrder"
     />
