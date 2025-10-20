@@ -235,9 +235,12 @@
                   <button 
                     @click="handleSelect"
                     :disabled="selectedCount === 0"
-                    class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400"
+                    class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 flex items-center gap-2"
                   >
-                    Select ({{ selectedCount }})
+                    <span>Select</span>
+                    <span v-if="selectedCount > 0" class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold bg-white bg-opacity-30 rounded-full">
+                      ✓
+                    </span>
                   </button>
                   <button @click="handleClose" class="px-6 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all font-medium shadow-sm">
                     Exit
@@ -382,14 +385,17 @@ const isSelected = (doNumber) => {
 
 const toggleSelection = (item) => {
   const index = selectedDOs.value.findIndex(d => d.do_number === item.do_number)
+  
   if (index > -1) {
-    selectedDOs.value.splice(index, 1)
-    // Clear form fields when deselecting
+    // Clicking same row - deselect
+    selectedDOs.value = []
     clearFormFields()
+    console.log('❌ Deselected DO:', item.do_number)
   } else {
-    selectedDOs.value.push(item)
-    // Auto-populate form fields with selected DO data
+    // Clicking different row - single selection (clear previous and select new)
+    selectedDOs.value = [item]  // Replace entire array with single item
     populateFormFields(item)
+    console.log('✅ Selected DO (single selection):', item.do_number)
   }
 }
 
@@ -404,7 +410,12 @@ const handleClose = () => {
 
 const handleSelect = () => {
   if (selectedDOs.value.length > 0) {
-    emit('select', selectedDOs.value)
+    // Single selection - emit only the first (and only) selected item
+    const selectedDO = selectedDOs.value[0]
+    console.log('📤 Emitting selected DO:', selectedDO.do_number)
+    emit('select', selectedDO)  // Emit single object, not array
+  } else {
+    console.warn('⚠️ No delivery order selected')
   }
 }
 
