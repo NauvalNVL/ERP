@@ -217,19 +217,51 @@ watch(() => props.open, async (isOpen) => {
 const fetchTaxOptions = async () => {
   loading.value = true
   try {
-    const res = await fetch('/api/invoices/sales-tax-options', {
+    // Use same API endpoint as SalesTaxIndexModal for data consistency
+    const res = await fetch('/api/material-management/tax-types', {
       headers: { 'Accept': 'application/json' }
     })
     if (res.ok) {
       const data = await res.json()
-      // Transform data to match expected format
-      taxOptions.value = data.map(tax => ({
-        code: tax.code || tax.tax_code,
-        name: tax.name || tax.tax_name,
-        rate: parseFloat(tax.rate || tax.tax_rate || 0),
-        apply: tax.status === 'Active' || tax.apply === true || tax.apply === 'Yes',
-        include: tax.include === true || tax.include === 'Yes' || tax.tax_included === true,
-      }))
+      // Transform data to match expected format (same mapping as SalesTaxIndexModal)
+      let allTaxes = (Array.isArray(data) ? data : (data.data || [])).map(tax => {
+        const code = tax.code || tax.tax_code || tax.TaxCode || tax.Code || tax.taxtype || tax.type || tax.id || ''
+        const name = tax.name || tax.description || tax.tax_name || tax.TaxName || tax.Name || ''
+        const rate = parseFloat(tax.rate || tax.tax_rate || tax.RATEPPN || 0)
+        const status = (tax.status ?? tax.is_active ?? tax.active ?? true) ? true : false
+        
+        return {
+          code: code,
+          name: name,
+          rate: rate,
+          apply: !!status,
+          include: tax.include === true || tax.include === 'Yes' || tax.tax_included === true,
+        }
+      })
+      
+      // CPS Behavior: If preselectedTaxCode exists, only show that specific tax
+      // This matches CPS where Check Sales Tax Screen only displays the tax selected in Tax Exemption Table
+      if (props.preselectedTaxCode) {
+        console.log('Searching for tax code:', props.preselectedTaxCode)
+        console.log('Available taxes:', allTaxes.map(t => t.code))
+        
+        const selectedTaxOnly = allTaxes.find(t => 
+          t.code && props.preselectedTaxCode && 
+          t.code.toLowerCase() === props.preselectedTaxCode.toLowerCase()
+        )
+        
+        if (selectedTaxOnly) {
+          taxOptions.value = [selectedTaxOnly]
+          console.log('✅ CPS Mode: Showing only preselected tax:', selectedTaxOnly)
+        } else {
+          console.warn('⚠️ Preselected tax not found, showing all taxes')
+          taxOptions.value = allTaxes
+        }
+      } else {
+        // If no preselection, show all taxes
+        taxOptions.value = allTaxes
+        console.log('No preselection, showing all taxes:', allTaxes.length)
+      }
     } else {
       taxOptions.value = []
     }

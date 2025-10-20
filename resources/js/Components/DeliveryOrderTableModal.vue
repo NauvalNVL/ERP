@@ -32,7 +32,7 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-                    <span>Prepare Invoice by D/Order (Current Period)</span>
+                    <span>Delivery Order Table</span>
                   </DialogTitle>
                   <button @click="handleClose" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-2 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,60 +42,8 @@
                 </div>
               </div>
 
-              <!-- Back Button & Status -->
-              <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-3 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                  <button @click="handleClose" class="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-100 px-4 py-2 rounded-lg transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                    Back to Delivery Order Screen
-                  </button>
-                  <div class="text-sm font-semibold text-gray-600">
-                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{{ filteredOrders.length }} delivery orders found</span>
-                  </div>
-                </div>
-              </div>
-
               <!-- Content -->
               <div class="p-6 bg-gray-50">
-                <!-- Title -->
-                <div class="mb-3">
-                  <h3 class="text-sm font-bold text-gray-700">Delivery Order Table</h3>
-                </div>
-
-                <!-- Section Above Table (2x2 Grid) -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-3">
-                  <div class="grid grid-cols-2 gap-x-6 gap-y-3">
-                    <!-- Row 1 -->
-                    <div class="flex items-center gap-3">
-                      <label class="text-xs font-semibold text-gray-700 w-28">Current Period:</label>
-                      <div class="flex gap-2 flex-1">
-                        <input v-model="filters.currentPeriodMonth" type="text" maxlength="2" placeholder="10" class="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center focus:ring-1 focus:ring-blue-500"/>
-                        <input v-model="filters.currentPeriodYear" type="text" maxlength="4" placeholder="2025" class="w-20 px-2 py-1 border border-gray-300 rounded text-sm text-center focus:ring-1 focus:ring-blue-500"/>
-                        <span class="text-xs text-gray-500 self-center">mm/yyyy</span>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                      <label class="text-xs font-semibold text-gray-700 w-28">Update Period:</label>
-                      <div class="flex gap-2 flex-1">
-                        <input v-model="filters.updatePeriodMonth" type="text" maxlength="2" placeholder="10" class="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center focus:ring-1 focus:ring-blue-500"/>
-                        <input v-model="filters.updatePeriodYear" type="text" maxlength="4" placeholder="2025" class="w-20 px-2 py-1 border border-gray-300 rounded text-sm text-center focus:ring-1 focus:ring-blue-500"/>
-                        <span class="text-xs text-gray-500 self-center">mm/yyyy</span>
-                      </div>
-                    </div>
-                    <!-- Row 2 -->
-                    <div class="flex items-center gap-3">
-                      <label class="text-xs font-semibold text-gray-700 w-28">Customer:</label>
-                      <input readonly :value="customerCode" class="flex-1 px-2 py-1 bg-gray-50 border border-gray-300 rounded text-sm"/>
-                    </div>
-                    <div class="flex items-center gap-3">
-                      <label class="text-xs font-semibold text-gray-700 w-28">Currency:</label>
-                      <input v-model="filters.currency" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"/>
-                    </div>
-                  </div>
-                </div>
-
                 <!-- Table Container with Modern Shadow -->
                 <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
                   <!-- Table -->
@@ -171,20 +119,7 @@
 
                 <!-- Filter Section (Below Table) - Exact CPS Layout -->
                 <div class="mt-3 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                  <!-- Row 1: Tax Index No & Invoice Date -->
-                  <div class="grid grid-cols-2 gap-x-4 gap-y-2 mb-3">
-                    <div class="flex items-center gap-2">
-                      <label class="text-xs font-semibold text-gray-700 w-32">Tax Index No:</label>
-                      <input v-model="filters.taxIndexNo" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"/>
-                      <button class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50 text-sm">📋</button>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <label class="text-xs font-semibold text-gray-700 w-32">Invoice Date:</label>
-                      <input v-model="filters.invoiceDate" type="text" placeholder="14/10/22" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"/>
-                    </div>
-                  </div>
-
-                  <!-- Row 2: D/Order# with icons + Search -->
+                  <!-- Row 1: D/Order# with icons + Search -->
                   <div class="mb-3">
                     <div class="flex items-center gap-2">
                       <label class="text-xs font-semibold text-gray-700 w-32">D/Order#:</label>
@@ -198,15 +133,7 @@
                     </div>
                   </div>
 
-                  <!-- Row 3: 2nd Reference# (Full Width) -->
-                  <div class="mb-3">
-                    <div class="flex items-center gap-2">
-                      <label class="text-xs font-semibold text-gray-700 w-32">2nd Reference#:</label>
-                      <input v-model="filters.secondReference" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"/>
-                    </div>
-                  </div>
-
-                  <!-- Row 4: Cust. Name (Full Width) -->
+                  <!-- Row 2: Cust. Name (Full Width) -->
                   <div class="mb-3">
                     <div class="flex items-center gap-2">
                       <label class="text-xs font-semibold text-gray-700 w-32">Cust. Name:</label>
@@ -302,34 +229,21 @@
 
                 <!-- Action Buttons in Content -->
                 <div class="mt-6 flex justify-center gap-3">
-                  <button class="px-6 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all font-medium shadow-sm">
-                    Zoom
-                  </button>
                   <button 
-                    @click="handleSelect"
-                    :disabled="selectedCount === 0"
-                    class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400"
+                    @click="handleClose" 
+                    class="px-6 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all font-medium shadow-sm"
                   >
-                    Select ({{ selectedCount }})
-                  </button>
-                  <button @click="handleClose" class="px-6 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all font-medium shadow-sm">
-                    Exit
-                  </button>
-                </div>
-              </div>
-
-              <!-- Footer -->
-              <div class="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-4 border-t border-gray-200">
-                <div class="flex justify-center gap-3">
-                  <button @click="handleClose" class="px-8 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all font-medium shadow-sm">
                     Cancel
                   </button>
                   <button 
                     @click="handleSelect"
                     :disabled="selectedCount === 0"
-                    class="px-8 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400"
+                    class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 flex items-center gap-2"
                   >
-                    OK
+                    <span>Select</span>
+                    <span v-if="selectedCount > 0" class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold bg-white bg-opacity-30 rounded-full">
+                      ✓
+                    </span>
                   </button>
                 </div>
               </div>
@@ -348,7 +262,9 @@ import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } fro
 const props = defineProps({
   open: { type: Boolean, default: false },
   customerCode: { type: String, default: '' },
-  customerName: { type: String, default: '' }
+  customerName: { type: String, default: '' },
+  periodMonth: { type: String, default: '' },
+  periodYear: { type: String, default: '' }
 })
 
 const emit = defineEmits(['close', 'select'])
@@ -408,22 +324,41 @@ watch(() => props.open, async (isOpen) => {
 // Methods
 const fetchDeliveryOrders = async () => {
   try {
-    let url = '/api/invoices/current-period-do'
+    // Build query parameters
+    const params = new URLSearchParams()
+    
+    // Add customer code if available
     if (props.customerCode) {
-      url += `?customer_code=${encodeURIComponent(props.customerCode)}`
+      params.append('customer_code', props.customerCode)
     }
+    
+    // Add period from props or filters
+    const month = props.periodMonth || filters.value.currentPeriodMonth
+    const year = props.periodYear || filters.value.currentPeriodYear
+    
+    if (month && year) {
+      params.append('period_month', month)
+      params.append('period_year', year)
+    }
+    
+    const url = `/api/invoices/delivery-orders?${params.toString()}`
+    console.log('Fetching delivery orders from:', url)
     
     const res = await fetch(url, {
       headers: { 'Accept': 'application/json' }
     })
     
     if (res.ok) {
-      deliveryOrders.value = await res.json()
+      const data = await res.json()
+      deliveryOrders.value = data
+      console.log(`✅ Loaded ${data.length} delivery orders from DO table`)
     } else {
+      const error = await res.text()
+      console.error('Failed to fetch delivery orders:', error)
       deliveryOrders.value = []
     }
   } catch (e) {
-    console.error('Failed to fetch delivery orders:', e)
+    console.error('Error fetching delivery orders:', e)
     deliveryOrders.value = []
   }
 }
@@ -434,10 +369,17 @@ const isSelected = (doNumber) => {
 
 const toggleSelection = (item) => {
   const index = selectedDOs.value.findIndex(d => d.do_number === item.do_number)
+  
   if (index > -1) {
-    selectedDOs.value.splice(index, 1)
+    // Clicking same row - deselect
+    selectedDOs.value = []
+    clearFormFields()
+    console.log('❌ Deselected DO:', item.do_number)
   } else {
-    selectedDOs.value.push(item)
+    // Clicking different row - single selection (clear previous and select new)
+    selectedDOs.value = [item]  // Replace entire array with single item
+    populateFormFields(item)
+    console.log('✅ Selected DO (single selection):', item.do_number)
   }
 }
 
@@ -452,7 +394,12 @@ const handleClose = () => {
 
 const handleSelect = () => {
   if (selectedDOs.value.length > 0) {
-    emit('select', selectedDOs.value)
+    // Single selection - emit only the first (and only) selected item
+    const selectedDO = selectedDOs.value[0]
+    console.log('📤 Emitting selected DO:', selectedDO.do_number)
+    emit('select', selectedDO)  // Emit single object, not array
+  } else {
+    console.warn('⚠️ No delivery order selected')
   }
 }
 
@@ -468,6 +415,73 @@ const formatDate = (dateString) => {
   } catch (e) {
     return dateString
   }
+}
+
+/**
+ * Auto-populate form fields with selected DO data
+ */
+const populateFormFields = (order) => {
+  console.log('🔄 Auto-populating fields with DO:', order.do_number)
+  console.log('📦 Order data received:', order)
+  console.log('📦 Full order object:', JSON.stringify(order, null, 2))
+  
+  // D/Order# - primary identifier
+  filters.value.doNumber = order.do_number || ''
+  
+  // Salesperson - from customer table
+  const salespersonValue = order.salesperson || ''
+  filters.value.salesperson = salespersonValue
+  
+  console.log('👤 Salesperson value:', {
+    raw: order.salesperson,
+    type: typeof order.salesperson,
+    assigned: salespersonValue,
+    isEmpty: !salespersonValue,
+    isUndefined: order.salesperson === undefined,
+    isNull: order.salesperson === null,
+    isEmptyString: order.salesperson === ''
+  })
+  
+  // D/O Inst1 & Inst2 - from remarks
+  filters.value.doInst1 = order.remark1 || ''
+  filters.value.doInst2 = order.remark2 || ''
+  
+  // Sales Type - default to 'Sales'
+  filters.value.salesType = 'Sales'
+  
+  console.log('✅ Form fields populated:', {
+    doNumber: filters.value.doNumber,
+    salesperson: filters.value.salesperson,
+    doInst1: filters.value.doInst1,
+    doInst2: filters.value.doInst2
+  })
+  
+  // Warning if salesperson is empty
+  if (!salespersonValue) {
+    console.warn('⚠️ Salesperson is empty for customer:', order.customer_code)
+  }
+}
+
+/**
+ * Clear form fields when deselecting DO
+ */
+const clearFormFields = () => {
+  console.log('Clearing form fields')
+  filters.value.doNumber = ''
+  filters.value.salesperson = ''
+  filters.value.crTicket = ''
+  filters.value.onHold = ''
+  filters.value.agentCust = ''
+  filters.value.doInst1 = ''
+  filters.value.doInst2 = ''
+  filters.value.preparedBy = ''
+  filters.value.preparedDate = ''
+  filters.value.amendedBy = ''
+  filters.value.amendedDate = ''
+  filters.value.cancelledBy = ''
+  filters.value.cancelledDate = ''
+  filters.value.printedBy = ''
+  filters.value.printedDate = ''
 }
 </script>
 

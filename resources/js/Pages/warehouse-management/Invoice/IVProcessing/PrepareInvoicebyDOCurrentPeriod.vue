@@ -203,12 +203,20 @@
 
             <!-- Tax Index No. -->
             <div v-if="hasCustomer" class="col-span-12 md:col-span-4">
-              <label class="block text-xs font-medium text-gray-700 mb-1">Tax Index No.</label>
-              <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
-                <input v-model="taxIndexNo" type="text" class="flex-1 px-3 py-2 text-sm outline-none border-0" />
-                <button @click="taxModalOpen = true" class="px-3 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700">
+              <label class="block text-xs font-medium text-gray-700 mb-1">
+                Tax Index No. <span class="text-red-600">*</span>
+              </label>
+              <div class="flex rounded-md shadow-sm ring-1 ring-inset overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200" :class="taxIndexNo ? 'ring-gray-300' : 'ring-red-300 bg-red-50'">
+                <input v-model="taxIndexNo" type="text" class="flex-1 px-3 py-2 text-sm outline-none border-0 bg-transparent" placeholder="Select tax from table..." />
+                <button @click="taxModalOpen = true" class="px-3 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700" title="Browse Tax">
                   <i class="fa fa-search"></i>
                 </button>
+              </div>
+              <!-- Fixed height container to prevent layout jump -->
+              <div class="h-5 mt-1">
+                <p v-show="!taxIndexNo" class="text-xs text-red-600 transition-opacity duration-200" :class="!taxIndexNo ? 'opacity-100' : 'opacity-0'">
+                  <i class="fa fa-exclamation-circle"></i> Required: Please select a tax
+                </p>
               </div>
             </div>
 
@@ -325,6 +333,8 @@
         :open="doSelectionModalOpen"
         :customerCode="customerCode"
         :customerName="customerName"
+        :periodMonth="currentMonth"
+        :periodYear="currentYear"
         @close="handleDetailedDOClose"
         @select="onDOsSelectedFromTable"
       />
@@ -367,7 +377,7 @@ import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
 import SalesTaxIndexModal from '@/Components/SalesTaxIndexModal.vue'
 import CheckSalesTaxModal from '@/Components/CheckSalesTaxModal.vue'
 import DeliveryOrderScreenModal from '@/Components/DeliveryOrderScreenModal.vue'
-import DeliveryOrderSelectionModal from '@/Components/DeliveryOrderSelectionModal.vue'
+import DeliveryOrderSelectionModal from '@/Components/DeliveryOrderTableModal.vue'
 import FinalTaxCalculationModal from '@/Components/FinalTaxCalculationModal.vue'
 import SalesOrderItemsModal from '@/Components/SalesOrderItemsModal.vue'
 import InvoiceNumberOptionModal from '@/Components/InvoiceNumberOptionModal.vue'
@@ -504,6 +514,12 @@ function selectTaxIndex(row){
  */
 function openFlow(){
   if (!hasCustomer.value) return
+
+  // CPS Validation: Tax Index No is MANDATORY
+  if (!taxIndexNo.value || taxIndexNo.value.trim() === '') {
+    alert('Please select Tax Index No. from Customer Sales Tax or Sales Tax Exemption Table.\n\nClick the search icon (🔍) next to Tax Index No. field to select a tax.')
+    return
+  }
 
   // Fetch tax options first
   fetchTaxOptions().then(() => {

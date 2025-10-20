@@ -160,6 +160,40 @@ Route::prefix('invoices')->group(function () {
     Route::get('/log', [InvoiceController::class, 'getInvoiceLog']);
     Route::post('/calculate-total', [InvoiceController::class, 'calculateTotal']);
     Route::get('/do-items', [InvoiceController::class, 'getDoItems']);
+    Route::get('/delivery-orders', [InvoiceController::class, 'getDeliveryOrders']);
+    
+    // Debug endpoint to test salesperson query
+    Route::get('/test-salesperson/{customerCode}', function($customerCode) {
+        $customerData = DB::select("
+            SELECT 
+                CODE as customer_code, 
+                NAME as customer_name, 
+                SLM as salesperson_code,
+                AREA as area
+            FROM CUSTOMER 
+            WHERE CODE = ?
+        ", [$customerCode]);
+        
+        $result = [
+            'customer_code' => $customerCode,
+            'found' => !empty($customerData),
+            'data' => $customerData,
+            'count' => count($customerData)
+        ];
+        
+        // Also get salesperson name if found
+        if (!empty($customerData) && !empty($customerData[0]->salesperson_code)) {
+            $salespersonTeam = DB::select("
+                SELECT s_person_code, salesperson_name 
+                FROM salesperson_teams 
+                WHERE s_person_code = ?
+            ", [$customerData[0]->salesperson_code]);
+            
+            $result['salesperson_name'] = !empty($salespersonTeam) ? $salespersonTeam[0]->salesperson_name : 'Not found in salesperson_teams';
+        }
+        
+        return response()->json($result);
+    });
 });
 
 // Debug endpoint to check customer tables

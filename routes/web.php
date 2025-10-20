@@ -711,6 +711,10 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/CancelDeliveryOrder');
     })->name('vue.warehouse-management.delivery-order.do-processing.cancel-delivery-order');
 
+    Route::get('/warehouse-management/delivery-order/do-processing/print-delivery-order', function () {
+        return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/PrintDeliveryOrder');
+    })->name('vue.warehouse-management.delivery-order.do-processing.print-delivery-order');
+
     Route::get('/warehouse-management/invoice', function () {
         return Inertia::render('warehouse-management/Invoice/index');
     })->name('vue.warehouse-management.invoice');
@@ -1249,6 +1253,7 @@ Route::prefix('api')->group(function () {
     Route::get('/delivery-orders/{doNumber}', [DeliveryOrderController::class, 'show']);
     Route::put('/delivery-orders/{doNumber}', [DeliveryOrderController::class, 'update']);
     Route::post('/delivery-orders/{doNumber}/cancel', [DeliveryOrderController::class, 'cancel']);
+    Route::get('/delivery-orders/print-range', [DeliveryOrderController::class, 'getPrintRange']);
     Route::get('/vehicles/{vehicleNumber}', [DeliveryOrderController::class, 'getVehicle']);
 
 

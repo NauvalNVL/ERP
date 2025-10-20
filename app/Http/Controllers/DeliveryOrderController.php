@@ -458,4 +458,72 @@ class DeliveryOrderController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get delivery orders for print range
+     */
+    public function getPrintRange(Request $request)
+    {
+        try {
+            $query = DB::table('DO')
+                ->leftJoin('AC', 'DO.AC_Num', '=', 'AC.AC_Num')
+                ->select(
+                    'DO.DO_Num',
+                    'DO.DO_DMY',
+                    'DO.AC_Num',
+                    'AC.AC_Name',
+                    'DO.DO_VHC_Num',
+                    'DO.Status',
+                    'DO.DO_Remark1',
+                    'DO.DO_Remark2'
+                );
+
+            // Filter by DO number range
+            if ($request->from_month && $request->from_year && $request->from_number) {
+                $fromDO = sprintf('%02d-%04d-%05d', 
+                    $request->from_month, 
+                    $request->from_year, 
+                    $request->from_number
+                );
+                $query->where('DO.DO_Num', '>=', $fromDO);
+            }
+
+            if ($request->to_month && $request->to_year && $request->to_number) {
+                $toDO = sprintf('%02d-%04d-%05d', 
+                    $request->to_month, 
+                    $request->to_year, 
+                    $request->to_number
+                );
+                $query->where('DO.DO_Num', '<=', $toDO);
+            }
+
+            // Filter by customer if specified
+            if ($request->customer_code) {
+                $query->where('DO.AC_Num', $request->customer_code);
+            }
+
+            // Filter by status for print (only Saved and Completed)
+            $query->whereIn('DO.Status', ['Saved', 'Completed']);
+
+            // Filter by new entry mode if specified
+            if ($request->new_entry_mode === 'print_only') {
+                // Add logic for new entries only if needed
+            }
+
+            $deliveryOrders = $query->orderBy('DO.DO_Num', 'asc')->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $deliveryOrders
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching delivery orders for print: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching delivery orders for print: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

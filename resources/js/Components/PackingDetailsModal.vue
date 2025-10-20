@@ -56,8 +56,8 @@
                     <input 
                       v-model="item.pDesign"
                       type="text"
-                      class="w-full px-2 py-1 text-xs border-0 focus:ring-0"
-                      :placeholder="item.name === 'Main' ? 'B1' : ''"
+                      class="w-full px-2 py-1 text-xs border-0 focus:ring-0 bg-gray-50"
+                      placeholder=""
                       readonly
                     >
                   </td>
@@ -65,8 +65,8 @@
                     <input 
                       v-model="item.pcsRolls"
                       type="text"
-                      class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-center"
-                      :placeholder="item.name === 'Main' ? '5' : ''"
+                      class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-center bg-gray-50"
+                      placeholder=""
                       readonly
                     >
                   </td>
@@ -74,8 +74,8 @@
                     <input 
                       v-model="item.toDel"
                       type="text"
-                      class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-right"
-                      :placeholder="item.name === 'Main' ? '500' : ''"
+                      class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-right bg-gray-50"
+                      placeholder=""
                       readonly
                     >
                   </td>
@@ -85,14 +85,14 @@
                         v-model="item.rolls"
                         type="text"
                         class="w-12 px-1 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 text-center"
-                        :placeholder="item.name === 'Main' ? '100' : ''"
+                        placeholder=""
                       >
                       <span class="text-xs text-gray-600">x</span>
                       <input 
                         v-model="item.qty"
                         type="text"
                         class="w-8 px-1 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 text-center"
-                        :placeholder="item.name === 'Main' ? '5' : ''"
+                        placeholder=""
                       >
                       <span class="text-xs text-gray-600">x</span>
                       <input 
@@ -141,6 +141,7 @@
       :sales-order-detail-data="salesOrderDetailData"
       @close="showFinishedGoodsOffsetsModal = false"
       @save="handleFinishedGoodsOffsetsSave"
+      @save-delivery-order="handleSaveDeliveryOrder"
     />
   </div>
 </template>
@@ -165,7 +166,7 @@ const props = defineProps({
 })
 
 // Emits
-const emit = defineEmits(['close', 'save'])
+const emit = defineEmits(['close', 'save', 'save-delivery-order'])
 
 // Modal state
 const showFinishedGoodsOffsetsModal = ref(false)
@@ -176,11 +177,11 @@ const currentPackingData = ref({})
 const packingItems = ref([
   { 
     name: 'Main', 
-    pDesign: 'B1', 
-    pcsRolls: '5', 
-    toDel: '500', 
-    rolls: '100', 
-    qty: '5', 
+    pDesign: '', 
+    pcsRolls: '', 
+    toDel: '', 
+    rolls: '', 
+    qty: '', 
     looseQty: '', 
     remark: '' 
   },
@@ -234,26 +235,65 @@ const handleFinishedGoodsOffsetsSave = (offsetsData) => {
   success('Finished goods offsets saved successfully')
 }
 
+const handleSaveDeliveryOrder = (offsetsData) => {
+  // Combine all data and emit save-delivery-order to parent
+  const completeData = {
+    packingDetails: currentPackingData.value,
+    finishedGoodsOffsets: offsetsData
+  }
+  
+  emit('save-delivery-order', completeData)
+  showFinishedGoodsOffsetsModal.value = false
+  success('Delivery order saved successfully')
+}
+
 // Initialize with sales order detail data if available
 onMounted(() => {
   if (props.salesOrderDetailData && props.salesOrderDetailData.itemRows) {
     // Populate packing items from sales order detail data
     props.salesOrderDetailData.itemRows.forEach((item, index) => {
-      if (index < packingItems.value.length && item.toDeliver) {
+      if (index < packingItems.value.length) {
         const packingItem = packingItems.value[index]
         packingItem.pDesign = item.pDesign || ''
         packingItem.pcsRolls = item.pcs || ''
-        packingItem.toDel = item.toDeliver || ''
         
-        // Set default values for Main item
-        if (item.name === 'Main' && item.toDeliver) {
-          packingItem.rolls = '100'
-          packingItem.qty = '5'
+        // Set "To Del" from "To Deliver" data
+        const toDeliverValue = parseFloat(item.toDeliver) || 0
+        if (toDeliverValue > 0) {
+          packingItem.toDel = item.toDeliver || ''
+          
+          // Set default packing values for items with delivery quantity
+          if (item.name === 'Main') {
+            packingItem.rolls = '100'
+            packingItem.qty = '5'
+          }
+        } else {
+          packingItem.toDel = ''
         }
       }
     })
   }
   
+  // Also check if there's "To Delivery Set" data and no individual "To Deliver" items
+  if (props.salesOrderDetailData && props.salesOrderDetailData.orderDetail) {
+    const orderDetail = props.salesOrderDetailData.orderDetail
+    const toDeliverySetValue = parseFloat(orderDetail.toDeliverySet) || 0
+    
+    // If "To Delivery Set" is filled but no individual "To Deliver" items
+    const hasIndividualToDeliver = props.salesOrderDetailData.itemRows?.some(item => 
+      parseFloat(item.toDeliver) > 0
+    )
+    
+    if (toDeliverySetValue > 0 && !hasIndividualToDeliver) {
+      // Set "To Del" for Main item from "To Delivery Set"
+      const mainItem = packingItems.value.find(item => item.name === 'Main')
+      if (mainItem) {
+        mainItem.toDel = orderDetail.toDeliverySet
+        mainItem.rolls = '100'
+        mainItem.qty = '5'
+      }
+    }
+  }
 })
 </script>
 

@@ -160,11 +160,6 @@
               </div>
             </div>
           </div>
-
-          <!-- TT Activated Status -->
-          <div class="absolute top-4 right-4">
-            <span class="text-sm text-red-600 font-medium">TT Activated: No</span>
-          </div>
         </div>
 
         <!-- Notes Section -->
@@ -222,6 +217,7 @@
     <!-- Delivery Order Lookup Modal -->
     <DeliveryOrderLookupModal 
       :show="showDeliveryOrderModal" 
+      context="cancel"
       @close="showDeliveryOrderModal = false" 
       @select="selectDeliveryOrder"
     />

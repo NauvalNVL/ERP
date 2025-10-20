@@ -298,6 +298,7 @@
       :customer-data="selectedCustomer"
       @close="showSalesOrderModal = false" 
       @save="handleSalesOrderSave"
+      @save-delivery-order="handleSalesOrderDeliveryOrderSave"
     />
   </AppLayout>
 </template>
@@ -505,6 +506,55 @@ const handleSalesOrderSave = (salesOrderData) => {
   }
   
   success('Sales order and packing details saved successfully')
+  showSalesOrderModal.value = false
+}
+
+const handleSalesOrderDeliveryOrderSave = async (salesOrderData) => {
+  console.log('Complete Sales Order Data for Delivery Order:', salesOrderData)
+  
+  // Process the complete data from Sales Order Detail + Packing Details + Finished Goods Offsets
+  if (salesOrderData.salesOrderDetail) {
+    const detailData = salesOrderData.salesOrderDetail
+    console.log('Order Detail:', detailData.orderDetail)
+    console.log('Item Rows:', detailData.itemRows)
+    
+    // Update delivery order with SO details
+    if (detailData.orderDetail.sOrderMonth && detailData.orderDetail.sOrderYear && detailData.orderDetail.sOrderSeq) {
+      const soNumber = `${detailData.orderDetail.sOrderMonth}-${detailData.orderDetail.sOrderYear}-${detailData.orderDetail.sOrderSeq}`
+      console.log('Processing SO Number:', soNumber)
+      
+      // Store the SO data for further processing
+      deliveryOrder.soNumber = soNumber
+      deliveryOrder.mcardSeq = detailData.orderDetail.mcardSeq
+      deliveryOrder.pOrderRef = detailData.orderDetail.pOrderRef
+      deliveryOrder.itemDetails = detailData.itemRows
+    }
+  }
+  
+  // Process packing details if available
+  if (salesOrderData.packingDetails) {
+    const packingData = salesOrderData.packingDetails
+    console.log('Packing Items:', packingData.packingItems)
+    
+    // Store packing data
+    deliveryOrder.packingItems = packingData.packingItems
+  }
+  
+  // Process finished goods offsets if available
+  if (salesOrderData.finishedGoodsOffsets) {
+    const offsetsData = salesOrderData.finishedGoodsOffsets
+    console.log('Offset Details:', offsetsData.offsetDetails)
+    console.log('Offset Items:', offsetsData.offsetItems)
+    console.log('Sales Order Data:', offsetsData.salesOrderData)
+    
+    // Store offsets data
+    deliveryOrder.offsetDetails = offsetsData.offsetDetails
+    deliveryOrder.offsetItems = offsetsData.offsetItems
+    deliveryOrder.salesOrderData = offsetsData.salesOrderData
+  }
+  
+  // Now save the delivery order
+  await saveDeliveryOrder()
   showSalesOrderModal.value = false
 }
 

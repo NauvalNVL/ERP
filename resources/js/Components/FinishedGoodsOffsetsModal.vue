@@ -208,10 +208,10 @@
             Cancel
           </button>
           <button 
-            @click="handleSave"
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            @click="handleSaveDeliveryOrder"
+            class="px-6 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            Save Changes
+            Save Delivery Order
           </button>
         </div>
       </div>
@@ -242,7 +242,7 @@ const props = defineProps({
 })
 
 // Emits
-const emit = defineEmits(['close', 'save'])
+const emit = defineEmits(['close', 'save', 'save-delivery-order'])
 
 // Reactive data
 const offsetDetails = reactive({
@@ -332,6 +332,17 @@ const handleSave = () => {
   
   emit('save', data)
   success('Finished goods offsets saved successfully')
+}
+
+const handleSaveDeliveryOrder = () => {
+  const data = {
+    offsetDetails,
+    offsetItems: offsetItems.value,
+    salesOrderData: salesOrderData.value
+  }
+  
+  emit('save-delivery-order', data)
+  success('Saving delivery order...')
 }
 
 // Initialize with data from previous screens

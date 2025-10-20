@@ -738,4 +738,165 @@ class InvoiceController extends Controller
         return response()->json($items);
     }
 
+    /**
+     * Get Delivery Orders from DO table for Delivery Order Table modal
+     * Filters by customer code and period
+     */
+    public function getDeliveryOrders(Request $request)
+    {
+        try {
+            $customerCode = $request->input('customer_code');
+            $periodMonth = $request->input('period_month');
+            $periodYear = $request->input('period_year');
+
+            // Build query
+            $query = DB::table('DO');
+
+            // Filter by customer if provided
+            if ($customerCode) {
+                $query->where('AC_Num', $customerCode);
+            }
+
+            // Filter by period if provided
+            if ($periodMonth && $periodYear) {
+                $query->where('DOMM', str_pad($periodMonth, 2, '0', STR_PAD_LEFT))
+                      ->where('DOYYYY', $periodYear);
+            }
+
+            // Get delivery orders with aggregated item count and additional fields
+            $deliveryOrders = $query
+                ->select([
+                    'DO_Num',
+                    'DO_DMY',
+                    'AC_Num',
+                    'AC_Name',
+                    'DO_VHC_Num',
+                    'COMP',
+                    'Status',
+                    'SO_Num',
+                    'PO_Num',
+                    'DO_Remark1',
+                    'DO_Remark2',
+                    'SLM',  // Salesperson from DO table
+                    'Area1', // Area from DO table
+                    DB::raw('COUNT(*) as item_count'),
+                    DB::raw('MAX(DOYYYY) as year'),
+                    DB::raw('MAX(DOMM) as month')
+                ])
+                ->groupBy([
+                    'DO_Num',
+                    'DO_DMY',
+                    'AC_Num',
+                    'AC_Name',
+                    'DO_VHC_Num',
+                    'COMP',
+                    'Status',
+                    'SO_Num',
+                    'PO_Num',
+                    'DO_Remark1',
+                    'DO_Remark2',
+                    'SLM',
+                    'Area1'
+                ])
+                ->orderBy('DO_DMY', 'desc')
+                ->orderBy('DO_Num', 'desc')
+                ->get();
+
+            // Transform data to match frontend structure and fetch salesperson
+            $formattedOrders = $deliveryOrders->map(function ($order) use ($customerCode) {
+                // Get salesperson - prioritize DO table SLM, then fallback to CUSTOMER table
+                $salesperson = '';
+                $salespersonCode = '';
+                
+                try {
+                    Log::info("=== Processing DO {$order->DO_Num} for customer: {$order->AC_Num} ===");
+                    
+                    // Priority 1: Get salesperson from DO table (most accurate - specific to this DO)
+                    if (!empty($order->SLM)) {
+                        $salespersonCode = $order->SLM;
+                        Log::info("✅ Salesperson from DO table: {$salespersonCode}");
+                    } else {
+                        // Priority 2: Fallback to CUSTOMER table
+                        Log::info("⚠️ No SLM in DO, trying CUSTOMER table...");
+                        
+                        $customerData = DB::select("
+                            SELECT SLM as salesperson_code
+                            FROM CUSTOMER 
+                            WHERE CODE = ?
+                            LIMIT 1
+                        ", [$order->AC_Num]);
+                        
+                        if (!empty($customerData) && !empty($customerData[0]->salesperson_code)) {
+                            $salespersonCode = $customerData[0]->salesperson_code;
+                            Log::info("✅ Salesperson from CUSTOMER table: {$salespersonCode}");
+                        } else {
+                            Log::warning("⚠️ No salesperson found in DO or CUSTOMER table for {$order->AC_Num}");
+                        }
+                    }
+                    
+                    // If we have salesperson code, get the name
+                    if (!empty($salespersonCode)) {
+                        $salespersonTeam = DB::select("
+                            SELECT s_person_code, salesperson_name 
+                            FROM salesperson_teams 
+                            WHERE s_person_code = ?
+                            LIMIT 1
+                        ", [$salespersonCode]);
+                        
+                        if (!empty($salespersonTeam)) {
+                            $salesperson = $salespersonCode . ' - ' . $salespersonTeam[0]->salesperson_name;
+                            Log::info("✅ Final salesperson: {$salesperson}");
+                        } else {
+                            $salesperson = $salespersonCode;
+                            Log::info("✅ Salesperson code only: {$salesperson}");
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::error("❌ Failed to fetch salesperson: " . $e->getMessage(), [
+                        'do_number' => $order->DO_Num,
+                        'customer' => $order->AC_Num,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+                
+                $result = [
+                    'do_number' => $order->DO_Num,
+                    'do_date' => $order->DO_DMY,
+                    'customer_code' => $order->AC_Num,
+                    'customer_name' => $order->AC_Name,
+                    'vehicle_no' => $order->DO_VHC_Num,
+                    'item_count' => intval($order->item_count),
+                    'pc' => $order->COMP,
+                    'mode' => 'Multiple',
+                    'status' => $order->Status,
+                    'so_number' => $order->SO_Num,
+                    'po_number' => $order->PO_Num,
+                    'remark1' => $order->DO_Remark1,
+                    'remark2' => $order->DO_Remark2,
+                    'period_month' => $order->month,
+                    'period_year' => $order->year,
+                    'salesperson' => $salesperson,
+                ];
+                
+                Log::info("📦 Final DO response for {$order->DO_Num}:", [
+                    'salesperson' => $salesperson,
+                    'is_empty' => empty($salesperson)
+                ]);
+                
+                return $result;
+            });
+
+            Log::info("📤 Returning " . count($formattedOrders) . " delivery orders to frontend");
+            
+            return response()->json($formattedOrders);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching delivery orders: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to fetch delivery orders',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

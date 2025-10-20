@@ -307,6 +307,7 @@
       :sales-order-data="currentSalesOrderData"
       @close="showSalesOrderDetailModal = false"
       @save="handleSalesOrderDetailSave"
+      @save-delivery-order="handleSalesOrderDeliveryOrderSave"
     />
   </div>
 </template>
@@ -332,7 +333,7 @@ const props = defineProps({
 })
 
 // Emits
-const emit = defineEmits(['close', 'save'])
+const emit = defineEmits(['close', 'save', 'save-delivery-order'])
 
 // Reactive data
 const selectedEntryIndex = ref(0)
@@ -409,6 +410,11 @@ const handleSalesOrderSelect = (selectedOrder) => {
       entry.sOrder2 = ''
       entry.sOrder3 = ''
     }
+    
+    // Store the complete selected order data for use in Sales Order Detail
+    entry.selectedOrderData = selectedOrder
+    entry.mcardSeq = selectedOrder.mcardSeq || ''
+    entry.pOrderRef = selectedOrder.pOrderRef || selectedOrder.customerPORef || ''
   }
   showSalesOrderTableModal.value = false
   success('Sales order selected successfully')
@@ -436,7 +442,8 @@ const handleSave = () => {
     pOrderRef: selectedEntry.pOrderRef || '',
     orderInfo,
     itemDetails: itemDetails.value,
-    bottomInfo
+    bottomInfo,
+    selectedOrderData: selectedEntry.selectedOrderData || null
   }
   
   // Close current modal and open Sales Order Detail Modal
@@ -455,6 +462,18 @@ const handleSalesOrderDetailSave = (detailData) => {
   emit('save', completeData)
   showSalesOrderDetailModal.value = false
   success('Sales order detail saved successfully')
+}
+
+const handleSalesOrderDeliveryOrderSave = (detailData) => {
+  const completeData = {
+    salesOrderData: currentSalesOrderData.value,
+    detailData: detailData,
+    selectedEntryIndex: selectedEntryIndex.value
+  }
+  
+  emit('save-delivery-order', completeData)
+  showSalesOrderDetailModal.value = false
+  success('Delivery order will be saved')
 }
 
 // Initialize with customer data if available
