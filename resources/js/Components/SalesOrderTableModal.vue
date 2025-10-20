@@ -103,8 +103,8 @@
                   <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Salesperson:</label>
                     <div class="flex space-x-2">
-                      <input type="text" v-model="orderInfo.salespersonCode" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm" readonly />
-                      <input type="text" v-model="orderInfo.salespersonName" class="w-24 px-2 py-1 border border-gray-300 rounded text-sm" readonly />
+                      <input type="text" v-model="orderInfo.salespersonCode" class="w-24 px-2 py-1 border border-gray-300 rounded text-sm" readonly placeholder="Code" />
+                      <input type="text" v-model="orderInfo.salespersonName" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm" readonly placeholder="Name" />
                     </div>
                   </div>
                   <div>
@@ -209,6 +209,9 @@
 import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import axios from 'axios'
+import { useToast } from '@/Composables/useToast'
+
+const { success, error, info } = useToast()
 
 const props = defineProps({
   isOpen: {
@@ -235,20 +238,20 @@ const soNumberFilter = ref('')
 const orderInfo = reactive({
   customerName: '',
   model: '',
-  orderMode: '0-Order by Customer + Deliver & Invoice to Customer',
+  orderMode: '',
   salespersonCode: '',
   salespersonName: '',
-  orderGroup: 'Sales',
-  orderType: 'S1'
+  orderGroup: '',
+  orderType: ''
 })
 
 const itemDetails = ref([
-  { name: 'PD', main: 'B1', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' },
-  { name: 'PCS', main: '1', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' },
-  { name: 'UNIT', main: 'Pcs', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' },
-  { name: 'ORDER', main: '450', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' },
+  { name: 'PD', main: '', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' },
+  { name: 'PCS', main: '', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' },
+  { name: 'UNIT', main: '', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' },
+  { name: 'ORDER', main: '', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' },
   { name: 'NET DELIVERY', main: '', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' },
-  { name: 'BALANCE', main: '450', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' }
+  { name: 'BALANCE', main: '', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' }
 ])
 
 // Computed properties
@@ -264,6 +267,7 @@ const closeModal = () => {
 const selectOrder = (index) => {
   if (typeof index === 'number') {
     selectedOrderIndex.value = index
+    // Fetch and update order info when selecting
     updateOrderInfo()
   } else {
     // Select button clicked
@@ -303,51 +307,122 @@ const selectItem = (index) => {
   selectedItemIndex.value = index
 }
 
-const updateOrderInfo = () => {
+const updateOrderInfo = async () => {
   if (selectedOrder.value) {
-    orderInfo.customerName = selectedOrder.value.customerName || ''
-    orderInfo.model = selectedOrder.value.model || ''
-    orderInfo.salespersonCode = selectedOrder.value.salespersonCode || ''
-    orderInfo.salespersonName = selectedOrder.value.salespersonName || ''
-    orderInfo.orderGroup = selectedOrder.value.orderGroup || 'Sales'
-    orderInfo.orderType = selectedOrder.value.orderType || 'S1'
+    try {
+      // Fetch detailed sales order data from new endpoint
+      const response = await axios.get(`/api/sales-order/${selectedOrder.value.soNumber}/detail`)
+      
+      console.log('API Response:', response.data)
+      
+      if (response.data.success) {
+        const data = response.data.data
+        
+        console.log('Order Info from API:', data.order_info)
+        console.log('Salesperson Code:', data.order_info.salesperson_code)
+        console.log('Salesperson Name:', data.order_info.salesperson_name)
+        
+        // Update order information
+        orderInfo.customerName = data.order_info.customer_name || ''
+        orderInfo.model = data.order_info.model || ''
+        orderInfo.orderMode = data.order_info.order_mode || '0-Order by Customer + Deliver & Invoice to Customer'
+        orderInfo.salespersonCode = data.order_info.salesperson_code || ''
+        orderInfo.salespersonName = data.order_info.salesperson_name || ''
+        orderInfo.orderGroup = data.order_info.order_group || 'Sales'
+        orderInfo.orderType = data.order_info.order_type || 'S1'
+        
+        console.log('Updated orderInfo:', orderInfo)
+        
+        // Update item details - Main item (PD row)
+        if (data.item_details) {
+          // PD (Product Design)
+          itemDetails.value[0].main = data.item_details.pd || ''
+          // PCS (Pieces per set)
+          itemDetails.value[1].main = data.item_details.pcs || ''
+          // UNIT
+          itemDetails.value[2].main = data.item_details.unit || ''
+          // ORDER (Order Quantity)
+          itemDetails.value[3].main = data.item_details.order_qty || ''
+          // NET DELIVERY
+          itemDetails.value[4].main = data.item_details.net_delivery || '0'
+          // BALANCE
+          itemDetails.value[5].main = data.item_details.balance || ''
+        }
+        
+        // Update fittings (F1-F9) if available
+        if (data.fittings && data.fittings.length > 0) {
+          data.fittings.forEach((fitting, index) => {
+            if (index < 9) { // F1-F9
+              const colKey = `f${index + 1}`
+              // PD row - fitting design
+              itemDetails.value[0][colKey] = fitting.design || ''
+              // PCS row - fitting pcs
+              itemDetails.value[1][colKey] = fitting.pcs || ''
+              // UNIT row - fitting unit
+              itemDetails.value[2][colKey] = fitting.unit || ''
+            }
+          })
+        }
+        
+        success('Sales order details loaded successfully')
+      } else {
+        error(response.data.message || 'Failed to load sales order details')
+      }
+    } catch (err) {
+      console.error('Error fetching sales order details:', err)
+      console.error('Error response:', err.response)
+      error('Error loading sales order details')
+    }
   }
 }
 
 const searchOrders = async () => {
   try {
     // Fetch sales orders from API based on customer code
-    const response = await axios.get('/api/sales-orders', {
-      params: {
-        customer_code: props.customerData?.code,
-        month: searchTerm1.value,
-        year: searchTerm2.value,
-        sequence: searchTerm3.value,
-        so_number: soNumberFilter.value
-      }
-    })
+    const params = {
+      customer_code: props.customerData?.code
+    }
+    
+    // Add search parameters if provided
+    if (searchTerm1.value && searchTerm1.value !== '0') {
+      params.month = searchTerm1.value
+    }
+    if (searchTerm2.value && searchTerm2.value !== '0') {
+      params.year = searchTerm2.value
+    }
+    if (searchTerm3.value && searchTerm3.value !== '0') {
+      params.sequence = searchTerm3.value
+    }
+    if (soNumberFilter.value) {
+      params.so_number = soNumberFilter.value
+    }
+    
+    const response = await axios.get('/api/sales-orders', { params })
     
     if (response.data.success) {
-      // Map API data to component format
-      salesOrders.value = response.data.data.map(order => ({
-        soNumber: order.SO_Num,
-        customerPo: order.PO_Num,
-        acNumber: order.AC_Num,
-        mcsNumber: order.MCS_Num,
-        statusLocation: order.STS,
-        customerName: order.AC_NAME,
-        model: order.MODEL,
-        salespersonCode: order.SLM,
-        salespersonName: order.SLM, // Assuming SLM contains salesperson name
-        orderGroup: order.GROUP_ || 'Sales',
-        orderType: order.TYPE || 'S1'
-      }))
+      // Map API data to component format and sort by SO number
+      salesOrders.value = response.data.data
+        .map(order => ({
+          soNumber: order.so_number,
+          customerPo: order.customer_po_number || '',
+          acNumber: order.customer_code || '',
+          mcsNumber: order.master_card_seq || '',
+          statusLocation: order.status || 'Outs',
+          customerName: order.customer_name || '',
+          model: order.master_card_model || '',
+          salespersonCode: order.salesperson_code || '',
+          salespersonName: order.salesperson_code || '',
+          orderGroup: order.order_group || 'Sales',
+          orderType: order.order_type || 'S1'
+        }))
+        .sort((a, b) => {
+          // Sort by SO number in descending order (newest first)
+          return b.soNumber.localeCompare(a.soNumber)
+        })
       
-      // Select first order by default
-      if (salesOrders.value.length > 0) {
-        selectedOrderIndex.value = 0
-        updateOrderInfo()
-      }
+      // Do NOT select first order by default - keep containers empty
+      selectedOrderIndex.value = -1
+      clearOrderInfo()
     } else {
       console.error('API Error:', response.data.message)
       salesOrders.value = []
@@ -372,6 +447,31 @@ watch(() => props.isOpen, (isOpen) => {
   }
 })
 
+const clearOrderInfo = () => {
+  // Clear order information
+  orderInfo.customerName = ''
+  orderInfo.model = ''
+  orderInfo.orderMode = ''
+  orderInfo.salespersonCode = ''
+  orderInfo.salespersonName = ''
+  orderInfo.orderGroup = ''
+  orderInfo.orderType = ''
+  
+  // Clear item details
+  itemDetails.value.forEach(item => {
+    item.main = ''
+    item.f1 = ''
+    item.f2 = ''
+    item.f3 = ''
+    item.f4 = ''
+    item.f5 = ''
+    item.f6 = ''
+    item.f7 = ''
+    item.f8 = ''
+    item.f9 = ''
+  })
+}
+
 const loadSalesOrders = async () => {
   try {
     // Load sales orders for the customer
@@ -379,8 +479,8 @@ const loadSalesOrders = async () => {
       console.log('Loading sales orders for customer:', props.customerData.code)
       await searchOrders()
     } else {
-      console.log('No customer selected, loading all sales orders')
-      await searchOrders()
+      console.log('No customer selected')
+      salesOrders.value = []
     }
   } catch (error) {
     console.error('Error loading sales orders:', error)

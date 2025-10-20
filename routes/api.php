@@ -377,6 +377,8 @@ Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderContr
 Route::post('/sales-order/save-to-so', [App\Http\Controllers\SalesOrderController::class, 'apiStoreToSo']);
 // Get sales orders for Print SO
 Route::get('/sales-orders', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrders']);
+// Get sales order detail by SO number
+Route::get('/sales-order/{soNumber}/detail', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrderDetail']);
 
 // Alternative route with /api prefix for consistency
 Route::get('/api/sales-orders', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrders']);
@@ -418,6 +420,8 @@ Route::get('/user/current', function() {
         ]
     ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
 });
+// Note: /api/user/current route moved to web.php for proper session authentication
+// See routes/web.php line ~258 for the authenticated user endpoint
 
 // Vehicle API routes
 Route::get('/vehicles', [VehicleController::class, 'apiIndex']);

@@ -87,6 +87,22 @@ class SalesOrderController extends Controller
         $mcModel = $masterCardData ? $masterCardData->MODEL : '';
         $mcPDesign = $masterCardData ? $masterCardData->P_DESIGN : '';
         $mcPartNumber = $masterCardData ? $masterCardData->PART_NO : '';
+        
+        // Extract dimensions and flute data from MC table
+        $intL = $masterCardData ? (float)($masterCardData->INT_LENGTH ?? 0) : 0;
+        $intW = $masterCardData ? (float)($masterCardData->INT_WIDTH ?? 0) : 0;
+        $intH = $masterCardData ? (float)($masterCardData->INT_HEIGHT ?? 0) : 0;
+        $extL = $masterCardData ? (float)($masterCardData->EXT_LENGTH ?? 0) : 0;
+        $extW = $masterCardData ? (float)($masterCardData->EXT_WIDTH ?? 0) : 0;
+        $extH = $masterCardData ? (float)($masterCardData->EXT_HEIGHT ?? 0) : 0;
+        $flute = $masterCardData ? ($masterCardData->FLUTE ?? '') : '';
+        
+        // Extract paper quality (PQ1-PQ5) from MC table (SO_PQ1-SO_PQ5)
+        $pq1 = $masterCardData ? ($masterCardData->SO_PQ1 ?? '') : '';
+        $pq2 = $masterCardData ? ($masterCardData->SO_PQ2 ?? '') : '';
+        $pq3 = $masterCardData ? ($masterCardData->SO_PQ3 ?? '') : '';
+        $pq4 = $masterCardData ? ($masterCardData->SO_PQ4 ?? '') : '';
+        $pq5 = $masterCardData ? ($masterCardData->SO_PQ5 ?? '') : '';
 
         // Prepare minimal legacy SO row so schedule updates can find it
         $qty = (float) ($validated['details'][0]['order_quantity'] ?? 0);
@@ -123,18 +139,20 @@ class SalesOrderController extends Controller
             'PER_SET' => 1,
             'UNIT' => (string) ($validated['details'][0]['uom'] ?? ''),
             'PART_NUMBER' => $partNumber,
-            'INT_L' => 0,
-            'INT_W' => 0,
-            'INT_H' => 0,
-            'EXT_L' => 0,
-            'EXT_W' => 0,
-            'EXT_H' => 0,
-            'FLUTE' => '',
-            'PQ1' => '',
-            'PQ2' => '',
-            'PQ3' => '',
-            'PQ4' => '',
-            'PQ5' => '',
+            // Populate dimensions from MC table
+            'INT_L' => $intL,
+            'INT_W' => $intW,
+            'INT_H' => $intH,
+            'EXT_L' => $extL,
+            'EXT_W' => $extW,
+            'EXT_H' => $extH,
+            // Populate flute and paper quality from MC table
+            'FLUTE' => $flute,
+            'PQ1' => $pq1,
+            'PQ2' => $pq2,
+            'PQ3' => $pq3,
+            'PQ4' => $pq4,
+            'PQ5' => $pq5,
             'SO_QTY' => $qty,
             'UNIT_PRICE' => $price,
             'CURR' => (string) ($validated['currency'] ?? ''),
@@ -528,6 +546,28 @@ class SalesOrderController extends Controller
         $price = (float) ($validated['details'][0]['unit_price'] ?? 0);
         $amount = $qty * $price;
         $partNumber = (string) ($request->input('part_number') ?? $request->input('partNo') ?? $request->input('master_card_model') ?? '');
+        
+        // Fetch master card data from MC table to populate dimensions and paper quality
+        $masterCardData = DB::table('MC')
+            ->where('MCS_Num', $validated['master_card_seq'])
+            ->where('AC_NUM', $validated['customer_code'])
+            ->first();
+        
+        // Extract dimensions and flute data from MC table
+        $intL = $masterCardData ? (float)($masterCardData->INT_LENGTH ?? 0) : 0;
+        $intW = $masterCardData ? (float)($masterCardData->INT_WIDTH ?? 0) : 0;
+        $intH = $masterCardData ? (float)($masterCardData->INT_HEIGHT ?? 0) : 0;
+        $extL = $masterCardData ? (float)($masterCardData->EXT_LENGTH ?? 0) : 0;
+        $extW = $masterCardData ? (float)($masterCardData->EXT_WIDTH ?? 0) : 0;
+        $extH = $masterCardData ? (float)($masterCardData->EXT_HEIGHT ?? 0) : 0;
+        $flute = $masterCardData ? ($masterCardData->FLUTE ?? '') : '';
+        
+        // Extract paper quality (PQ1-PQ5) from MC table (SO_PQ1-SO_PQ5)
+        $pq1 = $masterCardData ? ($masterCardData->SO_PQ1 ?? '') : '';
+        $pq2 = $masterCardData ? ($masterCardData->SO_PQ2 ?? '') : '';
+        $pq3 = $masterCardData ? ($masterCardData->SO_PQ3 ?? '') : '';
+        $pq4 = $masterCardData ? ($masterCardData->SO_PQ4 ?? '') : '';
+        $pq5 = $masterCardData ? ($masterCardData->SO_PQ5 ?? '') : '';
 
         $nowDate = date('Y-m-d');
         $nowTime = date('H:i');
@@ -556,18 +596,20 @@ class SalesOrderController extends Controller
             'PER_SET' => 1,
             'UNIT' => (string) ($validated['details'][0]['uom'] ?? ''),
             'PART_NUMBER' => $partNumber,
-            'INT_L' => 0,
-            'INT_W' => 0,
-            'INT_H' => 0,
-            'EXT_L' => 0,
-            'EXT_W' => 0,
-            'EXT_H' => 0,
-            'FLUTE' => '',
-            'PQ1' => '',
-            'PQ2' => '',
-            'PQ3' => '',
-            'PQ4' => '',
-            'PQ5' => '',
+            // Populate dimensions from MC table
+            'INT_L' => $intL,
+            'INT_W' => $intW,
+            'INT_H' => $intH,
+            'EXT_L' => $extL,
+            'EXT_W' => $extW,
+            'EXT_H' => $extH,
+            // Populate flute and paper quality from MC table
+            'FLUTE' => $flute,
+            'PQ1' => $pq1,
+            'PQ2' => $pq2,
+            'PQ3' => $pq3,
+            'PQ4' => $pq4,
+            'PQ5' => $pq5,
             'SO_QTY' => $qty,
             'UNIT_PRICE' => $price,
             'CURR' => (string) ($validated['currency'] ?? ''),
@@ -633,95 +675,354 @@ class SalesOrderController extends Controller
     {
         Log::info('getSalesOrders called with params:', $request->all());
         
-        $query = DB::table('so');
-
-        // Filter by month and year
-        if ($request->has('month') && $request->has('year')) {
-            $month = str_pad($request->input('month'), 2, '0', STR_PAD_LEFT);
-            $year = $request->input('year');
-            Log::info('Filtering by month/year:', ['month' => $month, 'year' => $year]);
-            $query->where('MM', $month)
-                  ->where('YYYY', $year);
+        // Clean output buffers
+        while (ob_get_level()) {
+            ob_end_clean();
         }
+        
+        try {
+            $query = DB::table('so');
+            
+            // Filter by customer code (for Sales Order Table Modal)
+            if ($request->has('customer_code') && !empty($request->customer_code)) {
+                $query->where('AC_Num', $request->customer_code);
+                Log::info('Filtering by customer:', ['customer_code' => $request->customer_code]);
+            }
 
-        // Filter by SO number range - Support both old and new format
-        if ($request->has('from_so') && $request->has('to_so')) {
-            $fromSO = $request->input('from_so');
-            $toSO = $request->input('to_so');
+            // Filter by month and year
+            if ($request->has('month') && !empty($request->month) && $request->month !== '0') {
+                $month = str_pad($request->input('month'), 2, '0', STR_PAD_LEFT);
+                $query->where('MM', $month);
+                Log::info('Filtering by month:', ['month' => $month]);
+            }
             
-            Log::info('Filtering SO range:', ['from_so' => $fromSO, 'to_so' => $toSO]);
+            if ($request->has('year') && !empty($request->year) && $request->year !== '0') {
+                $year = $request->input('year');
+                $query->where('YYYY', $year);
+                Log::info('Filtering by year:', ['year' => $year]);
+            }
             
-            // Check if we need to support old format (SO-YYYYMMDD-XXXX)
-            // For backward compatibility, also search old format
-            $query->where(function($q) use ($fromSO, $toSO) {
-                // New format: MM-YYYY-XXXXX
-                $q->whereBetween('SO_Num', [$fromSO, $toSO]);
+            // Filter by sequence
+            if ($request->has('sequence') && !empty($request->sequence) && $request->sequence !== '0') {
+                // Extract sequence from SO_Num format MM-YYYY-XXXXX
+                $query->whereRaw("SUBSTRING_INDEX(SO_Num, '-', -1) = ?", [str_pad($request->sequence, 5, '0', STR_PAD_LEFT)]);
+                Log::info('Filtering by sequence:', ['sequence' => $request->sequence]);
+            }
+            
+            // Filter by SO number (partial match)
+            if ($request->has('so_number') && !empty($request->so_number)) {
+                $query->where('SO_Num', 'like', '%' . $request->so_number . '%');
+                Log::info('Filtering by SO number:', ['so_number' => $request->so_number]);
+            }
+
+            // Filter by SO number range - Support both old and new format
+            if ($request->has('from_so') && $request->has('to_so')) {
+                $fromSO = $request->input('from_so');
+                $toSO = $request->input('to_so');
                 
-                // Old format: SO-YYYYMMDD-XXXX (always include for backward compatibility)
-                $q->orWhere('SO_Num', 'like', 'SO-%');
-            });
-        }
+                Log::info('Filtering SO range:', ['from_so' => $fromSO, 'to_so' => $toSO]);
+                
+                $query->where(function($q) use ($fromSO, $toSO) {
+                    // New format: MM-YYYY-XXXXX
+                    $q->whereBetween('SO_Num', [$fromSO, $toSO]);
+                    
+                    // Old format: SO-YYYYMMDD-XXXX (always include for backward compatibility)
+                    $q->orWhere('SO_Num', 'like', 'SO-%');
+                });
+            }
 
-        // Filter by status
-        if ($request->has('status')) {
-            $statuses = $request->input('status');
-            Log::info('Filtering by status:', ['status' => $statuses]);
-            if (is_array($statuses) && !empty($statuses)) {
-                $statusMap = [
-                    'outstanding' => 'OPEN',
-                    'partial' => 'PARTIAL',
-                    'completed' => 'COMPLETED',
-                    'closed' => 'CLOSED',
-                    'cancelled' => 'CANCELLED'
-                ];
-                $dbStatuses = [];
-                foreach ($statuses as $status) {
-                    if (isset($statusMap[$status])) {
-                        $dbStatuses[] = $statusMap[$status];
+            // Filter by status
+            if ($request->has('status')) {
+                $statuses = $request->input('status');
+                Log::info('Filtering by status:', ['status' => $statuses]);
+                if (is_array($statuses) && !empty($statuses)) {
+                    $statusMap = [
+                        'outstanding' => 'OPEN',
+                        'partial' => 'PARTIAL',
+                        'completed' => 'COMPLETED',
+                        'closed' => 'CLOSED',
+                        'cancelled' => 'CANCELLED'
+                    ];
+                    $dbStatuses = [];
+                    foreach ($statuses as $status) {
+                        if (isset($statusMap[$status])) {
+                            $dbStatuses[] = $statusMap[$status];
+                        }
+                    }
+                    if (!empty($dbStatuses)) {
+                        Log::info('Mapped DB statuses:', ['dbStatuses' => $dbStatuses]);
+                        $query->whereIn('STS', $dbStatuses);
                     }
                 }
-                if (!empty($dbStatuses)) {
-                    Log::info('Mapped DB statuses:', ['dbStatuses' => $dbStatuses]);
-                    $query->whereIn('STS', $dbStatuses);
+            }
+
+            // Get SQL query for debugging
+            $sql = $query->toSql();
+            $bindings = $query->getBindings();
+            Log::info('SQL Query:', ['sql' => $sql, 'bindings' => $bindings]);
+
+            $salesOrders = $query->orderBy('SO_Num', 'desc')
+                                ->limit(100)
+                                ->get();
+
+            Log::info('Query result count:', ['count' => $salesOrders->count()]);
+            if ($salesOrders->count() > 0) {
+                Log::info('First result:', ['first' => $salesOrders->first()]);
+                Log::info('Last result:', ['last' => $salesOrders->last()]);
+            } else {
+                Log::warning('No sales orders found with current filters');
+                
+                // Check if there are any records in the table at all
+                $totalCount = DB::table('so')->count();
+                Log::info('Total SO records in database:', ['total' => $totalCount]);
+                
+                if ($totalCount > 0) {
+                    // Get some sample records
+                    $samples = DB::table('so')->limit(5)->get(['SO_Num', 'MM', 'YYYY', 'STS', 'AC_Num']);
+                    Log::info('Sample SO records:', ['samples' => $samples]);
                 }
             }
+            
+            // Map to expected format for Sales Order Table Modal
+            $formattedOrders = $salesOrders->map(function($order) {
+                return [
+                    'so_number' => $order->SO_Num,
+                    'customer_code' => $order->AC_Num,
+                    'customer_name' => $order->AC_NAME,
+                    'customer_po_number' => $order->PO_Num,
+                    'master_card_seq' => $order->MCS_Num,
+                    'master_card_model' => $order->MODEL,
+                    'p_design' => $order->P_DESIGN,
+                    'salesperson_code' => $order->SLM,
+                    'order_group' => $order->GROUP_,
+                    'order_type' => $order->TYPE,
+                    'status' => $order->STS,
+                    'order_quantity' => $order->SO_QTY,
+                    'uom' => $order->UNIT,
+                    'unit_price' => $order->UNIT_PRICE,
+                    'amount' => $order->AMOUNT,
+                    'remark' => $order->SO_REMARK,
+                    'instruction1' => $order->SO_INSTRUCTION_1,
+                    'instruction2' => $order->SO_INSTRUCTION_2,
+                    'delivery_location' => $order->D_LOC_Num,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $formattedOrders,
+                'count' => $formattedOrders->count(),
+                'debug' => [
+                    'sql' => $sql,
+                    'bindings' => $bindings,
+                    'count' => $salesOrders->count()
+                ]
+            ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
+            
+        } catch (\Exception $e) {
+            Log::error('Error fetching sales orders:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching sales orders: ' . $e->getMessage()
+            ], 500, ['Content-Type' => 'application/json; charset=utf-8']);
         }
-
-        // Get SQL query for debugging
-        $sql = $query->toSql();
-        $bindings = $query->getBindings();
-        Log::info('SQL Query:', ['sql' => $sql, 'bindings' => $bindings]);
-
-        $salesOrders = $query->orderBy('SO_Num', 'desc')
-                            ->limit(100)
-                            ->get();
-
-        Log::info('Query result count:', ['count' => $salesOrders->count()]);
-        if ($salesOrders->count() > 0) {
-            Log::info('First result:', ['first' => $salesOrders->first()]);
-            Log::info('Last result:', ['last' => $salesOrders->last()]);
-        } else {
-            Log::warning('No sales orders found with current filters');
+    }
+    
+    /**
+     * Get sales order detail by SO number
+     */
+    public function getSalesOrderDetail(Request $request, $soNumber): JsonResponse
+    {
+        // Clean output buffers
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        try {
+            Log::info('Fetching sales order detail', ['so_number' => $soNumber]);
             
-            // Check if there are any records in the table at all
-            $totalCount = DB::table('so')->count();
-            Log::info('Total SO records in database:', ['total' => $totalCount]);
+            // Fetch sales order from SO table
+            $salesOrder = DB::table('so')
+                ->where('SO_Num', $soNumber)
+                ->first();
             
-            if ($totalCount > 0) {
-                // Get some sample records
-                $samples = DB::table('so')->limit(5)->get(['SO_Num', 'MM', 'YYYY', 'STS']);
-                Log::info('Sample SO records:', ['samples' => $samples]);
+            if (!$salesOrder) {
+                Log::warning('Sales order not found', ['so_number' => $soNumber]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sales order not found'
+                ], 404, ['Content-Type' => 'application/json; charset=utf-8']);
             }
+            
+            Log::info('Sales order found', ['so_data' => $salesOrder]);
+            
+            // Get salesperson data from SALESPERSON table
+            $salesperson = null;
+            if (!empty($salesOrder->SLM)) {
+                try {
+                    // Try uppercase table name first (legacy)
+                    $salesperson = DB::table('SALESPERSON')
+                        ->where('CODE', $salesOrder->SLM)
+                        ->first();
+                    
+                    // If not found, try lowercase table name
+                    if (!$salesperson) {
+                        $salesperson = DB::table('salesperson')
+                            ->where('code', $salesOrder->SLM)
+                            ->first();
+                    }
+                    
+                    if ($salesperson) {
+                        Log::info('Salesperson found', [
+                            'code' => $salesOrder->SLM,
+                            'salesperson' => $salesperson
+                        ]);
+                    } else {
+                        Log::warning('Salesperson not found in both tables', [
+                            'code' => $salesOrder->SLM
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Error fetching salesperson', [
+                        'code' => $salesOrder->SLM,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+            
+            // Get master card data for additional details
+            $masterCard = null;
+            if (!empty($salesOrder->MCS_Num) && !empty($salesOrder->AC_Num)) {
+                try {
+                    $masterCard = DB::table('MC')
+                        ->where('MCS_Num', $salesOrder->MCS_Num)
+                        ->where('AC_NUM', $salesOrder->AC_Num)
+                        ->first();
+                    
+                    if ($masterCard) {
+                        Log::info('Master card found', ['mc_seq' => $salesOrder->MCS_Num]);
+                    } else {
+                        Log::warning('Master card not found', [
+                            'mc_seq' => $salesOrder->MCS_Num,
+                            'ac_num' => $salesOrder->AC_Num
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Error fetching master card', [
+                        'mc_seq' => $salesOrder->MCS_Num,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+            
+            // Format order information
+            $salespersonName = '';
+            if ($salesperson) {
+                // Try uppercase NAME field first (legacy)
+                $salespersonName = $salesperson->NAME ?? $salesperson->name ?? $salesOrder->SLM ?? '';
+            } else {
+                $salespersonName = $salesOrder->SLM ?? '';
+            }
+            
+            $orderInfo = [
+                'customer_name' => $salesOrder->AC_NAME ?? '',
+                'model' => $salesOrder->MODEL ?? '',
+                'order_mode' => '0-Order by Customer + Deliver & Invoice to Customer',
+                'salesperson_code' => $salesOrder->SLM ?? '',
+                'salesperson_name' => $salespersonName,
+                'order_group' => $salesOrder->GROUP_ ?? 'Sales',
+                'order_type' => $salesOrder->TYPE ?? 'S1',
+            ];
+            
+            // Format item details from SO table
+            $itemDetails = [
+                'pd' => $salesOrder->P_DESIGN ?? '',
+                'pcs' => $salesOrder->PER_SET ?? '1',
+                'unit' => $salesOrder->UNIT ?? '',
+                'order_qty' => $salesOrder->SO_QTY ?? '0',
+                'net_delivery' => '0',
+                'balance' => $salesOrder->SO_QTY ?? '0',
+            ];
+            
+            // Calculate net delivery from D_QTY fields
+            $netDelivery = 0;
+            for ($i = 1; $i <= 10; $i++) {
+                $qtyField = $i === 10 ? 'D_QTY_10' : "D_QTY_{$i}";
+                if (isset($salesOrder->{$qtyField})) {
+                    $netDelivery += (float)$salesOrder->{$qtyField};
+                }
+            }
+            $itemDetails['net_delivery'] = $netDelivery;
+            $itemDetails['balance'] = (float)($salesOrder->SO_QTY ?? 0) - $netDelivery;
+            
+            // Get fittings from master card if available
+            $fittings = [];
+            if ($masterCard) {
+                // Convert object to array for easier access
+                $mcArray = (array)$masterCard;
+                
+                // Check for fitting data in MC table
+                for ($i = 1; $i <= 9; $i++) {
+                    $designField = "FIT{$i}_DESIGN";
+                    $pcsField = "FIT{$i}_PCS";
+                    $unitField = "FIT{$i}_UNIT";
+                    
+                    // Check if design field exists and has value
+                    if (isset($mcArray[$designField]) && !empty($mcArray[$designField])) {
+                        $fittings[] = [
+                            'design' => $mcArray[$designField],
+                            'pcs' => $mcArray[$pcsField] ?? '',
+                            'unit' => $mcArray[$unitField] ?? '',
+                        ];
+                    }
+                }
+            }
+            
+            Log::info('Successfully prepared response', [
+                'fittings_count' => count($fittings),
+                'net_delivery' => $netDelivery,
+                'salesperson_code' => $orderInfo['salesperson_code'],
+                'salesperson_name' => $orderInfo['salesperson_name']
+            ]);
+            
+            $responseData = [
+                'success' => true,
+                'data' => [
+                    'order_info' => $orderInfo,
+                    'item_details' => $itemDetails,
+                    'fittings' => $fittings,
+                    'so_number' => $salesOrder->SO_Num ?? '',
+                    'customer_po' => $salesOrder->PO_Num ?? '',
+                    'master_card_seq' => $salesOrder->MCS_Num ?? '',
+                    'part_number' => $salesOrder->PART_NUMBER ?? '',
+                ]
+            ];
+            
+            Log::info('Response data', ['response' => $responseData]);
+            
+            return response()->json($responseData, 200, ['Content-Type' => 'application/json; charset=utf-8']);
+            
+        } catch (\Exception $e) {
+            Log::error('Error fetching sales order detail:', [
+                'so_number' => $soNumber,
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching sales order detail: ' . $e->getMessage(),
+                'debug' => [
+                    'line' => $e->getLine(),
+                    'file' => basename($e->getFile())
+                ]
+            ], 500, ['Content-Type' => 'application/json; charset=utf-8']);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $salesOrders,
-            'debug' => [
-                'sql' => $sql,
-                'bindings' => $bindings,
-                'count' => $salesOrders->count()
-            ]
-        ]);
     }
 }
