@@ -1189,6 +1189,7 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
     const payload = {
             mc_seq: form.value.mcs,
             customer_code: form.value.ac,
+            customer_name: form.value.customer_name || '', // Pass customer name to backend
             mc_model: form.value.mc_model || '',
             mc_short_model: form.value.mc_short_model || '',
             status: form.value.mc_status || 'Active',
@@ -2215,6 +2216,7 @@ const saveRecord = async () => {
         const payload = {
             mc_seq: form.value.mcs,
             customer_code: form.value.ac,
+            customer_name: form.value.customer_name || '', // Pass customer name to backend
             mc_model: form.value.mc_model || '',
             mc_short_model: form.value.mc_short_model || '',
             status: form.value.mc_status || 'Active',

@@ -3,15 +3,6 @@
     <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50" v-page-transition>
       <div class="max-w-6xl mx-auto px-4 py-8">
         <!-- Header Section -->
-        <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4 shadow-lg">
-            <i class="fa-solid fa-print text-white text-2xl"></i>
-          </div>
-          <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Print Sales Order
-          </h1>
-          <p class="text-gray-600 text-lg">Generate and print sales order reports with modern interface</p>
-        </div>
 
         <!-- Main Card -->
         <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 animate-fade-in-up">
@@ -346,11 +337,15 @@ const fetchCurrentUser = async () => {
     console.log('Fetching current user...')
     const response = await axios.get('/api/user/current')
     console.log('User API response:', response.data)
+    
     if (response.data.success) {
       currentUser.value = response.data.data
-      console.log('Current user loaded:', currentUser.value)
+      console.log('✅ Current user loaded successfully:', currentUser.value)
+      console.log('  - user_id:', currentUser.value.user_id)
+      console.log('  - official_name:', currentUser.value.official_name)
+      console.log('  - username:', currentUser.value.username)
     } else {
-      console.warn('Failed to fetch current user:', response.data.message)
+      console.warn('❌ Failed to fetch current user:', response.data.message)
       currentUser.value = {
         user_id: 'guest',
         official_name: 'Guest User',
@@ -358,7 +353,8 @@ const fetchCurrentUser = async () => {
       }
     }
   } catch (error) {
-    console.error('Error fetching current user:', error)
+    console.error('❌ Error fetching current user:', error)
+    console.error('Error details:', error.response?.data)
     // Fallback to default if user not authenticated
     currentUser.value = {
       user_id: 'guest',
@@ -638,13 +634,26 @@ async function downloadPdf() {
   try {
     // Ensure current user is loaded first
     if (!currentUser.value.user_id || currentUser.value.user_id === '') {
-      console.log('User not loaded yet, fetching...')
+      console.log('⚠️ User not loaded yet, fetching...')
       await fetchCurrentUser()
       // Wait a bit to ensure the ref is updated
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 200))
     }
     
-    console.log('Starting PDF generation with user:', currentUser.value)
+    console.log('➡️ Starting PDF generation')
+    console.log('  Current user data:', JSON.stringify(currentUser.value, null, 2))
+    console.log('  user_id:', currentUser.value.user_id)
+    console.log('  official_name:', currentUser.value.official_name)
+    
+    // Alert for debugging
+    if (!currentUser.value.user_id || currentUser.value.user_id === '' || currentUser.value.user_id === 'guest') {
+      alert(`⚠️ WARNING: User data not loaded properly!
+
+user_id: ${currentUser.value.user_id}
+official_name: ${currentUser.value.official_name}
+
+Please check browser console for details.`)
+    }
     
     const doc = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' })
     
@@ -763,8 +772,12 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   const pageWidth = 595
   let yPos = 60
   
-  // Debug: Log current user data
-  console.log('renderSalesOrderPdf - currentUser:', currentUser.value)
+  // Debug: Log current user data at PDF render time
+  console.log('➡️ renderSalesOrderPdf called')
+  console.log('  currentUser.value:', currentUser.value)
+  console.log('  user_id:', currentUser.value.user_id)
+  console.log('  official_name:', currentUser.value.official_name)
+  console.log('  username:', currentUser.value.username)
   
   // Header
   doc.setFont('courier', 'bold')
@@ -790,7 +803,9 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   })
   // Use dynamic user_id instead of hardcoded 'mkt12'
   const userId = currentUser.value.user_id || 'guest'
-  console.log('PDF - Using userId:', userId, 'from currentUser:', currentUser.value)
+  console.log('➡️ PDF Header - Using userId:', userId)
+  console.log('  From currentUser.value:', currentUser.value)
+  console.log('  currentUser.value.user_id:', currentUser.value.user_id)
   doc.text(`${creditControl}    , ${creditDate}, ${userId}`, leftMargin, yPos)
   doc.text(`PAGE NO : 1`, rightMargin, yPos, { align: 'right' })
   yPos += 3
@@ -1026,7 +1041,14 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   const issuedBy = currentUser.value.official_name || 'Unknown User'
   const issuedDate = new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
   const printedBy = currentUser.value.user_id || 'guest'
-  console.log('PDF Footer - issuedBy:', issuedBy, 'printedBy:', printedBy)
+  
+  console.log('➡️ PDF Footer - User Info:')
+  console.log('  issuedBy (official_name):', issuedBy)
+  console.log('  printedBy (user_id):', printedBy)
+  console.log('  From currentUser.value:', currentUser.value)
+  console.log('  currentUser.value.official_name:', currentUser.value.official_name)
+  console.log('  currentUser.value.user_id:', currentUser.value.user_id)
+  
   doc.text(`ISSUED BY : ${issuedBy}      ${issuedDate}`, leftMargin, yPos)
   yPos += 8
   doc.text(`PRINTED BY: ${printedBy}      ${issuedDate}`, leftMargin, yPos)

@@ -313,17 +313,21 @@ class UpdateMcController extends Controller
             };
 
             // Map and upsert to legacy MC table for reporting/compatibility
+            // Get customer data to populate AC_NAME and CURRENCY
+            $customer = \App\Models\Customer::where('CODE', $validated['customer_code'])->first();
+            
             $legacy = [
                 'AC_NUM' => $validated['customer_code'],
-                // Try to resolve customer name; fallback to code
-                'AC_NAME' => optional(\App\Models\UpdateCustomerAccount::where('customer_code', $validated['customer_code'])->first())
-                    ->customer_name ?? $validated['customer_code'],
+                // Store customer NAME, not code
+                'AC_NAME' => $customer ? $customer->NAME : $validated['customer_code'],
                 'STS' => $validated['status'],
                 'COMP' => $validated['comp_no'] ?? null,
                 'P_DESIGN' => $validated['p_design'] ?? $validated['selectedProductDesign'] ?? null,
                 'MCS_Num' => $validated['mc_seq'],
                 'MODEL' => $validated['mc_model'] ?? null,
                 'PART_NO' => $validated['part_no'] ?? null,
+                // Get CURRENCY from customer table
+                'CURRENCY' => $customer ? $customer->CURRENCY : null,
             ];
 
             // Try to enrich with dimensions from detailed_master_card if present
@@ -504,7 +508,11 @@ class UpdateMcController extends Controller
                 $legacy['STRING_TYPE'] = $keep('STRING_TYPE', $alias($pd, ['stringType','string_type','selectedBundlingStringCode']));
                 $legacy['ITEM_REMARK'] = $keep('ITEM_REMARK', $alias($pd, ['itemRemark','item_remark']));
                 $legacy['UNIT'] = $alias($pd, ['unit','uom']);
-                $legacy['CURRENCY'] = $alias($pd, ['currency']);
+                // CURRENCY should always come from customer table, not from PD setup
+                // Only use PD currency if customer is not found
+                if (!$customer) {
+                    $legacy['CURRENCY'] = $alias($pd, ['currency']);
+                }
                 // Already set S_TOOL/COAT/TAPE above, keep backward aliases too
                 if (!isset($legacy['S_TOOL'])) $legacy['S_TOOL'] = $alias($pd, ['stitchingTool','s_tool']);
                 if (!isset($legacy['COAT'])) $legacy['COAT'] = $alias($pd, ['coat','chemicalCoat','coating']);
@@ -540,7 +548,8 @@ class UpdateMcController extends Controller
                 $legacy['DC_SHT_W'] = $num($dcShtW);
                 $legacy['DC_MOULD_L'] = $num($dcMouldL);
                 $legacy['DC_MOULD_W'] = $num($dcMouldW);
-                $legacy['PCS_PER_BLD'] = $keep('PCS_PER_BLD', $num($alias($pd, ['pcsPerBld','pcs_per_bld'])));
+                // PCS_PER_BLD should store bundling string qty (bundlingStringQty)
+                $legacy['PCS_PER_BLD'] = $keep('PCS_PER_BLD', $num($alias($pd, ['bundlingStringQty','pcsPerBld','pcs_per_bld'])));
                 $legacy['BLD_PER_PLD'] = $keep('BLD_PER_PLD', $num($alias($pd, ['bldPerPld','bld_per_pld','bdlPerPallet'])));
                 $legacy['PCS_SET'] = $keep('PCS_SET', $num($alias($pd, ['pcsSet','pcs_set','pcsPerSet'])));
                 $legacy['UNIT_PRICE'] = $keep('UNIT_PRICE', $num($alias($pd, ['unitPrice','unit_price'])));
@@ -568,6 +577,9 @@ class UpdateMcController extends Controller
                 $legacy['CREASE'] = $num($alias($pd, ['crease','creaseValue']));
 
                 // SL1..SL8 and SW1..SW8 and totals
+                $totalSL = 0;
+                $totalSW = 0;
+                
                 for ($i = 1; $i <= 8; $i++) {
                     $scoreLVal = null;
                     $scoreWVal = null;
@@ -586,9 +598,19 @@ class UpdateMcController extends Controller
                     
                     $legacy['SL' . $i] = $num($scoreLVal);
                     $legacy['SW' . $i] = $num($scoreWVal);
+                    
+                    // Calculate totals
+                    if ($legacy['SL' . $i] !== null) {
+                        $totalSL += (float)$legacy['SL' . $i];
+                    }
+                    if ($legacy['SW' . $i] !== null) {
+                        $totalSW += (float)$legacy['SW' . $i];
+                    }
                 }
-                $legacy['TOTAL_SL'] = $num($alias($pd, ['totalSl','TOTAL_SL']));
-                $legacy['TOTAL_SW'] = $num($alias($pd, ['totalSw','TOTAL_SW']));
+                
+                // Set calculated totals (override any passed value)
+                $legacy['TOTAL_SL'] = $totalSL > 0 ? $totalSL : null;
+                $legacy['TOTAL_SW'] = $totalSW > 0 ? $totalSW : null;
             }
 
             // Normalize empty strings to null

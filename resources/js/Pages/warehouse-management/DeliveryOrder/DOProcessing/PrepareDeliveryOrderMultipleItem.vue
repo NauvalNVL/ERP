@@ -8,7 +8,7 @@
             <i class="fas fa-truck text-2xl text-blue-600"></i>
             <div>
               <h1 class="text-xl font-semibold text-gray-800">Prepare Delivery Order (Multiple Item)</h1>
-              <p class="text-xs text-gray-500">F2: Customer • F3: Items • F4: Calendar • Ctrl+S: Save • F5: Refresh</p>
+              <p class="text-xs text-gray-500">F2: Customer • F3: Items • F4: Calendar • F8: Next • F5: Refresh</p>
             </div>
           </div>
           <div class="flex items-center space-x-2">
@@ -20,11 +20,11 @@
               <i class="fas fa-power-off"></i>
             </button>
             <button 
-              @click="saveDeliveryOrder" 
+              @click="openSalesOrderScreenNext" 
               class="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors"
-              title="Save/Process"
+              title="Next"
             >
-              <i class="fas fa-arrow-down-right"></i>
+              <i class="fas fa-arrow-right"></i>
             </button>
             <button 
               @click="refreshPage" 
@@ -245,25 +245,22 @@
         </div>
 
         <!-- Action Buttons -->
-        <div v-if="selectedCustomer.code" class="mt-6 flex items-center justify-between">
-          <!-- Left side buttons -->
-          <div class="flex items-center space-x-4">
-            <button 
-              @click="openSalesOrderScreen" 
-              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-            >
-              <i class="fas fa-list mr-2"></i>
-              Sales Order Screen
-            </button>
-          </div>
-          
+        <div v-if="selectedCustomer.code" class="mt-6 flex items-center justify-end">
           <!-- Right side buttons -->
           <div class="flex items-center space-x-4">
             <button 
-              @click="resetForm"
-              class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              @click="refreshPage" 
+              class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center"
             >
-              Reset
+              <i class="fas fa-sync-alt mr-2"></i>
+              Refresh
+            </button>
+            <button 
+              @click="openSalesOrderScreenNext" 
+              class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center"
+            >
+              <i class="fas fa-arrow-right mr-2"></i>
+              Next
             </button>
           </div>
         </div>
@@ -450,9 +447,14 @@ const openDatePicker = () => {
   info('Date picker functionality will be implemented')
 }
 
-const openSalesOrderScreen = () => {
+const openSalesOrderScreenNext = () => {
   if (!selectedCustomer.code) {
     error('Please select a customer first')
+    return
+  }
+  
+  if (!deliveryOrder.orderDate) {
+    error('Please select delivery order date')
     return
   }
   
@@ -655,9 +657,9 @@ const exitPage = () => {
 
 // Keyboard shortcuts
 const handleKeydown = (event) => {
-  if (event.ctrlKey && event.key === 's') {
+  if (event.key === 'F8') {
     event.preventDefault()
-    saveDeliveryOrder()
+    openSalesOrderScreenNext()
   } else if (event.key === 'F5') {
     event.preventDefault()
     refreshPage()
