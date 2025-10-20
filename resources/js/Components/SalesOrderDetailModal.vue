@@ -173,11 +173,14 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
               <div class="flex items-center space-x-2">
-                <label class="text-sm font-medium text-gray-700">To Delivery Set:</label>
+                <label class="text-sm font-medium text-gray-700">
+                  To Delivery Set: <span class="text-red-500">*</span>
+                </label>
                 <input 
                   v-model="orderDetail.toDeliverySet"
                   type="text"
                   class="w-12 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                  :class="{ 'border-red-500': isToDeliverySetRequired && !orderDetail.toDeliverySet }"
                   placeholder="0"
                   @input="handleDeliverySetChange"
                 >
@@ -220,7 +223,9 @@
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">Balance</th>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">Available</th>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">Max DO</th>
-                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">To Deliver</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">
+                    To Deliver <span class="text-red-500">*</span>
+                  </th>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Deliver KG</th>
                 </tr>
               </thead>
@@ -304,6 +309,7 @@
                       v-model="item.toDeliver"
                       type="text"
                       class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-right bg-yellow-50"
+                      :class="{ 'border border-red-500': isToDeliverySetRequired }"
                       @input="handleToDeliverChange"
                       placeholder=""
                     >
@@ -342,6 +348,14 @@
               >
             </div>
             
+            <!-- Validation Warning -->
+            <div v-if="isToDeliverySetRequired" class="bg-red-100 border border-red-300 rounded p-3">
+              <p class="text-sm text-red-800 font-medium">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                Please fill in "To Delivery Set" or at least one "To Deliver" quantity to proceed
+              </p>
+            </div>
+
             <!-- Warning Note -->
             <div class="bg-yellow-100 border border-yellow-300 rounded p-3">
               <p class="text-sm text-yellow-800 font-medium">
@@ -361,7 +375,13 @@
           </button>
           <button 
             @click="handleSave"
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            :disabled="isToDeliverySetRequired"
+            :class="[
+              'px-4 py-2 text-sm font-medium border border-transparent rounded-md focus:outline-none focus:ring-2',
+              isToDeliverySetRequired 
+                ? 'text-gray-400 bg-gray-300 cursor-not-allowed' 
+                : 'text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+            ]"
           >
             Save Changes
           </button>
@@ -375,6 +395,7 @@
       :sales-order-detail-data="currentDetailData"
       @close="showPackingDetailsModal = false"
       @save="handlePackingDetailsSave"
+      @save-delivery-order="handleSaveDeliveryOrder"
     />
   </div>
 </template>
@@ -399,7 +420,7 @@ const props = defineProps({
 })
 
 // Emits
-const emit = defineEmits(['close', 'save'])
+const emit = defineEmits(['close', 'save', 'save-delivery-order'])
 
 // Modal state
 const showPackingDetailsModal = ref(false)
@@ -480,6 +501,21 @@ const handleDeliverySetChange = () => {
 }
 
 const handleSave = () => {
+  // Validasi: Cek apakah To Delivery Set sudah diisi
+  const toDeliverySetValue = parseFloat(orderDetail.toDeliverySet) || 0
+  
+  // Validasi: Cek apakah ada item yang memiliki To Deliver
+  const hasToDeliverItems = itemRows.value.some(item => {
+    const toDeliverValue = parseFloat(item.toDeliver) || 0
+    return toDeliverValue > 0
+  })
+  
+  // Validasi: Harus ada To Delivery Set atau To Deliver yang diisi
+  if (toDeliverySetValue <= 0 && !hasToDeliverItems) {
+    error('Please fill in "To Delivery Set" or at least one "To Deliver" quantity before proceeding')
+    return
+  }
+  
   const data = {
     orderDetail,
     itemRows: itemRows.value
@@ -505,6 +541,18 @@ const handlePackingDetailsSave = (packingData) => {
   success('Packing details saved successfully')
 }
 
+const handleSaveDeliveryOrder = (packingData) => {
+  // Combine all data and emit save-delivery-order to parent
+  const completeData = {
+    salesOrderDetail: currentDetailData.value,
+    packingDetails: packingData
+  }
+  
+  emit('save-delivery-order', completeData)
+  showPackingDetailsModal.value = false
+  success('Delivery order will be saved')
+}
+
 // Flag untuk mencegah infinite loop
 const isUpdatingFromDeliverySet = ref(false)
 
@@ -514,6 +562,18 @@ const totalToDeliver = computed(() => {
     const toDeliver = parseFloat(item.toDeliver) || 0
     return total + toDeliver
   }, 0)
+})
+
+// Computed property untuk menentukan apakah To Delivery Set required
+const isToDeliverySetRequired = computed(() => {
+  const toDeliverySetValue = parseFloat(orderDetail.toDeliverySet) || 0
+  const hasToDeliverItems = itemRows.value.some(item => {
+    const toDeliverValue = parseFloat(item.toDeliver) || 0
+    return toDeliverValue > 0
+  })
+  
+  // Required jika tidak ada yang diisi
+  return toDeliverySetValue <= 0 && !hasToDeliverItems
 })
 
 // Watch untuk sinkronisasi dari "To Delivery Set" ke "To Deliver" items
@@ -579,12 +639,73 @@ onMounted(() => {
       }
     }
     
-    if (props.salesOrderData.mcardSeq) {
-      orderDetail.mcardSeq = props.salesOrderData.mcardSeq
-    }
-    
-    if (props.salesOrderData.pOrderRef) {
-      orderDetail.pOrderRef = props.salesOrderData.pOrderRef
+    // Use data from selected order if available
+    if (props.salesOrderData.selectedOrderData) {
+      const selectedOrder = props.salesOrderData.selectedOrderData
+      
+      // Update with actual data from Sales Order Table
+      orderDetail.mcardSeq = selectedOrder.mcardSeq || ''
+      orderDetail.pOrderRef = selectedOrder.pOrderRef || selectedOrder.customerPORef || ''
+      
+      // Update item rows with actual data from selected order
+      if (selectedOrder.items && selectedOrder.items.length > 0) {
+        selectedOrder.items.forEach((item, index) => {
+          if (index < itemRows.value.length) {
+            const itemRow = itemRows.value[index]
+            
+            // Map data based on item type
+            if (item.name === 'PD') {
+              itemRow.pDesign = item.pDesign || 'B1'
+            } else if (item.name === 'PCS') {
+              itemRow.pcs = item.pDesign || '1'
+            } else if (item.name === 'UNIT') {
+              itemRow.unit = item.pDesign || 'KG'
+            } else if (item.name === 'ORDER') {
+              itemRow.order = item.pDesign || '450'
+            } else if (item.name === 'DELIVERY') {
+              itemRow.delivery = item.pDesign || ''
+            } else if (item.name === 'REJECT') {
+              itemRow.reject = item.pDesign || ''
+            } else if (item.name === 'BALANCE') {
+              itemRow.balance = item.pDesign || '450'
+            } else if (item.name === 'AVAILABLE') {
+              itemRow.available = item.pDesign || '450'
+            } else if (item.name === 'MAX DO') {
+              itemRow.maxDO = item.pDesign || '22000'
+            }
+          }
+        })
+        
+        // Set default values for Main item based on the data
+        const mainItem = itemRows.value.find(item => item.name === 'Main')
+        if (mainItem) {
+          // Find corresponding data from items
+          const pdItem = selectedOrder.items.find(item => item.name === 'PD')
+          const pcsItem = selectedOrder.items.find(item => item.name === 'PCS')
+          const unitItem = selectedOrder.items.find(item => item.name === 'UNIT')
+          const orderItem = selectedOrder.items.find(item => item.name === 'ORDER')
+          const balanceItem = selectedOrder.items.find(item => item.name === 'BALANCE')
+          const availableItem = selectedOrder.items.find(item => item.name === 'AVAILABLE')
+          const maxDoItem = selectedOrder.items.find(item => item.name === 'MAX DO')
+          
+          mainItem.pDesign = pdItem?.pDesign || 'B1'
+          mainItem.pcs = pcsItem?.pDesign || '1'
+          mainItem.unit = unitItem?.pDesign || 'KG'
+          mainItem.order = orderItem?.pDesign || '450'
+          mainItem.balance = balanceItem?.pDesign || '450'
+          mainItem.available = availableItem?.pDesign || '450'
+          mainItem.maxDO = maxDoItem?.pDesign || '22000'
+        }
+      }
+    } else {
+      // Fallback to basic data
+      if (props.salesOrderData.mcardSeq) {
+        orderDetail.mcardSeq = props.salesOrderData.mcardSeq
+      }
+      
+      if (props.salesOrderData.pOrderRef) {
+        orderDetail.pOrderRef = props.salesOrderData.pOrderRef
+      }
     }
   }
 })

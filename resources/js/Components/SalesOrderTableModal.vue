@@ -268,7 +268,32 @@ const selectOrder = (index) => {
   } else {
     // Select button clicked
     if (selectedOrder.value) {
-      emit('select', selectedOrder.value)
+      // Create complete order data with all necessary information
+      const completeOrderData = {
+        ...selectedOrder.value,
+        // Add item details for Sales Order Detail Screen
+        items: itemDetails.value.map(item => ({
+          name: item.name,
+          pDesign: item.main,
+          pcs: item.main,
+          unit: item.name === 'UNIT' ? item.main : 'KG',
+          order: item.main,
+          delivery: '',
+          reject: '',
+          balance: item.main,
+          available: item.main,
+          maxDO: ''
+        })),
+        // Add order information
+        orderInfo: {
+          ...orderInfo
+        },
+        // Ensure mcardSeq and pOrderRef are available
+        mcardSeq: selectedOrder.value.mcardSeq || selectedOrder.value.mcsNumber || '',
+        pOrderRef: selectedOrder.value.pOrderRef || selectedOrder.value.customerPo || ''
+      }
+      
+      emit('select', completeOrderData)
       closeModal()
     }
   }
