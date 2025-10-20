@@ -581,14 +581,26 @@ function handleDetailedDOClose(){
  * Data is sent back to Delivery Order Screen (simple list)
  */
 function onDOsSelectedFromTable(dos){
+  console.log('📦 DOs selected from table:', dos)
+  
   // Close the detailed table modal
   doSelectionModalOpen.value = false
 
-  // Store selected DOs - they will be displayed in the simple list
-  selectedDOs.value = dos
+  // Handle both single DO (object) and multiple DOs (array)
+  // DeliveryOrderTableModal now emits single object for single selection
+  if (Array.isArray(dos)) {
+    selectedDOs.value = dos
+  } else {
+    // Single selection - convert to array
+    selectedDOs.value = [dos]
+  }
+  
+  console.log('✅ Selected DOs updated:', selectedDOs.value)
+  console.log('🔓 Delivery Order Screen Modal remains OPEN')
 
   // Keep the simple list modal open to show selected data
   // User can then click Select button to continue
+  // doListModalOpen stays true - screen modal will show the selected DO
 }
 
 /**
