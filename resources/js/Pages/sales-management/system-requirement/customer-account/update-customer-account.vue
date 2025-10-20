@@ -21,7 +21,7 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Find Customer</h3>
                     </div>
-                    
+
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -30,25 +30,25 @@
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-user"></i>
                                 </span>
-                                <input 
-                                    type="text" 
-                                    v-model="searchQuery" 
+                                <input
+                                    type="text"
+                                    v-model="searchQuery"
                                     placeholder="Enter code or name, then click search button to browse..."
                                     @keyup.enter="openCustomerAccountModal"
                                     class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                 >
-                                <button 
-                                    type="button" 
-                                    @click="openCustomerAccountModal" 
+                                <button
+                                    type="button"
+                                    @click="openCustomerAccountModal"
                                     class="inline-flex items-center px-3 py-2 border border-gray-300 bg-blue-500 hover:bg-blue-600 text-white transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
                                     title="Browse Customer Accounts"
                                 >
                                     <i class="fas fa-search"></i>
                                 </button>
-                                <button 
+                                <button
                                     v-if="searchQuery"
-                                    type="button" 
-                                    @click="clearSearch" 
+                                    type="button"
+                                    @click="clearSearch"
                                     class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-r-md"
                                 >
                                     <i class="fas fa-times"></i>
@@ -60,9 +60,9 @@
                         </div>
                         <div class="col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Create New:</label>
-                            <button 
-                                type="button" 
-                                @click="openAddNewCustomerModal" 
+                            <button
+                                type="button"
+                                @click="openAddNewCustomerModal"
                                 class="w-full flex items-center justify-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded transition-colors"
                             >
                                 <i class="fas fa-plus mr-2"></i> Add New
@@ -72,7 +72,7 @@
 
                 </div>
             </div>
-            
+
             <!-- Right Column -->
             <div class="lg:col-span-1">
                 <!-- Customer Info Card -->
@@ -168,7 +168,7 @@
     </div>
 
     <!-- Customer Account Selection Modal -->
-    <CustomerAccountModal 
+    <CustomerAccountModal
         v-if="showCustomerAccountModal"
         :show="showCustomerAccountModal"
         :customerAccounts="customers"
@@ -207,39 +207,39 @@
                             <h4 class="text-base font-medium text-gray-800 mb-3">
                                 <i class="fas fa-info-circle mr-2 text-green-500"></i>Basic Information
                             </h4>
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Customer Code *</label>
                                     <input type="text" v-model="newCustomerForm.customer_code" class="form-input" required>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Customer Name *</label>
                                     <input type="text" v-model="newCustomerForm.customer_name" class="form-input" required>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Short Name</label>
                                     <input type="text" v-model="newCustomerForm.short_name" class="form-input">
                                     <span class="text-xs text-gray-500">For Production</span>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
                                     <input type="text" v-model="newCustomerForm.contact_person" class="form-input">
                                 </div>
-                                
+
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Address 1</label>
                                     <textarea v-model="newCustomerForm.address" rows="2" class="form-input"></textarea>
                                 </div>
-                                
+
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Address 2</label>
                                     <textarea v-model="newCustomerForm.address2" rows="2" class="form-input"></textarea>
                                 </div>
-                                
+
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Address 3</label>
                                     <textarea v-model="newCustomerForm.address3" rows="2" class="form-input"></textarea>
@@ -252,18 +252,18 @@
                             <h4 class="text-base font-medium text-gray-800 mb-3">
                                 <i class="fas fa-phone mr-2 text-green-500"></i>Contact Information
                             </h4>
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Telephone No</label>
                                     <input type="text" v-model="newCustomerForm.telephone_no" class="form-input">
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Fax No</label>
                                     <input type="text" v-model="newCustomerForm.fax_no" class="form-input">
                                 </div>
-                                
+
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                                     <input type="email" v-model="newCustomerForm.co_email" class="form-input">
@@ -276,18 +276,18 @@
                             <h4 class="text-base font-medium text-gray-800 mb-3">
                                 <i class="fas fa-credit-card mr-2 text-green-500"></i>Financial Settings
                             </h4>
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Credit Limit</label>
                                     <input type="number" v-model="newCustomerForm.credit_limit" class="form-input" min="0" step="0.01">
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Credit Terms (Days)</label>
                                     <input type="number" v-model="newCustomerForm.credit_terms" class="form-input" min="0">
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
                                     <select v-model="newCustomerForm.ac_type" class="form-input">
@@ -295,22 +295,21 @@
                                         <option value="Y-Foreign">Y-Foreign</option>
                                     </select>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Currency Code</label>
                                     <select v-model="newCustomerForm.currency_code" class="form-input">
-                                        <option value="">-- Select Currency --</option>
                                         <option value="IDR">IDR</option>
                                         <option value="USD">USD</option>
                                     </select>
                                     <span class="text-xs text-gray-500">Leave blank if Local Account</span>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">NPWP</label>
                                     <input type="text" v-model="newCustomerForm.npwp" class="form-input" placeholder="Enter NPWP number">
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Print AR Aging</label>
                                     <select v-model="newCustomerForm.print_ar_aging" class="form-input">
@@ -326,7 +325,7 @@
                             <h4 class="text-base font-medium text-gray-800 mb-3">
                                 <i class="fas fa-tags mr-2 text-green-500"></i>Classification
                             </h4>
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code</label>
@@ -340,7 +339,7 @@
                                         {{ getSalespersonName(newCustomerForm.salesperson_code) }}
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Industrial Code</label>
                                     <div class="flex">
@@ -353,7 +352,7 @@
                                         {{ getIndustryName(newCustomerForm.industrial_code) }}
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Geographical</label>
                                     <div class="flex">
@@ -366,7 +365,7 @@
                                         {{ getGeoLocation(newCustomerForm.geographical) }}
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Customer Group</label>
                                     <div class="flex">
@@ -389,10 +388,10 @@
                     <button type="button" @click="closeAddNewCustomerModal" class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                         Cancel
                     </button>
-                    <button 
-                        type="button" 
-                        @click="saveNewCustomerAccount" 
-                        :disabled="isSaving" 
+                    <button
+                        type="button"
+                        @click="saveNewCustomerAccount"
+                        :disabled="isSaving"
                         class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-400"
                     >
                         <i v-if="!isSaving" class="fas fa-save mr-2"></i>
@@ -475,82 +474,82 @@
                             <h4 class="text-base font-medium text-gray-800 mb-3">
                                 <i class="fas fa-info-circle mr-2 text-blue-500"></i>Basic Information
                             </h4>
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Customer Code</label>
                                     <input type="text" v-model="form.customer_code" class="form-input bg-gray-100" readonly>
                                     <span class="text-xs text-gray-500">Read-only field</span>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Customer Name</label>
                                     <input type="text" v-model="form.customer_name" class="form-input" required>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
                                     <input type="text" v-model="form.contact_person" class="form-input">
                                 </div>
-                                
+
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Address 1</label>
                                     <textarea v-model="form.address" rows="2" class="form-input"></textarea>
                                 </div>
-                                
+
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Address 2</label>
                                     <textarea v-model="form.address2" rows="2" class="form-input"></textarea>
                                 </div>
-                                
+
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Address 3</label>
                                     <textarea v-model="form.address3" rows="2" class="form-input"></textarea>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Contact Information -->
                         <div class="border-b border-gray-200 pb-4">
                             <h4 class="text-base font-medium text-gray-800 mb-3">
                                 <i class="fas fa-phone mr-2 text-blue-500"></i>Contact Information
                             </h4>
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Telephone No</label>
                                     <input type="text" v-model="form.telephone_no" class="form-input">
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Fax No</label>
                                     <input type="text" v-model="form.fax_no" class="form-input">
                                 </div>
-                                
+
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                                     <input type="email" v-model="form.co_email" class="form-input">
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Financial Information -->
                         <div class="border-b border-gray-200 pb-4">
                             <h4 class="text-base font-medium text-gray-800 mb-3">
                                 <i class="fas fa-credit-card mr-2 text-blue-500"></i>Financial Information
                             </h4>
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Credit Limit</label>
                                     <input type="number" v-model="form.credit_limit" step="0.01" class="form-input">
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Credit Terms (Days)</label>
                                     <input type="number" v-model="form.credit_terms" class="form-input">
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
                                     <select v-model="form.ac_type" class="form-input">
@@ -558,22 +557,21 @@
                                         <option value="Y-Foreign">Y-Foreign</option>
                                     </select>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Currency Code</label>
                                     <select v-model="form.currency_code" class="form-input">
-                                        <option value="">-- Select Currency --</option>
                                         <option value="IDR">IDR</option>
                                         <option value="USD">USD</option>
                                     </select>
                                     <span class="text-xs text-gray-500">Leave blank if Local Account</span>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">NPWP</label>
                                     <input type="text" v-model="form.npwp" class="form-input" placeholder="Enter NPWP number">
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Print AR Aging</label>
                                     <select v-model="form.print_ar_aging" class="form-input">
@@ -583,13 +581,13 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Classification Information -->
                         <div>
                             <h4 class="text-base font-medium text-gray-800 mb-3">
                                 <i class="fas fa-tags mr-2 text-blue-500"></i>Classification & Codes
                             </h4>
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code</label>
@@ -603,7 +601,7 @@
                                         {{ getSalespersonName(form.salesperson_code) }}
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Industrial Code</label>
                                     <div class="flex">
@@ -616,7 +614,7 @@
                                         {{ getIndustryName(form.industrial_code) }}
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Geographical</label>
                                     <div class="flex">
@@ -629,7 +627,7 @@
                                         {{ getGeoLocation(form.geographical) }}
                                     </div>
                                 </div>
-                                
+
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Grouping Code</label>
                                     <div class="flex">
@@ -652,10 +650,10 @@
                     <button type="button" @click="showEditModal = false" class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Cancel
                     </button>
-                    <button 
-                        type="button" 
-                        @click="saveCustomerAccount" 
-                        :disabled="isSaving" 
+                    <button
+                        type="button"
+                        @click="saveCustomerAccount"
+                        :disabled="isSaving"
                         class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400"
                     >
                         <div v-if="isSaving" class="animate-spin h-5 w-5 mr-2 border-2 border-white border-t-transparent rounded-full"></div>
@@ -846,7 +844,7 @@ const getCustomerGroupName = (code) => {
 const openCustomerAccountModal = async () => {
     // Always reload data to ensure fresh data
     await loadCustomerAccounts()
-    
+
     showCustomerAccountModal.value = true
 }
 
@@ -887,7 +885,7 @@ const closeAddNewCustomerModal = () => {
 const selectCustomerAccount = (account) => {
     // Make a copy of the account data to avoid direct reference
     const accountData = { ...account }
-    
+
     // Fill the form with customer data, ensuring all required fields have valid values
     form.customer_code = accountData.customer_code
     form.customer_name = accountData.customer_name || ''
@@ -901,24 +899,24 @@ const selectCustomerAccount = (account) => {
     form.credit_limit = accountData.credit_limit || 0
     form.credit_terms = accountData.credit_terms || 0
     form.ac_type = accountData.ac_type || accountData.account_type || 'N-Local'
-    
+
     // Ensure ac_type has a valid value
     if (!['Y-Foreign', 'N-Local'].includes(form.ac_type)) {
         form.ac_type = 'N-Local'
     }
-    
+
     form.npwp = accountData.npwp || ''
     form.salesperson_code = accountData.salesperson_code || ''
     form.industrial_code = accountData.industrial_code || ''
     form.geographical = accountData.geographical || ''
     form.grouping_code = accountData.grouping_code || ''
     form.print_ar_aging = accountData.print_ar_aging || 'N-No'
-    
+
     // Ensure print_ar_aging has a valid value
     if (!['Y-Yes', 'N-No'].includes(form.print_ar_aging)) {
         form.print_ar_aging = 'N-No'
     }
-    
+
     closeCustomerAccountModal()
     customerSelected.value = true
     showEditModal.value = true // Automatically open the edit modal
@@ -1022,13 +1020,13 @@ const saveCustomerAccount = async () => {
         showNotification('Please select a customer first', 'warning')
         return
     }
-    
+
     // Basic validation
     if (!form.customer_name.trim()) {
         showNotification('Customer name is required', 'warning')
         return
     }
-    
+
     // Email validation if provided
     if (form.co_email && form.co_email.trim()) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -1037,37 +1035,37 @@ const saveCustomerAccount = async () => {
             return
         }
     }
-    
+
     // Ensure required fields have valid values
     if (!form.ac_type || !['Y-Foreign', 'N-Local'].includes(form.ac_type)) {
         form.ac_type = 'N-Local'; // Default to N-Local if not set or invalid
     }
-    
+
     if (!form.print_ar_aging || !['Y-Yes', 'N-No'].includes(form.print_ar_aging)) {
         form.print_ar_aging = 'N-No'; // Default to N-No if not set or invalid
     }
-    
+
     isSaving.value = true
-    
+
     try {
         // Create a copy of the form data to send to the API
         const customerData = { ...form }
-        
+
         // Ensure numeric fields are properly formatted
         if (customerData.credit_limit) {
             customerData.credit_limit = parseFloat(customerData.credit_limit);
         }
-        
+
         if (customerData.credit_terms) {
             customerData.credit_terms = parseInt(customerData.credit_terms);
         }
-        
+
         console.log('Sending customer data:', customerData);
-        
+
         // Check if the customer already exists
         let response;
         const existingCustomer = customers.value.find(c => c.customer_code === form.customer_code);
-        
+
         if (existingCustomer && existingCustomer.id) {
             // Update existing customer using PUT - Fix the URL to match the API endpoint
             console.log('Updating existing customer with ID:', existingCustomer.id);
@@ -1077,11 +1075,11 @@ const saveCustomerAccount = async () => {
             console.log('Creating new customer');
             response = await axios.post('/api/customer-accounts', customerData);
         }
-        
+
         if (response.data && response.status >= 200 && response.status < 300) {
             showNotification('Customer account saved successfully', 'success')
             showEditModal.value = false
-            
+
             // Reload customer accounts to get the latest data
             await loadCustomerAccounts()
         } else {
@@ -1090,18 +1088,18 @@ const saveCustomerAccount = async () => {
     } catch (error) {
         console.error('Error saving customer account:', error)
         let errorMessage = 'Failed to save customer account'
-        
+
         if (error.response) {
             // Handle validation errors
             if (error.response.status === 422 && error.response.data.errors) {
                 // Log detailed validation errors for debugging
                 console.error('Validation errors:', error.response.data.errors)
-                
+
                 // Format validation errors for display
                 const validationErrors = Object.entries(error.response.data.errors).map(([field, messages]) => {
                     return `${field}: ${messages.join(', ')}`;
                 });
-                
+
                 errorMessage += ': ' + validationErrors.join(' | ')
             } else if (error.response.data.message) {
                 errorMessage += ': ' + error.response.data.message
@@ -1109,7 +1107,7 @@ const saveCustomerAccount = async () => {
         } else if (error.message) {
             errorMessage += ': ' + error.message
         }
-        
+
         showNotification(errorMessage, 'error')
     } finally {
         isSaving.value = false
@@ -1123,12 +1121,12 @@ const saveNewCustomerAccount = async () => {
         showNotification('Customer code is required', 'warning')
         return
     }
-    
+
     if (!newCustomerForm.customer_name.trim()) {
         showNotification('Customer name is required', 'warning')
         return
     }
-    
+
     // Email validation if provided
     if (newCustomerForm.co_email && newCustomerForm.co_email.trim()) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -1137,40 +1135,40 @@ const saveNewCustomerAccount = async () => {
             return
         }
     }
-    
+
     // Check if customer code already exists
     const existingCustomer = customers.value.find(c => c.customer_code === newCustomerForm.customer_code.trim())
     if (existingCustomer) {
         showNotification('Customer code already exists. Please use a different code.', 'warning')
         return
     }
-    
+
     isSaving.value = true
-    
+
     try {
         // Create a copy of the form data to send to the API
         const customerData = { ...newCustomerForm }
-        
+
         // Ensure numeric fields are properly formatted
         if (customerData.credit_limit) {
             customerData.credit_limit = parseFloat(customerData.credit_limit);
         }
-        
+
         if (customerData.credit_terms) {
             customerData.credit_terms = parseInt(customerData.credit_terms);
         }
-        
+
         console.log('Creating new customer:', customerData);
-        
+
         const response = await axios.post('/api/customer-accounts', customerData);
-        
+
         if (response.data && response.status >= 200 && response.status < 300) {
             showNotification('New customer account created successfully', 'success')
             closeAddNewCustomerModal()
-            
+
             // Reload customer accounts to get the latest data
             await loadCustomerAccounts()
-            
+
             // Clear the form
             Object.assign(newCustomerForm, {
                 customer_code: '',
@@ -1198,18 +1196,18 @@ const saveNewCustomerAccount = async () => {
     } catch (error) {
         console.error('Error creating new customer account:', error)
         let errorMessage = 'Failed to create new customer account'
-        
+
         if (error.response) {
             // Handle validation errors
             if (error.response.status === 422 && error.response.data.errors) {
                 // Log detailed validation errors for debugging
                 console.error('Validation errors:', error.response.data.errors)
-                
+
                 // Format validation errors for display
                 const validationErrors = Object.entries(error.response.data.errors).map(([field, messages]) => {
                     return `${field}: ${messages.join(', ')}`;
                 });
-                
+
                 errorMessage += ': ' + validationErrors.join(' | ')
             } else if (error.response.data.message) {
                 errorMessage += ': ' + error.response.data.message
@@ -1217,7 +1215,7 @@ const saveNewCustomerAccount = async () => {
         } else if (error.message) {
             errorMessage += ': ' + error.message
         }
-        
+
         showNotification(errorMessage, 'error')
     } finally {
         isSaving.value = false
@@ -1231,7 +1229,7 @@ const showNotification = (message, type = 'success') => {
         message,
         type
     }
-    
+
     setTimeout(() => {
         notification.value.show = false
     }, 3000)
@@ -1241,7 +1239,7 @@ const showNotification = (message, type = 'success') => {
 const loadCustomerAccounts = async () => {
     try {
         const response = await axios.get('/api/customers-with-status')
-        
+
         if (response.data && response.data.data) {
             customers.value = response.data.data
         }
@@ -1259,7 +1257,7 @@ onMounted(() => {
     loadGeos()
     loadSalespersons()
     loadCustomerGroups()
-    
+
     // Check for flash messages
     if (page.props.flash && page.props.flash.message) {
         showNotification(page.props.flash.message, 'success')
