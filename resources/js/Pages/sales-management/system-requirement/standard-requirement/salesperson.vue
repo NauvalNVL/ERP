@@ -192,28 +192,13 @@
                             <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Sales Team:</label>
-                            <select v-model="editForm.sales_team_id" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                                <option v-for="team in salesTeams" :key="team.id" :value="team.id.toString()">{{ team.name }}</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Position:</label>
-                            <select v-model="editForm.position" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                                <option value="E - Executive">Executive</option>
-                                <option value="M - Manager">Manager</option>
-                                <option value="S - Supervisor">Supervisor</option>
-                            </select>
-                        </div>
-                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">User ID:</label>
-                            <input v-model="editForm.user_id" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
-                        </div>
-                        <div>
-                            <label class="flex items-center">
-                                <input type="checkbox" v-model="editForm.is_active" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                                <span class="ml-2 text-sm text-gray-700">Active</span>
-                            </label>
+                            <div class="relative flex">
+                                <input v-model="editForm.user_id" type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <button type="button" @click="showUserModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-green-500 hover:bg-green-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                    <i class="fas fa-users"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
@@ -258,6 +243,14 @@
             </div>
         </div>
     </div>
+    
+    <!-- User Modal -->
+    <UserModal 
+        :show="showUserModal" 
+        :users="users" 
+        @close="showUserModal = false"
+        @select="onUserSelected" 
+    />
     </AppLayout>
 </template>
 
@@ -265,6 +258,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import SalespersonModal from '@/Components/salesperson-modal.vue';
+import UserModal from '@/Components/user-modal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Get the header from props
@@ -276,21 +270,19 @@ const props = defineProps({
 });
 
 const salespersons = ref([]);
-const salesTeams = ref([]);
+const users = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
 const showEditModal = ref(false);
+const showUserModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref('');
 const editForm = ref({
     id: '',
     code: '',
     name: '',
-    sales_team_id: '',
-    position: 'E - Executive',
-    user_id: '',
-    is_active: true
+    user_id: ''
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
@@ -348,48 +340,45 @@ const fetchSalespersons = async () => {
     }
 };
 
-const fetchSalesTeams = async () => {
+const fetchUsers = async () => {
     try {
-        const res = await fetch('/api/sales-teams', { 
-            headers: { 
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin' 
-        });
-        
-        if (!res.ok) {
-            throw new Error('Network response was not ok');
-        }
-        
-        const data = await res.json();
-        console.log('Fetched sales teams:', data);
-        
-        if (Array.isArray(data)) {
-            salesTeams.value = data.map(team => ({
-                ...team,
-                id: team.id.toString() // Ensure id is a string
-            }));
-        } else if (data.data && Array.isArray(data.data)) {
-            salesTeams.value = data.data.map(team => ({
-                ...team,
-                id: team.id.toString() // Ensure id is a string
-            }));
-        } else {
-            salesTeams.value = [];
-            console.error('Unexpected data format for sales teams:', data);
-        }
-        
-        console.log('Processed sales teams:', salesTeams.value);
+        // Sample user data based on the image provided
+        users.value = [
+            { code: 'ACCOUNTING', name: 'ACCOUNTING', signon: 'No' },
+            { code: 'SLS', name: 'SALES', signon: 'No' },
+            { code: 'acc01', name: 'Jenita', signon: 'No' },
+            { code: 'acc02', name: 'Ricky', signon: 'No' },
+            { code: 'acc03', name: 'Uci', signon: 'No' },
+            { code: 'acc04', name: 'Kiki', signon: 'Yes' },
+            { code: 'acc041', name: 'Kiki(2)', signon: 'No' },
+            { code: 'acc05', name: 'Andri', signon: 'No' },
+            { code: 'acc06', name: 'Silvi', signon: 'Yes' },
+            { code: 'acc07', name: 'Andi', signon: 'Yes' },
+            { code: 'acc08', name: 'Sin Hauw', signon: 'No' },
+            { code: 'acc09', name: 'Nuri', signon: 'No' },
+            { code: 'acc10', name: 'Jaiwo', signon: 'No' },
+            { code: 'acc11', name: 'Law Shin', signon: 'No' },
+            { code: 'acc11a', name: 'Law Shin', signon: 'No' },
+            { code: 'acc12', name: 'Fanka', signon: 'No' },
+            { code: 'acc13', name: 'Christanti', signon: 'No' },
+            { code: 'acc14', name: 'Christanti', signon: 'No' },
+            { code: 'corpm1', name: 'Dudi', signon: 'No' },
+            { code: 'corpm2', name: 'Tony', signon: 'No' }
+        ];
     } catch (e) {
-        console.error('Error fetching sales teams:', e);
-        salesTeams.value = [];
+        console.error('Error fetching users:', e);
+        users.value = [];
     }
 };
 
+const onUserSelected = (user) => {
+    editForm.value.user_id = user.code;
+    showUserModal.value = false;
+};
+
 onMounted(async () => {
-    await fetchSalesTeams();
     await fetchSalespersons();
+    await fetchUsers();
 });
 
 // Watch for changes in search query to filter the data
@@ -406,11 +395,6 @@ watch(searchQuery, (newQuery) => {
     }
 });
 
-// Helper function to get team name
-function getTeamName(teamId) {
-    const team = salesTeams.value.find(team => team.id === teamId);
-    return team ? team.name : '';
-}
 
 const onSalespersonSelected = (person) => {
     selectedRow.value = person;
@@ -420,9 +404,7 @@ const onSalespersonSelected = (person) => {
     // Automatically open the edit modal for the selected row
     isCreating.value = false;
     editForm.value = { 
-        ...person,
-        sales_team_id: (person.sales_team_id || '1').toString(), // Ensure it's a string
-        is_active: person.is_active === 1 || person.is_active === true
+        ...person
     };
     console.log('Selected person for editing:', editForm.value);
     showEditModal.value = true;
@@ -432,9 +414,7 @@ const editSelectedRow = () => {
     if (selectedRow.value) {
         isCreating.value = false;
         editForm.value = { 
-            ...selectedRow.value,
-            sales_team_id: (selectedRow.value.sales_team_id || '1').toString(), // Ensure it's a string
-            is_active: selectedRow.value.is_active === 1 || selectedRow.value.is_active === true
+            ...selectedRow.value
         };
         console.log('Editing person with data:', editForm.value);
         showEditModal.value = true;
@@ -449,10 +429,7 @@ const createNewSalesperson = () => {
         id: '',
         code: '',
         name: '',
-        sales_team_id: salesTeams.value.length > 0 ? salesTeams.value[0].id.toString() : '1',
-        position: 'E - Executive',
-        user_id: '',
-        is_active: true
+        user_id: ''
     };
     showEditModal.value = true;
 };
@@ -463,10 +440,7 @@ const closeEditModal = () => {
         id: '',
         code: '',
         name: '',
-        sales_team_id: salesTeams.value.length > 0 ? salesTeams.value[0].id.toString() : '1',
-        position: 'E - Executive',
-        user_id: '',
-        is_active: true
+        user_id: ''
     };
     isCreating.value = false;
 };
@@ -482,11 +456,6 @@ const saveSalespersonChanges = async () => {
         }
         if (!editForm.value.name) {
             showNotification('Salesperson name is required', 'error');
-            saving.value = false;
-            return;
-        }
-        if (!editForm.value.sales_team_id) {
-            showNotification('Sales team is required', 'error');
             saving.value = false;
             return;
         }
@@ -510,10 +479,7 @@ const saveSalespersonChanges = async () => {
         const formData = new FormData();
         formData.append('code', editForm.value.code);
         formData.append('name', editForm.value.name);
-        formData.append('sales_team_id', editForm.value.sales_team_id.toString());
-        formData.append('position', editForm.value.position);
         formData.append('user_id', editForm.value.user_id || '');
-        formData.append('is_active', editForm.value.is_active ? '1' : '0');
         
         console.log('Form data values:');
         for (const pair of formData.entries()) {
@@ -545,10 +511,7 @@ const saveSalespersonChanges = async () => {
             } else {
                 if (selectedRow.value) {
                     selectedRow.value.name = editForm.value.name;
-                    selectedRow.value.sales_team_id = editForm.value.sales_team_id;
-                    selectedRow.value.position = editForm.value.position;
                     selectedRow.value.user_id = editForm.value.user_id;
-                    selectedRow.value.is_active = editForm.value.is_active;
                 }
                 showNotification('Salesperson updated successfully', 'success');
             }

@@ -362,14 +362,14 @@ Route::middleware('auth')->group(function () {
          })->name('vue.customer-service.production-monitoring-board');
          
          // Standard Requirement Routes
-         Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team.index');
-         Route::get('/sales-team/view-print', [SalesTeamController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');
+         Route::get('/sales-team', [SalespersonController::class, 'vueDefineTeam'])->name('vue.sales-team.index');
+         Route::get('/sales-team/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');
          
          Route::get('/sales-person', [SalespersonController::class, 'vueIndex'])->name('vue.sales-person.index');
          Route::get('/sales-person/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-person.view-print');
          
-         Route::get('/sales-person-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.sales-person-team.index');
-         Route::get('/sales-person-team/view-print', [SystemRequirementController::class, 'vueViewPrintSalespersonTeam'])->name('vue.sales-person-team.view-print');
+         Route::get('/sales-person-team', [SalespersonController::class, 'vueDefineSalespersonTeam'])->name('vue.sales-person-team.index');
+         Route::get('/sales-person-team/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-person-team.view-print');
          
          Route::get('/industry', [IndustryController::class, 'vueIndex'])->name('vue.industry.index');
          Route::get('/industry/view-print', [IndustryController::class, 'vueViewAndPrint'])->name('vue.industry.view-print');
@@ -1011,6 +1011,14 @@ Route::prefix('api')->group(function () {
     Route::post('/salesperson/update/{code}', [SalespersonController::class, 'update']);
     Route::post('/salesperson/delete/{code}', [SalespersonController::class, 'destroy']);
     Route::post('/salesperson/seed', [SalespersonController::class, 'seed']);
+    
+    // Sales Team API routes (using same controller)
+    Route::get('/sales-teams', [SalespersonController::class, 'getSalesTeams']);
+    Route::post('/sales-teams/store', [SalespersonController::class, 'storeSalesTeam']);
+    
+    // Salesperson Team API routes (using same controller)
+    Route::get('/salesperson-teams', [SalespersonController::class, 'getSalespersonTeams']);
+    Route::post('/salesperson-teams/assign', [SalespersonController::class, 'assignToTeam']);
     
     // Paper Quality API routes
     Route::get('/paper-qualities', [PaperQualityController::class, 'apiIndex']);

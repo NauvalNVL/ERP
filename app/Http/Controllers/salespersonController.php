@@ -18,13 +18,13 @@ class SalespersonController extends Controller
     public function index()
     {
         try {
-            // Always load from database, ordered by code
-            $salespersons = Salesperson::orderBy('code')->get();
+            // Always load from database, ordered by Code
+            $salespersons = Salesperson::orderBy('Code')->get();
             
             // If there are no salespersons in the database, seed them
             if ($salespersons->isEmpty()) {
                 $this->seedData();
-                $salespersons = Salesperson::orderBy('code')->get();
+                $salespersons = Salesperson::orderBy('Code')->get();
             }
             
             // If the request wants JSON, return JSON response
@@ -57,31 +57,43 @@ class SalespersonController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'code' => 'required|string|max:10|unique:salespersons,code',
-                'name' => 'required|string|max:100',
-                'sales_team_id' => 'required|exists:sales_team,id',
-                'position' => 'required|string|max:50',
+                'code' => 'required|string|max:50|unique:salesperson,Code',
+                'name' => 'required|string|max:50',
+                'sales_team_id' => 'nullable|integer',
+                'position' => 'nullable|string|max:50',
                 'user_id' => 'nullable|string|max:20',
-                'is_active' => 'required|boolean'
+                'is_active' => 'nullable|boolean'
             ]);
 
             if ($validator->fails()) {
+                $errors = $validator->errors();
+                $message = $errors->first();
+                
+                // If code already exists, suggest next available code
+                if ($errors->has('code') && strpos($message, 'already been taken') !== false) {
+                    $suggestedCode = $this->getNextAvailableCode($request->code);
+                    $message = "Code '{$request->code}' already exists. Suggested code: {$suggestedCode}";
+                }
+                
                 return response()->json([
                     'success' => false,
-                    'message' => $validator->errors()->first()
+                    'message' => $message
                 ], 422);
             }
 
             DB::beginTransaction();
 
-            $salesperson = Salesperson::create([
-                'code' => $request->code,
-                'name' => $request->name,
-                'sales_team_id' => $request->sales_team_id,
-                'position' => $request->position,
-                'user_id' => $request->user_id,
-                'is_active' => $request->is_active
-            ]);
+            // Create salesperson using mutator methods for compatibility
+            $salesperson = new Salesperson();
+            $salesperson->code = $request->code;
+            $salesperson->name = $request->name;
+            $salesperson->sales_team_id = $request->sales_team_id ?? 1;
+            $salesperson->position = $request->position ?? 'E - Executive';
+            $salesperson->user_id = $request->user_id;
+            $salesperson->is_active = $request->is_active ?? true;
+            $salesperson->Email = $request->email ?? '';
+            $salesperson->TargetSales = $request->target_sales ?? 0;
+            $salesperson->save();
 
             DB::commit();
 
@@ -110,34 +122,39 @@ class SalespersonController extends Controller
     public function update(Request $request, $code)
     {
         try {
-            $salesperson = Salesperson::where('code', $code)->firstOrFail();
+            $salesperson = Salesperson::where('Code', $code)->firstOrFail();
             
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:100',
-                'sales_team_id' => 'required|exists:sales_team,id',
-                'position' => 'required|string|max:50',
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:50',
+                'sales_team_id' => 'nullable|integer',
+                'position' => 'nullable|string|max:50',
                 'user_id' => 'nullable|string|max:20',
-                'is_active' => 'required|boolean'
-        ]);
+                'is_active' => 'nullable|boolean'
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
                     'message' => $validator->errors()->first()
                 ], 422);
             }
 
-            // Update the salesperson
-            $salesperson->update([
-                'name' => $request->name,
-                'sales_team_id' => $request->sales_team_id,
-                'position' => $request->position,
-                'user_id' => $request->user_id,
-                'is_active' => $request->is_active
-            ]);
+            // Update using mutator methods for compatibility
+            $salesperson->name = $request->name;
+            $salesperson->sales_team_id = $request->sales_team_id ?? 1;
+            $salesperson->position = $request->position ?? 'E - Executive';
+            $salesperson->user_id = $request->user_id;
+            $salesperson->is_active = $request->is_active ?? true;
+            if ($request->has('email')) {
+                $salesperson->Email = $request->email;
+            }
+            if ($request->has('target_sales')) {
+                $salesperson->TargetSales = $request->target_sales;
+            }
+            $salesperson->save();
 
             // Get the updated data
-            $updatedPerson = Salesperson::where('code', $code)->first();
+            $updatedPerson = Salesperson::where('Code', $code)->first();
 
             return response()->json([
                 'success' => true,
@@ -156,7 +173,7 @@ class SalespersonController extends Controller
     public function destroy($code)
     {
         try {
-            $salesperson = Salesperson::where('code', $code)->firstOrFail();
+            $salesperson = Salesperson::where('Code', $code)->firstOrFail();
             $salesperson->delete();
 
             return response()->json([
@@ -178,9 +195,9 @@ class SalespersonController extends Controller
         try {
         $query = $request->get('query', '');
             
-        $salespersons = Salesperson::where('code', 'like', "%{$query}%")
-            ->orWhere('name', 'like', "%{$query}%")
-            ->orderBy('code')
+        $salespersons = Salesperson::where('Code', 'like', "%{$query}%")
+            ->orWhere('Name', 'like', "%{$query}%")
+            ->orderBy('Code')
             ->get();
 
         return response()->json($salespersons);
@@ -197,9 +214,7 @@ class SalespersonController extends Controller
     public function getDetails($code)
     {
         try {
-        $salesperson = Salesperson::with('salesTeam')
-            ->where('code', $code)
-                ->firstOrFail();
+        $salesperson = Salesperson::where('Code', $code)->firstOrFail();
 
             return response()->json([
                 'success' => true,
@@ -249,16 +264,12 @@ class SalespersonController extends Controller
     public function apiIndex()
     {
         try {
-            $salespersons = Salesperson::with('salesTeam')
-                ->orderBy('name')
-                ->get();
+            $salespersons = Salesperson::orderBy('Name')->get();
 
             // Auto-seed when empty to ensure data is available for the Vue menu
             if ($salespersons->isEmpty()) {
                 $this->seedData();
-                $salespersons = Salesperson::with('salesTeam')
-                    ->orderBy('name')
-                    ->get();
+                $salespersons = Salesperson::orderBy('Name')->get();
             }
             
             return response()->json($salespersons);
@@ -323,5 +334,208 @@ class SalespersonController extends Controller
     {
         $purchasers = Salesperson::where('position', 'PU')->orWhere('position', 'PU/RQ')->get();
         return response()->json($purchasers);
+    }
+
+    // ==================== SALES TEAM METHODS ====================
+    
+    /**
+     * Get all sales teams (unique Grup values)
+     */
+    public function getSalesTeams()
+    {
+        try {
+            $teams = Salesperson::select('Grup as name', 'CodeGrup as code')
+                ->whereNotNull('Grup')
+                ->where('Grup', '!=', '')
+                ->distinct()
+                ->orderBy('Grup')
+                ->get()
+                ->map(function($team) {
+                    return [
+                        'name' => $team->name,
+                        'code' => $team->code
+                    ];
+                });
+                
+            return response()->json($teams);
+        } catch (\Exception $e) {
+            Log::error('Error getting sales teams: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load sales teams'], 500);
+        }
+    }
+
+    /**
+     * Vue component for Define Sales Team
+     */
+    public function vueDefineTeam()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/sales-team', [
+                'header' => 'Define Sales Team'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in SalespersonController@vueDefineTeam: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load sales team page'], 500);
+        }
+    }
+
+    /**
+     * Store or update sales team
+     */
+    public function storeSalesTeam(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'code' => 'required|string|max:50',
+                'name' => 'required|string|max:50',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            // Check if team already exists
+            $existingTeam = Salesperson::where('CodeGrup', $request->code)
+                ->orWhere('Grup', $request->name)
+                ->first();
+
+            if ($existingTeam) {
+                // Update existing team members
+                Salesperson::where('Grup', $existingTeam->Grup)
+                    ->update([
+                        'Grup' => $request->name,
+                        'CodeGrup' => $request->code
+                    ]);
+            } else {
+                // Create new team entry
+                Salesperson::create([
+                    'Code' => 'TEAM_' . $request->code,
+                    'Name' => 'Team: ' . $request->name,
+                    'Grup' => $request->name,
+                    'CodeGrup' => $request->code,
+                    'status' => 'Active'
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sales team saved successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error storing sales team: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving sales team: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // ==================== SALESPERSON TEAM METHODS ====================
+    
+    /**
+     * Get salesperson teams (salesperson with their team info)
+     */
+    public function getSalespersonTeams()
+    {
+        try {
+            $teams = Salesperson::select('Code', 'Name', 'Grup', 'CodeGrup', 'TargetSales', 'status')
+                ->whereNotNull('Grup')
+                ->whereNotLike('Code', 'TEAM_%')
+                ->orderBy('Grup')
+                ->orderBy('Name')
+                ->get();
+                
+            return response()->json($teams);
+        } catch (\Exception $e) {
+            Log::error('Error getting salesperson teams: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load salesperson teams'], 500);
+        }
+    }
+
+    /**
+     * Vue component for Define Salesperson Team
+     */
+    public function vueDefineSalespersonTeam()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/salesperson-team', [
+                'header' => 'Define Salesperson Team'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in SalespersonController@vueDefineSalespersonTeam: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load salesperson team page'], 500);
+        }
+    }
+
+    /**
+     * Assign salesperson to team
+     */
+    public function assignToTeam(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'salesperson_code' => 'required|exists:salesperson,Code',
+                'team_name' => 'required|string',
+                'team_code' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $salesperson = Salesperson::where('Code', $request->salesperson_code)->first();
+            $salesperson->update([
+                'Grup' => $request->team_name,
+                'CodeGrup' => $request->team_code
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Salesperson assigned to team successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error assigning salesperson to team: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error assigning salesperson to team: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get next available code based on existing code pattern
+     */
+    private function getNextAvailableCode($baseCode)
+    {
+        // Extract prefix and number from code (e.g., S106 -> S + 106)
+        if (preg_match('/^([A-Z]+)(\d+)$/', $baseCode, $matches)) {
+            $prefix = $matches[1];
+            $number = (int)$matches[2];
+            
+            // Find next available number
+            do {
+                $number++;
+                $newCode = $prefix . str_pad($number, strlen($matches[2]), '0', STR_PAD_LEFT);
+                $exists = Salesperson::where('Code', $newCode)->exists();
+            } while ($exists && $number < 9999);
+            
+            return $newCode;
+        }
+        
+        // If pattern doesn't match, just append a number
+        $counter = 1;
+        do {
+            $newCode = $baseCode . '_' . $counter;
+            $exists = Salesperson::where('Code', $newCode)->exists();
+            $counter++;
+        } while ($exists && $counter < 100);
+        
+        return $newCode;
     }
 }
