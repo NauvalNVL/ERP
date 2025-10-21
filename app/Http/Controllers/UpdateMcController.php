@@ -294,6 +294,17 @@ class UpdateMcController extends Controller
             'selectedWrappingCode' => 'nullable|string',
             'soValues' => 'nullable|array',
             'woValues' => 'nullable|array',
+            'specialInstructions' => 'nullable|array',
+            'moreDescriptions' => 'nullable|array',
+            'mcSpecialInst1' => 'nullable|string',
+            'mcSpecialInst2' => 'nullable|string',
+            'mcSpecialInst3' => 'nullable|string',
+            'mcSpecialInst4' => 'nullable|string',
+            'mcMoreDescription1' => 'nullable|string',
+            'mcMoreDescription2' => 'nullable|string',
+            'mcMoreDescription3' => 'nullable|string',
+            'mcMoreDescription4' => 'nullable|string',
+            'mcMoreDescription5' => 'nullable|string',
         ]);
 
         try {
@@ -406,6 +417,17 @@ class UpdateMcController extends Controller
                     'selectedWrappingCode' => $validated['selectedWrappingCode'] ?? null,
                     'soValues' => $validated['soValues'] ?? [],
                     'woValues' => $validated['woValues'] ?? [],
+                    'specialInstructions' => $validated['specialInstructions'] ?? [],
+                    'moreDescriptions' => $validated['moreDescriptions'] ?? [],
+                    'mcSpecialInst1' => $validated['mcSpecialInst1'] ?? null,
+                    'mcSpecialInst2' => $validated['mcSpecialInst2'] ?? null,
+                    'mcSpecialInst3' => $validated['mcSpecialInst3'] ?? null,
+                    'mcSpecialInst4' => $validated['mcSpecialInst4'] ?? null,
+                    'mcMoreDescription1' => $validated['mcMoreDescription1'] ?? null,
+                    'mcMoreDescription2' => $validated['mcMoreDescription2'] ?? null,
+                    'mcMoreDescription3' => $validated['mcMoreDescription3'] ?? null,
+                    'mcMoreDescription4' => $validated['mcMoreDescription4'] ?? null,
+                    'mcMoreDescription5' => $validated['mcMoreDescription5'] ?? null,
                 ];
             }
             
@@ -611,6 +633,32 @@ class UpdateMcController extends Controller
                 // Set calculated totals (override any passed value)
                 $legacy['TOTAL_SL'] = $totalSL > 0 ? $totalSL : null;
                 $legacy['TOTAL_SW'] = $totalSW > 0 ? $totalSW : null;
+                
+                // MC Special Instructions (1-4)
+                for ($i = 1; $i <= 4; $i++) {
+                    $key = 'MC_SPECIAL_INST' . $i;
+                    $incoming = $alias($pd, [
+                        'mcSpecialInst' . $i,
+                        'mc_special_inst_' . $i,
+                        'MC_SPECIAL_INST' . $i,
+                        'specialInstructions.' . ($i - 1),
+                        'special_instructions.' . ($i - 1)
+                    ]);
+                    $legacy[$key] = $keep($key, $incoming);
+                }
+                
+                // MC More Descriptions (1-5)
+                for ($i = 1; $i <= 5; $i++) {
+                    $key = 'MC_MORE_DESCRIPTION_' . $i;
+                    $incoming = $alias($pd, [
+                        'mcMoreDescription' . $i,
+                        'mc_more_description_' . $i,
+                        'MC_MORE_DESCRIPTION_' . $i,
+                        'moreDescriptions.' . ($i - 1),
+                        'more_descriptions.' . ($i - 1)
+                    ]);
+                    $legacy[$key] = $keep($key, $incoming);
+                }
             }
 
             // Normalize empty strings to null
