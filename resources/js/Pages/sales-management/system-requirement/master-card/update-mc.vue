@@ -1186,6 +1186,10 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
     pdRoot.soValues = Array.isArray(soValues.value) ? [...soValues.value] : [];
     pdRoot.woValues = Array.isArray(woValues.value) ? [...woValues.value] : [];
 
+    // Get selected component name (Main, Fit1, Fit2, etc.)
+    const selectedComponent = mcComponents.value.find(c => c.selected);
+    const componentName = selectedComponent ? selectedComponent.c_num : 'Main';
+
     const payload = {
             mc_seq: form.value.mcs,
             customer_code: form.value.ac,
@@ -1195,7 +1199,7 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
             status: form.value.mc_status || 'Active',
             mc_approval: form.value.mc_approval || 'No',
             part_no: '',
-            comp_no: '',
+            comp_no: componentName, // Use selected component (Main, Fit1, Fit2, etc.)
             p_design: '',
             ext_dim_1: mcDetails.value.ext_dim_1 || '',
             ext_dim_2: mcDetails.value.ext_dim_2 || '',
@@ -1267,6 +1271,7 @@ const form = ref({
     mc_short_model: "",
     mc_status: "Active",
     mc_approval: "No",
+    comp_no: "Main", // Default to Main component
 });
 
 // Loading state variables
@@ -2213,6 +2218,10 @@ const saveRecord = async () => {
     try {
         const loadingToast = toast.loading("Saving master card...");
         
+        // Get selected component name (Main, Fit1, Fit2, etc.)
+        const selectedComponent = mcComponents.value.find(c => c.selected);
+        const componentName = selectedComponent ? selectedComponent.c_num : 'Main';
+        
         const payload = {
             mc_seq: form.value.mcs,
             customer_code: form.value.ac,
@@ -2222,7 +2231,7 @@ const saveRecord = async () => {
             status: form.value.mc_status || 'Active',
             mc_approval: form.value.mc_approval || 'No',
             part_no: '',
-            comp_no: '',
+            comp_no: componentName, // Use selected component (Main, Fit1, Fit2, etc.)
             p_design: '',
             ext_dim_1: mcDetails.value.ext_dim_1 || '',
             ext_dim_2: mcDetails.value.ext_dim_2 || '',
@@ -2733,6 +2742,11 @@ const selectComponent = (component, index) => {
     mcComponents.value.forEach((comp) => (comp.selected = false));
     // Select the clicked component
     component.selected = true;
+    
+    // Update form comp_no with selected component name
+    if (form.value) {
+        form.value.comp_no = component.c_num; // Main, Fit1, Fit2, etc.
+    }
 };
 
 const setupPD = () => {
