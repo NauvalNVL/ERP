@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\UserCps;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +15,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::paginate(10);
+        $users = UserCps::paginate(10);
         return view('system-security/index', compact('users'));
     }
 
@@ -32,8 +32,8 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|unique:users|max:20',
-            'username' => 'required|unique:users|max:30',
+            'user_id' => 'required|unique:usercps,userID|max:20',
+            'username' => 'required|unique:usercps,userName|max:30',
             'official_name' => 'required|max:100',
             'official_title' => 'required|max:50',
             'mobile_number' => 'required|digits_between:10,15',
@@ -44,23 +44,10 @@ class UserController extends Controller
         ]);
 
         try {
-            $user = User::create([
-                'user_id' => $validated['user_id'],
-                'username' => $validated['username'],
-                'official_name' => $validated['official_name'],
-                'official_title' => $validated['official_title'],
-                'mobile_number' => $validated['mobile_number'],
-                'official_tel' => $validated['official_tel'],
-                'password' => bcrypt('temporary_password'),
-                'status' => $validated['status'],
-                'password_expiry_date' => (int)$validated['password_expiry_date'],
-                'amend_expired_password' => $validated['amend_expired_password'],
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+            $user = UserCps::createUser($validated);
 
             return redirect()->route('vue.system-security.index')
-                ->with('success', 'User '.$user->user_id.' berhasil dibuat');
+                ->with('success', 'User '.$user->userID.' berhasil dibuat');
 
         } catch (\Exception $e) {
             Log::error('Error creating user: '.$e->getMessage());
@@ -70,7 +57,7 @@ class UserController extends Controller
         }
     }
 
-    public function edit(User $user)
+    public function edit(UserCps $user)
     {
         try {
             return view('system-security/edit', compact('user'));
@@ -80,11 +67,11 @@ class UserController extends Controller
         }
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, UserCps $user)
     {
         $rules = [
-            'user_id' => ['required','max:20',Rule::unique('users')->ignore($user->id)],
-            'username' => ['required','max:30',Rule::unique('users')->ignore($user->id)],
+            'user_id' => ['required','max:20',Rule::unique('usercps', 'userID')->ignore($user->id)],
+            'username' => ['required','max:30',Rule::unique('usercps', 'userName')->ignore($user->id)],
             'official_name' => 'required|max:100',
             'official_title' => 'nullable|max:50',
             'mobile_number' => 'nullable|digits_between:10,15',
@@ -130,10 +117,10 @@ class UserController extends Controller
         }
     }
 
-    public function destroy(User $user)
+    public function destroy(UserCps $user)
     {
         try {
-            if ($user->user_id === Auth::user()->user_id) {
+            if ($user->userID === Auth::user()->userID) {
                 return back()->with('error', 'Tidak dapat menghapus akun sendiri');
             }
 
@@ -151,7 +138,7 @@ class UserController extends Controller
         $user = null;
         
         if($request->has('search_user_id')) {
-            $user = User::where('user_id', $request->search_user_id)->first();
+            $user = UserCps::where('userID', $request->search_user_id)->first();
             
             if(!$user) {
                 return redirect()->route('users.amend-password')
@@ -166,39 +153,29 @@ class UserController extends Controller
     public function updatePassword(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,user_id',
+            'user_id' => 'required|exists:usercps,userID',
             'new_password' => 'required|min:8|confirmed',
         ]);
 
         try {
-            $user = User::where('user_id', $request->user_id)->firstOrFail();
+            $user = UserCps::where('userID', $request->user_id)->firstOrFail();
             
-            // Perbaikan perhitungan hari
-            $expiryDate = now()->addDays(90)->startOfDay();
-            $currentDate = now()->startOfDay();
-            $daysDifference = $expiryDate->diffInDays($currentDate);
+            // Update password menggunakan method dari model
+            $user->updatePassword($request->new_password, 90);
 
-            $user->update([
-                'password' => bcrypt($request->new_password),
-                'password_expiry_date' => $daysDifference
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Password berhasil diperbarui untuk user: '.$user->user_id
-            ], 200);
+            return redirect()->route('vue.system-security.amend-password')
+                ->with('success', 'Password berhasil diperbarui untuk user: '.$user->userID);
         } catch (\Exception $e) {
             Log::error('Password update error: '.$e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal memperbarui password: '.$e->getMessage()
-            ], 500);
+            return back()
+                ->withInput()
+                ->with('error', 'Gagal memperbarui password: '.$e->getMessage());
         }
     }
 
     public function vueIndex()
     {
-        $users = User::paginate(10);
+        $users = UserCps::paginate(10);
         return Inertia::render('system-manager/system-security/Index', [
             'users' => $users,
             'header' => 'Define User'
@@ -212,7 +189,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function vueEdit(User $user)
+    public function vueEdit(UserCps $user)
     {
         return Inertia::render('system-manager/system-security/Edit', [
             'user' => $user,
@@ -225,7 +202,7 @@ class UserController extends Controller
         $user = null;
         
         if(request()->has('search_user_id')) {
-            $user = User::where('user_id', request()->search_user_id)->first();
+            $user = UserCps::where('userID', request()->search_user_id)->first();
         }
         
         return Inertia::render('system-manager/system-security/AmendPassword', [
@@ -245,17 +222,17 @@ class UserController extends Controller
     {
         $search = $request->query('search');
 
-        $users = User::query();
+        $users = UserCps::query();
 
         if (!empty($search)) {
-            $users->where('user_id', 'like', '%' . $search . '%')
-                  ->orWhere('name', 'like', '%' . $search . '%');
+            $users->where('userID', 'like', '%' . $search . '%')
+                  ->orWhere('userName', 'like', '%' . $search . '%');
         }
 
         return response()->json($users->get());
     }
 
-    public function getUserPermissions(User $user)
+    public function getUserPermissions(UserCps $user)
     {
         // Implementasi untuk mendapatkan daftar permission user
         // Ini hanya contoh, sesuaikan dengan struktur database Anda
@@ -272,7 +249,7 @@ class UserController extends Controller
         return response()->json($permissions);
     }
 
-    public function updateAccess(Request $request, User $user)
+    public function updateAccess(Request $request, UserCps $user)
     {
         // Validasi input
         $validated = $request->validate([
@@ -296,7 +273,7 @@ class UserController extends Controller
             }
             
             return redirect()->route('vue.system-security.define-access')
-                ->with('success', 'Permissions berhasil diperbarui untuk user: ' . $user->user_id);
+                ->with('success', 'Permissions berhasil diperbarui untuk user: ' . $user->userID);
         } catch (\Exception $e) {
             Log::error('Error updating permissions: ' . $e->getMessage());
             return redirect()->back()

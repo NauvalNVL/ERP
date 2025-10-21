@@ -55,7 +55,7 @@ class DatabaseSeeder extends Seeder
             BundlingComputationMethodSeeder::class,
             ObsolateReactiveMCSeeder::class,
             BusinessFormSeeder::class,
-            UserSeeder::class,
+            UserCpsSeeder::class,
             FinishingSeeder::class,
             ComputationMethodSeeder::class,
             PaperFluteSeeder::class,

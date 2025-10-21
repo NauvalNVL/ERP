@@ -140,6 +140,7 @@ Route::middleware('auth')->group(function () {
          Route::put('/user/{user}', [UserController::class, 'update'])->name('vue.system-security.update');
          Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('vue.system-security.destroy');
          Route::get('/system-security/amend-password', [UserController::class, 'vueAmendPassword'])->name('vue.system-security.amend-password');
+         Route::post('/system-security/update-password', [UserController::class, 'updatePassword'])->name('vue.system-security.update-password');
          Route::get('/system-security/define-access', [UserController::class, 'vueDefineAccess'])->name('vue.system-security.define-access');
          
          // System Maintenance Routes
