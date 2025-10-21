@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
+use App\Models\UserCps;
 use Inertia\Inertia;
 
 class LoginController extends Controller
@@ -18,14 +18,27 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'user_id' => 'required|string|max:20',
             'password' => 'required|string|min:8'
         ]);
+        
+        $credentials = [
+            'userID' => $request->user_id,
+            'password' => $request->password
+        ];
 
         try {
             if (Auth::attempt($credentials, $request->remember)) {
                 $request->session()->regenerate();
+                
+                // Update login info di tabel usercps
+                $user = Auth::user();
+                if ($user) {
+                    $user->updateLoginInfo();
+                    Log::info('Login info updated for user: ' . $user->userID);
+                }
+                
                 return redirect('/dashboard');
             }
         } catch (\Exception $e) {
@@ -40,14 +53,15 @@ class LoginController extends Controller
 
     public function username()
     {
-        return 'user_id';
+        return 'userID';
     }
-
+    
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
-        $request->session()->regenerateToken();  
+        $request->session()->regenerateToken();
+        
         return redirect('/login');
     }
 }
