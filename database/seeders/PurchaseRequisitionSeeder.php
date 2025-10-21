@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\PurchaseRequisition;
 use App\Models\PrItem;
 use App\Models\PrApproval;
-use App\Models\User;
+use App\Models\UserCps;
 use App\Models\MmSku;
 use Carbon\Carbon;
 
@@ -34,7 +34,7 @@ class PurchaseRequisitionSeeder extends Seeder
         // Create sample PRs
         foreach (range(1, 15) as $index) {
             $department = $departments[array_rand($departments)];
-            $requestor = $users[array_rand($users)];
+            $requestorId = $users[array_rand($users)]; // This is now a string ID
             
             $requestDate = Carbon::now()->subDays(rand(1, 30));
             $requiredDate = $requestDate->copy()->addDays(rand(7, 21));
@@ -48,8 +48,8 @@ class PurchaseRequisitionSeeder extends Seeder
                 'pr_year' => $requestDate->year,
                 'department_code' => $department['code'],
                 'department_name' => $department['name'],
-                'requestor_id' => $requestor->id,
-                'requestor_name' => $requestor->official_name,
+                'requestor_id' => $requestorId,
+                'requestor_name' => 'User ' . $requestorId,
                 'request_date' => $requestDate,
                 'required_date' => $requiredDate,
                 'priority' => $priority,
@@ -57,7 +57,7 @@ class PurchaseRequisitionSeeder extends Seeder
                 'budget_code' => 'BGT-' . $department['code'] . '-' . date('Y'),
                 'description' => $this->generateDescription($department['name']),
                 'currency' => 'IDR',
-                'created_by' => $requestor->id,
+                'created_by' => $requestorId,
             ]);
 
             // Create PR items
@@ -86,7 +86,7 @@ class PurchaseRequisitionSeeder extends Seeder
                     'urgency' => $this->getItemUrgency($priority),
                     'remaining_quantity' => $quantity,
                     'converted_quantity' => 0,
-                    'created_by' => $requestor->id,
+                    'created_by' => $requestorId,
                 ]);
             }
 
@@ -114,27 +114,16 @@ class PurchaseRequisitionSeeder extends Seeder
             ['full_name' => 'Sarah Employee', 'username' => 'sarah.employee', 'official_title' => 'employee'],
         ];
 
-        $users = [];
-        foreach ($sampleUsers as $userData) {
-            $user = User::firstOrCreate(
-                ['username' => $userData['username']],
-                [
-                    'user_id' => $userData['username'],
-                    'username' => $userData['username'],
-                    'official_name' => $userData['full_name'],
-                    'official_title' => $userData['official_title'],
-                    'password' => bcrypt('password'),
-                    'mobile_number' => '08' . rand(1000000000, 9999999999),
-                    'official_tel' => '021-' . rand(10000000, 99999999),
-                    'status' => 'A',
-                    'amend_expired_password' => 0,
-                    'password_expiry_date' => now()->addMonths(3)->timestamp,
-                ]
-            );
-            $users[] = $user;
+        // Get existing users from USERCPS or use default IDs
+        $existingUsers = UserCps::limit(5)->get();
+        
+        if ($existingUsers->count() > 0) {
+            // Use existing USERCPS users
+            return $existingUsers->pluck('ID')->toArray();
         }
-
-        return $users;
+        
+        // Fallback: use default user IDs
+        return ['SYSTEM', 'ADMIN', 'USER01', 'USER02', 'USER03'];
     }
 
     /**
@@ -343,33 +332,29 @@ class PurchaseRequisitionSeeder extends Seeder
      */
     private function createApprovalWorkflow($pr, $users, $status)
     {
-        $supervisor = collect($users)->firstWhere('official_title', 'supervisor');
-        $manager = collect($users)->firstWhere('official_title', 'manager');
-        $director = collect($users)->firstWhere('official_title', 'director');
-        $finance = collect($users)->firstWhere('official_title', 'finance_manager');
-
+        // Since $users is now array of string IDs, just use them directly
         $approvers = [];
         
         // Simple workflow based on total value
         if ($pr->total_estimated_value >= 50000000) { // 50M IDR
             $approvers = [
-                ['user' => $manager, 'level' => 2, 'sequence' => 1],
-                ['user' => $finance, 'level' => 5, 'sequence' => 2],
-                ['user' => $director, 'level' => 3, 'sequence' => 3],
+                ['user_id' => $users[1] ?? $users[0], 'level' => 2, 'sequence' => 1],
+                ['user_id' => $users[2] ?? $users[0], 'level' => 5, 'sequence' => 2],
+                ['user_id' => $users[3] ?? $users[0], 'level' => 3, 'sequence' => 3],
             ];
         } elseif ($pr->total_estimated_value >= 10000000) { // 10M IDR
             $approvers = [
-                ['user' => $manager, 'level' => 2, 'sequence' => 1],
-                ['user' => $finance, 'level' => 5, 'sequence' => 2],
+                ['user_id' => $users[1] ?? $users[0], 'level' => 2, 'sequence' => 1],
+                ['user_id' => $users[2] ?? $users[0], 'level' => 5, 'sequence' => 2],
             ];
         } else {
             $approvers = [
-                ['user' => $supervisor, 'level' => 1, 'sequence' => 1],
+                ['user_id' => $users[0], 'level' => 1, 'sequence' => 1],
             ];
         }
 
         foreach ($approvers as $approverData) {
-            if (!$approverData['user']) continue;
+            if (!$approverData['user_id']) continue;
 
             $action = PrApproval::ACTION_PENDING;
             $approvedDate = null;
@@ -390,7 +375,7 @@ class PurchaseRequisitionSeeder extends Seeder
 
             PrApproval::create([
                 'pr_id' => $pr->id,
-                'approver_id' => $approverData['user']->id,
+                'approver_id' => $approverData['user_id'],
                 'approver_level' => $approverData['level'],
                 'action' => $action,
                 'comments' => $this->getApprovalComment($action),

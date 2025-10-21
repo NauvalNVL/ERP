@@ -4,18 +4,16 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\CustomerGroup;
-use App\Models\User;
+use App\Models\UserCps;
 use Illuminate\Support\Facades\DB;
 
 class CustomerGroupSeeder extends Seeder
 {
     public function run()
     {
-        // Get a default user for created_by and updated_by
-        $user = User::first();
-        if (!$user) {
-            $user = User::factory()->create();
-        }
+        // Get a default user ID from USERCPS (legacy table with string ID)
+        $defaultUser = UserCps::first();
+        $userId = $defaultUser ? $defaultUser->ID : 'SYSTEM';
 
         // Clear existing data
         DB::table('customer_groups')->truncate();
@@ -24,32 +22,32 @@ class CustomerGroupSeeder extends Seeder
             [
                 'group_code' => '01',
                 'description' => 'PIUTANG TRAILER',
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
+                'created_by' => $userId,
+                'updated_by' => $userId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'group_code' => '02',
                 'description' => 'PIUTANG WASTE',
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
+                'created_by' => $userId,
+                'updated_by' => $userId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'group_code' => '03',
                 'description' => 'PIUTANG USAHA PENDAPATAN LAIN2',
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
+                'created_by' => $userId,
+                'updated_by' => $userId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'group_code' => 'NA',
                 'description' => 'PIUTANG USAHA',
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
+                'created_by' => $userId,
+                'updated_by' => $userId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

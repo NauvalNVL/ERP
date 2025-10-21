@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('pr_approvals', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('pr_id');
-            $table->unsignedBigInteger('approver_id');
+            $table->string('approver_id', 20); // Reference to USERCPS.ID
             $table->integer('approver_level')->default(1);
             $table->enum('action', [
                 'PENDING',
@@ -29,22 +29,18 @@ return new class extends Migration
             $table->integer('approval_sequence')->default(1);
             $table->boolean('is_required')->default(true);
             
-            // Delegation fields
-            $table->unsignedBigInteger('delegation_from')->nullable();
+            // Delegation fields - Reference to USERCPS.ID
+            $table->string('delegation_from', 20)->nullable();
             $table->text('delegation_reason')->nullable();
             
-            // Audit fields
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
+            // Audit fields - Reference to USERCPS.ID
+            $table->string('created_by', 20)->nullable();
+            $table->string('updated_by', 20)->nullable();
             $table->timestamps();
             $table->softDeletes();
 
             // Foreign key constraints
             $table->foreign('pr_id')->references('id')->on('purchase_requisitions')->onDelete('cascade');
-            $table->foreign('approver_id')->references('id')->on('users')->onDelete('no action');
-            $table->foreign('delegation_from')->references('id')->on('users')->onDelete('no action');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('no action');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('no action');
 
             // Indexes
             $table->index(['pr_id']);

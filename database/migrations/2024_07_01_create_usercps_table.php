@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('MC', 50);
             $table->string('MC_PRICE', 50);
             $table->string('SM', 50);
-            $table->string('PASS', 50);
+            $table->string('PASS', 255); // Increased to 255 to accommodate bcrypt hash (60 chars)
             $table->string('PRICE', 50);
             $table->string('COST', 50);
             $table->timestamps();

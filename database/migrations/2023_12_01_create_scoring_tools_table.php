@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('specification', 255)->nullable()->comment('Spesifikasi teknis');
             $table->text('description')->nullable()->comment('Deskripsi lengkap');
             $table->boolean('is_active')->default(true)->index()->comment('Status aktif');
-            $table->unsignedBigInteger('created_by')->nullable()->comment('User ID pembuat');
-            $table->unsignedBigInteger('updated_by')->nullable()->comment('User ID pengubah terakhir');
+            $table->string('created_by', 20)->nullable()->comment('Reference to USERCPS.ID');
+            $table->string('updated_by', 20)->nullable()->comment('Reference to USERCPS.ID');
             $table->timestamps();
             $table->softDeletes();
         });

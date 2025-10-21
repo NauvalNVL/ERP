@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('customer_code', 20);
             $table->string('customer_name', 100);
             $table->string('sales_type', 10)->default('LC'); // Default to LC (Local)
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->string('created_by', 20)->nullable(); // Reference to USERCPS.ID
+            $table->string('updated_by', 20)->nullable(); // Reference to USERCPS.ID
             $table->timestamps();
             
             // Add indexes instead of foreign keys to avoid potential issues

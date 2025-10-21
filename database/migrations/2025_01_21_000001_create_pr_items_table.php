@@ -43,17 +43,15 @@ return new class extends Migration
             $table->decimal('remaining_quantity', 15, 3)->default(0);
             $table->decimal('converted_quantity', 15, 3)->default(0);
             
-            // Audit fields
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
+            // Audit fields - Reference to USERCPS.ID
+            $table->string('created_by', 20)->nullable();
+            $table->string('updated_by', 20)->nullable();
             $table->timestamps();
             $table->softDeletes();
 
             // Foreign key constraints
             $table->foreign('pr_id')->references('id')->on('purchase_requisitions')->onDelete('cascade');
             // Note: Foreign key to mm_skus table removed as it may not exist in all environments
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('no action');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('no action');
 
             // Indexes
             $table->index(['pr_id']);

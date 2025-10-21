@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_permissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('user_id', 20); // Reference to USERCPS.ID (string type)
             $table->string('permission_name');
             $table->timestamps();
             
