@@ -25,7 +25,7 @@
 
           <div class="p-6">
             <!-- Modern Attractive Period Selection -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 pb-8 border-b border-gradient-to-r from-blue-100 to-purple-100">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
               <!-- Current Period Card -->
               <div class="group relative">
@@ -186,23 +186,33 @@
               </div>
             </div>
 
-            <!-- Additional Fields Grid -->
-            <div class="grid grid-cols-12 gap-5">
+            <!-- Additional Fields Grid with smooth transition -->
+            <div
+              class="overflow-hidden transition-all duration-500"
+              :style="{
+                maxHeight: hasCustomer ? '1000px' : '0',
+                opacity: hasCustomer ? 1 : 0,
+                marginTop: hasCustomer ? '1.5rem' : '0',
+                paddingTop: hasCustomer ? '1.5rem' : '0'
+              }"
+            >
+              <div class="border-t border-gray-200 pt-6">
+                <div class="grid grid-cols-12 gap-5">
 
             <!-- Customer name (readonly) -->
-            <div v-if="hasCustomer" class="col-span-12 lg:col-span-8">
+            <div class="col-span-12 lg:col-span-8">
               <label class="block text-xs font-medium text-gray-700 mb-1">Customer Name</label>
               <input v-model="customerName" type="text" readonly class="w-full px-3 py-2 text-sm rounded-md bg-gray-50 ring-1 ring-inset ring-gray-200 cursor-not-allowed" />
             </div>
 
             <!-- Currency (readonly) -->
-            <div v-if="hasCustomer" class="col-span-12 md:col-span-4">
+            <div class="col-span-12 md:col-span-4">
               <label class="block text-xs font-medium text-gray-700 mb-1">Currency</label>
               <input v-model="currency" type="text" readonly class="w-full px-3 py-2 text-sm rounded-md bg-gray-50 ring-1 ring-inset ring-gray-200 cursor-not-allowed" />
             </div>
 
             <!-- Tax Index No. -->
-            <div v-if="hasCustomer" class="col-span-12 md:col-span-4">
+            <div class="col-span-12 md:col-span-4">
               <label class="block text-xs font-medium text-gray-700 mb-1">
                 Tax Index No. <span class="text-red-600">*</span>
               </label>
@@ -221,7 +231,7 @@
             </div>
 
             <!-- Invoice Date with day of week -->
-            <div v-if="hasCustomer" class="col-span-12 md:col-span-4">
+            <div class="col-span-12 md:col-span-4">
               <label class="block text-xs font-medium text-gray-700 mb-1">Invoice Date</label>
               <div class="flex items-center gap-2">
                 <input v-model="invoiceDate" type="date" class="px-3 py-2 text-sm rounded-md ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500" />
@@ -230,62 +240,36 @@
             </div>
 
             <!-- 2nd Reference -->
-            <div v-if="hasCustomer" class="col-span-12 md:col-span-4">
+            <div class="col-span-12 md:col-span-4">
               <label class="block text-xs font-medium text-gray-700 mb-1">2nd Reference#</label>
               <input v-model="secondRef" type="text" class="w-full px-3 py-2 text-sm rounded-md ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500" />
             </div>
 
             <!-- Remark -->
-            <div v-if="hasCustomer" class="col-span-12">
+            <div class="col-span-12">
               <label class="block text-xs font-medium text-gray-700 mb-1">Remark</label>
               <input v-model="remark" type="text" class="w-full px-3 py-2 text-sm rounded-md ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500" />
             </div>
 
             <!-- Actions -->
-            <div class="col-span-12 flex flex-wrap items-center gap-3 pt-2">
-              <button
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="!hasCustomer"
-                @click="refreshPeriodData"
-              >
-                <i class="fa fa-sync"></i>
-                Refresh Period Data
-              </button>
-              <button
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-emerald-600 text-white text-sm hover:bg-emerald-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="!hasCustomer || preparing"
-                @click="openFlow"
-                @keyup.enter.stop.prevent="openFlow"
-              >
-                <i v-if="!preparing" class="fa fa-arrow-right"></i>
-                <i v-else class="fa fa-spinner fa-spin"></i>
-                {{ preparing ? 'Preparing...' : 'Continue to Prepare' }}
-              </button>
-              <div class="flex-1"></div>
-              <button class="inline-flex items-center gap-2 px-3 py-2 rounded-md border text-sm hover:bg-gray-50" @click="showCancelModal = true">
-                <i class="fa fa-ban text-red-600"></i>
-                Cancel Active Invoice
-              </button>
-              <button class="inline-flex items-center gap-2 px-3 py-2 rounded-md border text-sm hover:bg-gray-50" @click="showLogModal = true">
-                <i class="fa fa-print text-emerald-600"></i>
-                View & Print Invoice Log
-              </button>
-            </div>
-            <div v-if="hasCustomer" class="col-span-12 flex items-center justify-end gap-3 pt-4 border-t">
-              <button @click="refreshPeriodData" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
-                <i class="fa fa-sync-alt"></i>
-                Refresh
-              </button>
+            <div class="col-span-12 flex items-center justify-end gap-3 pt-6 border-t-2 border-gray-200 mt-4">
               <button
                 @click="openFlow"
-                :disabled="preparing"
-                class="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                :disabled="preparing || !hasCustomer"
+                class="inline-flex items-center gap-3 px-8 py-3 text-base font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
               >
-                <i v-if="!preparing" class="fa fa-arrow-right"></i>
-                <i v-else class="fa fa-spinner fa-spin"></i>
-                {{ preparing ? 'Processing...' : 'Continue to Prepare' }}
+                <span>{{ preparing ? 'Processing...' : 'Next' }}</span>
+                <svg v-if="!preparing" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+                <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
               </button>
             </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -358,6 +342,7 @@
         :mcSeq="selectedOrderForItems?.mcs_num || ''"
         :totalAmount="selectedOrderForItems?.amount || 0"
         @close="salesOrderItemsModalOpen = false"
+        @confirm="onSalesOrderItemsConfirm"
       />
 
       <!-- Modal 5: Invoice Number Option -->
@@ -613,13 +598,13 @@ function onDOsSelectedFromTable(dos){
   console.log('📊 Modal states AFTER:')
   console.log('   - Table Modal (doSelectionModalOpen):', doSelectionModalOpen.value, '❌ CLOSED')
   console.log('   - Screen Modal (doListModalOpen):', doListModalOpen.value, '✅ STILL OPEN')
-  
+
   // 🔒 CRITICAL: Ensure Screen Modal stays open
   if (doListModalOpen.value === false) {
     console.error('🚨 ERROR: Screen Modal was closed! Re-opening it...')
     doListModalOpen.value = true
   }
-  
+
   console.log('🔓 User should now see Delivery Order Screen with selected DO')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
@@ -639,7 +624,7 @@ function openSalesOrderItems(order){
 
 /**
  * Step 3: User clicks Select button in Delivery Order Screen
- * Calculate total and open Final Tax Calculation Modal
+ * Open Sales Order Items Screen (CPS Flow)
  */
 async function onDOsSelected(dos){
   // Close the simple list modal
@@ -650,11 +635,17 @@ async function onDOsSelected(dos){
     return
   }
 
-  // Calculate total amount
+  // Store selected DOs and calculate total
+  selectedDOs.value = dos
   await calculateTotalAmount(dos)
 
-  // Open Final Tax Calculation Modal
-  finalTaxModalOpen.value = true
+  // CPS Flow: Open Sales Order Items Screen first
+  if (dos.length > 0) {
+    selectedOrderForItems.value = dos[0] // Select first DO for items view
+    selectedOrderForItems.value.amount = totalAmount.value
+    salesOrderItemsModalOpen.value = true
+    console.log('📦 Opening Sales Order Items Screen for:', dos[0].do_number)
+  }
 }
 
 /**
@@ -681,6 +672,19 @@ async function calculateTotalAmount(dos){
     console.error('Failed to calculate total:', e)
     totalAmount.value = 0
   }
+}
+
+/**
+ * Step 3b: User confirms Sales Order Items
+ * Opens Final Tax Calculation Modal (CPS Flow)
+ */
+function onSalesOrderItemsConfirm(itemsData){
+  console.log('✅ Sales Order Items confirmed:', itemsData)
+  // Close Sales Order Items modal
+  salesOrderItemsModalOpen.value = false
+
+  // Open Final Tax Calculation Modal
+  finalTaxModalOpen.value = true
 }
 
 /**
@@ -963,3 +967,26 @@ function validateYear(event, type) {
   }
 }
 </script>
+
+<style scoped>
+/* Smooth expand/collapse transition */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.duration-500 {
+  transition-duration: 500ms;
+}
+
+/* Ensure smooth overflow during animation */
+.overflow-hidden {
+  overflow: hidden;
+}
+
+/* Prevent any flicker during transition */
+* {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+</style>

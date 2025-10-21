@@ -14,7 +14,7 @@ class Invoice extends Model
     // Relationship to customer account
     public function customer()
     {
-        return $this->belongsTo(\App\Models\CustomerAccount::class, 'AC_NUM', 'customer_code');
+        return $this->belongsTo(\App\Models\Customer::class, 'AC_NUM', 'CODE');
     }
 
     // Scope for filtering by period
