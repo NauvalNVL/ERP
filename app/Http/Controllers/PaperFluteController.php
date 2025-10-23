@@ -18,13 +18,13 @@ class PaperFluteController extends Controller
     public function index(Request $request)
     {
         try {
-            // Always load from database, ordered by code
-            $paperFlutes = PaperFlute::orderBy('code')->get();
+            // Always load from database, ordered by Flute
+            $paperFlutes = PaperFlute::orderBy('Flute')->get();
             
             // If there are no flutes in the database, seed them
             if ($paperFlutes->isEmpty()) {
                 $this->seedData();
-                $paperFlutes = PaperFlute::orderBy('code')->get();
+                $paperFlutes = PaperFlute::orderBy('Flute')->get();
             }
             
             // If the request wants JSON, return JSON response
@@ -55,11 +55,15 @@ class PaperFluteController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'code' => 'required|string|max:20|unique:paper_flutes',
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'flute_height' => 'required|numeric',
-                'is_active' => 'boolean',
+                'Flute' => 'required|string|max:25|unique:Flute_CPS,Flute',
+                'Descr' => 'required|string|max:100',
+                'DB' => 'nullable|numeric',
+                'B' => 'nullable|numeric',
+                '_1L' => 'nullable|numeric',
+                'A_C_E' => 'nullable|numeric',
+                '_2L' => 'nullable|numeric',
+                'Height' => 'nullable|numeric',
+                'Starch' => 'nullable|numeric',
             ]);
 
             if ($validator->fails()) {
@@ -69,10 +73,10 @@ class PaperFluteController extends Controller
                 ], 422);
             }
 
-            $paperFlute = PaperFlute::create($request->all());
-
-            // Update the seeder file if needed
-            $this->updateSeederFile($paperFlute);
+            $data = $request->all();
+            $data['No'] = PaperFlute::max('No') + 1;
+            
+            $paperFlute = PaperFlute::create($data);
 
             return response()->json([
                 'success' => true,
@@ -102,17 +106,20 @@ class PaperFluteController extends Controller
     /**
      * Update the specified paper flute in storage.
      */
-    public function update(Request $request, $code)
+    public function update(Request $request, $flute)
     {
         try {
-            $paperFlute = PaperFlute::where('code', $code)->firstOrFail();
+            $paperFlute = PaperFlute::where('Flute', $flute)->firstOrFail();
 
             $validator = Validator::make($request->all(), [
-                'code' => 'required|string|max:20|unique:paper_flutes,code,' . $paperFlute->id,
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-                'flute_height' => 'required|numeric',
-                'is_active' => 'boolean',
+                'Descr' => 'required|string|max:100',
+                'DB' => 'nullable|numeric',
+                'B' => 'nullable|numeric',
+                '_1L' => 'nullable|numeric',
+                'A_C_E' => 'nullable|numeric',
+                '_2L' => 'nullable|numeric',
+                'Height' => 'nullable|numeric',
+                'Starch' => 'nullable|numeric',
             ]);
 
             if ($validator->fails()) {
@@ -125,11 +132,8 @@ class PaperFluteController extends Controller
             // Update the paper flute
             $paperFlute->update($request->all());
 
-            // Update the seeder file
-            $this->updateSeederFile($paperFlute);
-
             // Get the updated data
-            $updatedFlute = PaperFlute::where('code', $code)->first();
+            $updatedFlute = PaperFlute::where('Flute', $flute)->first();
 
             return response()->json([
                 'success' => true,
@@ -198,16 +202,15 @@ class PaperFluteController extends Controller
     /**
      * Remove the specified paper flute from storage.
      */
-    public function destroy($code)
+    public function destroy($flute)
     {
         try {
-            $paperFlute = PaperFlute::where('code', $code)->firstOrFail();
+            $paperFlute = PaperFlute::where('Flute', $flute)->firstOrFail();
             
             // Store information before deletion for the response
             $fluteInfo = [
-                'id' => $paperFlute->id,
-                'code' => $paperFlute->code,
-                'name' => $paperFlute->name
+                'Flute' => $paperFlute->Flute,
+                'Descr' => $paperFlute->Descr
             ];
             
             $paperFlute->delete();
@@ -242,15 +245,15 @@ class PaperFluteController extends Controller
      */
     public function viewAndPrint()
     {
-        // Ambil semua data paper flute, urutkan berdasarkan code
-        $paperFlutes = PaperFlute::orderBy('code')->get(); 
+        // Ambil semua data paper flute, urutkan berdasarkan Flute
+        $paperFlutes = PaperFlute::orderBy('Flute')->get(); 
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpaperflute', compact('paperFlutes')); 
     }
 
     /**
      * Display a listing of the resource using Vue.
      *
-     * @return \Inertia\Response
+     * @return \Inertia\Response|\Illuminate\Http\JsonResponse
      */
     public function vueIndex()
     {
@@ -267,7 +270,7 @@ class PaperFluteController extends Controller
     /**
      * Display a listing of the resource for printing in Vue.
      *
-     * @return \Inertia\Response
+     * @return \Inertia\Response|\Illuminate\Http\JsonResponse
      */
     public function vueViewAndPrint()
     {
@@ -280,91 +283,6 @@ class PaperFluteController extends Controller
     }
 
     /**
-     * Get seeder data for paper flutes.
-     */
-    public function getSeederData()
-    {
-        // Get the seeder instance
-        $seeder = new PaperFluteSeeder();
-        
-        // Get the data from the seeder
-        $paperFlutes = $seeder->getSeederData();
-        
-        return response()->json($paperFlutes);
-    }
-
-    /**
-     * Update seeder data for paper flutes.
-     */
-    public function updateSeederData(Request $request)
-    {
-        try {
-            $data = $request->all();
-            
-            // Update the seeder file
-            $seederPath = database_path('seeders/PaperFluteSeeder.php');
-            $seederContent = file_get_contents($seederPath);
-            
-            // Find the paper flutes array in the seeder file
-            $pattern = '/\$flutes\s*=\s*\[(.*?)\];/s';
-            
-            // Create new paper flutes array content
-            $newFlutesArray = "[\n";
-            foreach ($data as $flute) {
-                $newFlutesArray .= "            [\n";
-                $newFlutesArray .= "                'code' => '{$flute['code']}',\n";
-                $newFlutesArray .= "                'name' => '{$flute['name']}',\n";
-                $newFlutesArray .= "                'description' => '{$flute['description']}',\n";
-                $newFlutesArray .= "                'tur_l2b' => {$flute['tur_l2b']},\n";
-                $newFlutesArray .= "                'tur_l3' => {$flute['tur_l3']},\n";
-                $newFlutesArray .= "                'tur_l1' => {$flute['tur_l1']},\n";
-                $newFlutesArray .= "                'tur_ace' => {$flute['tur_ace']},\n";
-                $newFlutesArray .= "                'tur_2l' => {$flute['tur_2l']},\n";
-                $newFlutesArray .= "                'flute_height' => {$flute['flute_height']},\n";
-                $newFlutesArray .= "                'starch_consumption' => {$flute['starch_consumption']},\n";
-                $newFlutesArray .= "                'is_active' => true,\n";
-                $newFlutesArray .= "            ],\n";
-            }
-            $newFlutesArray .= "        ]";
-            
-            // Replace the old array with the new one
-            $newContent = preg_replace($pattern, '$flutes = ' . $newFlutesArray . ';', $seederContent);
-            
-            // Write the updated content back to the file
-            file_put_contents($seederPath, $newContent);
-
-            // Also update the database
-            foreach ($data as $flute) {
-                PaperFlute::updateOrCreate(
-                    ['code' => $flute['code']],
-                    [
-                        'name' => $flute['name'],
-                        'description' => $flute['description'],
-                        'tur_l2b' => $flute['tur_l2b'],
-                        'tur_l3' => $flute['tur_l3'],
-                        'tur_l1' => $flute['tur_l1'],
-                        'tur_ace' => $flute['tur_ace'],
-                        'tur_2l' => $flute['tur_2l'],
-                        'flute_height' => $flute['flute_height'],
-                        'starch_consumption' => $flute['starch_consumption'],
-                        'is_active' => true
-                    ]
-                );
-            }
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Seeder data updated successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating seeder data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
      * Display a listing of the resource for API.
      *
      * @return \Illuminate\Http\JsonResponse
@@ -372,7 +290,7 @@ class PaperFluteController extends Controller
     public function apiIndex()
     {
         try {
-            $paperFlutes = PaperFlute::orderBy('code')->get();
+            $paperFlutes = PaperFlute::orderBy('Flute')->get();
             return response()->json($paperFlutes);
         } catch (\Exception $e) {
             Log::error('Error fetching paper flutes for API: ' . $e->getMessage());
