@@ -15,7 +15,7 @@
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-print mr-2"></i> Print List
+                    <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
                 <Link href="/color-group" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Color Groups
@@ -25,9 +25,9 @@
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
-                <input 
-                    type="text" 
-                    v-model="searchQuery" 
+                <input
+                    type="text"
+                    v-model="searchQuery"
                     class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Search color groups..."
                 >
@@ -51,52 +51,49 @@
                 </div>
 
                 <!-- Table Content -->
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-blue-600" style="background-color: #2563eb;">
                         <tr>
-                            <th @click="sortTable('cg')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                CG# <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('cg')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                CG# <i :class="getSortIcon('cg')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('cg_name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                CG Name <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('cg_name')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                CG Name <i :class="getSortIcon('cg_name')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('cg_type')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                CG Type <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('cg_type')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                CG Type <i :class="getSortIcon('cg_type')" class="text-xs"></i>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                    <tbody class="bg-white">
+                        <tr v-if="loading">
+                            <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
                                 <p class="mt-2">Loading color group data...</p>
                             </td>
                         </tr>
-                        <tr v-else-if="filteredColorGroups.length === 0" class="hover:bg-gray-50">
-                            <td colspan="3" class="px-6 py-4 text-center text-gray-500">
-                                No color group data found. 
+                        <tr v-else-if="filteredColorGroups.length === 0">
+                            <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                No color group data found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
                                     <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
                                 </template>
                             </td>
                         </tr>
-                        <tr v-for="(group, index) in filteredColorGroups" :key="group.cg" 
-                            :class="{'bg-blue-50': index % 2 === 0}" 
-                            class="hover:bg-blue-100">
-                            <td class="px-6 py-4 whitespace-nowrap">
+                        <tr v-for="(group, index) in filteredColorGroups" :key="group.cg"
+                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
+                            class="hover:bg-blue-200">
+                            <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm font-medium text-gray-900">{{ group.cg }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ group.cg_name }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" 
-                                    :class="getCGTypeClass(group.cg_type)">
-                                    {{ group.cg_type }}
-                                </span>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm text-gray-900">{{ group.cg_type }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -116,13 +113,13 @@
         <!-- Print Instructions -->
         <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
             <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
-                <i class="fas fa-info-circle mr-2"></i> Print Instructions
+                <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Click the "Print List" button above to print this color group list</li>
-                <li>Use landscape orientation for better results</li>
-                <li>You can search or sort data before printing</li>
-                <li>Only the table will be included in the print output</li>
+                <li>Click the "Print PDF" button above to generate and download PDF</li>
+                <li>PDF will be automatically saved in portrait orientation</li>
+                <li>You can search or sort data before exporting</li>
+                <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
         </div>
     </div>
@@ -132,6 +129,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const colorGroups = ref([]);
@@ -151,15 +150,18 @@ const fetchColorGroups = async () => {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch color groups');
         }
-        
+
         const data = await response.json();
-        
+
+        // Handle different response formats
         if (Array.isArray(data)) {
             colorGroups.value = data;
+        } else if (data.color_groups && Array.isArray(data.color_groups)) {
+            colorGroups.value = data.color_groups;
         } else if (data.data && Array.isArray(data.data)) {
             colorGroups.value = data.data;
         } else {
@@ -184,70 +186,123 @@ const sortTable = (column) => {
     }
 };
 
+// Get sort icon
+const getSortIcon = (column) => {
+    if (sortColumn.value !== column) {
+        return 'fas fa-sort text-black';
+    }
+
+    return sortDirection.value === 'asc'
+        ? 'fas fa-sort-up text-black'
+        : 'fas fa-sort-down text-black';
+};
+
 // Filtered and sorted color groups
 const filteredColorGroups = computed(() => {
     let filtered = [...colorGroups.value];
-    
+
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(group => 
+        filtered = filtered.filter(group =>
             group.cg.toLowerCase().includes(query) ||
             group.cg_name.toLowerCase().includes(query) ||
             group.cg_type.toLowerCase().includes(query)
         );
     }
-    
+
     // Apply sorting
     filtered.sort((a, b) => {
         const valueA = a[sortColumn.value].toLowerCase();
         const valueB = b[sortColumn.value].toLowerCase();
-        
+
         if (sortDirection.value === 'asc') {
             return valueA.localeCompare(valueB);
         } else {
             return valueB.localeCompare(valueA);
         }
     });
-    
+
     return filtered;
 });
 
-// Get styling class based on CG type
-const getCGTypeClass = (type) => {
-    const classes = {
-        'X-Flex': 'bg-blue-100 text-blue-800',
-        'C-Coating': 'bg-green-100 text-green-800',
-        'S-Offset': 'bg-purple-100 text-purple-800',
-        'D-Digital': 'bg-red-100 text-red-800',
-        'P-Pantone': 'bg-yellow-100 text-yellow-800'
-    };
-    
-    return classes[type] || 'bg-gray-100 text-gray-800';
-};
-
-// Print function
+// Print function using jsPDF
 const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+    try {
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-    newWin.document.write('<html><head><title>Print Color Groups</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }');
-    newWin.document.write('th { background-color: #f2f2f2; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('@media print { @page { size: landscape; } }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
-    
-    newWin.document.close();
+        // Add title
+        doc.setFontSize(16);
+        doc.setTextColor(37, 99, 235); // Blue color
+        doc.text('COLOR GROUP LIST', 10, 15);
+
+        // Add subtitle
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('View and print color group data', 10, 22);
+
+        // Prepare table data
+        const tableData = filteredColorGroups.value.map(group => [
+            group.cg || 'N/A',
+            group.cg_name || 'N/A',
+            group.cg_type || 'N/A'
+        ]);
+
+        // Add table using autoTable - call via imported function
+        autoTable(doc, {
+            startY: 28,
+            head: [['CG#', 'CG Name', 'CG Type']],
+            body: tableData,
+            theme: 'grid',
+            tableWidth: 'auto',  // Let autoTable calculate optimal widths
+            headStyles: {
+                fillColor: [37, 99, 235], // Blue background
+                textColor: [255, 255, 255], // White text
+                fontStyle: 'bold',
+                halign: 'left',
+                fontSize: 10
+            },
+            bodyStyles: {
+                textColor: [50, 50, 50],
+                halign: 'left',
+                fontSize: 9
+            },
+            alternateRowStyles: {
+                fillColor: [219, 234, 254] // Light blue for alternate rows
+            },
+            margin: { top: 28, left: 10, right: 10 }
+        });
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height;
+        
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text(
+                `Total Color Groups: ${filteredColorGroups.value.length} | Generated: ${currentDate}`,
+                10,
+                pageHeight - 10
+            );
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                doc.internal.pageSize.width - 35,
+                pageHeight - 10
+            );
+        }
+
+        // Save PDF
+        doc.save(`color-group-list-${new Date().getTime()}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    }
 };
 
 // Lifecycle hooks

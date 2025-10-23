@@ -24,7 +24,6 @@ use App\Http\Controllers\PaperQualityController;
 use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\ColorController;
-use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\ForeignCurrencyController;
 use App\Http\Controllers\BusinessFormController;
 use App\Http\Controllers\CustomerGroupController;
@@ -402,8 +401,8 @@ Route::middleware('auth')->group(function () {
          Route::get('/paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.paper-size.index');
          Route::get('/paper-size/view-print', [PaperSizeController::class, 'vueViewAndPrint'])->name('vue.paper-size.view-print');
          
-         Route::get('/color-group', [ColorGroupController::class, 'vueIndex'])->name('vue.color-group.index');
-         Route::get('/color-group/view-print', [ColorGroupController::class, 'vueViewAndPrint'])->name('vue.color-group.view-print');
+         Route::get('/color-group', [ColorController::class, 'indexColorGroups'])->name('vue.color-group.index');
+         Route::get('/color-group/view-print', [ColorController::class, 'vueViewAndPrintColorGroups'])->name('vue.color-group.view-print');
          
          Route::get('/color', [ColorController::class, 'vueIndex'])->name('vue.color.index');
          Route::get('/color/view-print', [ColorController::class, 'vueViewAndPrint'])->name('vue.color.view-print');
@@ -1055,11 +1054,11 @@ Route::prefix('api')->group(function () {
     Route::post('/geo', [GeoController::class, 'store']);
     Route::put('/geo/{code}', [GeoController::class, 'update']);
     Route::delete('/geo/{code}', [GeoController::class, 'destroy']);
-    Route::get('/color-groups', [ColorGroupController::class, 'index']);
-    Route::post('/color-groups', [ColorGroupController::class, 'store']);
-    Route::put('/color-groups/{id}', [ColorGroupController::class, 'update']);
-    Route::delete('/color-groups/{id}', [ColorGroupController::class, 'destroy']);
-    Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
+    Route::get('/color-groups', [ColorController::class, 'indexColorGroups']);
+    Route::post('/color-groups', [ColorController::class, 'storeColorGroup']);
+    Route::put('/color-groups/{id}', [ColorController::class, 'updateColorGroup']);
+    Route::delete('/color-groups/{id}', [ColorController::class, 'destroyColorGroup']);
+    Route::post('/color-groups/seed', [ColorController::class, 'seed']);
     
     // Colors API routes - Using color_id as parameter
     Route::post('/colors', [ColorController::class, 'store']);
@@ -1144,12 +1143,12 @@ Route::prefix('api')->group(function () {
     Route::put('/customer-sales-types/{id}', [CustomerSalesTypeController::class, 'apiUpdate']);
     Route::delete('/customer-sales-types/{id}', [CustomerSalesTypeController::class, 'apiDestroy']);
 
-    // Color Group API routes
-    Route::get('/color-groups', [ColorGroupController::class, 'index']);
-    Route::post('/color-groups', [ColorGroupController::class, 'store']);
-    Route::put('/color-groups/{id}', [ColorGroupController::class, 'update']);
-    Route::delete('/color-groups/{id}', [ColorGroupController::class, 'destroy']);
-    Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
+    // Color Group API routes (using ColorController)
+    Route::get('/color-groups', [ColorController::class, 'indexColorGroups']);
+    Route::post('/color-groups', [ColorController::class, 'storeColorGroup']);
+    Route::put('/color-groups/{id}', [ColorController::class, 'updateColorGroup']);
+    Route::delete('/color-groups/{id}', [ColorController::class, 'destroyColorGroup']);
+    Route::post('/color-groups/seed', [ColorController::class, 'seed']);
     
     // Finishing API routes
     Route::get('/finishings', [FinishingController::class, 'apiIndex']);
