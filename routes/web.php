@@ -403,9 +403,13 @@ Route::middleware('auth')->group(function () {
          
          Route::get('/color-group', [ColorController::class, 'indexColorGroups'])->name('vue.color-group.index');
          Route::get('/color-group/view-print', [ColorController::class, 'vueViewAndPrintColorGroups'])->name('vue.color-group.view-print');
+         // Alias for search menu
+         Route::get('/define-color-group', [ColorController::class, 'indexColorGroups'])->name('vue.define-color-group');
          
          Route::get('/color', [ColorController::class, 'vueIndex'])->name('vue.color.index');
          Route::get('/color/view-print', [ColorController::class, 'vueViewAndPrint'])->name('vue.color.view-print');
+         // Alias for search menu
+         Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.define-color');
          
          Route::get('/finishing', [FinishingController::class, 'vueIndex'])->name('vue.finishing.index');
          Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
