@@ -394,12 +394,18 @@ Route::middleware('auth')->group(function () {
          Route::get('/paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.paper-quality.index');
          Route::get('/paper-quality/status', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.status');
          Route::get('/paper-quality/view-print', [PaperQualityController::class, 'vueViewAndPrint'])->name('vue.paper-quality.view-print');
+         // Alias for search menu
+         Route::get('/define-paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.define-paper-quality');
          
          Route::get('/paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.paper-flute.index');
          Route::get('/paper-flute/view-print', [PaperFluteController::class, 'vueViewAndPrint'])->name('vue.paper-flute.view-print');
+         // Alias for search menu
+         Route::get('/define-paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.define-paper-flute');
          
          Route::get('/paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.paper-size.index');
          Route::get('/paper-size/view-print', [PaperSizeController::class, 'vueViewAndPrint'])->name('vue.paper-size.view-print');
+         // Alias for search menu
+         Route::get('/define-paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.define-paper-size');
          
          Route::get('/color-group', [ColorController::class, 'indexColorGroups'])->name('vue.color-group.index');
          Route::get('/color-group/view-print', [ColorController::class, 'vueViewAndPrintColorGroups'])->name('vue.color-group.view-print');
