@@ -28,14 +28,11 @@
           <table class="w-full divide-y divide-gray-200 table-fixed" id="salesTeamDataTable">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
-                <th @click="sortTable('code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer">
+                <th @click="sortTable('code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer">
                   Code <i class="fas fa-sort ml-1"></i>
                 </th>
-                <th @click="sortTable('name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2 cursor-pointer">
+                <th @click="sortTable('name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/3 cursor-pointer">
                   Name <i class="fas fa-sort ml-1"></i>
-                </th>
-                <th @click="sortTable('description')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer">
-                  Description <i class="fas fa-sort ml-1"></i>
                 </th>
               </tr>
             </thead>
@@ -46,10 +43,9 @@
                 @dblclick="selectAndClose(team)">
                 <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ team.code }}</td>
                 <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ team.name }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ team.description || '-' }}</td>
               </tr>
               <tr v-if="loading">
-                <td colspan="3" class="px-6 py-4 text-center">
+                <td colspan="2" class="px-6 py-4 text-center">
                   <div class="flex items-center justify-center">
                     <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
                     <span class="ml-2 text-gray-500">Loading data...</span>
@@ -57,7 +53,7 @@
                 </td>
               </tr>
               <tr v-else-if="filteredTeams.length === 0">
-                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No sales team data available.</td>
+                <td colspan="2" class="px-6 py-4 text-center text-gray-500">No sales team data available.</td>
               </tr>
             </tbody>
           </table>
@@ -111,8 +107,7 @@ const filteredTeams = computed(() => {
     const query = searchQuery.value.toLowerCase();
     teams = teams.filter(team =>
       (team.code && team.code.toLowerCase().includes(query)) ||
-      (team.name && team.name.toLowerCase().includes(query)) ||
-      (team.description && team.description.toLowerCase().includes(query))
+      (team.name && team.name.toLowerCase().includes(query))
     );
   }
   

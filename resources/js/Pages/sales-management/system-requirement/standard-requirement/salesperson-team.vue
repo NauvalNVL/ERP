@@ -170,8 +170,11 @@
     <SalespersonTeamModal
         :show="showModal"
         :salesperson-teams="salespersonTeams"
+        :sales-teams="salesTeams"
+        :salespersons="salespersons"
         @close="showModal = false"
         @select="onSalespersonTeamSelected"
+        @update="onSalespersonTeamUpdated"
     />
 
     <!-- Edit Modal -->
@@ -193,18 +196,29 @@
                     <div class="grid grid-cols-1 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code:</label>
-                            <input v-model="editForm.s_person_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <select v-model="editForm.s_person_code" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :disabled="!isCreating" required @change="onSalespersonCodeChange">
+                                <option value="">Select Salesperson Code</option>
+                                <option v-for="salesperson in salespersons" :key="salesperson.code" :value="salesperson.code">
+                                    {{ salesperson.code }}
+                                </option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Name:</label>
-                            <input v-model="editForm.salesperson_name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <select v-model="editForm.salesperson_name" class="block w-full rounded-md border-gray-300 shadow-sm" required @change="onSalespersonNameChange">
+                                <option value="">Select Salesperson Name</option>
+                                <option v-for="salesperson in salespersons" :key="salesperson.name" :value="salesperson.name">
+                                    {{ salesperson.name }}
+                                </option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Sales Team:</label>
                             <select v-model="editForm.sales_team_id" class="block w-full rounded-md border-gray-300 shadow-sm" required @change="updateTeamDetails">
-                                <option value="1">01 - MBI</option>
-                                <option value="2">02 - MANAGEMENT LOCAL</option>
-                                <option value="3">03 - MANAGEMENT MNC</option>
+                                <option value="">Select Sales Team</option>
+                                <option v-for="team in salesTeams" :key="team.id" :value="team.id">
+                                    {{ team.code }} - {{ team.name }}
+                                </option>
                             </select>
                         </div>
                         <div>
@@ -213,6 +227,14 @@
                                 <option value="E-Executive">E-Executive</option>
                                 <option value="M-Manager">M-Manager</option>
                                 <option value="S-Supervisor">S-Supervisor</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
+                            <select v-model="editForm.status" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Suspended">Suspended</option>
                             </select>
                         </div>
                     </div>
@@ -276,6 +298,7 @@ const props = defineProps({
 });
 
 const salespersonTeams = ref([]);
+const salespersons = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
@@ -286,20 +309,17 @@ const editForm = ref({
     id: '',
     s_person_code: '',
     salesperson_name: '',
-    sales_team_id: '1',
-    st_code: '01',
-    sales_team_name: 'MBI',
-    sales_team_position: 'E-Executive'
+    sales_team_id: '',
+    st_code: '',
+    sales_team_name: '',
+    sales_team_position: 'E-Executive',
+    status: 'Active'
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
-// Teams mapping
-const salesTeams = [
-    { id: 1, code: '01', name: 'MBI' },
-    { id: 2, code: '02', name: 'MANAGEMENT LOCAL' },
-    { id: 3, code: '03', name: 'MANAGEMENT MNC' }
-];
+// Teams mapping - now reactive to fetch from database
+const salesTeams = ref([]);
 
 // Reference to the CSRF form
 const csrfForm = ref(null);
@@ -353,8 +373,76 @@ const fetchSalespersonTeams = async () => {
     }
 };
 
-onMounted(() => {
-    fetchSalespersonTeams();
+const fetchSalesTeams = async () => {
+    try {
+        const res = await fetch('/api/sales-teams', { 
+            headers: { 
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin' 
+        });
+        
+        if (!res.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await res.json();
+        console.log('Fetched sales teams:', data);
+        
+        if (Array.isArray(data)) {
+            salesTeams.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            salesTeams.value = data.data;
+        } else {
+            salesTeams.value = [];
+            console.error('Unexpected sales teams data format:', data);
+        }
+        
+        console.log('Processed sales teams:', salesTeams.value);
+    } catch (e) {
+        console.error('Error fetching sales teams:', e);
+        salesTeams.value = [];
+    }
+};
+
+const fetchSalespersons = async () => {
+    try {
+        const res = await fetch('/api/salesperson', { 
+            headers: { 
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin' 
+        });
+        
+        if (!res.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await res.json();
+        console.log('Fetched salespersons:', data);
+        
+        if (Array.isArray(data)) {
+            salespersons.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            salespersons.value = data.data;
+        } else {
+            salespersons.value = [];
+            console.error('Unexpected salespersons data format:', data);
+        }
+        
+        console.log('Processed salespersons:', salespersons.value);
+    } catch (e) {
+        console.error('Error fetching salespersons:', e);
+        salespersons.value = [];
+    }
+};
+
+onMounted(async () => {
+    await fetchSalespersonTeams();
+    await fetchSalesTeams();
+    await fetchSalespersons();
 });
 
 // Watch for changes in search query to filter the data
@@ -376,10 +464,57 @@ const onSalespersonTeamSelected = (team) => {
     searchQuery.value = team.s_person_code;
     showModal.value = false;
     
-    // Automatically open the edit modal for the selected row
-    isCreating.value = false;
-    editForm.value = { ...team };
-    showEditModal.value = true;
+    // Data is now displayed in the text box, no need to open edit modal
+    // User can manually click Edit button if they want to modify the data
+};
+
+const onSalespersonTeamUpdated = async (updatedTeam) => {
+    try {
+        // Update the team via API
+        const csrfToken = getCsrfToken();
+        
+        const response = await fetch(`/api/salesperson-teams/${updatedTeam.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                s_person_code: updatedTeam.s_person_code,
+                salesperson_name: updatedTeam.salesperson_name,
+                st_code: updatedTeam.st_code,
+                sales_team_name: updatedTeam.sales_team_name,
+                sales_team_position: updatedTeam.sales_team_position,
+                status: updatedTeam.status
+            }),
+            credentials: 'same-origin'
+        });
+        
+        if (response.ok) {
+            // Update local data
+            const index = salespersonTeams.value.findIndex(team => 
+                (team.id && team.id === updatedTeam.id) || 
+                team.s_person_code === updatedTeam.s_person_code
+            );
+            
+            if (index !== -1) {
+                salespersonTeams.value[index] = { ...updatedTeam };
+            }
+            
+            showNotification('Salesperson team updated successfully', 'success');
+        } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to update salesperson team');
+        }
+    } catch (error) {
+        console.error('Error updating salesperson team:', error);
+        showNotification('Error updating salesperson team: ' + error.message, 'error');
+        
+        // Refresh data to revert changes
+        await fetchSalespersonTeams();
+    }
 };
 
 const editSelectedRow = () => {
@@ -398,10 +533,11 @@ const createNewSalespersonTeam = () => {
         id: '',
         s_person_code: '',
         salesperson_name: '',
-        sales_team_id: '1',
-        st_code: '01',
-        sales_team_name: 'MBI',
-        sales_team_position: 'E-Executive'
+        sales_team_id: '',
+        st_code: '',
+        sales_team_name: '',
+        sales_team_position: 'E-Executive',
+        status: 'Active'
     };
     showEditModal.value = true;
 };
@@ -412,20 +548,45 @@ const closeEditModal = () => {
         id: '',
         s_person_code: '',
         salesperson_name: '',
-        sales_team_id: '1',
-        st_code: '01',
-        sales_team_name: 'MBI',
-        sales_team_position: 'E-Executive'
+        sales_team_id: '',
+        st_code: '',
+        sales_team_name: '',
+        sales_team_position: 'E-Executive',
+        status: 'Active'
     };
     isCreating.value = false;
 };
 
 // Update team details when sales_team_id changes
 const updateTeamDetails = () => {
-    const team = salesTeams.find(t => t.id.toString() === editForm.value.sales_team_id.toString());
+    const team = salesTeams.value.find(t => t.id.toString() === editForm.value.sales_team_id.toString());
     if (team) {
         editForm.value.st_code = team.code;
         editForm.value.sales_team_name = team.name;
+    }
+};
+
+// Auto-fill salesperson name when code is selected/changed
+const onSalespersonCodeChange = () => {
+    if (editForm.value.s_person_code) {
+        const salesperson = salespersons.value.find(sp => 
+            sp.code && sp.code.toLowerCase() === editForm.value.s_person_code.toLowerCase()
+        );
+        if (salesperson) {
+            editForm.value.salesperson_name = salesperson.name || '';
+        }
+    }
+};
+
+// Auto-fill salesperson code when name is selected/changed
+const onSalespersonNameChange = () => {
+    if (editForm.value.salesperson_name) {
+        const salesperson = salespersons.value.find(sp => 
+            sp.name && sp.name.toLowerCase() === editForm.value.salesperson_name.toLowerCase()
+        );
+        if (salesperson) {
+            editForm.value.s_person_code = salesperson.code || '';
+        }
     }
 };
 
@@ -446,7 +607,8 @@ const saveSalespersonTeamChanges = async () => {
             salesperson_name: editForm.value.salesperson_name,
             st_code: editForm.value.st_code,
             sales_team_name: editForm.value.sales_team_name,
-            sales_team_position: editForm.value.sales_team_position
+            sales_team_position: editForm.value.sales_team_position,
+            status: editForm.value.status
         };
         
         const response = await fetch(url, {
@@ -478,6 +640,7 @@ const saveSalespersonTeamChanges = async () => {
                     selectedRow.value.st_code = editForm.value.st_code;
                     selectedRow.value.sales_team_name = editForm.value.sales_team_name;
                     selectedRow.value.sales_team_position = editForm.value.sales_team_position;
+                    selectedRow.value.status = editForm.value.status;
                 }
                 showNotification('Salesperson team updated successfully', 'success');
             }

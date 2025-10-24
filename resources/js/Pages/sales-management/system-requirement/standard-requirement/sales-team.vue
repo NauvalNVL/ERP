@@ -190,10 +190,6 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Name:</label>
                             <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
-                            <textarea v-model="editForm.description" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm"></textarea>
-                        </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
                         <button type="button" v-if="!isCreating" @click="deleteSalesTeam(editForm.code)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
@@ -261,7 +257,7 @@ const showModal = ref(false);
 const showEditModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref('');
-const editForm = ref({ code: '', name: '', description: '' });
+const editForm = ref({ code: '', name: '' });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
@@ -360,11 +356,10 @@ const onSalesTeamSelected = (team) => {
     
     // Automatically open the edit modal for the selected row
     isCreating.value = false;
-    editForm.value = { 
+    editForm.value = {
         id: team.id,
         code: team.code, 
-        name: team.name,
-        description: team.description || ''
+        name: team.name
     };
     console.log('Selected team for editing:', editForm.value);
     showEditModal.value = true;
@@ -377,8 +372,7 @@ const editSelectedRow = () => {
         editForm.value = { 
             id: selectedRow.value.id,
             code: selectedRow.value.code,
-            name: selectedRow.value.name,
-            description: selectedRow.value.description || ''
+            name: selectedRow.value.name
         };
         console.log('Editing team with ID:', editForm.value.id);
         showEditModal.value = true;
@@ -389,13 +383,13 @@ const editSelectedRow = () => {
 
 const createNewSalesTeam = () => {
     isCreating.value = true;
-    editForm.value = { code: '', name: '', description: '' };
+    editForm.value = { code: '', name: '' };
     showEditModal.value = true;
 };
 
 const closeEditModal = () => {
     showEditModal.value = false;
-    editForm.value = { code: '', name: '', description: '' };
+    editForm.value = { code: '', name: '' };
     isCreating.value = false;
 };
 
@@ -424,8 +418,7 @@ const saveSalesTeamChanges = async () => {
             },
             body: JSON.stringify({
                 code: editForm.value.code,
-                name: editForm.value.name,
-                description: editForm.value.description || ''
+                name: editForm.value.name
             }),
             credentials: 'same-origin' // Include cookies in the request
         });
@@ -444,7 +437,6 @@ const saveSalesTeamChanges = async () => {
             } else {
                 if (selectedRow.value) {
                     selectedRow.value.name = editForm.value.name;
-                    selectedRow.value.description = editForm.value.description;
                 }
                 showNotification('Sales team updated successfully', 'success');
             }
