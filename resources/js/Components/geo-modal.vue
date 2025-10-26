@@ -114,15 +114,21 @@ const sortAsc = ref(true);
 // Compute filtered geos based on search query
 const filteredGeos = computed(() => {
   let geos = props.geos;
+  
+  if (!Array.isArray(geos)) {
+    console.error('Modal - geos is not an array:', geos);
+    return [];
+  }
+  
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
     geos = geos.filter(geo =>
-      geo.code.toLowerCase().includes(q) ||
-      geo.country.toLowerCase().includes(q) ||
-      geo.state.toLowerCase().includes(q) ||
-      geo.town.toLowerCase().includes(q) ||
-      geo.town_section.toLowerCase().includes(q) ||
-      geo.area.toLowerCase().includes(q)
+      geo.code?.toLowerCase().includes(q) ||
+      geo.country?.toLowerCase().includes(q) ||
+      geo.state?.toLowerCase().includes(q) ||
+      geo.town?.toLowerCase().includes(q) ||
+      geo.town_section?.toLowerCase().includes(q) ||
+      geo.area?.toLowerCase().includes(q)
     );
   }
   

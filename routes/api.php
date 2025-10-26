@@ -830,7 +830,16 @@ Route::prefix('delivery-order-formats')->group(function () {
 
 // Industry, Geo, and Salesperson API routes
 Route::get('/industry', [App\Http\Controllers\IndustryController::class, 'apiIndex']);
-Route::get('/geos', [App\Http\Controllers\GeoController::class, 'apiIndex']);
+
+// Geo API routes (complete CRUD)
+Route::get('/geo', [App\Http\Controllers\GeoController::class, 'apiIndex']);
+Route::get('/geos', [App\Http\Controllers\GeoController::class, 'apiIndex']); // Alias for compatibility
+Route::post('/geo', [App\Http\Controllers\GeoController::class, 'store']);
+Route::get('/geo/{code}', [App\Http\Controllers\GeoController::class, 'show']);
+Route::put('/geo/{code}', [App\Http\Controllers\GeoController::class, 'update']);
+Route::delete('/geo/{code}', [App\Http\Controllers\GeoController::class, 'destroy']);
+Route::post('/geo/seed', [App\Http\Controllers\GeoController::class, 'seed']);
+
 Route::get('/salespersons', [App\Http\Controllers\SalespersonController::class, 'apiIndex']);
 
 // Customer Group API routes

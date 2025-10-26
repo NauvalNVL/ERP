@@ -118,6 +118,37 @@ Route::get('/test-db', function () {
     }
 });
 
+// Test Geo API
+Route::get('/test-geo-api', function () {
+    try {
+        $geos = \App\Models\Geo::orderBy('CODE')->take(5)->get();
+        
+        $transformed = $geos->map(function($geo) {
+            return [
+                'code' => $geo->CODE,
+                'country' => $geo->COUNTRY,
+                'state' => $geo->STATE,
+                'town' => $geo->TOWN,
+                'town_section' => $geo->TOWN_SECTION,
+                'area' => $geo->AREA
+            ];
+        });
+        
+        return response()->json([
+            'success' => true,
+            'count' => \App\Models\Geo::count(),
+            'sample_data' => $transformed,
+            'raw_first' => $geos->first()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // Guest Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -378,6 +409,8 @@ Route::middleware('auth')->group(function () {
          
          Route::get('/geo', [GeoController::class, 'vueIndex'])->name('vue.geo.index');
          Route::get('/geo/view-print', [GeoController::class, 'vueViewAndPrint'])->name('vue.geo.view-print');
+         // Alias for search menu
+         Route::get('/define-geo', [GeoController::class, 'vueIndex'])->name('vue.define-geo');
          
          Route::get('/product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.product-group.index');
          Route::get('/product-group/view-print', [ProductGroupController::class, 'vueViewAndPrint'])->name('vue.product-group.view-print');

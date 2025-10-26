@@ -15,7 +15,7 @@
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-print mr-2"></i> Print List
+                    <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
                 <Link href="/geo" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Geo Management
@@ -51,43 +51,43 @@
                 </div>
 
                 <!-- Table Content -->
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-blue-600" style="background-color: #2563eb;">
                         <tr>
-                            <th @click="sortTable('index')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                No <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('index')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                No <i :class="getSortIcon('index')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('code')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Code <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('code')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Code <i :class="getSortIcon('code')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('country')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Country <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('country')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Country <i :class="getSortIcon('country')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('state')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                State <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('state')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                State <i :class="getSortIcon('state')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('town')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Town <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('town')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Town <i :class="getSortIcon('town')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('town_section')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Town Section <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('town_section')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Town Section <i :class="getSortIcon('town_section')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('area')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Area <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('area')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Area <i :class="getSortIcon('area')" class="text-xs"></i>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                    <tbody class="bg-white">
+                        <tr v-if="loading">
+                            <td colspan="7" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
                                 <p class="mt-2">Loading geo data...</p>
                             </td>
                         </tr>
-                        <tr v-else-if="filteredGeos.length === 0" class="hover:bg-gray-50">
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                        <tr v-else-if="filteredGeos.length === 0">
+                            <td colspan="7" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 No geo data available.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -96,30 +96,28 @@
                             </td>
                         </tr>
                         <tr v-for="(geo, index) in filteredGeos" :key="geo.code" 
-                            :class="{'bg-blue-50': index % 2 === 0}" 
-                            class="hover:bg-blue-100">
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
+                            class="hover:bg-blue-200">
+                            <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm font-medium text-gray-900">{{ index + 1 }}</div>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ geo.code }}</div>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm font-medium text-gray-900">{{ geo.code || 'N/A' }}</div>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ geo.country || 'N/A' }}</div>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ geo.state || 'N/A' }}</div>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ geo.town || 'N/A' }}</div>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ geo.town_section || 'N/A' }}</div>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                                    {{ geo.area || 'N/A' }}
-                                </span>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm text-gray-900">{{ geo.area || 'N/A' }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -139,13 +137,13 @@
         <!-- Print Instructions -->
         <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
             <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
-                <i class="fas fa-info-circle mr-2"></i> Print Instructions
+                <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Click the "Print List" button above to print this geo data list</li>
-                <li>Use landscape orientation for better results</li>
-                <li>You can search or sort data before printing</li>
-                <li>Only the table will be included in the print output</li>
+                <li>Click the "Print PDF" button above to generate and download PDF</li>
+                <li>PDF will be automatically saved in landscape orientation</li>
+                <li>You can search or sort data before exporting</li>
+                <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
         </div>
     </div>
@@ -155,6 +153,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const geos = ref([]);
@@ -196,6 +196,14 @@ const sortTable = (column) => {
         sortColumn.value = column;
         sortDirection.value = 'asc';
     }
+};
+
+// Get sort icon based on current sort state
+const getSortIcon = (column) => {
+    if (sortColumn.value !== column) {
+        return 'fas fa-sort text-gray-400';
+    }
+    return sortDirection.value === 'asc' ? 'fas fa-sort-up text-blue-600' : 'fas fa-sort-down text-blue-600';
 };
 
 // Filtered and sorted geos
@@ -250,28 +258,87 @@ const filteredGeos = computed(() => {
     return filtered;
 });
 
-// Print function
+// Print function using jsPDF
 const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+    try {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-    newWin.document.write('<html><head><title>Print Geo Data</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }');
-    newWin.document.write('th { background-color: #f2f2f2; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('@media print { @page { size: landscape; } }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
-    
-    newWin.document.close();
+        // Add title
+        doc.setFontSize(16);
+        doc.setTextColor(37, 99, 235); // Blue color
+        doc.text('GEO DATA LIST', 10, 15);
+
+        // Add subtitle
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('View and print geographical data', 10, 22);
+
+        // Prepare table data
+        const tableData = filteredGeos.value.map((geo, index) => [
+            (index + 1).toString(),
+            geo.code || 'N/A',
+            geo.country || 'N/A',
+            geo.state || 'N/A',
+            geo.town || 'N/A',
+            geo.town_section || 'N/A',
+            geo.area || 'N/A'
+        ]);
+
+        // Add table using autoTable
+        autoTable(doc, {
+            startY: 28,
+            head: [['No', 'Code', 'Country', 'State', 'Town', 'Town Section', 'Area']],
+            body: tableData,
+            theme: 'grid',
+            tableWidth: 'auto',
+            headStyles: {
+                fillColor: [37, 99, 235], // Blue background
+                textColor: [255, 255, 255], // White text
+                fontStyle: 'bold',
+                halign: 'left',
+                fontSize: 10
+            },
+            bodyStyles: {
+                textColor: [50, 50, 50],
+                halign: 'left',
+                fontSize: 9
+            },
+            alternateRowStyles: {
+                fillColor: [219, 234, 254] // Light blue for alternate rows
+            },
+            margin: { top: 28, left: 10, right: 10 }
+        });
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height;
+        
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text(
+                `Total Geo Records: ${filteredGeos.value.length} | Generated: ${currentDate}`,
+                10,
+                pageHeight - 10
+            );
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                doc.internal.pageSize.width - 35,
+                pageHeight - 10
+            );
+        }
+
+        // Save PDF
+        doc.save(`geo-list-${new Date().getTime()}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    }
 };
 
 // Lifecycle hooks
