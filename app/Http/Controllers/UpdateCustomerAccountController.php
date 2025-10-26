@@ -40,6 +40,7 @@ class UpdateCustomerAccountController extends Controller
             'credit_terms' => 'nullable|numeric',
             'ac_type' => 'required|string|in:Y-Foreign,N-Local',
             'currency_code' => 'nullable|string|max:50',
+            'sales_type' => 'nullable|string|max:50',
             'salesperson_code' => 'nullable|string|max:50',
             'industrial_code' => 'nullable|string|max:50',
             'geographical' => 'nullable|string|max:50',
@@ -68,7 +69,7 @@ class UpdateCustomerAccountController extends Controller
             'IND' => $validated['industrial_code'] ?? '',
             'GROUP_' => $validated['grouping_code'] ?? '',
             'NPWP' => '',
-            'CUST_TYPE' => $validated['print_ar_aging'] === 'Y-Yes' ? 'Y' : 'N'
+            'CUST_TYPE' => $validated['sales_type'] ?? ''
         ];
 
         // Check if customer with this code already exists
@@ -135,6 +136,7 @@ class UpdateCustomerAccountController extends Controller
                     'industrial_code' => $customer->IND ?? '',
                     'geographical' => $customer->AREA ?? '',
                     'grouping_code' => $customer->GROUP_ ?? '',
+                    'sales_type' => $customer->CUST_TYPE ?? '',
                     'print_ar_aging' => $customer->CUST_TYPE === 'Y' ? 'Y-Yes' : 'N-No',
                     'status' => $customer->AC_STS ?? 'A'
                 ];
@@ -173,6 +175,7 @@ class UpdateCustomerAccountController extends Controller
                 'ac_type' => 'required|string|in:Y-Foreign,N-Local',
                 'currency_code' => 'nullable|string|max:50',
                 'npwp' => 'nullable|string|max:50',
+                'sales_type' => 'nullable|string|max:50',
                 'salesperson_code' => 'nullable|string|max:50',
                 'industrial_code' => 'nullable|string|max:50',
                 'geographical' => 'nullable|string|max:50',
@@ -211,7 +214,7 @@ class UpdateCustomerAccountController extends Controller
                 'IND' => $validated['industrial_code'] ?? '',
                 'GROUP_' => $validated['grouping_code'] ?? '',
                 'NPWP' => $validated['npwp'] ?? '',
-                'CUST_TYPE' => $validated['print_ar_aging'] === 'Y-Yes' ? 'Y' : 'N'
+                'CUST_TYPE' => $validated['sales_type'] ?? ''
             ];
 
             // Check if customer with this code already exists
@@ -268,6 +271,7 @@ class UpdateCustomerAccountController extends Controller
             'ac_type' => 'required|string|in:Y-Foreign,N-Local',
             'currency_code' => 'nullable|string|max:50',
             'npwp' => 'nullable|string|max:50',
+            'sales_type' => 'nullable|string|max:50',
             'salesperson_code' => 'nullable|string|max:50',
             'industrial_code' => 'nullable|string|max:50',
             'geographical' => 'nullable|string|max:50',
@@ -297,7 +301,7 @@ class UpdateCustomerAccountController extends Controller
             'IND' => $validated['industrial_code'] ?? '',
             'GROUP_' => $validated['grouping_code'] ?? '',
             'NPWP' => $validated['npwp'] ?? '',
-            'CUST_TYPE' => $validated['print_ar_aging'] === 'Y-Yes' ? 'Y' : 'N'
+            'CUST_TYPE' => $validated['sales_type'] ?? ''
         ];
 
         $customer->update($customerData);
@@ -338,6 +342,7 @@ class UpdateCustomerAccountController extends Controller
                 'industrial_code' => $customer->IND ?? '',
                 'geographical' => $customer->AREA ?? '',
                 'grouping_code' => $customer->GROUP_ ?? '',
+                'sales_type' => $customer->CUST_TYPE ?? '',
                 'print_ar_aging' => $customer->CUST_TYPE === 'Y' ? 'Y-Yes' : 'N-No',
                 'status' => $customer->AC_STS ?? 'A'
             ];

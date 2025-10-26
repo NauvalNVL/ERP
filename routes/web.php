@@ -434,9 +434,15 @@ Route::middleware('auth')->group(function () {
              return Inertia::render('sales-management/system-requirement/customer-account/customer-group');
          })->name('vue.define-customer-group');
 
+         // Update Customer Account - Main route (searchable in menu)
          Route::get('/update-customer-account', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
          })->name('vue.update-customer-account.index');
+         
+         // Alias for search menu (without 'index' suffix)
+         Route::get('/customer-account-update', function () {
+             return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
+         })->name('vue.update-customer-account-management');
          
          Route::post('/update-customer-account', [UpdateCustomerAccountController::class, 'store'])->name('update-customer-account.store');
          
@@ -1338,7 +1344,15 @@ Route::prefix('api')->group(function () {
                 // Determine title; if leaf is generic view, prepend with previous meaningful segment
                 $title = '';
                 $leafLower = strtolower($leaf);
-                if (in_array($leafLower, $genericView, true)) {
+                
+                // Custom title mappings for specific routes
+                $customTitles = [
+                    'vue.update-customer-account-management' => 'Update Customer Account',
+                ];
+                
+                if (isset($customTitles[$name])) {
+                    $title = $customTitles[$name];
+                } elseif (in_array($leafLower, $genericView, true)) {
                     // find previous non-generic segment
                     $prev = '';
                     for ($i = count($parts) - 2; $i >= 0; $i--) {

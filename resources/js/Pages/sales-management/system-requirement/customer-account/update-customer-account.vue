@@ -276,6 +276,12 @@
                                 </div>
 
                                 <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Sales Type</label>
+                                    <input type="text" v-model="newCustomerForm.sales_type" class="form-input" placeholder="Enter Sales Type" maxlength="50">
+                                    <span class="text-xs text-gray-500">Customer sales type classification</span>
+                                </div>
+
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Print AR Aging</label>
                                     <select v-model="newCustomerForm.print_ar_aging" class="form-input">
                                         <option value="N-No">N-No</option>
@@ -538,6 +544,12 @@
                                 </div>
 
                                 <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Sales Type</label>
+                                    <input type="text" v-model="form.sales_type" class="form-input" placeholder="Enter Sales Type" maxlength="50">
+                                    <span class="text-xs text-gray-500">Customer sales type classification</span>
+                                </div>
+
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Print AR Aging</label>
                                     <select v-model="form.print_ar_aging" class="form-input">
                                         <option value="N-No">N-No</option>
@@ -697,6 +709,7 @@ const form = reactive({
     credit_terms: 0,
     ac_type: 'N-Local', // Default value
     npwp: '',
+    sales_type: '', // Sales Type field
     salesperson_code: '',
     industrial_code: '',
     geographical: '',
@@ -719,6 +732,7 @@ const newCustomerForm = reactive({
     credit_terms: 0,
     ac_type: 'N-Local',
     npwp: '',
+    sales_type: '', // Sales Type field
     salesperson_code: '',
     industrial_code: '',
     geographical: '',
@@ -1149,6 +1163,7 @@ const saveNewCustomerAccount = async () => {
                 credit_terms: 0,
                 ac_type: 'N-Local',
                 npwp: '',
+                sales_type: '',
                 salesperson_code: '',
                 industrial_code: '',
                 geographical: '',
