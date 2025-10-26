@@ -15,7 +15,7 @@
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-print mr-2"></i> Print List
+                    <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
                 <Link href="/paper-quality" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Paper Qualities
@@ -51,73 +51,73 @@
                 </div>
 
                 <!-- Table Content -->
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-blue-600" style="background-color: #2563eb;">
                         <tr>
-                            <th @click="sortTable('id')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                ID <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('id')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                ID <i :class="getSortIcon('id')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('paper_quality')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Quality Code <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('paper_quality')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Quality <i :class="getSortIcon('paper_quality')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('paper_name')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Paper Name <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('paper_name')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Name <i :class="getSortIcon('paper_name')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('weight_kg_m')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Weight (kg/m) <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('weight_kg_m')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Weight <i :class="getSortIcon('weight_kg_m')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('commercial_code')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Comm. Code <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('commercial_code')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Comm <i :class="getSortIcon('commercial_code')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('wet_end_code')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Wet-End Code <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('wet_end_code')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Wet-End <i :class="getSortIcon('wet_end_code')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('decc_code')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                DECC Code <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('decc_code')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                DECC <i :class="getSortIcon('decc_code')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('status')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Status <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('status')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Status <i :class="getSortIcon('status')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('flute')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Flute <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('flute')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Flute <i :class="getSortIcon('flute')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('db')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                DB <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('db')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                DB <i :class="getSortIcon('db')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('b')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                B <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('b')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                B <i :class="getSortIcon('b')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('il')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                IL <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('il')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                IL <i :class="getSortIcon('il')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('a_c_e')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                A/C/E <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('a_c_e')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                A/C/E <i :class="getSortIcon('a_c_e')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('2l')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                2L <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('2l')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                2L <i :class="getSortIcon('2l')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('is_active')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Active <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('is_active')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Active <i :class="getSortIcon('is_active')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('created_at')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Created At <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('created_at')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Created <i :class="getSortIcon('created_at')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('updated_at')" class="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Updated At <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('updated_at')" class="px-2 py-2 text-left text-xs font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Updated <i :class="getSortIcon('updated_at')" class="text-xs"></i>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="17" class="px-2 py-4 text-center text-gray-500">
+                    <tbody class="bg-white">
+                        <tr v-if="loading">
+                            <td colspan="17" class="px-2 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
                                 <p class="mt-2">Loading paper quality data...</p>
                             </td>
                         </tr>
-                        <tr v-else-if="filteredPaperQualities.length === 0" class="hover:bg-gray-50">
-                            <td colspan="17" class="px-2 py-4 text-center text-gray-500">
+                        <tr v-else-if="filteredPaperQualities.length === 0">
+                            <td colspan="17" class="px-2 py-3 text-center text-gray-500 border border-gray-300">
                                 No paper qualities found. 
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -126,29 +126,25 @@
                             </td>
                         </tr>
                         <tr v-for="(quality, index) in filteredPaperQualities" :key="quality.id" 
-                            :class="{'bg-blue-50': index % 2 === 0}" 
-                            class="hover:bg-blue-100">
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.id }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.paper_quality || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.paper_name || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm text-right">{{ formatNumber(quality.weight_kg_m, 4) }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.commercial_code || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.wet_end_code || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.decc_code || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.status || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.flute || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.db || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.b || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.il || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality.a_c_e || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ quality['2l'] || 'N/A' }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">
-                                <span :class="quality.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                    {{ quality.is_active ? 'Yes' : 'No' }}
-                                </span>
-                            </td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ formatDate(quality.created_at) }}</td>
-                            <td class="px-2 py-4 whitespace-nowrap text-sm">{{ formatDate(quality.updated_at) }}</td>
+                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
+                            class="hover:bg-blue-200">
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.id }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.paper_quality || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.paper_name || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs text-right">{{ formatNumber(quality.weight_kg_m, 4) }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.commercial_code || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.wet_end_code || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.decc_code || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.status || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.flute || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.db || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.b || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.il || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.a_c_e || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality['2l'] || 'N/A' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ quality.is_active ? 'Yes' : 'No' }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ formatDate(quality.created_at) }}</td>
+                            <td class="px-2 py-2 border border-gray-300 text-xs">{{ formatDate(quality.updated_at) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -167,13 +163,13 @@
         <!-- Print Instructions -->
         <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
             <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
-                <i class="fas fa-info-circle mr-2"></i> Print Instructions
+                <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Click the "Print List" button above to print this paper quality list</li>
-                <li>Use landscape orientation for better results</li>
-                <li>You can search or sort data before printing</li>
-                <li>Only the table will be included in the print output</li>
+                <li>Click the "Print PDF" button above to generate and download PDF</li>
+                <li>PDF will be automatically saved in landscape orientation</li>
+                <li>You can search or sort data before exporting</li>
+                <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
         </div>
     </div>
@@ -183,6 +179,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const paperQualities = ref([]);
@@ -224,6 +222,17 @@ const sortTable = (column) => {
         sortColumn.value = column;
         sortDirection.value = 'asc';
     }
+};
+
+// Get sort icon
+const getSortIcon = (column) => {
+    if (sortColumn.value !== column) {
+        return 'fas fa-sort text-gray-400';
+    }
+    
+    return sortDirection.value === 'asc' 
+        ? 'fas fa-sort-up text-blue-600' 
+        : 'fas fa-sort-down text-blue-600';
 };
 
 // Format number
@@ -315,29 +324,116 @@ const filteredPaperQualities = computed(() => {
     return filtered;
 });
 
-// Print function
+// Print function using jsPDF
 const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+    try {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-    newWin.document.write('<html><head><title>Print Paper Qualities</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('@page { size: landscape; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; table-layout: fixed; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 3px; text-align: left; font-size: 7pt; color: #000; word-wrap: break-word; }');
-    newWin.document.write('th { background-color: #f2f2f2; font-weight: bold; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.text-right { text-align: right; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
-    
-    newWin.document.close();
+        // Add title
+        doc.setFontSize(16);
+        doc.setTextColor(37, 99, 235); // Blue color
+        doc.text('PAPER QUALITY LIST', 10, 15);
+
+        // Add subtitle
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('View and print paper quality data', 10, 22);
+
+        // Prepare table data
+        const tableData = filteredPaperQualities.value.map(quality => [
+            quality.id || '',
+            quality.paper_quality || 'N/A',
+            quality.paper_name || 'N/A',
+            formatNumber(quality.weight_kg_m, 4),
+            quality.commercial_code || 'N/A',
+            quality.wet_end_code || 'N/A',
+            quality.decc_code || 'N/A',
+            quality.status || 'N/A',
+            quality.flute || 'N/A',
+            quality.db || 'N/A',
+            quality.b || 'N/A',
+            quality.il || 'N/A',
+            quality.a_c_e || 'N/A',
+            quality['2l'] || 'N/A',
+            quality.is_active ? 'Yes' : 'No',
+            formatDate(quality.created_at),
+            formatDate(quality.updated_at)
+        ]);
+
+        // Add table using autoTable
+        autoTable(doc, {
+            startY: 28,
+            head: [['ID', 'Quality', 'Name', 'Weight', 'Comm', 'Wet-End', 'DECC', 'Status', 'Flute', 'DB', 'B', 'IL', 'A/C/E', '2L', 'Active', 'Created', 'Updated']],
+            body: tableData,
+            theme: 'grid',
+            tableWidth: 'auto',
+            headStyles: {
+                fillColor: [37, 99, 235], // Blue background
+                textColor: [255, 255, 255], // White text
+                fontStyle: 'bold',
+                halign: 'left',
+                fontSize: 7
+            },
+            bodyStyles: {
+                textColor: [50, 50, 50],
+                halign: 'left',
+                fontSize: 6
+            },
+            alternateRowStyles: {
+                fillColor: [219, 234, 254] // Light blue for alternate rows
+            },
+            margin: { top: 28, left: 5, right: 5 },
+            columnStyles: {
+                0: { cellWidth: 10 },   // ID
+                1: { cellWidth: 18 },   // Quality
+                2: { cellWidth: 25 },   // Name
+                3: { cellWidth: 15 },   // Weight
+                4: { cellWidth: 15 },   // Comm
+                5: { cellWidth: 18 },   // Wet-End
+                6: { cellWidth: 15 },   // DECC
+                7: { cellWidth: 15 },   // Status
+                8: { cellWidth: 12 },   // Flute
+                9: { cellWidth: 12 },   // DB
+                10: { cellWidth: 12 },  // B
+                11: { cellWidth: 12 },  // IL
+                12: { cellWidth: 15 },  // A/C/E
+                13: { cellWidth: 12 },  // 2L
+                14: { cellWidth: 13 },  // Active
+                15: { cellWidth: 25 },  // Created
+                16: { cellWidth: 25 }   // Updated
+            }
+        });
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height;
+        
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text(
+                `Total Paper Qualities: ${filteredPaperQualities.value.length} | Generated: ${currentDate}`,
+                10,
+                pageHeight - 10
+            );
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                doc.internal.pageSize.width - 35,
+                pageHeight - 10
+            );
+        }
+
+        // Save PDF
+        doc.save(`paper-quality-list-${new Date().getTime()}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    }
 };
 
 // Lifecycle hooks

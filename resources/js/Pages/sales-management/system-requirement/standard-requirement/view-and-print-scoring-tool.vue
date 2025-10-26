@@ -15,7 +15,7 @@
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-print mr-2"></i> Print List
+                    <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
                 <Link href="/scoring-tool" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Scoring Tool
@@ -51,40 +51,40 @@
                 </div>
 
                 <!-- Table Content -->
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-blue-600" style="background-color: #2563eb;">
                         <tr>
-                            <th @click="sortTable('code')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Tool Code <i :class="getSortIcon('code')"></i>
+                            <th @click="sortTable('code')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Tool Code <i :class="getSortIcon('code')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('name')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Tool Name <i :class="getSortIcon('name')"></i>
+                            <th @click="sortTable('name')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Tool Name <i :class="getSortIcon('name')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('description')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Description <i :class="getSortIcon('description')"></i>
+                            <th @click="sortTable('description')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Description <i :class="getSortIcon('description')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('is_active')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Status <i :class="getSortIcon('is_active')"></i>
+                            <th @click="sortTable('is_active')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Status <i :class="getSortIcon('is_active')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('created_at')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Created At <i :class="getSortIcon('created_at')"></i>
+                            <th @click="sortTable('created_at')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Created At <i :class="getSortIcon('created_at')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('updated_at')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Updated At <i :class="getSortIcon('updated_at')"></i>
+                            <th @click="sortTable('updated_at')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Updated At <i :class="getSortIcon('updated_at')" class="text-xs"></i>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="6" class="px-3 py-4 text-center text-gray-500">
+                    <tbody class="bg-white">
+                        <tr v-if="loading">
+                            <td colspan="6" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
                                 <p class="mt-2">Loading scoring tool data...</p>
                             </td>
                         </tr>
-                        <tr v-else-if="filteredScoringTools.length === 0" class="hover:bg-gray-50">
-                            <td colspan="6" class="px-3 py-4 text-center text-gray-500">
+                        <tr v-else-if="filteredScoringTools.length === 0">
+                            <td colspan="6" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 No scoring tools found. 
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -93,18 +93,26 @@
                             </td>
                         </tr>
                         <tr v-for="(tool, index) in filteredScoringTools" :key="tool.id" 
-                            :class="{'bg-blue-50': index % 2 === 0}" 
-                            class="hover:bg-blue-100">
-                            <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">{{ tool.code || 'N/A' }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ tool.name || 'N/A' }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ tool.description || 'N/A' }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">
-                                <span :class="tool.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                    {{ tool.is_active ? 'Active' : 'Inactive' }}
-                                </span>
+                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
+                            class="hover:bg-blue-200">
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm font-medium text-gray-900">{{ tool.code || 'N/A' }}</div>
                             </td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(tool.created_at) }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(tool.updated_at) }}</td>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm text-gray-900">{{ tool.name || 'N/A' }}</div>
+                            </td>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm text-gray-900">{{ tool.description || 'N/A' }}</div>
+                            </td>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm text-gray-900">{{ tool.is_active ? 'Active' : 'Inactive' }}</div>
+                            </td>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm text-gray-900">{{ formatDate(tool.created_at) }}</div>
+                            </td>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm text-gray-900">{{ formatDate(tool.updated_at) }}</div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -123,13 +131,13 @@
         <!-- Print Instructions -->
         <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
             <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
-                <i class="fas fa-info-circle mr-2"></i> Print Instructions
+                <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Click the "Print List" button above to print this scoring tool list</li>
-                <li>Use landscape orientation for better results</li>
-                <li>You can search or sort data before printing</li>
-                <li>Only the table will be included in the print output</li>
+                <li>Click the "Print PDF" button above to generate and download PDF</li>
+                <li>PDF will be automatically saved in landscape orientation</li>
+                <li>You can search or sort data before exporting</li>
+                <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
         </div>
     </div>
@@ -139,6 +147,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const scoringTools = ref([]);
@@ -201,12 +211,12 @@ const sortTable = (column) => {
 // Get sort icon
 const getSortIcon = (column) => {
     if (sortColumn.value !== column) {
-        return 'fas fa-sort text-gray-300';
+        return 'fas fa-sort text-gray-400';
     }
     
     return sortDirection.value === 'asc' 
-        ? 'fas fa-sort-up text-blue-500' 
-        : 'fas fa-sort-down text-blue-500';
+        ? 'fas fa-sort-up text-blue-600' 
+        : 'fas fa-sort-down text-blue-600';
 };
 
 // Filtered and sorted scoring tools
@@ -272,28 +282,94 @@ const filteredScoringTools = computed(() => {
     return filtered;
 });
 
-// Print function
+// Print function using jsPDF
 const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+    try {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-    newWin.document.write('<html><head><title>Print Scoring Tools</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('@page { size: landscape; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 4px; text-align: left; font-size: 10pt; }');
-    newWin.document.write('th { background-color: #f2f2f2; font-weight: bold; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
-    
-    newWin.document.close();
+        // Add title
+        doc.setFontSize(16);
+        doc.setTextColor(37, 99, 235); // Blue color
+        doc.text('SCORING TOOL LIST', 10, 15);
+
+        // Add subtitle
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('View and print scoring tool data', 10, 22);
+
+        // Prepare table data
+        const tableData = filteredScoringTools.value.map(tool => [
+            tool.code || 'N/A',
+            tool.name || 'N/A',
+            tool.description || 'N/A',
+            tool.is_active ? 'Active' : 'Inactive',
+            formatDate(tool.created_at),
+            formatDate(tool.updated_at)
+        ]);
+
+        // Add table using autoTable
+        autoTable(doc, {
+            startY: 28,
+            head: [['Tool Code', 'Tool Name', 'Description', 'Status', 'Created At', 'Updated At']],
+            body: tableData,
+            theme: 'grid',
+            tableWidth: 'auto',
+            headStyles: {
+                fillColor: [37, 99, 235], // Blue background
+                textColor: [255, 255, 255], // White text
+                fontStyle: 'bold',
+                halign: 'left',
+                fontSize: 9
+            },
+            bodyStyles: {
+                textColor: [50, 50, 50],
+                halign: 'left',
+                fontSize: 8
+            },
+            alternateRowStyles: {
+                fillColor: [219, 234, 254] // Light blue for alternate rows
+            },
+            margin: { top: 28, left: 10, right: 10 },
+            columnStyles: {
+                0: { cellWidth: 30 },  // Tool Code
+                1: { cellWidth: 50 },  // Tool Name
+                2: { cellWidth: 90 },  // Description
+                3: { cellWidth: 25 },  // Status
+                4: { cellWidth: 35 },  // Created At
+                5: { cellWidth: 35 }   // Updated At
+            }
+        });
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height;
+        
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text(
+                `Total Scoring Tools: ${filteredScoringTools.value.length} | Generated: ${currentDate}`,
+                10,
+                pageHeight - 10
+            );
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                doc.internal.pageSize.width - 35,
+                pageHeight - 10
+            );
+        }
+
+        // Save PDF
+        doc.save(`scoring-tool-list-${new Date().getTime()}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    }
 };
 
 // Fetch data on component mount
