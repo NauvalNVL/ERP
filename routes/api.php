@@ -144,7 +144,13 @@ Route::put('/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyCont
 Route::delete('/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyController::class, 'apiDestroy']);
 
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
+
+// Product API routes
 Route::get('/products', [ProductController::class, 'getProductsJson']);
+Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
+Route::post('/products', [ProductController::class, 'apiStore']);
+Route::match(['put', 'patch'], '/products/{id}', [ProductController::class, 'apiUpdate'])->where('id', '[0-9]+');
+Route::delete('/products/{id}', [ProductController::class, 'apiDestroy'])->where('id', '[0-9]+');
 
 // Color Group API routes
 Route::get('/color-groups', [ColorGroupController::class, 'apiIndex']);

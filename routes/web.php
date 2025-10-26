@@ -395,12 +395,18 @@ Route::middleware('auth')->group(function () {
          // Standard Requirement Routes
          Route::get('/sales-team', [SalespersonController::class, 'vueDefineTeam'])->name('vue.sales-team.index');
          Route::get('/sales-team/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');
+         // Alias for search menu
+         Route::get('/define-sales-team', [SalespersonController::class, 'vueDefineTeam'])->name('vue.define-sales-team');
          
          Route::get('/sales-person', [SalespersonController::class, 'vueIndex'])->name('vue.sales-person.index');
          Route::get('/sales-person/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-person.view-print');
+         // Alias for search menu
+         Route::get('/define-salesperson', [SalespersonController::class, 'vueIndex'])->name('vue.define-salesperson');
          
          Route::get('/sales-person-team', [SalespersonController::class, 'vueDefineSalespersonTeam'])->name('vue.sales-person-team.index');
          Route::get('/sales-person-team/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-person-team.view-print');
+         // Alias for search menu
+         Route::get('/define-salesperson-team', [SalespersonController::class, 'vueDefineSalespersonTeam'])->name('vue.define-salesperson-team');
          
          Route::get('/industry', [IndustryController::class, 'vueIndex'])->name('vue.industry.index');
          Route::get('/industry/view-print', [IndustryController::class, 'vueViewAndPrint'])->name('vue.industry.view-print');
@@ -414,18 +420,26 @@ Route::middleware('auth')->group(function () {
          
          Route::get('/product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.product-group.index');
          Route::get('/product-group/view-print', [ProductGroupController::class, 'vueViewAndPrint'])->name('vue.product-group.view-print');
+         // Alias for search menu
+         Route::get('/define-product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.define-product-group');
          
          Route::get('/product', [ProductController::class, 'vueIndex'])->name('vue.product.index');
          Route::get('/product/view-print', [ProductController::class, 'vueViewAndPrint'])->name('vue.product.view-print');
+         // Alias for search menu
+         Route::get('/define-product', [ProductController::class, 'vueIndex'])->name('vue.define-product');
          
          Route::get('/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design.index');
          Route::get('/product-design/standard-formula', function() {
              return Inertia::render('sales-management/standard-formula/setup-corrugator-run-size-formula/ProductDesign');
          })->name('vue.product-design.standard-formula');
          Route::get('/product-design/view-print', [ProductDesignController::class, 'vueViewAndPrint'])->name('vue.product-design.view-print');
+         // Alias for search menu
+         Route::get('/define-product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.define-product-design');
          
          Route::get('/scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.scoring-tool.index');
          Route::get('/scoring-tool/view-print', [ScoringToolController::class, 'vueViewAndPrint'])->name('vue.scoring-tool.view-print');
+         // Alias for search menu
+         Route::get('/define-scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.define-scoring-tool');
          
          Route::get('/paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.paper-quality.index');
          Route::get('/paper-quality/status', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.status');
@@ -1089,11 +1103,7 @@ Route::prefix('api')->group(function () {
     Route::get('/paper-flutes/seeder-data', [PaperFluteController::class, 'getSeederData']);
     Route::post('/paper-flutes/seeder-data', [PaperFluteController::class, 'updateSeederData']);
     
-    Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
-    Route::get('/products', [ProductController::class, 'getProductsJson']);
-    Route::post('/products', [ProductController::class, 'apiStore']);
-    Route::put('/products/{id}', [ProductController::class, 'apiUpdate']);
-    Route::delete('/products/{id}', [ProductController::class, 'apiDestroy']);
+    // Product API routes moved to routes/api.php
     
     // Product Designs API routes - Fixed duplicate /api prefix
     Route::get('/product-designs', [ProductDesignController::class, 'getDesignsJson']);

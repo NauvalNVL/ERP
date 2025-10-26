@@ -158,7 +158,9 @@ class ProductController extends Controller
             return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-product');
         } catch (\Exception $e) {
             Log::error('Error in ProductController@vueViewAndPrint: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to load product data for printing'], 500);
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-product', [
+                'error' => 'Failed to load product data for printing: ' . $e->getMessage()
+            ]);
         }
     }
 
@@ -207,7 +209,9 @@ class ProductController extends Controller
                     'description',
                     'category',
                     'product_group_id',
-                    'is_active'
+                    'is_active',
+                    'created_at',
+                    'updated_at'
                 )
                 ->orderBy('product_code')
                 ->get();
@@ -219,9 +223,13 @@ class ProductController extends Controller
                     'product_code' => $product->product_code,
                     'name' => $product->description, // Vue component uses 'name' for what is 'description' in DB
                     'description' => $product->description,
+                    'category' => $product->category,
                     'category_id' => $product->category,
                     'category_code' => $product->category,
                     'product_group_id' => $product->product_group_id,
+                    'is_active' => $product->is_active ? true : false,
+                    'created_at' => $product->created_at ? $product->created_at->toISOString() : null,
+                    'updated_at' => $product->updated_at ? $product->updated_at->toISOString() : null,
                     'unit' => ''
                 ];
             });
@@ -299,7 +307,8 @@ class ProductController extends Controller
     public function apiUpdate(Request $request, $id)
     {
         try {
-            $product = Product::find($id);
+            // Use where('id') instead of find() because primary key is 'product_code', not 'id'
+            $product = Product::where('id', $id)->first();
             
             if (!$product) {
                 return response()->json([
