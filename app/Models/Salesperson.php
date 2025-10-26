@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Salesperson extends Model
 {
@@ -27,6 +29,27 @@ class Salesperson extends Model
         'TargetSales' => 'decimal:2',
         'status' => 'string', // This will auto-trim CHAR fields
     ];
+
+    /**
+     * Boot method to register model events
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // When salesperson is created, updated, or deleted
+        static::created(function ($salesperson) {
+            self::syncSalespersonTeams();
+        });
+
+        static::updated(function ($salesperson) {
+            self::syncSalespersonTeams();
+        });
+
+        static::deleted(function ($salesperson) {
+            self::syncSalespersonTeams();
+        });
+    }
 
     /**
      * The accessors to append to the model's array form.
@@ -244,5 +267,71 @@ class Salesperson extends Model
     public function getTeamCodeAttribute()
     {
         return $this->CodeGrup;
+    }
+
+    /**
+     * Sync salesperson_teams table with current salesperson and sales_team data
+     */
+    public static function syncSalespersonTeams()
+    {
+        try {
+            // Clear existing salesperson_teams data
+            DB::table('salesperson_teams')->truncate();
+
+            // Get all salesperson data
+            $salespersons = DB::table('salesperson')
+                ->whereNotNull('Code')
+                ->whereNotNull('Name')
+                ->where('Code', '!=', '')
+                ->where('Name', '!=', '')
+                ->whereNotLike('Code', 'TEAM_%') // Exclude team entries
+                ->get();
+
+            // Get all sales_team data
+            $salesTeams = DB::table('sales_team')
+                ->whereNotNull('code')
+                ->whereNotNull('name')
+                ->where('code', '!=', '')
+                ->where('name', '!=', '')
+                ->get();
+
+            if ($salespersons->isEmpty() || $salesTeams->isEmpty()) {
+                return;
+            }
+
+            // Create one-to-one assignment of salesperson to sales_team
+            $salespersonTeamsData = [];
+            $now = now();
+            $salesTeamsArray = $salesTeams->toArray();
+            $teamIndex = 0;
+
+            foreach ($salespersons as $salesperson) {
+                // Assign each salesperson to one sales team (round-robin)
+                $assignedTeam = $salesTeamsArray[$teamIndex % count($salesTeamsArray)];
+                
+                $salespersonTeamsData[] = [
+                    's_person_code' => substr($salesperson->Code, 0, 10),
+                    'salesperson_name' => substr($salesperson->Name, 0, 100),
+                    'st_code' => substr($assignedTeam->code, 0, 2),
+                    'sales_team_name' => substr($assignedTeam->name, 0, 100),
+                    'sales_team_position' => 'E-Executive',
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+                
+                $teamIndex++;
+            }
+
+            // Insert data in chunks
+            if (!empty($salespersonTeamsData)) {
+                $chunks = array_chunk($salespersonTeamsData, 100);
+                foreach ($chunks as $chunk) {
+                    DB::table('salesperson_teams')->insert($chunk);
+                }
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error syncing salesperson_teams: ' . $e->getMessage());
+        }
     }
 } 

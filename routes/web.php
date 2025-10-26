@@ -1083,9 +1083,7 @@ Route::prefix('api')->group(function () {
     Route::post('/salesperson/delete/{code}', [SalespersonController::class, 'destroy']);
     Route::post('/salesperson/seed', [SalespersonController::class, 'seed']);
     
-    // Sales Team API routes (using same controller)
-    Route::get('/sales-teams', [SalespersonController::class, 'getSalesTeams']);
-    Route::post('/sales-teams/store', [SalespersonController::class, 'storeSalesTeam']);
+    // Sales Team API routes moved to proper SalesTeamController section below
     
     // Salesperson Team API routes (using same controller)
     Route::get('/salesperson-teams', [SalespersonController::class, 'getSalespersonTeams']);

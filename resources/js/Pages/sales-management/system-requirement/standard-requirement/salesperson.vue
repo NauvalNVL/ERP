@@ -184,12 +184,12 @@
                     <div class="grid grid-cols-1 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code:</label>
-                            <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
                             <span class="text-xs text-gray-500">Code must be unique</span>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Name:</label>
-                            <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
