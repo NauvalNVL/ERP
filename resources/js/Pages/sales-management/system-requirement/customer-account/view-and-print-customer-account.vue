@@ -27,13 +27,13 @@
                   </div>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                  <button @click="printTable" class="bg-gradient-to-r from-green-500 to-teal-400 text-white hover:from-green-600 hover:to-teal-500 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md relative overflow-hidden group">
+                  <button @click="exportPDF" class="bg-gradient-to-r from-green-500 to-teal-400 text-white hover:from-green-600 hover:to-teal-500 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md relative overflow-hidden group">
                     <span class="absolute inset-0 bg-white opacity-20 transform scale-x-0 origin-left transition-transform group-hover:scale-x-100"></span>
                     <div class="relative z-10 flex items-center">
                       <div class="bg-white bg-opacity-30 rounded-full p-1 mr-2">
-                        <i class="fas fa-print text-white"></i>
+                        <i class="fas fa-file-pdf text-white"></i>
                       </div>
-                      <span>Print List</span>
+                      <span>Print PDF</span>
     </div>
                 </button>
                   <Link href="/update-customer-account" class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center transition-all duration-300 relative overflow-hidden">
@@ -140,37 +140,43 @@
                 <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gradient-to-r from-cyan-50 to-blue-50">
                         <tr>
-                    <th @click="sortTable('customer_code')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <th @click="sortTable('customer_code')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                       <div class="flex items-center">
-                        <span>Customer Code</span>
+                        <span>Code</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                             </th>
-                    <th @click="sortTable('customer_name')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <th @click="sortTable('customer_name')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                       <div class="flex items-center">
-                        <span>Customer Name</span>
+                        <span>Name</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                             </th>
-                    <th @click="sortTable('address')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
-                      <div class="flex items-center">
-                        <span>Address</span>
-                        <i class="fas fa-sort ml-1"></i>
-                      </div>
-                            </th>
-                    <th @click="sortTable('telephone_no')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
-                      <div class="flex items-center">
-                        <span>Telephone</span>
-                        <i class="fas fa-sort ml-1"></i>
-                      </div>
-                            </th>
-                    <th @click="sortTable('contact_person')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <th @click="sortTable('contact_person')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                       <div class="flex items-center">
                         <span>Contact</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                             </th>
-                    <th @click="sortTable('status')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                    <th @click="sortTable('telephone_no')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Phone</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('currency_code')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Currency</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('sales_type')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Sales Type</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('status')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                       <div class="flex items-center">
                         <span>Status</span>
                         <i class="fas fa-sort ml-1"></i>
@@ -180,7 +186,7 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
@@ -188,7 +194,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredCustomerAccounts.length === 0" class="hover:bg-gray-50">
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                       <div class="flex flex-col items-center">
                         <i class="fas fa-users text-4xl text-gray-300 mb-2"></i>
                         <p class="text-lg font-medium">No customer accounts found</p>
@@ -202,30 +208,33 @@
                         <tr v-for="(account, index) in filteredCustomerAccounts" :key="account.customer_code" 
                             :class="{'bg-blue-50': index % 2 === 0}" 
                       class="hover:bg-blue-100 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{{ account.customer_code }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-4 py-3">
                                 <div class="text-sm text-gray-900">{{ account.customer_name }}</div>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm text-gray-900">{{ account.address || '-' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ account.telephone_no || '-' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ account.contact_person || '-' }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ account.telephone_no || '-' }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ account.currency_code || 'IDR' }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ account.sales_type || '-' }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
                                 <span 
                                     class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
                                     :class="{
-                                        'bg-green-100 text-green-800': account.status === 'Active',
-                                        'bg-red-100 text-red-800': account.status === 'Inactive',
-                                        'bg-gray-100 text-gray-800': account.status !== 'Active' && account.status !== 'Inactive'
+                                        'bg-green-100 text-green-800': account.status === 'Active' || account.status === 'A',
+                                        'bg-red-100 text-red-800': account.status === 'Inactive' || account.status === 'I',
+                                        'bg-gray-100 text-gray-800': account.status !== 'Active' && account.status !== 'Inactive' && account.status !== 'A' && account.status !== 'I'
                                     }">
-                                    {{ account.status || 'Active' }}
+                                    {{ account.status === 'A' ? 'Active' : account.status === 'I' ? 'Inactive' : (account.status || 'Active') }}
                                 </span>
                             </td>
                         </tr>
@@ -250,19 +259,15 @@
         </div>
 
         <!-- Print Instructions -->
-        <div class="mt-6 bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-xl border border-blue-100 shadow-md">
-          <h3 class="font-semibold text-blue-800 mb-3 flex items-center">
-            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full mr-3 flex items-center justify-center">
-              <i class="fas fa-info text-white text-sm"></i>
-            </div>
-            Print Instructions
+        <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
+          <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+            <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
-          <ul class="list-disc pl-5 text-sm text-white space-y-2">
-                <li>Click the "Print List" button above to print this customer account list</li>
-                <li>Use landscape orientation for better results</li>
-                <li>You can search, filter by status, or sort data before printing</li>
-                <li>Only the table will be included in the print output</li>
-            <li>Make sure your printer is properly configured</li>
+          <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                <li>Click the "Print PDF" button above to generate and download PDF</li>
+                <li>PDF will be automatically saved in landscape orientation</li>
+                <li>You can search, filter by status, or sort data before exporting</li>
+                <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
         </div>
         </div>
@@ -274,6 +279,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const customerAccounts = ref([]);
@@ -398,30 +405,96 @@ const filteredCustomerAccounts = computed(() => {
     return filtered;
 });
 
-// Print function
-const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+// Export to PDF function using jsPDF
+const exportPDF = () => {
+    try {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-    newWin.document.write('<html><head><title>Print Customer Accounts</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }');
-    newWin.document.write('th { background-color: #f2f2f2; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('span.badge-active { background-color: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 9999px; }');
-    newWin.document.write('span.badge-inactive { background-color: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 9999px; }');
-    newWin.document.write('@media print { @page { size: landscape; } }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
-    
-    newWin.document.close();
+        // Add title
+        doc.setFontSize(16);
+        doc.setTextColor(37, 99, 235); // Blue color
+        doc.text('CUSTOMER ACCOUNT LIST', 10, 15);
+
+        // Add subtitle
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('View and print customer account data', 10, 22);
+
+        // Prepare table data
+        const tableData = filteredCustomerAccounts.value.map(account => [
+            account.customer_code || 'N/A',
+            account.customer_name || 'N/A',
+            account.contact_person || '-',
+            account.telephone_no || '-',
+            account.currency_code || 'IDR',
+            account.sales_type || '-',
+            account.status === 'A' ? 'Active' : account.status === 'I' ? 'Inactive' : (account.status || 'Active')
+        ]);
+
+        // Add table using autoTable
+        autoTable(doc, {
+            startY: 28,
+            head: [['Code', 'Customer Name', 'Contact', 'Phone', 'Currency', 'Sales Type', 'Status']],
+            body: tableData,
+            theme: 'grid',
+            tableWidth: 'auto',
+            headStyles: {
+                fillColor: [37, 99, 235], // Blue background
+                textColor: [255, 255, 255], // White text
+                fontStyle: 'bold',
+                halign: 'left',
+                fontSize: 9
+            },
+            bodyStyles: {
+                textColor: [50, 50, 50],
+                halign: 'left',
+                fontSize: 8
+            },
+            alternateRowStyles: {
+                fillColor: [219, 234, 254] // Light blue for alternate rows
+            },
+            columnStyles: {
+                0: { fontStyle: 'bold', cellWidth: 25 },
+                1: { cellWidth: 60 },
+                2: { cellWidth: 40 },
+                3: { cellWidth: 35 },
+                4: { cellWidth: 25 },
+                5: { cellWidth: 30 },
+                6: { cellWidth: 'auto' }
+            },
+            margin: { top: 28, left: 10, right: 10 }
+        });
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height;
+
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text(
+                `Total Customer Accounts: ${filteredCustomerAccounts.value.length} | Generated: ${currentDate}`,
+                10,
+                pageHeight - 10
+            );
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                doc.internal.pageSize.width - 35,
+                pageHeight - 10
+            );
+        }
+
+        // Save PDF
+        doc.save(`customer-accounts-${new Date().getTime()}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    }
 };
 
 // Lifecycle hooks
