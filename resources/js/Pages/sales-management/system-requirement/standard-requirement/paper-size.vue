@@ -63,7 +63,7 @@
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
                             <p class="text-sm font-medium text-green-800">Data available: {{ paperSizes.length }} paper sizes found.</p>
                             <p v-if="selectedSize" class="text-xs text-green-700 mt-1">
-                                Selected: <span class="font-semibold">{{ sizeDisplay }}</span> - {{ selectedSize.description || 'No description' }}
+                                Selected: <span class="font-semibold">{{ selectedSize.millimeter }} mm</span> = {{ selectedSize.inches }} inches
                             </p>
                         </div>
                 </div>
@@ -193,7 +193,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Size in Millimeters (MM):</label>
                             <input 
                                 type="number" 
-                                v-model="form.size" 
+                                v-model="form.millimeter" 
                                 step="0.01" 
                                 min="0.01"
                                 @input="updateInches"
@@ -211,14 +211,6 @@
                                 class="block w-full rounded-md border-gray-300 shadow-sm"
                                 required>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
-                            <input 
-                                type="text" 
-                                v-model="form.description" 
-                                placeholder="e.g., A4 Width, Letter Height" 
-                                class="block w-full rounded-md border-gray-300 shadow-sm">
-                        </div>
                         <div class="p-4 mt-2 bg-blue-50 rounded-lg">
                             <div class="flex items-center mb-2">
                                 <div class="p-2 bg-blue-500 rounded-lg mr-3">
@@ -228,7 +220,7 @@
                             </div>
                             <p class="text-xs text-blue-800 ml-10">
                                 1 inch = 25.4 millimeters <br>
-                                {{ form.size ? form.size : '0.00' }} mm = {{ form.inches ? form.inches : '0.00' }} inches
+                                {{ form.millimeter ? form.millimeter : '0.00' }} mm = {{ form.inches ? form.inches : '0.00' }} inches
                             </p>
                         </div>
                     </div>
@@ -308,10 +300,8 @@ const notification = ref({ show: false, message: '', type: 'success' });
 // Form state
 const form = ref({
     id: null,
-    size: '',
-    inches: '',
-    description: '',
-    unit: 'mm'
+    millimeter: '',
+    inches: ''
 });
 
 // Display for size ID
@@ -322,15 +312,15 @@ const sizeDisplay = computed(() => {
 
 // Convert MM to Inches (1 inch = 25.4 mm)
 const updateInches = () => {
-    if (form.value.size) {
-        form.value.inches = (parseFloat(form.value.size) / 25.4).toFixed(2);
+    if (form.value.millimeter) {
+        form.value.inches = (parseFloat(form.value.millimeter) / 25.4).toFixed(2);
     }
 };
 
 // Convert Inches to MM
 const updateMillimeters = () => {
     if (form.value.inches) {
-        form.value.size = (parseFloat(form.value.inches) * 25.4).toFixed(2);
+        form.value.millimeter = (parseFloat(form.value.inches) * 25.4).toFixed(2);
     }
 };
 
@@ -339,8 +329,7 @@ watch(searchQuery, (newQuery) => {
     if (newQuery && paperSizes.value.length > 0) {
         const foundSize = paperSizes.value.find(size => 
             String(size.id).includes(newQuery) ||
-            String(size.size).includes(newQuery) ||
-            (size.description && size.description.toLowerCase().includes(newQuery.toLowerCase()))
+            String(size.millimeter).includes(newQuery)
         );
         
         if (foundSize) {
@@ -390,7 +379,7 @@ const onPaperSizeSelected = (size) => {
 
 const selectSize = (size) => {
     selectedSize.value = size;
-    searchQuery.value = size.size;
+    searchQuery.value = size.millimeter;
 };
 
 const editSelectedSize = () => {
@@ -398,10 +387,8 @@ const editSelectedSize = () => {
     isCreating.value = false;
     form.value = {
             id: selectedSize.value.id,
-            size: selectedSize.value.size,
-            inches: selectedSize.value.inches,
-            description: selectedSize.value.description || '',
-            unit: selectedSize.value.unit || 'mm'
+            millimeter: selectedSize.value.millimeter,
+            inches: selectedSize.value.inches
     };
         showEditModal.value = true;
     } else {
@@ -413,10 +400,8 @@ const createNewPaperSize = () => {
     isCreating.value = true;
     form.value = {
         id: null,
-        size: '',
-        inches: '',
-        description: '',
-        unit: 'mm'
+        millimeter: '',
+        inches: ''
     };
     showEditModal.value = true;
 };
@@ -427,7 +412,7 @@ const closeEditModal = () => {
 
 const savePaperSize = async () => {
     // Validate form
-    if (!form.value.size) {
+    if (!form.value.millimeter) {
         showNotification('Paper size in millimeters is required', 'error');
         return;
     }

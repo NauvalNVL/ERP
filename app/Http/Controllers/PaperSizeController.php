@@ -17,22 +17,22 @@ class PaperSizeController extends Controller
         try {
             // Jika request adalah AJAX, kembalikan data dalam format JSON
             if (request()->ajax() || request()->wantsJson()) {
-                $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+                $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
                 
                 if ($paperSizes->isEmpty()) {
                     $this->seedData();
-                    $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+                    $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
                 }
                 
                 return response()->json($paperSizes);
             }
             
-            $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+            $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
             
             // If there are no paper sizes in the database, seed them
             if ($paperSizes->isEmpty()) {
                 $this->seedData();
-                $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+                $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
             }
             
             return view('sales-management.system-requirement.system-requirement.standard-requirement.papersize', compact('paperSizes'));
@@ -52,30 +52,25 @@ class PaperSizeController extends Controller
     {
         try {
             $validated = $request->validate([
-                'size' => [
+                'millimeter' => [
                     'required',
                     'numeric',
                     'min:0.01',
-                    Rule::unique('paper_sizes', 'size')
+                    Rule::unique('paper_sizes', 'millimeter')
                 ]
             ], [
-                'size.required' => 'Ukuran kertas harus diisi',
-                'size.numeric' => 'Ukuran kertas harus berupa angka',
-                'size.min' => 'Ukuran kertas minimal 0.01',
-                'size.unique' => 'Ukuran kertas ini sudah terdaftar'
+                'millimeter.required' => 'Ukuran kertas harus diisi',
+                'millimeter.numeric' => 'Ukuran kertas harus berupa angka',
+                'millimeter.min' => 'Ukuran kertas minimal 0.01',
+                'millimeter.unique' => 'Ukuran kertas ini sudah terdaftar'
             ]);
 
             // Hitung inches secara manual untuk memastikan data konsisten
-            $inches = PaperSize::convertToInches($validated['size']);
-            
-            $createdBy = Auth::check() ? Auth::user()->user_id : 'system';
+            $inches = PaperSize::convertToInches($validated['millimeter']);
             
             PaperSize::create([
-                'size' => $validated['size'],
-                'inches' => $inches,
-                'unit' => 'Millimeter',
-                'created_by' => $createdBy,
-                'updated_by' => $createdBy
+                'millimeter' => $validated['millimeter'],
+                'inches' => $inches
             ]);
 
             return redirect()->route('paper-size.index')
@@ -108,28 +103,25 @@ class PaperSizeController extends Controller
             $paperSize = PaperSize::findOrFail($id);
             
             $validated = $request->validate([
-                'size' => [
+                'millimeter' => [
                     'required',
                     'numeric',
                     'min:0.01',
-                    Rule::unique('paper_sizes', 'size')->ignore($id)
+                    Rule::unique('paper_sizes', 'millimeter')->ignore($id)
                 ]
             ], [
-                'size.required' => 'Ukuran kertas harus diisi',
-                'size.numeric' => 'Ukuran kertas harus berupa angka',
-                'size.min' => 'Ukuran kertas minimal 0.01',
-                'size.unique' => 'Ukuran kertas ini sudah terdaftar'
+                'millimeter.required' => 'Ukuran kertas harus diisi',
+                'millimeter.numeric' => 'Ukuran kertas harus berupa angka',
+                'millimeter.min' => 'Ukuran kertas minimal 0.01',
+                'millimeter.unique' => 'Ukuran kertas ini sudah terdaftar'
             ]);
 
             // Hitung inches secara manual untuk memastikan data konsisten
-            $inches = PaperSize::convertToInches($validated['size']);
-            
-            $updatedBy = Auth::check() ? Auth::user()->user_id : 'system';
+            $inches = PaperSize::convertToInches($validated['millimeter']);
             
             $paperSize->update([
-                'size' => $validated['size'],
-                'inches' => $inches,
-                'updated_by' => $updatedBy
+                'millimeter' => $validated['millimeter'],
+                'inches' => $inches
             ]);
 
             return redirect()->route('paper-size.index')
@@ -178,16 +170,14 @@ class PaperSizeController extends Controller
     {
         try {
             // Ambil data paper size
-            $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+            $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
             
             // Konversi data untuk format yang benar di frontend
             $formattedPaperSizes = $paperSizes->map(function($size) {
                 return [
                     'id' => $size->id,
-                    'size' => $size->size,
-                    'inches' => $size->inches,
-                    'unit' => $size->unit,
-                    'description' => $size->description
+                    'millimeter' => $size->millimeter,
+                    'inches' => $size->inches
                 ];
             });
             
@@ -224,7 +214,7 @@ class PaperSizeController extends Controller
     public function apiIndex()
     {
         try {
-            $paperSizes = PaperSize::orderBy('size', 'asc')->get();
+            $paperSizes = PaperSize::orderBy('millimeter', 'asc')->get();
             return response()->json($paperSizes);
         } catch (\Exception $e) {
             Log::error('Error in PaperSizeController@apiIndex: ' . $e->getMessage());
@@ -245,14 +235,13 @@ class PaperSizeController extends Controller
             $paperSize = PaperSize::findOrFail($id);
             
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'size' => [
+                'millimeter' => [
                     'required',
                     'numeric',
                     'min:0.01',
-                    Rule::unique('paper_sizes', 'size')->ignore($id)
+                    Rule::unique('paper_sizes', 'millimeter')->ignore($id)
                 ],
-                'inches' => 'required|numeric|min:0.01',
-                'description' => 'nullable|string|max:255'
+                'inches' => 'required|numeric|min:0.01'
             ]);
 
             if ($validator->fails()) {
@@ -262,13 +251,9 @@ class PaperSizeController extends Controller
                 ], 422);
             }
             
-            $updatedBy = Auth::check() ? Auth::user()->user_id : 'system';
-            
             $paperSize->update([
-                'size' => $request->size,
-                'inches' => $request->inches,
-                'description' => $request->description,
-                'updated_by' => $updatedBy
+                'millimeter' => $request->millimeter,
+                'inches' => $request->inches
             ]);
 
             return response()->json([
@@ -295,9 +280,8 @@ class PaperSizeController extends Controller
     {
         try {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'size' => 'required|numeric|min:0.01|unique:paper_sizes,size',
-                'inches' => 'required|numeric|min:0.01',
-                'description' => 'nullable|string|max:255'
+                'millimeter' => 'required|numeric|min:0.01|unique:paper_sizes,millimeter',
+                'inches' => 'required|numeric|min:0.01'
             ]);
 
             if ($validator->fails()) {
@@ -307,15 +291,9 @@ class PaperSizeController extends Controller
                 ], 422);
             }
             
-            $createdBy = Auth::check() ? Auth::user()->user_id : 'system';
-            
             $paperSize = PaperSize::create([
-                'size' => $request->size,
-                'inches' => $request->inches,
-                'description' => $request->description,
-                'unit' => $request->unit ?? 'mm',
-                'created_by' => $createdBy,
-                'updated_by' => $createdBy
+                'millimeter' => $request->millimeter,
+                'inches' => $request->inches
             ]);
 
             return response()->json([
@@ -346,8 +324,8 @@ class PaperSizeController extends Controller
             // Store info before deletion for the response
             $sizeInfo = [
                 'id' => $paperSize->id,
-                'size' => $paperSize->size,
-                'description' => $paperSize->description
+                'millimeter' => $paperSize->millimeter,
+                'inches' => $paperSize->inches
             ];
             
             $paperSize->delete();
