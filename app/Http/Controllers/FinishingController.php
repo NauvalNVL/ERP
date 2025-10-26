@@ -197,7 +197,7 @@ class FinishingController extends Controller
      */
     public function vueIndex()
     {
-        return Inertia::render('sales-management/standard-formula/stitching-computation-method/Finishing');
+        return Inertia::render('sales-management/system-requirement/standard-requirement/finishing');
     }
     
     /**
@@ -207,7 +207,7 @@ class FinishingController extends Controller
      */
     public function vueViewAndPrint()
     {
-        return Inertia::render('sales-management/standard-formula/stitching-computation-method/ViewPrintFinishing');
+        return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-finishing');
     }
 
     /**
