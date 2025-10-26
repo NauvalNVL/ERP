@@ -12,7 +12,7 @@
             <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
             <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
             <div class="absolute bottom-0 right-0 w-32 h-32 bg-cyan-400 opacity-5 rounded-full translate-y-10 translate-x-10"></div>
-            
+
             <div class="p-6 md:p-8 relative z-10">
               <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="flex items-start md:items-center space-x-4 mb-4 md:mb-0">
@@ -27,13 +27,13 @@
                   </div>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                  <button @click="printTable" class="bg-gradient-to-r from-green-500 to-teal-400 text-white hover:from-green-600 hover:to-teal-500 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md relative overflow-hidden group">
+                  <button @click="exportPDF" class="bg-gradient-to-r from-green-500 to-teal-400 text-white hover:from-green-600 hover:to-teal-500 px-4 py-2 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-md relative overflow-hidden group">
                     <span class="absolute inset-0 bg-white opacity-20 transform scale-x-0 origin-left transition-transform group-hover:scale-x-100"></span>
                     <div class="relative z-10 flex items-center">
                       <div class="bg-white bg-opacity-30 rounded-full p-1 mr-2">
-                        <i class="fas fa-print text-white"></i>
+                        <i class="fas fa-file-pdf text-white"></i>
                       </div>
-                      <span>Print List</span>
+                      <span>Print PDF</span>
     </div>
                 </button>
                   <Link href="/customer-group" class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 hover:bg-opacity-30 px-4 py-2 rounded-lg flex items-center transition-all duration-300 relative overflow-hidden">
@@ -78,9 +78,9 @@
                   Search:
                 </label>
                 <div class="relative flex-grow">
-                <input 
-                    type="text" 
-                    v-model="searchQuery" 
+                <input
+                    type="text"
+                    v-model="searchQuery"
                     class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                     placeholder="Enter group code or description..."
                   />
@@ -89,7 +89,7 @@
                   </div>
                 </div>
               </div>
-              
+
               <!-- Sort Options -->
               <div class="space-y-2">
                 <label class="block text-sm font-medium text-blue-700 mb-2 flex items-center">
@@ -101,11 +101,9 @@
                 <select v-model="sortColumn" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm">
                   <option value="group_code">Group Code</option>
                   <option value="description">Description</option>
-                  <option value="created_at">Created Date</option>
-                  <option value="updated_at">Updated Date</option>
                 </select>
               </div>
-              
+
               <!-- Action Buttons -->
               <div class="flex items-end">
                 <button @click="searchQuery = ''; sortColumn = 'group_code'" class="px-6 py-2.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 text-gray-700 transition-all duration-300 shadow-sm flex items-center mr-3">
@@ -153,23 +151,11 @@
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                             </th>
-                    <th @click="sortTable('created_at')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
-                      <div class="flex items-center">
-                        <span>Created At</span>
-                        <i class="fas fa-sort ml-1"></i>
-                      </div>
-                            </th>
-                    <th @click="sortTable('updated_at')" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
-                      <div class="flex items-center">
-                        <span>Updated At</span>
-                        <i class="fas fa-sort ml-1"></i>
-                      </div>
-                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="2" class="px-6 py-4 text-center text-gray-500">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
@@ -177,7 +163,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredCustomerGroups.length === 0" class="hover:bg-gray-50">
-                            <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="2" class="px-6 py-4 text-center text-gray-500">
                       <div class="flex flex-col items-center">
                         <i class="fas fa-users text-4xl text-gray-300 mb-2"></i>
                         <p class="text-lg font-medium">No customer groups found</p>
@@ -188,20 +174,14 @@
                       </div>
                             </td>
                         </tr>
-                        <tr v-for="(group, index) in filteredCustomerGroups" :key="group.group_code" 
-                            :class="{'bg-blue-50': index % 2 === 0}" 
+                        <tr v-for="(group, index) in filteredCustomerGroups" :key="group.group_code"
+                            :class="{'bg-blue-50': index % 2 === 0}"
                       class="hover:bg-blue-100 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{{ group.group_code }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ group.description }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ formatDate(group.created_at) }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ formatDate(group.updated_at) }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -225,19 +205,15 @@
         </div>
 
         <!-- Print Instructions -->
-        <div class="mt-6 bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-xl border border-blue-100 shadow-md">
-          <h3 class="font-semibold text-blue-800 mb-3 flex items-center">
-            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full mr-3 flex items-center justify-center">
-              <i class="fas fa-info text-white text-sm"></i>
-            </div>
-            Print Instructions
+        <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
+          <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+            <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
-          <ul class="list-disc pl-5 text-sm text-white space-y-2">
-                <li>Click the "Print List" button above to print this customer group list</li>
-                <li>Use landscape orientation for better results</li>
-                <li>You can search or sort data before printing</li>
-                <li>Only the table will be included in the print output</li>
-            <li>Make sure your printer is properly configured</li>
+          <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                <li>Click the "Print PDF" button above to generate and download PDF</li>
+                <li>PDF will be automatically saved in landscape orientation</li>
+                <li>You can search or sort data before exporting</li>
+                <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
         </div>
         </div>
@@ -249,6 +225,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const customerGroups = ref([]);
@@ -268,16 +246,16 @@ const fetchCustomerGroups = async () => {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch customer groups');
         }
-        
+
         const data = await response.json();
         console.log('Received customer groups data:', data);
         console.log('Data type:', typeof data);
         console.log('Is array:', Array.isArray(data));
-        
+
         // Handle both data structures - wrapped in 'data' property or direct array
         if (data && Array.isArray(data.data)) {
             customerGroups.value = data.data;
@@ -294,13 +272,6 @@ const fetchCustomerGroups = async () => {
     }
 };
 
-// Format date
-const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleString();
-};
-
 // Sort function
 const sortTable = (column) => {
     if (sortColumn.value === column) {
@@ -314,45 +285,33 @@ const sortTable = (column) => {
 // Filtered and sorted customer groups
 const filteredCustomerGroups = computed(() => {
     let filtered = [...customerGroups.value];
-    
+
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(group => 
+        filtered = filtered.filter(group =>
             (group.group_code && group.group_code.toLowerCase().includes(query)) ||
             (group.description && group.description.toLowerCase().includes(query))
         );
     }
-    
+
     // Apply sorting
     filtered.sort((a, b) => {
         let valueA = a[sortColumn.value];
         let valueB = b[sortColumn.value];
-        
+
         // Handle null values
         if (valueA === null || valueA === undefined) valueA = '';
         if (valueB === null || valueB === undefined) valueB = '';
-        
-        // Handle date columns
-        if (['created_at', 'updated_at'].includes(sortColumn.value)) {
-            valueA = valueA ? new Date(valueA).getTime() : 0;
-            valueB = valueB ? new Date(valueB).getTime() : 0;
-            
-            if (sortDirection.value === 'asc') {
-                return valueA - valueB;
-            } else {
-                return valueB - valueA;
-            }
-        }
-        
+
         // Convert to string for comparison if not already
         if (typeof valueA !== 'string') valueA = valueA.toString();
         if (typeof valueB !== 'string') valueB = valueB.toString();
-        
+
         // Case insensitive comparison
         valueA = valueA.toLowerCase();
         valueB = valueB.toLowerCase();
-        
+
         // Sort direction
         if (sortDirection.value === 'asc') {
             return valueA.localeCompare(valueB);
@@ -360,32 +319,90 @@ const filteredCustomerGroups = computed(() => {
             return valueB.localeCompare(valueA);
         }
     });
-    
+
     return filtered;
 });
 
-// Print function
-const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+// Export to PDF function using jsPDF
+const exportPDF = () => {
+    try {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-    newWin.document.write('<html><head><title>Print Customer Groups</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }');
-    newWin.document.write('th { background-color: #f2f2f2; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('@media print { @page { size: landscape; } }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
-    
-    newWin.document.close();
+        // Add title
+        doc.setFontSize(16);
+        doc.setTextColor(37, 99, 235); // Blue color
+        doc.text('CUSTOMER GROUP LIST', 10, 15);
+
+        // Add subtitle
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('View and print customer group data', 10, 22);
+
+        // Prepare table data
+        const tableData = filteredCustomerGroups.value.map(group => [
+            group.group_code || 'N/A',
+            group.description || 'N/A'
+        ]);
+
+        // Add table using autoTable - call via imported function
+        autoTable(doc, {
+            startY: 28,
+            head: [['Group Code', 'Description']],
+            body: tableData,
+            theme: 'grid',
+            tableWidth: 'auto',
+            headStyles: {
+                fillColor: [37, 99, 235], // Blue background
+                textColor: [255, 255, 255], // White text
+                fontStyle: 'bold',
+                halign: 'left',
+                fontSize: 10
+            },
+            bodyStyles: {
+                textColor: [50, 50, 50],
+                halign: 'left',
+                fontSize: 9
+            },
+            alternateRowStyles: {
+                fillColor: [219, 234, 254] // Light blue for alternate rows
+            },
+            columnStyles: {
+                0: { fontStyle: 'bold', cellWidth: 40 },
+                1: { cellWidth: 'auto' }
+            },
+            margin: { top: 28, left: 10, right: 10 }
+        });
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height;
+
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text(
+                `Total Customer Groups: ${filteredCustomerGroups.value.length} | Generated: ${currentDate}`,
+                10,
+                pageHeight - 10
+            );
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                doc.internal.pageSize.width - 35,
+                pageHeight - 10
+            );
+        }
+
+        // Save PDF
+        doc.save(`customer-groups-${new Date().getTime()}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    }
 };
 
 // Lifecycle hooks
@@ -408,8 +425,8 @@ onMounted(() => {
     animation: pulse-slow 5s infinite;
 }
 
-.animation-delay-500 { 
-    animation-delay: 0.5s; 
+.animation-delay-500 {
+    animation-delay: 0.5s;
 }
 
 @keyframes ping-slow {

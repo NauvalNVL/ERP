@@ -4,57 +4,56 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\CustomerGroup;
-use App\Models\UserCps;
 use Illuminate\Support\Facades\DB;
 
 class CustomerGroupSeeder extends Seeder
 {
+    /**
+     * Seed CUST_GROUP table with default data from CPS
+     */
     public function run()
     {
-        // Get a default user ID from USERCPS (legacy table with string ID)
-        $defaultUser = UserCps::first();
-        $userId = $defaultUser ? $defaultUser->ID : 'SYSTEM';
-
-        // Clear existing data
-        DB::table('customer_groups')->truncate();
-
+        // Customer groups from CPS system with sequential No
         $customerGroups = [
             [
-                'group_code' => '01',
-                'description' => 'PIUTANG TRAILER',
-                'created_by' => $userId,
-                'updated_by' => $userId,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'No' => '1',
+                'Group_ID' => '01',
+                'Group_Name' => 'PHUTANG TRADER',
+                'Currency' => null,
+                'AC' => null,
+                'Name' => null
             ],
             [
-                'group_code' => '02',
-                'description' => 'PIUTANG WASTE',
-                'created_by' => $userId,
-                'updated_by' => $userId,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'No' => '2',
+                'Group_ID' => '02',
+                'Group_Name' => 'PHUTANG USAHA PENDAPATAN LAIN1',
+                'Currency' => null,
+                'AC' => null,
+                'Name' => null
             ],
             [
-                'group_code' => '03',
-                'description' => 'PIUTANG USAHA PENDAPATAN LAIN2',
-                'created_by' => $userId,
-                'updated_by' => $userId,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'No' => '3',
+                'Group_ID' => '03',
+                'Group_Name' => 'PHUTANG USAHA PENDAPATAN LAIN2',
+                'Currency' => null,
+                'AC' => null,
+                'Name' => null
             ],
             [
-                'group_code' => 'NA',
-                'description' => 'PIUTANG USAHA',
-                'created_by' => $userId,
-                'updated_by' => $userId,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'No' => '4',
+                'Group_ID' => 'NA',
+                'Group_Name' => 'PHUTANG USAHA',
+                'Currency' => null,
+                'AC' => null,
+                'Name' => null
             ],
         ];
 
         foreach ($customerGroups as $group) {
-            DB::table('customer_groups')->insert($group);
+            CustomerGroup::updateOrCreate(
+                ['Group_ID' => $group['Group_ID']],
+                $group
+            );
         }
     }
 }

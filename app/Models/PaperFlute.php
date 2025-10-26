@@ -9,11 +9,12 @@ class PaperFlute extends Model
 {
     use HasFactory;
 
+    // CPS Flute_CPS table configuration
     protected $table = 'Flute_CPS';
     public $timestamps = false;
-    protected $primaryKey = 'Flute';
-    public $incrementing = false;
-    protected $keyType = 'string';
+    protected $primaryKey = 'No';  // No is the primary key
+    public $incrementing = false;  // Not auto-increment
+    protected $keyType = 'integer'; // numeric(18,0) type
 
     protected $fillable = [
         'No',
@@ -21,21 +22,21 @@ class PaperFlute extends Model
         'Descr',
         'DB',
         'B',
-        '_1L',
-        'A_C_E',
-        '_2L',
+        '_1L',      // [1L] in database
+        'A_C_E',    // [A/C/E] in database
+        '_2L',      // [2L] in database
         'Height',
         'Starch'
     ];
 
     protected $casts = [
-        'No' => 'decimal:0',
-        'DB' => 'decimal:2',
-        'B' => 'decimal:2',
-        '_1L' => 'decimal:2',
-        'A_C_E' => 'decimal:2',
-        '_2L' => 'decimal:2',
-        'Height' => 'decimal:2',
-        'Starch' => 'decimal:2'
+        'No' => 'integer',
+        'DB' => 'float',
+        'B' => 'float',
+        '_1L' => 'float',
+        'A_C_E' => 'float',
+        '_2L' => 'float',
+        'Height' => 'float',
+        'Starch' => 'float'
     ];
 }

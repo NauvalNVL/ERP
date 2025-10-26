@@ -652,7 +652,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
+import CustomerAccountModal from '@/Components/customer-account-modal.vue'
 import UpdateMcModal from '@/Components/UpdateMcModal.vue'
 import ProductDesignScreenModal from '@/Components/ProductDesignScreenModal.vue'
 import DeliveryScheduleModal from '@/Components/DeliveryScheduleModal.vue'

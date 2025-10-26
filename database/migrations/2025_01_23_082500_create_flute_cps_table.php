@@ -14,16 +14,21 @@ return new class extends Migration
         Schema::create('Flute_CPS', function (Blueprint $table) {
             $collation = 'SQL_Latin1_General_CP1_CI_AS';
 
-            $table->decimal('No', 18, 0)->nullable();
-            $table->string('Flute', 25)->primary()->collation($collation);
+            // No as primary key (numeric 18,0 in SQL Server)
+            $table->decimal('No', 18, 0)->primary();
+            $table->string('Flute', 25)->collation($collation);
             $table->string('Descr', 100)->nullable()->collation($collation);
-            $table->decimal('DB', 10, 2)->nullable()->default(1.00);
-            $table->decimal('B', 10, 2)->nullable()->default(1.00);
-            $table->decimal('_1L', 10, 2)->nullable()->default(1.00);
-            $table->decimal('A_C_E', 10, 2)->nullable()->default(1.00);
-            $table->decimal('_2L', 10, 2)->nullable()->default(1.00);
-            $table->decimal('Height', 10, 2)->nullable()->default(0.00);
-            $table->decimal('Starch', 10, 2)->nullable()->default(0.00);
+            
+            // All numeric fields as float (matching SQL Server float type)
+            $table->float('DB')->nullable();
+            $table->float('B')->nullable();
+            $table->float('_1L')->nullable();  // [1L] in database
+            $table->float('A_C_E')->nullable(); // [A/C/E] in database
+            $table->float('_2L')->nullable();  // [2L] in database
+            $table->float('Height')->nullable();
+            $table->float('Starch')->nullable();
+            
+            // No timestamps - matching CPS database structure
         });
     }
 

@@ -277,7 +277,7 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
+import CustomerAccountModal from '@/Components/customer-account-modal.vue'
 import DeliveryOrderTableModal from '@/Components/DeliveryOrderTableModal.vue'
 
 const currentPeriod = reactive({

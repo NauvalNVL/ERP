@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('COLOR', function (Blueprint $table) {
+        Schema::create('COLOR_GROUP', function (Blueprint $table) {
             $collation = 'SQL_Latin1_General_CP1_CI_AS';
 
-            // Color_Code as primary key - matching CPS database structure
-            $table->string('Color_Code', 15)->primary()->collation($collation);
-            $table->string('Color_Name', 150)->nullable()->collation($collation);
-            $table->string('GroupCode', 15)->nullable()->collation($collation);
-            $table->string('Group', 50)->nullable()->collation($collation);
+            // CG as primary key - matching CPS database structure
+            $table->string('CG', 15)->primary()->collation($collation);
+            $table->string('CG_Name', 150)->nullable()->collation($collation);
+            $table->string('CG_Type', 50)->nullable()->collation($collation);
             
             // No timestamps - matching CPS database structure
         });
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('COLOR');
+        Schema::dropIfExists('COLOR_GROUP');
     }
-}; 
+};

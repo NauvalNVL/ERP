@@ -303,7 +303,7 @@
 import { Head } from '@inertiajs/vue3';
 import { ref, reactive } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import CustomerAccountModal from '@/Components/CustomerAccountModal.vue';
+import CustomerAccountModal from '@/Components/customer-account-modal.vue';
 import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue'; 
 import MasterCardOptionsModal from '@/Components/MasterCardOptionsModal.vue'; 
 import MasterCardZoomModal from '@/Components/MasterCardZoomModal.vue';

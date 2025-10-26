@@ -94,27 +94,19 @@
                         </div>
 
                         <div class="p-4 bg-blue-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common CG Types</h4>
-                            <div class="grid grid-cols-2 gap-2 text-sm">
+                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">CG Types</h4>
+                            <div class="grid grid-cols-1 gap-2 text-sm">
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">F</span>
-                                    <span>Flexo</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2 text-xs">C</span>
+                                    <span>C-Coating</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-purple-500 text-white rounded-full font-bold mr-2">O</span>
-                                    <span>Offset</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-purple-500 text-white rounded-full font-bold mr-2 text-xs">S</span>
+                                    <span>S-Offset</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">C</span>
-                                    <span>Coating</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-red-500 text-white rounded-full font-bold mr-2">D</span>
-                                    <span>Digital</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-yellow-500 text-white rounded-full font-bold mr-2">S</span>
-                                    <span>Special</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2 text-xs">X</span>
+                                    <span>X-Flexo</span>
                                 </div>
                             </div>
                         </div>
@@ -217,18 +209,20 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">CG Type:</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                    <i class="fas fa-tag"></i>
-                                </span>
-                                <select v-model="form.cg_type" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm" required>
-                                    <option value="X-Flex">X-Flex</option>
-                                    <option value="C-Coating">C-Coating</option>
-                                    <option value="S-Offset">S-Offset</option>
-                                    <option value="D-Digital">D-Digital</option>
-                                    <option value="P-Pantone">P-Pantone</option>
-                                </select>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">CG Type:</label>
+                            <div class="flex items-center space-x-6">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" v-model="form.cg_type" value="C-Coating" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                                    <span class="ml-2 text-sm text-gray-700">C-Coating</span>
+                                </label>
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" v-model="form.cg_type" value="S-Offset" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                                    <span class="ml-2 text-sm text-gray-700">S-Offset</span>
+                                </label>
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" v-model="form.cg_type" value="X-Flexo" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                                    <span class="ml-2 text-sm text-gray-700">X-Flexo</span>
+                                </label>
                             </div>
                         </div>
                         
@@ -335,7 +329,7 @@ const sortAsc = ref(true);
 const form = ref({
     cg: '',
     cg_name: '',
-    cg_type: 'X-Flex'
+    cg_type: 'X-Flexo'
 });
 
 // Filtered and sorted color groups for the modal table
@@ -449,7 +443,7 @@ const createNewColorGroup = () => {
     form.value = {
         cg: '',
         cg_name: '',
-        cg_type: 'X-Flex'
+        cg_type: 'X-Flexo'
     };
     showEditModal.value = true;
 };

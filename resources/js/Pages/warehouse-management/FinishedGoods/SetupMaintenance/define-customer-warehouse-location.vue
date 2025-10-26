@@ -209,7 +209,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, reactive, onMounted, watch } from 'vue';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
-import CustomerAccountModal from '@/Components/CustomerAccountModal.vue';
+import CustomerAccountModal from '@/Components/customer-account-modal.vue';
 
 const form = reactive({
     id: null,

@@ -13,18 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('geo', function (Blueprint $table) {
-            $table->id();
-            $table->string('code', 10)->unique()->comment('Kode geo area');
-            $table->string('country', 50)->index();
-            $table->string('state', 50)->index();
-            $table->string('town', 50);
-            $table->string('town_section', 50);
-            $table->string('area', 50);
-            $table->timestamps();
+        Schema::create('GEO', function (Blueprint $table) {
+            $table->string('CODE', 10)->primary();
+            $table->string('COUNTRY', 50);
+            $table->string('STATE', 50);
+            $table->string('TOWN', 50);
+            $table->string('TOWN_SECTION', 50);
+            $table->string('AREA', 50);
             
-            // Tambahkan indeks gabungan untuk pencarian yang lebih cepat
-            $table->index(['country', 'state', 'town']);
+            // No timestamps - matching CPS database structure
         });
     }
 
@@ -35,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('geo');
+        Schema::dropIfExists('GEO');
     }
 };

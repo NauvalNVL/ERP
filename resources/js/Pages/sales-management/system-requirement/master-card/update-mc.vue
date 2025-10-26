@@ -1250,7 +1250,7 @@ import { Link } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import axios from "axios";
 import { useToast } from "@/Composables/useToast";
-import CustomerAccountModal from "@/Components/CustomerAccountModal.vue";
+import CustomerAccountModal from "@/Components/customer-account-modal.vue";
 import UpdateMcModal from "@/Components/UpdateMcModal.vue";
 import MasterCardMaintenanceLogModal from "@/Components/MasterCardMaintenanceLogModal.vue";
 import MasterCardZoomModal from "@/Components/MasterCardZoomModal.vue";

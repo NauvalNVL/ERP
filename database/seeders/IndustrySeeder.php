@@ -14,122 +14,32 @@ class IndustrySeeder extends Seeder
     public function run(): void
     {
         // Disable constraints, truncate, and re-enable constraints for SQL Server
-        DB::statement('ALTER TABLE industries NOCHECK CONSTRAINT ALL');
-        DB::statement('TRUNCATE TABLE industries');
-        DB::statement('ALTER TABLE industries CHECK CONSTRAINT ALL');
+        DB::statement('ALTER TABLE industry NOCHECK CONSTRAINT ALL');
+        DB::statement('TRUNCATE TABLE industry');
+        DB::statement('ALTER TABLE industry CHECK CONSTRAINT ALL');
 
         $industries = [
-            [
-                'code' => 'ID01',
-                'name' => 'AUTOMOTIVE',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID02',
-                'name' => 'BUILDING MATERIAL',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID03',
-                'name' => 'CERAMIC TILE',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID04',
-                'name' => 'CHEMICAL',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID05',
-                'name' => 'ELECTRONIC',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID06',
-                'name' => 'FOOD & BEVERAGES',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID07',
-                'name' => 'FARM',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID08',
-                'name' => 'PHARMACY',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID09',
-                'name' => 'FURNITURE',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID10',
-                'name' => 'GARMENT',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID11',
-                'name' => 'HOUSEWARE',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID12',
-                'name' => 'INDUSTRY',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID13',
-                'name' => 'PAPER',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID14',
-                'name' => 'PERSONAL CARES',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID15',
-                'name' => 'SHOES',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID16',
-                'name' => 'TEXTILE',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID17',
-                'name' => 'TOYS',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'code' => 'ID18',
-                'name' => 'OTHER INDUSTRY',
-                'created_at' => now(),
-                'updated_at' => now()
-            ]
+            ['code' => 'ID01', 'name' => 'AUTOMOTIVE'],
+            ['code' => 'ID02', 'name' => 'BUILDING MATERIAL'],
+            ['code' => 'ID03', 'name' => 'CERAMIC TILE'],
+            ['code' => 'ID04', 'name' => 'CHEMICAL'],
+            ['code' => 'ID05', 'name' => 'ELECTRONIC'],
+            ['code' => 'ID06', 'name' => 'FOOD & BEVERAGES'],
+            ['code' => 'ID07', 'name' => 'FARM'],
+            ['code' => 'ID08', 'name' => 'PHARMACY'],
+            ['code' => 'ID09', 'name' => 'FURNITURE'],
+            ['code' => 'ID10', 'name' => 'GARMENT'],
+            ['code' => 'ID11', 'name' => 'HOUSEWARE'],
+            ['code' => 'ID12', 'name' => 'INDUSTRY'],
+            ['code' => 'ID13', 'name' => 'PAPER'],
+            ['code' => 'ID14', 'name' => 'PERSONAL CARES'],
+            ['code' => 'ID15', 'name' => 'SHOES'],
+            ['code' => 'ID16', 'name' => 'TEXTILE'],
+            ['code' => 'ID17', 'name' => 'TOYS'],
+            ['code' => 'ID18', 'name' => 'OTHER INDUSTRY']
         ];
 
         // Insert data using query builder instead of Eloquent
-        DB::table('industries')->insert($industries);
+        DB::table('industry')->insert($industries);
     }
 }

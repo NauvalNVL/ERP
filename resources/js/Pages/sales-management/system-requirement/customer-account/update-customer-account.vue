@@ -3,166 +3,131 @@
     <Head title="Customer Account Management" />
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-user-edit mr-3"></i> Update Customer Account
-        </h2>
-        <p class="text-cyan-100">Manage and update customer account information</p>
+    <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
+        <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
+        <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
+        <div class="flex items-center">
+            <div class="bg-gradient-to-br from-cyan-500 to-teal-600 p-3 rounded-lg shadow-inner mr-4">
+                <i class="fas fa-user-edit text-white text-2xl"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl md:text-3xl font-bold text-white text-shadow">Update Customer Account</h2>
+                <p class="text-teal-100">Manage and update customer account information</p>
+            </div>
+        </div>
     </div>
 
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-cyan-50">
+        <div class="max-w-7xl mx-auto">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
-                    <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-blue-500 rounded-lg mr-3">
-                            <i class="fas fa-search text-white"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Find Customer</h3>
+              <div class="relative bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100 p-8 rounded-2xl shadow-2xl border-t-4 border-cyan-500 overflow-hidden mb-8 animate-fade-in-up">
+                <div class="absolute -top-16 -right-16 w-40 h-40 bg-cyan-200 rounded-full opacity-30"></div>
+                <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-teal-200 rounded-full opacity-30"></div>
+                <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
+                    <div class="p-2 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-lg mr-4 shadow-md">
+                        <i class="fas fa-search text-white"></i>
                     </div>
-
-                    <!-- Search Section -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Search Customer (Click search button to browse):</label>
-                            <div class="relative flex">
-                                <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-user"></i>
-                                </span>
-                                <input
-                                    type="text"
-                                    v-model="searchQuery"
-                                    placeholder="Enter code or name, then click search button to browse..."
-                                    @keyup.enter="openCustomerAccountModal"
-                                    class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                >
-                                <button
-                                    type="button"
-                                    @click="openCustomerAccountModal"
-                                    class="inline-flex items-center px-3 py-2 border border-gray-300 bg-blue-500 hover:bg-blue-600 text-white transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
-                                    title="Browse Customer Accounts"
-                                >
-                                    <i class="fas fa-search"></i>
-                                </button>
-                                <button
-                                    v-if="searchQuery"
-                                    type="button"
-                                    @click="clearSearch"
-                                    class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-r-md"
-                                >
-                                    <i class="fas fa-times"></i>
-                                </button>
-                                <span v-else class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gray-100 text-gray-400 rounded-r-md">
-                                    <i class="fas fa-search"></i>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Create New:</label>
-                            <button
-                                type="button"
-                                @click="openAddNewCustomerModal"
-                                class="w-full flex items-center justify-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded transition-colors"
-                            >
-                                <i class="fas fa-plus mr-2"></i> Add New
-                            </button>
-                        </div>
-                    </div>
-
+                    <h3 class="text-xl font-semibold text-gray-800">Find Customer</h3>
                 </div>
+
+                <!-- Search Section -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10">
+                    <div class="md:col-span-2">
+                      <label for="searchQuery" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <span class="flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 text-white mr-3 shadow-md">
+                          <i class="fas fa-search text-xs"></i>
+                      </span>
+                        Find Customer Account
+                      </label>
+                      <div class="relative flex group">
+                        <input id="searchQuery" type="text" v-model="searchQuery" placeholder="Search by code or name..." class="input-field" @keyup.enter="openCustomerAccountModal">
+                        <button type="button" @click="openCustomerAccountModal" class="lookup-button from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+                        <i class="fas fa-table"></i>
+                      </button>
+                    </div>
+                  </div>
+                    <div class="md:col-span-1 flex flex-col justify-end">
+                      <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
+                      <button type="button" @click="openAddNewCustomerModal" class="primary-button group w-full">
+                          <span class="shimmer-effect"></span>
+                          <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300"></i>
+                          Add New Customer
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Right Column -->
-            <div class="lg:col-span-1">
-                <!-- Customer Info Card -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
-                    <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-teal-500 rounded-lg mr-3">
-                            <i class="fas fa-info-circle text-white"></i>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Customer Information</h3>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="p-4 bg-teal-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
-                            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                                <li>Search for a customer by code or name</li>
-                                <li>Click the search button to browse customers in the modal</li>
-                                <li>Select a customer from the modal to edit their details</li>
-                                <li>Use the "Add New" button to create new customers</li>
-                                <li>Save changes after editing customer information</li>
-                            </ul>
-                        </div>
-
-                        <div class="p-4 bg-blue-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Recent Activity</h4>
-                            <div v-if="customerSelected">
-                                <p class="text-sm text-gray-600 mb-1">Selected Customer:</p>
-                                <p class="font-medium">{{ form.customer_code }} - {{ form.customer_name }}</p>
-                                <p class="text-xs text-gray-500 mt-1">Click the Edit button to make changes</p>
-                            </div>
-                            <div v-else>
-                                <p class="text-sm text-gray-600">No customer selected</p>
-                                <p class="text-xs text-gray-500 mt-1">Search and select a customer to view or edit</p>
-                            </div>
-                        </div>
-
-                        <!-- How to Use Instructions -->
-                        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">How to Use</h4>
-                            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                                <li>Type a customer code or name in the search field</li>
-                                <li>Click the <i class="fas fa-search text-blue-600"></i> search button to open the customer account browser</li>
-                                <li>Select a customer from the modal table to load their information</li>
-                                <li>Use the "Add New" button to create a new customer account</li>
-                            </ul>
-                        </div>
-                    </div>
+            <div class="flex flex-col space-y-6">
+              <!-- Information Card -->
+              <div class="bg-white rounded-xl shadow-md border-t-4 border-blue-400 p-6">
+                <div class="flex items-center mb-2">
+                  <div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-400 to-teal-400 rounded-lg mr-3">
+                    <i class="fas fa-info text-white text-2xl"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-gray-800">Information</h3>
                 </div>
+                <hr class="my-2 border-blue-100">
 
-                <!-- Quick Links -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
-                    <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-purple-500 rounded-lg mr-3">
-                            <i class="fas fa-link text-white"></i>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-3">
-                        <Link :href="route('vue.update-customer-account.view-print')" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                            <div class="p-2 bg-green-500 rounded-full mr-3">
-                                <i class="fas fa-print text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-green-900">View & Print</p>
-                                <p class="text-xs text-green-700">Customer list report</p>
-                            </div>
-                        </Link>
-
-                        <Link :href="route('vue.customer-group.index')" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                            <div class="p-2 bg-blue-500 rounded-full mr-3">
-                                <i class="fas fa-users text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-blue-900">Customer Groups</p>
-                                <p class="text-xs text-blue-700">Manage customer groups</p>
-                            </div>
-                        </Link>
-
-                        <Link :href="route('vue.customer-alternate-address.index')" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                            <div class="p-2 bg-purple-500 rounded-full mr-3">
-                                <i class="fas fa-map-marker-alt text-white text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-purple-900">Alternate Addresses</p>
-                                <p class="text-xs text-purple-700">Manage customer addresses</p>
-                            </div>
-                        </Link>
-                    </div>
+                <div class="text-gray-700 mb-4">
+                  Gunakan form ini untuk memperbarui data customer account. Pastikan semua informasi yang dimasukkan sudah benar dan lengkap.
                 </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                  <div class="font-bold text-blue-700 mb-2">Petunjuk:</div>
+                  <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
+                    <li>Masukkan kode customer untuk mencari data</li>
+                    <li>Klik tombol tabel untuk melihat daftar customer</li>
+                    <li>Pilih customer dari modal untuk edit</li>
+                    <li>Klik "Add New" untuk membuat customer baru</li>
+                    <li>Klik Save untuk menyimpan perubahan</li>
+                  </ul>
+                </div>
+              </div>
+
+
+              <!-- Quick Links Card -->
+              <div class="bg-white rounded-xl shadow-md border-t-4 border-purple-400 p-6">
+                <div class="flex items-center mb-2">
+                  <div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg mr-3">
+                    <i class="fas fa-link text-white text-2xl"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-gray-800">Quick Links</h3>
+                </div>
+                <hr class="my-2 border-purple-100">
+                <div class="space-y-3 mt-4">
+                  <Link :href="route('vue.update-customer-account.view-print')" class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition">
+                    <span class="inline-flex items-center justify-center w-9 h-9 bg-green-400 rounded-lg mr-3">
+                      <i class="fas fa-print text-white text-xl"></i>
+                    </span>
+                    <div>
+                      <div class="font-bold text-green-800">View & Print</div>
+                      <div class="text-xs text-green-700">Print customer list</div>
+                    </div>
+                  </Link>
+                  <Link :href="route('vue.customer-group.index')" class="flex items-center p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition">
+                    <span class="inline-flex items-center justify-center w-9 h-9 bg-blue-400 rounded-lg mr-3">
+                      <i class="fas fa-users text-white text-xl"></i>
+                    </span>
+                    <div>
+                      <div class="font-bold text-blue-800">Customer Groups</div>
+                      <div class="text-xs text-blue-700">Manage customer groups</div>
+                    </div>
+                  </Link>
+                  <Link :href="route('vue.customer-alternate-address.index')" class="flex items-center p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition">
+                    <span class="inline-flex items-center justify-center w-9 h-9 bg-purple-400 rounded-lg mr-3">
+                      <i class="fas fa-map-marker-alt text-white text-xl"></i>
+                    </span>
+                    <div>
+                      <div class="font-bold text-purple-800">Alternate Addresses</div>
+                      <div class="text-xs text-purple-700">Manage addresses</div>
+                    </div>
+                  </Link>
+                </div>
+                </div>
+              </div>
             </div>
         </div>
     </div>
@@ -778,7 +743,7 @@ const clearSearch = () => {
 // Data loading functions
 const loadIndustries = async () => {
     try {
-        const response = await axios.get('/api/industries')
+        const response = await axios.get('/api/industry')
         industries.value = response.data
     } catch (error) {
         console.error('Error loading industries:', error)
@@ -1266,12 +1231,65 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-field {
+    @apply flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border-gray-300 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-300 group-hover:border-cyan-400 shadow-sm focus:shadow-md;
+}
+
+.lookup-button {
+    @apply inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r text-white shadow-sm hover:shadow-md transform hover:-translate-y-px;
+}
+
+.primary-button {
+    @apply h-full items-center justify-center bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-2 px-6 rounded-md shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex relative overflow-hidden;
+}
+
+.secondary-button {
+     @apply items-center justify-center bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 font-bold py-2 px-6 rounded-md shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex relative overflow-hidden border border-gray-300;
+}
+
 .form-input {
-    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500;
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 transition-shadow;
 }
 
 .form-radio {
-    @apply h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500;
+    @apply h-4 w-4 text-cyan-600 border-gray-300 focus:ring-cyan-500;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px) rotate(-2deg); }
+  75% { transform: translateX(3px) rotate(2deg); }
+}
+.group-hover\:animate-shake:hover {
+    animation: shake 0.3s ease-in-out;
+}
+
+.shimmer-effect {
+    @apply absolute top-0 -left-[150%] h-full w-[50%] skew-x-[-25deg] bg-white/20;
+    animation: shimmer 2.5s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        left: 150%;
+    }
+}
+
+@keyframes pulse-slow {
+    0%, 100% { transform: scale(1); opacity: 0.05; }
+    50% { transform: scale(1.1); opacity: 0.08; }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 5s infinite;
+}
+
+.animation-delay-500 { 
+    animation-delay: 0.5s; 
 }
 
 /* Add higher z-index for lookup modals */

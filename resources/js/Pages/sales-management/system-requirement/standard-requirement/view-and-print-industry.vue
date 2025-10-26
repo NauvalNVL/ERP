@@ -15,7 +15,7 @@
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-print mr-2"></i> Print List
+                    <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
                 <Link href="/industry" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Industry Management
@@ -51,61 +51,43 @@
                 </div>
 
                 <!-- Table Content -->
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-blue-600" style="background-color: #2563eb;">
                         <tr>
-                            <th @click="sortTable('id')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                ID <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('code')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Code <i :class="getSortIcon('code')" class="text-xs"></i>
                             </th>
-                            <th @click="sortTable('code')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Code <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('name')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Name <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('created_at')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Created At <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('updated_at')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Updated At <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('name')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Name <i :class="getSortIcon('name')" class="text-xs"></i>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                    <tbody class="bg-white">
+                        <tr v-if="loading">
+                            <td colspan="2" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
                                 <p class="mt-2">Loading industry data...</p>
                             </td>
                         </tr>
-                        <tr v-else-if="filteredIndustries.length === 0" class="hover:bg-gray-50">
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                No industry data available.
+                        <tr v-else-if="filteredIndustries.length === 0">
+                            <td colspan="2" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                No industries found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
                                     <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
                                 </template>
                             </td>
                         </tr>
-                        <tr v-for="(industry, index) in filteredIndustries" :key="industry.id" 
-                            :class="{'bg-blue-50': index % 2 === 0}" 
-                            class="hover:bg-blue-100">
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ industry.id }}</div>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                        <tr v-for="(industry, index) in filteredIndustries" :key="industry.code"
+                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
+                            class="hover:bg-blue-200">
+                            <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm font-medium text-gray-900">{{ industry.code || 'N/A' }}</div>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">{{ industry.name || 'N/A' }}</div>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ formatDate(industry.created_at) || 'N/A' }}</div>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ formatDate(industry.updated_at) || 'N/A' }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -128,10 +110,10 @@
                 <i class="fas fa-info-circle mr-2"></i> Print Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Click the "Print List" button above to print this industry data list</li>
-                <li>Use landscape orientation for better results</li>
-                <li>You can search or sort data before printing</li>
-                <li>Only the table will be included in the print output</li>
+                <li>Click the "Print PDF" button above to generate a PDF of this industry data list</li>
+                <li>PDF will be generated in landscape orientation</li>
+                <li>You can search or sort data before generating the PDF</li>
+                <li>The PDF will include all filtered data</li>
             </ul>
         </div>
     </div>
@@ -141,20 +123,16 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const industries = ref([]);
 const loading = ref(true);
 const searchQuery = ref('');
-const sortColumn = ref('id');
+const sortColumn = ref('code');
 const sortDirection = ref('asc');
 const currentDate = new Date().toLocaleString();
-
-// Format date helper
-const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
-};
 
 // Fetch industries from API
 const fetchIndustries = async () => {
@@ -168,21 +146,23 @@ const fetchIndustries = async () => {
         });
         
         if (!response.ok) {
-            throw new Error('Failed to fetch industry data');
+            throw new Error('Failed to fetch industries');
         }
         
         const data = await response.json();
         
+        // Handle different response formats
         if (Array.isArray(data)) {
             industries.value = data;
         } else if (data.data && Array.isArray(data.data)) {
             industries.value = data.data;
         } else {
-            console.error('Expected array of industries but got:', data);
             industries.value = [];
+            console.error('Unexpected data format for industries:', data);
         }
     } catch (error) {
-        console.error('Error fetching industry data:', error);
+        console.error('Error fetching industries:', error);
+        industries.value = []; // Ensure it's always an array
     } finally {
         loading.value = false;
     }
@@ -198,6 +178,14 @@ const sortTable = (column) => {
     }
 };
 
+// Get sort icon
+const getSortIcon = (column) => {
+    if (sortColumn.value !== column) {
+        return 'fas fa-sort text-black';
+    }
+    return sortDirection.value === 'asc' ? 'fas fa-sort-up text-black' : 'fas fa-sort-down text-black';
+};
+
 // Filtered and sorted industries
 const filteredIndustries = computed(() => {
     let filtered = [...industries.value];
@@ -206,7 +194,6 @@ const filteredIndustries = computed(() => {
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(industry => 
-            (industry.id && industry.id.toString().includes(query)) ||
             (industry.code && industry.code.toLowerCase().includes(query)) ||
             (industry.name && industry.name.toLowerCase().includes(query))
         );
@@ -222,17 +209,10 @@ const filteredIndustries = computed(() => {
         if (valueB === null || valueB === undefined) valueB = '';
         
         // Convert to string for comparison if not already
-        if (typeof valueA !== 'string') valueA = valueA.toString();
-        if (typeof valueB !== 'string') valueB = valueB.toString();
+        if (typeof valueA !== 'string') valueA = String(valueA || '');
+        if (typeof valueB !== 'string') valueB = String(valueB || '');
         
-        // For date fields
-        if (sortColumn.value === 'created_at' || sortColumn.value === 'updated_at') {
-            valueA = new Date(valueA).getTime() || 0;
-            valueB = new Date(valueB).getTime() || 0;
-            return sortDirection.value === 'asc' ? valueA - valueB : valueB - valueA;
-        }
-        
-        // For text fields - case insensitive comparison
+        // Case insensitive comparison
         valueA = valueA.toLowerCase();
         valueB = valueB.toLowerCase();
         
@@ -247,28 +227,73 @@ const filteredIndustries = computed(() => {
     return filtered;
 });
 
-// Print function
+// Print function using jsPDF
 const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+    try {
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-    newWin.document.write('<html><head><title>Print Industry Data</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }');
-    newWin.document.write('th { background-color: #f2f2f2; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('@media print { @page { size: landscape; } }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
-    
-    newWin.document.close();
+        // Add title
+        doc.setFontSize(16);
+        doc.setTextColor(37, 99, 235); // Blue color
+        doc.text('INDUSTRY DATA LIST', 10, 15);
+
+        // Add subtitle
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('View and print industry data', 10, 22);
+
+        // Prepare table data
+        const tableData = filteredIndustries.value.map(industry => [
+            industry.code || 'N/A',
+            industry.name || 'N/A'
+        ]);
+
+        // Add table using autoTable
+        autoTable(doc, {
+            startY: 28,
+            head: [['Code', 'Name']],
+            body: tableData,
+            theme: 'grid',
+            tableWidth: 'auto',
+            headStyles: {
+                fillColor: [37, 99, 235], // Blue background
+                textColor: [255, 255, 255], // White text
+                fontStyle: 'bold',
+                halign: 'left',
+                fontSize: 10
+            },
+            bodyStyles: {
+                textColor: [50, 50, 50],
+                halign: 'left',
+                fontSize: 9
+            },
+            alternateRowStyles: {
+                fillColor: [219, 234, 254] // Light blue for alternate rows
+            },
+            margin: { top: 28, left: 10, right: 10 },
+            columnStyles: {
+                0: { cellWidth: 40 }, // Code column
+                1: { cellWidth: 'auto' } // Name column takes remaining space
+            }
+        });
+
+        // Add footer with date and count
+        const finalY = doc.lastAutoTable.finalY || 28;
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text(`Generated: ${currentDate}`, 10, finalY + 10);
+        doc.text(`Total Industries: ${filteredIndustries.value.length}`, 10, finalY + 15);
+
+        // Save the PDF
+        doc.save('industry-list.pdf');
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Failed to generate PDF. Please try again.');
+    }
 };
 
 // Lifecycle hooks

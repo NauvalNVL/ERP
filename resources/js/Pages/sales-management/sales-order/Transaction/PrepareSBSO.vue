@@ -681,7 +681,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useToast } from '@/Composables/useToast'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
+import CustomerAccountModal from '@/Components/customer-account-modal.vue'
 import SalespersonModal from '@/Components/salesperson-modal.vue'
 import ProductDesignModal from '@/Components/product-design-modal.vue'
 import PaperFluteModal from '@/Components/paper-flute-modal.vue'

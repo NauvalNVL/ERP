@@ -13,11 +13,11 @@ class GeoController extends Controller
     {
         try {
             if ($request->ajax()) {
-                $geos = Geo::orderBy('country')->orderBy('state')->get();
+                $geos = Geo::orderBy('COUNTRY')->orderBy('STATE')->get();
                 
                 if ($geos->isEmpty()) {
                     $this->seedData();
-                    $geos = Geo::orderBy('country')->orderBy('state')->get();
+                    $geos = Geo::orderBy('COUNTRY')->orderBy('STATE')->get();
                 }
                 
                 return response()->json($geos);
@@ -43,7 +43,7 @@ class GeoController extends Controller
     {
         try {
             $request->validate([
-                'code' => 'required|unique:geo,code',
+                'code' => 'required|unique:GEO,CODE',
                 'country' => 'required',
                 'state' => 'required',
                 'town' => 'required',
@@ -77,7 +77,7 @@ class GeoController extends Controller
             'area' => 'required',
         ]);
 
-            $geo = Geo::where('code', $code)->firstOrFail();
+            $geo = Geo::where('CODE', $code)->firstOrFail();
             $geo->update($request->all());
             
             return response()->json([
@@ -96,7 +96,7 @@ class GeoController extends Controller
     public function destroy($code)
     {
         try {
-            $geo = Geo::where('code', $code)->firstOrFail();
+            $geo = Geo::where('CODE', $code)->firstOrFail();
             $geo->delete();
             
             return response()->json([
@@ -114,7 +114,7 @@ class GeoController extends Controller
     public function show($code)
     {
         try {
-            $geo = Geo::where('code', $code)->firstOrFail();
+            $geo = Geo::where('CODE', $code)->firstOrFail();
             
             return response()->json([
                 'success' => true,
@@ -136,7 +136,7 @@ class GeoController extends Controller
     public function viewAndPrint()
     {
         // Urutkan berdasarkan country, lalu state
-        $geos = Geo::orderBy('country')->orderBy('state')->get(); 
+        $geos = Geo::orderBy('COUNTRY')->orderBy('STATE')->get(); 
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintgeo', compact('geos')); 
     }
 
@@ -148,7 +148,7 @@ class GeoController extends Controller
     public function vueIndex()
     {
         try {
-            $geos = Geo::orderBy('country')->orderBy('state')->get();
+            $geos = Geo::orderBy('COUNTRY')->orderBy('STATE')->get();
             
             return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/geo', [
                 'geos' => $geos,
@@ -188,7 +188,7 @@ class GeoController extends Controller
     public function apiIndex()
     {
         try {
-            $geos = Geo::orderBy('country')->orderBy('state')->get();
+            $geos = Geo::orderBy('COUNTRY')->orderBy('STATE')->get();
             return response()->json($geos);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error in GeoController@apiIndex: ' . $e->getMessage());
