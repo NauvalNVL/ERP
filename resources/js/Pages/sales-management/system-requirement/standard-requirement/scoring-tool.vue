@@ -177,28 +177,17 @@
                 <form @submit.prevent="saveScoringToolChanges" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Code:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Scoring Tool Code:</label>
                             <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <span class="text-xs text-gray-500">Code must be unique</span>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Name:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Scoring Tool Name:</label>
                             <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Scores:</label>
-                            <input v-model="editForm.scores" type="number" step="0.1" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Gap:</label>
-                            <input v-model="editForm.gap" type="number" step="0.1" class="block w-full rounded-md border-gray-300 shadow-sm" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Specification:</label>
-                            <input v-model="editForm.specification" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
-                            <textarea v-model="editForm.description" rows="2" class="block w-full rounded-md border-gray-300 shadow-sm"></textarea>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Scorer Gap:</label>
+                            <input v-model="editForm.scorer_gap" type="number" step="0.1" class="block w-full rounded-md border-gray-300 shadow-sm" required>
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
@@ -271,11 +260,7 @@ const editForm = ref({
     id: '',
     code: '', 
     name: '', 
-    scores: 0,
-    gap: 0,
-    specification: '',
-    description: '',
-    is_active: true
+    scorer_gap: 0.0
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
@@ -357,11 +342,7 @@ const createNewScoringTool = () => {
         id: '',
         code: '', 
         name: '', 
-        scores: 1.0,
-        gap: 0.5,
-        specification: '',
-        description: '',
-        is_active: true
+        scorer_gap: 0.0
     };
     showEditModal.value = true;
 };
@@ -372,11 +353,7 @@ const closeEditModal = () => {
         id: '',
         code: '', 
         name: '', 
-        scores: 0,
-        gap: 0,
-        specification: '',
-        description: '',
-        is_active: true
+        scorer_gap: 0.0
     };
     isCreating.value = false;
 };
@@ -400,11 +377,7 @@ const saveScoringToolChanges = async () => {
             body: JSON.stringify({
                 code: editForm.value.code,
                 name: editForm.value.name,
-                scores: parseFloat(editForm.value.scores),
-                gap: parseFloat(editForm.value.gap),
-                specification: editForm.value.specification || '',
-                description: editForm.value.description || '',
-                is_active: true
+                scorer_gap: parseFloat(editForm.value.scorer_gap)
             })
         });
         

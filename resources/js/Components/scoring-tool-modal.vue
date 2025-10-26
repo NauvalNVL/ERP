@@ -35,28 +35,20 @@
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scores</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gap</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scorer Gap</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-if="filteredScoringTools.length === 0" class="hover:bg-gray-50">
-              <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+              <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
                 No scoring tools found.
               </td>
             </tr>
             <tr v-for="tool in filteredScoringTools" :key="tool.id" class="hover:bg-gray-50 cursor-pointer"
-                @click="selectTool(tool)">
+                @dblclick="selectTool(tool)">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ tool.code }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ tool.name }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ tool.scores }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ tool.gap }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
-                <button @click.stop="selectTool(tool)" class="text-blue-600 hover:text-blue-900">
-                  <i class="fas fa-check-circle mr-1"></i> Select
-                </button>
-              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ tool.scorer_gap }}</td>
             </tr>
           </tbody>
         </table>

@@ -25,9 +25,9 @@
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
-                <input 
-                    type="text" 
-                    v-model="searchQuery" 
+                <input
+                    type="text"
+                    v-model="searchQuery"
                     class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Search scoring tools..."
                 >
@@ -54,64 +54,52 @@
                 <table class="min-w-full border-collapse">
                     <thead class="bg-blue-600" style="background-color: #2563eb;">
                         <tr>
-                            <th @click="sortTable('code')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Tool Code <i :class="getSortIcon('code')" class="text-xs"></i>
+                            <th @click="sortTable('id')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 10%;">
+                                NO. <i :class="getSortIcon('id')" class="text-xs ml-1"></i>
                             </th>
-                            <th @click="sortTable('name')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Tool Name <i :class="getSortIcon('name')" class="text-xs"></i>
+                            <th @click="sortTable('code')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 15%;">
+                                CODE <i :class="getSortIcon('code')" class="text-xs ml-1"></i>
                             </th>
-                            <th @click="sortTable('description')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Description <i :class="getSortIcon('description')" class="text-xs"></i>
+                            <th @click="sortTable('name')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 50%;">
+                                NAME <i :class="getSortIcon('name')" class="text-xs ml-1"></i>
                             </th>
-                            <th @click="sortTable('is_active')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Status <i :class="getSortIcon('is_active')" class="text-xs"></i>
-                            </th>
-                            <th @click="sortTable('created_at')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Created At <i :class="getSortIcon('created_at')" class="text-xs"></i>
-                            </th>
-                            <th @click="sortTable('updated_at')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Updated At <i :class="getSortIcon('updated_at')" class="text-xs"></i>
+                            <th @click="sortTable('scorer_gap')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 25%;">
+                                SCORER GAP <i :class="getSortIcon('scorer_gap')" class="text-xs ml-1"></i>
                             </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white">
                         <tr v-if="loading">
-                            <td colspan="6" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
-                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                                 </div>
-                                <p class="mt-2">Loading scoring tool data...</p>
+                                <p class="mt-3 font-medium">Loading scoring tool data...</p>
                             </td>
                         </tr>
                         <tr v-else-if="filteredScoringTools.length === 0">
-                            <td colspan="6" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
-                                No scoring tools found. 
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
+                                <p class="font-medium text-gray-700">No scoring tools found.</p>
                                 <template v-if="searchQuery">
-                                    <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
-                                    <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
+                                    <p class="mt-2 text-sm">No results match your search query: "{{ searchQuery }}"</p>
+                                    <button @click="searchQuery = ''" class="mt-3 text-blue-500 hover:text-blue-700 hover:underline font-medium">Clear search</button>
                                 </template>
                             </td>
                         </tr>
-                        <tr v-for="(tool, index) in filteredScoringTools" :key="tool.id" 
+                        <tr v-for="(tool, index) in filteredScoringTools" :key="tool.id"
                             :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
-                            class="hover:bg-blue-200">
-                            <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm font-medium text-gray-900">{{ tool.code || 'N/A' }}</div>
+                            class="hover:bg-blue-200 transition-colors duration-150">
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-semibold text-gray-900">{{ index + 1 }}</div>
                             </td>
-                            <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm text-gray-900">{{ tool.name || 'N/A' }}</div>
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-semibold text-gray-900">{{ tool.code || 'N/A' }}</div>
                             </td>
-                            <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm text-gray-900">{{ tool.description || 'N/A' }}</div>
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-medium text-gray-900">{{ tool.name || 'N/A' }}</div>
                             </td>
-                            <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm text-gray-900">{{ tool.is_active ? 'Active' : 'Inactive' }}</div>
-                            </td>
-                            <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm text-gray-900">{{ formatDate(tool.created_at) }}</div>
-                            </td>
-                            <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm text-gray-900">{{ formatDate(tool.updated_at) }}</div>
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-medium text-gray-900">{{ formatNumber(tool.scorer_gap) }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -168,13 +156,13 @@ const fetchScoringTools = async () => {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch scoring tools');
         }
-        
+
         const data = await response.json();
-        
+
         // Handle different API response formats
         if (data.data) {
             scoringTools.value = data.data;
@@ -192,14 +180,17 @@ const fetchScoringTools = async () => {
     }
 };
 
-// Format date
-const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
+// Format number
+const formatNumber = (value) => {
+    if (value === null || value === undefined) return '0.0';
+    return Number(value).toFixed(1);
 };
 
 // Sort table
 const sortTable = (column) => {
+    // Don't sort by index (id/NO.)
+    if (column === 'id') return;
+
     if (sortColumn.value === column) {
         sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
     } else {
@@ -210,67 +201,62 @@ const sortTable = (column) => {
 
 // Get sort icon
 const getSortIcon = (column) => {
+    // Don't show sort icon for NO. column
+    if (column === 'id') {
+        return '';
+    }
+
     if (sortColumn.value !== column) {
         return 'fas fa-sort text-gray-400';
     }
-    
-    return sortDirection.value === 'asc' 
-        ? 'fas fa-sort-up text-blue-600' 
+
+    return sortDirection.value === 'asc'
+        ? 'fas fa-sort-up text-blue-600'
         : 'fas fa-sort-down text-blue-600';
 };
 
 // Filtered and sorted scoring tools
 const filteredScoringTools = computed(() => {
     let filtered = [...scoringTools.value];
-    
+
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(tool => 
+        filtered = filtered.filter(tool =>
             (tool.code && tool.code.toLowerCase().includes(query)) ||
-            (tool.name && tool.name.toLowerCase().includes(query)) ||
-            (tool.description && tool.description.toLowerCase().includes(query))
+            (tool.name && tool.name.toLowerCase().includes(query))
         );
     }
-    
+
     // Apply sorting
     filtered.sort((a, b) => {
         let valueA = a[sortColumn.value];
         let valueB = b[sortColumn.value];
-        
+
         // Handle null values
         if (valueA === null || valueA === undefined) valueA = '';
         if (valueB === null || valueB === undefined) valueB = '';
-        
-        // Handle boolean column
-        if (sortColumn.value === 'is_active') {
+
+        // Handle numeric column (scorer_gap)
+        if (sortColumn.value === 'scorer_gap') {
+            const numA = parseFloat(valueA) || 0;
+            const numB = parseFloat(valueB) || 0;
+
             if (sortDirection.value === 'asc') {
-                return valueA === valueB ? 0 : valueA ? -1 : 1;
+                return numA - numB;
             } else {
-                return valueA === valueB ? 0 : valueA ? 1 : -1;
+                return numB - numA;
             }
         }
-        
-        // Handle date columns
-        if (['created_at', 'updated_at'].includes(sortColumn.value)) {
-            const dateA = valueA ? new Date(valueA).getTime() : 0;
-            const dateB = valueB ? new Date(valueB).getTime() : 0;
-            
-            if (sortDirection.value === 'asc') {
-                return dateA - dateB;
-            } else {
-                return dateB - dateA;
-            }
-        }
-        
+
         // Convert to string for comparison if not already
         if (typeof valueA !== 'string') valueA = String(valueA || '');
         if (typeof valueB !== 'string') valueB = String(valueB || '');
-        
+
         // Case insensitive comparison
         valueA = valueA.toLowerCase();
         valueB = valueB.toLowerCase();
-        
+
         // Sort direction
         if (sortDirection.value === 'asc') {
             return valueA.localeCompare(valueB);
@@ -278,7 +264,7 @@ const filteredScoringTools = computed(() => {
             return valueB.localeCompare(valueA);
         }
     });
-    
+
     return filtered;
 });
 
@@ -302,19 +288,17 @@ const printTable = () => {
         doc.text('View and print scoring tool data', 10, 22);
 
         // Prepare table data
-        const tableData = filteredScoringTools.value.map(tool => [
+        const tableData = filteredScoringTools.value.map((tool, index) => [
+            (index + 1).toString(),
             tool.code || 'N/A',
             tool.name || 'N/A',
-            tool.description || 'N/A',
-            tool.is_active ? 'Active' : 'Inactive',
-            formatDate(tool.created_at),
-            formatDate(tool.updated_at)
+            formatNumber(tool.scorer_gap)
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['Tool Code', 'Tool Name', 'Description', 'Status', 'Created At', 'Updated At']],
+            head: [['NO.', 'CODE', 'NAME', 'SCORER GAP']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -322,32 +306,30 @@ const printTable = () => {
                 fillColor: [37, 99, 235], // Blue background
                 textColor: [255, 255, 255], // White text
                 fontStyle: 'bold',
-                halign: 'left',
-                fontSize: 9
+                halign: 'center',
+                fontSize: 10
             },
             bodyStyles: {
                 textColor: [50, 50, 50],
-                halign: 'left',
-                fontSize: 8
+                halign: 'center',
+                fontSize: 9
             },
             alternateRowStyles: {
                 fillColor: [219, 234, 254] // Light blue for alternate rows
             },
             margin: { top: 28, left: 10, right: 10 },
             columnStyles: {
-                0: { cellWidth: 30 },  // Tool Code
-                1: { cellWidth: 50 },  // Tool Name
-                2: { cellWidth: 90 },  // Description
-                3: { cellWidth: 25 },  // Status
-                4: { cellWidth: 35 },  // Created At
-                5: { cellWidth: 35 }   // Updated At
+                0: { cellWidth: 20, halign: 'center' },   // NO.
+                1: { cellWidth: 35, halign: 'center' },   // CODE
+                2: { cellWidth: 125, halign: 'center' },  // NAME
+                3: { cellWidth: 50, halign: 'center' }    // SCORER GAP
             }
         });
 
         // Add footer
         const pageCount = doc.internal.getNumberOfPages();
         const pageHeight = doc.internal.pageSize.height;
-        
+
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
             doc.setFontSize(8);
@@ -393,4 +375,4 @@ onMounted(() => {
         width: 100%;
     }
 }
-</style> 
+</style>

@@ -4,27 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ScoringTool extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
+    // Simplified to match CPS structure: NO., CODE, NAME, SCORER GAP
     protected $fillable = [
         'code',
         'name',
-        'scores',
-        'gap',
-        'specification',
-        'description',
-        'is_active',
-        'created_by',
-        'updated_by'
+        'scorer_gap'
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'scores' => 'float',
-        'gap' => 'float',
+        'scorer_gap' => 'float'
     ];
+    
+    // Disable timestamps
+    public $timestamps = false;
 }
