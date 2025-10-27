@@ -276,9 +276,9 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Sales Type</label>
-                                    <input type="text" v-model="newCustomerForm.sales_type" class="form-input" placeholder="Enter Sales Type" maxlength="50">
-                                    <span class="text-xs text-gray-500">Customer sales type classification</span>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Customer Type</label>
+                                    <input type="text" v-model="newCustomerForm.sales_type" class="form-input" placeholder="Enter Customer Type" maxlength="50">
+                                    <span class="text-xs text-gray-500">Customer type classification</span>
                                 </div>
 
                                 <div>
@@ -544,9 +544,9 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Sales Type</label>
-                                    <input type="text" v-model="form.sales_type" class="form-input" placeholder="Enter Sales Type" maxlength="50">
-                                    <span class="text-xs text-gray-500">Customer sales type classification</span>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Customer Type</label>
+                                    <input type="text" v-model="form.sales_type" class="form-input" placeholder="Enter Customer Type" maxlength="50">
+                                    <span class="text-xs text-gray-500">Customer type classification</span>
                                 </div>
 
                                 <div>
@@ -1303,8 +1303,8 @@ onMounted(() => {
     animation: pulse-slow 5s infinite;
 }
 
-.animation-delay-500 { 
-    animation-delay: 0.5s; 
+.animation-delay-500 {
+    animation-delay: 0.5s;
 }
 
 /* Add higher z-index for lookup modals */
