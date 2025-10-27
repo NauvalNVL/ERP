@@ -71,15 +71,8 @@ class SalespersonSeeder extends Seeder
         // Clear the table before seeding
         DB::table('salesperson')->truncate();
 
-        $now = now();
-        $rows = array_map(function ($row) use ($now) {
-            // Ensure timestamps exist
-            $row['created_at'] = $now;
-            $row['updated_at'] = $now;
-            return $row;
-        }, $this->salespersons);
-
-        DB::table('salesperson')->insert($rows);
+        // Insert data without timestamps (table doesn't have timestamp columns)
+        DB::table('salesperson')->insert($this->salespersons);
     }
 
     /**

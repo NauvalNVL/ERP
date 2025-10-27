@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('scoring_formulas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_design_id')->constrained('product_designs')->onDelete('cascade');
-            // Use soft reference to CPS table Flute_CPS instead of FK to non-existent paper_flutes
-            // Store either the numeric primary key (No) or the Flute code. Here we store Flute code for readability.
-            $table->string('paper_flute_code', 25)->nullable()->comment('Soft reference to Flute_CPS.Flute');
+            $table->decimal('paper_flute_id', 18, 0);
+            $table->foreign('paper_flute_id')->references('No')->on('Flute_CPS')->onDelete('cascade');
             $table->json('scoring_length_formula')->comment('JSON array of scoring length formulas');
             $table->json('scoring_width_formula')->comment('JSON array of scoring width formulas');
             $table->decimal('length_conversion', 8, 2)->default(7.00)->comment('Length conversion value in mm');
@@ -25,7 +24,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             // Add unique constraint for product design and paper flute combination
             $table->unique(['product_design_id', 'paper_flute_code']);
         });
@@ -38,4 +37,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('scoring_formulas');
     }
-}; 
+};

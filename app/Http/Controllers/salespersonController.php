@@ -20,29 +20,29 @@ class SalespersonController extends Controller
         try {
             // Always load from database, ordered by Code
             $salespersons = Salesperson::orderBy('Code')->get();
-            
+
             // If there are no salespersons in the database, seed them
             if ($salespersons->isEmpty()) {
                 $this->seedData();
                 $salespersons = Salesperson::orderBy('Code')->get();
             }
-            
+
             // If the request wants JSON, return JSON response
             if (request()->wantsJson() || request()->ajax()) {
                 return response()->json($salespersons);
             }
-            
+
             return view('sales-management.system-requirement.system-requirement.standard-requirement.salesperson', compact('salespersons'));
         } catch (\Exception $e) {
             Log::error('Error loading salespersons: ' . $e->getMessage());
-            
+
             if (request()->wantsJson() || request()->ajax()) {
                 return response()->json([
                     'error' => true,
                     'message' => 'Error loading data from database: ' . $e->getMessage()
                 ], 500);
             }
-            
+
             return redirect()->back()->with('error', 'Error loading data from database: ' . $e->getMessage());
         }
     }
@@ -59,22 +59,24 @@ class SalespersonController extends Controller
             $validator = Validator::make($request->all(), [
                 'code' => 'required|string|max:50|unique:salesperson,Code',
                 'name' => 'required|string|max:50',
-                'sales_team_id' => 'nullable|integer',
-                'position' => 'nullable|string|max:50',
-                'user_id' => 'nullable|string|max:20',
-                'is_active' => 'nullable|boolean'
+                'grup' => 'nullable|string|max:20',
+                'code_grup' => 'nullable|string|max:50',
+                'target_sales' => 'nullable|numeric',
+                'internal' => 'nullable|string|max:20',
+                'email' => 'nullable|email|max:100',
+                'status' => 'nullable|string|max:10'
             ]);
 
             if ($validator->fails()) {
                 $errors = $validator->errors();
                 $message = $errors->first();
-                
+
                 // If code already exists, suggest next available code
                 if ($errors->has('code') && strpos($message, 'already been taken') !== false) {
                     $suggestedCode = $this->getNextAvailableCode($request->code);
                     $message = "Code '{$request->code}' already exists. Suggested code: {$suggestedCode}";
                 }
-                
+
                 return response()->json([
                     'success' => false,
                     'message' => $message
@@ -83,16 +85,16 @@ class SalespersonController extends Controller
 
             DB::beginTransaction();
 
-            // Create salesperson using mutator methods for compatibility
+            // Create salesperson using direct column mapping
             $salesperson = new Salesperson();
-            $salesperson->code = $request->code;
-            $salesperson->name = $request->name;
-            $salesperson->sales_team_id = $request->sales_team_id ?? 1;
-            $salesperson->position = $request->position ?? 'E - Executive';
-            $salesperson->user_id = $request->user_id;
-            $salesperson->is_active = $request->is_active ?? true;
-            $salesperson->Email = $request->email ?? '';
+            $salesperson->Code = $request->code;
+            $salesperson->Name = $request->name;
+            $salesperson->Grup = $request->grup;
+            $salesperson->CodeGrup = $request->code_grup;
             $salesperson->TargetSales = $request->target_sales ?? 0;
+            $salesperson->Internal = $request->internal;
+            $salesperson->Email = $request->email;
+            $salesperson->status = $request->status ?? 'Active';
             $salesperson->save();
 
             DB::commit();
@@ -105,7 +107,7 @@ class SalespersonController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error creating salesperson: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error creating salesperson: ' . $e->getMessage()
@@ -123,13 +125,15 @@ class SalespersonController extends Controller
     {
         try {
             $salesperson = Salesperson::where('Code', $code)->firstOrFail();
-            
+
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:50',
-                'sales_team_id' => 'nullable|integer',
-                'position' => 'nullable|string|max:50',
-                'user_id' => 'nullable|string|max:20',
-                'is_active' => 'nullable|boolean'
+                'grup' => 'nullable|string|max:20',
+                'code_grup' => 'nullable|string|max:50',
+                'target_sales' => 'nullable|numeric',
+                'internal' => 'nullable|string|max:20',
+                'email' => 'nullable|email|max:100',
+                'status' => 'nullable|string|max:10'
             ]);
 
             if ($validator->fails()) {
@@ -139,18 +143,14 @@ class SalespersonController extends Controller
                 ], 422);
             }
 
-            // Update using mutator methods for compatibility
-            $salesperson->name = $request->name;
-            $salesperson->sales_team_id = $request->sales_team_id ?? 1;
-            $salesperson->position = $request->position ?? 'E - Executive';
-            $salesperson->user_id = $request->user_id;
-            $salesperson->is_active = $request->is_active ?? true;
-            if ($request->has('email')) {
-                $salesperson->Email = $request->email;
-            }
-            if ($request->has('target_sales')) {
-                $salesperson->TargetSales = $request->target_sales;
-            }
+            // Update using direct column mapping
+            $salesperson->Name = $request->name;
+            $salesperson->Grup = $request->grup;
+            $salesperson->CodeGrup = $request->code_grup;
+            $salesperson->TargetSales = $request->target_sales ?? 0;
+            $salesperson->Internal = $request->internal;
+            $salesperson->Email = $request->email;
+            $salesperson->status = $request->status ?? 'Active';
             $salesperson->save();
 
             // Get the updated data
@@ -182,7 +182,7 @@ class SalespersonController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error deleting salesperson: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting salesperson: ' . $e->getMessage()
@@ -194,7 +194,7 @@ class SalespersonController extends Controller
     {
         try {
         $query = $request->get('query', '');
-            
+
         $salespersons = Salesperson::where('Code', 'like', "%{$query}%")
             ->orWhere('Name', 'like', "%{$query}%")
             ->orderBy('Code')
@@ -203,7 +203,7 @@ class SalespersonController extends Controller
         return response()->json($salespersons);
         } catch (\Exception $e) {
             Log::error('Error searching salespersons: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error searching salespersons: ' . $e->getMessage()
@@ -222,7 +222,7 @@ class SalespersonController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error getting salesperson details: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error getting salesperson details: ' . $e->getMessage()
@@ -271,7 +271,7 @@ class SalespersonController extends Controller
                 $this->seedData();
                 $salespersons = Salesperson::orderBy('Name')->get();
             }
-            
+
             return response()->json($salespersons);
         } catch (\Exception $e) {
             Log::error('Error in SalespersonController@apiIndex: ' . $e->getMessage());
@@ -283,7 +283,7 @@ class SalespersonController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             // Ensure Sales Teams exist first (FK dependency)
             $teamSeeder = new SalesTeamSeeder();
             $teamSeeder->run();
@@ -291,7 +291,7 @@ class SalespersonController extends Controller
             // Run the salesperson seeder
             $seeder = new SalespersonSeeder();
             $seeder->run();
-            
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -315,7 +315,7 @@ class SalespersonController extends Controller
 
     /**
      * Render the Vue component for salesperson management.
-     * 
+     *
      * @return \Inertia\Response
      */
     public function vueIndex()
@@ -337,7 +337,7 @@ class SalespersonController extends Controller
     }
 
     // ==================== SALES TEAM METHODS ====================
-    
+
     /**
      * Get all sales teams (unique Grup values)
      */
@@ -356,7 +356,7 @@ class SalespersonController extends Controller
                         'code' => $team->code
                     ];
                 });
-                
+
             return response()->json($teams);
         } catch (\Exception $e) {
             Log::error('Error getting sales teams: ' . $e->getMessage());
@@ -434,7 +434,7 @@ class SalespersonController extends Controller
     }
 
     // ==================== SALESPERSON TEAM METHODS ====================
-    
+
     /**
      * Get salesperson teams (salesperson with their team info)
      */
@@ -447,7 +447,7 @@ class SalespersonController extends Controller
                 ->orderBy('Grup')
                 ->orderBy('Name')
                 ->get();
-                
+
             return response()->json($teams);
         } catch (\Exception $e) {
             Log::error('Error getting salesperson teams: ' . $e->getMessage());
@@ -517,17 +517,17 @@ class SalespersonController extends Controller
         if (preg_match('/^([A-Z]+)(\d+)$/', $baseCode, $matches)) {
             $prefix = $matches[1];
             $number = (int)$matches[2];
-            
+
             // Find next available number
             do {
                 $number++;
                 $newCode = $prefix . str_pad($number, strlen($matches[2]), '0', STR_PAD_LEFT);
                 $exists = Salesperson::where('Code', $newCode)->exists();
             } while ($exists && $number < 9999);
-            
+
             return $newCode;
         }
-        
+
         // If pattern doesn't match, just append a number
         $counter = 1;
         do {
@@ -535,7 +535,7 @@ class SalespersonController extends Controller
             $exists = Salesperson::where('Code', $newCode)->exists();
             $counter++;
         } while ($exists && $counter < 100);
-        
+
         return $newCode;
     }
 }

@@ -26,8 +26,8 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Salesperson Management</h3>
                     </div>
-                    
-                    
+
+
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -181,15 +181,42 @@
             </div>
             <div class="p-6">
                 <form @submit.prevent="saveSalespersonChanges" class="space-y-4">
-                    <div class="grid grid-cols-1 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code:</label>
-                            <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                            <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required :disabled="!isCreating">
                             <span class="text-xs text-gray-500">Code must be unique</span>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Name:</label>
                             <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Group:</label>
+                            <input v-model="editForm.grup" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Code Group:</label>
+                            <input v-model="editForm.code_grup" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Target Sales:</label>
+                            <input v-model="editForm.target_sales" type="number" step="0.01" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Internal:</label>
+                            <input v-model="editForm.internal" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+                            <input v-model="editForm.email" type="email" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
+                            <select v-model="editForm.status" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
@@ -211,7 +238,7 @@
     <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
         <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
-    
+
     <!-- Notification Toast -->
     <div v-if="notification.show" class="fixed bottom-4 right-4 z-50 shadow-xl rounded-lg transition-all duration-300"
          :class="{
@@ -234,7 +261,7 @@
             </div>
         </div>
     </div>
-    
+
     </AppLayout>
 </template>
 
@@ -262,7 +289,13 @@ const searchQuery = ref('');
 const editForm = ref({
     id: '',
     code: '',
-    name: ''
+    name: '',
+    grup: '',
+    code_grup: '',
+    target_sales: 0,
+    internal: '',
+    email: '',
+    status: 'Active'
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
@@ -274,7 +307,7 @@ const csrfForm = ref(null);
 const getCsrfToken = () => {
     // Try to get token from meta tag first
     let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    
+
     // If token from meta tag is not available or we want a fresh token, get from the form
     if (csrfForm.value) {
         const tokenInput = csrfForm.value.querySelector('input[name="_token"]');
@@ -282,28 +315,28 @@ const getCsrfToken = () => {
             token = tokenInput.value;
         }
     }
-    
+
     return token || '';
 };
 
 const fetchSalespersons = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/api/salesperson', { 
-            headers: { 
+        const res = await fetch('/api/salesperson', {
+            headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            credentials: 'same-origin' 
+            credentials: 'same-origin'
         });
-        
+
         if (!res.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         const data = await res.json();
         console.log('Fetched salespersons data:', data);
-        
+
         if (Array.isArray(data)) {
             salespersons.value = data;
         } else if (data.data && Array.isArray(data.data)) {
@@ -329,11 +362,11 @@ onMounted(async () => {
 // Watch for changes in search query to filter the data
 watch(searchQuery, (newQuery) => {
     if (newQuery && salespersons.value.length > 0) {
-        const foundPerson = salespersons.value.find(person => 
+        const foundPerson = salespersons.value.find(person =>
             person.code.toLowerCase().includes(newQuery.toLowerCase()) ||
             person.name.toLowerCase().includes(newQuery.toLowerCase())
         );
-        
+
         if (foundPerson) {
             selectedRow.value = foundPerson;
         }
@@ -345,10 +378,10 @@ const onSalespersonSelected = (person) => {
     selectedRow.value = person;
     searchQuery.value = person.code;
     showModal.value = false;
-    
+
     // Automatically open the edit modal for the selected row
     isCreating.value = false;
-    editForm.value = { 
+    editForm.value = {
         ...person
     };
     console.log('Selected person for editing:', editForm.value);
@@ -358,7 +391,7 @@ const onSalespersonSelected = (person) => {
 const editSelectedRow = () => {
     if (selectedRow.value) {
         isCreating.value = false;
-        editForm.value = { 
+        editForm.value = {
             ...selectedRow.value
         };
         console.log('Editing person with data:', editForm.value);
@@ -373,7 +406,13 @@ const createNewSalesperson = () => {
     editForm.value = {
         id: '',
         code: '',
-        name: ''
+        name: '',
+        grup: '',
+        code_grup: '',
+        target_sales: 0,
+        internal: '',
+        email: '',
+        status: 'Active'
     };
     showEditModal.value = true;
 };
@@ -383,7 +422,13 @@ const closeEditModal = () => {
     editForm.value = {
         id: '',
         code: '',
-        name: ''
+        name: '',
+        grup: '',
+        code_grup: '',
+        target_sales: 0,
+        internal: '',
+        email: '',
+        status: 'Active'
     };
     isCreating.value = false;
 };
@@ -402,32 +447,38 @@ const saveSalespersonChanges = async () => {
             saving.value = false;
             return;
         }
-        
+
         const csrfToken = getCsrfToken();
-        
+
         // Check if we need to create a custom API endpoint
         let url = '';
-        
+
         if (isCreating.value) {
             url = '/api/salesperson/store'; // Create path
         } else {
             // Use the code as identifier, not the ID
             url = `/api/salesperson/update/${editForm.value.code}`;
         }
-        
+
         console.log('Saving salesperson with data:', editForm.value);
         console.log('Using URL:', url);
-        
+
         // Create form data for submission
         const formData = new FormData();
         formData.append('code', editForm.value.code);
         formData.append('name', editForm.value.name);
-        
+        formData.append('grup', editForm.value.grup || '');
+        formData.append('code_grup', editForm.value.code_grup || '');
+        formData.append('target_sales', editForm.value.target_sales || 0);
+        formData.append('internal', editForm.value.internal || '');
+        formData.append('email', editForm.value.email || '');
+        formData.append('status', editForm.value.status || 'Active');
+
         console.log('Form data values:');
         for (const pair of formData.entries()) {
             console.log(`${pair[0]}: ${pair[1]}`);
         }
-        
+
         const response = await fetch(url, {
             method: 'POST', // Always use POST since our route is defined as POST
             headers: {
@@ -438,14 +489,14 @@ const saveSalespersonChanges = async () => {
             body: formData,
             credentials: 'same-origin'
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Error saving salesperson');
         }
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             // Update the local data with the changes or add new item
             if (isCreating.value) {
@@ -456,7 +507,7 @@ const saveSalespersonChanges = async () => {
                 }
                 showNotification('Salesperson updated successfully', 'success');
             }
-            
+
             // Refresh the full data list to ensure we're in sync with the database
             await fetchSalespersons();
             closeEditModal();
@@ -475,18 +526,18 @@ const deleteSalesperson = async (id) => {
     if (!confirm(`Are you sure you want to delete this salesperson?`)) {
         return;
     }
-    
+
     saving.value = true;
     try {
         const csrfToken = getCsrfToken();
-        
+
         // Use the code as identifier, not the ID
         const code = editForm.value.code;
         console.log('Deleting salesperson with code:', code);
-        
+
         // Create form data - no need for method spoofing now
         const formData = new FormData();
-        
+
         const response = await fetch(`/api/salesperson/delete/${code}`, {
             method: 'POST', // Use POST since our route is defined as POST
             headers: {
@@ -497,23 +548,23 @@ const deleteSalesperson = async (id) => {
             body: formData,
             credentials: 'same-origin'
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Error deleting salesperson');
         }
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             // Remove the item from the local array
             salespersons.value = salespersons.value.filter(person => person.code !== code);
-            
+
             if (selectedRow.value && selectedRow.value.code === code) {
                 selectedRow.value = null;
                 searchQuery.value = '';
             }
-            
+
             closeEditModal();
             showNotification('Salesperson deleted successfully', 'success');
         } else {
@@ -534,7 +585,7 @@ const showNotification = (message, type = 'success') => {
         message,
         type
     };
-    
+
     setTimeout(() => {
         notification.value.show = false;
     }, 3000);

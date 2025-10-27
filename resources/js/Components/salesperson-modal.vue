@@ -2,7 +2,7 @@
   <div v-if="show" class="fixed inset-0 z-100 flex items-center justify-center overflow-y-auto">
     <!-- Background overlay -->
     <div class="fixed inset-0 bg-black bg-opacity-50" @click="$emit('close')"></div>
-    
+
     <!-- Modal content -->
     <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl z-110 relative">
       <!-- Modal Header -->
@@ -32,8 +32,12 @@
           <table class="w-full divide-y divide-gray-200 table-fixed">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('code')">Code</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/3 cursor-pointer" @click="sortTable('name')">Name</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%] cursor-pointer" @click="sortTable('code')">Code</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%] cursor-pointer" @click="sortTable('name')">Name</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%] cursor-pointer" @click="sortTable('grup')">Group</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">Code Group</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]">Target Sales</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">Email</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -41,11 +45,15 @@
                 :class="['hover:bg-blue-50 cursor-pointer', selectedPerson && selectedPerson.code === person.code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
                 @click="selectRow(person)"
                 @dblclick="selectAndClose(person)">
-                <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ person.code }}</td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ person.name }}</td>
+                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ person.code }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ person.name }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ person.grup || '-' }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ person.code_grup || '-' }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ person.target_sales ? Number(person.target_sales).toFixed(2) : '0.00' }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700 truncate" :title="person.email">{{ person.email || '-' }}</td>
               </tr>
               <tr v-if="filteredSalespersons.length === 0">
-                <td colspan="2" class="px-6 py-4 text-center text-gray-500">No salesperson data available.</td>
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No salesperson data available.</td>
               </tr>
             </tbody>
           </table>
@@ -97,15 +105,17 @@ const filteredSalespersons = computed(() => {
     const q = searchQuery.value.toLowerCase();
     people = people.filter(person =>
       person.code.toLowerCase().includes(q) ||
-      person.name.toLowerCase().includes(q)
+      person.name.toLowerCase().includes(q) ||
+      (person.grup && person.grup.toLowerCase().includes(q)) ||
+      (person.email && person.email.toLowerCase().includes(q))
     );
   }
-  
+
   // Apply sorting
   return [...people].sort((a, b) => {
     const valueA = a[sortKey.value];
     const valueB = b[sortKey.value];
-    
+
     if (valueA < valueB) return sortAsc.value ? -1 : 1;
     if (valueA > valueB) return sortAsc.value ? 1 : -1;
     return 0;

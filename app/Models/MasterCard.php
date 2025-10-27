@@ -9,13 +9,13 @@ class MasterCard extends Model
 {
     use HasFactory;
 
-    protected $table = 'master_cards';
+    protected $table = 'MC';
 
-    protected $primaryKey = 'mc_seq';
+    public $timestamps = false;
+
+    protected $primaryKey = null;
 
     public $incrementing = false;
-
-    protected $keyType = 'string';
 
     protected $fillable = [
         'mc_seq',
