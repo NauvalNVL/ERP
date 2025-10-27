@@ -52,30 +52,6 @@
                 <i class="fas fa-sync-alt"></i>
               </button>
               <button 
-                @click="printSOLog"
-                class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
-                title="Print SO Log"
-              >
-                <i class="fas fa-print mr-1"></i>
-                Print SO Log
-              </button>
-              <button 
-                @click="printJitTracking"
-                class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
-                title="Print SO JIT Tracking"
-              >
-                <i class="fas fa-print mr-1"></i>
-                Print SO JIT Tracking
-              </button>
-              <button 
-                @click="openCapacityCheck"
-                class="px-3 py-1 bg-orange-600 text-white text-sm rounded hover:bg-orange-700 transition-colors"
-                title="Rough Cut Capacity Check"
-              >
-                <i class="fas fa-chart-line mr-1"></i>
-                Capacity Check
-              </button>
-              <button 
                 @click="$emit('close')"
                 class="text-gray-400 hover:text-gray-600 transition-colors"
                 title="Close (Esc)"
@@ -371,15 +347,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Rough Cut Capacity Check Modal -->
-    <RoughCutCapacityCheckModal 
-      :show="showCapacityCheck" 
-      @close="showCapacityCheck = false" 
-      @accept="handleCapacityAccept"
-      :entry-date="capacityCheckData?.entryDate"
-      :entry-lm="capacityCheckData?.entryLM"
-    />
   </div>
 </template>
 
@@ -387,7 +354,6 @@
 import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useToast } from '@/Composables/useToast'
 import axios from 'axios'
-import RoughCutCapacityCheckModal from './RoughCutCapacityCheckModal.vue'
 
 const props = defineProps({
   show: {
@@ -430,10 +396,6 @@ const scheduleEntries = ref([])
 const selectedEntry = ref(null)
 const selectedIndex = ref(-1)
 const isEditing = ref(false)
-
-// Rough cut capacity check
-const showCapacityCheck = ref(false)
-const capacityCheckData = ref(null)
 
 // Error popup state
 const showErrorPopup = ref(false)
@@ -616,51 +578,6 @@ const refreshScreen = () => {
 }
 
 
-const printSOLog = async () => {
-  try {
-    const response = await fetch('/api/sales-order/print-log')
-    const data = await response.json()
-    success('SO Log report generated successfully')
-    console.log('SO Log data:', data)
-  } catch (err) {
-    error('Error generating SO Log report')
-  }
-}
-
-const printJitTracking = async () => {
-  try {
-    const response = await fetch('/api/sales-order/print-jit-tracking')
-    const data = await response.json()
-    success('JIT Tracking report generated successfully')
-    console.log('JIT Tracking data:', data)
-  } catch (err) {
-    error('Error generating JIT Tracking report')
-  }
-}
-
-const openCapacityCheck = () => {
-  if (scheduleEntries.value.length === 0) {
-    error('Please add at least one schedule entry before checking capacity')
-    return
-  }
-  
-  // Prepare capacity check data
-  capacityCheckData.value = {
-    entryDate: new Date().toISOString().split('T')[0],
-    entryLM: entryTotal.value.main || 0,
-    scheduleEntries: scheduleEntries.value
-  }
-  
-  showCapacityCheck.value = true
-}
-
-const handleCapacityAccept = (capacityInfo) => {
-  showCapacityCheck.value = false
-  success('Capacity check completed successfully')
-  
-  // Proceed with saving schedule
-  saveSchedule()
-}
 
 const saveSchedule = async () => {
   if (scheduleEntries.value.length === 0) {

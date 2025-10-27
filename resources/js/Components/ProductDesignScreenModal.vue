@@ -159,7 +159,7 @@
               <input 
                 v-model="lastSONumber" 
                 type="text"
-                class="px-3 py-1 border border-blue-300 rounded text-sm bg-white flex-1"
+                class="px-3 py-1 border border-blue-300 rounded text-sm bg-white w-32"
                 placeholder="SO Number"
               >
             </div>

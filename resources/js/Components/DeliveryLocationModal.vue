@@ -135,86 +135,7 @@
             </div>
           </div>
 
-          <!-- Customer Alternate Delivery Location Table -->
-          <div class="mb-6">
-            <h4 class="text-md font-medium text-gray-800 mb-3 flex items-center">
-              <i class="fas fa-table mr-2 text-purple-600"></i>
-              Customer Alternate Delivery Location Table
-            </h4>
-            <div class="overflow-x-auto border border-gray-200 rounded-lg">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivery Code</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ship To</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Town</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tel No</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fax No</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr 
-                    v-for="(location, index) in deliveryLocations" 
-                    :key="location.delivery_code + location.address" 
-                    :class="[
-                      'hover:bg-gray-50 cursor-pointer transition-colors',
-                      selectedRowIndex === index ? 'bg-blue-100 border-blue-300' : ''
-                    ]"
-                    @click="selectRow(index)"
-                  >
-                    <td class="px-4 py-3 text-sm text-gray-900 font-medium">{{ location.delivery_code }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ location.ship_to }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ location.country }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ location.town }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ location.state }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ location.section }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ location.address }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ location.contact }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ location.tel_no }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ location.fax_no }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ location.email }}</td>
-                    <td class="px-4 py-3 text-center">
-                      <button 
-                        @click.stop="selectDeliveryLocation(location)"
-                        class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
-                      >
-                        Select
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
 
-            <!-- Table Action Buttons -->
-            <div class="flex justify-center space-x-3 mt-4">
-              <button 
-                @click="zoomTable"
-                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-              >
-                Zoom
-              </button>
-              <button 
-                @click="selectFromTable"
-                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-              >
-                Select
-              </button>
-              <button 
-                @click="exitTable"
-                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-              >
-                Exit
-              </button>
-            </div>
-          </div>
         </div>
 
         <!-- Footer -->
@@ -292,26 +213,6 @@ const shipTo = reactive({
 
 // Modal visibility
 const showDeliveryCodeModal = ref(false)
-
-// Selected row tracking
-const selectedRowIndex = ref(-1)
-
-// Delivery locations data
-const deliveryLocations = ref([
-  {
-    delivery_code: 'P103',
-    ship_to: 'ABDULLAH, BPK',
-    country: 'INDONESIA',
-    town: 'TANGERANG',
-    state: 'BANTEN',
-    section: 'TANGERANG',
-    address: 'JL.YOS SUDARSO NO.61 JURUMUDI BARU-TANGERANG',
-    contact: '',
-    tel_no: '6191875',
-    fax_no: '5407992',
-    email: ''
-  }
-])
 
 // Methods
 const openDeliveryCodeLookup = () => {
@@ -392,47 +293,6 @@ const applySameAddress = () => {
   }
 }
 
-const selectRow = (index) => {
-  selectedRowIndex.value = index
-  console.log('Row selected:', index)
-}
-
-const selectDeliveryLocation = (location) => {
-  shipTo.deliveryCode = location.delivery_code
-  shipTo.customerName = location.ship_to
-  shipTo.address = location.address
-  
-  console.log('Delivery location selected:', {
-    code: shipTo.deliveryCode,
-    name: shipTo.customerName,
-    address: shipTo.address
-  })
-  success('Delivery location selected successfully')
-}
-
-const zoomTable = () => {
-  // Zoom table functionality
-  success('Table zoomed')
-}
-
-const selectFromTable = () => {
-  // Select from table functionality
-  if (selectedRowIndex.value === -1) {
-    error('Please select a row from the table first')
-    return
-  }
-  
-  const selectedLocation = deliveryLocations.value[selectedRowIndex.value]
-  if (selectedLocation) {
-    selectDeliveryLocation(selectedLocation)
-  }
-}
-
-const exitTable = () => {
-  // Exit table functionality
-  success('Exited table view')
-}
-
 const saveLocation = () => {
   // If delivery code empty, ship to defaults to main customer
   if (!shipTo.deliveryCode) {
@@ -469,15 +329,12 @@ watch(() => props.customer, (newCustomer) => {
   if (newCustomer && (newCustomer.customer_code || newCustomer.code)) {
     console.log('Customer prop changed, reloading data:', newCustomer)
     loadMainCustomer()
-    loadDeliveryLocations()
   }
 }, { deep: true })
 
 // Initialize component
 onMounted(async () => {
   await loadMainCustomer()
-  // Load delivery locations for customer
-  loadDeliveryLocations()
 })
 
 const loadMainCustomer = async () => {
@@ -598,51 +455,6 @@ const loadMainCustomer = async () => {
   }
 }
 
-const loadDeliveryLocations = async () => {
-  const customerCode = props.customer?.customer_code || props.customer?.code
-  if (!customerCode) {
-    console.warn('No customer code available for loading delivery locations')
-    console.log('Customer prop in loadDeliveryLocations:', props.customer)
-    return
-  }
-  
-  try {
-    console.log('Fetching customer alternate addresses for:', customerCode)
-    const response = await fetch(`/api/customer-alternate-addresses/${customerCode}`)
-    const data = await response.json()
-    
-    if (data && Array.isArray(data)) {
-      deliveryLocations.value = data.map(location => ({
-        delivery_code: location.delivery_code || '',
-        ship_to: location.ship_to_name || location.alternate_name || mainCustomer.name,
-        country: location.country || 'INDONESIA',
-        town: location.town || '',
-        state: location.state || '',
-        section: location.town_section || location.section || '',
-        address: location.ship_to_address || location.address || '',
-        contact: location.contact_person || '',
-        tel_no: location.tel_no || location.telephone_no || '',
-        fax_no: location.fax_no || '',
-        email: location.email || ''
-      }))
-      
-      // Ensure uniqueness by code+address like CPS tables
-      const uniq = new Map()
-      deliveryLocations.value.forEach(l => {
-        uniq.set(`${l.delivery_code}|${l.address}`, l)
-      })
-      deliveryLocations.value = Array.from(uniq.values())
-      
-      console.log('Loaded delivery locations:', deliveryLocations.value.length, 'locations')
-    } else {
-      console.log('No alternate addresses found for customer:', customerCode)
-      deliveryLocations.value = []
-    }
-  } catch (err) {
-    console.error('Error loading delivery locations:', err)
-    deliveryLocations.value = []
-  }
-}
 </script>
 
 <style scoped>
