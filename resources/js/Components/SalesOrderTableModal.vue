@@ -39,7 +39,15 @@
 
               <!-- Main Sales Order Table -->
               <div class="mb-4 border border-gray-200 rounded-lg overflow-hidden">
-                <div class="bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-200">Sales Orders</div>
+                <div class="bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-200">
+                  Sales Orders
+                  <span v-if="isLoading" class="ml-2 text-blue-600">
+                    <i class="fas fa-spinner fa-spin"></i> Loading...
+                  </span>
+                  <span v-else-if="salesOrders.length > 0" class="ml-2 text-green-600">
+                    ({{ salesOrders.length }} order(s) found)
+                  </span>
+                </div>
                 <div class="overflow-x-auto max-h-80 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50 sticky top-0 z-10">
@@ -52,18 +60,31 @@
                       </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                      <tr v-for="(order, index) in salesOrders" :key="index" 
-                          :class="{'bg-blue-100': selectedOrderIndex === index, 'hover:bg-gray-50': selectedOrderIndex !== index}"
-                          @click="selectOrder(index)">
-                        <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ order.soNumber }}</td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.customerPo }}</td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.acNumber }}</td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.mcsNumber }}</td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.statusLocation }}</td>
-                      </tr>
-                      <tr v-if="salesOrders.length === 0">
-                        <td colspan="5" class="px-4 py-8 text-center text-gray-500">No sales orders found</td>
-                      </tr>
+                      <template v-if="isLoading">
+                        <tr>
+                          <td colspan="5" class="px-4 py-8 text-center text-blue-500">
+                            <i class="fas fa-spinner fa-spin mr-2"></i> Loading sales orders...
+                          </td>
+                        </tr>
+                      </template>
+                      <template v-else-if="salesOrders.length === 0">
+                        <tr>
+                          <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                            No sales orders found for this customer
+                          </td>
+                        </tr>
+                      </template>
+                      <template v-else>
+                        <tr v-for="(order, index) in salesOrders" :key="index" 
+                            :class="{'bg-blue-100': selectedOrderIndex === index, 'hover:bg-gray-50': selectedOrderIndex !== index}"
+                            @click="selectOrder(index)">
+                          <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ order.soNumber || '-' }}</td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.customerPo || '-' }}</td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.acNumber || '-' }}</td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.mcsNumber || '-' }}</td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.statusLocation || '-' }}</td>
+                        </tr>
+                      </template>
                     </tbody>
                   </table>
                 </div>
@@ -234,6 +255,7 @@ const searchTerm1 = ref('0')
 const searchTerm2 = ref('0')
 const searchTerm3 = ref('0')
 const soNumberFilter = ref('')
+const isLoading = ref(false)
 
 const orderInfo = reactive({
   customerName: '',
@@ -377,11 +399,17 @@ const updateOrderInfo = async () => {
 }
 
 const searchOrders = async () => {
+  isLoading.value = true
   try {
+    console.log('searchOrders called')
+    console.log('Customer data:', props.customerData)
+    
     // Fetch sales orders from API based on customer code
     const params = {
       customer_code: props.customerData?.code
     }
+    
+    console.log('API params:', params)
     
     // Add search parameters if provided
     if (searchTerm1.value && searchTerm1.value !== '0') {
@@ -397,39 +425,69 @@ const searchOrders = async () => {
       params.so_number = soNumberFilter.value
     }
     
+    console.log('Calling API /api/sales-orders with params:', params)
     const response = await axios.get('/api/sales-orders', { params })
+    console.log('API response:', response.data)
+    console.log('API response.data.data:', response.data.data)
+    console.log('First order raw:', response.data.data[0])
     
     if (response.data.success) {
+      console.log('Raw response.data.data:', response.data.data)
+      console.log('Number of orders:', response.data.data.length)
+      
       // Map API data to component format and sort by SO number
       salesOrders.value = response.data.data
-        .map(order => ({
-          soNumber: order.so_number,
-          customerPo: order.customer_po_number || '',
-          acNumber: order.customer_code || '',
-          mcsNumber: order.master_card_seq || '',
-          statusLocation: order.status || 'Outs',
-          customerName: order.customer_name || '',
-          model: order.master_card_model || '',
-          salespersonCode: order.salesperson_code || '',
-          salespersonName: order.salesperson_code || '',
-          orderGroup: order.order_group || 'Sales',
-          orderType: order.order_type || 'S1'
-        }))
+        .map((order, idx) => {
+          const mapped = {
+            soNumber: order.so_number,
+            customerPo: order.customer_po_number || '',
+            acNumber: order.customer_code || '',
+            mcsNumber: order.master_card_seq || '',
+            statusLocation: order.status || 'Outs',
+            customerName: order.customer_name || '',
+            model: order.master_card_model || '',
+            salespersonCode: order.salesperson_code || '',
+            salespersonName: order.salesperson_code || '',
+            orderGroup: order.order_group || 'Sales',
+            orderType: order.order_type || 'S1'
+          }
+          if (idx === 0) {
+            console.log('First order before mapping:', order)
+            console.log('First order after mapping:', mapped)
+          }
+          return mapped
+        })
         .sort((a, b) => {
           // Sort by SO number in descending order (newest first)
           return b.soNumber.localeCompare(a.soNumber)
         })
       
+      console.log('Mapped sales orders:', salesOrders.value)
+      console.log('Total orders loaded:', salesOrders.value.length)
+      console.log('Sample order object keys:', salesOrders.value[0] ? Object.keys(salesOrders.value[0]) : 'none')
+      console.log('Sample order values:', salesOrders.value[0])
+      
       // Do NOT select first order by default - keep containers empty
       selectedOrderIndex.value = -1
       clearOrderInfo()
+      
+      if (salesOrders.value.length === 0) {
+        info('No sales orders found for this customer')
+      } else {
+        success(`Loaded ${salesOrders.value.length} sales order(s)`)
+      }
     } else {
       console.error('API Error:', response.data.message)
+      error('Failed to load sales orders: ' + (response.data.message || 'Unknown error'))
       salesOrders.value = []
     }
-  } catch (error) {
-    console.error('Error fetching sales orders:', error)
+  } catch (err) {
+    console.error('Error fetching sales orders:', err)
+    console.error('Error details:', err.response?.data)
+    error('Error loading sales orders: ' + (err.message || 'Network error'))
     salesOrders.value = []
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -477,6 +535,19 @@ const loadSalesOrders = async () => {
     // Load sales orders for the customer
     if (props.customerData && props.customerData.code) {
       console.log('Loading sales orders for customer:', props.customerData.code)
+      
+      // First, try the debug route to see raw data
+      try {
+        const debugResponse = await axios.get('/api/debug/sales-orders', {
+          params: { customer_code: props.customerData.code }
+        })
+        console.log('DEBUG ROUTE Response:', debugResponse.data)
+        console.log('DEBUG: Sample order:', debugResponse.data.sample)
+      } catch (debugErr) {
+        console.error('Debug route error:', debugErr)
+      }
+      
+      // Then call the actual search
       await searchOrders()
     } else {
       console.log('No customer selected')

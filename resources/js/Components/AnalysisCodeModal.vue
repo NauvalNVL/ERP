@@ -34,7 +34,7 @@
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Code</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Grouping</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Group</th>
                                     <th scope="col" class="relative px-6 py-3"><span class="sr-only">Select</span></th>
                                 </tr>
                             </thead>
@@ -42,7 +42,7 @@
                                 <tr v-for="code in filteredAnalysisCodes" :key="code.code" @click="selectAnalysisCode(code)" class="hover:bg-blue-50 cursor-pointer transition-colors duration-150">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ code.code }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.grouping }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.group }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <button @click.stop="selectAnalysisCode(code)" class="text-blue-600 hover:text-blue-900 font-semibold transition-colors duration-150">Select</button>
                                     </td>
@@ -71,7 +71,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import debounce from 'lodash/debounce';
 import axios from 'axios';
 
@@ -80,7 +80,7 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    grouping: {
+    group: {
         type: String,
         default: null,
     },
@@ -92,15 +92,21 @@ const searchQuery = ref('');
 const analysisCodes = ref([]); // Data yang fetched dari API
 const rawAnalysisCodes = ref([]); // Menyimpan data asli yang belum difilter
 
-const fetchAnalysisCodes = async (grouping = null) => {
+const fetchAnalysisCodes = async (group = null) => {
     try {
+        console.log('Fetching analysis codes with group:', group);
         let url = '/api/material-management/analysis-codes';
-        if (grouping) {
-            url += `?grouping=${grouping}`;
+        if (group) {
+            url += `?group=${encodeURIComponent(group)}`;
         }
+        console.log('API URL:', url);
         const response = await axios.get(url);
-        rawAnalysisCodes.value = response.data; // Simpan data asli
-        analysisCodes.value = response.data; // Awalnya, data yang ditampilkan sama dengan data asli
+        console.log('API Response:', response.data);
+        // Ensure we're handling the response correctly
+        const data = Array.isArray(response.data) ? response.data : [];
+        rawAnalysisCodes.value = data; // Simpan data asli
+        analysisCodes.value = data; // Awalnya, data yang ditampilkan sama dengan data asli
+        console.log('Analysis codes loaded:', data.length);
     } catch (error) {
         console.error('Error fetching analysis codes:', error);
         rawAnalysisCodes.value = [];
@@ -114,13 +120,20 @@ const filteredAnalysisCodes = computed(() => {
     }
     const query = searchQuery.value.toLowerCase();
     return analysisCodes.value.filter(code => 
-        code.code.toLowerCase().includes(query) || 
-        code.name.toLowerCase().includes(query)
+        (code.code && code.code.toLowerCase().includes(query)) || 
+        (code.name && code.name.toLowerCase().includes(query))
     );
 });
 
 const selectAnalysisCode = (code) => {
-    emits('select-analysis-code', code);
+    // Ensure we're passing the correct data structure
+    const analysisCodeData = {
+        code: code.code,
+        name: code.name,
+        group: code.group
+    };
+    console.log('Selecting analysis code:', analysisCodeData);
+    emits('select-analysis-code', analysisCodeData);
     emits('close');
 };
 
@@ -130,24 +143,31 @@ const applySearchFilter = () => {
     } else {
         const query = searchQuery.value.toLowerCase();
         analysisCodes.value = rawAnalysisCodes.value.filter(code => 
-            code.code.toLowerCase().includes(query) || 
-            code.name.toLowerCase().includes(query)
+            (code.code && code.code.toLowerCase().includes(query)) || 
+            (code.name && code.name.toLowerCase().includes(query))
         );
     }
 };
 
 const debouncedSearch = debounce(applySearchFilter, 300); // Debounce search by 300ms
 
+// Fetch data when component is mounted and shown
+onMounted(() => {
+    if (props.show) {
+        fetchAnalysisCodes(props.group);
+    }
+});
+
 watch(() => props.show, (newValue) => {
     if (newValue) {
-        fetchAnalysisCodes(props.grouping);
+        fetchAnalysisCodes(props.group);
         searchQuery.value = ''; // Reset search query when modal opens
     }
 });
 
-watch(() => props.grouping, (newGrouping) => {
+watch(() => props.group, (newGroup) => {
     if (props.show) {
-        fetchAnalysisCodes(newGrouping);
+        fetchAnalysisCodes(newGroup);
     }
 });
 
@@ -172,4 +192,4 @@ watch(() => props.grouping, (newGrouping) => {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
-</style> 
+</style>

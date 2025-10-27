@@ -335,7 +335,11 @@ const currentUser = ref({
 const fetchCurrentUser = async () => {
   try {
     console.log('Fetching current user...')
-    const response = await axios.get('/api/user/current')
+    const response = await axios.get('/api/user/current', {
+      headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+      }
+    })
     console.log('User API response:', response.data)
     
     if (response.data.success) {
@@ -438,12 +442,21 @@ async function proceedPrint() {
   printer.open = false
   
   try {
+    // Format SO numbers properly
+    const fromSO = form.from.seq 
+      ? formatSO(form.from.month, form.from.year, form.from.seq)
+      : formatSO(form.from.month, form.from.year, '00001')
+    
+    const toSO = form.to.seq
+      ? formatSO(form.to.month, form.to.year, form.to.seq)
+      : formatSO(form.to.month, form.to.year, '99999')
+    
     // Compose payload similar to desktop filters
     const payload = {
       period: `${form.period.month} ${form.period.year}`,
       range: {
-        from: form.from.seq || formatSO(form.from.month, form.from.year, '00001'),
-        to: form.to.seq || formatSO(form.to.month, form.to.year, '99999'),
+        from: fromSO,
+        to: toSO,
       },
       copies: form.copies,
       status: Object.keys(form.status).filter(k => form.status[k]),
@@ -483,8 +496,13 @@ async function formatPreview(data) {
   lines.push(''.padEnd(80, '-'))
   
   // Report Information
-  const fromRange = form.from.seq || formatSO(form.from.month, form.from.year, '00001')
-  const toRange = form.to.seq || formatSO(form.to.month, form.to.year, '99999')
+  const fromRange = form.from.seq 
+    ? formatSO(form.from.month, form.from.year, form.from.seq)
+    : formatSO(form.from.month, form.from.year, '00001')
+  
+  const toRange = form.to.seq
+    ? formatSO(form.to.month, form.to.year, form.to.seq)
+    : formatSO(form.to.month, form.to.year, '99999')
   
   lines.push(`Period: ${form.period.month}/${form.period.year}`)
   lines.push(`Range: ${fromRange} to ${toRange}`)
@@ -569,21 +587,36 @@ async function formatPreview(data) {
 
 async function fetchSalesOrdersData() {
   try {
+    // Format SO numbers properly: MM-YYYY-XXXXX
+    const fromSO = form.from.seq 
+      ? formatSO(form.from.month, form.from.year, form.from.seq)
+      : formatSO(form.from.month, form.from.year, '00001')
+    
+    const toSO = form.to.seq
+      ? formatSO(form.to.month, form.to.year, form.to.seq)
+      : formatSO(form.to.month, form.to.year, '99999')
+    
+    // Get active status filters
+    const activeStatuses = Object.keys(form.status).filter(k => form.status[k])
+    
     console.log('Fetching sales orders with params:', {
       month: form.period.month,
       year: form.period.year,
-      from_so: formatSO(form.from.month, form.from.year, form.from.seq || '0'),
-      to_so: formatSO(form.to.month, form.to.year, form.to.seq || '99999'),
-      status: Object.keys(form.status).filter(k => form.status[k])
+      from_so: fromSO,
+      to_so: toSO,
+      status: activeStatuses
     })
     
     const response = await axios.get('/api/sales-orders', {
       params: {
         month: form.period.month,
         year: form.period.year,
-        from_so: formatSO(form.from.month, form.from.year, form.from.seq || '0'),
-        to_so: formatSO(form.to.month, form.to.year, form.to.seq || '99999'),
-        status: Object.keys(form.status).filter(k => form.status[k])
+        from_so: fromSO,
+        to_so: toSO,
+        status: activeStatuses
+      },
+      headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
       }
     })
     
@@ -597,17 +630,22 @@ async function fetchSalesOrdersData() {
         ['SO#', 'Customer PO#', 'Customer', 'Status', 'Amount', 'Date']
       ]
       
-      salesOrders.forEach(order => {
-        console.log('Processing order:', order)
-        tableData.push([
-          order.SO_Num || order.so_number || '',
-          order.PO_Num || order.customer_po_number || '',
-          order.AC_NAME || order.customer_name || '',
-          order.STS || order.status || 'Draft',
-          `Rp ${(order.AMOUNT || order.total_amount || 0).toLocaleString('id-ID')}`,
-          order.SO_DMY || order.po_date || ''
-        ])
-      })
+      if (salesOrders.length === 0) {
+        console.warn('No sales orders found matching filters')
+        tableData.push(['No sales orders found for the selected criteria', '', '', '', '', ''])
+      } else {
+        salesOrders.forEach(order => {
+          console.log('Processing order:', order)
+          tableData.push([
+            order.so_number || order.SO_Num || '',
+            order.customer_po_number || order.PO_Num || '',
+            order.customer_name || order.AC_NAME || '',
+            order.status || order.STS || 'OPEN',
+            `Rp ${(order.amount || order.AMOUNT || 0).toLocaleString('id-ID')}`,
+            order.po_date || order.SO_DMY || order.PO_DATE || ''
+          ])
+        })
+      }
       
       console.log('Table Data:', tableData)
       return tableData
@@ -688,7 +726,8 @@ Please check browser console for details.`)
         const response = await fetch(`/api/sales-order/${encodeURIComponent(soNumber)}/delivery-schedules`, {
           headers: { 
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
           }
         })
         
@@ -1128,7 +1167,11 @@ async function quickPrint() {
     console.log('quickPrint: Starting with user:', currentUser.value)
     
     const res = await fetch(`/api/sales-order/${encodeURIComponent(quick.so)}/delivery-schedules`, {
-      headers: { Accept: 'application/json' },
+      headers: { 
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+      },
     })
     const json = await res.json()
     if (!json.success) {

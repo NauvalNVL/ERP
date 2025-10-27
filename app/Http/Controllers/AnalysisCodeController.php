@@ -10,12 +10,14 @@ class AnalysisCodeController extends Controller
 {
     public function index()
     {
-        return response()->json(AnalysisCode::all());
+        // Use the MmAnalysisCode model instead since that's what exists in the database
+        $analysisCodes = \App\Models\MmAnalysisCode::all();
+        return response()->json($analysisCodes);
     }
 
     public function show($code)
     {
-        $analysisCode = AnalysisCode::where('code', $code)->first();
+        $analysisCode = \App\Models\MmAnalysisCode::where('code', $code)->first();
         if (!$analysisCode) {
             return response()->json(['message' => 'Not found'], 404);
         }
@@ -25,23 +27,25 @@ class AnalysisCodeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'code' => 'required|string|unique:analysis_codes,code',
+            'code' => 'required|string|unique:mm_analysis_codes,code',
             'name' => 'required|string',
-            'grouping' => 'required|string',
+            'group' => 'required|string',
+            'group2' => 'required|string',
         ]);
-        $analysisCode = AnalysisCode::create($validated);
+        $analysisCode = \App\Models\MmAnalysisCode::create($validated);
         return response()->json($analysisCode, 201);
     }
 
     public function update(Request $request, $code)
     {
-        $analysisCode = AnalysisCode::where('code', $code)->first();
+        $analysisCode = \App\Models\MmAnalysisCode::where('code', $code)->first();
         if (!$analysisCode) {
             return response()->json(['message' => 'Not found'], 404);
         }
         $validated = $request->validate([
             'name' => 'required|string',
-            'grouping' => 'required|string',
+            'group' => 'required|string',
+            'group2' => 'required|string',
         ]);
         $analysisCode->update($validated);
         return response()->json($analysisCode);
@@ -49,7 +53,7 @@ class AnalysisCodeController extends Controller
 
     public function destroy($code)
     {
-        $analysisCode = AnalysisCode::where('code', $code)->first();
+        $analysisCode = \App\Models\MmAnalysisCode::where('code', $code)->first();
         if (!$analysisCode) {
             return response()->json(['message' => 'Not found'], 404);
         }

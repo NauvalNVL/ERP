@@ -375,13 +375,35 @@ Route::get('/sales-order/delivery-schedule/{soNumber}', [App\Http\Controllers\Sa
 Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderController::class, 'getCustomer']); 
 // Save to legacy-style SO table (CPS compatibility)
 Route::post('/sales-order/save-to-so', [App\Http\Controllers\SalesOrderController::class, 'apiStoreToSo']);
-// Get sales orders for Print SO
+// Get sales orders for Print SO and Sales Order Table Modal
 Route::get('/sales-orders', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrders']);
+
+// Debug route to test sales order data directly
+Route::get('/debug/sales-orders', function(\Illuminate\Http\Request $request) {
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    $customerCode = $request->get('customer_code');
+    
+    $query = DB::table('so');
+    if ($customerCode) {
+        $query->where('AC_Num', $customerCode);
+    }
+    
+    $orders = $query->limit(10)->get();
+    
+    return response()->json([
+        'success' => true,
+        'customer_code' => $customerCode,
+        'count' => $orders->count(),
+        'data' => $orders,
+        'sample' => $orders->first()
+    ]);
+});
+
 // Get sales order detail by SO number
 Route::get('/sales-order/{soNumber}/detail', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrderDetail']);
-
-// Alternative route with /api prefix for consistency
-Route::get('/api/sales-orders', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrders']);
 
 // Get current authenticated user info
 Route::get('/user/current', function() {
@@ -755,16 +777,16 @@ Route::delete('/material-management/receive-destinations/{code}', [App\Http\Cont
 Route::post('/material-management/receive-destinations/seed', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'seed']); 
 
 // Add Analysis Code API routes
-Route::get('/material-management/analysis-codes', [MmAnalysisCodeController::class, 'getAnalysisCodes']);
-Route::get('/material-management/analysis-codes/groups', [MmAnalysisCodeController::class, 'getGroups']);
-Route::get('/material-management/analysis-codes/group2s', [MmAnalysisCodeController::class, 'getGroup2s']);
-Route::post('/material-management/analysis-codes', [MmAnalysisCodeController::class, 'store']);
-Route::get('/material-management/analysis-codes/{code}', [MmAnalysisCodeController::class, 'show']);
-Route::put('/material-management/analysis-codes/{code}', [MmAnalysisCodeController::class, 'update']);
-Route::delete('/material-management/analysis-codes/{code}', [MmAnalysisCodeController::class, 'destroy']);
-Route::post('/material-management/analysis-codes/seed', [MmAnalysisCodeController::class, 'seed']); 
+Route::get('/material-management/analysis-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'getAnalysisCodes']);
+Route::get('/material-management/analysis-codes/groups', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'getGroups']);
+Route::get('/material-management/analysis-codes/group2s', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'getGroup2s']);
+Route::post('/material-management/analysis-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'store']);
+Route::get('/material-management/analysis-codes/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'show']);
+Route::put('/material-management/analysis-codes/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'update']);
+Route::delete('/material-management/analysis-codes/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'destroy']);
+Route::post('/material-management/analysis-codes/seed', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'seed']); 
 
-Route::get('/material-management/control-periods/summary', [MmControlPeriodController::class, 'getControlPeriodSummary']);
+Route::get('/material-management/control-periods/summary', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'getControlPeriodSummary']);
 
 // Add Location API routes
 Route::prefix('material-management/locations')->group(function () {
@@ -2005,3 +2027,12 @@ Route::prefix('material-management/accounts/rc-posting-batch')->group(function (
     Route::post('/confirm-to-post', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'confirmToPostAction']);
     Route::get('/batch-details', [App\Http\Controllers\MaterialManagement\Accounts\RcPostingBatchController::class, 'getBatchDetails']);
 });
+
+// FG Stock In API Routes
+Route::prefix('fg-stock-in')->group(function () {
+    Route::post('/', [App\Http\Controllers\FGStockInController::class, 'store']);
+});
+
+// Test FG Stock In Route
+Route::get('/test-fg-stock-in', [App\Http\Controllers\TestFGStockInController::class, 'test']);
+

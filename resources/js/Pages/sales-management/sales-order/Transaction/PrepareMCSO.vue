@@ -8,7 +8,7 @@
             <i class="fas fa-clipboard-list text-2xl text-blue-600"></i>
             <div>
             <h1 class="text-xl font-semibold text-gray-800">Prepare MC SO</h1>
-              <p class="text-xs text-gray-500">F2: Customer • F3: Master Card • F4: Calendar • Ctrl+S: Save • F5: Refresh</p>
+              <p class="text-xs text-gray-500">F2: Customer • F3: Master Card • F4: Calendar • F6: SO Table • Ctrl+S: Save • F5: Refresh</p>
             </div>
             </div>
           <div class="flex items-center space-x-2">
@@ -646,6 +646,14 @@
       @save="saveDeliverySchedule"
       :order-details="orderDetails"
     />
+
+    <!-- Sales Order Table Modal -->
+    <SalesOrderTableModal 
+      :is-open="showSalesOrderTableModal" 
+      @close="showSalesOrderTableModal = false" 
+      @select="selectSalesOrderFromTable"
+      :customer-data="selectedCustomer"
+    />
   </AppLayout>
 </template>
 
@@ -657,6 +665,7 @@ import UpdateMcModal from '@/Components/UpdateMcModal.vue'
 import ProductDesignScreenModal from '@/Components/ProductDesignScreenModal.vue'
 import DeliveryScheduleModal from '@/Components/DeliveryScheduleModal.vue'
 import DeliveryLocationModal from '@/Components/DeliveryLocationModal.vue'
+import SalesOrderTableModal from '@/Components/SalesOrderTableModal.vue'
 import { useToast } from '@/Composables/useToast'
 
 const { success, error, info } = useToast()
@@ -736,6 +745,7 @@ const showMasterCardModal = ref(false) // legacy (unused)
 const showProductDesignModal = ref(false)
 const showDeliveryLocationModal = ref(false)
 const showDeliveryScheduleModal = ref(false)
+const showSalesOrderTableModal = ref(false)
 // Ref to Product Design modal for live quantity sync
 const productDesignModalRef = ref(null)
 
@@ -1085,15 +1095,8 @@ const refreshPage = () => {
 }
 
 const printLog = async () => {
-  try {
-    const response = await fetch('/api/sales-order/print-log')
-    const data = await response.json()
-    success('SO Log report generated successfully')
-    // You can implement actual PDF download or print functionality here
-    console.log('SO Log data:', data)
-  } catch (err) {
-    error('Error generating SO Log report')
-  }
+  // Open Sales Order Table Modal to view existing sales orders
+  openSalesOrderTable()
 }
 
 const printJitTracking = async () => {
@@ -1106,6 +1109,30 @@ const printJitTracking = async () => {
   } catch (err) {
     error('Error generating JIT Tracking report')
   }
+}
+
+// Open Sales Order Table Modal
+const openSalesOrderTable = () => {
+  if (!selectedCustomer.code) {
+    error('Please select a customer first to view sales orders')
+    return
+  }
+  showSalesOrderTableModal.value = true
+}
+
+// Handle selection from Sales Order Table Modal
+const selectSalesOrderFromTable = (orderData) => {
+  console.log('Sales Order selected from table:', orderData)
+  
+  // You can use the selected order data to populate the form or navigate to a detail screen
+  // For now, we'll just show a success message
+  success(`Sales Order ${orderData.soNumber} selected`)
+  
+  // Optionally, you could navigate to a detail page or populate form fields
+  // For example:
+  // orderDetails.so_number = orderData.soNumber
+  // orderDetails.customerPOrder = orderData.customerPo
+  // etc.
 }
 
 const openCustomerLookup = () => {
@@ -2068,6 +2095,12 @@ const handleKeyDown = (event) => {
   if (event.key === 'F5') {
     event.preventDefault()
     refreshPage()
+  }
+  
+  // F6 to open Sales Order Table
+  if (event.key === 'F6') {
+    event.preventDefault()
+    openSalesOrderTable()
   }
   
   // Ctrl/Cmd + P to print log

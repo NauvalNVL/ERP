@@ -227,11 +227,12 @@ const searchQuery = ref('');
 const orderItems = computed(() => {
     if (!selectedOrder.value) return [];
     
+    // Return default item details for now
     return [
-        { item: 'PD', main: 'OF-SF' },
+        { item: 'PD', main: selectedOrder.value.p_design || 'OF-SF' },
         { item: 'PCS', main: '1' },
-        { item: 'UNIT', main: 'Pcs' },
-        { item: 'ORDER', main: '1,000' },
+        { item: 'UNIT', main: selectedOrder.value.uom || 'Pcs' },
+        { item: 'ORDER', main: selectedOrder.value.order_quantity || '1,000' },
         { item: 'NET DELIVERY', main: '1,000' },
         { item: 'BALANCE', main: '' }
     ];
@@ -302,4 +303,4 @@ watch(() => props.salesOrders, () => {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
-</style> 
+</style>
