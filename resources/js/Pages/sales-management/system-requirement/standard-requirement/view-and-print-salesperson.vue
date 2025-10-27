@@ -54,17 +54,35 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                     <tr>
-                            <th @click="sortTable('code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            Salesperson Code <i :class="getSortIcon('code')"></i>
+                            <th @click="sortTable('code')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Code <i :class="getSortIcon('code')"></i>
                         </th>
-                            <th @click="sortTable('name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                            Salesperson Name <i :class="getSortIcon('name')"></i>
+                            <th @click="sortTable('name')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Name <i :class="getSortIcon('name')"></i>
+                        </th>
+                            <th @click="sortTable('grup')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Group <i :class="getSortIcon('grup')"></i>
+                        </th>
+                            <th @click="sortTable('code_grup')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Code Group <i :class="getSortIcon('code_grup')"></i>
+                        </th>
+                            <th @click="sortTable('target_sales')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Target Sales <i :class="getSortIcon('target_sales')"></i>
+                        </th>
+                            <th @click="sortTable('internal')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Internal <i :class="getSortIcon('internal')"></i>
+                        </th>
+                            <th @click="sortTable('email')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Email <i :class="getSortIcon('email')"></i>
+                        </th>
+                            <th @click="sortTable('status')" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Status <i :class="getSortIcon('status')"></i>
                         </th>
                     </tr>
                 </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="2" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="8" class="px-6 py-4 text-center text-gray-500">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
@@ -72,7 +90,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredSalespersons.length === 0" class="hover:bg-gray-50">
-                            <td colspan="2" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="8" class="px-6 py-4 text-center text-gray-500">
                                 No salespersons found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -83,8 +101,16 @@
                         <tr v-for="(person, index) in filteredSalespersons" :key="person.code"
                             :class="{'bg-blue-50': index % 2 === 0}"
                             class="hover:bg-blue-100">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ person.code || 'N/A' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ person.name || 'N/A' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">{{ person.code || 'N/A' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.name || 'N/A' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.grup || '-' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.code_grup || '-' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-right">{{ formatTargetSales(person.target_sales) }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.internal || '-' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.email || '-' }}</td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm">
+                                <span :class="getStatusClass(person.status)">{{ person.status || 'N/A' }}</span>
+                            </td>
                     </tr>
                 </tbody>
             </table>
@@ -173,6 +199,25 @@ const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString();
 };
 
+// Format target sales
+const formatTargetSales = (value) => {
+    if (value === null || value === undefined || value === '') return '0.00';
+    return Number(value).toFixed(2);
+};
+
+// Get status class for styling
+const getStatusClass = (status) => {
+    if (!status) return 'px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-800';
+
+    const statusLower = status.toLowerCase();
+    if (statusLower === 'active') {
+        return 'px-2 py-1 text-xs rounded-full bg-green-200 text-green-800';
+    } else if (statusLower === 'inactive') {
+        return 'px-2 py-1 text-xs rounded-full bg-red-200 text-red-800';
+    }
+    return 'px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-800';
+};
+
 // Sort table
 const sortTable = (column) => {
     if (sortColumn.value === column) {
@@ -203,7 +248,12 @@ const filteredSalespersons = computed(() => {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(person =>
             (person.code && person.code.toLowerCase().includes(query)) ||
-            (person.name && person.name.toLowerCase().includes(query))
+            (person.name && person.name.toLowerCase().includes(query)) ||
+            (person.grup && person.grup.toLowerCase().includes(query)) ||
+            (person.code_grup && person.code_grup.toLowerCase().includes(query)) ||
+            (person.internal && person.internal.toLowerCase().includes(query)) ||
+            (person.email && person.email.toLowerCase().includes(query)) ||
+            (person.status && person.status.toLowerCase().includes(query))
         );
     }
 
@@ -257,13 +307,19 @@ const exportPDF = () => {
         // Prepare table data
         const tableData = filteredSalespersons.value.map(person => [
             person.code || 'N/A',
-            person.name || 'N/A'
+            person.name || 'N/A',
+            person.grup || '-',
+            person.code_grup || '-',
+            formatTargetSales(person.target_sales),
+            person.internal || '-',
+            person.email || '-',
+            person.status || 'N/A'
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['Salesperson Code', 'Salesperson Name']],
+            head: [['Code', 'Name', 'Group', 'Code Group', 'Target Sales', 'Internal', 'Email', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -272,19 +328,25 @@ const exportPDF = () => {
                 textColor: [255, 255, 255], // White text
                 fontStyle: 'bold',
                 halign: 'left',
-                fontSize: 10
+                fontSize: 8
             },
             bodyStyles: {
                 textColor: [50, 50, 50],
                 halign: 'left',
-                fontSize: 9
+                fontSize: 7
             },
             alternateRowStyles: {
                 fillColor: [219, 234, 254] // Light blue for alternate rows
             },
             columnStyles: {
-                0: { cellWidth: 80 },
-                1: { cellWidth: 140 }
+                0: { cellWidth: 25 },
+                1: { cellWidth: 40 },
+                2: { cellWidth: 30 },
+                3: { cellWidth: 25 },
+                4: { cellWidth: 25, halign: 'right' },
+                5: { cellWidth: 20 },
+                6: { cellWidth: 45 },
+                7: { cellWidth: 20 }
             },
             margin: { top: 28, left: 10, right: 10 }
         });

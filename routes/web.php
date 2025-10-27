@@ -403,6 +403,7 @@ Route::middleware('auth')->group(function () {
          Route::get('/sales-person/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-person.view-print');
          // Alias for search menu
          Route::get('/define-salesperson', [SalespersonController::class, 'vueIndex'])->name('vue.define-salesperson');
+         Route::get('/view-print-salesperson', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.view-print-salesperson');
 
          Route::get('/sales-person-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.sales-person-team.index');
          Route::get('/sales-person-team/view-print', [SalespersonTeamController::class, 'vueViewAndPrint'])->name('vue.sales-person-team.view-print');

@@ -71,10 +71,11 @@ class Salesperson extends Model
     protected $appends = [
         'code',
         'name',
-        'sales_team_id',
-        'position',
-        'user_id',
-        'is_active'
+        'grup',
+        'code_grup',
+        'target_sales',
+        'internal',
+        'email'
     ];
 
     /**
@@ -90,39 +91,29 @@ class Salesperson extends Model
         return $this->attributes['Name'] ?? null;
     }
 
-    public function getSalesTeamIdAttribute()
+    public function getGrupAttribute()
     {
-        // Map Grup to a team ID for compatibility
-        $grupMapping = [
-            'MBI' => 1,
-            'MANAGEMENT LOCAL' => 2,
-            'MANAGEMENT MNC' => 3
-        ];
-
-        $grup = $this->attributes['Grup'] ?? null;
-        return $grupMapping[$grup] ?? 1;
+        return $this->attributes['Grup'] ?? null;
     }
 
-    public function getPositionAttribute()
+    public function getCodeGrupAttribute()
     {
-        // Map status or create a default position
-        return $this->attributes['status'] === 'Active' ? 'E - Executive' : 'E - Executive';
+        return $this->attributes['CodeGrup'] ?? null;
     }
 
-    public function getUserIdAttribute()
+    public function getTargetSalesAttribute()
+    {
+        return $this->attributes['TargetSales'] ?? 0;
+    }
+
+    public function getInternalAttribute()
     {
         return $this->attributes['Internal'] ?? null;
     }
 
-    public function getStatusAttribute($value)
+    public function getEmailAttribute()
     {
-        return trim($value ?? '');
-    }
-
-    public function getIsActiveAttribute()
-    {
-        $status = $this->status; // Use the trimmed status accessor
-        return $status === 'Active';
+        return $this->attributes['Email'] ?? null;
     }
 
     /**
@@ -138,34 +129,29 @@ class Salesperson extends Model
         $this->attributes['Name'] = $value;
     }
 
-    public function setSalesTeamIdAttribute($value)
+    public function setGrupAttribute($value)
     {
-        // Map team ID back to Grup
-        $teamMapping = [
-            1 => 'MBI',
-            2 => 'MANAGEMENT LOCAL',
-            3 => 'MANAGEMENT MNC'
-        ];
-
-        $this->attributes['Grup'] = $teamMapping[$value] ?? 'MBI';
+        $this->attributes['Grup'] = $value;
     }
 
-    public function setPositionAttribute($value)
+    public function setCodeGrupAttribute($value)
     {
-        // Map position to status or other field as needed
-        $this->attributes['status'] = 'Active';
+        $this->attributes['CodeGrup'] = $value;
     }
 
-    public function setUserIdAttribute($value)
+    public function setTargetSalesAttribute($value)
+    {
+        $this->attributes['TargetSales'] = $value;
+    }
+
+    public function setInternalAttribute($value)
     {
         $this->attributes['Internal'] = $value;
     }
 
-    public function setIsActiveAttribute($value)
+    public function setEmailAttribute($value)
     {
-        // Ensure no trailing spaces and proper boolean conversion
-        $isActive = (bool)$value;
-        $this->attributes['status'] = $isActive ? 'Active' : 'Inactive';
+        $this->attributes['Email'] = $value;
     }
 
     // ==================== SALES TEAM METHODS ====================
