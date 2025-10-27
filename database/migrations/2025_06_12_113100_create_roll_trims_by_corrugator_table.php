@@ -15,7 +15,8 @@ return new class extends Migration
         if (!Schema::hasTable('roll_trims_by_corrugator')) {
             Schema::create('roll_trims_by_corrugator', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('flute_id')->constrained('paper_flutes');
+                $table->decimal('flute_id', 18, 0);
+                $table->foreign('flute_id')->references('No')->on('Flute_CPS');
                 $table->boolean('compute')->default(false);
                 $table->integer('min_trim')->default(0);
                 $table->integer('max_trim')->nullable();

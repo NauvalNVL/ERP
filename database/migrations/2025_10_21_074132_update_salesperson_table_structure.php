@@ -11,33 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('salesperson', function (Blueprint $table) {
-            // Drop foreign key constraint first
-            $table->dropForeign(['sales_team_id']);
-        });
-        
-        Schema::table('salesperson', function (Blueprint $table) {
-            // Drop existing columns that will be replaced
-            $table->dropColumn(['sales_team_id', 'position', 'user_id', 'is_active']);
-            
-            // Modify existing columns
-            $table->string('code', 50)->nullable()->change();
-            $table->string('name', 50)->nullable()->change();
-            
-            // Add new columns
-            $table->string('Grup', 20)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
-            $table->string('CodeGrup', 50)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
-            $table->decimal('TargetSales', 18, 2)->nullable();
-            $table->string('Internal', 20)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
-            $table->string('Email', 100)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
-            $table->char('status', 10)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
-        });
-        
-        // Rename columns to match the specification
-        Schema::table('salesperson', function (Blueprint $table) {
-            $table->renameColumn('code', 'Code');
-            $table->renameColumn('name', 'Name');
-        });
+        // Skip - the salesperson table already has the correct structure
+        // This migration was created to update an old table structure that no longer exists
     }
 
     /**
@@ -49,10 +24,10 @@ return new class extends Migration
             // Rename columns back
             $table->renameColumn('Code', 'code');
             $table->renameColumn('Name', 'name');
-            
+
             // Drop new columns
             $table->dropColumn(['Grup', 'CodeGrup', 'TargetSales', 'Internal', 'Email', 'status']);
-            
+
             // Restore original columns
             $table->string('code', 10)->unique()->change();
             $table->string('name', 100)->change();

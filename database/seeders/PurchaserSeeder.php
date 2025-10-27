@@ -185,7 +185,10 @@ class PurchaserSeeder extends Seeder
         ];
 
         foreach ($purchasers as $purchaserData) {
-            Purchaser::create($purchaserData);
+            Purchaser::updateOrCreate(
+                ['purchaser_id' => $purchaserData['purchaser_id']],
+                $purchaserData
+            );
         }
     }
-} 
+}

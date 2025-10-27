@@ -14,6 +14,18 @@ class Salesperson extends Model
     // Set the table name explicitly to match the migration
     protected $table = 'salesperson';
 
+    // Disable timestamps since the table doesn't have created_at/updated_at columns
+    public $timestamps = false;
+
+    // Use 'Code' as the primary key
+    protected $primaryKey = 'Code';
+
+    // The primary key is not auto-incrementing
+    public $incrementing = false;
+
+    // The primary key type is string
+    protected $keyType = 'string';
+
     protected $fillable = [
         'Code',
         'Name',
@@ -86,7 +98,7 @@ class Salesperson extends Model
             'MANAGEMENT LOCAL' => 2,
             'MANAGEMENT MNC' => 3
         ];
-        
+
         $grup = $this->attributes['Grup'] ?? null;
         return $grupMapping[$grup] ?? 1;
     }
@@ -134,7 +146,7 @@ class Salesperson extends Model
             2 => 'MANAGEMENT LOCAL',
             3 => 'MANAGEMENT MNC'
         ];
-        
+
         $this->attributes['Grup'] = $teamMapping[$value] ?? 'MBI';
     }
 
@@ -157,7 +169,7 @@ class Salesperson extends Model
     }
 
     // ==================== SALES TEAM METHODS ====================
-    
+
     /**
      * Get all unique sales teams
      */
@@ -188,7 +200,7 @@ class Salesperson extends Model
     {
         // Check if team entry exists
         $teamEntry = self::where('Code', 'TEAM_' . $teamCode)->first();
-        
+
         if ($teamEntry) {
             $teamEntry->update([
                 'Name' => 'Team: ' . $teamName,
@@ -204,12 +216,12 @@ class Salesperson extends Model
                 'status' => 'Active'
             ]);
         }
-        
+
         return true;
     }
 
     // ==================== SALESPERSON TEAM METHODS ====================
-    
+
     /**
      * Get salesperson with team information
      */
@@ -308,7 +320,7 @@ class Salesperson extends Model
             foreach ($salespersons as $salesperson) {
                 // Assign each salesperson to one sales team (round-robin)
                 $assignedTeam = $salesTeamsArray[$teamIndex % count($salesTeamsArray)];
-                
+
                 $salespersonTeamsData[] = [
                     's_person_code' => substr($salesperson->Code, 0, 10),
                     'salesperson_name' => substr($salesperson->Name, 0, 100),
@@ -318,7 +330,7 @@ class Salesperson extends Model
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
-                
+
                 $teamIndex++;
             }
 
@@ -334,4 +346,4 @@ class Salesperson extends Model
             Log::error('Error syncing salesperson_teams: ' . $e->getMessage());
         }
     }
-} 
+}

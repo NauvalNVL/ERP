@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
             ScoringFormulaSeeder::class,
             StandardFormulaSeeder::class,
             // UpdateMcSeeder::class, // disabled per request
-            MasterCardSeeder::class,
+            // MasterCardSeeder::class, // disabled - table structure mismatch
             VendorSeeder::class,
             SalesTeamSeeder::class,
             SalespersonSeeder::class,
@@ -73,7 +73,7 @@ class DatabaseSeeder extends Seeder
             PaperQualitySeeder::class,
             PaperSizeSeeder::class,
             ColorGroupSeeder::class,
-            ColorSeeder::class,
+            // ColorSeeder::class, // disabled - table structure mismatch
             IndustrySeeder::class,
             GeoSeeder::class,
             ProductGroupSeeder::class,

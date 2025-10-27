@@ -140,7 +140,10 @@ class PurchaseSubControlSeeder extends Seeder
         ];
 
         foreach ($purchaseSubControls as $psc) {
-            PurchaseSubControl::create($psc);
+            PurchaseSubControl::updateOrCreate(
+                ['psc_code' => $psc['psc_code']],
+                $psc
+            );
         }
     }
 }

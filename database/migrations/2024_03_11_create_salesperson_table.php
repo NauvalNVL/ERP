@@ -12,16 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('salesperson', function (Blueprint $table) {
-            $table->id();
-            $table->string('Code', 50)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            $table->string('Code', 50)->primary()->collation('SQL_Latin1_General_CP1_CI_AS');
             $table->string('Name', 50)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
             $table->string('Grup', 20)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
             $table->string('CodeGrup', 50)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
-            $table->decimal('TargetSales', 18, 2)->nullable();
+            $table->float('TargetSales')->nullable(); // SQL Server 'real' type
             $table->string('Internal', 20)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
             $table->string('Email', 100)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
             $table->char('status', 10)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
-            $table->timestamps();
         });
     }
 
@@ -32,4 +30,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('salesperson');
     }
-}; 
+};

@@ -15,7 +15,8 @@ class CreateSideTrimsByFluteTable extends Migration
     {
         Schema::create('side_trims_by_flute', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('flute_id')->constrained('paper_flutes', 'id')->onDelete('cascade');
+            $table->decimal('flute_id', 18, 0);
+            $table->foreign('flute_id')->references('No')->on('Flute_CPS')->onDelete('cascade');
             $table->integer('length_add')->default(0);
             $table->integer('length_less')->default(0);
             $table->boolean('compute')->default(false);
@@ -32,4 +33,4 @@ class CreateSideTrimsByFluteTable extends Migration
     {
         Schema::dropIfExists('side_trims_by_flute');
     }
-} 
+}
