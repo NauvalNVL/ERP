@@ -16,13 +16,13 @@ class PaperQualityController extends Controller
     {
         try {
             $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->get();
-            
+
             // If there are no paper qualities in the database, seed them
             if ($paperQualities->isEmpty()) {
                 $this->seedData();
                 $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->get();
             }
-            
+
             return view('sales-management.system-requirement.system-requirement.standard-requirement.paperquality', compact('paperQualities'));
         } catch (\Exception $e) {
             Log::error('Error in PaperQualityController@index: ' . $e->getMessage());
@@ -64,14 +64,14 @@ class PaperQualityController extends Controller
                 'paper_quality.unique' => 'Kode kualitas kertas ini sudah terdaftar',
                 'paper_name.required' => 'Nama kualitas kertas harus diisi'
             ]);
-            
+
             $createdBy = Auth::check() ? Auth::user()->user_id : 'system';
-            
+
             // Set status if not provided
             if (!isset($validated['status'])) {
                 $validated['status'] = $validated['is_active'] ? 'Act' : 'Obs';
             }
-            
+
             $paperQuality = PaperQuality::create([
                 'paper_quality' => $validated['paper_quality'],
                 'paper_name' => $validated['paper_name'],
@@ -106,7 +106,7 @@ class PaperQualityController extends Controller
         try {
             $paperQuality = PaperQuality::findOrFail($id);
             $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->get();
-            
+
             return view('sales-management.system-requirement.system-requirement.standard-requirement.paperquality', compact('paperQuality', 'paperQualities'));
         } catch (\Exception $e) {
             Log::error('Error in PaperQualityController@edit: ' . $e->getMessage());
@@ -119,7 +119,7 @@ class PaperQualityController extends Controller
     {
         try {
             $paperQuality = PaperQuality::findOrFail($id);
-            
+
             $validated = $request->validate([
                 'paper_quality' => [
                     'required',
@@ -145,14 +145,14 @@ class PaperQualityController extends Controller
                 'paper_quality.unique' => 'Kode kualitas kertas ini sudah terdaftar',
                 'paper_name.required' => 'Nama kualitas kertas harus diisi'
             ]);
-            
+
             $updatedBy = Auth::check() ? Auth::user()->user_id : 'system';
-            
+
             // Set status if not provided
             if (!isset($validated['status'])) {
                 $validated['status'] = $validated['is_active'] ? 'Act' : 'Obs';
             }
-            
+
             $paperQuality->update([
                 'paper_quality' => $validated['paper_quality'],
                 'paper_name' => $validated['paper_name'],
@@ -223,7 +223,7 @@ class PaperQualityController extends Controller
     public function viewAndPrint()
     {
         // Ambil semua data paper quality, urutkan berdasarkan kode
-        $paperQualities = PaperQuality::orderBy('paper_quality')->get(); 
+        $paperQualities = PaperQuality::orderBy('paper_quality')->get();
             return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintpaperquality', compact('paperQualities'));
     }
 
@@ -236,16 +236,16 @@ class PaperQualityController extends Controller
     {
         // Using pagination, fetching 15 items per page, sorted by paper_quality
         $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')->paginate(15);
-        
+
         // Return JSON response for AJAX requests
         if (request()->ajax() || request()->wantsJson()) {
             return response()->json($paperQualities);
         }
-        
+
         // Return view for regular requests
         return view('sales-management.system-requirement.system-requirement.standard-requirement.obsolateunobsolatepaperquality', compact('paperQualities'));
     }
-    
+
     /**
      * Display the Vue version of paper quality status management page
      *
@@ -256,7 +256,7 @@ class PaperQualityController extends Controller
         try {
             $paperQualities = PaperQuality::orderBy('paper_quality', 'asc')
                 ->paginate(15);
-                
+
             return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-paper-quality', [
                 'paperQualities' => $paperQualities->items(),
                 'pagination' => [
@@ -268,7 +268,7 @@ class PaperQualityController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error in PaperQualityController@vueManageStatus: ' . $e->getMessage());
-            
+
             return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/obsolete-unobsolete-paper-quality', [
                 'paperQualities' => [],
                 'pagination' => [
@@ -341,7 +341,7 @@ class PaperQualityController extends Controller
     {
         try {
             $paperQuality = PaperQuality::findOrFail($id);
-            
+
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'paper_quality' => [
                     'required',
@@ -353,9 +353,7 @@ class PaperQualityController extends Controller
                 'weight_kg_m' => 'nullable|numeric|between:0,9.9999',
                 'commercial_code' => 'nullable|string|max:10',
                 'wet_end_code' => 'nullable|string|max:10',
-                'decc_code' => 'nullable|string|max:10',
-                'status' => 'nullable|string|max:3',
-                'is_active' => 'nullable|boolean'
+                'decc_code' => 'nullable|string|max:10'
             ]);
 
             if ($validator->fails()) {
@@ -364,16 +362,10 @@ class PaperQualityController extends Controller
                     'message' => $validator->errors()->first()
                 ], 422);
             }
-            
+
             $updatedBy = Auth::check() ? Auth::user()->user_id : 'system';
-            
-            // Set status if not provided
-            if (!isset($request->status)) {
-                $status = $request->is_active ? 'Act' : 'Obs';
-            } else {
-                $status = $request->status;
-            }
-            
+
+            // When updating, do not allow changing status - it should be done via obsolete/unobsolete menu
             $paperQuality->update([
                 'paper_quality' => $request->paper_quality,
                 'paper_name' => $request->paper_name,
@@ -381,8 +373,6 @@ class PaperQualityController extends Controller
                 'commercial_code' => $request->commercial_code,
                 'wet_end_code' => $request->wet_end_code,
                 'decc_code' => $request->decc_code,
-                'status' => $status,
-                'is_active' => $request->is_active ?? ($status === 'Act'),
                 'updated_by' => $updatedBy
             ]);
 
@@ -399,7 +389,7 @@ class PaperQualityController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Store a new paper quality via API.
      *
@@ -420,9 +410,7 @@ class PaperQualityController extends Controller
                 'weight_kg_m' => 'nullable|numeric|between:0,9.9999',
                 'commercial_code' => 'nullable|string|max:10',
                 'wet_end_code' => 'nullable|string|max:10',
-                'decc_code' => 'nullable|string|max:10',
-                'status' => 'nullable|string|max:3',
-                'is_active' => 'nullable|boolean'
+                'decc_code' => 'nullable|string|max:10'
             ]);
 
             if ($validator->fails()) {
@@ -431,16 +419,10 @@ class PaperQualityController extends Controller
                     'message' => $validator->errors()->first()
                 ], 422);
             }
-            
+
             $createdBy = Auth::check() ? Auth::user()->user_id : 'system';
-            
-            // Set status if not provided
-            if (!isset($request->status)) {
-                $status = $request->is_active ? 'Act' : 'Obs';
-            } else {
-                $status = $request->status;
-            }
-            
+
+            // New records are always created as Active
             $paperQuality = PaperQuality::create([
                 'paper_quality' => $request->paper_quality,
                 'paper_name' => $request->paper_name,
@@ -448,8 +430,8 @@ class PaperQualityController extends Controller
                 'commercial_code' => $request->commercial_code,
                 'wet_end_code' => $request->wet_end_code,
                 'decc_code' => $request->decc_code,
-                'status' => $status,
-                'is_active' => $request->is_active ?? ($status === 'Act'),
+                'status' => 'Act',
+                'is_active' => true,
                 'created_by' => $createdBy,
                 'updated_by' => $createdBy
             ]);
@@ -467,7 +449,7 @@ class PaperQualityController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Delete a paper quality via API.
      *
@@ -478,16 +460,16 @@ class PaperQualityController extends Controller
     {
         try {
             $paperQuality = PaperQuality::findOrFail($id);
-            
+
             // Store info before deletion for the response
             $qualityInfo = [
                 'id' => $paperQuality->id,
                 'paper_quality' => $paperQuality->paper_quality,
                 'paper_name' => $paperQuality->paper_name
             ];
-            
+
             $paperQuality->delete();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Paper quality deleted successfully',
