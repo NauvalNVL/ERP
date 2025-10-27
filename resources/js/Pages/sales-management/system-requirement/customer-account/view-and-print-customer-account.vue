@@ -12,7 +12,7 @@
             <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
             <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
             <div class="absolute bottom-0 right-0 w-32 h-32 bg-cyan-400 opacity-5 rounded-full translate-y-10 translate-x-10"></div>
-            
+
             <div class="p-6 md:p-8 relative z-10">
               <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div class="flex items-start md:items-center space-x-4 mb-4 md:mb-0">
@@ -78,9 +78,9 @@
                   Search:
                 </label>
                 <div class="relative flex-grow">
-                    <input 
-                        type="text" 
-                        v-model="searchQuery" 
+                    <input
+                        type="text"
+                        v-model="searchQuery"
                     class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                     placeholder="Enter customer code, name, or contact..."
                   />
@@ -89,7 +89,7 @@
                   </div>
                 </div>
               </div>
-              
+
               <!-- Status Filter -->
               <div class="space-y-2">
                 <label class="block text-sm font-medium text-blue-700 mb-2 flex items-center">
@@ -104,7 +104,7 @@
                         <option value="Inactive">Inactive</option>
                     </select>
               </div>
-              
+
               <!-- Action Buttons -->
               <div class="flex items-end">
                 <button @click="searchQuery = ''; statusFilter = 'all'" class="px-6 py-2.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 text-gray-700 transition-all duration-300 shadow-sm flex items-center mr-3">
@@ -152,6 +152,18 @@
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                             </th>
+                    <th @click="sortTable('short_name')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Short Name</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('address')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Address</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
                     <th @click="sortTable('contact_person')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                       <div class="flex items-center">
                         <span>Contact</span>
@@ -164,15 +176,75 @@
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                             </th>
+                    <th @click="sortTable('fax_no')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Fax</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('co_email')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Email</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('credit_limit')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Credit Limit</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('credit_terms')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Terms (Days)</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('ac_type')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Account Type</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
                     <th @click="sortTable('currency_code')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                       <div class="flex items-center">
                         <span>Currency</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                             </th>
+                    <th @click="sortTable('npwp')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>NPWP</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
                     <th @click="sortTable('sales_type')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
                       <div class="flex items-center">
-                        <span>Sales Type</span>
+                        <span>Customer Type</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('salesperson_code')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Salesperson</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('industrial_code')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Industry</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('geographical')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Geographical</span>
+                        <i class="fas fa-sort ml-1"></i>
+                      </div>
+                            </th>
+                    <th @click="sortTable('grouping_code')" class="px-4 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider cursor-pointer hover:bg-blue-100 transition-colors">
+                      <div class="flex items-center">
+                        <span>Group</span>
                         <i class="fas fa-sort ml-1"></i>
                       </div>
                             </th>
@@ -186,7 +258,7 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="19" class="px-6 py-4 text-center text-gray-500">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
@@ -194,7 +266,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredCustomerAccounts.length === 0" class="hover:bg-gray-50">
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="19" class="px-6 py-4 text-center text-gray-500">
                       <div class="flex flex-col items-center">
                         <i class="fas fa-users text-4xl text-gray-300 mb-2"></i>
                         <p class="text-lg font-medium">No customer accounts found</p>
@@ -205,8 +277,8 @@
                       </div>
                             </td>
                         </tr>
-                        <tr v-for="(account, index) in filteredCustomerAccounts" :key="account.customer_code" 
-                            :class="{'bg-blue-50': index % 2 === 0}" 
+                        <tr v-for="(account, index) in filteredCustomerAccounts" :key="account.customer_code"
+                            :class="{'bg-blue-50': index % 2 === 0}"
                       class="hover:bg-blue-100 transition-colors">
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{{ account.customer_code }}</div>
@@ -215,19 +287,55 @@
                                 <div class="text-sm text-gray-900">{{ account.customer_name }}</div>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ account.short_name || '-' }}</div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="text-sm text-gray-900">{{ formatAddress(account) }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ account.contact_person || '-' }}</div>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ account.telephone_no || '-' }}</div>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ account.fax_no || '-' }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ account.co_email || '-' }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-right">
+                                <div class="text-sm text-gray-900">{{ formatCurrency(account.credit_limit) }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-center">
+                                <div class="text-sm text-gray-900">{{ account.credit_terms || 0 }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ account.ac_type || account.account_type || '-' }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ account.currency_code || 'IDR' }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ account.npwp || '-' }}</div>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ account.sales_type || '-' }}</div>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <span 
+                                <div class="text-sm text-gray-900">{{ account.salesperson_code || '-' }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ account.industrial_code || '-' }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ account.geographical || '-' }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ account.grouping_code || '-' }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span
                                     class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
                                     :class="{
                                         'bg-green-100 text-green-800': account.status === 'Active' || account.status === 'A',
@@ -301,17 +409,17 @@ const fetchCustomerAccounts = async () => {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch customer accounts');
         }
-        
+
         const data = await response.json();
         console.log('Received customer accounts data:', data);
-        
+
         // Handle the data structure - it might be wrapped in a 'data' property
         const accountsData = data.data || data;
-        
+
         if (Array.isArray(accountsData)) {
             customerAccounts.value = accountsData.map(account => ({
                 ...account,
@@ -335,6 +443,24 @@ const formatDate = (dateString) => {
     return date.toLocaleString();
 };
 
+// Format address
+const formatAddress = (account) => {
+    const parts = [];
+    if (account.address) parts.push(account.address);
+    if (account.address2) parts.push(account.address2);
+    if (account.address3) parts.push(account.address3);
+    return parts.length > 0 ? parts.join(', ') : '-';
+};
+
+// Format currency
+const formatCurrency = (value) => {
+    if (!value || value === 0) return '0';
+    return new Intl.NumberFormat('id-ID', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(value);
+};
+
 // Sort function
 const sortTable = (column) => {
     if (sortColumn.value === column) {
@@ -348,52 +474,52 @@ const sortTable = (column) => {
 // Filtered and sorted customer accounts
 const filteredCustomerAccounts = computed(() => {
     let filtered = [...customerAccounts.value];
-    
+
     // Apply status filter
     if (statusFilter.value !== 'all') {
         filtered = filtered.filter(account => account.status === statusFilter.value);
     }
-    
+
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(account => 
+        filtered = filtered.filter(account =>
             (account.customer_code && account.customer_code.toLowerCase().includes(query)) ||
             (account.customer_name && account.customer_name.toLowerCase().includes(query)) ||
             (account.contact_person && account.contact_person.toLowerCase().includes(query)) ||
             (account.address && account.address.toLowerCase().includes(query))
         );
     }
-    
+
     // Apply sorting
     filtered.sort((a, b) => {
         let valueA = a[sortColumn.value];
         let valueB = b[sortColumn.value];
-        
+
         // Handle null values
         if (valueA === null || valueA === undefined) valueA = '';
         if (valueB === null || valueB === undefined) valueB = '';
-        
+
         // Handle date columns
         if (['created_at', 'updated_at'].includes(sortColumn.value)) {
             valueA = valueA ? new Date(valueA).getTime() : 0;
             valueB = valueB ? new Date(valueB).getTime() : 0;
-            
+
             if (sortDirection.value === 'asc') {
                 return valueA - valueB;
             } else {
                 return valueB - valueA;
             }
         }
-        
+
         // Convert to string for comparison if not already
         if (typeof valueA !== 'string') valueA = valueA.toString();
         if (typeof valueB !== 'string') valueB = valueB.toString();
-        
+
         // Case insensitive comparison
         valueA = valueA.toLowerCase();
         valueB = valueB.toLowerCase();
-        
+
         // Sort direction
         if (sortDirection.value === 'asc') {
             return valueA.localeCompare(valueB);
@@ -401,7 +527,7 @@ const filteredCustomerAccounts = computed(() => {
             return valueB.localeCompare(valueA);
         }
     });
-    
+
     return filtered;
 });
 
@@ -428,17 +554,29 @@ const exportPDF = () => {
         const tableData = filteredCustomerAccounts.value.map(account => [
             account.customer_code || 'N/A',
             account.customer_name || 'N/A',
+            account.short_name || '-',
+            formatAddress(account),
             account.contact_person || '-',
             account.telephone_no || '-',
+            account.fax_no || '-',
+            account.co_email || '-',
+            formatCurrency(account.credit_limit),
+            account.credit_terms || '0',
+            account.ac_type || account.account_type || '-',
             account.currency_code || 'IDR',
+            account.npwp || '-',
             account.sales_type || '-',
+            account.salesperson_code || '-',
+            account.industrial_code || '-',
+            account.geographical || '-',
+            account.grouping_code || '-',
             account.status === 'A' ? 'Active' : account.status === 'I' ? 'Inactive' : (account.status || 'Active')
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['Code', 'Customer Name', 'Contact', 'Phone', 'Currency', 'Sales Type', 'Status']],
+            head: [['Code', 'Customer Name', 'Short Name', 'Address', 'Contact', 'Phone', 'Fax', 'Email', 'Credit Limit', 'Terms', 'AC Type', 'Currency', 'NPWP', 'Cust Type', 'Salesperson', 'Industry', 'Geo', 'Group', 'Status']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -447,26 +585,38 @@ const exportPDF = () => {
                 textColor: [255, 255, 255], // White text
                 fontStyle: 'bold',
                 halign: 'left',
-                fontSize: 9
+                fontSize: 7
             },
             bodyStyles: {
                 textColor: [50, 50, 50],
                 halign: 'left',
-                fontSize: 8
+                fontSize: 6
             },
             alternateRowStyles: {
                 fillColor: [219, 234, 254] // Light blue for alternate rows
             },
             columnStyles: {
-                0: { fontStyle: 'bold', cellWidth: 25 },
-                1: { cellWidth: 60 },
-                2: { cellWidth: 40 },
-                3: { cellWidth: 35 },
-                4: { cellWidth: 25 },
-                5: { cellWidth: 30 },
-                6: { cellWidth: 'auto' }
+                0: { fontStyle: 'bold', cellWidth: 15 },
+                1: { cellWidth: 25 },
+                2: { cellWidth: 15 },
+                3: { cellWidth: 30 },
+                4: { cellWidth: 15 },
+                5: { cellWidth: 15 },
+                6: { cellWidth: 12 },
+                7: { cellWidth: 20 },
+                8: { cellWidth: 15, halign: 'right' },
+                9: { cellWidth: 10, halign: 'center' },
+                10: { cellWidth: 12 },
+                11: { cellWidth: 12 },
+                12: { cellWidth: 15 },
+                13: { cellWidth: 12 },
+                14: { cellWidth: 12 },
+                15: { cellWidth: 12 },
+                16: { cellWidth: 12 },
+                17: { cellWidth: 12 },
+                18: { cellWidth: 'auto' }
             },
-            margin: { top: 28, left: 10, right: 10 }
+            margin: { top: 28, left: 5, right: 5 }
         });
 
         // Add footer
@@ -517,8 +667,8 @@ onMounted(() => {
     animation: pulse-slow 5s infinite;
 }
 
-.animation-delay-500 { 
-    animation-delay: 0.5s; 
+.animation-delay-500 {
+    animation-delay: 0.5s;
 }
 
 @keyframes ping-slow {
