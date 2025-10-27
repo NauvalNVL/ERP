@@ -359,7 +359,7 @@ import axios from 'axios';
 const form = ref({
   product_design_id: '',
   productDesign: '',
-  paper_flute_id: '',
+  paper_flute_code: '',
   paperFlute: '',
   scoring_length_formula: [],
   scoring_width_formula: [],
@@ -465,51 +465,20 @@ const fetchProducts = async () => {
 // Handle flute selection from modal
 const onFluteSelected = (flute) => {
   console.log("Selected flute:", flute);
-  if (!flute || !flute.code) {
+  if (!flute || !(flute.code || flute.Flute)) {
     console.error("Invalid flute object:", flute);
     showNotification("Error selecting flute: Invalid data", 'error');
     return;
   }
 
   // Set the display value
-  form.value.paperFlute = flute.code;
-  
-  // Try to get a valid numeric ID
-  let validId = null;
-  
-  // First try from the selected flute
-  if (flute.id !== undefined && flute.id !== null) {
-    const parsedId = parseInt(flute.id, 10);
-    if (!isNaN(parsedId)) {
-      validId = parsedId;
-      console.log("Using ID directly from selected flute:", validId);
-    }
-  }
-  
-  // If that didn't work, try to find the flute in our cached list
-  if (validId === null) {
-    const matchedFlute = paperFlutes.value.find(f => f.code === flute.code);
-    if (matchedFlute && matchedFlute.id !== undefined && matchedFlute.id !== null) {
-      const parsedId = parseInt(matchedFlute.id, 10);
-      if (!isNaN(parsedId)) {
-        validId = parsedId;
-        console.log("Found ID from cached flutes list:", validId);
-      }
-    }
-  }
-  
-  // Set the ID or show warning if not found
-  if (validId !== null) {
-    form.value.paper_flute_id = validId;
-    console.log("Set paper_flute_id to:", validId);
-  } else {
-    form.value.paper_flute_id = null;
-    console.error("Could not find a valid numeric ID for flute:", flute.code);
-    showNotification("Warning: Could not find a valid ID for the selected flute. Please try selecting again.", 'warning');
-  }
+  const code = flute.code || flute.Flute;
+  form.value.paperFlute = code;
+  // Store soft reference code to be sent to backend
+  form.value.paper_flute_code = code;
   
   showPaperFluteModal.value = false;
-  showNotification(`Selected paper flute: ${flute.code}`, 'success');
+  showNotification(`Selected paper flute: ${code}`, 'success');
 };
 
 // Add function to fetch product designs
@@ -672,23 +641,19 @@ const saveFormula = async () => {
   console.log("Form object:", form.value);
   console.log("product_design_id (raw):", form.value.product_design_id);
   console.log("product_design_id (type):", typeof form.value.product_design_id);
-  console.log("paper_flute_id (raw):", form.value.paper_flute_id);
-  console.log("paper_flute_id (type):", typeof form.value.paper_flute_id);
+  console.log("paper_flute_code (raw):", form.value.paper_flute_code);
+  console.log("paper_flute_code (type):", typeof form.value.paper_flute_code);
   
   // Check if both values are present
-  if (!form.value.product_design_id || !form.value.paper_flute_id) {
+  if (!form.value.product_design_id || !form.value.paper_flute_code) {
     console.log("VALIDATION FAILED: Missing IDs");
     console.log("product_design_id exists:", !!form.value.product_design_id);
-    console.log("paper_flute_id exists:", !!form.value.paper_flute_id);
+    console.log("paper_flute_code exists:", !!form.value.paper_flute_code);
     showNotification('Please select both Product Design and Paper Flute', 'warning');
     return;
   }
-  
-  // Convert IDs to numbers and check if they're valid
   const productDesignId = Number(form.value.product_design_id);
-  const paperFluteId = Number(form.value.paper_flute_id);
-  
-  console.log("Converted IDs:");
+  const paperFluteCode = String(form.value.paper_flute_code);
   console.log("productDesignId:", productDesignId, "isNaN:", isNaN(productDesignId));
   console.log("paperFluteId:", paperFluteId, "isNaN:", isNaN(paperFluteId));
   
@@ -712,9 +677,9 @@ const saveFormula = async () => {
       return;
     }
     
-    const requestBody = {
+    const payload = {
       product_design_id: productDesignId,
-      paper_flute_id: paperFluteId,
+      paper_flute_code: paperFluteCode,
       scoring_length_formula: form.value.scoring_length_formula,
       scoring_width_formula: form.value.scoring_width_formula,
       length_conversion: parseFloat(form.value.length_conversion),
@@ -724,10 +689,10 @@ const saveFormula = async () => {
       notes: form.value.notes
     };
     
-    console.log("Request body:", requestBody);
+    console.log("Request body:", payload);
     
     // Use axios instead of fetch for better handling of CSRF
-    const response = await axios.post('/api/scoring-formulas', requestBody, {
+    const response = await axios.post('/api/scoring-formulas', payload, {
       headers: {
         'X-CSRF-TOKEN': csrfToken,
         'Content-Type': 'application/json',

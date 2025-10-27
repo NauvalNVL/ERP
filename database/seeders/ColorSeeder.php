@@ -6,6 +6,7 @@ use App\Models\Color;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Schema;
 
 class ColorSeeder extends Seeder
 {
@@ -14,8 +15,18 @@ class ColorSeeder extends Seeder
      */
     public function run(): void
     {
+        // Skip if target table does not exist in this environment
+        if (!Schema::hasTable('colors')) {
+            return;
+        }
+
         // Hapus data yang sudah ada untuk menghindari duplikasi
-        DB::table('colors')->truncate();
+        try {
+            DB::table('colors')->truncate();
+        } catch (QueryException $e) {
+            // If truncate fails due to constraints, fallback to delete
+            DB::table('colors')->delete();
+        }
 
         $colors = [
             [

@@ -22,7 +22,7 @@ class CreateRollSizesTable extends Migration
             $table->timestamps();
 
             // Add a unique constraint to prevent duplicate entries
-            $table->unique(['flute_id', 'roll_length'], 'roll_size_flute_unique');
+            $table->unique(['flute_code', 'roll_length'], 'roll_size_flute_unique');
         });
     }
 

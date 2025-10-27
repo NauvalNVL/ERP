@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('master_cards', function (Blueprint $table) {
-            $table->string('mc_short_model')->nullable()->after('mc_model');
-        });
+        if (Schema::hasTable('master_cards')) {
+            Schema::table('master_cards', function (Blueprint $table) {
+                if (!Schema::hasColumn('master_cards', 'mc_short_model')) {
+                    $table->string('mc_short_model')->nullable()->after('mc_model');
+                }
+            });
+        }
     }
 
     /**
@@ -21,8 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('master_cards', function (Blueprint $table) {
-            $table->dropColumn('mc_short_model');
-        });
+        if (Schema::hasTable('master_cards') && Schema::hasColumn('master_cards', 'mc_short_model')) {
+            Schema::table('master_cards', function (Blueprint $table) {
+                $table->dropColumn('mc_short_model');
+            });
+        }
     }
 };

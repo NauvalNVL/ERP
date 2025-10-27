@@ -1225,16 +1225,18 @@ const openColorModal = async (index) => {
             const res = await fetch('/api/colors', { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
             if (res.ok) {
                 const data = await res.json();
-                colors.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+                // API returns an object: { colors: [...], color_groups: [...] }
+                colors.value = Array.isArray(data?.colors) ? data.colors : [];
             }
         } catch (e) {}
     }
     if (colorGroups.value.length === 0) {
         try {
-            const res = await fetch('/api/color-groups', { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
+            // Reuse the same endpoint which already includes color_groups
+            const res = await fetch('/api/colors', { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
             if (res.ok) {
                 const data = await res.json();
-                colorGroups.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+                colorGroups.value = Array.isArray(data?.color_groups) ? data.color_groups : [];
             }
         } catch (e) {}
     }

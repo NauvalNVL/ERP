@@ -56,7 +56,7 @@ class ScoringFormulaController extends Controller
     {
         $validated = $request->validate([
             'product_design_id' => 'required|exists:product_designs,id',
-            'paper_flute_id' => 'required|exists:paper_flutes,id',
+            'paper_flute_code' => 'required|string|exists:Flute_CPS,Flute',
             'scoring_length_formula' => 'required|array',
             'scoring_width_formula' => 'required|array',
             'length_conversion' => 'required|numeric',
@@ -68,7 +68,7 @@ class ScoringFormulaController extends Controller
 
         // Check for duplicate formula
         $existingFormula = ScoringFormula::where('product_design_id', $validated['product_design_id'])
-            ->where('paper_flute_id', $validated['paper_flute_id'])
+            ->where('paper_flute_code', $validated['paper_flute_code'])
             ->first();
 
         if ($existingFormula) {
@@ -108,7 +108,7 @@ class ScoringFormulaController extends Controller
 
         // Check for duplicate formula (excluding current record)
         $existingFormula = ScoringFormula::where('product_design_id', $validated['product_design_id'])
-            ->where('paper_flute_id', $validated['paper_flute_id'])
+            ->where('paper_flute_code', $validated['paper_flute_code'])
             ->where('id', '!=', $id)
             ->first();
 
@@ -157,10 +157,10 @@ class ScoringFormulaController extends Controller
     /**
      * Get formulas by paper flute.
      */
-    public function getByPaperFlute($paperFluteId)
+    public function getByPaperFlute($paperFluteCode)
     {
         $formulas = ScoringFormula::with(['productDesign', 'paperFlute'])
-            ->where('paper_flute_id', $paperFluteId)
+            ->where('paper_flute_code', $paperFluteCode)
             ->get();
 
         return response()->json($formulas);

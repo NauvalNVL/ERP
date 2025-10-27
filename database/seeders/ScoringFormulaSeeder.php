@@ -144,7 +144,8 @@ class ScoringFormulaSeeder extends Seeder
         foreach ($scoringFormulas as $formulaData) {
             // Find product design and paper flute by code
             $productDesign = $productDesigns->where('code', $formulaData['product_design'])->first();
-            $paperFlute = $paperFlutes->where('code', $formulaData['paper_flute'])->first();
+            // PaperFlute model maps to Flute_CPS with column 'Flute'
+            $paperFlute = $paperFlutes->where('Flute', $formulaData['paper_flute'])->first();
 
             // Skip if product design or paper flute not found
             if (!$productDesign || !$paperFlute) {
@@ -155,7 +156,7 @@ class ScoringFormulaSeeder extends Seeder
             // Create scoring formula
             ScoringFormula::create([
                 'product_design_id' => $productDesign->id,
-                'paper_flute_id' => $paperFlute->id,
+                'paper_flute_code' => $paperFlute->Flute,
                 'scoring_length_formula' => $formulaData['scoring_length_formula'],
                 'scoring_width_formula' => $formulaData['scoring_width_formula'],
                 'length_conversion' => $formulaData['length_conversion'],

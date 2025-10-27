@@ -56,24 +56,30 @@ class SalesOrderController extends Controller
         $month = date('m');
         $year = date('Y');
         
-        // Get the last SO number for this period
+        // Get the ACTUAL last sequence number by checking the max sequence in SO_Num column
+        // SQL Server compatible: Use CHARINDEX and REVERSE for extracting last part
         $lastSO = DB::table('so')
             ->where('MM', $month)
             ->where('YYYY', $year)
-            ->orderBy('SO_Num', 'desc')
+            ->orderByRaw('CAST(RIGHT(SO_Num, 5) AS INT) DESC')
             ->first();
         
         $sequence = 1;
         if ($lastSO && $lastSO->SO_Num) {
-            // Extract sequence from format MM-YYYY-XXXXX
-            $parts = explode('-', $lastSO->SO_Num);
-            if (count($parts) === 3) {
-                $sequence = intval($parts[2]) + 1;
-            }
+            // Extract last 5 characters (sequence) from format MM-YYYY-XXXXX
+            $lastSequence = substr($lastSO->SO_Num, -5);
+            $sequence = intval($lastSequence) + 1;
         }
         
-        $seqPart = str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
-        $soNumber = $month . '-' . $year . '-' . $seqPart;
+        // Ensure uniqueness by checking if SO_Num already exists
+        do {
+            $seqPart = str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
+            $soNumber = $month . '-' . $year . '-' . $seqPart;
+            $exists = DB::table('so')->where('SO_Num', $soNumber)->exists();
+            if ($exists) {
+                $sequence++;
+            }
+        } while ($exists);
 
         // Fetch customer data from database
         $customerData = DB::table('CUSTOMER')->where('CODE', $validated['customer_code'])->first();
@@ -199,13 +205,15 @@ class SalesOrderController extends Controller
             'updated_at' => now(),
         ];
 
-        // Upsert by SO_Num
-        $exists = DB::table('so')->where('SO_Num', $soNumber)->exists();
-        if ($exists) {
-            DB::table('so')->where('SO_Num', $soNumber)->update($base);
-        } else {
-            DB::table('so')->insert($base);
-        }
+        // Always INSERT new record, NEVER update existing
+        // This ensures each sales order is unique even for same customer and master card
+        DB::table('so')->insert($base);
+        
+        Log::info('New sales order created', [
+            'so_number' => $soNumber,
+            'customer_code' => $validated['customer_code'],
+            'master_card_seq' => $validated['master_card_seq']
+        ]);
 
         return response()->json([
             'success' => true,
@@ -520,24 +528,30 @@ class SalesOrderController extends Controller
             $month = date('m');
             $year = date('Y');
             
-            // Get the last SO number for this period
+            // Get the ACTUAL last sequence number by checking the max sequence in SO_Num column
+            // SQL Server compatible: Use RIGHT() function
             $lastSO = DB::table('so')
                 ->where('MM', $month)
                 ->where('YYYY', $year)
-                ->orderBy('SO_Num', 'desc')
+                ->orderByRaw('CAST(RIGHT(SO_Num, 5) AS INT) DESC')
                 ->first();
             
             $sequence = 1;
             if ($lastSO && $lastSO->SO_Num) {
-                // Extract sequence from format MM-YYYY-XXXXX
-                $parts = explode('-', $lastSO->SO_Num);
-                if (count($parts) === 3) {
-                    $sequence = intval($parts[2]) + 1;
-                }
+                // Extract last 5 characters (sequence) from format MM-YYYY-XXXXX
+                $lastSequence = substr($lastSO->SO_Num, -5);
+                $sequence = intval($lastSequence) + 1;
             }
             
-            $seqPart = str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
-            $soNumber = $month . '-' . $year . '-' . $seqPart;
+            // Ensure uniqueness by checking if SO_Num already exists
+            do {
+                $seqPart = str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
+                $soNumber = $month . '-' . $year . '-' . $seqPart;
+                $exists = DB::table('so')->where('SO_Num', $soNumber)->exists();
+                if ($exists) {
+                    $sequence++;
+                }
+            } while ($exists);
         } else {
             $soNumber = $validated['so_number'];
         }
@@ -656,13 +670,15 @@ class SalesOrderController extends Controller
             'updated_at' => now(),
         ];
 
-        // Upsert by SO_Num in case it's already created
-        $exists = DB::table('so')->where('SO_Num', $soNumber)->exists();
-        if ($exists) {
-            DB::table('so')->where('SO_Num', $soNumber)->update($base);
-        } else {
-            DB::table('so')->insert($base);
-        }
+        // Always INSERT new record, NEVER update existing
+        // This ensures each sales order is unique even for same customer and master card
+        DB::table('so')->insert($base);
+        
+        Log::info('Legacy SO record created', [
+            'so_number' => $soNumber,
+            'customer_code' => $validated['customer_code'],
+            'master_card_seq' => $validated['master_card_seq']
+        ]);
 
         return response()->json([
             'success' => true,
@@ -704,8 +720,8 @@ class SalesOrderController extends Controller
             
             // Filter by sequence
             if ($request->has('sequence') && !empty($request->sequence) && $request->sequence !== '0') {
-                // Extract sequence from SO_Num format MM-YYYY-XXXXX
-                $query->whereRaw("SUBSTRING_INDEX(SO_Num, '-', -1) = ?", [str_pad($request->sequence, 5, '0', STR_PAD_LEFT)]);
+                // Extract sequence from SO_Num format MM-YYYY-XXXXX using SQL Server compatible RIGHT()
+                $query->whereRaw("RIGHT(SO_Num, 5) = ?", [str_pad($request->sequence, 5, '0', STR_PAD_LEFT)]);
                 Log::info('Filtering by sequence:', ['sequence' => $request->sequence]);
             }
             

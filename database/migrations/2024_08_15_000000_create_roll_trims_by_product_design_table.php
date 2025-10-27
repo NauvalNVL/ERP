@@ -25,7 +25,7 @@ class CreateRollTrimsByProductDesignTable extends Migration
             $table->timestamps();
 
             // Add a unique constraint to prevent duplicate entries
-            $table->unique(['product_id', 'product_design_id', 'flute_id'], 'roll_trim_product_design_unique');
+            $table->unique(['product_id', 'product_design_id', 'flute_code'], 'roll_trim_product_design_unique');
         });
     }
 

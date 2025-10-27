@@ -169,6 +169,7 @@
         :show="showModal"
         :designs="designs"
         :products="products"
+        :doubleClickAction="'edit'"
         :isCreating="isCreatingNewDesign"
         @close="closeModal"
         @select="onDesignSelected"

@@ -25,7 +25,7 @@ class CreateSideTrimsByProductDesignTable extends Migration
             $table->timestamps();
 
             // Add unique constraint for the combination
-            $table->unique(['product_design_id', 'product_id', 'flute_id'], 'side_trims_by_product_design_unique');
+            $table->unique(['product_design_id', 'product_id', 'flute_code'], 'side_trims_by_product_design_unique');
         });
     }
 

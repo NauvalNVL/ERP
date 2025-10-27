@@ -112,27 +112,28 @@ const selectedFlute = ref(null);
 const sortKey = ref('code');
 const sortAsc = ref(true);
 
-// Compute filtered flutes based on search query
+// Compute filtered flutes based on search query, normalizing field names
 const filteredFlutes = computed(() => {
-  let flutes = props.flutes;
-  if (searchQuery.value) {
+  // Normalize incoming objects to have { code, description }
+  const normalized = (Array.isArray(props.flutes) ? props.flutes : []).map(f => ({
+    code: f?.code ?? f?.Flute ?? f?.Flute_Code ?? '',
+    description: f?.description ?? f?.Descr ?? f?.Description ?? f?.name ?? ''
+  }));
+
+  // Filter by search query
+  const list = (() => {
+    if (!searchQuery.value) return normalized;
     const q = searchQuery.value.toLowerCase();
-    flutes = flutes.filter(flute => {
-      const searchText = [
-        flute.code,
-        flute.description,
-        flute.name
-      ].filter(Boolean).join(' ').toLowerCase();
+    return normalized.filter(flute => {
+      const searchText = [flute.code, flute.description].filter(Boolean).join(' ').toLowerCase();
       return searchText.includes(q);
     });
-  }
+  })();
 
-  // Apply sorting
-  return [...flutes].sort((a, b) => {
-    // Handle null values for sorting
-    const aVal = a[sortKey.value] || '';
-    const bVal = b[sortKey.value] || '';
-
+  // Sort
+  return [...list].sort((a, b) => {
+    const aVal = (a?.[sortKey.value] ?? '').toString();
+    const bVal = (b?.[sortKey.value] ?? '').toString();
     if (aVal < bVal) return sortAsc.value ? -1 : 1;
     if (aVal > bVal) return sortAsc.value ? 1 : -1;
     return 0;

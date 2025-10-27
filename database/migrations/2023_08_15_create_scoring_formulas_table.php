@@ -26,7 +26,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Add unique constraint for product design and paper flute combination
-            $table->unique(['product_design_id', 'paper_flute_id']);
+            $table->unique(['product_design_id', 'paper_flute_code']);
         });
     }
 

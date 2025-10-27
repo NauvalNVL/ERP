@@ -329,7 +329,7 @@ Route::middleware('auth')->group(function () {
         });
 
         // Print SO API routes
-        Route::post('/api/so-report', [SalesOrderController::class, 'getSalesOrderReport']);
+        Route::post('/api/so-report', [App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController::class, 'apiGenerateSoReport']);
         Route::get('/api/sales-order/{soNumber}/delivery-schedules', [SalesOrderController::class, 'getDeliverySchedules']);
 
         // Sales Order API routes
@@ -340,6 +340,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/api/sales-order/product-design', [SalesOrderController::class, 'saveProductDesign']);
         Route::post('/api/sales-order/delivery-schedule', [SalesOrderController::class, 'saveDeliverySchedule']);
         Route::get('/api/sales-order/{soNumber}/delivery-schedule-summary', [SalesOrderController::class, 'getDeliveryScheduleSummary']);
+        Route::get('/api/sales-orders', [SalesOrderController::class, 'getSalesOrders']);
 
         // Delivery Order Transaction - Prepare Delivery Order (Multiple Item)
         Route::get('/delivery-order/transaction/prepare-delivery-order-multiple-item', function () {
@@ -1664,6 +1665,12 @@ Route::get('/material-management/system-requirement/inventory-setup/unlock-sku-u
 
 // Add route for CustomerWarehouseRequirement
 Route::get('/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-requirement', [CustomerWarehouseRequirementController::class, 'index'])->name('vue.warehouse-management.finished-goods.setup-maintenance.define-customer-warehouse-requirement');
+
+// Add route for Sales Orders API
+Route::get('/api/sales-orders', [SalesOrderController::class, 'getSalesOrders']);
+
+// Add route for Sales Orders API
+Route::get('/api/sales-orders', [SalesOrderController::class, 'getSalesOrders']);
 
         // Update MC Routes
         Route::prefix('update-mc')->group(function () {

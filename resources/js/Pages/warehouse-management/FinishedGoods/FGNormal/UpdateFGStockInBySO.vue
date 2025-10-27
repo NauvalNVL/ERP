@@ -117,7 +117,9 @@
                                 <div class="flex items-center mb-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">Analysis Code:</label>
                                     <input type="text" class="form-input border border-gray-300 rounded px-2 py-1 text-sm w-24" v-model="detail.analysis_code" />
-                                    <button class="ml-2 text-blue-600"><i class="fas fa-table"></i></button>
+                                    <button class="ml-2 text-blue-600" @click="openAnalysisCodeModal">
+                                        <i class="fas fa-table"></i>
+                                    </button>
                             </div>
                                 <div class="flex items-center mb-2">
                                     <label class="w-40 text-sm font-semibold text-gray-700">Entry Date:</label>
@@ -144,10 +146,22 @@
                                     <input type="text" class="form-input border border-gray-300 rounded px-2 py-1 text-sm flex-1" v-model="detail.remark" />
                                 </div>
                             </div>
+                            
+                            <!-- Save Button -->
+                            <div class="flex justify-end mt-6">
+                                <button 
+                                    type="button"
+                                    class="px-6 py-2 rounded-lg shadow-md flex items-center space-x-2 transition-all duration-300 transform active:scale-95 text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+                                    @click="saveFGStockIn"
+                                >
+                                    <i class="fas fa-save"></i>
+                                    <span>Save</span>
+                                </button>
+                            </div>
                         </div>
-                                            </div>
-
-                                            </div>
+                    </div>
+                </div>
+                
                 <!-- Quick Tips -->
                 <div class="lg:col-span-1">
                     <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 relative overflow-hidden">
@@ -202,6 +216,11 @@
             @sort-by-so="sortSalesOrders('so_number')"
             @sort-by-customer="sortSalesOrders('customer_name')"
         />
+        <AnalysisCodeModal
+            :show="isAnalysisCodeModalOpen"
+            @close="closeAnalysisCodeModal"
+            @select-analysis-code="handleAnalysisCodeSelect"
+        />
     </AppLayout>
 </template>
 
@@ -210,14 +229,42 @@ import { ref, reactive } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import SalesOrderModal from '@/Components/SalesOrderModal.vue';
 import WarehouseLocationModal from '@/Components/WarehouseLocationModal.vue';
+import AnalysisCodeModal from '@/Components/AnalysisCodeModal.vue';
 import axios from 'axios';
 
+// Get current date for the period
+const getCurrentPeriod = () => {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    return `${month}/${year}`;
+};
+
 const form = reactive({
-    current_period: '06/2025',
+    current_period: getCurrentPeriod(),
     so_number: ''
 });
 
+// Simple in-memory product cache: { [product_code]: { code, name, description } }
+const productsIndex = ref({});
+const ensureProductsLoaded = async () => {
+    if (Object.keys(productsIndex.value).length > 0) return;
+    try {
+        const resp = await axios.get('/api/products');
+        if (Array.isArray(resp.data)) {
+            const idx = {};
+            resp.data.forEach(p => {
+                if (p?.product_code) idx[p.product_code] = p;
+            });
+            productsIndex.value = idx;
+        }
+    } catch (e) {
+        console.warn('Failed to load products for description mapping', e);
+    }
+};
+
 const isModalOpen = ref(false);
+const isAnalysisCodeModalOpen = ref(false);
 const salesOrders = ref([]);
 const showDetailForm = ref(false);
 
@@ -269,8 +316,23 @@ const sortWarehouseLocations = (key) => {
     });
 };
 
-const openSalesOrderModal = () => {
-    fetchSalesOrders();
+// Analysis Code Modal Functions
+const openAnalysisCodeModal = () => {
+    console.log('Opening Analysis Code Modal');
+    isAnalysisCodeModalOpen.value = true;
+};
+const closeAnalysisCodeModal = () => {
+    console.log('Closing Analysis Code Modal');
+    isAnalysisCodeModalOpen.value = false;
+};
+const handleAnalysisCodeSelect = (analysisCode) => {
+    console.log('Selected Analysis Code:', analysisCode);
+    detail.analysis_code = analysisCode.code;
+    closeAnalysisCodeModal();
+};
+
+const openSalesOrderModal = async () => {
+    await fetchSalesOrders();
     isModalOpen.value = true;
 };
 
@@ -280,6 +342,88 @@ const closeSalesOrderModal = () => {
 
 const fetchSalesOrders = async () => {
     try {
+        // Fetch sales orders from the API
+        const response = await axios.get('/api/sales-orders');
+        
+        if (response.data.success) {
+            // Transform the data to match the expected format for the SalesOrderModal
+            salesOrders.value = response.data.data.map(order => ({
+                so_number: order.so_number,
+                customer_po: order.customer_po_number || '',
+                ac_number: order.customer_code || '',
+                mcs_number: order.master_card_seq || '',
+                status: order.status || '',
+                d_location: order.delivery_location || '',
+                customer_name: order.customer_name || '',
+                model: order.master_card_model || '',
+                order_mode: '0-Order by Customer + Deliver & Invoice to Customer',
+                salesperson_code: order.salesperson_code || '',
+                salesperson_name: '', // Would need to fetch this separately if needed
+                order_group: order.order_group || 'Sales',
+                order_type: order.order_type || 'S1',
+                product: order.product || '',
+                product_desc: '', // Would need to fetch this separately if needed
+                order_status: order.status || '',
+                p_design: order.p_design || '',
+                uom: order.uom || '',
+                order_quantity: order.order_quantity || 0
+            }));
+        } else {
+            // Fallback to sample data if API fails
+            salesOrders.value = [
+                {
+                    so_number: '06-2025-02271',
+                    customer_po: 'KOS2250600806',
+                    ac_number: '000506-10',
+                    mcs_number: 'OL-0000172-4',
+                    status: 'Completed',
+                    d_location: 'Same',
+                    customer_name: 'PT. SELALU CINTA INDONESIA',
+                    model: '183156-19SBP14',
+                    order_mode: '0-Order by Customer + Deliver & Invoice to Customer',
+                    salesperson_code: 'S129',
+                    salesperson_name: 'MULTI NATIONAL COMPANY DIA',
+                    order_group: 'Sales',
+                    order_type: 'S1',
+                    product: '017',
+                    product_desc: 'OFFSET',
+                    order_status: 'Completed'
+                },
+                {
+                    so_number: '06-2025-02270',
+                    customer_po: '250010920P',
+                    ac_number: '000541-02',
+                    mcs_number: 'DP-000009',
+                    status: 'Outs',
+                    d_location: 'Same',
+                    customer_name: 'ABC Electronics Inc.',
+                    model: '183156-20SBP15',
+                    order_mode: '0-Order by Customer + Deliver & Invoice to Customer',
+                    salesperson_code: 'S130',
+                    salesperson_name: 'ANOTHER SALES COMPANY',
+                    order_group: 'Sales',
+                    order_type: 'S1'
+                },
+                {
+                    so_number: '06-2025-02268',
+                    customer_po: 'SO PRODUKSI NIKE',
+                    ac_number: '000506',
+                    mcs_number: '0063923',
+                    status: 'Outs',
+                    d_location: 'Same',
+                    customer_name: 'NIKE PRODUCTION',
+                    model: '183156-21SBP16',
+                    order_mode: '0-Order by Customer + Deliver & Invoice to Customer',
+                    salesperson_code: 'S131',
+                    salesperson_name: 'NIKE SALES TEAM',
+                    order_group: 'Sales',
+                    order_type: 'S1'
+                }
+            ];
+        }
+    } catch (err) {
+        console.error('Error fetching sales orders:', err);
+        // Fallback to sample data if API fails
         salesOrders.value = [
             {
                 so_number: '06-2025-02271',
@@ -330,28 +474,89 @@ const fetchSalesOrders = async () => {
                 order_type: 'S1'
             }
         ];
-    } catch (err) {
-        // handle error
     }
 };
 
-const handleSalesOrderSelect = (salesOrder) => {
+const handleSalesOrderSelect = async (salesOrder) => {
     form.so_number = salesOrder.so_number;
-    // Pre-fill detail form fields from selected SO
-    detail.current_period = form.current_period;
-    detail.so_number = salesOrder.so_number;
-    detail.customer = salesOrder.customer_name;
-    detail.mcard_seq = salesOrder.ac_number;
-    detail.product = salesOrder.product || '';
-    detail.product_desc = salesOrder.product_desc || '';
-    detail.model = salesOrder.model;
-    detail.order_status = salesOrder.order_status || salesOrder.status || '';
-    detail.analysis_code = '';
-    detail.entry_date = '';
-    detail.entry_ref = '';
-    detail.set_qty = '';
-    detail.whse_location = '';
-    detail.remark = '';
+    
+    // Fetch detailed sales order data to get product information
+    try {
+        const response = await axios.get(`/api/sales-order/${salesOrder.so_number}/detail`);
+        
+        if (response.data.success) {
+            const orderData = response.data.data;
+            
+            // Pre-fill detail form fields from selected SO
+            detail.current_period = form.current_period;
+            detail.so_number = salesOrder.so_number;
+            detail.customer = salesOrder.customer_name;
+            // Use MCS (Master Card Sequence) if provided; fallback to account code
+            detail.mcard_seq = salesOrder.mcs_number || salesOrder.ac_number || '';
+            detail.product = salesOrder.product || '';
+            detail.product_desc = orderData.item_details?.pd || salesOrder.product_desc || '';
+            detail.model = salesOrder.model;
+            detail.order_status = salesOrder.order_status || salesOrder.status || '';
+            detail.analysis_code = '';
+            detail.entry_date = '';
+            detail.entry_ref = '';
+            detail.set_qty = '';
+            detail.whse_location = '';
+            detail.remark = '';
+
+            // If product description is still empty, try to resolve from product master
+            if (!detail.product_desc && detail.product) {
+                await ensureProductsLoaded();
+                const pm = productsIndex.value[detail.product];
+                if (pm) {
+                    // Prefer name/description provided by products API
+                    detail.product_desc = pm.name || pm.description || '';
+                }
+            }
+        } else {
+            // Fallback to basic data if detail fetch fails
+            detail.current_period = form.current_period;
+            detail.so_number = salesOrder.so_number;
+            detail.customer = salesOrder.customer_name;
+            detail.mcard_seq = salesOrder.mcs_number || salesOrder.ac_number || '';
+            detail.product = salesOrder.product || '';
+            detail.product_desc = salesOrder.product_desc || '';
+            detail.model = salesOrder.model;
+            detail.order_status = salesOrder.order_status || salesOrder.status || '';
+            detail.analysis_code = '';
+            detail.entry_date = '';
+            detail.entry_ref = '';
+            detail.set_qty = '';
+            detail.whse_location = '';
+            detail.remark = '';
+
+            if (!detail.product_desc && detail.product) {
+                await ensureProductsLoaded();
+                const pm = productsIndex.value[detail.product];
+                if (pm) {
+                    detail.product_desc = pm.name || pm.description || '';
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching sales order details:', error);
+        // Fallback to basic data if detail fetch fails
+        detail.current_period = form.current_period;
+        detail.so_number = salesOrder.so_number;
+        detail.customer = salesOrder.customer_name;
+        detail.mcard_seq = salesOrder.ac_number;
+        detail.product = salesOrder.product || '';
+        detail.product_desc = salesOrder.product_desc || '';
+        detail.model = salesOrder.model;
+        detail.order_status = salesOrder.order_status || salesOrder.status || '';
+        detail.analysis_code = '';
+        detail.entry_date = '';
+        detail.entry_ref = '';
+        detail.set_qty = '';
+        detail.whse_location = '';
+        detail.remark = '';
+    }
+    
     showDetailForm.value = false;
     closeSalesOrderModal();
 };
@@ -365,8 +570,75 @@ const sortSalesOrders = (key) => {
 };
 
 const proceed = () => {
+    // Update current period to ensure it's always current
+    form.current_period = getCurrentPeriod();
+    
     // Show the detail form below
     showDetailForm.value = true;
+};
+
+// Save FG Stock In data
+const saveFGStockIn = async () => {
+    try {
+        // Update current period before saving
+        const currentPeriod = getCurrentPeriod();
+        detail.current_period = currentPeriod;
+
+        // Basic front-end validation to avoid 422 errors
+        const errors = [];
+        if (!detail.so_number) errors.push('Sales Order# is required');
+        if (!detail.customer) errors.push('Customer is required');
+        if (!detail.mcard_seq) errors.push('M/Card Seq# is required');
+        if (!detail.product) errors.push('Product is required');
+        if (!detail.product_desc) errors.push('Product Description is required');
+        if (!detail.model) errors.push('Model is required');
+        if (!detail.order_status) errors.push('Order Status is required');
+        const qty = detail.set_qty !== '' && detail.set_qty !== null && detail.set_qty !== undefined ? Number(detail.set_qty) : 0;
+        if (Number.isNaN(qty) || qty < 0) errors.push('Set Quantity must be a valid number');
+        if (errors.length) {
+            alert('Please fix the following before saving:\n- ' + errors.join('\n- '));
+            return;
+        }
+        
+        // Normalize payload to satisfy backend validation
+        const payload = {
+            current_period: currentPeriod,
+            so_number: detail.so_number || '',
+            customer: detail.customer || '',
+            mcard_seq: detail.mcard_seq || '',
+            product: detail.product || '',
+            product_desc: detail.product_desc || '',
+            model: detail.model || '',
+            order_status: detail.order_status || '',
+            analysis_code: detail.analysis_code || null,
+            entry_date: detail.entry_date && detail.entry_date.trim() !== '' ? detail.entry_date : null,
+            entry_ref: detail.entry_ref || null,
+            set_qty: qty,
+            whse_location: detail.whse_location || null,
+            remark: detail.remark || null
+        };
+
+        const response = await axios.post('/api/fg-stock-in', payload);
+
+        if (response.data.success) {
+            alert('FG Stock In record saved successfully!');
+            // Reset form or redirect as needed
+        } else {
+            alert('Failed to save FG Stock In record: ' + response.data.message);
+        }
+    } catch (error) {
+        // Improved diagnostics
+        const status = error?.response?.status;
+        const data = error?.response?.data;
+        console.error('Error saving FG Stock In record:', { status, data, error });
+        let message = 'An error occurred while saving the FG Stock In record.';
+        if (data?.message) message += `\n${data.message}`;
+        if (data?.errors) {
+            const serverErrors = Object.entries(data.errors).map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`);
+            if (serverErrors.length) message += `\n- ${serverErrors.join('\n- ')}`;
+        }
+        alert(message);
+    }
 };
 </script>
 
@@ -374,4 +646,4 @@ const proceed = () => {
 .text-shadow {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-</style> 
+</style>

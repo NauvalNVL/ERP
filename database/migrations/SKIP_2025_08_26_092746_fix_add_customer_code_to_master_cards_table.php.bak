@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('master_cards', function (Blueprint $table) {
-            // Check if customer_code column doesn't exist, then add it
-            if (!Schema::hasColumn('master_cards', 'customer_code')) {
-                $table->string('customer_code', 20)->nullable()->after('mc_seq');
-                
-                // Add index for better performance (without foreign key for now)
-                $table->index('customer_code');
-            }
-        });
+        if (Schema::hasTable('master_cards')) {
+            Schema::table('master_cards', function (Blueprint $table) {
+                // Check if customer_code column doesn't exist, then add it
+                if (!Schema::hasColumn('master_cards', 'customer_code')) {
+                    $table->string('customer_code', 20)->nullable()->after('mc_seq');
+                    
+                    // Add index for better performance (without foreign key for now)
+                    $table->index('customer_code');
+                }
+            });
+        }
     }
 
     /**
@@ -27,14 +29,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('master_cards', function (Blueprint $table) {
-            if (Schema::hasColumn('master_cards', 'customer_code')) {
-                // Drop index
-                $table->dropIndex(['customer_code']);
-                
-                // Drop column
-                $table->dropColumn('customer_code');
-            }
-        });
+        if (Schema::hasTable('master_cards')) {
+            Schema::table('master_cards', function (Blueprint $table) {
+                if (Schema::hasColumn('master_cards', 'customer_code')) {
+                    // Drop index
+                    $table->dropIndex(['customer_code']);
+                    
+                    // Drop column
+                    $table->dropColumn('customer_code');
+                }
+            });
+        }
     }
 };
