@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Color;
-use App\Models\ColorGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -22,43 +21,51 @@ class ColorController extends Controller
     public function index(Request $request)
     {
         try {
-            if ($request->has('search')) {
-                $searchTerm = $request->search;
-                $colors = DB::table('colors')
-                    ->where('color_id', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('color_name', 'like', '%' . $searchTerm . '%')
-                    ->orderBy('color_id', 'asc')
-                    ->get();
-            } else {
-                // Get all colors matching the seed data structure
-                $colors = DB::table('colors')
-                    ->select([
-                        'color_id',
-                        'color_name',
-                        'origin',
-                        'color_group_id',
-                        'cg_type'
-                    ])
-                    ->orderBy('color_id', 'asc')
-                    ->get();
-            }
+            // Get only colors (not color groups) from COLOR table
+            $colors = Color::whereNotNull('GroupCode')
+                ->whereRaw('GroupCode != Color_Code')
+                ->orderBy('Color_Code', 'asc')
+                ->get();
             
-            $colorGroups = ColorGroup::all();
+            // Get color groups for dropdown
+            $colorGroups = Color::whereNull('GroupCode')
+                ->orWhereRaw('GroupCode = Color_Code')
+                ->orderBy('Color_Code', 'asc')
+                ->get();
             
-            // If no data exists, automatically seed the data
-            if ($colors->isEmpty()) {
+            // If no data exists, seed sample data
+            if ($colors->isEmpty() && $colorGroups->isEmpty()) {
                 $this->seedData();
-                $colors = DB::table('colors')
-                    ->select([
-                        'color_id',
-                        'color_name',
-                        'origin',
-                        'color_group_id',
-                        'cg_type'
-                    ])
-                    ->orderBy('color_id', 'asc')
+                
+                $colors = Color::whereNotNull('GroupCode')
+                    ->whereRaw('GroupCode != Color_Code')
+                    ->orderBy('Color_Code', 'asc')
+                    ->get();
+                    
+                $colorGroups = Color::whereNull('GroupCode')
+                    ->orWhereRaw('GroupCode = Color_Code')
+                    ->orderBy('Color_Code', 'asc')
                     ->get();
             }
+            
+            // Transform data to match Vue component expected format
+            $colorsTransformed = $colors->map(function($color) {
+                return [
+                    'color_id' => $color->Color_Code,
+                    'color_name' => $color->Color_Name,
+                    'color_group_id' => $color->GroupCode,
+                    'cg_type' => $color->Group,
+                    'origin' => 'ID' // Default value
+                ];
+            });
+            
+            $colorGroupsTransformed = $colorGroups->map(function($group) {
+                return [
+                    'cg' => $group->Color_Code,
+                    'cg_name' => $group->Color_Name,
+                    'cg_type' => $group->Group
+                ];
+            });
             
             // For debugging
             if ($colors->isEmpty()) {
@@ -67,9 +74,12 @@ class ColorController extends Controller
                 Log::info('Found ' . $colors->count() . ' colors in the database');
             }
             
-            // Return JSON if requested
-            if ($request->wantsJson() || $request->ajax()) {
-                return response()->json($colors);
+            // Only return JSON for explicit API requests
+            if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
+                return response()->json([
+                    'colors' => $colorsTransformed,
+                    'color_groups' => $colorGroupsTransformed
+                ]);
             }
             
             return view('sales-management.system-requirement.system-requirement.standard-requirement.color', [
@@ -79,17 +89,18 @@ class ColorController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in ColorController@index: ' . $e->getMessage());
             
-            if ($request->wantsJson() || $request->ajax()) {
+            // Only return JSON for explicit API requests
+            if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json([
                     'error' => true,
-                    'message' => 'Error loading data from database: ' . $e->getMessage()
+                    'message' => 'Error displaying color data: ' . $e->getMessage()
                 ], 500);
             }
             
             return view('sales-management.system-requirement.system-requirement.standard-requirement.color', [
                 'colors' => [],
                 'colorGroups' => [],
-                'error' => 'Terjadi kesalahan dalam menampilkan data warna: ' . $e->getMessage()
+                'error' => 'Error displaying color data'
             ]);
         }
     }
@@ -101,7 +112,9 @@ class ColorController extends Controller
      */
     public function create()
     {
-        $colorGroups = ColorGroup::all();
+        $colorGroups = Color::whereNull('GroupCode')
+            ->orWhereRaw('GroupCode = Color_Code')
+            ->get();
         return view('sales-management.system-requirement.system-requirement.standard-requirement.color', compact('colorGroups'));
     }
 
@@ -117,10 +130,9 @@ class ColorController extends Controller
             Log::info('Creating new color with data:', $request->all());
 
             $validator = Validator::make($request->all(), [
-                'color_id' => 'required|unique:colors|max:5',
-                'color_name' => 'required|max:100',
-                'color_group_id' => 'required|max:5',
-                'origin' => 'nullable|max:2',
+                'color_id' => 'required|unique:COLOR,Color_Code|max:15',
+                'color_name' => 'required|max:150',
+                'color_group_id' => 'required|max:15',
                 'cg_type' => 'required|max:50'
             ]);
 
@@ -137,31 +149,30 @@ class ColorController extends Controller
                 return back()->withErrors($validator)->withInput();
             }
 
-            // Escape potentially harmful characters in string inputs
-            $colorId = trim($request->color_id);
-            $colorName = trim($request->color_name);
-            $origin = trim($request->origin);
-            $colorGroupId = trim($request->color_group_id);
-            $cgType = trim($request->cg_type);
-
-            $color = new Color();
-            $color->color_id = $colorId;
-            $color->color_name = $colorName;
-            $color->color_group_id = $colorGroupId;
-            $color->origin = $origin;
-            $color->cg_type = $cgType;
-            $color->save();
-
-            // Get the complete color data to return
-            $newColor = DB::table('colors')->where('color_id', $colorId)->first();
+            // Transform Vue field names to database column names
+            $color = Color::create([
+                'Color_Code' => trim($request->color_id),
+                'Color_Name' => trim($request->color_name),
+                'GroupCode' => trim($request->color_group_id),
+                'Group' => trim($request->cg_type)
+            ]);
             
-            Log::info('Color created successfully:', ['color_id' => $colorId]);
+            Log::info('Color created successfully:', ['Color_Code' => $color->Color_Code]);
+            
+            // Transform back to Vue format for response
+            $colorResponse = [
+                'color_id' => $color->Color_Code,
+                'color_name' => $color->Color_Name,
+                'color_group_id' => $color->GroupCode,
+                'cg_type' => $color->Group,
+                'origin' => 'ID'
+            ];
             
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Color berhasil ditambahkan',
-                    'data' => $newColor
+                    'data' => $colorResponse
                 ]);
             }
 
@@ -213,9 +224,8 @@ class ColorController extends Controller
             Log::info('Request data:', $request->all());
 
             $validator = Validator::make($request->all(), [
-                'color_name' => 'required|string|max:100',
-                'origin' => 'required|string|max:2',
-                'color_group_id' => 'required|string|max:5',
+                'color_name' => 'required|string|max:150',
+                'color_group_id' => 'required|string|max:15',
                 'cg_type' => 'required|string|max:50',
             ]);
 
@@ -227,8 +237,8 @@ class ColorController extends Controller
                 ], 422);
             }
 
-            // Find the color using DB facade since we're using color_id as primary key
-            $color = DB::table('colors')->where('color_id', $color_id)->first();
+            // Find color using Color model with correct primary key
+            $color = Color::where('Color_Code', $color_id)->first();
             
             if (!$color) {
                 Log::warning('Color not found with ID: ' . $color_id);
@@ -238,43 +248,28 @@ class ColorController extends Controller
                 ], 404);
             }
 
-            // Escape potentially harmful characters in string inputs
-            $colorName = trim($request->color_name);
-            $origin = trim($request->origin);
-            $colorGroupId = trim($request->color_group_id);
-            $cgType = trim($request->cg_type);
+            // Update the color with transformed field names
+            $color->update([
+                'Color_Name' => trim($request->color_name),
+                'GroupCode' => trim($request->color_group_id),
+                'Group' => trim($request->cg_type)
+            ]);
 
-            // Update the color using DB facade
-            $updated = DB::table('colors')
-                ->where('color_id', $color_id)
-                ->update([
-                    'color_name' => $colorName,
-                    'origin' => $origin,
-                    'color_group_id' => $colorGroupId,
-                    'cg_type' => $cgType,
-                    'updated_at' => now()
-                ]);
-
-            if (!$updated) {
-                Log::warning('No changes made to color with ID: ' . $color_id);
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tidak ada perubahan data'
-                ], 400);
-            }
-
-            // Get the updated color data
-            $updatedColor = DB::table('colors')->where('color_id', $color_id)->first();
-
-            // Update the seeder file
-            $this->updateSeederFile($updatedColor);
-
-            Log::info('Color updated successfully:', ['color_id' => $color_id]);
+            Log::info('Color updated successfully:', ['Color_Code' => $color_id]);
+            
+            // Transform back to Vue format for response
+            $colorResponse = [
+                'color_id' => $color->Color_Code,
+                'color_name' => $color->Color_Name,
+                'color_group_id' => $color->GroupCode,
+                'cg_type' => $color->Group,
+                'origin' => 'ID'
+            ];
             
             return response()->json([
                 'success' => true,
                 'message' => 'Color berhasil diperbarui',
-                'data' => $updatedColor
+                'data' => $colorResponse
             ]);
 
         } catch (\Exception $e) {
@@ -353,9 +348,11 @@ class ColorController extends Controller
     public function destroy($color_id)
     {
         try {
-            $affected = DB::table('colors')->where('color_id', $color_id)->delete();
+            $color = Color::where('Color_Code', $color_id)->first();
             
-            if ($affected) {
+            if ($color) {
+                $color->delete();
+                
                 if (request()->wantsJson() || request()->ajax()) {
                     return response()->json([
                         'success' => true,
@@ -396,23 +393,40 @@ class ColorController extends Controller
     public function vueIndex()
     {
         try {
-            // Get all colors matching the seed data structure
-            $colors = DB::table('colors')
-                ->select([
-                    'color_id',
-                    'color_name',
-                    'origin',
-                    'color_group_id',
-                    'cg_type'
-                ])
-                ->orderBy('color_id', 'asc')
+            // Get only colors (not color groups) from COLOR table
+            $colors = Color::whereNotNull('GroupCode')
+                ->whereRaw('GroupCode != Color_Code')
+                ->orderBy('Color_Code', 'asc')
                 ->get();
             
-            $colorGroups = ColorGroup::all();
+            // Get color groups for dropdown
+            $colorGroups = Color::whereNull('GroupCode')
+                ->orWhereRaw('GroupCode = Color_Code')
+                ->orderBy('Color_Code', 'asc')
+                ->get();
+            
+            // Transform data to match Vue component expected format
+            $colorsTransformed = $colors->map(function($color) {
+                return [
+                    'color_id' => $color->Color_Code,
+                    'color_name' => $color->Color_Name,
+                    'color_group_id' => $color->GroupCode,
+                    'cg_type' => $color->Group,
+                    'origin' => 'ID' // Default value
+                ];
+            });
+            
+            $colorGroupsTransformed = $colorGroups->map(function($group) {
+                return [
+                    'cg' => $group->Color_Code,
+                    'cg_name' => $group->Color_Name,
+                    'cg_type' => $group->Group
+                ];
+            });
             
             return Inertia::render('sales-management/system-requirement/standard-requirement/color', [
-                'colors' => $colors,
-                'colorGroups' => $colorGroups,
+                'colors' => $colorsTransformed,
+                'colorGroups' => $colorGroupsTransformed,
                 'header' => 'Color Management'
             ]);
         } catch (\Exception $e) {
@@ -434,8 +448,8 @@ class ColorController extends Controller
     public function viewAndPrint()
     {
         // Ambil semua data warna, urutkan berdasarkan nama
-        // Eager load ColorGroup
-        $colors = Color::with('colorGroup')->orderBy('color_name')->get(); 
+        // Eager load Color Group relationship
+        $colors = Color::with('colorGroup')->orderBy('Color_Name')->get(); 
         return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintcolor', compact('colors')); 
     }
     
@@ -452,7 +466,30 @@ class ColorController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ColorController@vueViewAndPrint: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to load color data for printing'], 500);
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-color', [
+                'header' => 'View & Print Colors',
+                'error' => 'Failed to load color data for printing'
+            ]);
+        }
+    }
+
+    /**
+     * Display View & Print page for Color Groups.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrintColorGroups()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-color-group', [
+                'header' => 'View & Print Color Groups'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorController@vueViewAndPrintColorGroups: ' . $e->getMessage());
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-color-group', [
+                'header' => 'View & Print Color Groups',
+                'error' => 'Failed to load color group data for printing'
+            ]);
         }
     }
 
@@ -464,30 +501,40 @@ class ColorController extends Controller
     private function seedData()
     {
         try {
-            // Sample color data
-            $sampleData = [
-                ['color_id' => 'BK01', 'color_name' => 'Black Matte', 'origin' => 'ID', 'color_group_id' => 'BK', 'cg_type' => 'X-Flexo'],
-                ['color_id' => 'BK02', 'color_name' => 'Black Glossy', 'origin' => 'ID', 'color_group_id' => 'BK', 'cg_type' => 'X-Flexo'],
-                ['color_id' => 'RD01', 'color_name' => 'Red Standard', 'origin' => 'ID', 'color_group_id' => 'R', 'cg_type' => 'X-Flexo'],
-                ['color_id' => 'RD02', 'color_name' => 'Red Bright', 'origin' => 'ID', 'color_group_id' => 'R', 'cg_type' => 'X-Flexo'],
-                ['color_id' => 'BL01', 'color_name' => 'Blue Navy', 'origin' => 'ID', 'color_group_id' => 'B', 'cg_type' => 'X-Flexo'],
-                ['color_id' => 'BL02', 'color_name' => 'Blue Sky', 'origin' => 'ID', 'color_group_id' => 'B', 'cg_type' => 'X-Flexo'],
-                ['color_id' => 'GR01', 'color_name' => 'Green Forest', 'origin' => 'ID', 'color_group_id' => 'G', 'cg_type' => 'X-Flexo'],
-                ['color_id' => 'GR02', 'color_name' => 'Green Lime', 'origin' => 'ID', 'color_group_id' => 'G', 'cg_type' => 'X-Flexo'],
-                ['color_id' => 'YL01', 'color_name' => 'Yellow Standard', 'origin' => 'ID', 'color_group_id' => 'Y', 'cg_type' => 'X-Flexo'],
-                ['color_id' => 'WT01', 'color_name' => 'White Standard', 'origin' => 'ID', 'color_group_id' => 'W', 'cg_type' => 'X-Flexo'],
+            // 1. Seed Color Groups first (GroupCode = Color_Code for self-reference)
+            $colorGroups = [
+                ['Color_Code' => 'BK', 'Color_Name' => 'Black', 'GroupCode' => 'BK', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'R', 'Color_Name' => 'Red', 'GroupCode' => 'R', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'B', 'Color_Name' => 'Blue', 'GroupCode' => 'B', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'G', 'Color_Name' => 'Green', 'GroupCode' => 'G', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'Y', 'Color_Name' => 'Yellow', 'GroupCode' => 'Y', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'W', 'Color_Name' => 'White', 'GroupCode' => 'W', 'Group' => 'X-Flexo'],
             ];
 
-            foreach ($sampleData as $data) {
-                // Skip if color already exists
-                if (DB::table('colors')->where('color_id', $data['color_id'])->exists()) {
-                    continue;
+            foreach ($colorGroups as $group) {
+                if (!Color::where('Color_Code', $group['Color_Code'])->exists()) {
+                    Color::create($group);
                 }
+            }
 
-                DB::table('colors')->insert(array_merge($data, [
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]));
+            // 2. Seed individual Colors (GroupCode references parent Color Group)
+            $colors = [
+                ['Color_Code' => 'BK01', 'Color_Name' => 'Black Matte', 'GroupCode' => 'BK', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'BK02', 'Color_Name' => 'Black Glossy', 'GroupCode' => 'BK', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'RD01', 'Color_Name' => 'Red Standard', 'GroupCode' => 'R', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'RD02', 'Color_Name' => 'Red Bright', 'GroupCode' => 'R', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'BL01', 'Color_Name' => 'Blue Navy', 'GroupCode' => 'B', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'BL02', 'Color_Name' => 'Blue Sky', 'GroupCode' => 'B', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'GR01', 'Color_Name' => 'Green Forest', 'GroupCode' => 'G', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'GR02', 'Color_Name' => 'Green Lime', 'GroupCode' => 'G', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'YL01', 'Color_Name' => 'Yellow Standard', 'GroupCode' => 'Y', 'Group' => 'X-Flexo'],
+                ['Color_Code' => 'WT01', 'Color_Name' => 'White Standard', 'GroupCode' => 'W', 'Group' => 'X-Flexo'],
+            ];
+
+            foreach ($colors as $color) {
+                if (!Color::where('Color_Code', $color['Color_Code'])->exists()) {
+                    Color::create($color);
+                }
             }
         } catch (\Exception $e) {
             Log::error('Error seeding color data: ' . $e->getMessage());
@@ -513,6 +560,187 @@ class ColorController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to seed colors data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // ==================== COLOR GROUP METHODS ====================
+
+    /**
+     * Display a listing of color groups
+     */
+    public function indexColorGroups(Request $request)
+    {
+        try {
+            // Get only color groups from COLOR table
+            $colorGroups = Color::whereNull('GroupCode')
+                ->orWhereRaw('GroupCode = Color_Code')
+                ->orderBy('Color_Code', 'asc')
+                ->get();
+            
+            // Transform data to match Vue component expected format
+            $colorGroupsTransformed = $colorGroups->map(function($group) {
+                return [
+                    'cg' => $group->Color_Code,
+                    'cg_name' => $group->Color_Name,
+                    'cg_type' => $group->Group
+                ];
+            });
+            
+            // Only return JSON for explicit API requests (with /api/ prefix or X-Requested-With header)
+            // Inertia requests should always get Inertia response
+            if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
+                return response()->json($colorGroupsTransformed);
+            }
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/color-group', [
+                'colorGroups' => $colorGroupsTransformed,
+                'header' => 'Color Group Management'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ColorController@indexColorGroups: ' . $e->getMessage());
+            
+            // Only return JSON for explicit API requests
+            if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Error loading color groups: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/color-group', [
+                'colorGroups' => [],
+                'error' => 'Error loading color groups'
+            ]);
+        }
+    }
+
+    /**
+     * Store a new color group
+     */
+    public function storeColorGroup(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'cg' => 'required|unique:COLOR,Color_Code|max:15',
+                'cg_name' => 'required|max:150',
+                'cg_type' => 'required|max:50'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            // Create color group with GroupCode = Color_Code (self-reference)
+            $colorGroup = Color::create([
+                'Color_Code' => $request->cg,
+                'Color_Name' => $request->cg_name,
+                'GroupCode' => $request->cg, // Self-reference indicates color group
+                'Group' => $request->cg_type
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Color group created successfully',
+                'data' => $colorGroup
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error creating color group: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating color group: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update a color group
+     */
+    public function updateColorGroup(Request $request, $code)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'cg_name' => 'required|max:150',
+                'cg_type' => 'required|max:50'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $colorGroup = Color::where('Color_Code', $code)->first();
+            
+            if (!$colorGroup) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Color group not found'
+                ], 404);
+            }
+
+            // Update color group
+            $colorGroup->update([
+                'Color_Name' => $request->cg_name,
+                'Group' => $request->cg_type
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Color group updated successfully',
+                'data' => $colorGroup
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating color group: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating color group: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete a color group
+     */
+    public function destroyColorGroup($code)
+    {
+        try {
+            $colorGroup = Color::where('Color_Code', $code)->first();
+            
+            if (!$colorGroup) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Color group not found'
+                ], 404);
+            }
+
+            // Check if any colors use this group
+            $colorsUsingGroup = Color::where('GroupCode', $code)
+                ->where('Color_Code', '!=', $code)
+                ->count();
+
+            if ($colorsUsingGroup > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot delete color group. It is being used by ' . $colorsUsingGroup . ' color(s).'
+                ], 422);
+            }
+
+            $colorGroup->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Color group deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting color group: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting color group: ' . $e->getMessage()
             ], 500);
         }
     }

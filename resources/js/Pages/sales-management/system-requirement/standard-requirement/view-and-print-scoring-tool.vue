@@ -15,7 +15,7 @@
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-print mr-2"></i> Print List
+                    <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
                 <Link href="/scoring-tool" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Scoring Tool
@@ -25,9 +25,9 @@
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
-                <input 
-                    type="text" 
-                    v-model="searchQuery" 
+                <input
+                    type="text"
+                    v-model="searchQuery"
                     class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Search scoring tools..."
                 >
@@ -51,60 +51,56 @@
                 </div>
 
                 <!-- Table Content -->
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-blue-600" style="background-color: #2563eb;">
                         <tr>
-                            <th @click="sortTable('code')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Tool Code <i :class="getSortIcon('code')"></i>
+                            <th @click="sortTable('id')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 10%;">
+                                NO. <i :class="getSortIcon('id')" class="text-xs ml-1"></i>
                             </th>
-                            <th @click="sortTable('name')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Tool Name <i :class="getSortIcon('name')"></i>
+                            <th @click="sortTable('code')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 15%;">
+                                CODE <i :class="getSortIcon('code')" class="text-xs ml-1"></i>
                             </th>
-                            <th @click="sortTable('description')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Description <i :class="getSortIcon('description')"></i>
+                            <th @click="sortTable('name')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 50%;">
+                                NAME <i :class="getSortIcon('name')" class="text-xs ml-1"></i>
                             </th>
-                            <th @click="sortTable('is_active')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Status <i :class="getSortIcon('is_active')"></i>
-                            </th>
-                            <th @click="sortTable('created_at')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Created At <i :class="getSortIcon('created_at')"></i>
-                            </th>
-                            <th @click="sortTable('updated_at')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Updated At <i :class="getSortIcon('updated_at')"></i>
+                            <th @click="sortTable('scorer_gap')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 25%;">
+                                SCORER GAP <i :class="getSortIcon('scorer_gap')" class="text-xs ml-1"></i>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="6" class="px-3 py-4 text-center text-gray-500">
+                    <tbody class="bg-white">
+                        <tr v-if="loading">
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
-                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                                 </div>
-                                <p class="mt-2">Loading scoring tool data...</p>
+                                <p class="mt-3 font-medium">Loading scoring tool data...</p>
                             </td>
                         </tr>
-                        <tr v-else-if="filteredScoringTools.length === 0" class="hover:bg-gray-50">
-                            <td colspan="6" class="px-3 py-4 text-center text-gray-500">
-                                No scoring tools found. 
+                        <tr v-else-if="filteredScoringTools.length === 0">
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
+                                <p class="font-medium text-gray-700">No scoring tools found.</p>
                                 <template v-if="searchQuery">
-                                    <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
-                                    <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
+                                    <p class="mt-2 text-sm">No results match your search query: "{{ searchQuery }}"</p>
+                                    <button @click="searchQuery = ''" class="mt-3 text-blue-500 hover:text-blue-700 hover:underline font-medium">Clear search</button>
                                 </template>
                             </td>
                         </tr>
-                        <tr v-for="(tool, index) in filteredScoringTools" :key="tool.id" 
-                            :class="{'bg-blue-50': index % 2 === 0}" 
-                            class="hover:bg-blue-100">
-                            <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">{{ tool.code || 'N/A' }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ tool.name || 'N/A' }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ tool.description || 'N/A' }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">
-                                <span :class="tool.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                    {{ tool.is_active ? 'Active' : 'Inactive' }}
-                                </span>
+                        <tr v-for="(tool, index) in filteredScoringTools" :key="tool.id"
+                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
+                            class="hover:bg-blue-200 transition-colors duration-150">
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-semibold text-gray-900">{{ index + 1 }}</div>
                             </td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(tool.created_at) }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(tool.updated_at) }}</td>
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-semibold text-gray-900">{{ tool.code || 'N/A' }}</div>
+                            </td>
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-medium text-gray-900">{{ tool.name || 'N/A' }}</div>
+                            </td>
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-medium text-gray-900">{{ formatNumber(tool.scorer_gap) }}</div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -123,13 +119,13 @@
         <!-- Print Instructions -->
         <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
             <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
-                <i class="fas fa-info-circle mr-2"></i> Print Instructions
+                <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Click the "Print List" button above to print this scoring tool list</li>
-                <li>Use landscape orientation for better results</li>
-                <li>You can search or sort data before printing</li>
-                <li>Only the table will be included in the print output</li>
+                <li>Click the "Print PDF" button above to generate and download PDF</li>
+                <li>PDF will be automatically saved in landscape orientation</li>
+                <li>You can search or sort data before exporting</li>
+                <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
         </div>
     </div>
@@ -139,6 +135,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const scoringTools = ref([]);
@@ -158,13 +156,13 @@ const fetchScoringTools = async () => {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch scoring tools');
         }
-        
+
         const data = await response.json();
-        
+
         // Handle different API response formats
         if (data.data) {
             scoringTools.value = data.data;
@@ -182,14 +180,17 @@ const fetchScoringTools = async () => {
     }
 };
 
-// Format date
-const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
+// Format number
+const formatNumber = (value) => {
+    if (value === null || value === undefined) return '0.0';
+    return Number(value).toFixed(1);
 };
 
 // Sort table
 const sortTable = (column) => {
+    // Don't sort by index (id/NO.)
+    if (column === 'id') return;
+
     if (sortColumn.value === column) {
         sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
     } else {
@@ -200,67 +201,62 @@ const sortTable = (column) => {
 
 // Get sort icon
 const getSortIcon = (column) => {
-    if (sortColumn.value !== column) {
-        return 'fas fa-sort text-gray-300';
+    // Don't show sort icon for NO. column
+    if (column === 'id') {
+        return '';
     }
-    
-    return sortDirection.value === 'asc' 
-        ? 'fas fa-sort-up text-blue-500' 
-        : 'fas fa-sort-down text-blue-500';
+
+    if (sortColumn.value !== column) {
+        return 'fas fa-sort text-gray-400';
+    }
+
+    return sortDirection.value === 'asc'
+        ? 'fas fa-sort-up text-blue-600'
+        : 'fas fa-sort-down text-blue-600';
 };
 
 // Filtered and sorted scoring tools
 const filteredScoringTools = computed(() => {
     let filtered = [...scoringTools.value];
-    
+
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(tool => 
+        filtered = filtered.filter(tool =>
             (tool.code && tool.code.toLowerCase().includes(query)) ||
-            (tool.name && tool.name.toLowerCase().includes(query)) ||
-            (tool.description && tool.description.toLowerCase().includes(query))
+            (tool.name && tool.name.toLowerCase().includes(query))
         );
     }
-    
+
     // Apply sorting
     filtered.sort((a, b) => {
         let valueA = a[sortColumn.value];
         let valueB = b[sortColumn.value];
-        
+
         // Handle null values
         if (valueA === null || valueA === undefined) valueA = '';
         if (valueB === null || valueB === undefined) valueB = '';
-        
-        // Handle boolean column
-        if (sortColumn.value === 'is_active') {
+
+        // Handle numeric column (scorer_gap)
+        if (sortColumn.value === 'scorer_gap') {
+            const numA = parseFloat(valueA) || 0;
+            const numB = parseFloat(valueB) || 0;
+
             if (sortDirection.value === 'asc') {
-                return valueA === valueB ? 0 : valueA ? -1 : 1;
+                return numA - numB;
             } else {
-                return valueA === valueB ? 0 : valueA ? 1 : -1;
+                return numB - numA;
             }
         }
-        
-        // Handle date columns
-        if (['created_at', 'updated_at'].includes(sortColumn.value)) {
-            const dateA = valueA ? new Date(valueA).getTime() : 0;
-            const dateB = valueB ? new Date(valueB).getTime() : 0;
-            
-            if (sortDirection.value === 'asc') {
-                return dateA - dateB;
-            } else {
-                return dateB - dateA;
-            }
-        }
-        
+
         // Convert to string for comparison if not already
         if (typeof valueA !== 'string') valueA = String(valueA || '');
         if (typeof valueB !== 'string') valueB = String(valueB || '');
-        
+
         // Case insensitive comparison
         valueA = valueA.toLowerCase();
         valueB = valueB.toLowerCase();
-        
+
         // Sort direction
         if (sortDirection.value === 'asc') {
             return valueA.localeCompare(valueB);
@@ -268,32 +264,94 @@ const filteredScoringTools = computed(() => {
             return valueB.localeCompare(valueA);
         }
     });
-    
+
     return filtered;
 });
 
-// Print function
+// Print function using jsPDF
 const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+    try {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-    newWin.document.write('<html><head><title>Print Scoring Tools</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('@page { size: landscape; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 4px; text-align: left; font-size: 10pt; }');
-    newWin.document.write('th { background-color: #f2f2f2; font-weight: bold; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
-    
-    newWin.document.close();
+        // Add title
+        doc.setFontSize(16);
+        doc.setTextColor(37, 99, 235); // Blue color
+        doc.text('SCORING TOOL LIST', 10, 15);
+
+        // Add subtitle
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('View and print scoring tool data', 10, 22);
+
+        // Prepare table data
+        const tableData = filteredScoringTools.value.map((tool, index) => [
+            (index + 1).toString(),
+            tool.code || 'N/A',
+            tool.name || 'N/A',
+            formatNumber(tool.scorer_gap)
+        ]);
+
+        // Add table using autoTable
+        autoTable(doc, {
+            startY: 28,
+            head: [['NO.', 'CODE', 'NAME', 'SCORER GAP']],
+            body: tableData,
+            theme: 'grid',
+            tableWidth: 'auto',
+            headStyles: {
+                fillColor: [37, 99, 235], // Blue background
+                textColor: [255, 255, 255], // White text
+                fontStyle: 'bold',
+                halign: 'center',
+                fontSize: 10
+            },
+            bodyStyles: {
+                textColor: [50, 50, 50],
+                halign: 'center',
+                fontSize: 9
+            },
+            alternateRowStyles: {
+                fillColor: [219, 234, 254] // Light blue for alternate rows
+            },
+            margin: { top: 28, left: 10, right: 10 },
+            columnStyles: {
+                0: { cellWidth: 20, halign: 'center' },   // NO.
+                1: { cellWidth: 35, halign: 'center' },   // CODE
+                2: { cellWidth: 125, halign: 'center' },  // NAME
+                3: { cellWidth: 50, halign: 'center' }    // SCORER GAP
+            }
+        });
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height;
+
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text(
+                `Total Scoring Tools: ${filteredScoringTools.value.length} | Generated: ${currentDate}`,
+                10,
+                pageHeight - 10
+            );
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                doc.internal.pageSize.width - 35,
+                pageHeight - 10
+            );
+        }
+
+        // Save PDF
+        doc.save(`scoring-tool-list-${new Date().getTime()}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    }
 };
 
 // Fetch data on component mount
@@ -317,4 +375,4 @@ onMounted(() => {
         width: 100%;
     }
 }
-</style> 
+</style>

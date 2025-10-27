@@ -29,8 +29,8 @@ class IndustryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'code' => 'required|string|max:4|unique:industries,code',
-            'name' => 'required|string|max:100',
+            'code' => 'required|string|max:5|unique:industry,code',
+            'name' => 'required|string|max:30',
         ]);
 
         $industry = Industry::create([
@@ -60,8 +60,8 @@ class IndustryController extends Controller
         $industry = Industry::findOrFail($id);
         
         $request->validate([
-            'code' => 'required|string|max:4|unique:industries,code,' . $id,
-            'name' => 'required|string|max:100',
+            'code' => 'required|string|max:5|unique:industry,code,' . $id,
+            'name' => 'required|string|max:30',
         ]);
 
         $industry->update([
@@ -126,7 +126,7 @@ class IndustryController extends Controller
     public function vueIndex()
     {
         try {
-            $industries = Industry::select('id', 'code', 'name')
+            $industries = Industry::select('code', 'name')
                 ->orderBy('code')
                 ->get();
                 
@@ -168,13 +168,18 @@ class IndustryController extends Controller
     public function apiIndex()
     {
         try {
-            $industries = Industry::orderBy('code')
+            $industries = Industry::select('code', 'name')
+                ->orderBy('code')
                 ->get();
             
-            return response()->json($industries);
+            return response()->json($industries, 200, [], JSON_PRETTY_PRINT);
         } catch (\Exception $e) {
             Log::error('Error in IndustryController@apiIndex: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to load industry data'], 500);
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'error' => 'Failed to load industry data',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 

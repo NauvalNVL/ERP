@@ -8,30 +8,40 @@ use Illuminate\Support\Facades\DB;
 
 class ColorGroupSeeder extends Seeder
 {
+    /**
+     * Seed the COLOR_GROUP table with sample data
+     * Matching CPS Enterprise 2020 structure
+     */
     public function run()
     {
-        DB::table('color_groups')->truncate(); // Bersihkan tabel sebelum seeding
-
+        // Sample color groups from CPS Enterprise 2020
         $colorGroups = [
-            ['cg' => '01', 'cg_name' => 'BLACK', 'cg_type' => 'X-Flex'],
-            ['cg' => '02', 'cg_name' => 'WHITE', 'cg_type' => 'X-Flex'],
-            ['cg' => '03', 'cg_name' => 'RED', 'cg_type' => 'X-Flex'],
-            ['cg' => '04', 'cg_name' => 'BLUE', 'cg_type' => 'X-Flex'],
-            ['cg' => '05', 'cg_name' => 'GREEN', 'cg_type' => 'X-Flex'],
-            ['cg' => '06', 'cg_name' => 'YELLOW', 'cg_type' => 'X-Flex'],
-            ['cg' => '07', 'cg_name' => 'MAGENTA', 'cg_type' => 'X-Flex'],
-            ['cg' => '08', 'cg_name' => 'CYAN', 'cg_type' => 'X-Flex'],
-            ['cg' => '09', 'cg_name' => 'ORANGE', 'cg_type' => 'C-Coating'],
-            ['cg' => '10', 'cg_name' => 'BROWN', 'cg_type' => 'S-Offset'],
-            ['cg' => '11', 'cg_name' => 'GRAY', 'cg_type' => 'S-Offset'],
-            ['cg' => '12', 'cg_name' => 'PURPLE', 'cg_type' => 'C-Coating'],
-            ['cg' => '13', 'cg_name' => 'VIOLET', 'cg_type' => 'S-Offset'],
-            ['cg' => '14', 'cg_name' => 'CREAM', 'cg_type' => 'S-Offset'],
-            ['cg' => '15', 'cg_name' => 'PANTONE', 'cg_type' => 'S-Offset']
+            ['CG' => '01', 'CG_Name' => 'BLACK', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '02', 'CG_Name' => 'WHITE', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '03', 'CG_Name' => 'RED', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '04', 'CG_Name' => 'BLUE', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '05', 'CG_Name' => 'GREEN', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '06', 'CG_Name' => 'CYAN', 'CG_Type' => 'C-Coating'],
+            ['CG' => '07', 'CG_Name' => 'MAGENTA', 'CG_Type' => 'C-Coating'],
+            ['CG' => '08', 'CG_Name' => 'YELLOW', 'CG_Type' => 'S-Offset'],
+            ['CG' => '09', 'CG_Name' => 'ORANGE', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '10', 'CG_Name' => 'YELLOW', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '11', 'CG_Name' => 'PINK', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '12', 'CG_Name' => 'GOLD', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '13', 'CG_Name' => 'GRAY', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '14', 'CG_Name' => 'BROWN', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '15', 'CG_Name' => 'VARNISH', 'CG_Type' => 'C-Coating'],
+            ['CG' => '16', 'CG_Name' => 'VIOLET', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '17', 'CG_Name' => 'PURPLE', 'CG_Type' => 'X-Flexo'],
+            ['CG' => '18', 'CG_Name' => 'SILVER', 'CG_Type' => 'S-Offset'],
+            ['CG' => 'PANTONE', 'CG_Name' => 'PANTONE', 'CG_Type' => 'S-Offset'],
         ];
 
         foreach ($colorGroups as $group) {
-            ColorGroup::create($group);
+            ColorGroup::updateOrCreate(
+                ['CG' => $group['CG']],
+                $group
+            );
         }
     }
-} 
+}

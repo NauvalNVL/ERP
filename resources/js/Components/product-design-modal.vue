@@ -6,130 +6,125 @@
         <!-- Modal Header -->
         <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
           <div class="flex items-center">
-            <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3 shadow-inner">
+            <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
               <i class="fas fa-drafting-compass"></i>
             </div>
-            <div>
-              <h3 class="text-xl font-semibold">Product Design Table</h3>
-              <p class="text-xs text-blue-100">Select a design, or create a new one.</p>
-            </div>
+            <h3 class="text-xl font-semibold">Product Design Table</h3>
           </div>
-          <div class="flex space-x-2">
-            <button @click="createNewDesign" class="px-3 py-1 bg-green-500 hover:bg-green-400 text-white rounded-md text-sm flex items-center shadow-sm">
-                <i class="fas fa-plus mr-1"></i> Add New
-            </button>
-            <button @click="$emit('close')" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px bg-red-500 hover:bg-red-600 h-8 w-8 rounded-full flex items-center justify-center">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
+          <button @click="$emit('close')" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+            <i class="fas fa-times text-xl"></i>
+          </button>
         </div>
         <!-- Modal Content -->
         <div class="p-5">
-          <div class="mb-4 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-sm">
-            <div class="flex flex-wrap items-center gap-3">
-              <div class="relative flex-grow">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                  <i class="fas fa-search"></i>
-                </span>
-                <input type="text" v-model="searchQuery" placeholder="Search by design code, name, type or product..."
-                  class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm">
-              </div>
-              <div class="flex space-x-2">
-                <button type="button" @click="searchQuery = ''" class="py-2 px-3 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm rounded-lg flex items-center">
-                  <i class="fas fa-eraser mr-1"></i> Clear
-                </button>
-                <button type="button" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg flex items-center">
-                  <i class="fas fa-filter mr-1"></i> Filter
-                </button>
-              </div>
+          <div class="mb-4">
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                <i class="fas fa-search"></i>
+              </span>
+              <input type="text" v-model="searchQuery" placeholder="Search product designs..."
+                class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
             </div>
           </div>
           <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
             <table class="w-full divide-y divide-gray-200">
               <thead class="bg-gray-50 sticky top-0">
                 <tr>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[80px]" @click="sortTable('pd_code')">Design#</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[150px]" @click="sortTable('pd_name')">Design Name</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[120px]" @click="sortTable('pd_design_type')">Design Type</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[80px]" @click="sortTable('idc')">IDC</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[80px]" @click="sortTable('product')">Product</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[70px]" @click="sortTable('joint')">Joint</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[110px]" @click="sortTable('joint_to_print')">Joint to Print</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[100px]" @click="sortTable('pcs_to_joint')">PCS to Joint</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[70px]" @click="sortTable('score')">Score</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[70px]" @click="sortTable('slot')">Slot</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[100px]" @click="sortTable('flute_style')">Flute Style</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[90px]" @click="sortTable('print_flute')">Print Flute</th>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer min-w-[110px]" @click="sortTable('input_weight')">Input Weight</th>
+                  <th @click="sortTable('pd_code')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    Design Code <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('pd_name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    Design Name <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('pd_design_type')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    Design Type <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('idc')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    IDC <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('product')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    Product <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('joint')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    Joint <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('joint_to_print')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    Joint to Print <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('pcs_to_joint')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    PCS to Joint <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('score')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    Score <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('slot')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    Slot <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('flute_style')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    Flute Style <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('print_flute')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    Print Flute <i class="fas fa-sort ml-1"></i>
+                  </th>
+                  <th @click="sortTable('input_weight')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                    Input Weight <i class="fas fa-sort ml-1"></i>
+                  </th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200 text-xs">
                 <tr v-for="design in filteredDesigns" :key="design.pd_code"
-                  :class="['hover:bg-blue-50 cursor-pointer group', selectedDesign && selectedDesign.pd_code === design.pd_code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
+                  :class="['hover:bg-blue-50 cursor-pointer', selectedDesign && selectedDesign.pd_code === design.pd_code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
                   @click="selectRow(design)"
-                  @dblclick="handleDoubleClick(design)"
-                  title="Double-click to edit this design">
-                  <td class="px-3 py-3 whitespace-nowrap font-medium text-gray-900 relative">
-                    {{ design.pd_code }}
-                    <span class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity text-blue-500">
-                      <i class="fas fa-mouse-pointer text-xs"></i>
-                    </span>
-                  </td>
-                  <td class="px-3 py-3 whitespace-nowrap text-gray-700">{{ design.pd_name }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-gray-700">{{ design.pd_design_type }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-gray-700">{{ design.idc }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap">
+                  @dblclick="handleDoubleClick(design)">
+                  <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ design.pd_code }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700 truncate">{{ design.pd_name }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.pd_design_type }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.idc }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap">
                     <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ design.product }}</span>
                   </td>
-                  <td class="px-3 py-3 whitespace-nowrap text-gray-700">{{ design.joint }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-gray-700">{{ design.joint_to_print }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-gray-700">{{ design.pcs_to_joint }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-gray-700">{{ design.score }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-gray-700">{{ design.slot }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-gray-700">{{ design.flute_style }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-gray-700">{{ design.print_flute }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-gray-700">{{ design.input_weight }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.joint }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.joint_to_print }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.pcs_to_joint }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.score }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.slot }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.flute_style }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.print_flute }}</td>
+                  <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ design.input_weight }}</td>
                 </tr>
-                <tr v-if="filteredDesigns.length === 0">
+                <tr v-if="loading">
+                  <td colspan="13" class="px-6 py-4 text-center">
+                    <div class="flex items-center justify-center">
+                      <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                      <span class="ml-2 text-gray-500">Loading data...</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-else-if="filteredDesigns.length === 0">
                   <td colspan="13" class="px-6 py-4 text-center text-gray-500">No product design data available.</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div class="mt-4 flex justify-between items-center">
-            <div class="flex items-center text-sm text-gray-500">
-              <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-              <p>{{ filteredDesigns.length }} designs found. Double-click a row to edit.</p>
-              <span v-if="selectedDesign" class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                Selected: {{ selectedDesign.pd_code }}
-              </span>
-            </div>
-            <div class="flex space-x-2">
-              <div class="dropdown relative">
-                <button type="button" class="py-2 px-3 bg-gray-100 border border-gray-300 hover:bg-gray-200 text-sm rounded-lg flex items-center">
-                  <i class="fas fa-sort mr-1"></i> Sort By <i class="fas fa-chevron-down ml-1 text-xs"></i>
-                </button>
-                <div class="absolute right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 hidden hover:block focus:block group-hover:block z-20 w-48">
-                  <div class="py-1">
-                    <button @click="sortTable('pd_code')" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      <i class="fas fa-sort-alpha-down mr-2"></i> By Design#
-                    </button>
-                    <button @click="sortByProductAndDesign()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      <i class="fas fa-layer-group mr-2"></i> By Product + Design#
-                    </button>
-                    <button @click="sortByProductName()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      <i class="fas fa-font mr-2"></i> By Design Name
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <button type="button" @click="selectAndClose(selectedDesign)" class="py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg flex items-center shadow-sm" :disabled="!selectedDesign" :class="{'opacity-50 cursor-not-allowed': !selectedDesign}">
-                <i class="fas fa-check-circle mr-2"></i>Select Design
-              </button>
-              <button type="button" @click="$emit('close')" class="py-2 px-4 bg-gray-300 hover:bg-gray-400 text-gray-800 text-sm rounded-lg flex items-center">
-                <i class="fas fa-times mr-2"></i>Cancel
-              </button>
-            </div>
+          <div class="mt-2 text-xs text-gray-500 italic">
+            <p>Click on a row to select, double-click to edit the design.</p>
+          </div>
+          <div class="mt-4 grid grid-cols-5 gap-2">
+            <button type="button" @click="sortTable('pd_code')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+              <i class="fas fa-sort mr-1"></i>By Code
+            </button>
+            <button type="button" @click="sortTable('pd_name')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+              <i class="fas fa-sort mr-1"></i>By Name
+            </button>
+            <button type="button" @click="sortTable('product')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+              <i class="fas fa-sort mr-1"></i>By Product
+            </button>
+            <button type="button" @click="selectAndEdit(selectedDesign)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px" :disabled="!selectedDesign" :class="{'opacity-50 cursor-not-allowed': !selectedDesign}">
+              <i class="fas fa-edit mr-1"></i>Select
+            </button>
+            <button type="button" @click="$emit('close')" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
+              <i class="fas fa-times mr-1"></i>Close
+            </button>
           </div>
         </div>
       </div>
@@ -447,6 +442,10 @@ const props = defineProps({
   doubleClickAction: {
     type: String,
     default: 'edit' // 'edit' or 'select'
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -521,11 +520,10 @@ function selectRow(design) {
   selectedDesign.value = design;
 }
 
-// Select and close modal
-function selectAndClose(design) {
+// Select and open edit form
+function selectAndEdit(design) {
   if (design) {
-    emit('select', design);
-    emit('close');
+    editDesign(design);
   }
 }
 
@@ -606,6 +604,7 @@ async function saveDesignChanges() {
 
         emit('data-changed');
         view.value = 'list';
+        emit('close');
     } catch (e) {
         console.error('Error saving product design:', e);
         // You might want to show an error notification here
@@ -634,6 +633,7 @@ async function deleteDesign(pdCode) {
         if (response.ok) {
             emit('data-changed');
             view.value = 'list';
+            emit('close');
         } else {
             const result = await response.json();
             throw new Error(result.message || 'Unknown error');
@@ -705,6 +705,11 @@ watch(() => props.show, (val) => {
       searchQuery.value = '';
       view.value = 'list';
     }
+  } else {
+    // Reset to list view when modal is closed
+    view.value = 'list';
+    selectedDesign.value = null;
+    searchQuery.value = '';
   }
 });
 </script>

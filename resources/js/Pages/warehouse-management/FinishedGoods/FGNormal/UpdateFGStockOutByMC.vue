@@ -130,7 +130,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, nextTick } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import CustomerAccountModal from '@/Components/CustomerAccountModal.vue';
+import CustomerAccountModal from '@/Components/customer-account-modal.vue';
 import MasterCardSearchSelectModal from '@/Components/MasterCardSearchSelectModal.vue';
 import axios from 'axios';
 

@@ -15,7 +15,7 @@
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-print mr-2"></i> Print List
+                    <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
                 <Link href="/paper-size" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Paper Sizes
@@ -51,68 +51,50 @@
                 </div>
 
                 <!-- Table Content -->
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full border-collapse table-fixed">
+                    <thead class="bg-blue-600" style="background-color: #2563eb;">
                         <tr>
-                            <th @click="sortTable('id')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                ID <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('id')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 15%;">
+                                NO. <i :class="getSortIcon('id')" class="text-xs ml-1"></i>
                             </th>
-                            <th @click="sortTable('size')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Size (mm) <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('millimeter')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 45%;">
+                                MILLIMETER <i :class="getSortIcon('millimeter')" class="text-xs ml-1"></i>
                             </th>
-                            <th @click="sortTable('inches')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Inches <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('unit')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Unit <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('description')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Description <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('is_active')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Active <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('created_at')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Created At <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('updated_at')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Updated At <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('inches')" class="px-6 py-3 text-center font-semibold border border-gray-300 cursor-pointer" style="color: black; width: 40%;">
+                                INCHES <i :class="getSortIcon('inches')" class="text-xs ml-1"></i>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="8" class="px-3 py-4 text-center text-gray-500">
+                    <tbody class="bg-white">
+                        <tr v-if="loading">
+                            <td colspan="3" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
-                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                                 </div>
-                                <p class="mt-2">Loading paper size data...</p>
+                                <p class="mt-3 font-medium">Loading paper size data...</p>
                             </td>
                         </tr>
-                        <tr v-else-if="filteredPaperSizes.length === 0" class="hover:bg-gray-50">
-                            <td colspan="8" class="px-3 py-4 text-center text-gray-500">
-                                No paper sizes found. 
+                        <tr v-else-if="filteredPaperSizes.length === 0">
+                            <td colspan="3" class="px-6 py-8 text-center text-gray-500 border border-gray-300">
+                                <p class="font-medium text-gray-700">No paper sizes found.</p>
                                 <template v-if="searchQuery">
-                                    <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
-                                    <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
+                                    <p class="mt-2 text-sm">No results match your search query: "{{ searchQuery }}"</p>
+                                    <button @click="searchQuery = ''" class="mt-3 text-blue-500 hover:text-blue-700 hover:underline font-medium">Clear search</button>
                                 </template>
                             </td>
                         </tr>
                         <tr v-for="(size, index) in filteredPaperSizes" :key="size.id" 
-                            :class="{'bg-blue-50': index % 2 === 0}" 
-                            class="hover:bg-blue-100">
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ size.id }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm text-right">{{ formatNumber(size.size) }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm text-right">{{ formatNumber(size.inches) }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ size.unit || 'N/A' }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ size.description || 'N/A' }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">
-                                <span :class="size.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                    {{ size.is_active ? 'Yes' : 'No' }}
-                                </span>
+                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
+                            class="hover:bg-blue-200 transition-colors duration-150">
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-semibold text-gray-900">{{ size.id }}</div>
                             </td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(size.created_at) }}</td>
-                            <td class="px-3 py-4 whitespace-nowrap text-sm">{{ formatDate(size.updated_at) }}</td>
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-medium text-gray-900">{{ formatNumber(size.millimeter) }}</div>
+                            </td>
+                            <td class="px-6 py-3 border border-gray-300 text-center">
+                                <div class="text-sm font-medium text-gray-900">{{ formatNumber(size.inches) }}</div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -131,13 +113,13 @@
         <!-- Print Instructions -->
         <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
             <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
-                <i class="fas fa-info-circle mr-2"></i> Print Instructions
+                <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Click the "Print List" button above to print this paper size list</li>
-                <li>Use landscape orientation for better results</li>
-                <li>You can search or sort data before printing</li>
-                <li>Only the table will be included in the print output</li>
+                <li>Click the "Print PDF" button above to generate and download PDF</li>
+                <li>PDF will be automatically saved in landscape orientation</li>
+                <li>You can search or sort data before exporting</li>
+                <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
         </div>
     </div>
@@ -147,12 +129,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const paperSizes = ref([]);
 const loading = ref(true);
 const searchQuery = ref('');
-const sortColumn = ref('size');
+const sortColumn = ref('millimeter');
 const sortDirection = ref('asc');
 const currentDate = new Date().toLocaleString();
 
@@ -190,6 +174,17 @@ const sortTable = (column) => {
     }
 };
 
+// Get sort icon
+const getSortIcon = (column) => {
+    if (sortColumn.value !== column) {
+        return 'fas fa-sort text-gray-400';
+    }
+    
+    return sortDirection.value === 'asc' 
+        ? 'fas fa-sort-up text-blue-600' 
+        : 'fas fa-sort-down text-blue-600';
+};
+
 // Format number
 const formatNumber = (value) => {
     if (value === null || value === undefined) return '0.00';
@@ -211,10 +206,8 @@ const filteredPaperSizes = computed(() => {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(size => 
             (size.id && size.id.toString().includes(query)) ||
-            (size.size && size.size.toString().includes(query)) ||
-            (size.inches && size.inches.toString().includes(query)) ||
-            (size.unit && size.unit.toLowerCase().includes(query)) ||
-            (size.description && size.description.toLowerCase().includes(query))
+            (size.millimeter && size.millimeter.toString().includes(query)) ||
+            (size.inches && size.inches.toString().includes(query))
         );
     }
     
@@ -228,7 +221,7 @@ const filteredPaperSizes = computed(() => {
         if (valueB === null || valueB === undefined) valueB = '';
         
         // Handle numeric columns
-        if (['id', 'size', 'inches'].includes(sortColumn.value)) {
+        if (['id', 'millimeter', 'inches'].includes(sortColumn.value)) {
             valueA = parseFloat(valueA) || 0;
             valueB = parseFloat(valueB) || 0;
             
@@ -279,29 +272,88 @@ const filteredPaperSizes = computed(() => {
     return filtered;
 });
 
-// Print function
+// Print function using jsPDF
 const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+    try {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-    newWin.document.write('<html><head><title>Print Paper Sizes</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('@page { size: landscape; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 4px; text-align: left; font-size: 10pt; }');
-    newWin.document.write('th { background-color: #f2f2f2; font-weight: bold; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.text-right { text-align: right; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
-    
-    newWin.document.close();
+        // Add title
+        doc.setFontSize(16);
+        doc.setTextColor(37, 99, 235); // Blue color
+        doc.text('PAPER SIZE LIST', 10, 15);
+
+        // Add subtitle
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('View and print paper size data', 10, 22);
+
+        // Prepare table data
+        const tableData = filteredPaperSizes.value.map(size => [
+            size.id || '',
+            formatNumber(size.millimeter),
+            formatNumber(size.inches)
+        ]);
+
+        // Add table using autoTable
+        autoTable(doc, {
+            startY: 28,
+            head: [['NO.', 'MILLIMETER', 'INCHES']],
+            body: tableData,
+            theme: 'grid',
+            tableWidth: 'auto',
+            headStyles: {
+                fillColor: [37, 99, 235], // Blue background
+                textColor: [255, 255, 255], // White text
+                fontStyle: 'bold',
+                halign: 'center',
+                fontSize: 10
+            },
+            bodyStyles: {
+                textColor: [50, 50, 50],
+                halign: 'center',
+                fontSize: 9
+            },
+            alternateRowStyles: {
+                fillColor: [219, 234, 254] // Light blue for alternate rows
+            },
+            margin: { top: 28, left: 10, right: 10 },
+            columnStyles: {
+                0: { cellWidth: 30, halign: 'center' },  // ID
+                1: { cellWidth: 60, halign: 'center' },  // Millimeter
+                2: { cellWidth: 60, halign: 'center' }   // Inches
+            }
+        });
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height;
+        
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text(
+                `Total Paper Sizes: ${filteredPaperSizes.value.length} | Generated: ${currentDate}`,
+                10,
+                pageHeight - 10
+            );
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                doc.internal.pageSize.width - 35,
+                pageHeight - 10
+            );
+        }
+
+        // Save PDF
+        doc.save(`paper-size-list-${new Date().getTime()}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    }
 };
 
 // Lifecycle hooks

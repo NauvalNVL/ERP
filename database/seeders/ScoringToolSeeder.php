@@ -8,62 +8,29 @@ use Illuminate\Database\Seeder;
 class ScoringToolSeeder extends Seeder
 {
     /**
-     * The scoring tools data.
+     * The scoring tools data from CPS Enterprise 2020.
+     * Structure: CODE, NAME, SCORER GAP
      */
     protected $scoringTools = [
-            [
-                'code' => '86768',
-                'name' => 'hfgj',
-                'scores' => 1,
-                'gap' => 0.5,
-                'specification' => '8',
-                'description' => 'fjfghjk',
-                'is_active' => true,
-            ],
         [
-            'code' => '5',
-            'name' => 'tess1',
-            'scores' => 1,
-            'gap' => 0.5,
-            'specification' => '',
-            'description' => '',
-            'is_active' => true,
+            'code' => 'P',
+            'name' => 'N/A',
+            'scorer_gap' => 0.0
         ],
         [
             'code' => '1',
-            'name' => 'MALE MALE',
-            'scores' => 1,
-            'gap' => 0.5,
-            'specification' => '',
-            'description' => '',
-            'is_active' => true,
+            'name' => 'MALE FEMAIL 10MM',
+            'scorer_gap' => 0.0
         ],
         [
             'code' => '2',
-            'name' => 'MALE FEMALE 10MM',
-            'scores' => 1,
-            'gap' => 0.5,
-            'specification' => '',
-            'description' => '',
-            'is_active' => true,
+            'name' => 'MALE PHAT',
+            'scorer_gap' => 0.0
         ],
         [
             'code' => '3',
-            'name' => 'MALE FEMALE 10MM',
-            'scores' => 0,
-            'gap' => 0,
-            'specification' => '',
-            'description' => 'MALE FEMALE 10MM',
-            'is_active' => true,
-        ],
-        [
-            'code' => '4',
-            'name' => 'MALE FEMALE 9MM',
-            'scores' => 1,
-            'gap' => 0,
-            'specification' => '',
-            'description' => 'MALE FEMALE 9MM',
-            'is_active' => true,
+            'name' => 'MALE FEMAIL 8MM',
+            'scorer_gap' => 0.0
         ]
     ];
 

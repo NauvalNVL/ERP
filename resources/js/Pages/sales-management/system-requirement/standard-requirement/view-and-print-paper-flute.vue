@@ -14,8 +14,8 @@
         <!-- Actions Bar -->
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
-                <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-print mr-2"></i> Print List
+                <button @click="exportPDF" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                    <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
                 <Link href="/paper-flute" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Paper Flutes
@@ -54,44 +54,38 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th @click="sortTable('code')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Code <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('Flute')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Flute <i class="fas fa-sort ml-1"></i>
                             </th>
-                            <th @click="sortTable('name')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Name <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('description')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            <th @click="sortTable('Descr')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                                 Description <i class="fas fa-sort ml-1"></i>
                             </th>
-                            <th @click="sortTable('tur_l2b')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                TUR L2B <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('DB')" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                DB <i class="fas fa-sort ml-1"></i>
                             </th>
-                            <th @click="sortTable('tur_l3')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                TUR L3 <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('B')" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                B <i class="fas fa-sort ml-1"></i>
                             </th>
-                            <th @click="sortTable('tur_l1')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                TUR L1 <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('_1L')" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                1L <i class="fas fa-sort ml-1"></i>
                             </th>
-                            <th @click="sortTable('tur_ace')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                TUR A/C/E <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('A_C_E')" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                A/C/E <i class="fas fa-sort ml-1"></i>
                             </th>
-                            <th @click="sortTable('tur_2l')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                TUR 2L <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('_2L')" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                2L <i class="fas fa-sort ml-1"></i>
                             </th>
-                            <th @click="sortTable('flute_height')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Flute Height <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('Height')" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Height <i class="fas fa-sort ml-1"></i>
                             </th>
-                            <th @click="sortTable('starch_consumption')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Starch Consumption <i class="fas fa-sort ml-1"></i>
-                            </th>
-                            <th @click="sortTable('is_active')" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                                Active <i class="fas fa-sort ml-1"></i>
+                            <th @click="sortTable('Starch')" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                                Starch <i class="fas fa-sort ml-1"></i>
                             </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-if="loading" class="hover:bg-gray-50">
-                            <td colspan="11" class="px-3 py-4 text-center text-gray-500">
+                            <td colspan="9" class="px-3 py-4 text-center text-gray-500">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
@@ -99,7 +93,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredPaperFlutes.length === 0" class="hover:bg-gray-50">
-                            <td colspan="11" class="px-3 py-4 text-center text-gray-500">
+                            <td colspan="9" class="px-3 py-4 text-center text-gray-500">
                                 No paper flutes found. 
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -107,43 +101,35 @@
                                 </template>
                             </td>
                         </tr>
-                        <tr v-for="(flute, index) in filteredPaperFlutes" :key="flute.code" 
+                        <tr v-for="(flute, index) in filteredPaperFlutes" :key="flute.Flute" 
                             :class="{'bg-blue-50': index % 2 === 0}" 
                             class="hover:bg-blue-100">
                             <td class="px-3 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ flute.code }}</div>
+                                <div class="text-sm font-medium text-gray-900">{{ flute.Flute }}</div>
                             </td>
-                            <td class="px-3 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ flute.name }}</div>
-                            </td>
-                            <td class="px-3 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ flute.description }}</div>
+                            <td class="px-3 py-4">
+                                <div class="text-sm text-gray-900">{{ flute.Descr }}</div>
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm text-gray-900">{{ formatNumber(flute.tur_l2b) }}</div>
+                                <div class="text-sm text-gray-900">{{ formatNumber(flute.DB) }}</div>
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm text-gray-900">{{ formatNumber(flute.tur_l3) }}</div>
+                                <div class="text-sm text-gray-900">{{ formatNumber(flute.B) }}</div>
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm text-gray-900">{{ formatNumber(flute.tur_l1) }}</div>
+                                <div class="text-sm text-gray-900">{{ formatNumber(flute._1L) }}</div>
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm text-gray-900">{{ formatNumber(flute.tur_ace) }}</div>
+                                <div class="text-sm text-gray-900">{{ formatNumber(flute.A_C_E) }}</div>
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm text-gray-900">{{ formatNumber(flute.tur_2l) }}</div>
+                                <div class="text-sm text-gray-900">{{ formatNumber(flute._2L) }}</div>
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm text-gray-900">{{ formatNumber(flute.flute_height) }}</div>
+                                <div class="text-sm text-gray-900">{{ formatNumber(flute.Height) }}</div>
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap text-right">
-                                <div class="text-sm text-gray-900">{{ formatNumber(flute.starch_consumption) }}</div>
-                            </td>
-                            <td class="px-3 py-4 whitespace-nowrap">
-                                <span :class="flute.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                    {{ flute.is_active ? 'Yes' : 'No' }}
-                                </span>
+                                <div class="text-sm text-gray-900">{{ formatNumber(flute.Starch) }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -163,13 +149,13 @@
         <!-- Print Instructions -->
         <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
             <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
-                <i class="fas fa-info-circle mr-2"></i> Print Instructions
+                <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Click the "Print List" button above to print this paper flute list</li>
-                <li>Use landscape orientation for better results</li>
-                <li>You can search or sort data before printing</li>
-                <li>Only the table will be included in the print output</li>
+                <li>Click the "Print PDF" button above to generate and download PDF</li>
+                <li>PDF will be automatically saved in landscape orientation</li>
+                <li>You can search or sort data before exporting</li>
+                <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
         </div>
     </div>
@@ -179,12 +165,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const paperFlutes = ref([]);
 const loading = ref(true);
 const searchQuery = ref('');
-const sortColumn = ref('code');
+const sortColumn = ref('Flute');
 const sortDirection = ref('asc');
 const currentDate = new Date().toLocaleString();
 
@@ -236,9 +224,8 @@ const filteredPaperFlutes = computed(() => {
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
         filtered = filtered.filter(flute => 
-            (flute.code && flute.code.toLowerCase().includes(query)) ||
-            (flute.name && flute.name.toLowerCase().includes(query)) ||
-            (flute.description && flute.description.toLowerCase().includes(query))
+            (flute.Flute && flute.Flute.toLowerCase().includes(query)) ||
+            (flute.Descr && flute.Descr.toLowerCase().includes(query))
         );
     }
     
@@ -252,7 +239,7 @@ const filteredPaperFlutes = computed(() => {
         if (valueB === null || valueB === undefined) valueB = '';
         
         // Handle numeric columns
-        if (['tur_l2b', 'tur_l3', 'tur_l1', 'tur_ace', 'tur_2l', 'flute_height', 'starch_consumption'].includes(sortColumn.value)) {
+        if (['DB', 'B', '_1L', 'A_C_E', '_2L', 'Height', 'Starch'].includes(sortColumn.value)) {
             valueA = parseFloat(valueA) || 0;
             valueB = parseFloat(valueB) || 0;
             
@@ -260,15 +247,6 @@ const filteredPaperFlutes = computed(() => {
                 return valueA - valueB;
             } else {
                 return valueB - valueA;
-            }
-        }
-        
-        // Handle boolean column
-        if (sortColumn.value === 'is_active') {
-            if (sortDirection.value === 'asc') {
-                return valueA === valueB ? 0 : valueA ? -1 : 1;
-            } else {
-                return valueA === valueB ? 0 : valueA ? 1 : -1;
             }
         }
         
@@ -291,28 +269,99 @@ const filteredPaperFlutes = computed(() => {
     return filtered;
 });
 
-// Print function
-const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+// Export to PDF function
+const exportPDF = () => {
+    try {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-    newWin.document.write('<html><head><title>Print Paper Flutes</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 6px 4px; text-align: left; font-size: 10px; }');
-    newWin.document.write('th { background-color: #f2f2f2; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('@media print { @page { size: landscape; } }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
-    
-    newWin.document.close();
+        // Add title
+        doc.setFontSize(16);
+        doc.setTextColor(37, 99, 235); // Blue color
+        doc.text('PAPER FLUTE LIST', 10, 15);
+
+        // Add subtitle
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('View and print paper flute data', 10, 22);
+
+        // Prepare table data
+        const tableData = filteredPaperFlutes.value.map(flute => [
+            flute.Flute || '',
+            flute.Descr || '',
+            formatNumber(flute.DB),
+            formatNumber(flute.B),
+            formatNumber(flute._1L),
+            formatNumber(flute.A_C_E),
+            formatNumber(flute._2L),
+            formatNumber(flute.Height),
+            formatNumber(flute.Starch)
+        ]);
+
+        // Add table using autoTable - call via imported function
+        autoTable(doc, {
+            startY: 28,
+            head: [['Flute', 'Description', 'DB', 'B', '1L', 'A/C/E', '2L', 'Height', 'Starch']],
+            body: tableData,
+            theme: 'grid',
+            tableWidth: 'auto',
+            headStyles: {
+                fillColor: [37, 99, 235], // Blue background
+                textColor: [255, 255, 255], // White text
+                fontStyle: 'bold',
+                halign: 'left',
+                fontSize: 10
+            },
+            bodyStyles: {
+                textColor: [50, 50, 50],
+                fontSize: 9
+            },
+            alternateRowStyles: {
+                fillColor: [219, 234, 254] // Light blue for alternate rows
+            },
+            columnStyles: {
+                0: { fontStyle: 'bold', halign: 'left' },
+                1: { halign: 'left' },
+                2: { halign: 'right' },
+                3: { halign: 'right' },
+                4: { halign: 'right' },
+                5: { halign: 'right' },
+                6: { halign: 'right' },
+                7: { halign: 'right' },
+                8: { halign: 'right' }
+            },
+            margin: { top: 28, left: 10, right: 10 }
+        });
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height;
+        
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text(
+                `Total Paper Flutes: ${filteredPaperFlutes.value.length} | Generated: ${currentDate}`,
+                10,
+                pageHeight - 10
+            );
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                doc.internal.pageSize.width - 35,
+                pageHeight - 10
+            );
+        }
+
+        // Save PDF
+        doc.save(`paper-flutes-${new Date().getTime()}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    }
 };
 
 // Lifecycle hooks

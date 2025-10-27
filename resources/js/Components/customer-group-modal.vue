@@ -56,8 +56,21 @@
                   </div>
                 </td>
               </tr>
+              <tr v-else-if="error">
+                <td colspan="2" class="px-6 py-4 text-center">
+                  <div class="text-red-600">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    {{ error }}
+                  </div>
+                </td>
+              </tr>
               <tr v-else-if="filteredGroups.length === 0">
-                <td colspan="2" class="px-6 py-4 text-center text-gray-500">No customer group data available.</td>
+                <td colspan="2" class="px-6 py-4 text-center text-gray-500">
+                  No customer group data available.
+                  <div class="mt-2 text-xs">
+                    Total groups loaded: {{ customerGroups.length }}
+                  </div>
+                </td>
             </tr>
           </tbody>
         </table>
@@ -100,20 +113,32 @@ const loading = ref(false);
 const error = ref(null);
 
 // Fetch customer groups when the component is mounted or when show changes
-    const fetchCustomerGroups = async () => {
+const fetchCustomerGroups = async () => {
   loading.value = true;
   error.value = null;
-      try {
-    console.log('Fetching customer groups...');
+  try {
+    console.log('Fetching customer groups from API...');
     const response = await axios.get('/api/customer-groups');
-    console.log('Response:', response.data);
+    console.log('API Response:', response.data);
+    console.log('Total groups fetched:', response.data.length);
+    
+    // Log first item to see structure
+    if (response.data.length > 0) {
+      console.log('First group structure:', response.data[0]);
+      console.log('Has group_code?', response.data[0].group_code);
+      console.log('Has description?', response.data[0].description);
+      console.log('Has Group_ID?', response.data[0].Group_ID);
+      console.log('Has Group_Name?', response.data[0].Group_Name);
+    }
+    
     customerGroups.value = response.data;
   } catch (err) {
     console.error('Error fetching customer groups:', err);
+    console.error('Error details:', err.response?.data);
     error.value = 'Failed to load customer groups. Please try again.';
-      } finally {
+  } finally {
     loading.value = false;
-      }
+  }
 };
 
 // Compute filtered groups based on search query

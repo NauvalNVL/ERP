@@ -306,7 +306,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
+import CustomerAccountModal from '@/Components/customer-account-modal.vue'
 import VehicleLookupModal from '@/Components/VehicleLookupModal.vue'
 import SalesOrderScreenModal from '@/Components/SalesOrderScreenModal.vue'
 import { useToast } from '@/Composables/useToast'

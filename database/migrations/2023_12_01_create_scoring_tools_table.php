@@ -8,22 +8,16 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Table structure matches CPS Enterprise 2020
+     * Columns: NO., CODE, NAME, SCORER GAP
      */
     public function up(): void
     {
         Schema::create('scoring_tools', function (Blueprint $table) {
-            $table->id();
-            $table->string('code', 10)->unique()->comment('Kode scoring tool');
-            $table->string('name', 100)->index()->comment('Nama scoring tool');
-            $table->decimal('scores', 8, 1)->default(0.0)->comment('Skor scoring tool');  
-            $table->decimal('gap', 8, 1)->default(0.0)->comment('Gap scoring tool');
-            $table->string('specification', 255)->nullable()->comment('Spesifikasi teknis');
-            $table->text('description')->nullable()->comment('Deskripsi lengkap');
-            $table->boolean('is_active')->default(true)->index()->comment('Status aktif');
-            $table->unsignedBigInteger('created_by')->nullable()->comment('User ID pembuat');
-            $table->unsignedBigInteger('updated_by')->nullable()->comment('User ID pengubah terakhir');
-            $table->timestamps();
-            $table->softDeletes();
+            $table->id(); // NO. column (auto increment)
+            $table->string('code', 10)->unique(); // CODE column
+            $table->string('name', 100); // NAME column
+            $table->decimal('scorer_gap', 8, 1)->default(0.0); // SCORER GAP column
         });
     }
 

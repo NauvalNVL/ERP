@@ -32,11 +32,8 @@
           <table class="w-full divide-y divide-gray-200 table-fixed">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('code')">Code</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('name')">Name</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('sales_team_id')">Team</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('position')">Position</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('is_active')">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('code')">Code</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/3 cursor-pointer" @click="sortTable('name')">Name</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -46,21 +43,9 @@
                 @dblclick="selectAndClose(person)">
                 <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ person.code }}</td>
                 <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ person.name }}</td>
-                <td class="px-6 py-3 whitespace-nowrap">
-                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ getTeamName(person.sales_team_id) }}</span>
-                </td>
-                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ getPositionLabel(person.position) }}</td>
-                <td class="px-6 py-3 whitespace-nowrap">
-                  <span :class="[
-                    'px-2 py-1 text-xs font-medium rounded-full', 
-                    person.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  ]">
-                    {{ person.is_active ? 'Active' : 'Inactive' }}
-                  </span>
-                </td>
               </tr>
               <tr v-if="filteredSalespersons.length === 0">
-                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No salesperson data available.</td>
+                <td colspan="2" class="px-6 py-4 text-center text-gray-500">No salesperson data available.</td>
               </tr>
             </tbody>
           </table>
@@ -68,15 +53,12 @@
         <div class="mt-2 text-xs text-gray-500 italic">
           <p>Click on a row to select and edit its details.</p>
         </div>
-        <div class="mt-4 grid grid-cols-5 gap-2">
+        <div class="mt-4 grid grid-cols-4 gap-2">
           <button type="button" @click="sortTable('code')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Code
           </button>
           <button type="button" @click="sortTable('name')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Name
-          </button>
-          <button type="button" @click="sortTable('sales_team_id')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-            <i class="fas fa-sort mr-1"></i>By Team
           </button>
           <button type="button" @click="selectAndClose(selectedPerson)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-edit mr-1"></i>Select
@@ -115,26 +97,14 @@ const filteredSalespersons = computed(() => {
     const q = searchQuery.value.toLowerCase();
     people = people.filter(person =>
       person.code.toLowerCase().includes(q) ||
-      person.name.toLowerCase().includes(q) ||
-      getTeamName(person.sales_team_id).toLowerCase().includes(q) ||
-      getPositionLabel(person.position).toLowerCase().includes(q)
+      person.name.toLowerCase().includes(q)
     );
   }
   
   // Apply sorting
   return [...people].sort((a, b) => {
-    let valueA, valueB;
-    
-    if (sortKey.value === 'sales_team_id') {
-      valueA = getTeamName(a[sortKey.value]);
-      valueB = getTeamName(b[sortKey.value]);
-    } else if (sortKey.value === 'position') {
-      valueA = getPositionLabel(a[sortKey.value]);
-      valueB = getPositionLabel(b[sortKey.value]);
-    } else {
-      valueA = a[sortKey.value];
-      valueB = b[sortKey.value];
-    }
+    const valueA = a[sortKey.value];
+    const valueB = b[sortKey.value];
     
     if (valueA < valueB) return sortAsc.value ? -1 : 1;
     if (valueA > valueB) return sortAsc.value ? 1 : -1;
@@ -142,23 +112,6 @@ const filteredSalespersons = computed(() => {
   });
 });
 
-// Helper function to get team name
-function getTeamName(teamId) {
-  const teams = {
-    1: 'MBI',
-    2: 'MANAGEMENT LOCAL',
-    3: 'MANAGEMENT MNC'
-  };
-  return teams[teamId] || teamId;
-}
-
-// Helper function to get position label
-function getPositionLabel(position) {
-  if (position === 'E - Executive') return 'Executive';
-  if (position === 'M - Manager') return 'Manager';
-  if (position === 'S - Supervisor') return 'Supervisor';
-  return position;
-}
 
 // Select a row
 function selectRow(person) {

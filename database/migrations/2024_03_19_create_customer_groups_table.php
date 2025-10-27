@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('customer_groups', function (Blueprint $table) {
             $table->string('group_code', 20)->primary();
             $table->string('description', 100);
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('updated_by')->constrained('users');
+            $table->string('created_by', 20)->nullable(); // Reference to USERCPS.ID
+            $table->string('updated_by', 20)->nullable(); // Reference to USERCPS.ID
             $table->timestamps();
         });
     }

@@ -9,32 +9,43 @@ class CustomerGroup extends Model
 {
     use HasFactory;
 
-    protected $table = 'customer_groups';
-    protected $primaryKey = 'group_code';
+    // Use existing CPS table
+    protected $table = 'CUST_GROUP';
+    protected $primaryKey = 'Group_ID';
     public $incrementing = false;
     protected $keyType = 'string';
+    public $timestamps = false; // CPS tables don't have timestamps
 
     protected $fillable = [
-        'group_code',
-        'description',
-        'created_by',
-        'updated_by'
+        'No',
+        'Group_ID',
+        'Group_Name',
+        'Currency',
+        'AC',
+        'Name'
     ];
 
-    protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime'
-    ];
+    // Add accessors to $appends for JSON serialization
+    protected $appends = ['group_code', 'description'];
 
-    // Relationship with User for created_by
-    public function creator()
+    // Map to CPS fields for backward compatibility
+    public function getGroupCodeAttribute()
     {
-        return $this->belongsTo(User::class, 'created_by', 'id');
+        return $this->Group_ID;
     }
 
-    // Relationship with User for updated_by
-    public function updater()
+    public function setGroupCodeAttribute($value)
     {
-        return $this->belongsTo(User::class, 'updated_by', 'id');
+        $this->attributes['Group_ID'] = $value;
+    }
+
+    public function getDescriptionAttribute()
+    {
+        return $this->Group_Name;
+    }
+
+    public function setDescriptionAttribute($value)
+    {
+        $this->attributes['Group_Name'] = $value;
     }
 }

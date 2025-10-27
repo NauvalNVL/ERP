@@ -21,26 +21,26 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Product Design Management</h3>
                     </div>
-                    
+
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Design #:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Design Code:</label>
                             <div class="relative flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-drafting-compass"></i>
                                 </span>
-                                <input type="text" v-model="searchQuery" @dblclick="showModal = true" placeholder="Double-click to browse designs..." class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                                 <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md">
-                                    <i class="fas fa-table mr-1"></i> Browse
+                                    <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Info:</label>
-                            <div class="p-3 bg-gray-50 border rounded-md text-sm text-gray-600 h-full flex items-center">
-                                Click 'Browse' to Add, Edit, or Delete designs.
-                            </div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
+                            <button type="button" @click="openModalForCreate" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
+                                <i class="fas fa-plus-circle mr-2"></i> Add New
+                            </button>
                         </div>
                     </div>
                     <!-- Data Status Information -->
@@ -169,7 +169,8 @@
         :show="showModal"
         :designs="designs"
         :products="products"
-        @close="showModal = false"
+        :isCreating="isCreatingNewDesign"
+        @close="closeModal"
         @select="onDesignSelected"
         @data-changed="fetchDesigns"
     />
@@ -195,23 +196,24 @@ const loading = ref(false);
 const showModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref('');
+const isCreatingNewDesign = ref(false);
 
 const fetchDesigns = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/api/product-designs', { 
-            headers: { 
+        const res = await fetch('/api/product-designs', {
+            headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
-            } 
+            }
         });
-        
+
         if (!res.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         const data = await res.json();
-        
+
         if (Array.isArray(data)) {
             designs.value = data;
         } else {
@@ -228,19 +230,19 @@ const fetchDesigns = async () => {
 
 const fetchProducts = async () => {
     try {
-        const res = await fetch('/api/products', { 
-            headers: { 
+        const res = await fetch('/api/products', {
+            headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
-            } 
+            }
         });
-        
+
         if (!res.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         const data = await res.json();
-        
+
         if (Array.isArray(data)) {
             products.value = data;
         } else {
@@ -261,11 +263,11 @@ onMounted(() => {
 // Watch for changes in search query to filter the data
 watch(searchQuery, (newQuery) => {
     if (newQuery && designs.value.length > 0) {
-        const foundDesign = designs.value.find(design => 
+        const foundDesign = designs.value.find(design =>
             design.pd_code.toLowerCase().includes(newQuery.toLowerCase()) ||
             design.pd_name.toLowerCase().includes(newQuery.toLowerCase())
         );
-        
+
         if (foundDesign) {
             selectedRow.value = foundDesign;
         }
@@ -275,6 +277,16 @@ watch(searchQuery, (newQuery) => {
 const onDesignSelected = (design) => {
     selectedRow.value = design;
     searchQuery.value = design.pd_code;
+};
+
+const openModalForCreate = () => {
+    isCreatingNewDesign.value = true;
+    showModal.value = true;
+};
+
+const closeModal = () => {
+    showModal.value = false;
+    isCreatingNewDesign.value = false;
 };
 </script>
 

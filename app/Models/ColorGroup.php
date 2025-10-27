@@ -2,19 +2,32 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ColorGroup extends Model
 {
+    use HasFactory;
+
+    // CPS COLOR_GROUP table configuration
+    protected $table = 'COLOR_GROUP';
+    protected $primaryKey = 'CG';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    public $timestamps = false;
+
     protected $fillable = [
-        'cg', 
-        'cg_name', 
-        'cg_type'
+        'CG',
+        'CG_Name',
+        'CG_Type'
     ];
 
-    // Relasi dengan warna jika diperlukan
+    /**
+     * Get all colors that belong to this color group
+     * Relationship with COLOR table through GroupCode
+     */
     public function colors()
     {
-        return $this->hasMany(Color::class, 'color_group_id');
+        return $this->hasMany(Color::class, 'GroupCode', 'CG');
     }
-} 
+}

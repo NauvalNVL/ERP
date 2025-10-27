@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('salesperson', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 10)->unique()->comment('Salesperson code');
-            $table->string('name', 100)->comment('Salesperson name');
-            $table->foreignId('sales_team_id')->nullable()->constrained('sales_team');
-            $table->string('position', 50)->nullable();
-            $table->string('user_id', 20)->nullable()->comment('User ID for this salesperson');
-            $table->boolean('is_active')->default(true);
+            $table->string('Code', 50)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            $table->string('Name', 50)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            $table->string('Grup', 20)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            $table->string('CodeGrup', 50)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            $table->decimal('TargetSales', 18, 2)->nullable();
+            $table->string('Internal', 20)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            $table->string('Email', 100)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            $table->char('status', 10)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
             $table->timestamps();
         });
     }

@@ -15,7 +15,7 @@
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-print mr-2"></i> Print List
+                    <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
                 <Link href="/finishing" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Finishings
@@ -125,13 +125,13 @@
         <!-- Print Instructions -->
         <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
             <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
-                <i class="fas fa-info-circle mr-2"></i> Print Instructions
+                <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                <li>Click the "Print List" button above to print this finishing list</li>
-                <li>Use landscape orientation for better results</li>
-                <li>You can search or sort data before printing</li>
-                <li>Only the table will be included in the print output</li>
+                <li>Click the "Print PDF" button above to generate and download PDF</li>
+                <li>PDF will be automatically saved in landscape orientation</li>
+                <li>You can search or sort data before exporting</li>
+                <li>PDF includes formatted table with headers and page numbers</li>
             </ul>
         </div>
     </div>
@@ -141,6 +141,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Data
 const finishings = ref([]);
@@ -241,28 +243,85 @@ const filteredFinishings = computed(() => {
     return filtered;
 });
 
-// Print function
+// Print function using jsPDF
 const printTable = () => {
-    const printContent = document.getElementById('printableTable');
-    const newWin = window.open('', '_blank');
+    try {
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
 
-    newWin.document.write('<html><head><title>Print Finishings</title>');
-    newWin.document.write('<style>');
-    newWin.document.write('body { font-family: Arial, sans-serif; }');
-    newWin.document.write('table { width: 100%; border-collapse: collapse; }');
-    newWin.document.write('th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }');
-    newWin.document.write('th { background-color: #f2f2f2; }');
-    newWin.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-    newWin.document.write('.header { background-color: #1e40af; color: white; padding: 10px; display: flex; align-items: center; }');
-    newWin.document.write('.header-text { margin-left: 15px; }');
-    newWin.document.write('.footer { background-color: #f2f2f2; padding: 8px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; }');
-    newWin.document.write('@media print { @page { size: landscape; } }');
-    newWin.document.write('</style></head><body>');
-    newWin.document.write(printContent.outerHTML);
-    newWin.document.write('<script>window.onload = function() { window.print(); window.close(); }<\/script>');
-    newWin.document.write('</body></html>');
-    
-    newWin.document.close();
+        // Add title
+        doc.setFontSize(16);
+        doc.setTextColor(37, 99, 235); // Blue color
+        doc.text('FINISHING LIST', 10, 15);
+
+        // Add subtitle
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('View and print finishing data', 10, 22);
+
+        // Prepare table data
+        const tableData = filteredFinishings.value.map(finishing => [
+            finishing.id || 'N/A',
+            finishing.code || 'N/A',
+            finishing.description || 'N/A',
+            formatDate(finishing.created_at),
+            formatDate(finishing.updated_at)
+        ]);
+
+        // Add table using autoTable
+        autoTable(doc, {
+            startY: 28,
+            head: [['ID', 'Code', 'Description', 'Created At', 'Updated At']],
+            body: tableData,
+            theme: 'grid',
+            tableWidth: 'auto',
+            headStyles: {
+                fillColor: [37, 99, 235], // Blue background
+                textColor: [255, 255, 255], // White text
+                fontStyle: 'bold',
+                halign: 'left',
+                fontSize: 10
+            },
+            bodyStyles: {
+                textColor: [50, 50, 50],
+                halign: 'left',
+                fontSize: 9
+            },
+            alternateRowStyles: {
+                fillColor: [219, 234, 254] // Light blue for alternate rows
+            },
+            margin: { top: 28, left: 10, right: 10 }
+        });
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height;
+        
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text(
+                `Total Finishings: ${filteredFinishings.value.length} | Generated: ${currentDate}`,
+                10,
+                pageHeight - 10
+            );
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                doc.internal.pageSize.width - 35,
+                pageHeight - 10
+            );
+        }
+
+        // Save PDF
+        doc.save(`finishing-list-${new Date().getTime()}.pdf`);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    }
 };
 
 // Lifecycle hooks

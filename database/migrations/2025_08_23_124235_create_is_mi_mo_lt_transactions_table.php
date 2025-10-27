@@ -26,11 +26,11 @@ return new class extends Migration
             $table->string('reference_number', 50)->nullable();
             $table->text('notes')->nullable();
             $table->enum('status', ['Draft', 'Posted', 'Cancelled'])->default('Draft');
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
-            $table->unsignedBigInteger('posted_by')->nullable();
+            $table->string('created_by', 20)->nullable(); // Reference to USERCPS.ID
+            $table->string('updated_by', 20)->nullable(); // Reference to USERCPS.ID
+            $table->string('posted_by', 20)->nullable(); // Reference to USERCPS.ID
             $table->timestamp('posted_at')->nullable();
-            $table->unsignedBigInteger('cancelled_by')->nullable();
+            $table->string('cancelled_by', 20)->nullable(); // Reference to USERCPS.ID
             $table->timestamp('cancelled_at')->nullable();
             $table->string('cancellation_reason', 500)->nullable();
             $table->timestamps();

@@ -20,20 +20,16 @@ return new class extends Migration
             $table->string('description', 255)->nullable();
             $table->enum('status', ['active', 'obsolete'])->default('active');
             $table->timestamp('obsolate_date')->nullable();
-            $table->unsignedBigInteger('obsolate_by')->nullable();
+            $table->string('obsolate_by', 20)->nullable(); // Reference to USERCPS.ID
             $table->string('obsolate_reason', 255)->nullable();
             $table->timestamp('reactive_date')->nullable();
-            $table->unsignedBigInteger('reactive_by')->nullable();
+            $table->string('reactive_by', 20)->nullable(); // Reference to USERCPS.ID
             $table->string('reactive_reason', 255)->nullable();
-            $table->unsignedBigInteger('created_by');
-            $table->unsignedBigInteger('updated_by');
+            $table->string('created_by', 20); // Reference to USERCPS.ID
+            $table->string('updated_by', 20); // Reference to USERCPS.ID
             $table->timestamps();
             
             $table->foreign('customer_id')->references('id')->on('update_customer_accounts');
-            $table->foreign('obsolate_by')->references('id')->on('users');
-            $table->foreign('reactive_by')->references('id')->on('users');
-            $table->foreign('created_by')->references('id')->on('users');
-            $table->foreign('updated_by')->references('id')->on('users');
         });
     }
 

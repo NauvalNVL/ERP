@@ -17,6 +17,9 @@
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-print mr-2"></i> Print List
                 </button>
+                <button @click="refreshData" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded flex items-center space-x-2" :disabled="loading">
+                    <i class="fas fa-sync-alt mr-2" :class="{ 'animate-spin': loading }"></i> Refresh Data
+                </button>
                 <Link href="/sales-team" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Sales Teams
                 </Link>
@@ -112,6 +115,33 @@
             </div>
         </div>
 
+        <!-- Debug Information Panel -->
+        <div class="mt-6 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+            <h3 class="font-semibold text-yellow-800 mb-2 flex items-center">
+                <i class="fas fa-bug mr-2"></i> Debug Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                    <strong>Data Source:</strong> /api/sales-teams<br>
+                    <strong>Records Loaded:</strong> {{ salesTeams.length }}<br>
+                    <strong>Loading Status:</strong> {{ loading ? 'Loading...' : 'Complete' }}
+                </div>
+                <div>
+                    <strong>Last Fetch:</strong> {{ new Date().toLocaleTimeString() }}<br>
+                    <strong>Filtered Records:</strong> {{ filteredSalesTeams.length }}<br>
+                    <strong>Search Query:</strong> {{ searchQuery || 'None' }}
+                </div>
+                <div>
+                    <strong>Sort Column:</strong> {{ sortColumn }}<br>
+                    <strong>Sort Direction:</strong> {{ sortDirection }}<br>
+                    <strong>Cache Busting:</strong> Enabled
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-yellow-700">
+                If data doesn't match Define Sales Team, click "Refresh Data" button or check browser console for errors.
+            </div>
+        </div>
+
         <!-- Print Instructions -->
         <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
             <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
@@ -131,6 +161,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Data
 const salesTeams = ref([]);
@@ -143,34 +174,60 @@ const currentDate = new Date().toLocaleString();
 // Fetch sales teams from the API
 const fetchSalesTeams = async () => {
     loading.value = true;
+    console.log('🔄 Fetching sales teams from /api/sales-teams...');
+    
     try {
-        const response = await fetch('/api/sales-teams', {
+        const response = await fetch('/api/sales-teams?' + new URLSearchParams({
+            '_t': Date.now(), // Cache busting
+            '_refresh': 'true'
+        }), {
             headers: {
                 'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             }
         });
         
+        console.log('📡 API Response status:', response.status);
+        console.log('📡 API Response headers:', Object.fromEntries(response.headers.entries()));
+        
         if (!response.ok) {
-            throw new Error('Failed to fetch sales teams');
+            const errorText = await response.text();
+            console.error('❌ API Error Response:', errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
         
         const data = await response.json();
+        console.log('📊 Raw API Response:', data);
+        console.log('📊 Data type:', typeof data);
+        console.log('📊 Is array:', Array.isArray(data));
         
         // Handle different API response formats
         if (data.data) {
             salesTeams.value = data.data;
+            console.log('✅ Using data.data format, records:', data.data.length);
         } else if (Array.isArray(data)) {
             salesTeams.value = data;
+            console.log('✅ Using direct array format, records:', data.length);
         } else {
-            console.error('Unexpected API response format:', data);
+            console.error('❌ Unexpected API response format:', data);
             salesTeams.value = [];
         }
+        
+        console.log('📋 Final salesTeams.value:', salesTeams.value);
+        
     } catch (error) {
-        console.error('Error fetching sales teams:', error);
+        console.error('❌ Error fetching sales teams:', error);
+        console.error('❌ Error details:', {
+            message: error.message,
+            stack: error.stack
+        });
         salesTeams.value = [];
     } finally {
         loading.value = false;
+        console.log('✅ Loading finished, final count:', salesTeams.value.length);
     }
 };
 
@@ -277,6 +334,12 @@ const printTable = () => {
     newWin.document.write('</body></html>');
     
     newWin.document.close();
+};
+
+// Refresh data function
+const refreshData = async () => {
+    console.log('🔄 Manual refresh triggered...');
+    await fetchSalesTeams();
 };
 
 // Fetch data on component mount

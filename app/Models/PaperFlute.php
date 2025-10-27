@@ -9,17 +9,34 @@ class PaperFlute extends Model
 {
     use HasFactory;
 
+    // CPS Flute_CPS table configuration
+    protected $table = 'Flute_CPS';
+    public $timestamps = false;
+    protected $primaryKey = 'No';  // No is the primary key
+    public $incrementing = false;  // Not auto-increment
+    protected $keyType = 'integer'; // numeric(18,0) type
+
     protected $fillable = [
-        'code',
-        'name',
-        'description',
-        'tur_l2b',
-        'tur_l3',
-        'tur_l1',
-        'tur_ace',
-        'tur_2l',
-        'flute_height',
-        'starch_consumption',
-        'is_active'
+        'No',
+        'Flute',
+        'Descr',
+        'DB',
+        'B',
+        '_1L',      // [1L] in database
+        'A_C_E',    // [A/C/E] in database
+        '_2L',      // [2L] in database
+        'Height',
+        'Starch'
+    ];
+
+    protected $casts = [
+        'No' => 'integer',
+        'DB' => 'float',
+        'B' => 'float',
+        '_1L' => 'float',
+        'A_C_E' => 'float',
+        '_2L' => 'float',
+        'Height' => 'float',
+        'Starch' => 'float'
     ];
 }

@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('COLOR', function (Blueprint $table) {
             $collation = 'SQL_Latin1_General_CP1_CI_AS';
 
-            $table->string('Color_Code', 15)->nullable()->collation($collation);
+            // Color_Code as primary key - matching CPS database structure
+            $table->string('Color_Code', 15)->primary()->collation($collation);
             $table->string('Color_Name', 150)->nullable()->collation($collation);
             $table->string('GroupCode', 15)->nullable()->collation($collation);
             $table->string('Group', 50)->nullable()->collation($collation);
-
-            // Tambahkan primary key atau index jika diperlukan
-            // $table->primary('Color_Code');
+            
+            // No timestamps - matching CPS database structure
         });
     }
 

@@ -4,52 +4,72 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Color extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
-    protected $primaryKey = 'color_id';
+    protected $table = 'COLOR';
+    protected $primaryKey = 'Color_Code';
     public $incrementing = false;
     protected $keyType = 'string';
+    public $timestamps = false;
 
     protected $fillable = [
-        'color_id',
-        'color_name',
-        'origin',
-        'color_group_id',
-        'cg_type',
-        'is_active',
-        'created_by',
-        'updated_by'
-    ];
-
-    protected $casts = [
-        'is_active' => 'boolean',
+        'Color_Code',
+        'Color_Name',
+        'GroupCode',
+        'Group'
     ];
 
     /**
-     * Get the color group that owns the color.
+     * Scope to get only color groups (where GroupCode is NULL or equals Color_Code)
+     */
+    public function scopeColorGroups($query)
+    {
+        return $query->whereNull('GroupCode')
+                    ->orWhereRaw('GroupCode = Color_Code');
+    }
+
+    /**
+     * Scope to get only colors (where GroupCode is not NULL and not equal to Color_Code)
+     */
+    public function scopeColors($query)
+    {
+        return $query->whereNotNull('GroupCode')
+                    ->whereRaw('GroupCode != Color_Code');
+    }
+
+    /**
+     * Check if this record is a color group
+     */
+    public function isColorGroup()
+    {
+        return $this->GroupCode === null || $this->GroupCode === $this->Color_Code;
+    }
+
+    /**
+     * Check if this record is a color
+     */
+    public function isColor()
+    {
+        return !$this->isColorGroup();
+    }
+
+    /**
+     * Get the parent color group for this color
      */
     public function colorGroup()
     {
-        return $this->belongsTo(ColorGroup::class, 'color_group_id', 'cg');
+        return $this->belongsTo(Color::class, 'GroupCode', 'Color_Code');
     }
 
     /**
-     * Get the user that created the color.
+     * Get all colors that belong to this color group
      */
-    public function creator()
+    public function colors()
     {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    /**
-     * Get the user that last updated the color.
-     */
-    public function updater()
-    {
-        return $this->belongsTo(User::class, 'updated_by');
+        return $this->hasMany(Color::class, 'GroupCode', 'Color_Code')
+                    ->where('GroupCode', '!=', 'Color_Code');
     }
 }

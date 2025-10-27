@@ -118,6 +118,37 @@ Route::get('/test-db', function () {
     }
 });
 
+// Test Geo API
+Route::get('/test-geo-api', function () {
+    try {
+        $geos = \App\Models\Geo::orderBy('CODE')->take(5)->get();
+        
+        $transformed = $geos->map(function($geo) {
+            return [
+                'code' => $geo->CODE,
+                'country' => $geo->COUNTRY,
+                'state' => $geo->STATE,
+                'town' => $geo->TOWN,
+                'town_section' => $geo->TOWN_SECTION,
+                'area' => $geo->AREA
+            ];
+        });
+        
+        return response()->json([
+            'success' => true,
+            'count' => \App\Models\Geo::count(),
+            'sample_data' => $transformed,
+            'raw_first' => $geos->first()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // Guest Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -140,6 +171,7 @@ Route::middleware('auth')->group(function () {
          Route::put('/user/{user}', [UserController::class, 'update'])->name('vue.system-security.update');
          Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('vue.system-security.destroy');
          Route::get('/system-security/amend-password', [UserController::class, 'vueAmendPassword'])->name('vue.system-security.amend-password');
+         Route::post('/system-security/update-password', [UserController::class, 'updatePassword'])->name('vue.system-security.update-password');
          Route::get('/system-security/define-access', [UserController::class, 'vueDefineAccess'])->name('vue.system-security.define-access');
          
          // System Maintenance Routes
@@ -362,54 +394,84 @@ Route::middleware('auth')->group(function () {
          })->name('vue.customer-service.production-monitoring-board');
          
          // Standard Requirement Routes
-         Route::get('/sales-team', [SalesTeamController::class, 'vueIndex'])->name('vue.sales-team.index');
-         Route::get('/sales-team/view-print', [SalesTeamController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');
+         Route::get('/sales-team', [SalespersonController::class, 'vueDefineTeam'])->name('vue.sales-team.index');
+         Route::get('/sales-team/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-team.view-print');
+         // Alias for search menu
+         Route::get('/define-sales-team', [SalespersonController::class, 'vueDefineTeam'])->name('vue.define-sales-team');
          
          Route::get('/sales-person', [SalespersonController::class, 'vueIndex'])->name('vue.sales-person.index');
          Route::get('/sales-person/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-person.view-print');
+         // Alias for search menu
+         Route::get('/define-salesperson', [SalespersonController::class, 'vueIndex'])->name('vue.define-salesperson');
          
-         Route::get('/sales-person-team', [SalespersonTeamController::class, 'vueIndex'])->name('vue.sales-person-team.index');
-         Route::get('/sales-person-team/view-print', [SystemRequirementController::class, 'vueViewPrintSalespersonTeam'])->name('vue.sales-person-team.view-print');
+         Route::get('/sales-person-team', [SalespersonController::class, 'vueDefineSalespersonTeam'])->name('vue.sales-person-team.index');
+         Route::get('/sales-person-team/view-print', [SalespersonController::class, 'vueViewAndPrint'])->name('vue.sales-person-team.view-print');
+         // Alias for search menu
+         Route::get('/define-salesperson-team', [SalespersonController::class, 'vueDefineSalespersonTeam'])->name('vue.define-salesperson-team');
          
          Route::get('/industry', [IndustryController::class, 'vueIndex'])->name('vue.industry.index');
          Route::get('/industry/view-print', [IndustryController::class, 'vueViewAndPrint'])->name('vue.industry.view-print');
+         // Alias for search menu
+         Route::get('/define-industry', [IndustryController::class, 'vueIndex'])->name('vue.define-industry');
          
          Route::get('/geo', [GeoController::class, 'vueIndex'])->name('vue.geo.index');
          Route::get('/geo/view-print', [GeoController::class, 'vueViewAndPrint'])->name('vue.geo.view-print');
+         // Alias for search menu
+         Route::get('/define-geo', [GeoController::class, 'vueIndex'])->name('vue.define-geo');
          
          Route::get('/product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.product-group.index');
          Route::get('/product-group/view-print', [ProductGroupController::class, 'vueViewAndPrint'])->name('vue.product-group.view-print');
+         // Alias for search menu
+         Route::get('/define-product-group', [ProductGroupController::class, 'vueIndex'])->name('vue.define-product-group');
          
          Route::get('/product', [ProductController::class, 'vueIndex'])->name('vue.product.index');
          Route::get('/product/view-print', [ProductController::class, 'vueViewAndPrint'])->name('vue.product.view-print');
+         // Alias for search menu
+         Route::get('/define-product', [ProductController::class, 'vueIndex'])->name('vue.define-product');
          
          Route::get('/product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.product-design.index');
          Route::get('/product-design/standard-formula', function() {
              return Inertia::render('sales-management/standard-formula/setup-corrugator-run-size-formula/ProductDesign');
          })->name('vue.product-design.standard-formula');
          Route::get('/product-design/view-print', [ProductDesignController::class, 'vueViewAndPrint'])->name('vue.product-design.view-print');
+         // Alias for search menu
+         Route::get('/define-product-design', [ProductDesignController::class, 'vueIndex'])->name('vue.define-product-design');
          
          Route::get('/scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.scoring-tool.index');
          Route::get('/scoring-tool/view-print', [ScoringToolController::class, 'vueViewAndPrint'])->name('vue.scoring-tool.view-print');
+         // Alias for search menu
+         Route::get('/define-scoring-tool', [ScoringToolController::class, 'vueIndex'])->name('vue.define-scoring-tool');
          
          Route::get('/paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.paper-quality.index');
          Route::get('/paper-quality/status', [PaperQualityController::class, 'vueManageStatus'])->name('vue.paper-quality.status');
          Route::get('/paper-quality/view-print', [PaperQualityController::class, 'vueViewAndPrint'])->name('vue.paper-quality.view-print');
+         // Alias for search menu
+         Route::get('/define-paper-quality', [PaperQualityController::class, 'vueIndex'])->name('vue.define-paper-quality');
          
          Route::get('/paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.paper-flute.index');
          Route::get('/paper-flute/view-print', [PaperFluteController::class, 'vueViewAndPrint'])->name('vue.paper-flute.view-print');
+         // Alias for search menu
+         Route::get('/define-paper-flute', [PaperFluteController::class, 'vueIndex'])->name('vue.define-paper-flute');
          
          Route::get('/paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.paper-size.index');
          Route::get('/paper-size/view-print', [PaperSizeController::class, 'vueViewAndPrint'])->name('vue.paper-size.view-print');
+         // Alias for search menu
+         Route::get('/define-paper-size', [PaperSizeController::class, 'vueIndex'])->name('vue.define-paper-size');
          
-         Route::get('/color-group', [ColorGroupController::class, 'vueIndex'])->name('vue.color-group.index');
+         Route::get('/color-group', [ColorGroupController::class, 'index'])->name('vue.color-group.index');
          Route::get('/color-group/view-print', [ColorGroupController::class, 'vueViewAndPrint'])->name('vue.color-group.view-print');
+         // Alias for search menu
+         Route::get('/define-color-group', [ColorGroupController::class, 'index'])->name('vue.define-color-group');
          
          Route::get('/color', [ColorController::class, 'vueIndex'])->name('vue.color.index');
          Route::get('/color/view-print', [ColorController::class, 'vueViewAndPrint'])->name('vue.color.view-print');
+         // Alias for search menu
+         Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.define-color');
          
          Route::get('/finishing', [FinishingController::class, 'vueIndex'])->name('vue.finishing.index');
          Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
+         // Alias for search menu
+         Route::get('/define-finishing', [FinishingController::class, 'vueIndex'])->name('vue.define-finishing');
          
          // Customer Account Routes
          Route::get('/customer-group', function () {
@@ -417,10 +479,20 @@ Route::middleware('auth')->group(function () {
          })->name('vue.customer-group.index');
          
          Route::get('/customer-group/view-print', [CustomerGroupController::class, 'vueViewAndPrint'])->name('vue.customer-group.view-print');
+         // Alias for search menu
+         Route::get('/define-customer-group', function () {
+             return Inertia::render('sales-management/system-requirement/customer-account/customer-group');
+         })->name('vue.define-customer-group');
 
+         // Update Customer Account - Main route (searchable in menu)
          Route::get('/update-customer-account', function () {
              return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
          })->name('vue.update-customer-account.index');
+         
+         // Alias for search menu (without 'index' suffix)
+         Route::get('/customer-account-update', function () {
+             return Inertia::render('sales-management/system-requirement/customer-account/update-customer-account');
+         })->name('vue.update-customer-account-management');
          
          Route::post('/update-customer-account', [UpdateCustomerAccountController::class, 'store'])->name('update-customer-account.store');
          
@@ -1012,6 +1084,12 @@ Route::prefix('api')->group(function () {
     Route::post('/salesperson/delete/{code}', [SalespersonController::class, 'destroy']);
     Route::post('/salesperson/seed', [SalespersonController::class, 'seed']);
     
+    // Sales Team API routes moved to proper SalesTeamController section below
+    
+    // Salesperson Team API routes (using same controller)
+    Route::get('/salesperson-teams', [SalespersonController::class, 'getSalespersonTeams']);
+    Route::post('/salesperson-teams/assign', [SalespersonController::class, 'assignToTeam']);
+    
     // Paper Quality API routes
     Route::get('/paper-qualities', [PaperQualityController::class, 'apiIndex']);
     Route::post('/paper-qualities', [PaperQualityController::class, 'apiStore']);
@@ -1026,11 +1104,7 @@ Route::prefix('api')->group(function () {
     Route::get('/paper-flutes/seeder-data', [PaperFluteController::class, 'getSeederData']);
     Route::post('/paper-flutes/seeder-data', [PaperFluteController::class, 'updateSeederData']);
     
-    Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
-    Route::get('/products', [ProductController::class, 'getProductsJson']);
-    Route::post('/products', [ProductController::class, 'apiStore']);
-    Route::put('/products/{id}', [ProductController::class, 'apiUpdate']);
-    Route::delete('/products/{id}', [ProductController::class, 'apiDestroy']);
+    // Product API routes moved to routes/api.php
     
     // Product Designs API routes - Fixed duplicate /api prefix
     Route::get('/product-designs', [ProductDesignController::class, 'getDesignsJson']);
@@ -1055,10 +1129,10 @@ Route::prefix('api')->group(function () {
     Route::post('/geo', [GeoController::class, 'store']);
     Route::put('/geo/{code}', [GeoController::class, 'update']);
     Route::delete('/geo/{code}', [GeoController::class, 'destroy']);
-    Route::get('/color-groups', [ColorGroupController::class, 'index']);
+    Route::get('/color-groups', [ColorGroupController::class, 'apiIndex']);
     Route::post('/color-groups', [ColorGroupController::class, 'store']);
-    Route::put('/color-groups/{id}', [ColorGroupController::class, 'update']);
-    Route::delete('/color-groups/{id}', [ColorGroupController::class, 'destroy']);
+    Route::put('/color-groups/{code}', [ColorGroupController::class, 'update']);
+    Route::delete('/color-groups/{code}', [ColorGroupController::class, 'destroy']);
     Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
     
     // Colors API routes - Using color_id as parameter
@@ -1072,7 +1146,7 @@ Route::prefix('api')->group(function () {
     Route::put('/industry/{id}', [IndustryController::class, 'update']);
     Route::delete('/industry/{id}', [IndustryController::class, 'destroy']);
     Route::get('/industry/search/{code}', [IndustryController::class, 'search']);
-    Route::get('/industries', [IndustryController::class, 'apiIndex']);
+    Route::get('/industry/api', [IndustryController::class, 'apiIndex']);
     Route::get('/paper-flutes', [PaperFluteController::class, 'index']);
     
     // Product Group API routes
@@ -1144,11 +1218,11 @@ Route::prefix('api')->group(function () {
     Route::put('/customer-sales-types/{id}', [CustomerSalesTypeController::class, 'apiUpdate']);
     Route::delete('/customer-sales-types/{id}', [CustomerSalesTypeController::class, 'apiDestroy']);
 
-    // Color Group API routes
-    Route::get('/color-groups', [ColorGroupController::class, 'index']);
+    // Color Group API routes (using ColorGroupController)
+    Route::get('/color-groups', [ColorGroupController::class, 'apiIndex']);
     Route::post('/color-groups', [ColorGroupController::class, 'store']);
-    Route::put('/color-groups/{id}', [ColorGroupController::class, 'update']);
-    Route::delete('/color-groups/{id}', [ColorGroupController::class, 'destroy']);
+    Route::put('/color-groups/{code}', [ColorGroupController::class, 'update']);
+    Route::delete('/color-groups/{code}', [ColorGroupController::class, 'destroy']);
     Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
     
     // Finishing API routes
@@ -1314,7 +1388,15 @@ Route::prefix('api')->group(function () {
                 // Determine title; if leaf is generic view, prepend with previous meaningful segment
                 $title = '';
                 $leafLower = strtolower($leaf);
-                if (in_array($leafLower, $genericView, true)) {
+                
+                // Custom title mappings for specific routes
+                $customTitles = [
+                    'vue.update-customer-account-management' => 'Update Customer Account',
+                ];
+                
+                if (isset($customTitles[$name])) {
+                    $title = $customTitles[$name];
+                } elseif (in_array($leafLower, $genericView, true)) {
                     // find previous non-generic segment
                     $prev = '';
                     for ($i = count($parts) - 2; $i >= 0; $i--) {

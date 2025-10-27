@@ -11,20 +11,19 @@ class PaperSize extends Model
 
     protected $table = 'paper_sizes';
     
+    // Simplified to match CPS structure: NO, MILLIMETER, INCHES
     protected $fillable = [
-        'size',
-        'inches',
-        'unit',
-        'is_active',
-        'created_by',
-        'updated_by'
+        'millimeter',
+        'inches'
     ];
     
     protected $casts = [
-        'size' => 'decimal:2',
-        'inches' => 'decimal:2',
-        'is_active' => 'boolean'
+        'millimeter' => 'decimal:2',
+        'inches' => 'decimal:2'
     ];
+    
+    // Disable timestamps
+    public $timestamps = false;
 
     /**
      * Konversi millimeter ke inches - Metode statis yang dipanggil dari Controller
@@ -83,17 +82,17 @@ class PaperSize extends Model
     {
         try {
             // Konversi mm ke inches
-            if (isset($model->size) && is_numeric($model->size) && $model->size > 0) {
-                $model->inches = self::convertToInches($model->size);
+            if (isset($model->millimeter) && is_numeric($model->millimeter) && $model->millimeter > 0) {
+                $model->inches = self::convertToInches($model->millimeter);
             }
             // Konversi inches ke mm
             elseif (isset($model->inches) && is_numeric($model->inches) && $model->inches > 0) {
-                $model->size = self::convertToMillimeters($model->inches);
+                $model->millimeter = self::convertToMillimeters($model->inches);
             }
         } catch (\Exception $e) {
             // Set nilai default jika terjadi error
-            if (!isset($model->size) || !is_numeric($model->size) || $model->size <= 0) {
-                $model->size = 0;
+            if (!isset($model->millimeter) || !is_numeric($model->millimeter) || $model->millimeter <= 0) {
+                $model->millimeter = 0;
             }
             if (!isset($model->inches) || !is_numeric($model->inches) || $model->inches <= 0) {
                 $model->inches = 0;
@@ -106,7 +105,7 @@ class PaperSize extends Model
      */
     public function getInchesValue($millimeters = null)
     {
-        $mm = $millimeters ?? $this->size;
+        $mm = $millimeters ?? $this->millimeter;
         return self::convertToInches($mm);
     }
 
@@ -117,13 +116,5 @@ class PaperSize extends Model
     {
         $inch = $inches ?? $this->inches;
         return self::convertToMillimeters($inch);
-    }
-    
-    /**
-     * Scope untuk data aktif
-     */
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
     }
 }

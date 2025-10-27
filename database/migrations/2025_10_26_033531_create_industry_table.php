@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->rememberToken()->after('amend_expired_password');
+        Schema::create('industry', function (Blueprint $table) {
+            $table->string('code', 5)->primary();
+            $table->string('name', 30);
         });
     }
 
@@ -21,8 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('remember_token');
-        });
+        Schema::dropIfExists('industry');
     }
 };

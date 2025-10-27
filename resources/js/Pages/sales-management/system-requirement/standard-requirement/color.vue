@@ -462,9 +462,15 @@ const fetchColors = async () => {
         
         const data = await response.json();
         
+        // Handle different response formats
         if (Array.isArray(data)) {
+            // Direct array response
             colors.value = data;
+        } else if (data.colors && Array.isArray(data.colors)) {
+            // Object with colors array
+            colors.value = data.colors;
         } else if (data.data && Array.isArray(data.data)) {
+            // Nested data array
             colors.value = data.data;
         } else {
             colors.value = [];
@@ -501,16 +507,29 @@ const fetchColorGroups = async () => {
         
         const data = await response.json();
         
+        // Handle different response formats
+        let groupsArray = [];
         if (Array.isArray(data)) {
-            colorGroups.value = data.map(group => ({
-                cg: group.cg_id || group.cg,
-                cg_name: group.cg_name,
-                cg_type: group.cg_type
-            }));
+            // Direct array response
+            groupsArray = data;
+        } else if (data.color_groups && Array.isArray(data.color_groups)) {
+            // Object with color_groups array
+            groupsArray = data.color_groups;
+        } else if (data.data && Array.isArray(data.data)) {
+            // Nested data array
+            groupsArray = data.data;
         } else {
             colorGroups.value = [];
             console.error('Unexpected data format:', data);
+            return;
         }
+        
+        // Transform the data
+        colorGroups.value = groupsArray.map(group => ({
+            cg: group.cg_id || group.cg,
+            cg_name: group.cg_name,
+            cg_type: group.cg_type
+        }));
     } catch (e) {
         console.error('Error fetching color groups:', e);
         colorGroups.value = [];

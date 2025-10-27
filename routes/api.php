@@ -19,6 +19,7 @@ use App\Http\Controllers\SideTrimByProductDesignController;
 use App\Http\Controllers\ProductDesignController;
 use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\FinishingController;
+use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController;
 use App\Http\Controllers\SalesManagement\CustomerService\CustomerServiceController;
@@ -143,7 +144,20 @@ Route::put('/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyCont
 Route::delete('/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyController::class, 'apiDestroy']);
 
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
+
+// Product API routes
 Route::get('/products', [ProductController::class, 'getProductsJson']);
+Route::get('/categories', [ProductController::class, 'getCategoriesJson']);
+Route::post('/products', [ProductController::class, 'apiStore']);
+Route::match(['put', 'patch'], '/products/{id}', [ProductController::class, 'apiUpdate'])->where('id', '[0-9]+');
+Route::delete('/products/{id}', [ProductController::class, 'apiDestroy'])->where('id', '[0-9]+');
+
+// Color Group API routes
+Route::get('/color-groups', [ColorGroupController::class, 'apiIndex']);
+Route::post('/color-groups', [ColorGroupController::class, 'store']);
+Route::put('/color-groups/{code}', [ColorGroupController::class, 'update']);
+Route::delete('/color-groups/{code}', [ColorGroupController::class, 'destroy']);
+Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -843,8 +857,17 @@ Route::prefix('delivery-order-formats')->group(function () {
 });
 
 // Industry, Geo, and Salesperson API routes
-Route::get('/industries', [App\Http\Controllers\IndustryController::class, 'apiIndex']);
-Route::get('/geos', [App\Http\Controllers\GeoController::class, 'apiIndex']);
+Route::get('/industry', [App\Http\Controllers\IndustryController::class, 'apiIndex']);
+
+// Geo API routes (complete CRUD)
+Route::get('/geo', [App\Http\Controllers\GeoController::class, 'apiIndex']);
+Route::get('/geos', [App\Http\Controllers\GeoController::class, 'apiIndex']); // Alias for compatibility
+Route::post('/geo', [App\Http\Controllers\GeoController::class, 'store']);
+Route::get('/geo/{code}', [App\Http\Controllers\GeoController::class, 'show']);
+Route::put('/geo/{code}', [App\Http\Controllers\GeoController::class, 'update']);
+Route::delete('/geo/{code}', [App\Http\Controllers\GeoController::class, 'destroy']);
+Route::post('/geo/seed', [App\Http\Controllers\GeoController::class, 'seed']);
+
 Route::get('/salespersons', [App\Http\Controllers\SalespersonController::class, 'apiIndex']);
 
 // Customer Group API routes

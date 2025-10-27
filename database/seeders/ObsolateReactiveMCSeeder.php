@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\ObsolateReactiveMC;
 use App\Models\UpdateCustomerAccount;
-use App\Models\User;
+use App\Models\UserCps;
 
 class ObsolateReactiveMCSeeder extends Seeder
 {
@@ -15,8 +15,9 @@ class ObsolateReactiveMCSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get a default user for created_by and updated_by
-        $user = User::first() ?? User::factory()->create();
+        // Get a default user ID from USERCPS (legacy table with string ID)
+        $defaultUser = UserCps::first();
+        $userId = $defaultUser ? $defaultUser->ID : 'SYSTEM';
         
         // Get some customers to associate with master cards
         $customers = UpdateCustomerAccount::limit(5)->get();
@@ -28,8 +29,8 @@ class ObsolateReactiveMCSeeder extends Seeder
                 [
                     'customer_name' => 'Default Customer',
                     'address' => 'Default Address',
-                    'created_by' => $user->id,
-                    'updated_by' => $user->id,
+                    'created_by' => $userId,
+                    'updated_by' => $userId,
                 ]
             );
             $customers = collect([$customer]);
@@ -55,7 +56,7 @@ class ObsolateReactiveMCSeeder extends Seeder
                 'description' => 'Third master card',
                 'status' => 'obsolete',
                 'obsolate_date' => now()->subDays(5),
-                'obsolate_by' => $user->id,
+                'obsolate_by' => $userId,
                 'obsolate_reason' => 'Product discontinued',
             ],
             [
@@ -64,10 +65,10 @@ class ObsolateReactiveMCSeeder extends Seeder
                 'description' => 'Fourth master card',
                 'status' => 'active',
                 'obsolate_date' => now()->subDays(10),
-                'obsolate_by' => $user->id,
+                'obsolate_by' => $userId,
                 'obsolate_reason' => 'Product discontinued',
                 'reactive_date' => now()->subDays(2),
-                'reactive_by' => $user->id,
+                'reactive_by' => $userId,
                 'reactive_reason' => 'Product reintroduced',
             ],
         ];
@@ -89,8 +90,8 @@ class ObsolateReactiveMCSeeder extends Seeder
                     'reactive_date' => $masterCard['reactive_date'] ?? null,
                     'reactive_by' => $masterCard['reactive_by'] ?? null,
                     'reactive_reason' => $masterCard['reactive_reason'] ?? null,
-                    'created_by' => $user->id,
-                    'updated_by' => $user->id,
+                    'created_by' => $userId,
+                    'updated_by' => $userId,
                 ]
             );
         }

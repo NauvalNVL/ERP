@@ -352,7 +352,7 @@ const fetchProducts = async () => {
 const fetchCategories = async () => {
     try {
         // Use the correct endpoint for categories
-        const res = await fetch('/categories', { 
+        const res = await fetch('/api/categories', { 
             headers: { 
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

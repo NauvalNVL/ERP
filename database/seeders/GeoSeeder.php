@@ -251,9 +251,16 @@ class GeoSeeder extends Seeder
 
         foreach ($geoData as $data) {
             Geo::updateOrCreate(
-                ['code' => $data['code']],
-                $data
+                ['CODE' => $data['code']],
+                [
+                    'CODE' => $data['code'],
+                    'COUNTRY' => $data['country'],
+                    'STATE' => $data['state'],
+                    'TOWN' => $data['town'],
+                    'TOWN_SECTION' => $data['town_section'],
+                    'AREA' => $data['area']
+                ]
             );
         }
     }
-} 
+}

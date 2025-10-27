@@ -383,6 +383,13 @@ const fetchGeos = async () => {
     }
 };
 
+// Watch for props changes
+watch(() => props.geos, (newGeos) => {
+    if (newGeos && newGeos.length > 0) {
+        geos.value = newGeos;
+    }
+}, { immediate: true });
+
 onMounted(() => {
     if (geos.value.length === 0) {
         fetchGeos();

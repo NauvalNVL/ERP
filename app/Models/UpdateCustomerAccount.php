@@ -22,6 +22,7 @@ class UpdateCustomerAccount extends Model
         'credit_terms',
         'ac_type',
         'currency_code',
+        'sales_type',
         'salesperson_code',
         'industrial_code',
         'geographical',

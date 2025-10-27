@@ -9,10 +9,13 @@ class Geo extends Model
 {
     use HasFactory;
 
-    // Specify the table name if it's not the plural form of the model name
-    protected $table = 'geo';
+    // Actual database table has lowercase columns
+    protected $table = 'GEO';
+    protected $primaryKey = 'code';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    public $timestamps = false; // No timestamps - matching migration and CPS structure
 
-    // Specify the fillable fields
     protected $fillable = [
         'code',
         'country',

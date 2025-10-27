@@ -25,8 +25,8 @@
 
           <div class="p-6">
             <!-- Modern Attractive Period Selection -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 pb-8 border-b border-gradient-to-r from-blue-100 to-purple-100">
-              
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
               <!-- Current Period Card -->
               <div class="group relative">
                 <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
@@ -40,34 +40,34 @@
                       <p class="text-xs text-gray-500">Active posting period</p>
                     </div>
                   </div>
-                  
+
                   <div class="flex items-center justify-center space-x-2 bg-white/70 backdrop-blur rounded-xl border border-blue-100 p-4 shadow-inner">
                     <div class="relative">
-                      <input 
-                        v-model="currentMonth" 
-                        type="text" 
+                      <input
+                        v-model="currentMonth"
+                        type="text"
                         readonly
                         class="w-12 h-12 text-center text-lg font-bold bg-gray-100 border-2 border-gray-300 text-gray-700 rounded-lg cursor-not-allowed"
-                        placeholder="MM" 
+                        placeholder="MM"
                       />
                       <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-blue-400 font-medium">Month</div>
                       <div v-if="currentMonth && currentPeriodValid" class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                         <i class="fa fa-check text-white text-xs"></i>
                       </div>
                     </div>
-                    
+
                     <div :class="[
                       'w-8 h-1 rounded-full',
                       currentPeriodValid ? 'bg-gradient-to-r from-green-400 to-emerald-500' : 'bg-gradient-to-r from-blue-400 to-indigo-500'
                     ]"></div>
-                    
+
                     <div class="relative">
-                      <input 
-                        v-model="currentYear" 
-                        type="text" 
+                      <input
+                        v-model="currentYear"
+                        type="text"
                         readonly
                         class="w-16 h-12 text-center text-lg font-bold bg-gray-100 border-2 border-gray-300 text-gray-700 rounded-lg cursor-not-allowed"
-                        placeholder="YYYY" 
+                        placeholder="YYYY"
                       />
                       <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-blue-400 font-medium">Year</div>
                       <div v-if="currentYear && currentPeriodValid" class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
@@ -91,34 +91,34 @@
                       <p class="text-xs text-gray-500">Invoice processing period</p>
                     </div>
                   </div>
-                  
+
                   <div class="flex items-center justify-center space-x-2 bg-white/70 backdrop-blur rounded-xl border border-purple-100 p-4 shadow-inner">
                     <div class="relative">
-                      <input 
-                        v-model="updateMonth" 
-                        type="text" 
+                      <input
+                        v-model="updateMonth"
+                        type="text"
                         readonly
                         class="w-12 h-12 text-center text-lg font-bold bg-gray-100 border-2 border-gray-300 text-gray-700 rounded-lg cursor-not-allowed"
-                        placeholder="MM" 
+                        placeholder="MM"
                       />
                       <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 font-medium">Month</div>
                       <div v-if="updateMonth && updatePeriodValid" class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                         <i class="fa fa-check text-white text-xs"></i>
                       </div>
                     </div>
-                    
+
                     <div :class="[
                       'w-8 h-1 rounded-full',
                       updatePeriodValid ? 'bg-gradient-to-r from-green-400 to-emerald-500' : 'bg-gradient-to-r from-purple-400 to-pink-500'
                     ]"></div>
-                    
+
                     <div class="relative">
-                      <input 
-                        v-model="updateYear" 
-                        type="text" 
+                      <input
+                        v-model="updateYear"
+                        type="text"
                         readonly
                         class="w-16 h-12 text-center text-lg font-bold bg-gray-100 border-2 border-gray-300 text-gray-700 rounded-lg cursor-not-allowed"
-                        placeholder="YYYY" 
+                        placeholder="YYYY"
                       />
                       <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 font-medium">Year</div>
                       <div v-if="updateYear && updatePeriodValid" class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
@@ -142,7 +142,7 @@
                       <p class="text-xs text-gray-500">{{ hasCustomer ? 'Customer selected' : 'Select target customer' }}</p>
                     </div>
                   </div>
-                  
+
                   <div class="flex items-center justify-center bg-white/70 backdrop-blur rounded-xl border border-emerald-100 p-4 shadow-inner">
                     <div class="relative w-full max-w-none">
                       <div class="flex items-stretch bg-white rounded-lg border-2 border-emerald-200 shadow-sm h-12">
@@ -153,11 +153,11 @@
                             hasCustomer ? 'fa fa-check-circle text-green-600' : 'fa fa-user text-emerald-600'
                           ]"></i>
                         </div>
-                        
+
                         <!-- Input Field -->
-                        <input 
-                          v-model="customerCode" 
-                          type="text" 
+                        <input
+                          v-model="customerCode"
+                          type="text"
                           :class="[
                             'flex-grow min-w-0 px-4 text-sm font-medium outline-none border-0 bg-white transition-colors duration-200',
                             hasCustomer ? 'text-green-700' : 'text-gray-900'
@@ -165,17 +165,17 @@
                           placeholder="Type customer code (e.g. 000004)"
                           @input="onCustomerCodeInput"
                         />
-                        
+
                         <!-- Search Button -->
-                        <button 
-                          @click="showCustomerModal = true" 
+                        <button
+                          @click="showCustomerModal = true"
                           type="button"
                           class="flex items-center justify-center w-12 bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 transition-all duration-200 border-l border-emerald-400"
                         >
                           <i class="fa fa-search text-sm"></i>
                         </button>
                       </div>
-                      
+
                       <!-- Success indicator -->
                       <div v-if="hasCustomer" class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center shadow-md">
                         <i class="fa fa-check text-white text-xs"></i>
@@ -186,23 +186,33 @@
               </div>
             </div>
 
-            <!-- Additional Fields Grid -->
-            <div class="grid grid-cols-12 gap-5">
+            <!-- Additional Fields Grid with smooth transition -->
+            <div
+              class="overflow-hidden transition-all duration-500"
+              :style="{
+                maxHeight: hasCustomer ? '1000px' : '0',
+                opacity: hasCustomer ? 1 : 0,
+                marginTop: hasCustomer ? '1.5rem' : '0',
+                paddingTop: hasCustomer ? '1.5rem' : '0'
+              }"
+            >
+              <div class="border-t border-gray-200 pt-6">
+                <div class="grid grid-cols-12 gap-5">
 
             <!-- Customer name (readonly) -->
-            <div v-if="hasCustomer" class="col-span-12 lg:col-span-8">
+            <div class="col-span-12 lg:col-span-8">
               <label class="block text-xs font-medium text-gray-700 mb-1">Customer Name</label>
               <input v-model="customerName" type="text" readonly class="w-full px-3 py-2 text-sm rounded-md bg-gray-50 ring-1 ring-inset ring-gray-200 cursor-not-allowed" />
             </div>
 
             <!-- Currency (readonly) -->
-            <div v-if="hasCustomer" class="col-span-12 md:col-span-4">
+            <div class="col-span-12 md:col-span-4">
               <label class="block text-xs font-medium text-gray-700 mb-1">Currency</label>
               <input v-model="currency" type="text" readonly class="w-full px-3 py-2 text-sm rounded-md bg-gray-50 ring-1 ring-inset ring-gray-200 cursor-not-allowed" />
             </div>
 
             <!-- Tax Index No. -->
-            <div v-if="hasCustomer" class="col-span-12 md:col-span-4">
+            <div class="col-span-12 md:col-span-4">
               <label class="block text-xs font-medium text-gray-700 mb-1">
                 Tax Index No. <span class="text-red-600">*</span>
               </label>
@@ -221,7 +231,7 @@
             </div>
 
             <!-- Invoice Date with day of week -->
-            <div v-if="hasCustomer" class="col-span-12 md:col-span-4">
+            <div class="col-span-12 md:col-span-4">
               <label class="block text-xs font-medium text-gray-700 mb-1">Invoice Date</label>
               <div class="flex items-center gap-2">
                 <input v-model="invoiceDate" type="date" class="px-3 py-2 text-sm rounded-md ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500" />
@@ -230,62 +240,36 @@
             </div>
 
             <!-- 2nd Reference -->
-            <div v-if="hasCustomer" class="col-span-12 md:col-span-4">
+            <div class="col-span-12 md:col-span-4">
               <label class="block text-xs font-medium text-gray-700 mb-1">2nd Reference#</label>
               <input v-model="secondRef" type="text" class="w-full px-3 py-2 text-sm rounded-md ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500" />
             </div>
 
             <!-- Remark -->
-            <div v-if="hasCustomer" class="col-span-12">
+            <div class="col-span-12">
               <label class="block text-xs font-medium text-gray-700 mb-1">Remark</label>
               <input v-model="remark" type="text" class="w-full px-3 py-2 text-sm rounded-md ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500" />
             </div>
 
             <!-- Actions -->
-            <div class="col-span-12 flex flex-wrap items-center gap-3 pt-2">
-              <button
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="!hasCustomer"
-                @click="refreshPeriodData"
-              >
-                <i class="fa fa-sync"></i>
-                Refresh Period Data
-              </button>
-              <button
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-emerald-600 text-white text-sm hover:bg-emerald-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="!hasCustomer || preparing"
-                @click="openFlow"
-                @keyup.enter.stop.prevent="openFlow"
-              >
-                <i v-if="!preparing" class="fa fa-arrow-right"></i>
-                <i v-else class="fa fa-spinner fa-spin"></i>
-                {{ preparing ? 'Preparing...' : 'Continue to Prepare' }}
-              </button>
-              <div class="flex-1"></div>
-              <button class="inline-flex items-center gap-2 px-3 py-2 rounded-md border text-sm hover:bg-gray-50" @click="showCancelModal = true">
-                <i class="fa fa-ban text-red-600"></i>
-                Cancel Active Invoice
-              </button>
-              <button class="inline-flex items-center gap-2 px-3 py-2 rounded-md border text-sm hover:bg-gray-50" @click="showLogModal = true">
-                <i class="fa fa-print text-emerald-600"></i>
-                View & Print Invoice Log
-              </button>
-            </div>
-            <div v-if="hasCustomer" class="col-span-12 flex items-center justify-end gap-3 pt-4 border-t">
-              <button @click="refreshPeriodData" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
-                <i class="fa fa-sync-alt"></i>
-                Refresh
-              </button>
+            <div class="col-span-12 flex items-center justify-end gap-3 pt-6 border-t-2 border-gray-200 mt-4">
               <button
                 @click="openFlow"
-                :disabled="preparing"
-                class="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                :disabled="preparing || !hasCustomer"
+                class="inline-flex items-center gap-3 px-8 py-3 text-base font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
               >
-                <i v-if="!preparing" class="fa fa-arrow-right"></i>
-                <i v-else class="fa fa-spinner fa-spin"></i>
-                {{ preparing ? 'Processing...' : 'Continue to Prepare' }}
+                <span>{{ preparing ? 'Processing...' : 'Next' }}</span>
+                <svg v-if="!preparing" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+                <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
               </button>
             </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -358,6 +342,7 @@
         :mcSeq="selectedOrderForItems?.mcs_num || ''"
         :totalAmount="selectedOrderForItems?.amount || 0"
         @close="salesOrderItemsModalOpen = false"
+        @confirm="onSalesOrderItemsConfirm"
       />
 
       <!-- Modal 5: Invoice Number Option -->
@@ -373,7 +358,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { ref, computed, watch } from 'vue'
-import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
+import CustomerAccountModal from '@/Components/customer-account-modal.vue'
 import SalesTaxIndexModal from '@/Components/SalesTaxIndexModal.vue'
 import CheckSalesTaxModal from '@/Components/CheckSalesTaxModal.vue'
 import DeliveryOrderScreenModal from '@/Components/DeliveryOrderScreenModal.vue'
@@ -414,7 +399,7 @@ async function selectCustomer(customer){
 
   // Extract only currency code (remove full names like "INDONESIA")
   currency.value = extractCurrencyCode(modalCurrency)
-  
+
   // Track the selected customer code to detect manual changes later
   lastSelectedCustomerCode.value = customerCode.value
 
@@ -437,7 +422,7 @@ async function selectCustomer(customer){
           // Extract currency code and update
           const apiCurrencyCode = extractCurrencyCode(data.currency)
           const modalCurrencyCode = extractCurrencyCode(modalCurrency)
-          
+
           if (apiCurrencyCode !== modalCurrencyCode) {
             currency.value = apiCurrencyCode
             console.log(`Currency updated from API: ${modalCurrencyCode} -> ${apiCurrencyCode}`)
@@ -479,6 +464,16 @@ const salesOrderItemsModalOpen = ref(false)  // Sales Order Items screen
 const finalTaxModalOpen = ref(false)
 const invoiceNumberModalOpen = ref(false)
 const preparing = ref(false)
+
+// 🔍 DEBUG: Watch doListModalOpen changes to track unexpected closes
+watch(() => doListModalOpen.value, (newVal, oldVal) => {
+  if (oldVal === true && newVal === false) {
+    console.log('⚠️ [MAIN PAGE] doListModalOpen changed: true → false')
+    console.trace('doListModalOpen closed from:')
+  } else if (oldVal === false && newVal === true) {
+    console.log('✅ [MAIN PAGE] doListModalOpen changed: false → true (Screen Modal Opening)')
+  }
+})
 
 // Flow data
 const selectedDOs = ref([])
@@ -581,8 +576,12 @@ function handleDetailedDOClose(){
  * Data is sent back to Delivery Order Screen (simple list)
  */
 function onDOsSelectedFromTable(dos){
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log('📦 DOs selected from table:', dos)
-  
+  console.log('📊 Modal states BEFORE:')
+  console.log('   - Table Modal (doSelectionModalOpen):', doSelectionModalOpen.value)
+  console.log('   - Screen Modal (doListModalOpen):', doListModalOpen.value)
+
   // Close the detailed table modal
   doSelectionModalOpen.value = false
 
@@ -594,13 +593,24 @@ function onDOsSelectedFromTable(dos){
     // Single selection - convert to array
     selectedDOs.value = [dos]
   }
-  
-  console.log('✅ Selected DOs updated:', selectedDOs.value)
-  console.log('🔓 Delivery Order Screen Modal remains OPEN')
+
+  console.log('✅ Selected DOs updated:', selectedDOs.value.map(d => d.do_number))
+  console.log('📊 Modal states AFTER:')
+  console.log('   - Table Modal (doSelectionModalOpen):', doSelectionModalOpen.value, '❌ CLOSED')
+  console.log('   - Screen Modal (doListModalOpen):', doListModalOpen.value, '✅ STILL OPEN')
+
+  // 🔒 CRITICAL: Ensure Screen Modal stays open
+  if (doListModalOpen.value === false) {
+    console.error('🚨 ERROR: Screen Modal was closed! Re-opening it...')
+    doListModalOpen.value = true
+  }
+
+  console.log('🔓 User should now see Delivery Order Screen with selected DO')
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
   // Keep the simple list modal open to show selected data
   // User can then click Select button to continue
-  // doListModalOpen stays true - screen modal will show the selected DO
+  // doListModalOpen MUST stay true - screen modal will show the selected DO
 }
 
 /**
@@ -614,7 +624,7 @@ function openSalesOrderItems(order){
 
 /**
  * Step 3: User clicks Select button in Delivery Order Screen
- * Calculate total and open Final Tax Calculation Modal
+ * Open Sales Order Items Screen (CPS Flow)
  */
 async function onDOsSelected(dos){
   // Close the simple list modal
@@ -625,11 +635,17 @@ async function onDOsSelected(dos){
     return
   }
 
-  // Calculate total amount
+  // Store selected DOs and calculate total
+  selectedDOs.value = dos
   await calculateTotalAmount(dos)
 
-  // Open Final Tax Calculation Modal
-  finalTaxModalOpen.value = true
+  // CPS Flow: Open Sales Order Items Screen first
+  if (dos.length > 0) {
+    selectedOrderForItems.value = dos[0] // Select first DO for items view
+    selectedOrderForItems.value.amount = totalAmount.value
+    salesOrderItemsModalOpen.value = true
+    console.log('📦 Opening Sales Order Items Screen for:', dos[0].do_number)
+  }
 }
 
 /**
@@ -656,6 +672,19 @@ async function calculateTotalAmount(dos){
     console.error('Failed to calculate total:', e)
     totalAmount.value = 0
   }
+}
+
+/**
+ * Step 3b: User confirms Sales Order Items
+ * Opens Final Tax Calculation Modal (CPS Flow)
+ */
+function onSalesOrderItemsConfirm(itemsData){
+  console.log('✅ Sales Order Items confirmed:', itemsData)
+  // Close Sales Order Items modal
+  salesOrderItemsModalOpen.value = false
+
+  // Open Final Tax Calculation Modal
+  finalTaxModalOpen.value = true
 }
 
 /**
@@ -772,13 +801,13 @@ async function onCustomerCodeInput() {
   if (customerLookupTimeout) {
     clearTimeout(customerLookupTimeout)
   }
-  
+
   // Clear customer name and currency if code is changed manually
   if (customerCode.value !== lastSelectedCustomerCode.value) {
     customerName.value = ''
     currency.value = ''
   }
-  
+
   // Auto-lookup customer details when code is entered (debounced)
   const code = customerCode.value?.trim()
   if (code && code.length >= 4) { // Check for codes with 4 or more characters (like "000004" or "000211-08")
@@ -786,34 +815,34 @@ async function onCustomerCodeInput() {
       try {
         // Show loading state
         customerName.value = 'Loading...'
-        
+
         console.log(`Attempting customer lookup for code: ${code}`)
-        
+
         // Use the proper InvoiceController endpoint
         const res = await fetch(`/api/invoices/customer-details?customer_code=${encodeURIComponent(code)}`, {
-          headers: { 
+          headers: {
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
             'Content-Type': 'application/json'
           }
         })
-        
+
         console.log(`API response status: ${res.status}`)
-        
+
         if (res.ok) {
           const data = await res.json()
           console.log('API Response data:', data)
-          
+
           // The InvoiceController returns a single customer object with debug info
           if (data) {
             console.log('Debug info from backend:', data.debug_info)
-            
+
             if (data.customer_name && data.customer_name.trim() !== '') {
               customerName.value = data.customer_name
               // Extract only currency code (3 letters)
               currency.value = extractCurrencyCode(data.currency)
               lastSelectedCustomerCode.value = code
-              
+
               console.log(`Auto-lookup successful: ${data.customer_name}, Currency: ${currency.value}`)
               console.log(`Found in table: ${data.debug_info?.found_in_table}`)
             } else {
@@ -866,20 +895,20 @@ let customerLookupTimeout = null
  */
 function extractCurrencyCode(currencyString) {
   if (!currencyString) return 'IDR' // Default
-  
+
   const str = String(currencyString).trim().toUpperCase()
-  
+
   // If it's already 3 letters, return it
   if (str.length === 3 && /^[A-Z]{3}$/.test(str)) {
     return str
   }
-  
+
   // Extract first 3-letter word (currency code)
   const match = str.match(/\b([A-Z]{3})\b/)
   if (match) {
     return match[1]
   }
-  
+
   // Map common currency names to codes
   const currencyMap = {
     'INDONESIA': 'IDR',
@@ -891,14 +920,14 @@ function extractCurrencyCode(currencyString) {
     'YUAN': 'CNY',
     'RINGGIT': 'MYR'
   }
-  
+
   // Check if string contains any mapped currency name
   for (const [name, code] of Object.entries(currencyMap)) {
     if (str.includes(name)) {
       return code
     }
   }
-  
+
   // If nothing matches, take first 3 characters
   return str.substring(0, 3) || 'IDR'
 }
@@ -907,7 +936,7 @@ function extractCurrencyCode(currencyString) {
 function validateMonth(event, type) {
   const value = event.target.value.replace(/\D/g, '') // Only numbers
   const numValue = parseInt(value)
-  
+
   if (value.length <= 2 && (!numValue || (numValue >= 1 && numValue <= 12))) {
     const formattedValue = value.length === 1 && numValue > 0 ? value : (value.length === 2 ? value.padStart(2, '0') : value)
     if (type === 'current') {
@@ -928,7 +957,7 @@ function validateMonth(event, type) {
 function validateYear(event, type) {
   const value = event.target.value.replace(/\D/g, '') // Only numbers
   const thisYear = new Date().getFullYear()
-  
+
   if (value.length <= 4 && (!value || (parseInt(value) >= 2000 && parseInt(value) <= thisYear + 5))) {
     if (type === 'current') {
       currentYear.value = value
@@ -938,3 +967,26 @@ function validateYear(event, type) {
   }
 }
 </script>
+
+<style scoped>
+/* Smooth expand/collapse transition */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.duration-500 {
+  transition-duration: 500ms;
+}
+
+/* Ensure smooth overflow during animation */
+.overflow-hidden {
+  overflow: hidden;
+}
+
+/* Prevent any flicker during transition */
+* {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+</style>

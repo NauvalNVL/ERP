@@ -1,329 +1,242 @@
 <template>
   <AppLayout header="Print Delivery Order">
-    <!-- Main Container -->
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Page Header -->
-        <div class="mb-8">
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-6">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                  <div class="bg-white/20 p-3 rounded-lg">
-                    <span class="text-3xl">🖨️</span>
-                  </div>
-                  <div>
-                    <h1 class="text-2xl font-bold text-white">Print Delivery Order</h1>
-                    <p class="text-blue-100 text-sm mt-1">Generate and print delivery order documents</p>
-                  </div>
-                </div>
-                <div class="hidden md:flex items-center space-x-2 text-blue-100 text-sm">
-                  <span class="bg-white/20 px-3 py-1 rounded-full">F2: Lookup</span>
-                  <span class="bg-white/20 px-3 py-1 rounded-full">F5: Refresh</span>
-                  <span class="bg-white/20 px-3 py-1 rounded-full">Ctrl+P: Print</span>
-                </div>
-              </div>
-            </div>
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50" v-page-transition>
+      <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Header Section -->
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4 shadow-lg">
+            <i class="fa-solid fa-print text-white text-2xl"></i>
           </div>
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            Print Delivery Order
+          </h1>
+          <p class="text-gray-600 text-lg">Generate and print delivery order reports with modern interface</p>
         </div>
 
-        <!-- Main Form -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <!-- Form Header -->
-          <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
-              <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
-              Print Configuration
-            </h2>
-          </div>
-          
-          <!-- Form Content -->
-          <div class="p-6 space-y-8">
-            <!-- Current Period Card -->
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-              <div class="flex items-center mb-4">
-                <div class="bg-blue-500 p-2 rounded-lg mr-3">
-                  <span class="text-white text-lg">📅</span>
+        <!-- Main Card -->
+        <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 animate-fade-in-up">
+          <!-- Card Header -->
+          <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                  <i class="fa-solid fa-print text-white text-lg"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Current Period</h3>
-                  <p class="text-sm text-gray-600">Set the current working period</p>
+                  <h2 class="text-xl font-bold text-white">Print Configuration</h2>
+                  <p class="text-blue-100 text-sm">Configure your delivery order printing parameters</p>
                 </div>
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Month</label>
-                  <input 
-                    v-model="currentPeriod.month" 
-                    type="number" 
-                    min="1" 
-                    max="12" 
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
-                    placeholder="MM"
-                  >
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Year</label>
-                  <input 
-                    v-model="currentPeriod.year" 
-                    type="number" 
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" 
-                    placeholder="YYYY"
-                  >
-                </div>
-                <div class="text-center">
-                  <div class="bg-white px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-600 font-medium">
-                    Format: MM/YYYY
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Delivery Order Range Card -->
-            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-              <div class="flex items-center mb-4">
-                <div class="bg-green-500 p-2 rounded-lg mr-3">
-                  <span class="text-white text-lg">📋</span>
-                </div>
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Delivery Order Range</h3>
-                  <p class="text-sm text-gray-600">Specify the range of delivery orders to print</p>
-                </div>
-              </div>
-              
-              <div class="space-y-6">
-                <!-- From Range -->
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-3">From DO Number</label>
-                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div>
-                      <label class="block text-xs text-gray-500 mb-1">Month</label>
-                      <input 
-                        v-model="doRange.fromMonth" 
-                        type="number" 
-                        min="1" 
-                        max="12" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors" 
-                        placeholder="MM"
-                      >
-                    </div>
-                    <div>
-                      <label class="block text-xs text-gray-500 mb-1">Year</label>
-                      <input 
-                        v-model="doRange.fromYear" 
-                        type="number" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors" 
-                        placeholder="YYYY"
-                      >
-                    </div>
-                    <div>
-                      <label class="block text-xs text-gray-500 mb-1">Number</label>
-                      <input 
-                        v-model="doRange.fromNumber" 
-                        type="text" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors" 
-                        placeholder="00000"
-                      >
-                    </div>
-                    <div class="flex items-end">
-                      <button 
-                        @click="openDOModal"
-                        class="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
-                        title="DO Lookup"
-                      >
-                        🔍 Lookup
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- To Range -->
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-3">To DO Number</label>
-                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div>
-                      <label class="block text-xs text-gray-500 mb-1">Month</label>
-                      <input 
-                        v-model="doRange.toMonth" 
-                        type="number" 
-                        min="1" 
-                        max="12" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors" 
-                        placeholder="MM"
-                      >
-                    </div>
-                    <div>
-                      <label class="block text-xs text-gray-500 mb-1">Year</label>
-                      <input 
-                        v-model="doRange.toYear" 
-                        type="number" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors" 
-                        placeholder="YYYY"
-                      >
-                    </div>
-                    <div>
-                      <label class="block text-xs text-gray-500 mb-1">Number</label>
-                      <input 
-                        v-model="doRange.toNumber" 
-                        type="text" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors" 
-                        placeholder="99999"
-                      >
-                    </div>
-                    <div class="flex items-end">
-                      <button 
-                        @click="openToDOModal"
-                        class="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
-                        title="DO Lookup"
-                      >
-                        🔍 Lookup
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Format Info -->
-                <div class="bg-white rounded-lg p-3 border border-gray-200">
-                  <div class="flex items-center text-sm text-gray-600">
-                    <span class="text-green-500 mr-2">ℹ️</span>
-                    <span class="font-medium">Format:</span>
-                    <span class="ml-2 font-mono bg-gray-100 px-2 py-1 rounded">MM-YYYY-NNNNN</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Customer Selection Card -->
-            <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
-              <div class="flex items-center mb-4">
-                <div class="bg-purple-500 p-2 rounded-lg mr-3">
-                  <span class="text-white text-lg">👤</span>
-                </div>
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Customer Selection</h3>
-                  <p class="text-sm text-gray-600">Filter by specific customer (optional)</p>
-                </div>
-              </div>
-              
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Customer Code</label>
-                  <input 
-                    v-model="customer.code" 
-                    type="text" 
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors" 
-                    placeholder="Enter customer code"
-                  >
-                </div>
-                <div class="flex items-end">
-                  <button 
-                    @click="openCustomerModal"
-                    class="w-full px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium"
-                    title="Customer Lookup"
-                  >
-                    🔍 Search Customer
-                  </button>
-                </div>
-                <div v-if="customer.name" class="flex items-end">
-                  <div class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700">
-                    {{ customer.name }}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Print Options Card -->
-            <div class="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-6 border border-orange-100">
-              <div class="flex items-center mb-4">
-                <div class="bg-orange-500 p-2 rounded-lg mr-3">
-                  <span class="text-white text-lg">⚙️</span>
-                </div>
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Print Options</h3>
-                  <p class="text-sm text-gray-600">Configure print settings</p>
-                </div>
-              </div>
-              
-              <div class="space-y-4">
-                <label class="flex items-center p-4 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors">
-                  <input 
-                    v-model="newEntryMode" 
-                    type="radio" 
-                    value="print_only" 
-                    class="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500"
-                  >
-                  <div class="ml-3">
-                    <div class="text-sm font-medium text-gray-900">Print Only New Entry</div>
-                    <div class="text-xs text-gray-500">Only print delivery orders that haven't been printed before</div>
-                  </div>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center text-sm text-gray-600">
-              <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-              Ready to print delivery orders
-            </div>
-            
-            <div class="flex gap-3">
-              <button 
-                @click="refreshForm" 
-                class="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center font-medium"
+              <button
+                @click="refreshForm"
+                class="modern-btn-secondary"
               >
-                <span class="mr-2">🔄</span>
+                <i class="fa-solid fa-rotate-left mr-2"></i>
                 Reset Form
               </button>
-              <button 
-                @click="proceedToPrint" 
-                class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="!hasValidRange"
-              >
-                <span class="mr-2">🖨️</span>
-                Generate Print
+            </div>
+          </div>
+
+          <!-- Card Content -->
+          <div class="p-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <!-- Left Column -->
+              <div class="space-y-6">
+                <!-- Current Period Section -->
+                <div class="modern-section">
+                  <div class="modern-section-header">
+                    <i class="fa-solid fa-calendar-days text-blue-500"></i>
+                    <h3 class="modern-section-title">Current Period</h3>
+                  </div>
+                  <div class="modern-section-content">
+                    <div class="flex items-center gap-3">
+                      <div class="flex-1">
+                        <label class="modern-label">Month</label>
+                        <input 
+                          v-model.number="currentPeriod.month" 
+                          type="number" 
+                          min="1" 
+                          max="12" 
+                          class="modern-input text-center"
+                          placeholder="MM"
+                        />
+                      </div>
+                      <div class="flex-1">
+                        <label class="modern-label">Year</label>
+                        <input 
+                          v-model.number="currentPeriod.year" 
+                          type="number" 
+                          min="2000" 
+                          max="2099" 
+                          class="modern-input text-center"
+                          placeholder="YYYY"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- DO Range Section -->
+                <div class="modern-section">
+                  <div class="modern-section-header">
+                    <i class="fa-solid fa-list-ol text-green-500"></i>
+                    <h3 class="modern-section-title">Delivery Order Range</h3>
+                  </div>
+                  <div class="modern-section-content">
+                    <div class="space-y-4">
+                      <!-- From Range -->
+                      <div>
+                        <label class="modern-label">From D/Order#</label>
+                        <div class="flex items-center gap-2">
+                          <input v-model.number="doRange.fromMonth" type="number" min="1" max="12" class="modern-input w-16 text-center" placeholder="MM" />
+                          <span class="text-gray-400">/</span>
+                          <input v-model.number="doRange.fromYear" type="number" min="2000" max="2099" class="modern-input w-20 text-center" placeholder="YYYY" />
+                          <span class="text-gray-400">/</span>
+                          <input v-model="doRange.fromNumber" type="text" class="modern-input w-24" placeholder="Seq" />
+                          <button 
+                            class="modern-icon-btn" 
+                            title="Lookup"
+                            @click="openDOModal"
+                          >
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <!-- To Range -->
+                      <div>
+                        <label class="modern-label">To D/Order#</label>
+                        <div class="flex items-center gap-2">
+                          <input v-model.number="doRange.toMonth" type="number" min="1" max="12" class="modern-input w-16 text-center" placeholder="MM" />
+                          <span class="text-gray-400">/</span>
+                          <input v-model.number="doRange.toYear" type="number" min="2000" max="2099" class="modern-input w-20 text-center" placeholder="YYYY" />
+                          <span class="text-gray-400">/</span>
+                          <input v-model="doRange.toNumber" type="text" class="modern-input w-24" placeholder="Seq" />
+                          <button 
+                            class="modern-icon-btn" 
+                            title="Lookup"
+                            @click="openToDOModal"
+                          >
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Quick Print Section -->
+                <div class="modern-section">
+                  <div class="modern-section-header">
+                    <i class="fa-solid fa-bolt text-yellow-500"></i>
+                    <h3 class="modern-section-title">Quick Print</h3>
+                  </div>
+                  <div class="modern-section-content">
+                    <div class="flex gap-2">
+                      <input 
+                        v-model="quickDO" 
+                        class="modern-input flex-1" 
+                        placeholder="Enter DO Number (e.g. DO20250001)" 
+                      />
+                      <button class="modern-btn-primary" @click="quickPrint">
+                        <i class="fa-solid fa-bolt mr-2"></i>Quick Print
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column -->
+              <div class="space-y-6">
+                <!-- Customer Selection Section -->
+                <div class="modern-section">
+                  <div class="modern-section-header">
+                    <i class="fa-solid fa-user text-purple-500"></i>
+                    <h3 class="modern-section-title">Customer Filter</h3>
+                  </div>
+                  <div class="modern-section-content">
+                    <div class="space-y-3">
+                      <div>
+                        <label class="modern-label">Customer Code</label>
+                        <div class="flex gap-2">
+                          <input 
+                            v-model="customer.code" 
+                            class="modern-input flex-1" 
+                            placeholder="Enter customer code"
+                          />
+                          <button 
+                            class="modern-icon-btn" 
+                            title="Customer Lookup"
+                            @click="openCustomerModal"
+                          >
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div v-if="customer.name">
+                        <label class="modern-label">Customer Name</label>
+                        <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700">
+                          {{ customer.name }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Print Settings Section -->
+                <div class="modern-section">
+                  <div class="modern-section-header">
+                    <i class="fa-solid fa-cog text-orange-500"></i>
+                    <h3 class="modern-section-title">Print Settings</h3>
+                  </div>
+                  <div class="modern-section-content">
+                    <div class="space-y-4">
+                      <div>
+                        <label class="modern-label">Number of Copies</label>
+                        <select v-model.number="printCopies" class="modern-select">
+                          <option v-for="n in 9" :key="n" :value="n">{{ n }} {{ n === 1 ? 'Copy' : 'Copies' }}</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="modern-checkbox">
+                          <input type="checkbox" v-model="newEntryMode" />
+                          <span class="checkmark"></span>
+                          <span class="label-text">Print Only New Entry</span>
+                          <span class="status-badge outstanding">New</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-8 flex justify-center">
+              <button class="modern-btn-confirm" @click="proceedToPrint" :disabled="!hasValidRange">
+                <i class="fa-solid fa-print mr-2"></i>
+                Proceed to Print
               </button>
             </div>
           </div>
         </div>
 
         <!-- Status Messages -->
-        <div v-if="!hasValidRange || message" class="mt-6 space-y-4">
-          <!-- Validation Message -->
-          <div v-if="!hasValidRange" class="bg-white rounded-xl border border-yellow-200 overflow-hidden">
-            <div class="bg-yellow-50 px-6 py-4 border-b border-yellow-200">
-              <div class="flex items-center">
-                <div class="bg-yellow-500 p-2 rounded-lg mr-3">
-                  <span class="text-white text-lg">⚠️</span>
+        <div v-if="message" class="mt-6">
+          <div class="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden border border-white/20">
+            <div class="bg-gradient-to-r from-green-500 to-blue-500 px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <i class="fa-solid fa-check text-white"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Validation Required</h3>
-                  <p class="text-sm text-gray-600">Please complete the required fields</p>
+                  <h3 class="text-lg font-bold text-white">Status Update</h3>
+                  <p class="text-green-100 text-sm">Operation completed successfully</p>
                 </div>
               </div>
             </div>
             <div class="p-6">
-              <p class="text-sm text-gray-700">Please specify a valid delivery order range to proceed with printing.</p>
-            </div>
-          </div>
-
-          <!-- Status Message -->
-          <div v-if="message" class="bg-white rounded-xl border border-green-200 overflow-hidden">
-            <div class="bg-green-50 px-6 py-4 border-b border-green-200">
-              <div class="flex items-center">
-                <div class="bg-green-500 p-2 rounded-lg mr-3">
-                  <span class="text-white text-lg">✅</span>
-                </div>
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Status Update</h3>
-                  <p class="text-sm text-gray-600">Operation completed</p>
-                </div>
-              </div>
-            </div>
-            <div class="p-6">
-              <p class="text-sm text-gray-700">{{ message }}</p>
+              <p class="text-gray-700">{{ message }}</p>
             </div>
           </div>
         </div>
@@ -364,7 +277,7 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import CustomerAccountModal from '@/Components/CustomerAccountModal.vue'
+import CustomerAccountModal from '@/Components/customer-account-modal.vue'
 import DeliveryOrderTableModal from '@/Components/DeliveryOrderTableModal.vue'
 
 const currentPeriod = reactive({
@@ -386,8 +299,10 @@ const customer = reactive({
   name: ''
 })
 
-const newEntryMode = ref('print_only')
+const newEntryMode = ref(true)
 const message = ref('')
+const quickDO = ref('')
+const printCopies = ref(1)
 
 // Modal states
 const showCustomerModal = ref(false)
@@ -472,27 +387,48 @@ const closeDOModal = () => {
   showDOModal.value = false
 }
 
-const handleDOSelect = (selectedDOs) => {
-  if (selectedDOs && selectedDOs.length > 0) {
-    const firstDO = selectedDOs[0]
-    
+const handleDOSelect = (selectedDO) => {
+  console.log('📥 Received DO selection:', selectedDO)
+  
+  if (selectedDO) {
     // Parse DO number format: MM-YYYY-NNNNN
-    const doNumber = firstDO.do_number || firstDO.doNumber
+    const doNumber = selectedDO.do_number || selectedDO.doNumber
+    console.log('🔍 Parsing DO number:', doNumber)
+    
     if (doNumber) {
       const parts = doNumber.split('-')
+      console.log('📊 DO parts:', parts)
+      
       if (parts.length === 3) {
-        doRange.fromMonth = parts[0]
-        doRange.fromYear = parts[1]
+        // Populate From DO fields
+        doRange.fromMonth = parseInt(parts[0])
+        doRange.fromYear = parseInt(parts[1])
         doRange.fromNumber = parts[2]
         
-        message.value = `DO selected: ${doNumber}`
+        console.log('✅ From DO populated:', {
+          month: doRange.fromMonth,
+          year: doRange.fromYear,
+          number: doRange.fromNumber
+        })
+        
+        message.value = `From DO selected: ${doNumber}`
         
         setTimeout(() => {
           message.value = ''
         }, 3000)
+      } else {
+        console.error('❌ Invalid DO number format:', doNumber)
+        message.value = `Invalid DO format: ${doNumber}`
       }
+    } else {
+      console.error('❌ No DO number found in selection')
+      message.value = 'No DO number found in selection'
     }
+  } else {
+    console.error('❌ No DO selected')
+    message.value = 'No delivery order selected'
   }
+  
   closeDOModal()
 }
 
@@ -505,31 +441,195 @@ const closeToDOModal = () => {
   showToDOModal.value = false
 }
 
-const handleToDOSelect = (selectedDOs) => {
-  if (selectedDOs && selectedDOs.length > 0) {
-    const firstDO = selectedDOs[0]
-    
+const handleToDOSelect = (selectedDO) => {
+  console.log('📥 Received To DO selection:', selectedDO)
+  
+  if (selectedDO) {
     // Parse DO number format: MM-YYYY-NNNNN
-    const doNumber = firstDO.do_number || firstDO.doNumber
+    const doNumber = selectedDO.do_number || selectedDO.doNumber
+    console.log('🔍 Parsing To DO number:', doNumber)
+    
     if (doNumber) {
       const parts = doNumber.split('-')
+      console.log('📊 To DO parts:', parts)
+      
       if (parts.length === 3) {
-        doRange.toMonth = parts[0]
-        doRange.toYear = parts[1]
+        // Populate To DO fields
+        doRange.toMonth = parseInt(parts[0])
+        doRange.toYear = parseInt(parts[1])
         doRange.toNumber = parts[2]
+        
+        console.log('✅ To DO populated:', {
+          month: doRange.toMonth,
+          year: doRange.toYear,
+          number: doRange.toNumber
+        })
         
         message.value = `To DO selected: ${doNumber}`
         
         setTimeout(() => {
           message.value = ''
         }, 3000)
+      } else {
+        console.error('❌ Invalid To DO number format:', doNumber)
+        message.value = `Invalid To DO format: ${doNumber}`
       }
+    } else {
+      console.error('❌ No To DO number found in selection')
+      message.value = 'No To DO number found in selection'
     }
+  } else {
+    console.error('❌ No To DO selected')
+    message.value = 'No To delivery order selected'
   }
+  
   closeToDOModal()
+}
+
+// Quick Print function
+const quickPrint = () => {
+  if (quickDO.value) {
+    message.value = `Quick print initiated for: ${quickDO.value}`
+    
+    setTimeout(() => {
+      message.value = ''
+    }, 3000)
+  } else {
+    message.value = 'Please enter a DO number for quick print'
+    
+    setTimeout(() => {
+      message.value = ''
+    }, 3000)
+  }
 }
 </script>
 
 <style scoped>
-/* Custom styles if needed */
+/* Modern Input Styles */
+.modern-input {
+  @apply w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition-all duration-200 
+         focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 
+         hover:border-gray-300 bg-white/80 backdrop-blur-sm;
+}
+
+.modern-select {
+  @apply w-full px-4 py-3 border border-gray-200 rounded-xl text-sm transition-all duration-200 
+         focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 
+         hover:border-gray-300 bg-white/80 backdrop-blur-sm cursor-pointer;
+}
+
+.modern-label {
+  @apply block text-sm font-semibold text-gray-700 mb-2;
+}
+
+/* Modern Section Styles */
+.modern-section {
+  @apply bg-white/60 backdrop-blur-sm rounded-xl border border-white/40 shadow-lg overflow-hidden;
+}
+
+.modern-section-header {
+  @apply flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100;
+}
+
+.modern-section-title {
+  @apply text-lg font-bold text-gray-800;
+}
+
+.modern-section-content {
+  @apply p-4;
+}
+
+/* Modern Button Styles */
+.modern-btn-primary {
+  @apply inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white 
+         font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 
+         transition-all duration-200 hover:from-blue-600 hover:to-blue-700;
+}
+
+.modern-btn-secondary {
+  @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white 
+         font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 
+         transition-all duration-200 hover:from-gray-600 hover:to-gray-700;
+}
+
+.modern-btn-confirm {
+  @apply inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
+         font-bold rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 
+         transition-all duration-200 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+}
+
+.modern-icon-btn {
+  @apply inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 
+         text-gray-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 
+         transition-all duration-200 shadow-sm hover:shadow-md;
+}
+
+/* Modern Checkbox Styles */
+.modern-checkbox {
+  @apply flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 
+         cursor-pointer transition-all duration-200 hover:shadow-sm;
+}
+
+.modern-checkbox input[type="checkbox"] {
+  @apply sr-only;
+}
+
+.checkmark {
+  @apply w-5 h-5 border-2 border-gray-300 rounded-md flex items-center justify-center 
+         transition-all duration-200;
+}
+
+.modern-checkbox input[type="checkbox"]:checked + .checkmark {
+  @apply bg-blue-500 border-blue-500;
+}
+
+.modern-checkbox input[type="checkbox"]:checked + .checkmark::after {
+  content: '✓';
+  @apply text-white text-xs font-bold;
+}
+
+.label-text {
+  @apply flex-1 text-sm font-medium text-gray-700;
+}
+
+/* Status Badge Styles */
+.status-badge {
+  @apply px-2 py-1 rounded-full text-xs font-semibold;
+}
+
+.status-badge.outstanding {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-badge.partial {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-badge.closed {
+  @apply bg-gray-100 text-gray-800;
+}
+
+.status-badge.completed {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.status-badge.cancelled {
+  @apply bg-red-100 text-red-800;
+}
+
+/* Animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out;
+}
 </style>

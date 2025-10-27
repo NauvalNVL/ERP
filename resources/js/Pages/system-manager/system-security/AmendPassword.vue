@@ -228,7 +228,7 @@ export default {
         updatePassword() {
             if (!this.foundUser) return;
             
-            this.$inertia.post('/api/users/update-password', this.form, {
+            this.$inertia.post('/system-security/update-password', this.form, {
                 onSuccess: () => {
                     this.form.new_password = '';
                     this.form.new_password_confirmation = '';

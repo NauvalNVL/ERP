@@ -28,10 +28,9 @@
           <table class="w-full divide-y divide-gray-200 table-fixed">
             <thead class="bg-gray-50 sticky top-0">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('size_id')">Size ID</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('size_mm')">Millimeters</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6 cursor-pointer" @click="sortTable('size_inch')">Inches</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2 cursor-pointer" @click="sortTable('description')">Description</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('size_id')">NO.</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('millimeter')">MILLIMETER</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('inches')">INCHES</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -40,12 +39,11 @@
                 @click="selectRow(size)"
                 @dblclick="selectAndClose(size)">
                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ 'PS' + String(size.id).padStart(3, '0') }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ Number(size.size).toFixed(2) }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ Number(size.millimeter).toFixed(2) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ Number(size.inches).toFixed(2) }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ size.description || '' }}</td>
               </tr>
               <tr v-if="filteredSizes.length === 0">
-                <td colspan="4" class="px-4 py-4 text-center text-gray-500">No paper sizes found.</td>
+                <td colspan="3" class="px-4 py-4 text-center text-gray-500">No paper sizes found.</td>
               </tr>
             </tbody>
           </table>
@@ -54,14 +52,11 @@
           <p>Click on a row to select and edit its details.</p>
         </div>
         <div class="mt-4 flex justify-end space-x-3">
-          <button type="button" @click="sortTable('size_mm')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+          <button type="button" @click="sortTable('millimeter')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-sort mr-1"></i>By Size
           </button>
-          <button type="button" @click="sortTable('description')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
-            <i class="fas fa-sort mr-1"></i>By Description
-          </button>
           <button type="button" @click="selectAndClose(selectedSize)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
-            <i class="fas fa-edit mr-1"></i>Select
+            <i class="fas fa-check mr-1"></i>Select
           </button>
           <button type="button" @click="$emit('close')" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
             <i class="fas fa-times mr-1"></i>Close
@@ -87,7 +82,7 @@ const emit = defineEmits(['close', 'select', 'create']);
 
 const searchQuery = ref('');
 const selectedSize = ref(null);
-const sortKey = ref('size_mm');
+const sortKey = ref('millimeter');
 const sortAsc = ref(true);
 
 // Compute filtered sizes based on search query
@@ -97,9 +92,8 @@ const filteredSizes = computed(() => {
     const q = searchQuery.value.toLowerCase();
     sizes = sizes.filter(size =>
       String(size.id).toLowerCase().includes(q) ||
-      String(size.size).toLowerCase().includes(q) ||
-      String(size.inches).toLowerCase().includes(q) ||
-      (size.description && size.description.toLowerCase().includes(q))
+      String(size.millimeter).toLowerCase().includes(q) ||
+      String(size.inches).toLowerCase().includes(q)
     );
   }
   
@@ -110,18 +104,15 @@ const filteredSizes = computed(() => {
     if (sortKey.value === 'size_id') {
       valA = String(a.id).padStart(3, '0');
       valB = String(b.id).padStart(3, '0');
-    } else if (sortKey.value === 'size_mm') {
-      valA = parseFloat(a.size || 0);
-      valB = parseFloat(b.size || 0);
-    } else if (sortKey.value === 'size_inch') {
+    } else if (sortKey.value === 'millimeter') {
+      valA = parseFloat(a.millimeter || 0);
+      valB = parseFloat(b.millimeter || 0);
+    } else if (sortKey.value === 'inches') {
       valA = parseFloat(a.inches || 0);
       valB = parseFloat(b.inches || 0);
-    } else {
-      valA = a.description || '';
-      valB = b.description || '';
     }
     
-    if (sortKey.value === 'size_mm' || sortKey.value === 'size_inch') {
+    if (sortKey.value === 'millimeter' || sortKey.value === 'inches') {
       return sortAsc.value ? valA - valB : valB - valA;
     } else {
       if (typeof valA === 'string' && typeof valB === 'string') {

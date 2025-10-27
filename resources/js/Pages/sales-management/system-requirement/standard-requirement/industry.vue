@@ -295,11 +295,15 @@ const notification = ref({ show: false, message: '', type: 'success' });
 const fetchIndustries = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/api/industry', { 
-            headers: { 
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            } 
+        console.log('Fetching industry data from API...');
+        
+        // Using fetch API
+        const res = await fetch('/api/industry', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
         });
         
         if (!res.ok) {

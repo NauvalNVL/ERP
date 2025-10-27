@@ -42,28 +42,53 @@
                 </div>
               </div>
 
-              <!-- Toolbar -->
-              <div class="px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
-                <button @click="$emit('close')" class="p-1.5 hover:bg-gray-200 rounded border border-gray-300" title="Power Off">
-                  <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                  </svg>
-                </button>
-                <button class="p-1.5 hover:bg-gray-200 rounded border border-gray-300" title="Print">
-                  <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd"/>
-                  </svg>
-                </button>
-                <button class="p-1.5 hover:bg-gray-200 rounded border border-gray-300" title="End Process">
-                  <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                  </svg>
-                </button>
-                <button @click="$emit('close')" class="p-1.5 hover:bg-gray-200 rounded border border-gray-300" title="Close">
-                  <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                  </svg>
-                </button>
+              <!-- Toolbar - CPS ERP Style -->
+              <div class="px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-300 shadow-sm">
+                <div class="flex items-center gap-2">
+                  <!-- Exit/Close Button (Red) -->
+                  <button 
+                    @click="$emit('close')" 
+                    class="p-2 hover:bg-red-100 rounded-md bg-white border-2 border-red-400 transition-all shadow-md hover:shadow-lg" 
+                    title="Exit / Close"
+                  >
+                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                  </button>
+
+                  <!-- Delete Button (Red) -->
+                  <button 
+                    @click="handleDelete" 
+                    class="p-2 hover:bg-red-100 rounded-md bg-white border-2 border-red-400 transition-all shadow-md hover:shadow-lg" 
+                    title="Delete"
+                  >
+                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                  </button>
+
+                  <!-- Save/Update Button (Blue) -->
+                  <button 
+                    @click="handleSave" 
+                    class="p-2 hover:bg-blue-100 rounded-md bg-white border-2 border-blue-500 transition-all shadow-md hover:shadow-lg" 
+                    title="Save / Update"
+                  >
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"/>
+                    </svg>
+                  </button>
+
+                  <!-- Enter/Return Button (Blue) -->
+                  <button 
+                    @click="handleConfirm" 
+                    class="p-2 hover:bg-blue-100 rounded-md bg-white border-2 border-blue-500 transition-all shadow-md hover:shadow-lg" 
+                    title="Enter / Return"
+                  >
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
 
               <!-- Content -->
@@ -178,16 +203,16 @@
               </div>
 
               <!-- Footer -->
-              <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 flex justify-center gap-3">
+              <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-blue-50 border-t-2 border-gray-300 flex justify-center gap-3 shadow-inner">
                 <button 
                   @click="$emit('close')"
-                  class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="px-8 py-2 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-400 rounded hover:bg-gray-50 hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-all shadow-sm"
                 >
                   Cancel
                 </button>
                 <button 
-                  @click="$emit('close')"
-                  class="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  @click="handleConfirm"
+                  class="px-8 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 border-2 border-blue-600 rounded hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-md"
                 >
                   OK
                 </button>
@@ -215,13 +240,34 @@ const props = defineProps({
   unitPrice: { type: Number, default: 14700000 },
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'confirm', 'delete', 'save'])
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('id-ID', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   }).format(value || 0)
+}
+
+const handleConfirm = () => {
+  console.log('✅ Sales Order Items confirmed, proceeding to Final Tax Calculation')
+  emit('confirm', {
+    doNumber: props.doNumber,
+    totalAmount: props.totalAmount,
+    model: props.model
+  })
+}
+
+const handleDelete = () => {
+  if (confirm('Delete this sales order item?')) {
+    console.log('🗑️ Deleting sales order item')
+    emit('delete')
+  }
+}
+
+const handleSave = () => {
+  console.log('💾 Saving sales order items')
+  emit('save')
 }
 </script>
 
