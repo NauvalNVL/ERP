@@ -530,15 +530,6 @@
               <i class="fas fa-cogs mr-2"></i>
               Continue to Product Design
                 </button>
-                
-                <button 
-              @click="createSalesOrder" 
-              class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center disabled:bg-gray-400 disabled:cursor-not-allowed"
-              :disabled="!canProceed"
-            >
-              <i class="fas fa-save mr-2"></i>
-              Create Sales Order
-                </button>
               </div>
               
               <!-- Form validation summary -->

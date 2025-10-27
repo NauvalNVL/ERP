@@ -149,20 +149,19 @@
 
           <!-- Customer Service Dashboard -->
           <div class="bg-blue-50 rounded-lg p-4 mb-6">
-            <div class="flex items-center justify-between">
-              <span class="text-sm font-medium text-blue-800">Customer Service Dashboard Using Last SO#</span>
-              <input 
-                v-model="lastSONumber" 
-                type="text"
-                class="px-3 py-1 border border-blue-300 rounded text-sm bg-white"
-                placeholder="SO Number"
-              >
+            <div class="flex items-center space-x-3">
               <button 
                 @click="openCustomerServiceDashboard"
                 class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
               >
                 Customer Service Dashboard Using Last SO#
               </button>
+              <input 
+                v-model="lastSONumber" 
+                type="text"
+                class="px-3 py-1 border border-blue-300 rounded text-sm bg-white flex-1"
+                placeholder="SO Number"
+              >
             </div>
           </div>
         </div>
