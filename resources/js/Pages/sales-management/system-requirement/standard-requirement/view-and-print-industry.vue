@@ -25,9 +25,9 @@
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
                 </div>
-                <input 
-                    type="text" 
-                    v-model="searchQuery" 
+                <input
+                    type="text"
+                    v-model="searchQuery"
                     class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Search industries..."
                 >
@@ -54,17 +54,20 @@
                 <table class="min-w-full border-collapse">
                     <thead class="bg-blue-600" style="background-color: #2563eb;">
                         <tr>
+                            <th class="px-4 py-2 text-left font-semibold border border-gray-300" style="color: black; width: 80px;">
+                                NO.
+                            </th>
                             <th @click="sortTable('code')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Code <i :class="getSortIcon('code')" class="text-xs"></i>
+                                INDUSTRY CODE <i :class="getSortIcon('code')" class="text-xs"></i>
                             </th>
                             <th @click="sortTable('name')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
-                                Name <i :class="getSortIcon('name')" class="text-xs"></i>
+                                INDUSTRY NAME <i :class="getSortIcon('name')" class="text-xs"></i>
                             </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white">
                         <tr v-if="loading">
-                            <td colspan="2" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                            <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
@@ -72,7 +75,7 @@
                             </td>
                         </tr>
                         <tr v-else-if="filteredIndustries.length === 0">
-                            <td colspan="2" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                            <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 No industries found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
@@ -83,11 +86,14 @@
                         <tr v-for="(industry, index) in filteredIndustries" :key="industry.code"
                             :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
                             class="hover:bg-blue-200">
-                            <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm font-medium text-gray-900">{{ industry.code || 'N/A' }}</div>
+                            <td class="px-4 py-2 border border-gray-300 text-center">
+                                <div class="text-sm font-medium text-gray-900">{{ index + 1 }}</div>
                             </td>
                             <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm text-gray-900">{{ industry.name || 'N/A' }}</div>
+                                <div class="text-sm font-medium text-gray-900">{{ industry.code || '' }}</div>
+                            </td>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm text-gray-900">{{ industry.name || '' }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -144,13 +150,13 @@ const fetchIndustries = async () => {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch industries');
         }
-        
+
         const data = await response.json();
-        
+
         // Handle different response formats
         if (Array.isArray(data)) {
             industries.value = data;
@@ -189,33 +195,33 @@ const getSortIcon = (column) => {
 // Filtered and sorted industries
 const filteredIndustries = computed(() => {
     let filtered = [...industries.value];
-    
+
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(industry => 
+        filtered = filtered.filter(industry =>
             (industry.code && industry.code.toLowerCase().includes(query)) ||
             (industry.name && industry.name.toLowerCase().includes(query))
         );
     }
-    
+
     // Apply sorting
     filtered.sort((a, b) => {
         let valueA = a[sortColumn.value];
         let valueB = b[sortColumn.value];
-        
+
         // Handle null values
         if (valueA === null || valueA === undefined) valueA = '';
         if (valueB === null || valueB === undefined) valueB = '';
-        
+
         // Convert to string for comparison if not already
         if (typeof valueA !== 'string') valueA = String(valueA || '');
         if (typeof valueB !== 'string') valueB = String(valueB || '');
-        
+
         // Case insensitive comparison
         valueA = valueA.toLowerCase();
         valueB = valueB.toLowerCase();
-        
+
         // Sort direction
         if (sortDirection.value === 'asc') {
             return valueA.localeCompare(valueB);
@@ -223,7 +229,7 @@ const filteredIndustries = computed(() => {
             return valueB.localeCompare(valueA);
         }
     });
-    
+
     return filtered;
 });
 
@@ -247,15 +253,16 @@ const printTable = () => {
         doc.text('View and print industry data', 10, 22);
 
         // Prepare table data
-        const tableData = filteredIndustries.value.map(industry => [
-            industry.code || 'N/A',
-            industry.name || 'N/A'
+        const tableData = filteredIndustries.value.map((industry, index) => [
+            (index + 1).toString(),
+            industry.code || '',
+            industry.name || ''
         ]);
 
         // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['Code', 'Name']],
+            head: [['NO.', 'INDUSTRY CODE', 'INDUSTRY NAME']],
             body: tableData,
             theme: 'grid',
             tableWidth: 'auto',
@@ -276,8 +283,9 @@ const printTable = () => {
             },
             margin: { top: 28, left: 10, right: 10 },
             columnStyles: {
-                0: { cellWidth: 40 }, // Code column
-                1: { cellWidth: 'auto' } // Name column takes remaining space
+                0: { cellWidth: 20, halign: 'center' }, // NO. column - centered
+                1: { cellWidth: 40 }, // Industry Code column
+                2: { cellWidth: 'auto' } // Industry Name column takes remaining space
             }
         });
 

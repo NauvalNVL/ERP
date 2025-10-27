@@ -211,7 +211,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Commercial Code:</label>
                             <div class="flex items-center space-x-2">
                                 <input v-model="form.commercial_code" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                <span class="text-sm text-gray-600 whitespace-nowrap">For Forms like QT, DD, IV, etc</span>
+                                <span class="text-sm text-gray-600 whitespace-nowrap">For Forms like QT, DO, IV, etc</span>
                             </div>
                         </div>
                         <div>
