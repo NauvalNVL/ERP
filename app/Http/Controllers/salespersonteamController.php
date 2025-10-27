@@ -35,7 +35,7 @@ class SalespersonTeamController extends Controller
                 )
                 ->orderBy('s_person_code')
                 ->get();
-            
+
             // If there are no salesperson teams in the database, seed them
             if ($salespersons->isEmpty()) {
                 $this->seedData();
@@ -51,17 +51,17 @@ class SalespersonTeamController extends Controller
                     ->orderBy('s_person_code')
                     ->get();
             }
-            
+
             // Mengambil data sales team untuk dropdown dan convert ke collection
             $salesTeams = collect([
                 (object)['id' => 1, 'code' => '01', 'name' => 'MBI'],
                 (object)['id' => 2, 'code' => '02', 'name' => 'MANAGEMENT LOCAL'],
                 (object)['id' => 3, 'code' => '03', 'name' => 'MANAGEMENT MNC']
             ]);
-            
+
             // Log the query result
             Log::info('Salesperson teams count in index: ' . $salespersons->count());
-            
+
             // Mengirim data ke view
             return view('sales-management.system-requirement.system-requirement.standard-requirement.salespersonteam', compact('salespersons', 'salesTeams'));
         } catch (\Exception $e) {
@@ -130,14 +130,14 @@ class SalespersonTeamController extends Controller
                 )
                 ->where('salesperson.id', $id)
                 ->first();
-            
+
             if (!$salesperson) {
                 return redirect()->route('salesperson-team.index')->with('error', 'Salesperson tidak ditemukan');
             }
-    
+
             // Mengambil data sales team untuk dropdown
             $salesTeams = DB::table('sales_team')->get();
-            
+
             return view('sales-management.system-requirement.system-requirement.standard-requirement.salespersonteam-edit', compact('salesperson', 'salesTeams'));
         } catch (\Exception $e) {
             return redirect()->route('salesperson-team.index')->with('error', 'Error: ' . $e->getMessage());
@@ -222,14 +222,14 @@ class SalespersonTeamController extends Controller
         try {
             // Delete salesperson team record from the correct table
             $deleted = DB::table('salesperson_teams')->where('id', $id)->delete();
-            
+
             if (!$deleted) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Salesperson team not found or could not be deleted'
                 ], 404);
             }
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Salesperson team deleted successfully'
@@ -242,11 +242,11 @@ class SalespersonTeamController extends Controller
             ], 500);
         }
     }
-    
+
     public function search(Request $request)
     {
         $searchTerm = $request->q;
-        
+
         try {
             $salespersons = DB::table('salesperson')
                 ->join('sales_team', 'salesperson.sales_team_id', '=', 'sales_team.id')
@@ -264,7 +264,7 @@ class SalespersonTeamController extends Controller
                 ->orWhere('sales_team.name', 'like', "%{$searchTerm}%")
                 ->orderBy('salesperson.code')
                 ->get();
-                
+
             return response()->json($salespersons);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -273,7 +273,7 @@ class SalespersonTeamController extends Controller
 
     /**
      * Render the Vue component for salesperson team management.
-     * 
+     *
      * @return \Inertia\Response
      */
     public function vueIndex()
@@ -287,10 +287,10 @@ class SalespersonTeamController extends Controller
             return response()->json(['error' => 'Failed to load salesperson team data'], 500);
         }
     }
-    
+
     /**
      * API endpoint to get all salesperson teams for Vue component.
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function apiIndex()
@@ -307,7 +307,7 @@ class SalespersonTeamController extends Controller
                 )
                 ->orderBy('s_person_code')
                 ->get();
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $salespersonTeams
@@ -320,10 +320,10 @@ class SalespersonTeamController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * API endpoint to store a new salesperson team.
-     * 
+     *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -346,7 +346,7 @@ class SalespersonTeamController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
-            
+
             // Insert new record
             $id = DB::table('salesperson_teams')->insertGetId([
                 's_person_code' => strtoupper($request->s_person_code),
@@ -357,10 +357,10 @@ class SalespersonTeamController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-            
+
             // Get the newly created record
             $salespersonTeam = DB::table('salesperson_teams')->where('id', $id)->first();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Salesperson team created successfully',
@@ -374,10 +374,10 @@ class SalespersonTeamController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * API endpoint to seed sample data for the Vue component.
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     private function seedData()
@@ -406,13 +406,13 @@ class SalespersonTeamController extends Controller
                     'sales_team_position' => 'S-Supervisor',
                 ]
             ];
-            
+
             // Insert sample data only if it doesn't exist
             foreach ($sampleData as $data) {
                 $exists = DB::table('salesperson_teams')
                     ->where('s_person_code', $data['s_person_code'])
                     ->exists();
-                
+
                 if (!$exists) {
                     DB::table('salesperson_teams')->insert(array_merge($data, [
                         'created_at' => now(),
@@ -442,10 +442,10 @@ class SalespersonTeamController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Blade version of the view and print functionality
-     * 
+     *
      * @return \Illuminate\View\View
      */
     public function viewAndPrint()
@@ -461,7 +461,7 @@ class SalespersonTeamController extends Controller
                 )
                 ->orderBy('s_person_code')
                 ->get();
-            
+
             return view('sales-management.system-requirement.system-requirement.viewandprintsalespersonteam', compact('salespersonTeams'));
         } catch (\Exception $e) {
             Log::error('Error in viewAndPrint method: ' . $e->getMessage());
@@ -469,6 +469,21 @@ class SalespersonTeamController extends Controller
                 'salespersonTeams' => collect([]),
                 'error' => 'Error: ' . $e->getMessage()
             ]);
+        }
+    }
+
+    /**
+     * Vue version of the view and print functionality
+     *
+     * @return \Inertia\Response
+     */
+    public function vueViewAndPrint()
+    {
+        try {
+            return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-salesperson-team');
+        } catch (\Exception $e) {
+            Log::error('Error in SalespersonTeamController@vueViewAndPrint: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load salesperson team data for printing'], 500);
         }
     }
 }
