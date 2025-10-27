@@ -14,22 +14,22 @@ class GeoController extends Controller
         try {
             if ($request->ajax()) {
                 $geos = Geo::orderBy('COUNTRY')->orderBy('STATE')->get();
-                
+
                 if ($geos->isEmpty()) {
                     $this->seedData();
                     $geos = Geo::orderBy('COUNTRY')->orderBy('STATE')->get();
                 }
-                
+
                 return response()->json($geos);
             }
-            
+
             $geoData = Geo::all();
-            
+
             if ($geoData->isEmpty()) {
                 $this->seedData();
                 $geoData = Geo::all();
             }
-            
+
             return view('sales-management.system-requirement.system-requirement.standard-requirement.geo', compact('geoData'));
         } catch (\Exception $e) {
             if ($request->ajax()) {
@@ -51,8 +51,15 @@ class GeoController extends Controller
                 'area' => 'required',
             ]);
 
-            $geo = Geo::create($request->all());
-            
+            $geo = new Geo();
+            $geo->CODE = $request->code;
+            $geo->COUNTRY = $request->country;
+            $geo->STATE = $request->state;
+            $geo->TOWN = $request->town;
+            $geo->TOWN_SECTION = $request->town_section;
+            $geo->AREA = $request->area;
+            $geo->save();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Geo data added successfully',
@@ -69,17 +76,22 @@ class GeoController extends Controller
     public function update(Request $request, $code)
     {
         try {
-        $request->validate([
-            'country' => 'required',
-            'state' => 'required',
-            'town' => 'required',
-            'town_section' => 'required',
-            'area' => 'required',
-        ]);
+            $request->validate([
+                'country' => 'required',
+                'state' => 'required',
+                'town' => 'required',
+                'town_section' => 'required',
+                'area' => 'required',
+            ]);
 
             $geo = Geo::where('CODE', $code)->firstOrFail();
-            $geo->update($request->all());
-            
+            $geo->COUNTRY = $request->country;
+            $geo->STATE = $request->state;
+            $geo->TOWN = $request->town;
+            $geo->TOWN_SECTION = $request->town_section;
+            $geo->AREA = $request->area;
+            $geo->save();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Geo data updated successfully',
@@ -98,7 +110,7 @@ class GeoController extends Controller
         try {
             $geo = Geo::where('CODE', $code)->firstOrFail();
             $geo->delete();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Geo data deleted successfully'
@@ -115,7 +127,7 @@ class GeoController extends Controller
     {
         try {
             $geo = Geo::where('CODE', $code)->firstOrFail();
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $geo
@@ -136,8 +148,8 @@ class GeoController extends Controller
     public function viewAndPrint()
     {
         // Urutkan berdasarkan country, lalu state
-        $geos = Geo::orderBy('COUNTRY')->orderBy('STATE')->get(); 
-        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintgeo', compact('geos')); 
+        $geos = Geo::orderBy('COUNTRY')->orderBy('STATE')->get();
+        return view('sales-management.system-requirement.system-requirement.standard-requirement.viewandprintgeo', compact('geos'));
     }
 
     /**
@@ -149,16 +161,16 @@ class GeoController extends Controller
     {
         try {
             $geos = Geo::orderBy('country')->orderBy('state')->get();
-            
+
             \Illuminate\Support\Facades\Log::info('GeoController@vueIndex: Passing ' . $geos->count() . ' geo records to view');
-            
+
             return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/geo', [
                 'geos' => $geos,
                 'header' => 'Geo Management'
             ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error in GeoController@vueIndex: ' . $e->getMessage());
-            
+
             return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/geo', [
                 'geos' => [],
                 'header' => 'Geo Management',
@@ -193,9 +205,9 @@ class GeoController extends Controller
     {
         try {
             $geos = Geo::orderBy('country')->orderBy('state')->get();
-            
+
             \Illuminate\Support\Facades\Log::info('GeoController@apiIndex: Returning ' . $geos->count() . ' geo records');
-            
+
             return response()->json($geos);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error in GeoController@apiIndex: ' . $e->getMessage());
