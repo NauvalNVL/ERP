@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,32 +12,57 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('salesperson', function (Blueprint $table) {
-            // Drop foreign key constraint first
-            $table->dropForeign(['sales_team_id']);
-        });
+        // Safely drop FK by name if it exists (SQL Server)
+        DB::statement("
+IF EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'salesperson_sales_team_id_foreign')
+    ALTER TABLE salesperson DROP CONSTRAINT salesperson_sales_team_id_foreign;
+");
         
         Schema::table('salesperson', function (Blueprint $table) {
-            // Drop existing columns that will be replaced
-            $table->dropColumn(['sales_team_id', 'position', 'user_id', 'is_active']);
-            
-            // Modify existing columns
-            $table->string('code', 50)->nullable()->change();
-            $table->string('name', 50)->nullable()->change();
-            
-            // Add new columns
-            $table->string('Grup', 20)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
-            $table->string('CodeGrup', 50)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
-            $table->decimal('TargetSales', 18, 2)->nullable();
-            $table->string('Internal', 20)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
-            $table->string('Email', 100)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
-            $table->char('status', 10)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            // Drop existing columns that will be replaced (guard each)
+            foreach (['sales_team_id', 'position', 'user_id', 'is_active'] as $col) {
+                if (Schema::hasColumn('salesperson', $col)) {
+                    $table->dropColumn($col);
+                }
+            }
+
+            // Modify existing columns if present
+            if (Schema::hasColumn('salesperson', 'code')) {
+                $table->string('code', 50)->nullable()->change();
+            }
+            if (Schema::hasColumn('salesperson', 'name')) {
+                $table->string('name', 50)->nullable()->change();
+            }
+
+            // Add new columns (only if not already there)
+            if (!Schema::hasColumn('salesperson', 'Grup')) {
+                $table->string('Grup', 20)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            }
+            if (!Schema::hasColumn('salesperson', 'CodeGrup')) {
+                $table->string('CodeGrup', 50)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            }
+            if (!Schema::hasColumn('salesperson', 'TargetSales')) {
+                $table->decimal('TargetSales', 18, 2)->nullable();
+            }
+            if (!Schema::hasColumn('salesperson', 'Internal')) {
+                $table->string('Internal', 20)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            }
+            if (!Schema::hasColumn('salesperson', 'Email')) {
+                $table->string('Email', 100)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            }
+            if (!Schema::hasColumn('salesperson', 'status')) {
+                $table->char('status', 10)->nullable()->collation('SQL_Latin1_General_CP1_CI_AS');
+            }
         });
         
         // Rename columns to match the specification
         Schema::table('salesperson', function (Blueprint $table) {
-            $table->renameColumn('code', 'Code');
-            $table->renameColumn('name', 'Name');
+            if (Schema::hasColumn('salesperson', 'code')) {
+                $table->renameColumn('code', 'Code');
+            }
+            if (Schema::hasColumn('salesperson', 'name')) {
+                $table->renameColumn('name', 'Name');
+            }
         });
     }
 

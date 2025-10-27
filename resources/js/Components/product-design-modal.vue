@@ -119,8 +119,14 @@
             <button type="button" @click="sortTable('product')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
               <i class="fas fa-sort mr-1"></i>By Product
             </button>
-            <button type="button" @click="selectAndEdit(selectedDesign)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px" :disabled="!selectedDesign" :class="{'opacity-50 cursor-not-allowed': !selectedDesign}">
-              <i class="fas fa-edit mr-1"></i>Select
+            <button 
+              type="button" 
+              @click="props.doubleClickAction === 'select' ? selectAndClose(selectedDesign) : selectAndEdit(selectedDesign)"
+              class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px" 
+              :disabled="!selectedDesign" 
+              :class="{'opacity-50 cursor-not-allowed': !selectedDesign}">
+              <i :class="props.doubleClickAction === 'select' ? 'fas fa-check mr-1' : 'fas fa-edit mr-1'"></i>
+              {{ props.doubleClickAction === 'select' ? 'Select' : 'Edit' }}
             </button>
             <button type="button" @click="$emit('close')" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
               <i class="fas fa-times mr-1"></i>Close
@@ -532,6 +538,14 @@ function handleDoubleClick(design) {
     selectAndClose(design);
   } else {
     editDesign(design);
+  }
+}
+
+// Emit selected design to parent and close modal
+function selectAndClose(design) {
+  if (design) {
+    emit('select', design);
+    emit('close');
   }
 }
 

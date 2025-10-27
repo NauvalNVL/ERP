@@ -11,7 +11,7 @@ class ScoringFormula extends Model
 
     protected $fillable = [
         'product_design_id',
-        'paper_flute_id',
+        'paper_flute_code',
         'scoring_length_formula',
         'scoring_width_formula',
         'length_conversion',
@@ -38,7 +38,8 @@ class ScoringFormula extends Model
      */
     public function paperFlute()
     {
-        return $this->belongsTo(PaperFlute::class);
+        // Map local paper_flute_code (string) to PaperFlute.Flute (string)
+        return $this->belongsTo(PaperFlute::class, 'paper_flute_code', 'Flute');
     }
 
     /**

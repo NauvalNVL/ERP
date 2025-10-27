@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\MasterCard;
+use Illuminate\Support\Facades\Schema;
 
 class MasterCardSeeder extends Seeder
 {
@@ -12,6 +13,11 @@ class MasterCardSeeder extends Seeder
      */
     public function run(): void
     {
+        if (!Schema::hasTable('master_cards')) {
+            // Skip seeding if legacy table is not present in this environment
+            return;
+        }
+
         $masterCards = [
             [
                 'mc_seq' => '1609138',

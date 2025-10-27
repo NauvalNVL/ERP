@@ -15,7 +15,8 @@ class CreateSideTrimsByFluteTable extends Migration
     {
         Schema::create('side_trims_by_flute', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('flute_id')->constrained('paper_flutes', 'id')->onDelete('cascade');
+            // Replace FK to non-existent paper_flutes with soft reference to Flute_CPS.Flute
+            $table->string('flute_code', 25)->nullable()->comment('Soft reference to Flute_CPS.Flute');
             $table->integer('length_add')->default(0);
             $table->integer('length_less')->default(0);
             $table->boolean('compute')->default(false);

@@ -15,13 +15,14 @@ class CreateRollSizesTable extends Migration
     {
         Schema::create('roll_sizes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('flute_id')->constrained('paper_flutes', 'id')->onDelete('cascade');
+            // Replace FK to non-existent paper_flutes with soft reference to Flute_CPS.Flute
+            $table->string('flute_code', 25)->nullable()->comment('Soft reference to Flute_CPS.Flute');
             $table->float('roll_length', 8, 2);
             $table->boolean('compute')->default(false);
             $table->timestamps();
             
             // Add a unique constraint to prevent duplicate entries
-            $table->unique(['flute_id', 'roll_length'], 'roll_size_flute_unique');
+            $table->unique(['flute_code', 'roll_length'], 'roll_size_flute_unique');
         });
     }
 

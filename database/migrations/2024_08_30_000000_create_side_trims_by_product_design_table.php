@@ -17,14 +17,15 @@ class CreateSideTrimsByProductDesignTable extends Migration
             $table->id();
             $table->foreignId('product_design_id')->constrained('product_designs')->onDelete('cascade');
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->foreignId('flute_id')->constrained('paper_flutes')->onDelete('cascade');
+            // Replace FK to non-existent paper_flutes with soft reference to Flute_CPS.Flute
+            $table->string('flute_code', 25)->nullable()->comment('Soft reference to Flute_CPS.Flute');
             $table->boolean('compute')->default(false);
             $table->decimal('length_less', 8, 2)->default(0);
             $table->decimal('length_add', 8, 2)->default(0);
             $table->timestamps();
 
             // Add unique constraint for the combination
-            $table->unique(['product_design_id', 'product_id', 'flute_id'], 'side_trims_by_product_design_unique');
+            $table->unique(['product_design_id', 'product_id', 'flute_code'], 'side_trims_by_product_design_unique');
         });
     }
 
