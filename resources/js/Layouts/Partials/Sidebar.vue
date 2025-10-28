@@ -178,11 +178,8 @@ const systemManagerItems = [
       { title: 'Amend User Password', icon: 'fas fa-key', route: '/system-security/amend-password' },
       { title: 'Release Locked Password', icon: 'fas fa-unlock', route: null },
       { title: 'Define User Access Permission', icon: 'fas fa-user-lock', route: '/system-security/define-access' },
-      { title: 'Copy & Paste User Access Permission', icon: 'fas fa-copy', route: null },
-      { title: 'Purge User Log-in/out Audit Log', icon: 'fas fa-trash-alt', route: null },
-      { title: 'View & Print User', icon: 'fas fa-users', route: null },
-      { title: 'View & Print User Access Permission', icon: 'fas fa-list-alt', route: null },
-      { title: 'View & Print User Log-in/out Audit Log', icon: 'fas fa-history', route: null }
+      { title: 'Copy & Paste User Access Permission', icon: 'fas fa-copy', route: '/system-security/copy-paste-access' },
+      { title: 'View & Print User', icon: 'fas fa-users', route: '/system-security/view-print-user' }
     ]
   },
   {

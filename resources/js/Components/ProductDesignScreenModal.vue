@@ -38,7 +38,6 @@
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">FG Balance for {{ balanceDate }}</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -81,7 +80,6 @@
                       </select>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-900 font-medium">{{ formatCurrency(item.amount) }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-600">{{ item.fgBalance || '-' }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -102,12 +100,14 @@
                     v-model="totalQuantity" 
                     type="number"
                     class="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                    @input="updateMainQuantity"
                   >
                   <input 
                     v-model="totalUnitPrice" 
                     type="number"
                     step="0.01"
                     class="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
+                    @input="updateMainUnitPrice"
                   >
                   <span class="text-sm text-gray-700">IDR</span>
                   <span class="text-sm font-medium text-gray-900">{{ formatCurrency(totalAmount) }}</span>
@@ -146,24 +146,6 @@
               </table>
             </div>
           </div>
-
-          <!-- Customer Service Dashboard -->
-          <div class="bg-blue-50 rounded-lg p-4 mb-6">
-            <div class="flex items-center space-x-3">
-              <button 
-                @click="openCustomerServiceDashboard"
-                class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-              >
-                Customer Service Dashboard Using Last SO#
-              </button>
-              <input 
-                v-model="lastSONumber" 
-                type="text"
-                class="px-3 py-1 border border-blue-300 rounded text-sm bg-white w-32"
-                placeholder="SO Number"
-              >
-            </div>
-          </div>
         </div>
 
         <!-- Footer -->
@@ -183,20 +165,12 @@
         </div>
       </div>
     </div>
-
-    <!-- Customer Service Dashboard Modal -->
-    <CustomerServiceDashboardModal 
-      :show="showCustomerServiceModal" 
-      :soNumber="lastSONumber"
-      @close="showCustomerServiceModal = false"
-    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useToast } from '@/Composables/useToast'
-import CustomerServiceDashboardModal from './CustomerServiceDashboardModal.vue'
 
 const props = defineProps({
   show: {
@@ -216,11 +190,8 @@ const emit = defineEmits(['close', 'save'])
 const { success, error } = useToast()
 
 // Data
-const balanceDate = ref('08/2025')
-const lastSONumber = ref('3.0620')
 const totalQuantity = ref(null)
 const totalUnitPrice = ref(3036.3600)
-const showCustomerServiceModal = ref(false)
 
 const items = reactive([
   {
@@ -230,8 +201,7 @@ const items = reactive([
     quantity: null,
     unitPrice: 3036.3600,
     unit: 'Pcs',
-    amount: 0,
-    fgBalance: null
+    amount: 0
   },
   {
     name: 'Fit 1',
@@ -240,8 +210,7 @@ const items = reactive([
     quantity: null,
     unitPrice: null,
     unit: '',
-    amount: 0,
-    fgBalance: null
+    amount: 0
   },
   {
     name: 'Fit 2',
@@ -250,8 +219,7 @@ const items = reactive([
     quantity: null,
     unitPrice: null,
     unit: '',
-    amount: 0,
-    fgBalance: null
+    amount: 0
   },
   {
     name: 'Fit 3',
@@ -260,8 +228,7 @@ const items = reactive([
     quantity: null,
     unitPrice: null,
     unit: '',
-    amount: 0,
-    fgBalance: null
+    amount: 0
   },
   {
     name: 'Fit 4',
@@ -270,8 +237,7 @@ const items = reactive([
     quantity: null,
     unitPrice: null,
     unit: '',
-    amount: 0,
-    fgBalance: null
+    amount: 0
   },
   {
     name: 'Fit 5',
@@ -280,8 +246,7 @@ const items = reactive([
     quantity: null,
     unitPrice: null,
     unit: '',
-    amount: 0,
-    fgBalance: null
+    amount: 0
   },
   {
     name: 'Fit 6',
@@ -290,8 +255,7 @@ const items = reactive([
     quantity: null,
     unitPrice: null,
     unit: '',
-    amount: 0,
-    fgBalance: null
+    amount: 0
   },
   {
     name: 'Fit 7',
@@ -300,8 +264,7 @@ const items = reactive([
     quantity: null,
     unitPrice: null,
     unit: '',
-    amount: 0,
-    fgBalance: null
+    amount: 0
   },
   {
     name: 'Fit 8',
@@ -310,8 +273,7 @@ const items = reactive([
     quantity: null,
     unitPrice: null,
     unit: '',
-    amount: 0,
-    fgBalance: null
+    amount: 0
   },
   {
     name: 'Fit 9',
@@ -320,8 +282,7 @@ const items = reactive([
     quantity: null,
     unitPrice: null,
     unit: '',
-    amount: 0,
-    fgBalance: null
+    amount: 0
   }
 ])
 
@@ -435,6 +396,19 @@ const calculateAmount = (item) => {
   const quantity = parseFloat(item.quantity) || 0
   const unitPrice = parseFloat(item.unitPrice) || 0
   item.amount = quantity * unitPrice
+  
+  // Update total text boxes when Main item changes
+  if (item.name === 'Main') {
+    // Update totalQuantity when Main item quantity changes
+    if (quantity > 0) {
+      totalQuantity.value = quantity
+    }
+    
+    // Update totalUnitPrice when Main item unit price changes
+    if (unitPrice > 0) {
+      totalUnitPrice.value = unitPrice
+    }
+  }
 }
 
 const formatCurrency = (amount) => {
@@ -456,6 +430,24 @@ const setQuantity = () => {
   })
 }
 
+// Update Main item quantity when total quantity changes
+const updateMainQuantity = () => {
+  const quantity = parseFloat(totalQuantity.value)
+  if (!isNaN(quantity) && quantity >= 0) {
+    items[0].quantity = quantity
+    calculateAmount(items[0])
+  }
+}
+
+// Update Main item unit price when total unit price changes
+const updateMainUnitPrice = () => {
+  const unitPrice = parseFloat(totalUnitPrice.value)
+  if (!isNaN(unitPrice) && unitPrice >= 0) {
+    items[0].unitPrice = unitPrice
+    calculateAmount(items[0])
+  }
+}
+
 // Allow parent to push quantity while modal is open
 const applyExternalQuantity = (qty) => {
   console.log('applyExternalQuantity called with:', qty)
@@ -475,16 +467,6 @@ const applyExternalQuantity = (qty) => {
 
 defineExpose({ applyExternalQuantity })
 
-const openCustomerServiceDashboard = () => {
-  if (!lastSONumber.value) {
-    error('Please enter SO number')
-    return
-  }
-  
-  // Open customer service dashboard modal
-  showCustomerServiceModal.value = true
-}
-
 const saveDesign = () => {
   // Validate that at least main item has quantity and price
   const mainItem = items[0]
@@ -497,8 +479,7 @@ const saveDesign = () => {
     items: items.filter(item => item.quantity && item.unitPrice),
     dimensions: dimensionItems.filter(item => item.totalGrossKg),
     totalAmount: totalAmount.value,
-    totalGrossKg: totalGrossKg.value,
-    lastSONumber: lastSONumber.value
+    totalGrossKg: totalGrossKg.value
   }
 
   emit('save', designData)
