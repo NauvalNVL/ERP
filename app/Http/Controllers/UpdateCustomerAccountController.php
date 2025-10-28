@@ -398,14 +398,14 @@ class UpdateCustomerAccountController extends Controller
                 $username = request()->user()->name;
             }
             
-            // Update status only
-            $customerAccount->status = $request->active === 'Y' ? 'Active' : 'Inactive';
+            // Update AC_STS (Account Status) - correct column name in CUSTOMER table
+            $customerAccount->AC_STS = $request->active === 'Y' ? 'Active' : 'Inactive';
             $customerAccount->save();
             
             // Log status change with reason
             Log::info('Customer account status changed', [
                 'customer_code' => $customer_code,
-                'customer_name' => $customerAccount->customer_name,
+                'customer_name' => $customerAccount->NAME,
                 'new_status' => $request->active === 'Y' ? 'Active' : 'Inactive',
                 'reason' => $request->reason,
                 'changed_by' => $username
