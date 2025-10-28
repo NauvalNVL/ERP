@@ -26,7 +26,7 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Define Color</h3>
                     </div>
-                    
+
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -163,7 +163,7 @@
     </div>
 
     <!-- Gunakan komponen ColorModal yang telah diimpor -->
-    <ColorModal 
+    <ColorModal
       v-if="showModal"
       :show="showModal"
       :colors="colors"
@@ -238,22 +238,6 @@
                                 <input v-model="editForm.cg_type" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:ring-blue-500 focus:border-blue-500 text-sm" readonly>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">KG per M2:</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                    <i class="fas fa-weight"></i>
-                                </span>
-                                <input v-model="editForm.kg_per_m2" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                                <span class="text-xs text-gray-500 mt-1 block">Estimate KG per M2</span>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Note:</label>
-                            <div class="border border-gray-300 rounded-md p-3 bg-gray-50 h-16 overflow-auto text-sm">
-                                <p>Flexo Ink is estimated around 0.008 KG per M2</p>
-                            </div>
-                        </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
                         <button type="button" v-if="!isCreating" @click="deleteColor(editForm.color_id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm transform active:translate-y-px">
@@ -273,7 +257,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Color Group Selector Modal -->
     <div v-if="showColorGroupModal" class="fixed inset-0 z-[70] bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto transform transition-transform duration-300">
@@ -298,7 +282,7 @@
                             class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
                     </div>
                 </div>
-                
+
                 <div class="overflow-x-auto rounded-lg border border-gray-200">
                     <table class="min-w-full divide-y divide-gray-200 table-fixed">
                         <thead class="bg-gray-50 sticky top-0">
@@ -323,7 +307,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="mt-4 flex justify-center space-x-4">
                     <button @click="confirmColorGroupSelection" class="py-2 px-6 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transform active:translate-y-px">
                         <i class="fas fa-check mr-2"></i>Select
@@ -340,7 +324,7 @@
     <div v-if="saving" class="fixed inset-0 z-[80] bg-black bg-opacity-50 flex justify-center items-center">
         <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
-    
+
     <!-- Notification Toast -->
     <div v-if="notification.show" class="fixed bottom-4 right-4 z-50 shadow-xl rounded-lg transition-all duration-300"
          :class="{
@@ -395,12 +379,12 @@ const csrfForm = ref(null);
 const getCsrfToken = () => {
     // Try to get token from meta tag first (prefer this method)
     let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    
+
     // Option 2: Try to get from Inertia usePage if available
     if (!token && usePage().props.value?.csrf) {
         token = usePage().props.value.csrf;
     }
-    
+
     // Option 3: Try to get from hidden form with @csrf directive
     if (!token && csrfForm.value) {
         const tokenInput = csrfForm.value.querySelector('input[name="_token"]');
@@ -408,14 +392,14 @@ const getCsrfToken = () => {
             token = tokenInput.value;
         }
     }
-    
+
     // Debug log
     console.log('CSRF Token acquired:', token ? 'Yes' : 'No');
-    
+
     if (!token) {
         console.error('Failed to acquire CSRF token from any source');
     }
-    
+
     return token || '';
 };
 
@@ -433,13 +417,12 @@ const cgSearchQuery = ref('');
 const modalSearchQuery = ref('');
 const sortKey = ref('color_id');
 const sortAsc = ref(true);
-const editForm = ref({ 
-    color_id: '', 
-    color_name: '', 
+const editForm = ref({
+    color_id: '',
+    color_name: '',
     origin: '',
     color_group_id: '',
-    cg_type: 'X-Flexo',
-    kg_per_m2: '1.0000'
+    cg_type: 'X-Flexo'
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
@@ -448,20 +431,20 @@ const notification = ref({ show: false, message: '', type: 'success' });
 const fetchColors = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/colors', { 
-            headers: { 
+        const response = await fetch('/api/colors', {
+            headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             },
             credentials: 'same-origin' // Include cookies in the request
         });
-        
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         const data = await response.json();
-        
+
         // Handle different response formats
         if (Array.isArray(data)) {
             // Direct array response
@@ -493,20 +476,20 @@ const refreshColors = async () => {
 // Fetch color groups from API
 const fetchColorGroups = async () => {
     try {
-        const response = await fetch('/api/color-groups', { 
-            headers: { 
+        const response = await fetch('/api/color-groups', {
+            headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             },
             credentials: 'same-origin'
         });
-        
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         const data = await response.json();
-        
+
         // Handle different response formats
         let groupsArray = [];
         if (Array.isArray(data)) {
@@ -523,7 +506,7 @@ const fetchColorGroups = async () => {
             console.error('Unexpected data format:', data);
             return;
         }
-        
+
         // Transform the data
         colorGroups.value = groupsArray.map(group => ({
             cg: group.cg_id || group.cg,
@@ -549,11 +532,11 @@ onMounted(() => {
 // Watch for changes in search query to filter the data
 watch(searchQuery, (newQuery) => {
     if (newQuery && colors.value.length > 0) {
-        const foundColor = colors.value.find(color => 
+        const foundColor = colors.value.find(color =>
             color.color_id.toLowerCase().includes(newQuery.toLowerCase()) ||
             color.color_name.toLowerCase().includes(newQuery.toLowerCase())
         );
-        
+
         if (foundColor) {
             selectedRow.value = foundColor;
         }
@@ -571,9 +554,9 @@ watch(showModal, (isOpen) => {
 // Filtered color groups based on search query
 const filteredColorGroups = computed(() => {
     if (!cgSearchQuery.value) return colorGroups.value;
-    
+
     const query = cgSearchQuery.value.toLowerCase();
-    return colorGroups.value.filter(group => 
+    return colorGroups.value.filter(group =>
         group.cg.toLowerCase().includes(query) ||
         group.cg_name.toLowerCase().includes(query) ||
         group.cg_type.toLowerCase().includes(query)
@@ -599,7 +582,7 @@ const onColorSelected = (color) => {
     selectedRow.value = color;
     searchQuery.value = color.color_id;
     showModal.value = false;
-    
+
     // Automatically open the edit modal for the selected row
     isCreating.value = false;
     editForm.value = { ...color };
@@ -618,26 +601,24 @@ const editSelectedRow = () => {
 
 const createNewColor = () => {
     isCreating.value = true;
-    editForm.value = { 
-        color_id: '', 
-        color_name: '', 
+    editForm.value = {
+        color_id: '',
+        color_name: '',
         origin: '',
         color_group_id: '',
-        cg_type: 'X-Flexo',
-        kg_per_m2: '1.0000'
+        cg_type: 'X-Flexo'
     };
     showEditModal.value = true;
 };
 
 const closeEditModal = () => {
     showEditModal.value = false;
-    editForm.value = { 
-        color_id: '', 
-        color_name: '', 
+    editForm.value = {
+        color_id: '',
+        color_name: '',
         origin: '',
         color_group_id: '',
-        cg_type: 'X-Flexo',
-        kg_per_m2: '1.0000'
+        cg_type: 'X-Flexo'
     };
     isCreating.value = false;
 };
@@ -682,16 +663,16 @@ const saveColorChanges = async () => {
         showNotification('Color group is required', 'error');
         return;
     }
-    
+
     saving.value = true;
-    
+
     try {
         const csrfToken = getCsrfToken();
-        
+
         // Different API call for create vs update
         let url = isCreating.value ? '/api/colors' : `/api/colors/${editForm.value.color_id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
-        
+
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -703,17 +684,17 @@ const saveColorChanges = async () => {
             body: JSON.stringify(editForm.value),
             credentials: 'same-origin' // Include cookies in the request
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Error saving color');
         }
-        
+
         const result = await response.json();
-        
+
         // Update the local data
         await fetchColors();
-        
+
         // Show success notification
         if (isCreating.value) {
             showNotification('Color created successfully', 'success');
@@ -726,7 +707,7 @@ const saveColorChanges = async () => {
         } else {
             showNotification('Color updated successfully', 'success');
         }
-        
+
         // Close the edit modal
         closeEditModal();
     } catch (error) {
@@ -739,12 +720,12 @@ const saveColorChanges = async () => {
 
 const deleteColor = async (colorId) => {
     if (!confirm(`Are you sure you want to delete color "${colorId}"?`)) return;
-    
+
     saving.value = true;
-    
+
     try {
         const csrfToken = getCsrfToken();
-        
+
         const response = await fetch(`/api/colors/${colorId}`, {
             method: 'DELETE',
             headers: {
@@ -754,20 +735,20 @@ const deleteColor = async (colorId) => {
             },
             credentials: 'same-origin' // Include cookies in the request
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Error deleting color');
         }
-        
+
         showNotification('Color deleted successfully!', 'success');
         await fetchColors();
-        
+
         if (selectedRow.value && selectedRow.value.color_id === colorId) {
             selectedRow.value = null;
             searchQuery.value = '';
         }
-        
+
         closeEditModal();
     } catch (error) {
         console.error('Error deleting color:', error);
@@ -783,7 +764,7 @@ const showNotification = (message, type = 'success') => {
         message,
         type
     };
-    
+
     setTimeout(() => {
         notification.value.show = false;
     }, 3000);
@@ -792,9 +773,9 @@ const showNotification = (message, type = 'success') => {
 // Filtered colors based on search query
 const filteredColors = computed(() => {
     if (!modalSearchQuery.value) return colors.value;
-    
+
     const query = modalSearchQuery.value.toLowerCase();
-    return colors.value.filter(color => 
+    return colors.value.filter(color =>
         color.color_id.toLowerCase().includes(query) ||
         color.color_name.toLowerCase().includes(query) ||
         color.color_group_id.toLowerCase().includes(query) ||

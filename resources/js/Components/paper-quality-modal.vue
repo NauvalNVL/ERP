@@ -29,12 +29,12 @@
             <thead class="bg-gray-50 sticky top-0">
               <tr>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('paper_quality')">Paper Quality</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('status')">Record Status</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('paper_name')">Paper Name</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('weight_kg_m')">Weight KG/M</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('commercial_code')">Commercial</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('wet_end_code')">Wet-End</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('decc_code')">DECC</th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('status')">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('weight_kg_m')">Weight</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('commercial_code')">Commercial Code</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('wet_end_code')">CORR Wet-End Code</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8 cursor-pointer" @click="sortTable('decc_code')">CORR DECC Code</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 text-xs">
@@ -43,16 +43,12 @@
                 @click="selectRow(quality)"
                 @dblclick="selectAndClose(quality)">
                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ quality.paper_quality }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.status }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.paper_name }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.weight_kg_m }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.commercial_code }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.wet_end_code }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.decc_code }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-center">
-                  <span :class="['px-2 py-1 text-xs font-medium rounded-full', quality.status === 'Act' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                    {{ quality.status }}
-                  </span>
-                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.commercial_code || '' }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.wet_end_code || '' }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ quality.decc_code || '' }}</td>
               </tr>
               <tr v-if="filteredQualities.length === 0">
                 <td colspan="7" class="px-4 py-4 text-center text-gray-500">No paper quality data available.</td>
@@ -110,26 +106,26 @@ const filteredQualities = computed(() => {
       quality.decc_code?.toLowerCase().includes(q)
     );
   }
-  
+
   // Apply sorting
   return [...qualities].sort((a, b) => {
     let valA, valB;
-    
+
     if (sortKey.value === 'weight_kg_m') {
       valA = parseFloat(a[sortKey.value] || 0);
       valB = parseFloat(b[sortKey.value] || 0);
     } else {
       valA = a[sortKey.value] || '';
       valB = b[sortKey.value] || '';
-      
+
       // Special handling for strings
       if (typeof valA === 'string' && typeof valB === 'string') {
-        return sortAsc.value 
-          ? valA.localeCompare(valB) 
+        return sortAsc.value
+          ? valA.localeCompare(valB)
           : valB.localeCompare(valA);
       }
     }
-    
+
     if (valA < valB) return sortAsc.value ? -1 : 1;
     if (valA > valB) return sortAsc.value ? 1 : -1;
     return 0;

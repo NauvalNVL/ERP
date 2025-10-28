@@ -30,14 +30,14 @@
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-hashtag"></i>
                                 </span>
-                                <input type="text" v-model="searchQuery" 
+                                <input type="text" v-model="searchQuery"
                                     class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                                 <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
-                        
+
                         <div class="col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
                             <button type="button" @click="createNewPaperQuality" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
@@ -187,42 +187,45 @@
                 <form @submit.prevent="saveChanges" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Paper Quality Code:</label>
-                            <input v-model="form.paper_quality" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" 
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Paper Quality:</label>
+                            <input v-model="form.paper_quality" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm"
                                 :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Paper Quality Name:</label>
-                            <input v-model="form.paper_name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                        <div v-if="!isCreating">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Record Status:</label>
+                            <input v-model="form.status" type="text" class="block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" readonly>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Weight (KG/M):</label>
-                            <input v-model="form.weight_kg_m" type="number" step="0.0001" min="0" max="9.9999" 
-                                class="block w-full rounded-md border-gray-300 shadow-sm">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Paper Name:</label>
+                            <input v-model="form.paper_name" type="text" maxlength="50" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Weight:</label>
+                            <div class="flex items-center space-x-2">
+                                <input v-model="form.weight_kg_m" type="number" step="0.0001" min="0" max="9.9999"
+                                    class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <span class="text-sm text-gray-600 whitespace-nowrap">Kg/m2 for Weight Calculation</span>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Commercial Code:</label>
-                            <input v-model="form.commercial_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
+                            <div class="flex items-center space-x-2">
+                                <input v-model="form.commercial_code" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <span class="text-sm text-gray-600 whitespace-nowrap">For Forms like QT, DO, IV, etc</span>
+                            </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Wet-End Code:</label>
-                            <input v-model="form.wet_end_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">CORR Wet-End Code:</label>
+                            <div class="flex items-center space-x-2">
+                                <input v-model="form.wet_end_code" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <span class="text-sm text-gray-600 whitespace-nowrap">For Roll FIFO Line-Up</span>
+                            </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">DECC Code:</label>
-                            <input v-model="form.decc_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
-                            <div class="grid grid-cols-2 gap-4">
-                                <label class="relative flex items-center p-3 rounded-lg border border-gray-200 hover:border-blue-500 cursor-pointer transition-colors">
-                                    <input type="radio" v-model="form.status" value="Act" class="h-4 w-4 text-blue-600 focus:ring-blue-500" @change="updateIsActive">
-                                    <span class="ml-3 text-gray-900">Active (Act)</span>
-                                </label>
-                                <label class="relative flex items-center p-3 rounded-lg border border-gray-200 hover:border-blue-500 cursor-pointer transition-colors">
-                                    <input type="radio" v-model="form.status" value="Obs" class="h-4 w-4 text-blue-600 focus:ring-blue-500" @change="updateIsActive">
-                                    <span class="ml-3 text-gray-900">Obsolete (Obs)</span>
-                                </label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">CORR DECC Code:</label>
+                            <div class="flex items-center space-x-2">
+                                <input v-model="form.decc_code" type="text" maxlength="10" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <span class="text-sm text-gray-600 whitespace-nowrap">For Linking to CPMS</span>
                             </div>
                         </div>
                     </div>
@@ -245,7 +248,7 @@
     <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
         <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
-    
+
     <!-- Notification Toast -->
     <div v-if="notification.show" class="fixed bottom-4 right-4 z-50 shadow-xl rounded-lg transition-all duration-300"
          :class="{
@@ -303,7 +306,7 @@ const form = ref({
     commercial_code: '',
     wet_end_code: '',
     decc_code: '',
-    status: 'Act',
+    status: 'Active',
     is_active: 1
 });
 
@@ -314,11 +317,11 @@ const updateIsActive = () => {
 // Watch for changes in search query to filter the data
 watch(searchQuery, (newQuery) => {
     if (newQuery && paperQualities.value.length > 0) {
-        const foundQuality = paperQualities.value.find(quality => 
+        const foundQuality = paperQualities.value.find(quality =>
             quality.paper_quality.toLowerCase().includes(newQuery.toLowerCase()) ||
             quality.paper_name.toLowerCase().includes(newQuery.toLowerCase())
         );
-        
+
         if (foundQuality) {
             selectedQuality.value = foundQuality;
         }
@@ -329,13 +332,13 @@ const fetchPaperQualities = async () => {
     loading.value = true;
     try {
         const response = await fetch('/api/paper-qualities');
-        
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         const data = await response.json();
-        
+
         if (Array.isArray(data)) {
             paperQualities.value = data;
         } else {
@@ -356,7 +359,7 @@ const onPaperQualitySelected = (quality) => {
     selectedQuality.value = quality;
     searchQuery.value = quality.paper_quality;
     showModal.value = false;
-    
+
     // Automatically open the edit modal for the selected row
     isCreating.value = false;
     form.value = { ...quality };
@@ -382,7 +385,7 @@ const createNewPaperQuality = () => {
         commercial_code: '',
         wet_end_code: '',
         decc_code: '',
-        status: 'Act',
+        status: 'Active',
         is_active: 1
     };
     showEditModal.value = true;
@@ -408,10 +411,16 @@ const saveChanges = async () => {
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
+        // For new records, set status to Active and is_active to 1
+        if (isCreating.value) {
+            form.value.status = 'Act';
+            form.value.is_active = 1;
+        }
+
         // Different API call for create vs update
         let url = isCreating.value ? '/api/paper-qualities' : `/api/paper-qualities/${selectedQuality.value.id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
-        
+
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -421,17 +430,17 @@ const saveChanges = async () => {
             },
             body: JSON.stringify(form.value)
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Error saving paper quality');
         }
-        
+
         const result = await response.json();
-        
+
         // Update the local data
         await fetchPaperQualities();
-        
+
         // Show success notification
         if (isCreating.value) {
             showNotification('Paper quality created successfully', 'success');
@@ -444,7 +453,7 @@ const saveChanges = async () => {
         } else {
             showNotification('Paper quality updated successfully', 'success');
         }
-        
+
         // Close the edit modal
         closeEditModal();
     } catch (e) {
@@ -460,15 +469,15 @@ const deletePaperQuality = async () => {
         showNotification('No paper quality selected', 'error');
         return;
     }
-    
+
     if (!confirm(`Are you sure you want to delete paper quality "${selectedQuality.value.paper_quality}"?`)) {
         return;
     }
-    
+
     saving.value = true;
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-        
+
         const response = await fetch(`/api/paper-qualities/${selectedQuality.value.id}`, {
             method: 'DELETE',
             headers: {
@@ -476,20 +485,20 @@ const deletePaperQuality = async () => {
                 'Accept': 'application/json'
             }
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Error deleting paper quality');
         }
-        
+
         // Remove from local array
         paperQualities.value = paperQualities.value.filter(q => q.id !== selectedQuality.value.id);
-        
+
         // Reset selection and form
         selectedQuality.value = null;
         searchQuery.value = '';
         closeEditModal();
-        
+
         showNotification('Paper quality deleted successfully', 'success');
     } catch (e) {
         console.error('Error deleting paper quality:', e);
@@ -505,7 +514,7 @@ const showNotification = (message, type = 'success') => {
         message,
         type
     };
-    
+
     setTimeout(() => {
         notification.value.show = false;
     }, 3000);
