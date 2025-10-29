@@ -201,6 +201,26 @@ class DeliveryOrderController extends Controller
             // Insert into DO table
             DB::table('DO')->insert($doData);
 
+            // Update SO status based on remaining balance
+            if (!empty($soNumber) && $so) {
+                $soQty = (float) ($so->SO_QTY ?? 0);
+                try {
+                    $delivered = (float) DB::table('DO')
+                        ->where('SO_Num', $soNumber)
+                        ->sum('DO_Qty');
+                    $epsilon = 0.0001;
+                    if ($soQty > 0) {
+                        $newStatus = ($delivered + $epsilon) >= $soQty ? 'Complete' : 'Partial Complete';
+                        DB::table('so')->where('SO_Num', $soNumber)->update(['STS' => $newStatus]);
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Failed to update SO status after DO insert', [
+                        'so_number' => $soNumber,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
             DB::commit();
 
             return response()->json([

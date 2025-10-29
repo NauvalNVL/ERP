@@ -125,7 +125,7 @@ class SalesOrderController extends Controller
             'YYYY' => date('Y'),
             'MM' => date('m'),
             'SO_Num' => $soNumber,
-            'STS' => 'OPEN',
+            'STS' => 'Outstanding',
             'TYPE' => (string) ($validated['order_type'] ?? 'S1'),
             'SO_DMY' => $nowDate,
             'AC_Num' => (string) $validated['customer_code'],
