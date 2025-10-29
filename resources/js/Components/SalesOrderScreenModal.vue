@@ -452,26 +452,27 @@ const handleSave = () => {
 }
 
 const handleSalesOrderDetailSave = (detailData) => {
-  // Combine all data and emit to parent
-  const completeData = {
-    salesOrderData: currentSalesOrderData.value,
-    detailData: detailData,
-    selectedEntryIndex: selectedEntryIndex.value
+  // Transform payload to match parent expectations
+  const payload = {
+    salesOrderDetail: detailData?.salesOrderDetail || {},
+    packingDetails: detailData?.packingDetails || {},
+    finishedGoodsOffsets: undefined
   }
-  
-  emit('save', completeData)
+
+  emit('save', payload)
   showSalesOrderDetailModal.value = false
   success('Sales order detail saved successfully')
 }
 
 const handleSalesOrderDeliveryOrderSave = (detailData) => {
-  const completeData = {
-    salesOrderData: currentSalesOrderData.value,
-    detailData: detailData,
-    selectedEntryIndex: selectedEntryIndex.value
+  // Transform payload to match parent expectations
+  const payload = {
+    salesOrderDetail: detailData?.salesOrderDetail || {},
+    packingDetails: detailData?.packingDetails || {},
+    finishedGoodsOffsets: undefined
   }
-  
-  emit('save-delivery-order', completeData)
+
+  emit('save-delivery-order', payload)
   showSalesOrderDetailModal.value = false
   success('Delivery order will be saved')
 }

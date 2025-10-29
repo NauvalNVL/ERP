@@ -227,7 +227,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted, watchEffect } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import axios from 'axios'
 import { useToast } from '@/Composables/useToast'
@@ -275,6 +275,24 @@ const itemDetails = ref([
   { name: 'NET DELIVERY', main: '', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' },
   { name: 'BALANCE', main: '', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' }
 ])
+
+// Keep BALANCE equal to ORDER reactively
+watchEffect(() => {
+  if (Array.isArray(itemDetails.value) && itemDetails.value.length >= 6) {
+    const orderRow = itemDetails.value[3]
+    const balanceRow = itemDetails.value[5]
+    if (orderRow && balanceRow) {
+      if (balanceRow.main !== orderRow.main) balanceRow.main = orderRow.main
+      // Mirror F1..F9 too if needed
+      for (let i = 1; i <= 9; i++) {
+        const key = `f${i}`
+        if (orderRow[key] !== undefined && balanceRow[key] !== orderRow[key]) {
+          balanceRow[key] = orderRow[key]
+        }
+      }
+    }
+  }
+})
 
 // Computed properties
 const selectedOrder = computed(() => {
@@ -358,17 +376,17 @@ const updateOrderInfo = async () => {
         // Update item details - Main item (PD row)
         if (data.item_details) {
           // PD (Product Design)
-          itemDetails.value[0].main = data.item_details.pd || ''
+          itemDetails.value[0].main = data.item_details.pd ?? ''
           // PCS (Pieces per set)
-          itemDetails.value[1].main = data.item_details.pcs || ''
+          itemDetails.value[1].main = data.item_details.pcs ?? ''
           // UNIT
-          itemDetails.value[2].main = data.item_details.unit || ''
+          itemDetails.value[2].main = data.item_details.unit ?? ''
           // ORDER (Order Quantity)
-          itemDetails.value[3].main = data.item_details.order_qty || ''
+          itemDetails.value[3].main = data.item_details.order_qty ?? ''
           // NET DELIVERY
-          itemDetails.value[4].main = data.item_details.net_delivery || '0'
-          // BALANCE
-          itemDetails.value[5].main = data.item_details.balance || ''
+          itemDetails.value[4].main = data.item_details.net_delivery ?? 0
+          // BALANCE should mirror ORDER for display
+          itemDetails.value[5].main = itemDetails.value[3].main
         }
         
         // Update fittings (F1-F9) if available

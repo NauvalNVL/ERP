@@ -44,9 +44,12 @@
                 <tr>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">Item</th>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">P/Design</th>
-                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">Pcs/Rolls</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">Pcs/Bdls</th>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">To Del</th>
-                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Rolls + Qty + Loose Qty/Remark</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                    Bdls x Qty + Loose Qty
+                    <div class="text-[10px] font-normal leading-tight">Remark</div>
+                  </th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -128,28 +131,18 @@
             @click="handleSave"
             class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Save Changes
+            Create DO
           </button>
         </div>
       </div>
     </div>
-
-    <!-- Finished Goods Offsets Modal -->
-    <FinishedGoodsOffsetsModal 
-      :is-open="showFinishedGoodsOffsetsModal"
-      :packing-details-data="currentPackingData"
-      :sales-order-detail-data="salesOrderDetailData"
-      @close="showFinishedGoodsOffsetsModal = false"
-      @save="handleFinishedGoodsOffsetsSave"
-      @save-delivery-order="handleSaveDeliveryOrder"
-    />
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
+import axios from 'axios'
 import { useToast } from '@/Composables/useToast'
-import FinishedGoodsOffsetsModal from './FinishedGoodsOffsetsModal.vue'
 
 const { success, error, info } = useToast()
 
@@ -169,8 +162,6 @@ const props = defineProps({
 const emit = defineEmits(['close', 'save', 'save-delivery-order'])
 
 // Modal state
-const showFinishedGoodsOffsetsModal = ref(false)
-const currentPackingData = ref({})
 
 // Reactive data
 
@@ -193,7 +184,7 @@ const packingItems = ref([
   { name: 'Fit6', pDesign: '', pcsRolls: '', toDel: '', rolls: '', qty: '', looseQty: '', remark: '' },
   { name: 'Fit7', pDesign: '', pcsRolls: '', toDel: '', rolls: '', qty: '', looseQty: '', remark: '' },
   { name: 'Fit8', pDesign: '', pcsRolls: '', toDel: '', rolls: '', qty: '', looseQty: '', remark: '' },
-  { name: 'Fit10', pDesign: '', pcsRolls: '', toDel: '', rolls: '', qty: '', looseQty: '', remark: '' }
+  { name: 'Fit9', pDesign: '', pcsRolls: '', toDel: '', rolls: '', qty: '', looseQty: '', remark: '' }
 ])
 
 
@@ -211,90 +202,94 @@ const handlePrint = () => {
 }
 
 const handleSave = () => {
-  const data = {
-    packingItems: packingItems.value
+  // Emit create DO directly with packing details
+  const payload = {
+    packingDetails: { packingItems: packingItems.value }
   }
-  
-  // Store current data for finished goods offsets modal
-  currentPackingData.value = data
-  
-  // Open Finished Goods Offsets Modal
-  showFinishedGoodsOffsetsModal.value = true
-  success('Opening Finished Goods Offsets Screen')
+  emit('save-delivery-order', payload)
+  success('Creating Delivery Order')
 }
 
-const handleFinishedGoodsOffsetsSave = (offsetsData) => {
-  // Combine all data and emit to parent
-  const completeData = {
-    packingDetails: currentPackingData.value,
-    finishedGoodsOffsets: offsetsData
-  }
-  
-  emit('save', completeData)
-  showFinishedGoodsOffsetsModal.value = false
-  success('Finished goods offsets saved successfully')
-}
+async function populatePackingFromProps() {
+  // Reset rows to blank first
+  packingItems.value = packingItems.value.map(pi => ({ ...pi, pDesign: '', pcsRolls: '', toDel: '', rolls: '', qty: '', looseQty: '', remark: '' }))
 
-const handleSaveDeliveryOrder = (offsetsData) => {
-  // Combine all data and emit save-delivery-order to parent
-  const completeData = {
-    packingDetails: currentPackingData.value,
-    finishedGoodsOffsets: offsetsData
-  }
-  
-  emit('save-delivery-order', completeData)
-  showFinishedGoodsOffsetsModal.value = false
-  success('Delivery order saved successfully')
-}
-
-// Initialize with sales order detail data if available
-onMounted(() => {
   if (props.salesOrderDetailData && props.salesOrderDetailData.itemRows) {
-    // Populate packing items from sales order detail data
     props.salesOrderDetailData.itemRows.forEach((item, index) => {
       if (index < packingItems.value.length) {
         const packingItem = packingItems.value[index]
         packingItem.pDesign = item.pDesign || ''
-        packingItem.pcsRolls = item.pcs || ''
-        
         // Set "To Del" from "To Deliver" data
-        const toDeliverValue = parseFloat(item.toDeliver) || 0
-        if (toDeliverValue > 0) {
-          packingItem.toDel = item.toDeliver || ''
-          
-          // Set default packing values for items with delivery quantity
-          if (item.name === 'Main') {
-            packingItem.rolls = '100'
-            packingItem.qty = '5'
-          }
-        } else {
-          packingItem.toDel = ''
-        }
+        const toDeliverValue = parseFloat(String(item.toDeliver || '').toString().replace(/,/g, '')) || 0
+        packingItem.toDel = toDeliverValue > 0 ? (item.toDeliver || '') : ''
       }
     })
   }
-  
-  // Also check if there's "To Delivery Set" data and no individual "To Deliver" items
+
+  // Use To Delivery Set if individual To Deliver values are not present
   if (props.salesOrderDetailData && props.salesOrderDetailData.orderDetail) {
     const orderDetail = props.salesOrderDetailData.orderDetail
-    const toDeliverySetValue = parseFloat(orderDetail.toDeliverySet) || 0
-    
-    // If "To Delivery Set" is filled but no individual "To Deliver" items
-    const hasIndividualToDeliver = props.salesOrderDetailData.itemRows?.some(item => 
-      parseFloat(item.toDeliver) > 0
-    )
-    
+    const toDeliverySetValue = parseFloat(String(orderDetail.toDeliverySet || '').toString().replace(/,/g, '')) || 0
+    const hasIndividualToDeliver = props.salesOrderDetailData.itemRows?.some(item => parseFloat(item.toDeliver) > 0)
     if (toDeliverySetValue > 0 && !hasIndividualToDeliver) {
-      // Set "To Del" for Main item from "To Delivery Set"
       const mainItem = packingItems.value.find(item => item.name === 'Main')
-      if (mainItem) {
-        mainItem.toDel = orderDetail.toDeliverySet
-        mainItem.rolls = '100'
-        mainItem.qty = '5'
+      if (mainItem) mainItem.toDel = orderDetail.toDeliverySet
+    }
+    // Prefer pcsPerBdl passed from detail modal when available
+    const pcsPerBdlPassed = Number(orderDetail.pcsPerBdl || 0)
+    if (pcsPerBdlPassed > 0) {
+      // Set only for Main, clear others
+      const mainItem = packingItems.value.find(i => i.name === 'Main')
+      packingItems.value.forEach(pi => { pi.pcsRolls = pi.name === 'Main' ? pcsPerBdlPassed.toString() : '' })
+      const toDel = Number((mainItem?.toDel || '0').toString().replace(/,/g, ''))
+      if (mainItem && toDel > 0) {
+        const bdls = Math.floor(toDel / pcsPerBdlPassed)
+        const loose = toDel % pcsPerBdlPassed
+        mainItem.rolls = bdls ? bdls.toString() : ''
+        mainItem.qty = pcsPerBdlPassed.toString()
+        mainItem.looseQty = loose ? loose.toString() : ''
       }
+      // We have data; skip API fetch later by returning early
+      return
     }
   }
-})
+
+  // Fetch pcs_per_bdl from SO detail API using S/Order parts
+  try {
+    const od = props.salesOrderDetailData?.orderDetail || {}
+    const soNumber = od.soNumber || (() => {
+      const soMonth = (od.sOrderMonth || '').toString().padStart(2, '0')
+      const soYear = od.sOrderYear || ''
+      const soSeq = (od.sOrderSeq || '').toString().padStart(5, '0')
+      return [soMonth, soYear, soSeq].every(Boolean) ? `${soMonth}-${soYear}-${soSeq}` : ''
+    })()
+    if (soNumber) {
+      const resp = await axios.get(`/api/sales-order/${soNumber}/detail`)
+      const data = resp.data?.data || {}
+      const pcsPerBdl = Number(data?.item_details?.pcs_per_bdl || 0)
+      if (pcsPerBdl > 0) {
+        // Set only for Main, clear others
+        const mainItem = packingItems.value.find(i => i.name === 'Main')
+        packingItems.value.forEach(pi => { pi.pcsRolls = pi.name === 'Main' ? pcsPerBdl.toString() : '' })
+        const toDel = Number(mainItem?.toDel || 0)
+        if (mainItem && toDel > 0) {
+          const bdls = Math.floor(toDel / pcsPerBdl)
+          const loose = toDel % pcsPerBdl
+          mainItem.rolls = bdls ? bdls.toString() : ''
+          mainItem.qty = pcsPerBdl.toString()
+          mainItem.looseQty = loose ? loose.toString() : ''
+        }
+      }
+    }
+  } catch (e) {
+    // ignore; user can fill manually
+  }
+}
+
+// Populate on mount and whenever modal opens or data changes
+onMounted(populatePackingFromProps)
+watch(() => props.isOpen, (val) => { if (val) populatePackingFromProps() })
+watch(() => props.salesOrderDetailData, () => { populatePackingFromProps() }, { deep: true })
 </script>
 
 <style scoped>

@@ -1626,7 +1626,7 @@ const hydratePdFromLoaded = () => {
         stitchWirePieces.value = formatTrimZeros(loaded.SWIRE_PCS ?? '');
         // Bundle string type
         selectedBundlingStringCode.value = (loaded.STRING_TYPE ?? '') + '';
-        bundlingStringQty.value = formatTrimZeros(loaded.STRING_TYPE_VALUE ?? '');
+        bundlingStringQty.value = formatTrimZeros(loaded.PCS_PER_BLD ?? '');
         // Packs and process flags
         bdlPerPallet.value = (loaded.BLD_PER_PLD ?? '') + '';
         peelOffPercent.value = formatTrimZeros(loaded.PEEL_OFF_PERCENT ?? '');
@@ -1714,7 +1714,7 @@ const hydratePdFromLoaded = () => {
     selectedStitchWireCode.value = pd.selectedStitchWireCode || loaded.SWIRE || '';
     stitchWirePieces.value = pd.stitchWirePieces || '';
     selectedBundlingStringCode.value = pd.selectedBundlingStringCode || loaded.STRING_TYPE || '';
-    bundlingStringQty.value = formatTrimZeros(pd.bundlingStringQty || (loaded.STRING_TYPE_VALUE ?? ''));
+    bundlingStringQty.value = formatTrimZeros(pd.bundlingStringQty || (loaded.PCS_PER_BLD ?? ''));
     selectedGlueingCode.value = pd.selectedGlueingCode || '';
     selectedWrappingCode.value = pd.selectedWrappingCode || '';
     moreDescriptions.value = Array.isArray(pd.moreDescriptions) ? pd.moreDescriptions : [];

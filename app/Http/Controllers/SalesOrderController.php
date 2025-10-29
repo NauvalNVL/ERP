@@ -952,6 +952,11 @@ class SalesOrderController extends Controller
                 'salesperson_name' => $salespersonName,
                 'order_group' => $salesOrder->GROUP_ ?? 'Sales',
                 'order_type' => $salesOrder->TYPE ?? 'S1',
+                // Added fields for UI bindings
+                'so_status' => $salesOrder->STS ?? '',
+                'so_date' => $salesOrder->SO_DMY ?? '',
+                'po_date' => $salesOrder->PO_DATE ?? '',
+                'customer_po_number' => $salesOrder->PO_Num ?? '',
             ];
             
             // Format item details from SO table
@@ -974,6 +979,10 @@ class SalesOrderController extends Controller
             }
             $itemDetails['net_delivery'] = $netDelivery;
             $itemDetails['balance'] = (float)($salesOrder->SO_QTY ?? 0) - $netDelivery;
+            // Include pcs per bundle from MC if available
+            if ($masterCard && isset($masterCard->PCS_PER_BLD)) {
+                $itemDetails['pcs_per_bdl'] = (float) $masterCard->PCS_PER_BLD;
+            }
             
             // Get fittings from master card if available
             $fittings = [];

@@ -342,9 +342,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/api/sales-order/{soNumber}/delivery-schedule-summary', [SalesOrderController::class, 'getDeliveryScheduleSummary']);
         Route::get('/api/sales-orders', [SalesOrderController::class, 'getSalesOrders']);
 
+        // Delivery Order API routes (use web.php to keep session/CSRF context)
+        Route::post('/api/delivery-orders', [DeliveryOrderController::class, 'store']);
+
         // Delivery Order Transaction - Prepare Delivery Order (Multiple Item)
         Route::get('/delivery-order/transaction/prepare-delivery-order-multiple-item', function () {
-            return Inertia::render('sales-management/delivery-order/Transaction/PrepareDeliveryOrderMultipleItem');
+            return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/PrepareDeliveryOrderMultipleItem');
         })->name('vue.delivery-order.transaction.prepare-delivery-order-multiple-item');
 
         // Delivery Order Transaction routes moved to warehouse management section

@@ -65,19 +65,19 @@
                   v-model="orderDetail.sOrderMonth"
                   type="text"
                   class="w-8 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                  placeholder="9"
+                  placeholder=""
                 >
                 <input 
                   v-model="orderDetail.sOrderYear"
                   type="text"
                   class="w-12 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                  placeholder="2025"
+                  placeholder=""
                 >
                 <input 
                   v-model="orderDetail.sOrderSeq"
                   type="text"
                   class="w-12 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                  placeholder="2090"
+                  placeholder=""
                 >
               </div>
               
@@ -87,7 +87,7 @@
                   v-model="orderDetail.mcardSeq"
                   type="text"
                   class="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                  placeholder="282912"
+                  placeholder=""
                 >
               </div>
               
@@ -107,7 +107,7 @@
                   v-model="orderDetail.setOrder"
                   type="text"
                   class="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                  placeholder="2,000"
+                  placeholder=""
                 >
               </div>
             </div>
@@ -120,7 +120,7 @@
                   v-model="orderDetail.soStatus"
                   type="text"
                   class="w-24 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                  placeholder="Partially"
+                  placeholder=""
                 >
               </div>
               
@@ -130,7 +130,7 @@
                   v-model="orderDetail.soDate"
                   type="text"
                   class="w-24 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                  placeholder="17/09/2025"
+                  placeholder=""
                 >
               </div>
               
@@ -140,7 +140,7 @@
                   v-model="orderDetail.pOrderRef"
                   type="text"
                   class="w-32 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                  placeholder="ASF/PO/25/1188"
+                  placeholder=""
                 >
               </div>
               
@@ -150,7 +150,7 @@
                   v-model="orderDetail.poDate"
                   type="text"
                   class="w-24 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                  placeholder="17/09/2025"
+                  placeholder=""
                 >
               </div>
             </div>
@@ -162,7 +162,7 @@
                   v-model="orderDetail.productDescription"
                   type="text"
                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                  placeholder="SHIPPING CASE ACOSTA JUMBO"
+                  placeholder=""
                   readonly
                 >
               </div>
@@ -181,7 +181,7 @@
                   type="text"
                   class="w-12 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                   :class="{ 'border-red-500': isToDeliverySetRequired && !orderDetail.toDeliverySet }"
-                  placeholder="0"
+                  placeholder=""
                   @input="handleDeliverySetChange"
                 >
               </div>
@@ -237,7 +237,7 @@
                       v-model="item.pDesign"
                       type="text"
                       class="w-full px-2 py-1 text-xs border-0 focus:ring-0"
-                      :placeholder="item.name === 'Main' ? 'B1' : ''"
+                      :placeholder="''"
                     >
                   </td>
                   <td class="px-3 py-2 border-r border-gray-200">
@@ -245,7 +245,7 @@
                       v-model="item.pcs"
                       type="text"
                       class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-center"
-                      :placeholder="item.name === 'Main' ? '1' : ''"
+                      :placeholder="''"
                     >
                   </td>
                   <td class="px-3 py-2 border-r border-gray-200">
@@ -253,7 +253,7 @@
                       v-model="item.unit"
                       type="text"
                       class="w-full px-2 py-1 text-xs border-0 focus:ring-0"
-                      :placeholder="item.name === 'Main' ? 'Pcs' : ''"
+                      :placeholder="''"
                     >
                   </td>
                   <td class="px-3 py-2 border-r border-gray-200">
@@ -261,7 +261,7 @@
                       v-model="item.order"
                       type="text"
                       class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-right"
-                      :placeholder="item.name === 'Main' ? '2,000' : ''"
+                      :placeholder="''"
                     >
                   </td>
                   <td class="px-3 py-2 border-r border-gray-200">
@@ -269,7 +269,7 @@
                       v-model="item.delivery"
                       type="text"
                       class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-right"
-                      :placeholder="item.name === 'Main' ? '1,100' : ''"
+                      :placeholder="''"
                     >
                   </td>
                   <td class="px-3 py-2 border-r border-gray-200">
@@ -277,7 +277,7 @@
                       v-model="item.reject"
                       type="text"
                       class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-right"
-                      :placeholder="item.name === 'Main' ? '35' : ''"
+                      :placeholder="''"
                     >
                   </td>
                   <td class="px-3 py-2 border-r border-gray-200">
@@ -285,7 +285,7 @@
                       v-model="item.balance"
                       type="text"
                       class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-right"
-                      :placeholder="item.name === 'Main' ? '900' : ''"
+                      :placeholder="''"
                     >
                   </td>
                   <td class="px-3 py-2 border-r border-gray-200">
@@ -293,7 +293,7 @@
                       v-model="item.available"
                       type="text"
                       class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-right"
-                      :placeholder="item.name === 'Main' ? '1,275' : ''"
+                      :placeholder="''"
                     >
                   </td>
                   <td class="px-3 py-2 border-r border-gray-200">
@@ -301,7 +301,7 @@
                       v-model="item.maxDO"
                       type="text"
                       class="w-full px-2 py-1 text-xs border-0 focus:ring-0 text-right"
-                      :placeholder="item.name === 'Main' ? '22,000' : ''"
+                      :placeholder="''"
                     >
                   </td>
                   <td class="px-3 py-2 border-r border-gray-200">
@@ -404,6 +404,7 @@
 import { ref, reactive, onMounted, watch, computed, watchEffect } from 'vue'
 import { useToast } from '@/Composables/useToast'
 import PackingDetailsModal from './PackingDetailsModal.vue'
+import axios from 'axios'
 
 const { success, error, info } = useToast()
 
@@ -426,20 +427,20 @@ const emit = defineEmits(['close', 'save', 'save-delivery-order'])
 const showPackingDetailsModal = ref(false)
 const currentDetailData = ref({})
 
-// Reactive data
+// Reactive data (no hardcoded defaults; will be populated from selected SO)
 const orderDetail = reactive({
   itemNumber: '1',
-  sOrderMonth: '9',
-  sOrderYear: '2025',
-  sOrderSeq: '2090',
-  mcardSeq: '282912',
+  sOrderMonth: '',
+  sOrderYear: '',
+  sOrderSeq: '',
+  mcardSeq: '',
   lotNumber: '',
-  setOrder: '2,000',
-  soStatus: 'Partially',
-  soDate: '17/09/2025',
-  productDescription: 'SHIPPING CASE ACOSTA JUMBO',
-  pOrderRef: 'ASF/PO/25/1188',
-  poDate: '17/09/2025',
+  setOrder: '',
+  soStatus: '',
+  soDate: '',
+  productDescription: '',
+  pOrderRef: '',
+  poDate: '',
   toDeliverySet: '0',
   unapplyFGoods: false,
   tickForYYes: false,
@@ -448,20 +449,7 @@ const orderDetail = reactive({
 })
 
 const itemRows = ref([
-  { 
-    name: 'Main', 
-    pDesign: 'B1', 
-    pcs: '1', 
-    unit: 'Pcs', 
-    order: '2,000', 
-    delivery: '1,100', 
-    reject: '35', 
-    balance: '900', 
-    available: '1,275', 
-    maxDO: '22,000', 
-    toDeliver: '', 
-    deliverKG: '' 
-  },
+  { name: 'Main', pDesign: '', pcs: '', unit: '', order: '', delivery: '', reject: '', balance: '', available: '', maxDO: '', toDeliver: '', deliverKG: '' },
   { name: 'Fit1', pDesign: '', pcs: '', unit: '', order: '', delivery: '', reject: '', balance: '', available: '', maxDO: '', toDeliver: '', deliverKG: '' },
   { name: 'Fit2', pDesign: '', pcs: '', unit: '', order: '', delivery: '', reject: '', balance: '', available: '', maxDO: '', toDeliver: '', deliverKG: '' },
   { name: 'Fit3', pDesign: '', pcs: '', unit: '', order: '', delivery: '', reject: '', balance: '', available: '', maxDO: '', toDeliver: '', deliverKG: '' },
@@ -472,6 +460,17 @@ const itemRows = ref([
   { name: 'Fit8', pDesign: '', pcs: '', unit: '', order: '', delivery: '', reject: '', balance: '', available: '', maxDO: '', toDeliver: '', deliverKG: '' },
   { name: 'Fit9', pDesign: '', pcs: '', unit: '', order: '', delivery: '', reject: '', balance: '', available: '', maxDO: '', toDeliver: '', deliverKG: '' }
 ])
+
+// Ensure Balance always mirrors Order for display (placed after itemRows declaration)
+watchEffect(() => {
+  if (Array.isArray(itemRows.value)) {
+    itemRows.value.forEach((row) => {
+      if (row && row.order !== undefined && row.balance !== row.order) {
+        row.balance = row.order
+      }
+    })
+  }
+})
 
 // Functions
 const closeModal = () => {
@@ -627,88 +626,106 @@ watchEffect(() => {
 })
 
 // Initialize with sales order data if available
-onMounted(() => {
-  if (props.salesOrderData) {
-    // Populate form with sales order data
-    if (props.salesOrderData.soNumber) {
-      const soParts = props.salesOrderData.soNumber.split('-')
-      if (soParts.length === 3) {
-        orderDetail.sOrderMonth = soParts[0]
-        orderDetail.sOrderYear = soParts[1]
-        orderDetail.sOrderSeq = soParts[2]
+async function hydrateFromSalesOrderData() {
+  if (!props.salesOrderData) return
+  const soNo = props.salesOrderData.soNumber || props.salesOrderData.selectedOrderData?.soNumber || ''
+  if (soNo) {
+    const soParts = soNo.split('-')
+    if (soParts.length === 3) {
+      orderDetail.sOrderMonth = soParts[0]
+      orderDetail.sOrderYear = soParts[1]
+      orderDetail.sOrderSeq = soParts[2]
+    }
+    // store full so number for downstream consumers
+    orderDetail.soNumber = soNo
+  }
+  try {
+    if (soNo) {
+      const response = await axios.get(`/api/sales-order/${soNo}/detail`)
+      if (response.data?.success) {
+        const data = response.data.data
+        orderDetail.mcardSeq = data.order_info?.mcard_seq || props.salesOrderData.selectedOrderData?.mcardSeq || ''
+        orderDetail.pOrderRef = data.order_info?.customer_po_number || props.salesOrderData.selectedOrderData?.pOrderRef || ''
+        orderDetail.productDescription = data.order_info?.model || ''
+        orderDetail.soDate = data.order_info?.so_date || ''
+        orderDetail.soStatus = data.order_info?.so_status || ''
+        orderDetail.poDate = data.order_info?.po_date || ''
+        orderDetail.setOrder = data.item_details?.order_qty || ''
+        // expose MC pcs per bundle for Packing Details modal
+        orderDetail.pcsPerBdl = data.item_details?.pcs_per_bdl || ''
+        const main = itemRows.value.find(r => r.name === 'Main')
+        if (main) {
+          main.pDesign = data.item_details?.pd ?? ''
+          main.pcs = data.item_details?.pcs ?? ''
+          main.unit = data.item_details?.unit ?? ''
+          main.order = data.item_details?.order_qty ?? ''
+          main.delivery = data.item_details?.net_delivery ?? 0
+          main.balance = main.order
+          // Per request: keep these empty for now
+          main.reject = ''
+          main.available = ''
+          main.maxDO = ''
+        }
+        if (Array.isArray(data.fittings)) {
+          data.fittings.forEach((fitting, idx) => {
+            if (idx < 9) {
+              const row = itemRows.value[idx + 1]
+              if (row) {
+                row.pDesign = fitting.design || ''
+                row.pcs = fitting.pcs || ''
+                row.unit = fitting.unit || ''
+              }
+            }
+          })
+        }
+        return
       }
     }
-    
-    // Use data from selected order if available
-    if (props.salesOrderData.selectedOrderData) {
-      const selectedOrder = props.salesOrderData.selectedOrderData
-      
-      // Update with actual data from Sales Order Table
-      orderDetail.mcardSeq = selectedOrder.mcardSeq || ''
-      orderDetail.pOrderRef = selectedOrder.pOrderRef || selectedOrder.customerPORef || ''
-      
-      // Update item rows with actual data from selected order
-      if (selectedOrder.items && selectedOrder.items.length > 0) {
-        selectedOrder.items.forEach((item, index) => {
-          if (index < itemRows.value.length) {
-            const itemRow = itemRows.value[index]
-            
-            // Map data based on item type
-            if (item.name === 'PD') {
-              itemRow.pDesign = item.pDesign || 'B1'
-            } else if (item.name === 'PCS') {
-              itemRow.pcs = item.pDesign || '1'
-            } else if (item.name === 'UNIT') {
-              itemRow.unit = item.pDesign || 'KG'
-            } else if (item.name === 'ORDER') {
-              itemRow.order = item.pDesign || '450'
-            } else if (item.name === 'DELIVERY') {
-              itemRow.delivery = item.pDesign || ''
-            } else if (item.name === 'REJECT') {
-              itemRow.reject = item.pDesign || ''
-            } else if (item.name === 'BALANCE') {
-              itemRow.balance = item.pDesign || '450'
-            } else if (item.name === 'AVAILABLE') {
-              itemRow.available = item.pDesign || '450'
-            } else if (item.name === 'MAX DO') {
-              itemRow.maxDO = item.pDesign || '22000'
-            }
-          }
-        })
-        
-        // Set default values for Main item based on the data
-        const mainItem = itemRows.value.find(item => item.name === 'Main')
-        if (mainItem) {
-          // Find corresponding data from items
-          const pdItem = selectedOrder.items.find(item => item.name === 'PD')
-          const pcsItem = selectedOrder.items.find(item => item.name === 'PCS')
-          const unitItem = selectedOrder.items.find(item => item.name === 'UNIT')
-          const orderItem = selectedOrder.items.find(item => item.name === 'ORDER')
-          const balanceItem = selectedOrder.items.find(item => item.name === 'BALANCE')
-          const availableItem = selectedOrder.items.find(item => item.name === 'AVAILABLE')
-          const maxDoItem = selectedOrder.items.find(item => item.name === 'MAX DO')
-          
-          mainItem.pDesign = pdItem?.pDesign || 'B1'
-          mainItem.pcs = pcsItem?.pDesign || '1'
-          mainItem.unit = unitItem?.pDesign || 'KG'
-          mainItem.order = orderItem?.pDesign || '450'
-          mainItem.balance = balanceItem?.pDesign || '450'
-          mainItem.available = availableItem?.pDesign || '450'
-          mainItem.maxDO = maxDoItem?.pDesign || '22000'
-        }
-      }
-    } else {
-      // Fallback to basic data
-      if (props.salesOrderData.mcardSeq) {
-        orderDetail.mcardSeq = props.salesOrderData.mcardSeq
-      }
-      
-      if (props.salesOrderData.pOrderRef) {
-        orderDetail.pOrderRef = props.salesOrderData.pOrderRef
-      }
+  } catch (e) {}
+  hydrateFromSelectedOrder()
+}
+
+onMounted(() => {
+  hydrateFromSalesOrderData()
+})
+
+watch(() => props.salesOrderData, () => {
+  hydrateFromSalesOrderData()
+}, { deep: true })
+
+function hydrateFromSelectedOrder() {
+  const selectedOrder = props.salesOrderData?.selectedOrderData
+  if (!selectedOrder) return
+
+  orderDetail.mcardSeq = selectedOrder.mcardSeq || ''
+  orderDetail.pOrderRef = selectedOrder.pOrderRef || selectedOrder.customerPORef || ''
+  orderDetail.productDescription = selectedOrder.model || ''
+  // Fallbacks if API not called
+  orderDetail.soStatus = selectedOrder.soStatus || ''
+  orderDetail.soDate = selectedOrder.soDate || orderDetail.soDate || ''
+  orderDetail.poDate = selectedOrder.poDate || orderDetail.poDate || ''
+  if (selectedOrder.soNumber) {
+    orderDetail.soNumber = selectedOrder.soNumber
+  }
+
+  if (Array.isArray(selectedOrder.items)) {
+    const main = itemRows.value.find(r => r.name === 'Main')
+    // Try to find main components by name
+    const findVal = (name) => selectedOrder.items.find(i => i.name === name)?.pDesign || ''
+    if (main) {
+      main.pDesign = findVal('PD')
+      main.pcs = findVal('PCS')
+      main.unit = findVal('UNIT')
+      main.order = findVal('ORDER')
+      // Balance should mirror Order in fallback too
+      main.balance = main.order
+      // Per request: keep these empty for now
+      main.reject = ''
+      main.available = ''
+      main.maxDO = ''
     }
   }
-})
+}
 </script>
 
 <style scoped>

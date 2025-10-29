@@ -345,7 +345,13 @@ const deliveryOrder = reactive({
   packingItems: [],
   offsetDetails: {},
   offsetItems: [],
-  salesOrderData: []
+  salesOrderData: [],
+  // Main row summary used for DO save
+  mainPD: '',
+  mainPCS: '',
+  mainUnit: '',
+  mainToDel: '',
+  toDeliverySet: ''
 })
 
 // Modal visibility
@@ -479,7 +485,16 @@ const handleSalesOrderSave = (salesOrderData) => {
       deliveryOrder.soNumber = soNumber
       deliveryOrder.mcardSeq = detailData.orderDetail.mcardSeq
       deliveryOrder.pOrderRef = detailData.orderDetail.pOrderRef
+      deliveryOrder.productDescription = detailData.orderDetail.productDescription || ''
+      deliveryOrder.soDate = detailData.orderDetail.soDate || ''
+      deliveryOrder.soStatus = detailData.orderDetail.soStatus || ''
+      deliveryOrder.poDate = detailData.orderDetail.poDate || ''
+      deliveryOrder.pcsPerBdl = detailData.orderDetail.pcsPerBdl || ''
       deliveryOrder.itemDetails = detailData.itemRows
+      const mainRow = detailData.itemRows.find(i => i.name === 'Main') || {}
+      deliveryOrder.mainPD = mainRow.pDesign || ''
+      deliveryOrder.mainPCS = mainRow.pcs || ''
+      deliveryOrder.mainUnit = mainRow.unit || ''
     }
   }
   
@@ -490,6 +505,8 @@ const handleSalesOrderSave = (salesOrderData) => {
     
     // Store packing data
     deliveryOrder.packingItems = packingData.packingItems
+    const mainPack = packingData.packingItems.find(i => i.name === 'Main') || {}
+    deliveryOrder.mainToDel = mainPack.toDel || ''
   }
   
   // Process finished goods offsets if available
@@ -528,16 +545,31 @@ const handleSalesOrderDeliveryOrderSave = async (salesOrderData) => {
       deliveryOrder.mcardSeq = detailData.orderDetail.mcardSeq
       deliveryOrder.pOrderRef = detailData.orderDetail.pOrderRef
       deliveryOrder.itemDetails = detailData.itemRows
+      // Capture To Delivery Set for fallback
+      const od = detailData.orderDetail || {}
+      deliveryOrder.toDeliverySet = od.toDeliverySet || ''
     }
   }
   
   // Process packing details if available
   if (salesOrderData.packingDetails) {
     const packingData = salesOrderData.packingDetails
-    console.log('Packing Items:', packingData.packingItems)
+    const items = Array.isArray(packingData.packingItems) ? packingData.packingItems : []
+    console.log('Packing Items:', items)
     
     // Store packing data
-    deliveryOrder.packingItems = packingData.packingItems
+    deliveryOrder.packingItems = items
+    // Capture Main row To Delivery for DO_Qty
+    const mainPack = items.find(i => i && i.name === 'Main') || {}
+    deliveryOrder.mainToDel = mainPack.toDel || ''
+  } else {
+    // No packing details provided; ensure safe defaults
+    deliveryOrder.packingItems = []
+    deliveryOrder.mainToDel = ''
+  }
+  // Fallback: if mainToDel still empty, use To Delivery Set from detail screen
+  if (!deliveryOrder.mainToDel && deliveryOrder.toDeliverySet) {
+    deliveryOrder.mainToDel = deliveryOrder.toDeliverySet
   }
   
   // Process finished goods offsets if available
@@ -577,7 +609,20 @@ const saveDeliveryOrder = async () => {
       cust_remark: deliveryOrder.custRemark,
       remark1: deliveryOrder.remark1,
       remark2: deliveryOrder.remark2,
-      unapply_fg: deliveryOrder.unapplyFG
+      unapply_fg: deliveryOrder.unapplyFG,
+      // SO / MC mapping for DO
+      so_number: deliveryOrder.soNumber,
+      mcard_seq: deliveryOrder.mcardSeq,
+      model: deliveryOrder.productDescription,
+      so_status: deliveryOrder.soStatus,
+      so_date: deliveryOrder.soDate,
+      po_number: deliveryOrder.pOrderRef,
+      po_date: deliveryOrder.poDate,
+      pd: deliveryOrder.mainPD,
+      per_set: deliveryOrder.mainPCS,
+      unit: deliveryOrder.mainUnit,
+      do_qty: Number((deliveryOrder.mainToDel || '0').toString().replace(/,/g, '')) || 0,
+      pcs_per_bdl: deliveryOrder.pcsPerBdl || ''
     }
     
     console.log('Saving delivery order:', deliveryOrderData)
