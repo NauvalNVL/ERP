@@ -300,37 +300,110 @@ class ApproveMcController extends Controller
     public function approve($id)
     {
         try {
+            Log::info('Approve MC Request', [
+                'id' => $id,
+                'user_id' => Auth::check() ? (Auth::user()->userID ?? Auth::user()->user_id ?? Auth::user()->name ?? 'unknown') : null
+            ]);
+            
             // Try resolving by primary key id first
             $approveMc = ApproveMC::find($id);
             
             // If not found, fall back to mc_seq match
             if (!$approveMc) {
+                Log::info('Not found by ID, trying mc_seq', ['id' => $id]);
                 $approveMc = ApproveMC::where('mc_seq', $id)->first();
             }
 
             // If still not found, try to seed from MasterCard and approve directly
             if (!$approveMc) {
-                $master = MasterCard::where('mc_seq', $id)->first();
+                Log::info('Not found in ApproveMC, trying MasterCard', ['id' => $id]);
+                // Try using MCS_Num column instead of mc_seq
+                $master = MasterCard::where('MCS_Num', $id)->first();
                 if (!$master) {
+                    Log::error('MC not found anywhere', ['id' => $id]);
                     return response()->json([
                         'success' => false,
                         'message' => 'No ApproveMC or MasterCard record found for identifier: ' . $id,
                     ], 404);
                 }
+                
+                // Validate required fields before creating ApproveMC
+                $mcSeq = $master->MCS_Num ?? $id;
+                $mcModel = $master->MODEL ?? 'N/A';
+                $customerCode = $master->AC_NUM ?? 'N/A';
+                $customerName = $master->AC_NAME ?? ($master->AC_NUM ?? 'N/A');
+                
+                if (empty($mcModel) || $mcModel === '') {
+                    $mcModel = 'Model-' . $mcSeq; // Generate a model name if empty
+                }
+                
+                Log::info('Creating ApproveMC from MasterCard', [
+                    'mc_seq' => $mcSeq,
+                    'mc_model' => $mcModel,
+                    'customer_code' => $customerCode,
+                    'customer_name' => $customerName
+                ]);
+                
                 $approveMc = new ApproveMC();
-                $approveMc->mc_seq = $master->mc_seq;
-                $approveMc->mc_model = $master->mc_model;
-                $approveMc->customer_code = $master->customer_code;
-                $approveMc->customer_name = $master->customer_code; // placeholder; join to name if available
+                $approveMc->mc_seq = $mcSeq;
+                $approveMc->mc_model = $mcModel;
+                $approveMc->customer_code = $customerCode;
+                $approveMc->customer_name = $customerName;
                 $approveMc->status = 'pending';
                 $approveMc->save();
+                Log::info('Created new ApproveMC from MasterCard', ['mc_seq' => $mcSeq]);
             }
+
+            // Get authenticated user ID
+            $userId = 'SYSTEM';
+            if (Auth::check()) {
+                $user = Auth::user();
+                if (isset($user->userID)) {
+                    $userId = $user->userID;
+                } elseif (isset($user->user_id)) {
+                    $userId = $user->user_id;
+                } elseif (isset($user->name)) {
+                    $userId = $user->name;
+                } elseif (isset($user->username)) {
+                    $userId = $user->username;
+                }
+            }
+
+            Log::info('Approving MC', [
+                'mc_id' => $approveMc->id,
+                'mc_seq' => $approveMc->mc_seq,
+                'approved_by' => $userId
+            ]);
 
             // Set approval fields
             $approveMc->status = 'active';
-            $approveMc->approved_by = Auth::user() ? (Auth::user()->user_id ?? Auth::user()->name ?? 'SYSTEM') : 'SYSTEM';
+            $approveMc->approved_by = $userId;
             $approveMc->approved_date = now();
             $approveMc->save();
+            
+            // IMPORTANT: Also update the MC table's mc_approval field
+            try {
+                $mcRecord = MasterCard::where('MCS_Num', $approveMc->mc_seq)->first();
+                if ($mcRecord) {
+                    // Update the MC table to reflect approval status
+                    MasterCard::where('MCS_Num', $approveMc->mc_seq)
+                        ->update(['mc_approval' => 'Yes']);
+                    Log::info('Updated MC table approval status', ['mc_seq' => $approveMc->mc_seq]);
+                } else {
+                    Log::warning('MC record not found in MC table for approval sync', ['mc_seq' => $approveMc->mc_seq]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to update MC table approval status', [
+                    'mc_seq' => $approveMc->mc_seq,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't fail the approval if MC table update fails
+            }
+            
+            Log::info('MC approved successfully', [
+                'mc_id' => $approveMc->id,
+                'status' => $approveMc->status
+            ]);
             
             return response()->json([
                 'success' => true,
@@ -340,9 +413,21 @@ class ApproveMcController extends Controller
                 'data' => $approveMc
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to approve MC', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to approve master card: ' . $e->getMessage()
+                'message' => 'Failed to approve master card: ' . $e->getMessage(),
+                'error_details' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
             ], 500);
         }
     }
@@ -352,59 +437,136 @@ class ApproveMcController extends Controller
      */
     public function reject(Request $request, $id)
     {
-        // Resolve ApproveMC record by id, then mc_seq, or seed from MasterCard
-        $approveMc = ApproveMC::find($id);
-        if (!$approveMc) {
-            $approveMc = ApproveMC::where('mc_seq', $id)->first();
-        }
-        if (!$approveMc) {
-            $master = MasterCard::where('mc_seq', $id)->first();
-            if (!$master) {
+        try {
+            Log::info('Reject MC Request', [
+                'id' => $id,
+                'user_id' => Auth::check() ? (Auth::user()->userID ?? Auth::user()->user_id ?? Auth::user()->name ?? 'unknown') : null,
+                'reason' => $request->rejection_reason
+            ]);
+            
+            // Resolve ApproveMC record by id, then mc_seq, or seed from MasterCard
+            $approveMc = ApproveMC::find($id);
+            if (!$approveMc) {
+                Log::info('Not found by ID, trying mc_seq', ['id' => $id]);
+                $approveMc = ApproveMC::where('mc_seq', $id)->first();
+            }
+            if (!$approveMc) {
+                Log::info('Not found in ApproveMC, trying MasterCard', ['id' => $id]);
+                // Try using MCS_Num column instead of mc_seq
+                $master = MasterCard::where('MCS_Num', $id)->first();
+                if (!$master) {
+                    Log::error('MC not found anywhere for rejection', ['id' => $id]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No ApproveMC or MasterCard record found for identifier: ' . $id,
+                    ], 404);
+                }
+                
+                // Validate required fields before creating ApproveMC
+                $mcSeq = $master->MCS_Num ?? $id;
+                $mcModel = $master->MODEL ?? 'N/A';
+                $customerCode = $master->AC_NUM ?? 'N/A';
+                $customerName = $master->AC_NAME ?? ($master->AC_NUM ?? 'N/A');
+                
+                if (empty($mcModel) || $mcModel === '') {
+                    $mcModel = 'Model-' . $mcSeq; // Generate a model name if empty
+                }
+                
+                Log::info('Creating ApproveMC from MasterCard for rejection', [
+                    'mc_seq' => $mcSeq,
+                    'mc_model' => $mcModel,
+                    'customer_code' => $customerCode,
+                    'customer_name' => $customerName
+                ]);
+                
+                $approveMc = new ApproveMC();
+                $approveMc->mc_seq = $mcSeq;
+                $approveMc->mc_model = $mcModel;
+                $approveMc->customer_code = $customerCode;
+                $approveMc->customer_name = $customerName;
+                $approveMc->status = 'pending';
+                $approveMc->save();
+                Log::info('Created new ApproveMC from MasterCard for rejection', ['mc_seq' => $mcSeq]);
+            }
+
+            // Allow rejecting from any status except already obsolete
+            if ($approveMc->status === 'obsolete') {
+                Log::warning('Attempted to reject already obsolete MC', ['id' => $id]);
                 return response()->json([
                     'success' => false,
-                    'message' => 'No ApproveMC or MasterCard record found for identifier: ' . $id,
-                ], 404);
+                    'message' => 'Master card is already obsolete.'
+                ], 400);
             }
-            $approveMc = new ApproveMC();
-            $approveMc->mc_seq = $master->mc_seq;
-            $approveMc->mc_model = $master->mc_model;
-            $approveMc->customer_code = $master->customer_code;
-            $approveMc->customer_name = $master->customer_code;
-            $approveMc->status = 'pending';
+            
+            $validator = Validator::make($request->all(), [
+                'rejection_reason' => 'required|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                Log::warning('Validation failed for MC rejection', ['errors' => $validator->errors()]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Rejection reason is required.',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Get authenticated user ID
+            $userId = 'SYSTEM';
+            if (Auth::check()) {
+                $user = Auth::user();
+                if (isset($user->userID)) {
+                    $userId = $user->userID;
+                } elseif (isset($user->user_id)) {
+                    $userId = $user->user_id;
+                } elseif (isset($user->name)) {
+                    $userId = $user->name;
+                } elseif (isset($user->username)) {
+                    $userId = $user->username;
+                }
+            }
+
+            Log::info('Rejecting MC', [
+                'mc_id' => $approveMc->id,
+                'mc_seq' => $approveMc->mc_seq,
+                'rejected_by' => $userId,
+                'reason' => $request->rejection_reason
+            ]);
+
+            $approveMc->status = 'obsolete';
+            $approveMc->rejected_by = $userId;
+            $approveMc->rejected_date = now();
+            $approveMc->rejection_reason = $request->rejection_reason;
             $approveMc->save();
-        }
 
-        // Allow rejecting from any status except already obsolete
-        if ($approveMc->status === 'obsolete') {
+            Log::info('MC rejected successfully', [
+                'mc_id' => $approveMc->id,
+                'status' => $approveMc->status
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Master card has been rejected and marked as obsolete.',
+                'data' => $approveMc
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to reject MC', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Master card is already obsolete.'
-            ], 400);
+                'message' => 'Failed to reject master card: ' . $e->getMessage(),
+                'error_details' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            ], 500);
         }
-        
-        $validator = Validator::make($request->all(), [
-            'rejection_reason' => 'required|string|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Rejection reason is required.',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $approveMc->status = 'obsolete';
-        $approveMc->rejected_by = Auth::user() ? (Auth::user()->user_id ?? Auth::user()->name ?? 'SYSTEM') : 'SYSTEM';
-        $approveMc->rejected_date = now();
-        $approveMc->rejection_reason = $request->rejection_reason;
-        $approveMc->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Master card has been rejected and marked as obsolete.',
-            'data' => $approveMc
-        ]);
     }
 
     /**

@@ -26,7 +26,7 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Sales Team Management</h3>
                     </div>
-                    
+
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
@@ -183,8 +183,8 @@
                     <div class="grid grid-cols-1 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Code:</label>
-                            <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
-                            <span class="text-xs text-gray-500">Team code must be unique</span>
+                            <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <span class="text-xs text-gray-500">{{ isCreating ? 'Team code must be unique' : 'Code cannot be changed after creation' }}</span>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Name:</label>
@@ -210,7 +210,7 @@
     <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
         <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
-    
+
     <!-- Notification Toast -->
     <div v-if="notification.show" class="fixed bottom-4 right-4 z-50 shadow-xl rounded-lg transition-all duration-300"
          :class="{
@@ -268,7 +268,7 @@ const csrfForm = ref(null);
 const getCsrfToken = () => {
     // Try to get token from meta tag first
     let token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    
+
     // If token from meta tag is not available or we want a fresh token, get from the form
     if (csrfForm.value) {
         const tokenInput = csrfForm.value.querySelector('input[name="_token"]');
@@ -276,28 +276,28 @@ const getCsrfToken = () => {
             token = tokenInput.value;
         }
     }
-    
+
     return token || '';
 };
 
 const fetchSalesTeams = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/api/sales-teams', { 
-            headers: { 
+        const res = await fetch('/api/sales-teams', {
+            headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             },
             credentials: 'same-origin'
         });
-        
+
         if (!res.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         const data = await res.json();
         console.log('Fetched sales teams:', data);
-        
+
         if (Array.isArray(data)) {
             salesTeams.value = data;
         } else if (data.data && Array.isArray(data.data)) {
@@ -306,7 +306,7 @@ const fetchSalesTeams = async () => {
             salesTeams.value = [];
             console.error('Unexpected data format:', data);
         }
-        
+
         // Verify that each record has an ID
         if (salesTeams.value.length > 0) {
             if (salesTeams.value[0].id === undefined) {
@@ -321,7 +321,7 @@ const fetchSalesTeams = async () => {
                 }
             }
         }
-        
+
         console.log('Processed sales teams:', salesTeams.value);
     } catch (e) {
         console.error('Error fetching sales teams:', e);
@@ -338,11 +338,11 @@ onMounted(() => {
 // Watch for changes in search query to filter the data
 watch(searchQuery, (newQuery) => {
     if (newQuery && salesTeams.value.length > 0) {
-        const foundTeam = salesTeams.value.find(team => 
+        const foundTeam = salesTeams.value.find(team =>
             team.code.toLowerCase().includes(newQuery.toLowerCase()) ||
             team.name.toLowerCase().includes(newQuery.toLowerCase())
         );
-        
+
         if (foundTeam) {
             selectedRow.value = foundTeam;
         }
@@ -353,12 +353,12 @@ const onSalesTeamSelected = (team) => {
     selectedRow.value = team;
     searchQuery.value = team.code;
     showModal.value = false;
-    
+
     // Automatically open the edit modal for the selected row
     isCreating.value = false;
     editForm.value = {
         id: team.id,
-        code: team.code, 
+        code: team.code,
         name: team.name
     };
     console.log('Selected team for editing:', editForm.value);
@@ -369,7 +369,7 @@ const editSelectedRow = () => {
     if (selectedRow.value) {
         isCreating.value = false;
         // Make sure we're capturing the ID properly
-        editForm.value = { 
+        editForm.value = {
             id: selectedRow.value.id,
             code: selectedRow.value.code,
             name: selectedRow.value.name
@@ -398,16 +398,16 @@ const saveSalesTeamChanges = async () => {
     try {
         // Get fresh CSRF token
         const csrfToken = getCsrfToken();
-        
+
         // Different API call for create vs update
         // Use code as the identifier for updates instead of id
         let url = isCreating.value ? '/api/sales-teams' : `/api/sales-teams/${editForm.value.code}`;
         let method = isCreating.value ? 'POST' : 'PUT';
-        
+
         // Log what we're trying to update to help with debugging
         console.log('Updating sales team with code:', editForm.value.code);
         console.log('Update data:', editForm.value);
-        
+
         const response = await fetch(url, {
             method: method,
             headers: {
@@ -422,14 +422,14 @@ const saveSalesTeamChanges = async () => {
             }),
             credentials: 'same-origin' // Include cookies in the request
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Error updating sales team');
         }
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             // Update the local data with the changes or add new item
             if (isCreating.value) {
@@ -440,7 +440,7 @@ const saveSalesTeamChanges = async () => {
                 }
                 showNotification('Sales team updated successfully', 'success');
             }
-            
+
             // Refresh the full data list to ensure we're in sync with the database
             await fetchSalesTeams();
             closeEditModal();
@@ -459,21 +459,21 @@ const deleteSalesTeam = async (code) => {
     if (!confirm(`Are you sure you want to delete sales team "${code}"?`)) {
         return;
     }
-    
+
     saving.value = true;
     try {
         // Get fresh CSRF token
         const csrfToken = getCsrfToken();
-        
+
         console.log('Deleting sales team with code:', code);
-        
+
         // Find the team in the array to get the ID
         const teamToDelete = salesTeams.value.find(team => team.code === code);
-        
+
         if (!teamToDelete || !teamToDelete.id) {
             throw new Error('Team not found or missing ID');
         }
-        
+
         // Use the team ID for deletion
         const response = await fetch(`/api/sales-teams/${teamToDelete.id}`, {
             method: 'DELETE',
@@ -484,23 +484,23 @@ const deleteSalesTeam = async (code) => {
             },
             credentials: 'same-origin' // Include cookies in the request
         });
-        
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Error deleting sales team');
         }
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             // Remove the item from the local array
             salesTeams.value = salesTeams.value.filter(team => team.code !== code);
-            
+
             if (selectedRow.value && selectedRow.value.code === code) {
                 selectedRow.value = null;
                 searchQuery.value = '';
             }
-            
+
             closeEditModal();
             showNotification('Sales team deleted successfully', 'success');
         } else {
@@ -521,7 +521,7 @@ const showNotification = (message, type = 'success') => {
         message,
         type
     };
-    
+
     setTimeout(() => {
         notification.value.show = false;
     }, 3000);

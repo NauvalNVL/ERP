@@ -218,6 +218,20 @@ class UserController extends Controller
         ]);
     }
 
+    public function vueCopyPasteAccess()
+    {
+        return Inertia::render('system-manager/system-security/CopyPasteUserAccessPermission', [
+            'header' => 'Copy & Paste User Access Permission'
+        ]);
+    }
+
+    public function vueViewPrintUser()
+    {
+        return Inertia::render('system-manager/system-security/ViewPrintUser', [
+            'header' => 'View & Print User'
+        ]);
+    }
+
     public function searchUsers(Request $request)
     {
         $search = $request->query('search');

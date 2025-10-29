@@ -4,14 +4,14 @@
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
     
     <!-- Modal -->
-    <div class="relative min-h-screen flex items-center justify-center p-4">
-      <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <div class="relative min-h-screen flex items-center justify-center p-2 sm:p-4">
+      <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
         <!-- Header -->
-        <div class="px-8 py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 flex items-center">
               <i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>
-              Delivery Location: 0-Order by Customer + Deliver & Invoice to Customer
+              <span class="line-clamp-2">Delivery Location: 0-Order by Customer + Deliver & Invoice to Customer</span>
             </h3>
             <button 
               @click="$emit('close')"
@@ -23,7 +23,7 @@
         </div>
 
         <!-- Content -->
-        <div class="px-8 py-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-y-auto flex-1">
           <!-- Order Information -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <!-- Order by Section -->
@@ -139,16 +139,16 @@
         </div>
 
         <!-- Footer -->
-        <div class="px-8 py-6 bg-gray-50 border-t border-gray-200 flex justify-end space-x-4">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 flex-shrink-0">
           <button 
             @click="$emit('close')"
-            class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            class="w-full sm:w-auto px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors order-2 sm:order-1"
           >
             Cancel
           </button>
           <button 
             @click="saveLocation"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            class="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors order-1 sm:order-2"
           >
             OK
           </button>

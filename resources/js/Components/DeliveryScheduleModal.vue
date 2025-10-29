@@ -4,16 +4,17 @@
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
     
     <!-- Modal -->
-    <div class="relative min-h-screen flex items-center justify-center p-4">
-      <div class="relative bg-white rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] overflow-hidden">
+    <div class="relative min-h-screen flex items-center justify-center p-2 sm:p-4">
+      <div class="relative bg-white rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] flex flex-col">
         <!-- Header -->
-        <div class="px-8 py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 flex items-center">
               <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>
-              Delivery Schedule Screen
+              <span class="hidden sm:inline">Delivery Schedule Screen</span>
+              <span class="sm:hidden">Delivery Schedule</span>
             </h3>
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-1 sm:space-x-2">
               <button 
                 @click="saveSchedule"
                 class="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors"
@@ -63,7 +64,7 @@
         </div>
 
         <!-- Content -->
-        <div class="px-8 py-6 overflow-y-auto max-h-[calc(90vh-160px)]">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-y-auto flex-1">
           <!-- Validation Error Popup -->
           <div v-if="showErrorPopup" class="fixed inset-0 z-50 flex items-center justify-center">
             <div class="fixed inset-0 bg-black bg-opacity-40"></div>
@@ -85,7 +86,9 @@
           </div>
           <!-- Schedule Grid -->
           <div class="mb-6">
-            <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white">
+            <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white -mx-4 sm:mx-0">
+              <!-- Inner wrapper with minimum width to prevent column collapse -->
+              <div class="min-w-[1400px]">
               <!-- Grid Header -->
               <div class="grid grid-cols-16 bg-yellow-100 border-b border-gray-200 text-xs font-medium text-gray-600">
                 <div class="px-2 py-3 border-r border-gray-200 text-center">No.</div>
@@ -116,22 +119,22 @@
                   selectedIndex === index ? 'bg-blue-100' : 'bg-white hover:bg-gray-50'
                 ]"
               >
-                <div class="px-2 py-2 border-r border-gray-200 text-sm font-medium">{{ entry.no }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.set || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.main || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.fit1 || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.fit2 || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.fit3 || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.fit4 || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.fit5 || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.fit6 || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.fit7 || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.fit8 || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.fit9 || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ formatDate(entry.date) }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.time || '' }}</div>
-                <div class="px-2 py-2 border-r border-gray-200 text-sm">{{ entry.due || '' }}</div>
-                <div class="px-2 py-2 text-sm">{{ entry.remark || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm font-medium text-center">{{ entry.no }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.set || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.main || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.fit1 || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.fit2 || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.fit3 || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.fit4 || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.fit5 || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.fit6 || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.fit7 || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.fit8 || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.fit9 || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ formatDate(entry.date) }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.time || '' }}</div>
+                <div class="px-2 py-2 border-r border-gray-200 text-sm text-center">{{ entry.due || '' }}</div>
+                <div class="px-2 py-2 text-sm text-center">{{ entry.remark || '' }}</div>
               </div>
 
               <!-- Empty Grid Rows for visual consistency -->
@@ -153,16 +156,17 @@
                 <div class="px-2 py-2 border-r border-gray-200"></div>
                 <div class="px-2 py-2"></div>
               </div>
+              </div>
             </div>
           </div>
 
           <!-- Schedule Details Form -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
             <!-- Left Column - Quantity Allocation -->
             <div class="space-y-4">
               <div class="bg-gray-50 rounded-lg p-4">
                 <h4 class="text-sm font-medium text-gray-700 mb-3">Quantity Allocation</h4>
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                   <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">No.</label>
                     <div 
@@ -195,7 +199,7 @@
                 </div>
 
                 <!-- Fit columns -->
-                <div class="grid grid-cols-3 gap-4 mt-3">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mt-3">
                   <div v-for="i in 9" :key="i">
                     <label class="block text-xs font-medium text-gray-600 mb-1">Fit {{ i }}</label>
                     <input 
@@ -315,8 +319,8 @@
         </div>
 
         <!-- Footer -->
-        <div class="px-8 py-6 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
-          <div class="text-xs text-gray-500">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-gray-50 border-t border-gray-200 flex-shrink-0">
+          <div class="hidden lg:block text-xs text-gray-500 mb-4">
             <span class="font-medium">Keyboard Shortcuts:</span>
             <span class="ml-2">F2: Edit</span>
             <span class="ml-2">F3: Add New</span>
@@ -324,22 +328,22 @@
             <span class="ml-2">Ctrl+S: Save</span>
             <span class="ml-2">Esc: Close</span>
           </div>
-          <div class="flex space-x-4">
+          <div class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
             <button 
               @click="$emit('close')"
-              class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              class="w-full sm:w-auto px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors order-3 sm:order-1"
             >
               Cancel
             </button>
             <button 
               @click="addScheduleEntry"
-              class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+              class="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors order-2 sm:order-2"
             >
               Add Entry
             </button>
             <button 
               @click="saveSchedule"
-              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              class="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors order-1 sm:order-3"
             >
               Save Schedule
             </button>
@@ -722,10 +726,26 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Grid layout for 16 columns */
+/* Grid layout for 16 columns with specific widths */
 .grid-cols-16 {
   display: grid;
-  grid-template-columns: repeat(16, minmax(0, 1fr));
+  grid-template-columns: 
+    minmax(50px, 60px)   /* No. */
+    minmax(70px, 80px)   /* Set */
+    minmax(70px, 80px)   /* Main */
+    minmax(60px, 70px)   /* Fit 1 */
+    minmax(60px, 70px)   /* Fit 2 */
+    minmax(60px, 70px)   /* Fit 3 */
+    minmax(60px, 70px)   /* Fit 4 */
+    minmax(60px, 70px)   /* Fit 5 */
+    minmax(60px, 70px)   /* Fit 6 */
+    minmax(60px, 70px)   /* Fit 7 */
+    minmax(60px, 70px)   /* Fit 8 */
+    minmax(60px, 70px)   /* Fit 9 */
+    minmax(150px, 180px) /* Schedule Date - wider for date + day */
+    minmax(70px, 80px)   /* Time */
+    minmax(70px, 80px)   /* Due */
+    minmax(120px, 1fr);  /* Remark - flexible */
 }
 
 /* Custom scrollbar */
