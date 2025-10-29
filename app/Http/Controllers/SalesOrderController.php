@@ -969,16 +969,32 @@ class SalesOrderController extends Controller
                 'balance' => $salesOrder->SO_QTY ?? '0',
             ];
             
-            // Calculate net delivery from D_QTY fields
+            // Calculate net delivery from DO table (sum of DO_Qty) for this SO
             $netDelivery = 0;
-            for ($i = 1; $i <= 10; $i++) {
-                $qtyField = $i === 10 ? 'D_QTY_10' : "D_QTY_{$i}";
-                if (isset($salesOrder->{$qtyField})) {
-                    $netDelivery += (float)$salesOrder->{$qtyField};
+            $hasDoRows = false;
+            try {
+                $hasDoRows = DB::table('DO')->where('SO_Num', $soNumber)->exists();
+                if ($hasDoRows) {
+                    $netDelivery = (float) DB::table('DO')
+                        ->where('SO_Num', $soNumber)
+                        ->sum('DO_Qty');
                 }
+            } catch (\Exception $e) {
+                Log::warning('Error computing DO net delivery; falling back to SO schedule fields', [
+                    'so_number' => $soNumber,
+                    'error' => $e->getMessage()
+                ]);
+                $hasDoRows = false;
             }
-            $itemDetails['net_delivery'] = $netDelivery;
-            $itemDetails['balance'] = (float)($salesOrder->SO_QTY ?? 0) - $netDelivery;
+
+            // If no DO rows, show net_delivery as empty string and balance equals order
+            if (!$hasDoRows) {
+                $itemDetails['net_delivery'] = '';
+                $itemDetails['balance'] = $salesOrder->SO_QTY ?? '0';
+            } else {
+                $itemDetails['net_delivery'] = $netDelivery;
+                $itemDetails['balance'] = (float)($salesOrder->SO_QTY ?? 0) - $netDelivery;
+            }
             // Include pcs per bundle from MC if available
             if ($masterCard && isset($masterCard->PCS_PER_BLD)) {
                 $itemDetails['pcs_per_bdl'] = (float) $masterCard->PCS_PER_BLD;

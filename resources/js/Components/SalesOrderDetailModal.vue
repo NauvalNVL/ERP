@@ -180,7 +180,7 @@
                   v-model="orderDetail.toDeliverySet"
                   type="text"
                   class="w-12 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
-                  :class="{ 'border-red-500': isToDeliverySetRequired && !orderDetail.toDeliverySet }"
+                  :class="{ 'border-red-500': (isToDeliverySetRequired && !orderDetail.toDeliverySet) || isToDeliverySetExceed }"
                   placeholder=""
                   @input="handleDeliverySetChange"
                 >
@@ -356,6 +356,14 @@
               </p>
             </div>
 
+            <!-- Exceed Warning -->
+            <div v-if="isToDeliverySetExceed" class="bg-red-100 border border-red-300 rounded p-3">
+              <p class="text-sm text-red-800 font-medium">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                To Delivery Set cannot exceed Balance ({{ maxDeliverable.toLocaleString() }}).
+              </p>
+            </div>
+
             <!-- Warning Note -->
             <div class="bg-yellow-100 border border-yellow-300 rounded p-3">
               <p class="text-sm text-yellow-800 font-medium">
@@ -461,13 +469,14 @@ const itemRows = ref([
   { name: 'Fit9', pDesign: '', pcs: '', unit: '', order: '', delivery: '', reject: '', balance: '', available: '', maxDO: '', toDeliver: '', deliverKG: '' }
 ])
 
-// Ensure Balance always mirrors Order for display (placed after itemRows declaration)
+// Default Balance to Order only when balance is empty (do not override API-computed balance)
 watchEffect(() => {
   if (Array.isArray(itemRows.value)) {
     itemRows.value.forEach((row) => {
-      if (row && row.order !== undefined && row.balance !== row.order) {
-        row.balance = row.order
-      }
+      if (!row) return
+      const isEmpty = (v) => v === '' || v === null || v === undefined
+      if (!isEmpty(row.balance) || row.order === undefined) return
+      row.balance = row.order
     })
   }
 })
@@ -512,6 +521,12 @@ const handleSave = () => {
   // Validasi: Harus ada To Delivery Set atau To Deliver yang diisi
   if (toDeliverySetValue <= 0 && !hasToDeliverItems) {
     error('Please fill in "To Delivery Set" or at least one "To Deliver" quantity before proceeding')
+    return
+  }
+
+  // Validasi: To Delivery Set tidak boleh melebihi Balance
+  if (isToDeliverySetExceed.value) {
+    error('To Delivery Set cannot exceed Balance')
     return
   }
   
@@ -573,6 +588,21 @@ const isToDeliverySetRequired = computed(() => {
   
   // Required jika tidak ada yang diisi
   return toDeliverySetValue <= 0 && !hasToDeliverItems
+})
+
+// Max deliverable (Balance) for validation
+const maxDeliverable = computed(() => {
+  const main = itemRows.value.find(r => r.name === 'Main') || {}
+  const orderQty = Number((main.order || '0').toString().replace(/,/g, '')) || 0
+  const netDel = Number((main.delivery || '0').toString().replace(/,/g, '')) || 0
+  const bal = orderQty - netDel
+  return bal > 0 ? bal : 0
+})
+
+// Flag: To Delivery Set exceeds Balance
+const isToDeliverySetExceed = computed(() => {
+  const val = Number((orderDetail.toDeliverySet || '0').toString().replace(/,/g, '')) || 0
+  return val > maxDeliverable.value
 })
 
 // Watch untuk sinkronisasi dari "To Delivery Set" ke "To Deliver" items
@@ -660,7 +690,16 @@ async function hydrateFromSalesOrderData() {
           main.unit = data.item_details?.unit ?? ''
           main.order = data.item_details?.order_qty ?? ''
           main.delivery = data.item_details?.net_delivery ?? 0
-          main.balance = main.order
+          // BALANCE = ORDER - NET DELIVERY (prefer API value if provided)
+          const apiBalance = data.item_details?.balance
+          if (apiBalance !== undefined && apiBalance !== null && apiBalance !== '') {
+            main.balance = apiBalance
+          } else {
+            const orderQty = Number((main.order || '0').toString().replace(/,/g, '')) || 0
+            const netDel = Number((main.delivery || '0').toString().replace(/,/g, '')) || 0
+            const bal = orderQty - netDel
+            main.balance = Number.isFinite(bal) ? bal.toString() : main.order
+          }
           // Per request: keep these empty for now
           main.reject = ''
           main.available = ''

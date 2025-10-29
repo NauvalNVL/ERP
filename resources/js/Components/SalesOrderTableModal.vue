@@ -276,17 +276,18 @@ const itemDetails = ref([
   { name: 'BALANCE', main: '', f1: '', f2: '', f3: '', f4: '', f5: '', f6: '', f7: '', f8: '', f9: '' }
 ])
 
-// Keep BALANCE equal to ORDER reactively
+// Default BALANCE to ORDER only when balance is empty (avoid overriding API-computed balance)
 watchEffect(() => {
   if (Array.isArray(itemDetails.value) && itemDetails.value.length >= 6) {
     const orderRow = itemDetails.value[3]
     const balanceRow = itemDetails.value[5]
     if (orderRow && balanceRow) {
-      if (balanceRow.main !== orderRow.main) balanceRow.main = orderRow.main
-      // Mirror F1..F9 too if needed
+      const isEmpty = (v) => v === '' || v === null || v === undefined
+      if (isEmpty(balanceRow.main)) balanceRow.main = orderRow.main
+      // For F1..F9, only fill if empty
       for (let i = 1; i <= 9; i++) {
         const key = `f${i}`
-        if (orderRow[key] !== undefined && balanceRow[key] !== orderRow[key]) {
+        if (orderRow[key] !== undefined && isEmpty(balanceRow[key])) {
           balanceRow[key] = orderRow[key]
         }
       }
@@ -385,8 +386,8 @@ const updateOrderInfo = async () => {
           itemDetails.value[3].main = data.item_details.order_qty ?? ''
           // NET DELIVERY
           itemDetails.value[4].main = data.item_details.net_delivery ?? 0
-          // BALANCE should mirror ORDER for display
-          itemDetails.value[5].main = itemDetails.value[3].main
+          // BALANCE = ORDER - NET DELIVERY (from API if provided, otherwise default later by watcher)
+          itemDetails.value[5].main = (data.item_details.balance ?? '')
         }
         
         // Update fittings (F1-F9) if available
