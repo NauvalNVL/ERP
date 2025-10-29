@@ -711,31 +711,202 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Get DO items details (for Sales Order Items Screen)
+     * Get DO items details (for Sales Order Items Screen) - CPS Compatible
      */
     public function getDoItems(Request $request)
     {
-        $doNumber = $request->input('do_number');
+        try {
+            $doNumber = $request->input('do_number');
 
-        if (!$doNumber) {
-            return response()->json(['error' => 'DO number is required'], 400);
+            if (!$doNumber) {
+                return response()->json(['error' => 'DO number is required'], 400);
+            }
+
+            Log::info("=== Fetching DO Items for: {$doNumber} ===");
+
+            // Get all DO records for this DO number (can be multiple lines)
+            $doRecords = DB::table('DO')
+                ->where('DO_Num', $doNumber)
+                ->select([
+                    'DO_Num',
+                    'DO_DMY',
+                    'AC_Num',
+                    'AC_Name',
+                    'SO_Num',
+                    'MCS_Num',
+                    'Model',
+                    'Product',
+                    'PD',
+                    'No',
+                    'Unit',
+                    'PCS_PER_SET',
+                    'DO_Qty',
+                    'SO_Unit_Price',
+                    'DO_Tran_Amt',
+                    'DO_Base_Amt',
+                    'Curr',
+                    'COMP',
+                    'Total_DO_Net_KG',
+                    'Total_DO_Gross_KG',
+                    'MC_Net_Kg_Per_Pcs',
+                    'MC_Gross_Kg_Per_Pcs',
+                    'DO_Remark1',
+                    'DO_Remark2',
+                ])
+                ->orderBy('No')
+                ->get();
+
+            if ($doRecords->isEmpty()) {
+                Log::warning("No DO records found for: {$doNumber}");
+                return response()->json(['error' => 'DO not found'], 404);
+            }
+
+            // Get the first record for header info
+            $firstRecord = $doRecords->first();
+
+            // Calculate totals
+            $totalAmount = $doRecords->sum('DO_Tran_Amt');
+            $totalQty = $doRecords->sum('DO_Qty');
+
+            // Build S/O List (unique SO numbers)
+            $soList = $doRecords->groupBy('SO_Num')->map(function ($items, $soNum) {
+                $firstItem = $items->first();
+                return [
+                    'so_number' => $soNum ?: '-',
+                    'mc_seq' => $firstItem->MCS_Num ?: '-',
+                    'do_ref' => $firstItem->DO_Num,
+                    'amount' => $items->sum('DO_Tran_Amt'),
+                ];
+            })->values();
+
+            // Build item details (Main + Finishing items)
+            $itemDetails = [];
+            
+            // Main item
+            $mainItem = $doRecords->first();
+            
+            // Calculate total Net KG from all DO records (sum if multiple lines)
+            $totalNetKg = floatval($doRecords->sum('Total_DO_Net_KG'));
+            $doQty = floatval($mainItem->DO_Qty ?: 0);
+            $kgPerUnit = 0;
+            
+            Log::info("=== KG Calculation Start ===", [
+                'DO_Num' => $doNumber,
+                'Total_DO_Net_KG_sum' => $totalNetKg,
+                'DO_Qty' => $doQty,
+            ]);
+            
+            // Priority 1: Use Total_DO_Net_KG if available
+            if ($totalNetKg > 0 && $doQty > 0) {
+                $kgPerUnit = $totalNetKg / $doQty;
+                Log::info("✅ Method 1: Calculated from Total_DO_Net_KG", [
+                    'totalNetKg' => $totalNetKg,
+                    'doQty' => $doQty,
+                    'kg_per_unit' => $kgPerUnit
+                ]);
+            }
+            // Priority 2: Try MC_Net_Kg_Per_Pcs if available
+            else if ($mainItem->MC_Net_Kg_Per_Pcs && floatval($mainItem->MC_Net_Kg_Per_Pcs) > 0) {
+                $kgPerUnit = floatval($mainItem->MC_Net_Kg_Per_Pcs);
+                $totalNetKg = $kgPerUnit * $doQty;
+                Log::info("✅ Method 2: Using MC_Net_Kg_Per_Pcs", [
+                    'MC_Net_Kg_Per_Pcs' => $kgPerUnit,
+                    'doQty' => $doQty,
+                    'calculated_total' => $totalNetKg
+                ]);
+            }
+            // Priority 3: Default estimation (very rough, for testing)
+            else {
+                // Last resort: use a default estimation based on typical box weight
+                // This is just to prevent 0.00 display
+                $kgPerUnit = 0.05; // 50g per unit as default
+                $totalNetKg = $kgPerUnit * $doQty;
+                Log::warning("⚠️ Method 3: Using default estimation", [
+                    'default_kg_per_unit' => $kgPerUnit,
+                    'doQty' => $doQty,
+                    'estimated_total' => $totalNetKg,
+                    'note' => 'No KG data available, using rough estimate'
+                ]);
+            }
+            
+            $itemDetails[] = [
+                'item' => 'Main',
+                'p_design' => $mainItem->PD ?: 'B1',
+                'pcs' => $mainItem->PCS_PER_SET ?: 1,
+                'unit' => $mainItem->Unit ?: 'Pcs',
+                'u_price' => floatval($mainItem->SO_Unit_Price ?: 0),
+                'deliver' => $doQty,
+                'reject' => 0,
+                'unbill' => $doQty,
+                'to_bill' => 0, // Default 0 - User must input manually (CPS-compatible)
+                'to_bill_kg' => 0, // Will calculate when user inputs to_bill
+                'kg_per_unit' => $kgPerUnit,
+            ];
+            
+            Log::info("=== Final KG Data ===", [
+                'kg_per_unit' => $kgPerUnit,
+                'total_kg_available' => $totalNetKg,
+                'ready_for_calculation' => $kgPerUnit > 0
+            ]);
+
+            // Finishing items F#1 - F#9 (placeholders for now)
+            for ($i = 1; $i <= 9; $i++) {
+                $itemDetails[] = [
+                    'item' => "F# {$i}",
+                    'p_design' => '-',
+                    'pcs' => null,
+                    'unit' => null,
+                    'u_price' => null,
+                    'deliver' => null,
+                    'reject' => null,
+                    'unbill' => null,
+                    'to_bill' => null,
+                    'to_bill_kg' => null,
+                ];
+            }
+
+            $response = [
+                'do_number' => $doNumber,
+                'do_date' => $firstRecord->DO_DMY,
+                'customer_code' => $firstRecord->AC_Num,
+                'customer_name' => $firstRecord->AC_Name,
+                'so_number' => $firstRecord->SO_Num ?: '-',
+                'mc_seq' => $firstRecord->MCS_Num ?: '-',
+                'model' => $firstRecord->Model ?: 'N/A',
+                'currency' => $this->extractCurrencyCode($firstRecord->Curr),
+                'control_set_order' => 0,
+                's_o_count' => $soList->count(),
+                'total_amount' => floatval($totalAmount),
+                'total_qty' => floatval($totalQty),
+                'so_list' => $soList,
+                'item_details' => $itemDetails,
+                'remarks' => [
+                    'remark1' => $firstRecord->DO_Remark1,
+                    'remark2' => $firstRecord->DO_Remark2,
+                ],
+            ];
+
+            Log::info("✅ DO Items response prepared", [
+                'do_number' => $doNumber,
+                'so_count' => $soList->count(),
+                'total_amount' => $totalAmount,
+                'item_count' => count($itemDetails)
+            ]);
+
+            return response()->json($response);
+
+        } catch (\Exception $e) {
+            Log::error("Error fetching DO items: " . $e->getMessage(), [
+                'do_number' => $request->input('do_number'),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'error' => 'Failed to fetch DO items',
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        $items = DB::table('DO')
-            ->where('DO_Num', $doNumber)
-            ->select([
-                'No as item_no',
-                'Product as product',
-                'Model as model',
-                'MCS_Num as mcs_num',
-                'DO_Qty as quantity',
-                'SO_Unit_Price as unit_price',
-                'DO_Tran_Amt as amount',
-                'Unit as unit',
-            ])
-            ->get();
-
-        return response()->json($items);
     }
 
     /**
@@ -748,9 +919,18 @@ class InvoiceController extends Controller
             $customerCode = $request->input('customer_code');
             $periodMonth = $request->input('period_month');
             $periodYear = $request->input('period_year');
+            $doNumber = $request->input('do_number'); // For specific DO search
 
             // Build query
             $query = DB::table('DO');
+
+            // Filter by specific DO number if provided (highest priority)
+            if ($doNumber) {
+                $query->where(function($q) use ($doNumber) {
+                    $q->where('DO_Num', $doNumber)
+                      ->orWhere('DO_Num', 'LIKE', "%{$doNumber}%");
+                });
+            }
 
             // Filter by customer if provided
             if ($customerCode) {
@@ -774,11 +954,14 @@ class InvoiceController extends Controller
                     'COMP',
                     'Status',
                     'SO_Num',
+                    'SO_Type',
                     'PO_Num',
                     'DO_Remark1',
                     'DO_Remark2',
                     'SLM',  // Salesperson from DO table
                     'Area1', // Area from DO table
+                    'IND', // Industry
+                    'Group_', // Group
                     DB::raw('COUNT(*) as item_count'),
                     DB::raw('MAX(DOYYYY) as year'),
                     DB::raw('MAX(DOMM) as month')
@@ -792,11 +975,14 @@ class InvoiceController extends Controller
                     'COMP',
                     'Status',
                     'SO_Num',
+                    'SO_Type',
                     'PO_Num',
                     'DO_Remark1',
                     'DO_Remark2',
                     'SLM',
-                    'Area1'
+                    'Area1',
+                    'IND',
+                    'Group_'
                 ])
                 ->orderBy('DO_DMY', 'desc')
                 ->orderBy('DO_Num', 'desc')
@@ -813,43 +999,64 @@ class InvoiceController extends Controller
                     
                     // Priority 1: Get salesperson from DO table (most accurate - specific to this DO)
                     if (!empty($order->SLM)) {
-                        $salespersonCode = $order->SLM;
-                        Log::info("✅ Salesperson from DO table: {$salespersonCode}");
+                        $salespersonCode = trim($order->SLM);
+                        Log::info("✅ Salesperson from DO.SLM: {$salespersonCode}");
                     } else {
                         // Priority 2: Fallback to CUSTOMER table
                         Log::info("⚠️ No SLM in DO, trying CUSTOMER table...");
                         
-                        $customerData = DB::select("
-                            SELECT SLM as salesperson_code
-                            FROM CUSTOMER 
-                            WHERE CODE = ?
-                            LIMIT 1
-                        ", [$order->AC_Num]);
-                        
-                        if (!empty($customerData) && !empty($customerData[0]->salesperson_code)) {
-                            $salespersonCode = $customerData[0]->salesperson_code;
-                            Log::info("✅ Salesperson from CUSTOMER table: {$salespersonCode}");
-                        } else {
-                            Log::warning("⚠️ No salesperson found in DO or CUSTOMER table for {$order->AC_Num}");
+                        try {
+                            $customerData = DB::table('CUSTOMER')
+                                ->where('CODE', $order->AC_Num)
+                                ->select('SLM')
+                                ->first();
+                            
+                            if ($customerData && !empty($customerData->SLM)) {
+                                $salespersonCode = trim($customerData->SLM);
+                                Log::info("✅ Salesperson from CUSTOMER.SLM: {$salespersonCode}");
+                            } else {
+                                Log::warning("⚠️ No SLM in CUSTOMER table for {$order->AC_Num}");
+                            }
+                        } catch (\Exception $e) {
+                            Log::warning("⚠️ Could not query CUSTOMER table: " . $e->getMessage());
                         }
                     }
                     
-                    // If we have salesperson code, get the name
+                    // If we have salesperson code, try to get the name from various tables
                     if (!empty($salespersonCode)) {
-                        $salespersonTeam = DB::select("
-                            SELECT s_person_code, salesperson_name 
-                            FROM salesperson_teams 
-                            WHERE s_person_code = ?
-                            LIMIT 1
-                        ", [$salespersonCode]);
-                        
-                        if (!empty($salespersonTeam)) {
-                            $salesperson = $salespersonCode . ' - ' . $salespersonTeam[0]->salesperson_name;
-                            Log::info("✅ Final salesperson: {$salesperson}");
-                        } else {
+                        // Try salesperson_teams table first
+                        try {
+                            $salespersonTeam = DB::table('salesperson_teams')
+                                ->where('s_person_code', $salespersonCode)
+                                ->select('s_person_code', 'salesperson_name')
+                                ->first();
+                            
+                            if ($salespersonTeam && !empty($salespersonTeam->salesperson_name)) {
+                                $salesperson = $salespersonCode;
+                                Log::info("✅ Found in salesperson_teams: {$salesperson}");
+                            } else {
+                                // Try salesperson table as fallback
+                                $salespersonData = DB::table('salesperson')
+                                    ->where('Code', $salespersonCode)
+                                    ->select('Code', 'Name')
+                                    ->first();
+                                
+                                if ($salespersonData && !empty($salespersonData->Name)) {
+                                    $salesperson = $salespersonCode;
+                                    Log::info("✅ Found in salesperson: {$salesperson}");
+                                } else {
+                                    // Just use code if name not found
+                                    $salesperson = $salespersonCode;
+                                    Log::info("✅ Using salesperson code only: {$salesperson}");
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            // If queries fail, just use the code
                             $salesperson = $salespersonCode;
-                            Log::info("✅ Salesperson code only: {$salesperson}");
+                            Log::warning("⚠️ Could not query salesperson tables, using code: {$salesperson}");
                         }
+                    } else {
+                        Log::warning("⚠️ No salesperson code found for {$order->AC_Num}");
                     }
                 } catch (\Exception $e) {
                     Log::error("❌ Failed to fetch salesperson: " . $e->getMessage(), [
@@ -859,6 +1066,12 @@ class InvoiceController extends Controller
                     ]);
                 }
                 
+                // Determine order mode based on SO_Type
+                $orderMode = 'customer'; // default
+                if (!empty($order->SO_Type)) {
+                    $orderMode = strtolower($order->SO_Type) === 'invoice' ? 'invoice' : 'customer';
+                }
+                
                 $result = [
                     'do_number' => $order->DO_Num,
                     'do_date' => $order->DO_DMY,
@@ -866,20 +1079,29 @@ class InvoiceController extends Controller
                     'customer_name' => $order->AC_Name,
                     'vehicle_no' => $order->DO_VHC_Num,
                     'item_count' => intval($order->item_count),
-                    'pc' => $order->COMP,
+                    'pc' => $order->COMP ?? 1,
                     'mode' => 'Multiple',
-                    'status' => $order->Status,
+                    'status' => $order->Status ?? 'Draft',
                     'so_number' => $order->SO_Num,
+                    'so_type' => $order->SO_Type,
                     'po_number' => $order->PO_Num,
                     'remark1' => $order->DO_Remark1,
                     'remark2' => $order->DO_Remark2,
                     'period_month' => $order->month,
                     'period_year' => $order->year,
                     'salesperson' => $salesperson,
+                    'salesperson_code' => $salespersonCode,
+                    'area' => $order->Area1,
+                    'industry' => $order->IND,
+                    'group' => $order->Group_,
+                    'order_mode' => $orderMode,
                 ];
                 
                 Log::info("📦 Final DO response for {$order->DO_Num}:", [
                     'salesperson' => $salesperson,
+                    'order_mode' => $orderMode,
+                    'remark1' => $order->DO_Remark1,
+                    'remark2' => $order->DO_Remark2,
                     'is_empty' => empty($salesperson)
                 ]);
                 

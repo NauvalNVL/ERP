@@ -323,14 +323,18 @@
         @select="onDOsSelectedFromTable"
       />
 
-      <!-- Modal 3: Final Tax Calculation -->
-      <FinalTaxCalculationModal
+      <!-- Modal 3: Final Screen -->
+      <FinalScreenModal
         :open="finalTaxModalOpen"
         :totalAmount="totalAmount"
         :taxCode="taxIndexNo"
         :taxOptions="taxOptions"
+        :customerCode="selectedDeliveryOrder?.customer_code || ''"
+        :customerName="selectedDeliveryOrder?.customer_name || ''"
+        :doNumber="selectedDeliveryOrder?.do_number || ''"
+        :doDate="selectedDeliveryOrder?.do_date || ''"
         @close="finalTaxModalOpen = false"
-        @confirm="onFinalTaxConfirmed"
+        @confirm="onFinalScreenConfirmed"
       />
 
       <!-- Modal 4: Sales Order Items Screen -->
@@ -363,7 +367,7 @@ import SalesTaxIndexModal from '@/Components/SalesTaxIndexModal.vue'
 import CheckSalesTaxModal from '@/Components/CheckSalesTaxModal.vue'
 import DeliveryOrderScreenModal from '@/Components/DeliveryOrderScreenModal.vue'
 import DeliveryOrderSelectionModal from '@/Components/DeliveryOrderTableModal.vue'
-import FinalTaxCalculationModal from '@/Components/FinalTaxCalculationModal.vue'
+import FinalScreenModal from '@/Components/FinalScreen.vue'
 import SalesOrderItemsModal from '@/Components/SalesOrderItemsModal.vue'
 import InvoiceNumberOptionModal from '@/Components/InvoiceNumberOptionModal.vue'
 
@@ -676,24 +680,36 @@ async function calculateTotalAmount(dos){
 
 /**
  * Step 3b: User confirms Sales Order Items
- * Opens Final Tax Calculation Modal (CPS Flow)
+ * Opens Final Screen Modal (CPS Flow)
  */
 function onSalesOrderItemsConfirm(itemsData){
   console.log('✅ Sales Order Items confirmed:', itemsData)
+  
+  // Store total amount from Sales Order Items
+  if (itemsData && itemsData.totalAmount) {
+    totalAmount.value = itemsData.totalAmount
+    console.log('💰 Total Amount set to:', totalAmount.value)
+  } else {
+    console.warn('⚠️ No totalAmount in itemsData, using 0')
+    totalAmount.value = 0
+  }
+  
   // Close Sales Order Items modal
   salesOrderItemsModalOpen.value = false
 
-  // Open Final Tax Calculation Modal
+  // Open Final Screen Modal
   finalTaxModalOpen.value = true
 }
 
 /**
- * Step 4: User confirms final tax calculation
+ * Step 4: User confirms final screen (tax + invoice details)
  * Opens Invoice Number Option Modal
  */
-function onFinalTaxConfirmed(taxData){
-  // Store final tax data
-  finalTaxData.value = taxData
+function onFinalScreenConfirmed(finalData){
+  console.log('✅ Final Screen confirmed with complete data:', finalData)
+  
+  // Store final data (includes tax, periods, invoice info, etc.)
+  finalTaxData.value = finalData
   finalTaxModalOpen.value = false
 
   // Open Invoice Number Option Modal
