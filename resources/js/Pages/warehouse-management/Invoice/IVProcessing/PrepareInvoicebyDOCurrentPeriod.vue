@@ -487,6 +487,7 @@ const finalTaxData = ref(null)
 const invoiceNumberMode = ref('auto')
 const manualInvoiceNumber = ref('')
 const selectedOrderForItems = ref(null)
+const selectedDeliveryOrder = ref(null) // For Final Screen props
 
 // Toggle section visibility depending on selection
 const hasCustomer = computed(() => !!(customerCode.value && String(customerCode.value).trim()))
@@ -547,9 +548,23 @@ async function fetchTaxOptions(){
  * Step 2: User confirms tax in Check Sales Tax Screen
  * Opens Delivery Order List Modal (simple list)
  */
-function onTaxConfirmed(selectedTax){
+function onTaxConfirmed(data){
+  console.log('✅ Tax confirmed in Check Sales Tax Screen:', data)
+  
+  // Handle both old format (direct tax object) and new format (object with selectedTax)
+  const selectedTax = data.selectedTax || data
+  const allTaxOptions = data.allTaxOptions || []
+  
   // Update tax information from confirmed selection
   taxIndexNo.value = selectedTax.code
+  console.log('💼 Tax Index No set to:', taxIndexNo.value)
+  
+  // Store all tax options for later use
+  if (allTaxOptions.length > 0) {
+    taxOptions.value = allTaxOptions
+    console.log('✅ Tax Options stored:', taxOptions.value.length, 'options')
+  }
+  
   checkTaxModalOpen.value = false
 
   // Open Delivery Order List Modal (CPS workflow - simple list first)
@@ -647,6 +662,7 @@ async function onDOsSelected(dos){
   if (dos.length > 0) {
     selectedOrderForItems.value = dos[0] // Select first DO for items view
     selectedOrderForItems.value.amount = totalAmount.value
+    selectedDeliveryOrder.value = dos[0] // Also set for Final Screen
     salesOrderItemsModalOpen.value = true
     console.log('📦 Opening Sales Order Items Screen for:', dos[0].do_number)
   }
@@ -682,7 +698,7 @@ async function calculateTotalAmount(dos){
  * Step 3b: User confirms Sales Order Items
  * Opens Final Screen Modal (CPS Flow)
  */
-function onSalesOrderItemsConfirm(itemsData){
+async function onSalesOrderItemsConfirm(itemsData){
   console.log('✅ Sales Order Items confirmed:', itemsData)
   
   // Store total amount from Sales Order Items
@@ -696,6 +712,23 @@ function onSalesOrderItemsConfirm(itemsData){
   
   // Close Sales Order Items modal
   salesOrderItemsModalOpen.value = false
+
+  // Check if taxOptions is loaded (should already be loaded from Check Sales Tax Screen)
+  if (!taxOptions.value || taxOptions.value.length === 0) {
+    console.warn('⚠️ Tax Options not loaded! This should not happen. Fetching now...')
+    await fetchTaxOptions()
+    console.log('✅ Tax Options fetched:', taxOptions.value.length)
+  } else {
+    console.log('✅ Tax Options already loaded:', taxOptions.value.length, 'options')
+  }
+  
+  // Log data being passed to Final Screen
+  console.log('📤 Opening Final Screen with:', {
+    totalAmount: totalAmount.value,
+    taxIndexNo: taxIndexNo.value,
+    taxOptionsCount: taxOptions.value.length,
+    taxOptions: taxOptions.value.map(t => ({ code: t.code, rate: t.rate }))
+  })
 
   // Open Final Screen Modal
   finalTaxModalOpen.value = true

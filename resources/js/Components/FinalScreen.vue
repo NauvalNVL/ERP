@@ -133,38 +133,154 @@ const emit = defineEmits(['close', 'confirm'])
 const selectedTaxGroup = ref('')
 const taxAmount = ref(0)
 
-// Watch for tax code changes
-watch(() => props.taxCode, (newVal) => {
-  if (newVal) {
-    selectedTaxGroup.value = newVal
-    calculateTax()
+// Watch for tax code changes (with validation)
+watch(() => props.taxCode, (newVal, oldVal) => {
+  console.log('👁️ Tax Code prop changed:', { old: oldVal, new: newVal })
+  
+  if (newVal && newVal.trim() !== '') {
+    console.log('🔍 Validating tax code:', newVal)
+    
+    // Check if taxOptions is available
+    if (!props.taxOptions || props.taxOptions.length === 0) {
+      console.warn('⚠️ Tax Options not available yet, will wait...')
+      return
+    }
+    
+    // Find tax in options
+    const taxExists = props.taxOptions.find(t => t.code === newVal)
+    if (taxExists) {
+      selectedTaxGroup.value = newVal
+      console.log('✅ Tax auto-selected from prop watcher:', newVal)
+      calculateTax()
+    } else {
+      console.warn('⚠️ Tax code not found in options:', {
+        taxCode: newVal,
+        availableOptions: props.taxOptions.map(t => t.code)
+      })
+    }
   }
 }, { immediate: true })
 
 watch(() => props.open, (isOpen) => {
   if (isOpen) {
-    // Reset and initialize tax when modal opens
-    if (props.taxCode) {
-      selectedTaxGroup.value = props.taxCode
-      calculateTax()
-    } else {
-      selectedTaxGroup.value = ''
-      taxAmount.value = 0
-    }
+    console.log('📋 Final Screen opened with:', {
+      doNumber: props.doNumber,
+      totalAmount: props.totalAmount,
+      taxCode: props.taxCode,
+      taxOptions: props.taxOptions,
+      formatted: formatCurrency(props.totalAmount)
+    })
     
     // Warn if total amount is 0
     if (!props.totalAmount || props.totalAmount === 0) {
       console.warn('⚠️ Total Amount is 0! Did user input To Bill quantity in Sales Order Items?')
     }
     
-    console.log('📋 Final Screen opened with:', {
-      doNumber: props.doNumber,
-      totalAmount: props.totalAmount,
-      taxCode: props.taxCode,
-      formatted: formatCurrency(props.totalAmount)
-    })
+    // Auto-select tax group from taxCode prop
+    if (props.taxCode && props.taxCode.trim() !== '') {
+      console.log('🎯 Auto-selecting Tax Group:', props.taxCode)
+      console.log('📦 Available taxOptions:', props.taxOptions)
+      console.log('📊 taxOptions count:', props.taxOptions?.length || 0)
+      console.log('📋 taxOptions structure:', JSON.stringify(props.taxOptions, null, 2))
+      
+      // Verify tax exists in options (case-insensitive check)
+      const taxExists = props.taxOptions.find(t => {
+        // Check both 'code' and 'tax_code' fields (API might use different field name)
+        const tCode = t.code || t.tax_code || t.Code || t.TAX_CODE
+        console.log('  Checking:', tCode, 'against', props.taxCode, '| Full object:', t)
+        return tCode && tCode.toUpperCase() === props.taxCode.toUpperCase()
+      })
+      
+      console.log('🔍 Tax search result:', taxExists)
+      
+      if (taxExists) {
+        // Use the actual code from taxOptions (in case of case mismatch)
+        const actualCode = taxExists.code || taxExists.tax_code || taxExists.Code || taxExists.TAX_CODE
+        selectedTaxGroup.value = actualCode
+        console.log('✅ Tax Group auto-selected:', actualCode)
+        
+        // Calculate tax with delay to ensure state is updated
+        setTimeout(() => {
+          calculateTax()
+        }, 150)
+      } else {
+        console.warn('⚠️ Tax Code not found in options:', {
+          taxCode: props.taxCode,
+          taxCodeType: typeof props.taxCode,
+          availableOptions: props.taxOptions.map(t => ({
+            code: t.code,
+            tax_code: t.tax_code,
+            name: t.name,
+            rate: t.rate
+          }))
+        })
+        selectedTaxGroup.value = ''
+        taxAmount.value = 0
+      }
+    } else {
+      console.warn('⚠️ No Tax Code provided')
+      selectedTaxGroup.value = ''
+      taxAmount.value = 0
+    }
   }
 })
+
+// Recalculate tax when totalAmount changes
+watch(() => props.totalAmount, (newAmount, oldAmount) => {
+  if (newAmount !== oldAmount && selectedTaxGroup.value) {
+    console.log('💰 Total Amount changed, recalculating tax...', {
+      old: oldAmount,
+      new: newAmount
+    })
+    calculateTax()
+  }
+})
+
+// Watch taxOptions - when loaded, auto-select if taxCode is set
+watch(() => props.taxOptions, (newOptions, oldOptions) => {
+  console.log('📊 Tax Options changed:', {
+    oldCount: oldOptions?.length || 0,
+    newCount: newOptions?.length || 0,
+    options: newOptions?.map(t => ({ code: t.code, rate: t.rate }))
+  })
+  
+  if (newOptions && newOptions.length > 0) {
+    // If taxCode is set but selectedTaxGroup is not, auto-select
+    if (props.taxCode && props.taxCode.trim() !== '' && !selectedTaxGroup.value) {
+      console.log('🎯 Tax Options now available, attempting auto-select:', props.taxCode)
+      
+      // Case-insensitive search with multiple field support
+      const taxExists = newOptions.find(t => {
+        const tCode = t.code || t.tax_code || t.Code || t.TAX_CODE
+        return tCode && tCode.toUpperCase() === props.taxCode.toUpperCase()
+      })
+      
+      if (taxExists) {
+        const actualCode = taxExists.code || taxExists.tax_code || taxExists.Code || taxExists.TAX_CODE
+        selectedTaxGroup.value = actualCode
+        console.log('✅ Tax auto-selected from taxOptions watcher:', actualCode)
+        
+        // Calculate tax after auto-select
+        setTimeout(() => calculateTax(), 100)
+      } else {
+        console.warn('⚠️ Tax code not found after taxOptions loaded:', {
+          taxCode: props.taxCode,
+          availableOptions: newOptions.map(t => ({
+            code: t.code,
+            tax_code: t.tax_code,
+            name: t.name
+          }))
+        })
+      }
+    }
+    
+    // If already selected, recalculate
+    if (selectedTaxGroup.value) {
+      console.log('🔄 Tax already selected, recalculating...')
+      calculateTax()
+    }
+  }
+}, { deep: true, immediate: true })
 
 const netAmount = computed(() => {
   return props.totalAmount + taxAmount.value
@@ -177,16 +293,39 @@ const selectedTaxRate = computed(() => {
 })
 
 const calculateTax = () => {
+  console.log('🧮 Calculating tax...', {
+    selectedTaxGroup: selectedTaxGroup.value,
+    totalAmount: props.totalAmount,
+    taxOptions: props.taxOptions
+  })
+  
   if (!selectedTaxGroup.value) {
     taxAmount.value = 0
+    console.log('❌ No tax group selected, tax = 0')
+    return
+  }
+  
+  if (!props.totalAmount || props.totalAmount === 0) {
+    taxAmount.value = 0
+    console.warn('⚠️ Total Amount is 0, cannot calculate tax')
     return
   }
   
   const tax = props.taxOptions.find(t => t.code === selectedTaxGroup.value)
+  console.log('📊 Found tax option:', tax)
+  
   if (tax && tax.rate) {
     taxAmount.value = props.totalAmount * (tax.rate / 100)
+    console.log('✅ Tax calculated:', {
+      taxCode: tax.code,
+      taxRate: tax.rate,
+      totalAmount: props.totalAmount,
+      taxAmount: taxAmount.value,
+      formula: `${props.totalAmount} × ${tax.rate}% = ${taxAmount.value}`
+    })
   } else {
     taxAmount.value = 0
+    console.warn('⚠️ Tax option not found or no rate')
   }
 }
 
