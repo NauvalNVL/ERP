@@ -535,36 +535,155 @@ class DeliveryOrderController extends Controller
     public function getPrintRange(Request $request)
     {
         try {
+            Log::info('PrintDO - Request received', $request->all());
             $query = DB::table('DO')
-                ->leftJoin('AC', 'DO.AC_Num', '=', 'AC.AC_Num')
+                ->leftJoin('CUSTOMER', 'DO.AC_Num', '=', 'CUSTOMER.CODE')
+                ->leftJoin('so', 'DO.SO_Num', '=', 'so.SO_Num')
+                ->leftJoin('MC', function($join) {
+                    $join->on('DO.MCS_Num', '=', 'MC.MCS_Num')
+                         ->on('DO.AC_Num', '=', 'MC.AC_NUM');
+                })
+                // Join products to fetch its product group
+                // Some datasets store product code in DO.Product, others in DO.PD
+                ->leftJoin('products as p', function($join) {
+                    $join->on('p.product_code', '=', 'DO.Product')
+                         ->orOn('p.product_code', '=', 'DO.PD');
+                })
+                ->leftJoin('product_groups as pg', 'p.product_group_id', '=', 'pg.product_group_id')
                 ->select(
                     'DO.DO_Num',
                     'DO.DO_DMY',
                     'DO.AC_Num',
-                    'AC.AC_Name',
+                    'CUSTOMER.NAME as AC_Name',
+                    'CUSTOMER.ADDRESS1',
+                    'CUSTOMER.ADDRESS2', 
+                    'CUSTOMER.ADDRESS3',
+                    'CUSTOMER.TEL_NO',
+                    'CUSTOMER.FAX_NO',
                     'DO.DO_VHC_Num',
                     'DO.Status',
+                    'DO.SO_Num',
+                    'DO.PO_Num',
+                    'DO.Model',
+                    'DO.Product',
+                    'DO.DO_Qty',
+                    'DO.Unit',
+                    'DO.INT_L',
+                    'DO.INT_W', 
+                    'DO.INT_H',
+                    'DO.PCS_PER_SET',
+                    'MC.PCS_PER_BLD',
+                    'so.MODEL as SO_Model',
+                    'so.PRODUCT as SO_Product',
+                    'so.SO_QTY',
+                    'so.UNIT as SO_Unit',
+                    DB::raw("pg.product_group_name as ProductGroupName"),
                     'DO.DO_Remark1',
                     'DO.DO_Remark2'
                 );
 
-            // Filter by DO number range
+            // If exact do_num provided, prefer exact match (supports both formats)
+            if ($request->filled('do_num')) {
+                $num = (string) $request->do_num;
+                // Try both formats: YYYY-MM-SSSSS or MM-YYYY-SSSSS
+                $parts = explode('-', $num);
+                if (count($parts) === 3) {
+                    // Detect which segment represents the year
+                    if (strlen($parts[0]) === 4) {
+                        // Format: YYYY-MM-SSSSS (canonical)
+                        $yyyy = (int) $parts[0];
+                        $mm   = (int) $parts[1];
+                        $seq  = (int) $parts[2];
+                        $canonical = sprintf('%04d-%02d-%05d', $yyyy, $mm, $seq);
+                        $alternate = sprintf('%02d-%04d-%05d', $mm, $yyyy, $seq); // MM-YYYY-SSSSS
+                    } else {
+                        // Format: MM-YYYY-SSSSS
+                        $mm   = (int) $parts[0];
+                        $yyyy = (int) $parts[1];
+                        $seq  = (int) $parts[2];
+                        $canonical = sprintf('%04d-%02d-%05d', $yyyy, $mm, $seq); // YYYY-MM-SSSSS
+                        $alternate = sprintf('%02d-%04d-%05d', $mm, $yyyy, $seq); // MM-YYYY-SSSSS
+                    }
+
+                    $query->where(function ($q) use ($num, $canonical, $alternate) {
+                        $q->where('DO.DO_Num', $num)
+                          ->orWhere('DO.DO_Num', $canonical)
+                          ->orWhere('DO.DO_Num', $alternate);
+                    });
+                } else {
+                    $query->where('DO.DO_Num', $num);
+                }
+            } else {
+            // Filter by DO number range (DO_Num format is MM-YYYY-SSSSS)
+            $fromDO = null;
+            $toDO = null;
             if ($request->from_month && $request->from_year && $request->from_number) {
+                // Auto-correct swapped inputs (e.g., month=2025, year=10)
+                $fMonth = (int) $request->from_month;
+                $fYear  = (int) $request->from_year;
+                if ($fMonth >= 1000 && $fYear > 0 && $fYear <= 12) {
+                    [$fMonth, $fYear] = [$fYear, $fMonth];
+                }
                 $fromDO = sprintf('%02d-%04d-%05d', 
-                    $request->from_month, 
-                    $request->from_year, 
-                    $request->from_number
+                    $fMonth, 
+                    $fYear, 
+                    (int)$request->from_number
                 );
-                $query->where('DO.DO_Num', '>=', $fromDO);
             }
 
             if ($request->to_month && $request->to_year && $request->to_number) {
+                // Auto-correct swapped inputs (e.g., month=2025, year=10)
+                $tMonth = (int) $request->to_month;
+                $tYear  = (int) $request->to_year;
+                if ($tMonth >= 1000 && $tYear > 0 && $tYear <= 12) {
+                    [$tMonth, $tYear] = [$tYear, $tMonth];
+                }
                 $toDO = sprintf('%02d-%04d-%05d', 
-                    $request->to_month, 
-                    $request->to_year, 
-                    $request->to_number
+                    $tMonth, 
+                    $tYear, 
+                    (int)$request->to_number
                 );
-                $query->where('DO.DO_Num', '<=', $toDO);
+            }
+
+            if ($fromDO && $toDO) {
+                // Build swapped variants to support both formats
+                $fromYear = (int)$request->from_year; $fromMonth = (int)$request->from_month; $fromSeq = (int)$request->from_number;
+                $toYear = (int)$request->to_year; $toMonth = (int)$request->to_month; $toSeq = (int)$request->to_number;
+                $fromAlt = sprintf('%04d-%02d-%05d', $fromYear, $fromMonth, $fromSeq); // YYYY-MM-SSSSS
+                $toAlt = sprintf('%04d-%02d-%05d', $toYear, $toMonth, $toSeq);
+
+                if ($fromDO === $toDO) {
+                    // Exact single DO match (either format)
+                    $query->where(function ($q) use ($fromDO, $fromAlt) {
+                        $q->where('DO.DO_Num', $fromDO)
+                          ->orWhere('DO.DO_Num', $fromAlt);
+                    });
+                } else {
+                    // Range match on either format
+                    $query->where(function ($q) use ($fromDO, $toDO, $fromAlt, $toAlt) {
+                        $q->whereBetween('DO.DO_Num', [$fromDO, $toDO])
+                          ->orWhereBetween('DO.DO_Num', [$fromAlt, $toAlt]);
+                    });
+                }
+            } elseif ($fromDO && !$toDO) {
+                // Only from provided: treat as exact DO (either format)
+                $fromYear = (int)$request->from_year; $fromMonth = (int)$request->from_month; $fromSeq = (int)$request->from_number;
+                $fromAlt = sprintf('%04d-%02d-%05d', $fromYear, $fromMonth, $fromSeq);
+                $query->where(function ($q) use ($fromDO, $fromAlt) {
+                    $q->where('DO.DO_Num', $fromDO)
+                      ->orWhere('DO.DO_Num', $fromAlt);
+                });
+            } elseif (!$fromDO && $toDO) {
+                // Only to provided: treat as exact DO (either format)
+                $toYear = (int)$request->to_year; $toMonth = (int)$request->to_month; $toSeq = (int)$request->to_number;
+                $toAlt = sprintf('%04d-%02d-%05d', $toYear, $toMonth, $toSeq);
+                $query->where(function ($q) use ($toDO, $toAlt) {
+                    $q->where('DO.DO_Num', $toDO)
+                      ->orWhere('DO.DO_Num', $toAlt);
+                });
+            }
+
+            // Close 'else' block for do_num exact matching
             }
 
             // Filter by customer if specified
@@ -572,8 +691,11 @@ class DeliveryOrderController extends Controller
                 $query->where('DO.AC_Num', $request->customer_code);
             }
 
-            // Filter by status for print (only Saved and Completed)
-            $query->whereIn('DO.Status', ['Saved', 'Completed']);
+            // Optional: filter by status only if provided; otherwise include all statuses
+            if ($request->has('status')) {
+                $statuses = is_array($request->status) ? $request->status : [$request->status];
+                $query->whereIn('DO.Status', $statuses);
+            }
 
             // Filter by new entry mode if specified
             if ($request->new_entry_mode === 'print_only') {
@@ -581,6 +703,11 @@ class DeliveryOrderController extends Controller
             }
 
             $deliveryOrders = $query->orderBy('DO.DO_Num', 'asc')->get();
+
+            Log::info('PrintDO - Query result', [
+                'count' => $deliveryOrders->count(),
+                'sample' => $deliveryOrders->take(2)->toArray()
+            ]);
 
             return response()->json([
                 'success' => true,

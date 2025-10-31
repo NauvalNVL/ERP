@@ -324,39 +324,75 @@ watch(() => props.open, async (isOpen) => {
 // Methods
 const fetchDeliveryOrders = async () => {
   try {
-    // Build query parameters
     const params = new URLSearchParams()
-    
-    // Add customer code if available
-    if (props.customerCode) {
-      params.append('customer_code', props.customerCode)
-    }
-    
-    // Add period from props or filters
-    const month = props.periodMonth || filters.value.currentPeriodMonth
-    const year = props.periodYear || filters.value.currentPeriodYear
-    
+    // Optional customer filter
+    if (props.customerCode) params.append('customer_code', props.customerCode)
+
+    // Build from/to date (YYYY-MM-DD) for the given month/year
+    const month = String(props.periodMonth || filters.value.currentPeriodMonth).padStart(2, '0')
+    const year = String(props.periodYear || filters.value.currentPeriodYear)
     if (month && year) {
-      params.append('period_month', month)
-      params.append('period_year', year)
+      const fromDate = `${year}-${month}-01`
+      // Compute last day of month
+      const lastDay = new Date(Number(year), Number(month), 0).getDate()
+      const toDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`
+      params.append('from_date', fromDate)
+      params.append('to_date', toDate)
     }
-    
-    const url = `/api/invoices/delivery-orders?${params.toString()}`
+
+    const url = `/api/delivery-orders?${params.toString()}`
     console.log('Fetching delivery orders from:', url)
-    
-    const res = await fetch(url, {
-      headers: { 'Accept': 'application/json' }
-    })
-    
-    if (res.ok) {
-      const data = await res.json()
-      deliveryOrders.value = data
-      console.log(`✅ Loaded ${data.length} delivery orders from DO table`)
-    } else {
+
+    const res = await fetch(url, { headers: { Accept: 'application/json' } })
+    if (!res.ok) {
       const error = await res.text()
       console.error('Failed to fetch delivery orders:', error)
       deliveryOrders.value = []
+      return
     }
+
+    const json = await res.json()
+    // Normalize response: support {success, data: {data: []}} or plain array
+    let rows = []
+    if (Array.isArray(json)) {
+      rows = json
+    } else if (json && Array.isArray(json.data)) {
+      rows = json.data
+    } else if (json && json.data && Array.isArray(json.data.data)) {
+      rows = json.data.data
+    } else {
+      rows = []
+    }
+
+    // Map DB fields to UI fields
+    deliveryOrders.value = rows.map(r => {
+      const doNum = r.DO_Num || r.do_num || r.doNumber || ''
+      const doDateSk = r.DODateSK || r.dodatesk
+      const doDmy = r.DO_DMY || r.do_dmy || ''
+      // Prefer DODateSK (YYYYMMDD) to build a proper ISO date string
+      let doDate = ''
+      if (doDateSk) {
+        const s = String(doDateSk)
+        doDate = `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`
+      } else {
+        doDate = doDmy // may be d/m/Y; formatDate() will fallback to raw if invalid
+      }
+      return {
+        do_number: doNum,
+        do_date: doDate,
+        customer_code: r.AC_Num || r.ac_num || r.customer_code || '',
+        vehicle_no: r.DO_VHC_Num || r.vehicle_number || r.vehicle_no || '',
+        item_count: 1,
+        pc: r.PCS_PER_SET || r.pcs_per_set || 1,
+        mode: 'Multiple',
+        status: r.Status || r.status || 'Draft',
+        remark1: r.DO_Remark1 || r.do_remark1 || '',
+        remark2: r.DO_Remark2 || r.do_remark2 || '',
+        salesperson: r.SLM || r.slm || ''
+      }
+    })
+
+    console.log(`✅ Loaded ${deliveryOrders.value.length} delivery orders from DO table`)
   } catch (e) {
     console.error('Error fetching delivery orders:', e)
     deliveryOrders.value = []

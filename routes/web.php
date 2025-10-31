@@ -346,6 +346,8 @@ Route::middleware('auth')->group(function () {
 
         // Delivery Order API routes (use web.php to keep session/CSRF context)
         Route::post('/api/delivery-orders', [DeliveryOrderController::class, 'store']);
+        // Print Delivery Order (preview range / single DO)
+        Route::get('/api/delivery-orders/print-range', [DeliveryOrderController::class, 'getPrintRange']);
 
         // Delivery Order Transaction - Prepare Delivery Order (Multiple Item)
         Route::get('/delivery-order/transaction/prepare-delivery-order-multiple-item', function () {

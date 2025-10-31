@@ -240,6 +240,31 @@
             </div>
           </div>
         </div>
+        
+        <!-- Preview Section -->
+        <div v-if="preview" class="mt-6 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden border border-white/20">
+          <div class="bg-gradient-to-r from-green-500 to-blue-500 px-6 py-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <i class="fa-solid fa-eye text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-white">Preview Surat Jalan</h3>
+                  <p class="text-green-100 text-sm">Review sebelum mencetak PDF</p>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button class="modern-btn-primary" @click="downloadPdf">
+                  <i class="fa-solid fa-file-pdf mr-2"></i> PDF
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="p-6 overflow-auto max-h-96">
+            <pre class="font-mono text-xs leading-5 bg-white p-6 rounded-lg border shadow-sm" style="font-family: 'Courier New', monospace; white-space: pre-wrap;">{{ previewText }}</pre>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -275,10 +300,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomerAccountModal from '@/Components/customer-account-modal.vue'
 import DeliveryOrderTableModal from '@/Components/DeliveryOrderTableModal.vue'
+import jsPDF from 'jspdf'
 
 const currentPeriod = reactive({
   month: new Date().getMonth() + 1,
@@ -303,6 +329,9 @@ const newEntryMode = ref(true)
 const message = ref('')
 const quickDO = ref('')
 const printCopies = ref(1)
+const preview = ref(false)
+const previewText = ref('')
+const currentUser = ref({ user_id: 'guest', official_name: 'Guest User' })
 
 // Modal states
 const showCustomerModal = ref(false)
@@ -339,22 +368,394 @@ const refreshForm = () => {
   }, 3000)
 }
 
-const proceedToPrint = () => {
-  if (!hasValidRange.value) {
-    message.value = 'Please specify a valid delivery order range'
-    return
+const proceedToPrint = async () => {
+  try {
+    if (!hasValidRange.value) {
+      message.value = 'Please specify a valid delivery order range'
+      return
+    }
+
+    // Build request params for backend print range
+    const params = new URLSearchParams()
+    // Compute effective range; if To empty, use From for single-DO
+    const hasFrom = !!(doRange.fromMonth && doRange.fromYear && doRange.fromNumber)
+    const effFromMonth = hasFrom ? String(doRange.fromMonth).padStart(2, '0') : String(currentPeriod.month).padStart(2, '0')
+    const effFromYear = hasFrom ? String(doRange.fromYear) : String(currentPeriod.year)
+    const effFromNumber = hasFrom ? String(doRange.fromNumber).padStart(5, '0') : '00001'
+
+    const hasTo = !!(doRange.toMonth && doRange.toYear && doRange.toNumber)
+    const effToMonth = hasTo ? String(doRange.toMonth).padStart(2, '0') : effFromMonth
+    const effToYear = hasTo ? String(doRange.toYear) : effFromYear
+    const effToNumber = hasTo ? String(doRange.toNumber).padStart(5, '0') : effFromNumber
+
+    params.append('from_month', effFromMonth)
+    params.append('from_year', effFromYear)
+    params.append('from_number', effFromNumber)
+    params.append('to_month', effToMonth)
+    params.append('to_year', effToYear)
+    params.append('to_number', effToNumber)
+    // If single DO, pass exact do_num to guarantee match (use YYYY-MM-SSSSS)
+    if (effFromMonth === effToMonth && effFromYear === effToYear && effFromNumber === effToNumber) {
+      const exact = `${effFromYear}-${effFromMonth}-${effFromNumber}`
+      params.append('do_num', exact)
+    }
+    if (newEntryMode.value) params.append('new_entry_mode', 'print_only')
+
+    const url = `/api/delivery-orders/print-range?${params.toString()}`
+    console.log('🔍 PrintDO - Request URL:', url)
+    console.log('📤 PrintDO - Params sent:', {
+      from_month: effFromMonth,
+      from_year: effFromYear,
+      from_number: effFromNumber,
+      to_month: effToMonth,
+      to_year: effToYear,
+      to_number: effToNumber,
+      do_num: effFromMonth === effToMonth && effFromYear === effToYear && effFromNumber === effToNumber ? `${effFromYear}-${effFromMonth}-${effFromNumber}` : null,
+      new_entry_mode: newEntryMode.value || null
+    })
+    const res = await fetch(url, { headers: { Accept: 'application/json' } })
+    const json = await res.json()
+    console.log('📥 PrintDO - Response from backend:', json)
+
+    // Normalize rows
+    let rows = []
+    if (json && json.success && Array.isArray(json.data)) rows = json.data
+    else if (Array.isArray(json)) rows = json
+
+    preview.value = true
+    previewText.value = formatPreviewText(rows)
+  } catch (e) {
+    preview.value = true
+    previewText.value = 'Error generating preview: ' + (e.message || e)
   }
-  
-  const fromDO = doRange.fromMonth && doRange.fromYear && doRange.fromNumber 
-    ? `${doRange.fromMonth.toString().padStart(2, '0')}-${doRange.fromYear}-${doRange.fromNumber.toString().padStart(5, '0')}`
-    : 'Not specified'
-    
-  const toDO = doRange.toMonth && doRange.toYear && doRange.toNumber 
-    ? `${doRange.toMonth.toString().padStart(2, '0')}-${doRange.toYear}-${doRange.toNumber.toString().padStart(5, '0')}`
-    : 'Not specified'
-  
-  message.value = `Print range: ${fromDO} to ${toDO}${customer.code ? ` for customer ${customer.code}` : ''}`
 }
+
+function formatPreviewText(rows) {
+  const lines = []
+  
+  if (rows.length === 0) {
+    lines.push('No delivery orders found for selected range')
+    return lines.join('\n')
+  }
+
+  rows.forEach((r, idx) => {
+    const doNum = r.DO_Num || r.do_num || ''
+    const doDate = r.DO_DMY || r.DODateSK || ''
+    const cust = r.AC_Name || r.AC_NAME || r.customer_name || ''
+    const custAddress1 = r.ADDRESS1 || ''
+    const custAddress2 = r.ADDRESS2 || ''
+    const custAddress3 = r.ADDRESS3 || ''
+    const custTel = r.TEL_NO || ''
+    const custFax = r.FAX_NO || ''
+    const vhc = r.DO_VHC_Num || r.vehicle_no || ''
+    const soNum = r.SO_Num || ''
+    const poNum = r.PO_Num || ''
+    const model = r.Model || r.SO_Model || ''
+    const mainName = r.ProductGroupName || ''
+    const doQty = parseFloat(r.DO_Qty || 0)
+    const unit = r.Unit || r.SO_Unit || ''
+    const unitLower = (unit || '').toLowerCase()
+    const intL = r.INT_L || 0
+    const intW = r.INT_W || 0
+    const intH = r.INT_H || 0
+    const pcsPerBld = parseFloat(r.PCS_PER_BLD || 1)
+
+    // Calculate bundle quantities
+    let bundles = 0
+    let remainingPcs = 0
+    
+    if (pcsPerBld > 0 && doQty > 0) {
+      bundles = Math.floor(doQty / pcsPerBld)
+      remainingPcs = doQty - (bundles * pcsPerBld)
+    } else {
+      remainingPcs = doQty
+    }
+
+    lines.push('PT. MULTIBOX INDAH'.padEnd(50) + `No. SJ    : ${doNum}`)
+    lines.push('Jl. Raya Cikande - Rangkas Bitung KM.6 Desa Kareo'.padEnd(50) + `Tanggal   : ${doDate}`)
+    lines.push('Kec. Jawilan, Serang - Banten 42180'.padEnd(50) + 'Halaman   : 1')
+    lines.push('Phone : (0254)404060 (Hunting)')
+    lines.push('Fax   : (021)8252690')
+    lines.push('')
+    lines.push('                           SURAT JALAN')
+    lines.push('')
+    lines.push(`Kirim ke :`.padEnd(50) + `Nomor Truk : ${vhc || '-'}`)
+    lines.push(`${cust || '-'}`.padEnd(50) + `Waktu Print : ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}`)
+    
+    // Customer address from database
+    if (custAddress1) {
+      lines.push(custAddress1.padEnd(50) + 'Dibuat Oleh : whs12')
+    }
+    if (custAddress2) {
+      lines.push(custAddress2)
+    }
+    if (custAddress3) {
+      lines.push(custAddress3)
+    }
+    
+    lines.push('')
+    
+    // Customer phone and fax from database
+    if (custTel) {
+      lines.push(`Tel   : ${custTel}`)
+    }
+    if (custFax) {
+      lines.push(`Fax   : ${custFax}`)
+    }
+    
+    lines.push('')
+    lines.push('No. Nama Barang'.padEnd(60) + 'Jumlah'.padStart(12) + ' '.repeat(4) + 'Satuan')
+    lines.push(''.padEnd(110, '-'))
+    const qtyStrPrev = `${Number(doQty)}${unitLower}`
+    const unitStrPrev = `${bundles}BDL x ${pcsPerBld}Pcs + ${remainingPcs}Pcs`
+    lines.push(`1 SO# : ${soNum}/PO# / ${poNum}`.padEnd(60) + qtyStrPrev.padStart(12) + '    ' + unitStrPrev)
+    lines.push(`  Model : ${model}`)
+    lines.push(`  Main : ${mainName}`.padEnd(40) + `${intL} x ${intW} x ${intH}`)
+    lines.push('')
+    lines.push('')
+    lines.push('Keterangan :')
+    lines.push('')
+    lines.push('Yang menerima Jam : ..........    Yang mengantar              Hormat kami')
+    lines.push('')
+    lines.push('(Nama Jelas dan Cap Perusahaan)  SUHERMAN                     Gudang    1773.98')
+    lines.push('Akhir dari halaman                Sopir')
+    lines.push(''.padEnd(110, '-'))
+    
+    if (idx < rows.length - 1) {
+      lines.push('')
+      lines.push(''.padEnd(110, '='))
+      lines.push('')
+    }
+  })
+  
+  return lines.join('\n')
+}
+
+async function downloadPdf() {
+  try {
+    const doc = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' })
+    // Fetch rows again using current preview filters (simple approach)
+    const params = new URLSearchParams()
+    const hasFrom = !!(doRange.fromMonth && doRange.fromYear && doRange.fromNumber)
+    const effFromMonth = hasFrom ? String(doRange.fromMonth).padStart(2, '0') : String(currentPeriod.month).padStart(2, '0')
+    const effFromYear = hasFrom ? String(doRange.fromYear) : String(currentPeriod.year)
+    const effFromNumber = hasFrom ? String(doRange.fromNumber).padStart(5, '0') : '00001'
+
+    const hasTo = !!(doRange.toMonth && doRange.toYear && doRange.toNumber)
+    const effToMonth = hasTo ? String(doRange.toMonth).padStart(2, '0') : effFromMonth
+    const effToYear = hasTo ? String(doRange.toYear) : effFromYear
+    const effToNumber = hasTo ? String(doRange.toNumber).padStart(5, '0') : effFromNumber
+
+    params.append('from_month', effFromMonth)
+    params.append('from_year', effFromYear)
+    params.append('from_number', effFromNumber)
+    params.append('to_month', effToMonth)
+    params.append('to_year', effToYear)
+    params.append('to_number', effToNumber)
+    if (effFromMonth === effToMonth && effFromYear === effToYear && effFromNumber === effToNumber) {
+      const exact = `${effFromYear}-${effFromMonth}-${effFromNumber}`
+      params.append('do_num', exact)
+    }
+    if (newEntryMode.value) params.append('new_entry_mode', 'print_only')
+
+    const res = await fetch(`/api/delivery-orders/print-range?${params.toString()}`, { headers: { Accept: 'application/json' } })
+    const json = await res.json()
+    const rows = (json && json.success && Array.isArray(json.data)) ? json.data : []
+
+    let page = 0
+    for (const r of rows) {
+      if (page > 0) doc.addPage()
+      renderSuratJalan(doc, r)
+      page++
+    }
+
+    if (page === 0) {
+      alert('No delivery orders found to print.')
+      return
+    }
+
+    const mm = String(currentPeriod.month).padStart(2, '0')
+    const yy = String(currentPeriod.year)
+    doc.save(`SuratJalan_${mm}_${yy}.pdf`)
+  } catch (e) {
+    alert('Error generating PDF: ' + (e.message || e))
+  }
+}
+
+function renderSuratJalan(doc, row) {
+  const left = 50
+  const right = 545
+  const center = (left + right) / 2
+  let y = 50
+
+  // Extract data from row
+  const doNum = row.DO_Num || ''
+  const doDate = row.DO_DMY || ''
+  const custName = row.AC_Name || ''
+  const custAddress1 = row.ADDRESS1 || ''
+  const custAddress2 = row.ADDRESS2 || ''
+  const custAddress3 = row.ADDRESS3 || ''
+  const custTel = row.TEL_NO || ''
+  const custFax = row.FAX_NO || ''
+  const truck = row.DO_VHC_Num || ''
+  const status = row.Status || ''
+  const soNum = row.SO_Num || ''
+  const poNum = row.PO_Num || ''
+  const model = row.Model || row.SO_Model || ''
+  const mainName = row.ProductGroupName || ''
+  const doQty = parseFloat(row.DO_Qty || 0)
+  const unit = row.Unit || row.SO_Unit || ''
+  const unitLower = (unit || '').toLowerCase()
+  const intL = row.INT_L || 0
+  const intW = row.INT_W || 0
+  const intH = row.INT_H || 0
+  const pcsPerBld = parseFloat(row.PCS_PER_BLD || 1)
+
+  // Calculate bundle quantities
+  let bundles = 0
+  let pcsInBundles = 0
+  let remainingPcs = 0
+  
+  if (pcsPerBld > 0 && doQty > 0) {
+    bundles = Math.floor(doQty / pcsPerBld)
+    pcsInBundles = bundles * pcsPerBld
+    remainingPcs = doQty - pcsInBundles
+  } else {
+    remainingPcs = doQty
+  }
+
+  // Header Section
+  doc.setFont('courier', 'bold')
+  doc.setFontSize(10)
+  doc.text('PT. MULTIBOX INDAH', left, y)
+  doc.text(`No. SJ    : ${doNum}`, right, y, { align: 'right' })
+  y += 12
+
+  doc.setFont('courier', 'normal')
+  doc.setFontSize(9)
+  doc.text('Jl. Raya Cikande - Rangkas Bitung KM.6 Desa Kareo', left, y)
+  doc.text(`Tanggal   : ${doDate}`, right, y, { align: 'right' })
+  y += 12
+
+  doc.text('Kec. Jawilan, Serang - Banten 42180', left, y)
+  doc.text('Halaman   : 1', right, y, { align: 'right' })
+  y += 12
+
+  doc.text('Phone : (0254)404060 (Hunting)', left, y)
+  y += 12
+
+  doc.text('Fax   : (021)8252690', left, y)
+  y += 25
+
+  // Title
+  doc.setFont('courier', 'bold')
+  doc.setFontSize(16)
+  doc.text('SURAT JALAN', center, y, { align: 'center' })
+  y += 25
+
+  // Customer and delivery info section
+  doc.setFont('courier', 'normal')
+  doc.setFontSize(9)
+  doc.text('Kirim ke :', left, y)
+  doc.text(`Nomor Truk : ${truck || '-'}`, right, y, { align: 'right' })
+  y += 12
+
+  doc.text(`${custName || '-'}`, left, y)
+  doc.text(`Waktu Print : ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'})}`, right, y, { align: 'right' })
+  y += 12
+
+  // Customer address from database
+  if (custAddress1) {
+    doc.text(custAddress1, left, y)
+    doc.text(`Dibuat Oleh : ${currentUser.value.username || currentUser.value.user_id || 'whs12'}`, right, y, { align: 'right' })
+    y += 12
+  }
+
+  if (custAddress2) {
+    doc.text(custAddress2, left, y)
+    y += 12
+  }
+
+  if (custAddress3) {
+    doc.text(custAddress3, left, y)
+    y += 12
+  }
+
+  // Customer phone and fax from database
+  if (custTel) {
+    doc.text(`Tel   : ${custTel}`, left, y)
+    y += 12
+  }
+
+  if (custFax) {
+    doc.text(`Fax   : ${custFax}`, left, y)
+    y += 12
+  }
+
+  y += 13
+
+  // Table header with separate columns
+  const qtyColX = right - 160 // column for quantity (Jumlah)
+  const unitColX = right      // column for unit breakdown (Satuan)
+  doc.text('No. Nama Barang', left, y)
+  doc.text('Jumlah', qtyColX, y, { align: 'right' })
+  doc.text('Satuan', unitColX, y, { align: 'right' })
+  y += 8
+
+  // Draw line under header
+  doc.line(left, y, right, y)
+  y += 15
+
+  // Item details with proper bundle calculation
+  doc.text(`1 SO# : ${soNum}/PO# / ${poNum}`, left, y)
+  // Align DO_Qty under 'Jumlah' and unit breakdown under 'Satuan'
+  const qtyStr = `${Number(doQty)}${unitLower}`
+  const unitStr = `${bundles}BDL x ${pcsPerBld}Pcs + ${remainingPcs}Pcs`
+  doc.text(qtyStr, qtyColX, y, { align: 'right' })
+  doc.text(unitStr, unitColX, y, { align: 'right' })
+  y += 12
+
+  doc.text(`  Model : ${model}`, left, y)
+  y += 12
+
+  doc.text(`  Main : ${mainName}`, left, y)
+  doc.text(`${intL} x ${intW} x ${intH}`, left + 150, y)
+  y += 12
+
+  // Add more space before footer
+  y = 650
+
+  // Footer section
+  doc.text('Keterangan :', left, y)
+  y += 40
+
+  doc.text('Yang menerima Jam : ..........', left, y)
+  doc.text('Yang mengantar', center - 50, y)
+  doc.text('Hormat kami', right, y, { align: 'right' })
+  y += 40
+
+  // Signature names
+  doc.text('(Nama Jelas dan Cap Perusahaan)', left, y)
+  doc.text('SUHERMAN', center - 50, y)
+  doc.text('Gudang    1773.98', right, y, { align: 'right' })
+  y += 12
+
+  doc.text('Akhir dari halaman', left, y)
+  doc.text('Sopir', center - 50, y)
+  y += 30
+
+  // Bottom line
+  doc.line(left, y, right, y)
+}
+
+onMounted(async () => {
+  // Try fetch current user (optional)
+  try {
+    const res = await fetch('/api/user/current', { headers: { Accept: 'application/json' } })
+    const json = await res.json()
+    if (json && json.success && json.data) currentUser.value = json.data
+  } catch (_) {}
+})
 
 // Modal functions
 const openCustomerModal = () => {
@@ -400,10 +801,17 @@ const handleDOSelect = (selectedDO) => {
       console.log('📊 DO parts:', parts)
       
       if (parts.length === 3) {
-        // Populate From DO fields
+        // Actual format: MM-YYYY-SSSSS
         doRange.fromMonth = parseInt(parts[0])
         doRange.fromYear = parseInt(parts[1])
         doRange.fromNumber = parts[2]
+
+        // If To range is empty, set it equal to From to enable single-DO print
+        if (!doRange.toMonth && !doRange.toYear && !doRange.toNumber) {
+          doRange.toYear = doRange.fromYear
+          doRange.toMonth = doRange.fromMonth
+          doRange.toNumber = doRange.fromNumber
+        }
         
         console.log('✅ From DO populated:', {
           month: doRange.fromMonth,
@@ -454,7 +862,7 @@ const handleToDOSelect = (selectedDO) => {
       console.log('📊 To DO parts:', parts)
       
       if (parts.length === 3) {
-        // Populate To DO fields
+        // Actual format: MM-YYYY-SSSSS
         doRange.toMonth = parseInt(parts[0])
         doRange.toYear = parseInt(parts[1])
         doRange.toNumber = parts[2]
