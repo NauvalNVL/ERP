@@ -780,7 +780,15 @@ Route::post('/material-management/tax-groups', [MmTaxGroupController::class, 'st
 Route::get('/material-management/tax-groups/{code}', [MmTaxGroupController::class, 'show']);
 Route::put('/material-management/tax-groups/{code}', [MmTaxGroupController::class, 'update']);
 Route::delete('/material-management/tax-groups/{code}', [MmTaxGroupController::class, 'destroy']);
-Route::post('/material-management/tax-groups/seed', [MmTaxGroupController::class, 'seed']); 
+Route::post('/material-management/tax-groups/seed', [MmTaxGroupController::class, 'seed']);
+
+// Invoice Tax Type API routes (CPS-style Define Tax Type)
+Route::get('/invoices/tax-types', [App\Http\Controllers\Invoice\TaxTypeController::class, 'getTaxTypes']);
+Route::post('/invoices/tax-types', [App\Http\Controllers\Invoice\TaxTypeController::class, 'store']);
+Route::get('/invoices/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'show']);
+Route::put('/invoices/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'update']);
+Route::delete('/invoices/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'destroy']);
+Route::post('/invoices/tax-types/seed', [App\Http\Controllers\Invoice\TaxTypeController::class, 'seed']); 
 
 // Add Receive Destination API routes
 Route::get('/material-management/receive-destinations', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'getReceiveDestinations']);

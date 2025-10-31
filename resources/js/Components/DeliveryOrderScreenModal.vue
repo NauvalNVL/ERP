@@ -149,14 +149,23 @@
                         <td class="px-2 py-2 border-r border-gray-200">
                           <!-- Input + Browse Button for each row -->
                           <div class="flex items-center gap-1">
-                            <input
-                              :value="selectedOrders[index-1]?.do_number || ''"
-                              type="text"
-                              :placeholder="'D/Order# ' + String(index).padStart(2, '0')"
-                              @keyup.enter="searchDeliveryOrder"
-                              class="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                              :class="selectedOrders[index-1] ? 'text-blue-600 font-semibold' : 'text-gray-900'"
-                            />
+                            <div class="flex-1 flex flex-col gap-0.5">
+                              <input
+                                :value="selectedOrders[index-1]?.do_number || ''"
+                                type="text"
+                                :placeholder="'D/Order# ' + String(index).padStart(2, '0')"
+                                @keyup.enter="searchDeliveryOrder"
+                                class="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                :class="selectedOrders[index-1] ? 'text-blue-600 font-semibold' : 'text-gray-900'"
+                              />
+                              <!-- Billed indicator (CPS Flow) -->
+                              <span 
+                                v-if="selectedOrders[index-1] && isBilled(selectedOrders[index-1].do_number)"
+                                class="text-xs text-green-600 font-semibold px-1"
+                              >
+                                ✓ Billed
+                              </span>
+                            </div>
                             <button 
                               @click="openBrowseModal" 
                               class="p-1.5 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-all flex-shrink-0" 
@@ -214,6 +223,15 @@
                 >
                   OK
                 </button>
+                <!-- Proceed to Final Screen Button (CPS Flow) -->
+                <button 
+                  v-if="hasBilledItems"
+                  @click="handleProceed"
+                  class="px-8 py-2 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-green-700 border-2 border-green-600 rounded hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all shadow-md"
+                  title="Proceed to Final Screen"
+                >
+                  Proceed →
+                </button>
               </div>
             </DialogPanel>
           </TransitionChild>
@@ -233,10 +251,11 @@ const props = defineProps({
   customerName: { type: String, default: '' },
   taxIndexNo: { type: String, default: '' },
   invoiceDate: { type: String, default: '' },
-  selectedDeliveryOrders: { type: Array, default: () => [] }
+  selectedDeliveryOrders: { type: Array, default: () => [] },
+  billedItems: { type: Map, default: () => new Map() } // Track billed items per DO
 })
 
-const emit = defineEmits(['close', 'select', 'browse', 'viewItems', 'delete', 'save'])
+const emit = defineEmits(['close', 'select', 'browse', 'viewItems', 'delete', 'save', 'proceed'])
 
 // State
 const selectedDOs = ref([])
@@ -248,6 +267,11 @@ const selectedOrders = computed(() => {
 })
 
 const selectedCount = computed(() => selectedDOs.value.length)
+
+// Check if user has billed any items (CPS Flow)
+const hasBilledItems = computed(() => {
+  return props.billedItems && props.billedItems.size > 0
+})
 
 // Watch for prop changes
 watch(() => props.open, (isOpen, wasOpen) => {
@@ -277,6 +301,10 @@ watch(() => props.selectedDeliveryOrders, (newOrders, oldOrders) => {
 // Methods
 const isSelected = (doNumber) => {
   return selectedDOs.value.some(d => d.do_number === doNumber)
+}
+
+const isBilled = (doNumber) => {
+  return props.billedItems && props.billedItems.has(doNumber)
 }
 
 const toggleSelection = (item) => {
@@ -370,6 +398,12 @@ const handleReturn = () => {
   console.log('↩️ Returning with selected orders:', selectedDOs.value.map(d => d.do_number))
   // Emit select event (same as OK)
   emit('select', selectedDOs.value)
+}
+
+const handleProceed = () => {
+  console.log('🎯 Proceeding to Final Screen with billed items:', props.billedItems.size)
+  // Emit proceed event to go to Final Screen
+  emit('proceed')
 }
 
 const formatDate = (dateString) => {

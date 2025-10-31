@@ -283,7 +283,11 @@ const formatPercent = (rate) => {
 
 const handleOk = () => {
   if (selectedTax.value) {
-    emit('confirm', selectedTax.value)
+    // Emit both selected tax AND all tax options to parent
+    emit('confirm', {
+      selectedTax: selectedTax.value,
+      allTaxOptions: taxOptions.value
+    })
   }
 }
 

@@ -123,11 +123,15 @@
                   <div class="mb-3">
                     <div class="flex items-center gap-2">
                       <label class="text-xs font-semibold text-gray-700 w-32">D/Order#:</label>
-                      <input v-model="filters.doNumber" type="text" class="flex-1 max-w-xs px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"/>
-                      <button class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50">📋</button>
-                      <button class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50">📁</button>
-                      <button class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50">🗙</button>
-                      <button @click="applyFilters" class="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium">
+                      <input 
+                        v-model="filters.doNumber" 
+                        type="text" 
+                        @keyup.enter="applyFilters"
+                        placeholder="Type D/O number and press Enter"
+                        class="flex-1 max-w-xs px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"
+                      />
+                      <button @click="clearFormFields" class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-50" title="Clear">🗙</button>
+                      <button @click="applyFilters" class="px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm">
                         Search
                       </button>
                     </div>
@@ -157,20 +161,17 @@
                     </div>
                   </div>
 
-                  <!-- Row 6: Order Mode (Radio) -->
+                  <!-- Row 6: Order Mode (Textbox like CPS) -->
                   <div class="mb-3">
                     <div class="flex items-center gap-2">
                       <label class="text-xs font-semibold text-gray-700 w-32">Order Mode:</label>
-                      <div class="flex gap-4">
-                        <label class="flex items-center gap-1.5">
-                          <input type="radio" v-model="filters.orderMode" value="customer" class="text-blue-600"/>
-                          <span class="text-sm text-gray-700">D-Order by Customer</span>
-                        </label>
-                        <label class="flex items-center gap-1.5">
-                          <input type="radio" v-model="filters.orderMode" value="invoice" class="text-blue-600"/>
-                          <span class="text-sm text-gray-700">Deliver & Invoice to Customer</span>
-                        </label>
-                      </div>
+                      <input 
+                        v-model="filters.orderModeText" 
+                        type="text" 
+                        readonly
+                        class="flex-1 px-2 py-1 bg-gray-50 border border-gray-300 rounded text-sm"
+                        placeholder="D-Order by Customer + Deliver & Invoice to Customer"
+                      />
                     </div>
                   </div>
 
@@ -286,6 +287,7 @@ const filters = ref({
   crTicket: '',
   onHold: '',
   orderMode: 'customer',
+  orderModeText: '', // CPS-style textbox for order mode
   agentCust: '',
   salesType: 'Sales',
   doInst1: '',
@@ -419,9 +421,84 @@ const toggleSelection = (item) => {
   }
 }
 
+/**
+ * Search specific DO by number and auto-populate
+ */
+const searchByDoNumber = async () => {
+  const doNum = filters.value.doNumber?.trim()
+  
+  if (!doNum) {
+    console.warn('⚠️ No D/Order# provided for search')
+    return
+  }
+  
+  console.log('🔍 Searching for D/Order#:', doNum)
+  
+  try {
+    // Search in existing loaded orders first
+    const existingOrder = deliveryOrders.value.find(o => 
+      o.do_number === doNum || o.do_number.includes(doNum)
+    )
+    
+    if (existingOrder) {
+      console.log('✅ Found in loaded orders:', existingOrder.do_number)
+      // Select and populate
+      selectedDOs.value = [existingOrder]
+      populateFormFields(existingOrder)
+      return
+    }
+    
+    // If not found, fetch from API
+    console.log('🌐 Fetching from API...')
+    const params = new URLSearchParams()
+    params.append('do_number', doNum)
+    
+    // Add period if available
+    if (props.periodMonth && props.periodYear) {
+      params.append('period_month', props.periodMonth)
+      params.append('period_year', props.periodYear)
+    }
+    
+    const url = `/api/invoices/delivery-orders?${params.toString()}`
+    const res = await fetch(url, {
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    if (res.ok) {
+      const data = await res.json()
+      
+      if (data && data.length > 0) {
+        const foundOrder = data[0]
+        console.log('✅ Found via API:', foundOrder.do_number)
+        
+        // Add to loaded orders if not already there
+        if (!deliveryOrders.value.some(o => o.do_number === foundOrder.do_number)) {
+          deliveryOrders.value.unshift(foundOrder)
+        }
+        
+        // Select and populate
+        selectedDOs.value = [foundOrder]
+        populateFormFields(foundOrder)
+      } else {
+        console.warn('⚠️ D/Order# not found:', doNum)
+        alert(`D/Order# "${doNum}" not found in the system.`)
+      }
+    } else {
+      console.error('❌ API error:', res.status)
+    }
+  } catch (e) {
+    console.error('❌ Error searching DO:', e)
+  }
+}
+
 const applyFilters = () => {
-  // Apply filter logic here
-  fetchDeliveryOrders()
+  // If D/Order# is provided, search for it specifically
+  if (filters.value.doNumber?.trim()) {
+    searchByDoNumber()
+  } else {
+    // Otherwise, fetch all with other filters
+    fetchDeliveryOrders()
+  }
 }
 
 const handleClose = () => {
@@ -461,47 +538,79 @@ const formatDate = (dateString) => {
 }
 
 /**
- * Auto-populate form fields with selected DO data
+ * Auto-populate form fields with selected DO data (CPS-compatible)
  */
 const populateFormFields = (order) => {
   console.log('🔄 Auto-populating fields with DO:', order.do_number)
-  console.log('📦 Order data received:', order)
-  console.log('📦 Full order object:', JSON.stringify(order, null, 2))
+  console.log('📦 Full order data:', order)
   
   // D/Order# - primary identifier
   filters.value.doNumber = order.do_number || ''
   
-  // Salesperson - from customer table
-  const salespersonValue = order.salesperson || ''
-  filters.value.salesperson = salespersonValue
+  // Salesperson - from DO or Customer table (already includes code + name from API)
+  filters.value.salesperson = order.salesperson || order.salesperson_code || ''
   
-  console.log('👤 Salesperson value:', {
-    raw: order.salesperson,
-    type: typeof order.salesperson,
-    assigned: salespersonValue,
-    isEmpty: !salespersonValue,
-    isUndefined: order.salesperson === undefined,
-    isNull: order.salesperson === null,
-    isEmptyString: order.salesperson === ''
-  })
+  // CR/Ticket# - from PO number or SO number
+  filters.value.crTicket = order.po_number || order.so_number || ''
+  
+  // On Hold - based on status
+  filters.value.onHold = (order.status === 'Hold' || order.status === 'OnHold') ? 'Yes' : 'No'
+  
+  // Order Mode - Build textbox content based on SO_Type
+  let orderModeText = 'D-Order by Customer'
+  
+  if (order.order_mode === 'invoice' || order.so_type === 'invoice') {
+    orderModeText = 'D-Order by Customer + Deliver & Invoice to Customer'
+    filters.value.orderMode = 'invoice'
+  } else if (order.order_mode === 'customer' || order.so_type === 'customer') {
+    orderModeText = 'D-Order by Customer'
+    filters.value.orderMode = 'customer'
+  } else {
+    // Default based on customer field
+    orderModeText = 'D-Order by Customer'
+    filters.value.orderMode = 'customer'
+  }
+  
+  filters.value.orderModeText = orderModeText
+  
+  // Agent Cust - can be populated if available
+  filters.value.agentCust = order.agent_customer || ''
+  
+  // Sales Type - default to 'Sales'
+  filters.value.salesType = order.sales_type || 'Sales'
   
   // D/O Inst1 & Inst2 - from remarks
   filters.value.doInst1 = order.remark1 || ''
   filters.value.doInst2 = order.remark2 || ''
   
-  // Sales Type - default to 'Sales'
-  filters.value.salesType = 'Sales'
+  // Audit trail fields - populate if available from backend
+  filters.value.preparedBy = order.prepared_by || ''
+  filters.value.preparedDate = order.prepared_date || ''
+  filters.value.amendedBy = order.amended_by || ''
+  filters.value.amendedDate = order.amended_date || ''
+  filters.value.cancelledBy = order.cancelled_by || ''
+  filters.value.cancelledDate = order.cancelled_date || ''
+  filters.value.printedBy = order.printed_by || ''
+  filters.value.printedDate = order.printed_date || ''
   
-  console.log('✅ Form fields populated:', {
+  console.log('✅ Form fields auto-populated (CPS-style):', {
     doNumber: filters.value.doNumber,
     salesperson: filters.value.salesperson,
+    crTicket: filters.value.crTicket,
+    onHold: filters.value.onHold,
+    orderMode: filters.value.orderMode,
+    orderModeText: filters.value.orderModeText,
+    salesType: filters.value.salesType,
     doInst1: filters.value.doInst1,
     doInst2: filters.value.doInst2
   })
   
-  // Warning if salesperson is empty
-  if (!salespersonValue) {
+  // Warning if important fields are empty
+  if (!filters.value.salesperson) {
     console.warn('⚠️ Salesperson is empty for customer:', order.customer_code)
+  }
+  if (!filters.value.crTicket) {
+    console.warn('⚠️ CR/Ticket# is empty for DO:', order.do_number)
   }
 }
 
@@ -509,12 +618,15 @@ const populateFormFields = (order) => {
  * Clear form fields when deselecting DO
  */
 const clearFormFields = () => {
-  console.log('Clearing form fields')
+  console.log('🧹 Clearing all form fields')
   filters.value.doNumber = ''
   filters.value.salesperson = ''
   filters.value.crTicket = ''
   filters.value.onHold = ''
+  filters.value.orderMode = 'customer'
+  filters.value.orderModeText = ''
   filters.value.agentCust = ''
+  filters.value.salesType = 'Sales'
   filters.value.doInst1 = ''
   filters.value.doInst2 = ''
   filters.value.preparedBy = ''
@@ -525,6 +637,8 @@ const clearFormFields = () => {
   filters.value.cancelledDate = ''
   filters.value.printedBy = ''
   filters.value.printedDate = ''
+  
+  console.log('✅ All fields cleared')
 }
 </script>
 

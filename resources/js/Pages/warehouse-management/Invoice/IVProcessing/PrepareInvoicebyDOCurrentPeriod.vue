@@ -306,10 +306,12 @@
         :taxIndexNo="taxIndexNo"
         :invoiceDate="invoiceDate"
         :selectedDeliveryOrders="selectedDOs"
-        @close="doListModalOpen = false"
+        :billedItems="billedItems"
+        @close="handleDOScreenClose"
         @select="onDOsSelected"
         @browse="openDetailedDOView"
         @viewItems="openSalesOrderItems"
+        @proceed="proceedToFinalScreen"
       />
 
       <!-- Modal 2b: Delivery Order Selection (CPS-style detailed table - opened from Zoom) -->
@@ -323,14 +325,18 @@
         @select="onDOsSelectedFromTable"
       />
 
-      <!-- Modal 3: Final Tax Calculation -->
-      <FinalTaxCalculationModal
+      <!-- Modal 3: Final Screen -->
+      <FinalScreenModal
         :open="finalTaxModalOpen"
         :totalAmount="totalAmount"
         :taxCode="taxIndexNo"
         :taxOptions="taxOptions"
+        :customerCode="selectedDeliveryOrder?.customer_code || ''"
+        :customerName="selectedDeliveryOrder?.customer_name || ''"
+        :doNumber="selectedDeliveryOrder?.do_number || ''"
+        :doDate="selectedDeliveryOrder?.do_date || ''"
         @close="finalTaxModalOpen = false"
-        @confirm="onFinalTaxConfirmed"
+        @confirm="onFinalScreenConfirmed"
       />
 
       <!-- Modal 4: Sales Order Items Screen -->
@@ -363,7 +369,7 @@ import SalesTaxIndexModal from '@/Components/SalesTaxIndexModal.vue'
 import CheckSalesTaxModal from '@/Components/CheckSalesTaxModal.vue'
 import DeliveryOrderScreenModal from '@/Components/DeliveryOrderScreenModal.vue'
 import DeliveryOrderSelectionModal from '@/Components/DeliveryOrderTableModal.vue'
-import FinalTaxCalculationModal from '@/Components/FinalTaxCalculationModal.vue'
+import FinalScreenModal from '@/Components/FinalScreen.vue'
 import SalesOrderItemsModal from '@/Components/SalesOrderItemsModal.vue'
 import InvoiceNumberOptionModal from '@/Components/InvoiceNumberOptionModal.vue'
 
@@ -465,13 +471,12 @@ const finalTaxModalOpen = ref(false)
 const invoiceNumberModalOpen = ref(false)
 const preparing = ref(false)
 
-// 🔍 DEBUG: Watch doListModalOpen changes to track unexpected closes
+// Monitor modal state changes (for debugging only - can be removed in production)
 watch(() => doListModalOpen.value, (newVal, oldVal) => {
   if (oldVal === true && newVal === false) {
-    console.log('⚠️ [MAIN PAGE] doListModalOpen changed: true → false')
-    console.trace('doListModalOpen closed from:')
+    console.log('⚠️ [MAIN PAGE] Delivery Order Screen modal closed')
   } else if (oldVal === false && newVal === true) {
-    console.log('✅ [MAIN PAGE] doListModalOpen changed: false → true (Screen Modal Opening)')
+    console.log('✅ [MAIN PAGE] Delivery Order Screen modal opened')
   }
 })
 
@@ -480,9 +485,13 @@ const selectedDOs = ref([])
 const totalAmount = ref(0)
 const taxOptions = ref([])
 const finalTaxData = ref(null)
+
+// Track billed items per DO (for CPS partial billing flow)
+const billedItems = ref(new Map()) // Map<do_number, { item_details, total_billed }>
 const invoiceNumberMode = ref('auto')
 const manualInvoiceNumber = ref('')
 const selectedOrderForItems = ref(null)
+const selectedDeliveryOrder = ref(null) // For Final Screen props
 
 // Toggle section visibility depending on selection
 const hasCustomer = computed(() => !!(customerCode.value && String(customerCode.value).trim()))
@@ -543,9 +552,23 @@ async function fetchTaxOptions(){
  * Step 2: User confirms tax in Check Sales Tax Screen
  * Opens Delivery Order List Modal (simple list)
  */
-function onTaxConfirmed(selectedTax){
+function onTaxConfirmed(data){
+  console.log('✅ Tax confirmed in Check Sales Tax Screen:', data)
+
+  // Handle both old format (direct tax object) and new format (object with selectedTax)
+  const selectedTax = data.selectedTax || data
+  const allTaxOptions = data.allTaxOptions || []
+
   // Update tax information from confirmed selection
   taxIndexNo.value = selectedTax.code
+  console.log('💼 Tax Index No set to:', taxIndexNo.value)
+
+  // Store all tax options for later use
+  if (allTaxOptions.length > 0) {
+    taxOptions.value = allTaxOptions
+    console.log('✅ Tax Options stored:', taxOptions.value.length, 'options')
+  }
+
   checkTaxModalOpen.value = false
 
   // Open Delivery Order List Modal (CPS workflow - simple list first)
@@ -569,6 +592,16 @@ function openDetailedDOView(){
 function handleDetailedDOClose(){
   doSelectionModalOpen.value = false
   // Simple list modal stays open
+}
+
+/**
+ * Handle closing the Delivery Order Screen modal
+ * Only close if user explicitly clicks cancel/close button
+ */
+function handleDOScreenClose(){
+  console.log('🚪 [MAIN PAGE] DO Screen close requested')
+  // Only close the modal, don't reset data
+  doListModalOpen.value = false
 }
 
 /**
@@ -597,13 +630,16 @@ function onDOsSelectedFromTable(dos){
   console.log('✅ Selected DOs updated:', selectedDOs.value.map(d => d.do_number))
   console.log('📊 Modal states AFTER:')
   console.log('   - Table Modal (doSelectionModalOpen):', doSelectionModalOpen.value, '❌ CLOSED')
-  console.log('   - Screen Modal (doListModalOpen):', doListModalOpen.value, '✅ STILL OPEN')
+  console.log('   - Screen Modal (doListModalOpen):', doListModalOpen.value)
 
-  // 🔒 CRITICAL: Ensure Screen Modal stays open
-  if (doListModalOpen.value === false) {
-    console.error('🚨 ERROR: Screen Modal was closed! Re-opening it...')
-    doListModalOpen.value = true
-  }
+  // 🔒 CRITICAL: Re-open Screen Modal if it was closed
+  // Use nextTick to ensure state is updated after any reactive changes
+  setTimeout(() => {
+    if (!doListModalOpen.value) {
+      console.log('🚀 Re-opening Delivery Order Screen modal...')
+      doListModalOpen.value = true
+    }
+  }, 50)
 
   console.log('🔓 User should now see Delivery Order Screen with selected DO')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
@@ -643,6 +679,7 @@ async function onDOsSelected(dos){
   if (dos.length > 0) {
     selectedOrderForItems.value = dos[0] // Select first DO for items view
     selectedOrderForItems.value.amount = totalAmount.value
+    selectedDeliveryOrder.value = dos[0] // Also set for Final Screen
     salesOrderItemsModalOpen.value = true
     console.log('📦 Opening Sales Order Items Screen for:', dos[0].do_number)
   }
@@ -676,24 +713,89 @@ async function calculateTotalAmount(dos){
 
 /**
  * Step 3b: User confirms Sales Order Items
- * Opens Final Tax Calculation Modal (CPS Flow)
+ * CPS Flow: Return to Delivery Order Screen (not Final Screen)
+ * User can select more DOs or proceed to Final Screen
  */
-function onSalesOrderItemsConfirm(itemsData){
+async function onSalesOrderItemsConfirm(itemsData){
   console.log('✅ Sales Order Items confirmed:', itemsData)
+
+  // Store billed items for this DO
+  const doNumber = itemsData.doNumber
+  if (doNumber && itemsData.itemDetails) {
+    billedItems.value.set(doNumber, {
+      item_details: itemsData.itemDetails,
+      total_billed: itemsData.totalAmount || 0,
+      do_data: itemsData.doData
+    })
+    console.log('📦 Saved billed items for DO:', doNumber, {
+      total_billed: itemsData.totalAmount,
+      item_count: itemsData.itemDetails.length
+    })
+  }
+
+  // Accumulate total amount from all billed items
+  let accumulatedTotal = 0
+  billedItems.value.forEach((value) => {
+    accumulatedTotal += value.total_billed || 0
+  })
+  totalAmount.value = accumulatedTotal
+  console.log('💰 Accumulated Total Amount:', totalAmount.value)
+
   // Close Sales Order Items modal
   salesOrderItemsModalOpen.value = false
 
-  // Open Final Tax Calculation Modal
+  // CPS Flow: Reopen Delivery Order Screen
+  // User can select more DOs or proceed to Final Screen
+  console.log('🔄 Returning to Delivery Order Screen (CPS Flow)')
+  doListModalOpen.value = true
+}
+
+/**
+ * Step 3c: User proceeds to Final Screen from DO Screen
+ * CPS Flow: User clicks "Proceed" or "Next" button
+ */
+async function proceedToFinalScreen(){
+  console.log('🎯 Proceeding to Final Screen with accumulated data')
+  
+  // Check if any items have been billed
+  if (billedItems.value.size === 0) {
+    alert('Please select and bill at least one delivery order')
+    return
+  }
+
+  // Close DO Screen
+  doListModalOpen.value = false
+
+  // Check if taxOptions is loaded
+  if (!taxOptions.value || taxOptions.value.length === 0) {
+    console.warn('⚠️ Tax Options not loaded! Fetching now...')
+    await fetchTaxOptions()
+    console.log('✅ Tax Options fetched:', taxOptions.value.length)
+  } else {
+    console.log('✅ Tax Options already loaded:', taxOptions.value.length, 'options')
+  }
+
+  // Log data being passed to Final Screen
+  console.log('📤 Opening Final Screen with:', {
+    totalAmount: totalAmount.value,
+    taxIndexNo: taxIndexNo.value,
+    billedItemsCount: billedItems.value.size,
+    taxOptionsCount: taxOptions.value.length
+  })
+
+  // Open Final Screen Modal
   finalTaxModalOpen.value = true
 }
 
 /**
- * Step 4: User confirms final tax calculation
+ * Step 4: User confirms final screen (tax + invoice details)
  * Opens Invoice Number Option Modal
  */
-function onFinalTaxConfirmed(taxData){
-  // Store final tax data
-  finalTaxData.value = taxData
+function onFinalScreenConfirmed(finalData){
+  console.log('✅ Final Screen confirmed with complete data:', finalData)
+
+  // Store final data (includes tax, periods, invoice info, etc.)
+  finalTaxData.value = finalData
   finalTaxModalOpen.value = false
 
   // Open Invoice Number Option Modal
