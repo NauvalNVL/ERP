@@ -333,6 +333,7 @@ const calculateTax = () => {
 }
 
 const formatCurrency = (value) => {
+  // Format Indonesia: 3.036.360,00 (titik = thousand separator, koma = decimal)
   return new Intl.NumberFormat('id-ID', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
@@ -340,13 +341,12 @@ const formatCurrency = (value) => {
 }
 
 const formatCurrencyForDisplay = (value) => {
-  // Format with thousand separator and 2 decimals
-  // CPS style: 485.100,00 (Indonesian) or 485,100.00 (International)
-  const formatted = new Intl.NumberFormat('en-US', {
+  // Use same Indonesian format for consistency: 303.636,00
+  // Titik (.) = thousand separator, Koma (,) = decimal separator
+  return new Intl.NumberFormat('id-ID', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(value || 0)
-  return formatted
 }
 
 const handleOK = () => {
