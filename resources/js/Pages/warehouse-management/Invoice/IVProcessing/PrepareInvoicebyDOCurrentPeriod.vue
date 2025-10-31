@@ -306,10 +306,12 @@
         :taxIndexNo="taxIndexNo"
         :invoiceDate="invoiceDate"
         :selectedDeliveryOrders="selectedDOs"
+        :billedItems="billedItems"
         @close="handleDOScreenClose"
         @select="onDOsSelected"
         @browse="openDetailedDOView"
         @viewItems="openSalesOrderItems"
+        @proceed="proceedToFinalScreen"
       />
 
       <!-- Modal 2b: Delivery Order Selection (CPS-style detailed table - opened from Zoom) -->
@@ -483,6 +485,9 @@ const selectedDOs = ref([])
 const totalAmount = ref(0)
 const taxOptions = ref([])
 const finalTaxData = ref(null)
+
+// Track billed items per DO (for CPS partial billing flow)
+const billedItems = ref(new Map()) // Map<do_number, { item_details, total_billed }>
 const invoiceNumberMode = ref('auto')
 const manualInvoiceNumber = ref('')
 const selectedOrderForItems = ref(null)
@@ -708,26 +713,62 @@ async function calculateTotalAmount(dos){
 
 /**
  * Step 3b: User confirms Sales Order Items
- * Opens Final Screen Modal (CPS Flow)
+ * CPS Flow: Return to Delivery Order Screen (not Final Screen)
+ * User can select more DOs or proceed to Final Screen
  */
 async function onSalesOrderItemsConfirm(itemsData){
   console.log('✅ Sales Order Items confirmed:', itemsData)
 
-  // Store total amount from Sales Order Items
-  if (itemsData && itemsData.totalAmount) {
-    totalAmount.value = itemsData.totalAmount
-    console.log('💰 Total Amount set to:', totalAmount.value)
-  } else {
-    console.warn('⚠️ No totalAmount in itemsData, using 0')
-    totalAmount.value = 0
+  // Store billed items for this DO
+  const doNumber = itemsData.doNumber
+  if (doNumber && itemsData.itemDetails) {
+    billedItems.value.set(doNumber, {
+      item_details: itemsData.itemDetails,
+      total_billed: itemsData.totalAmount || 0,
+      do_data: itemsData.doData
+    })
+    console.log('📦 Saved billed items for DO:', doNumber, {
+      total_billed: itemsData.totalAmount,
+      item_count: itemsData.itemDetails.length
+    })
   }
+
+  // Accumulate total amount from all billed items
+  let accumulatedTotal = 0
+  billedItems.value.forEach((value) => {
+    accumulatedTotal += value.total_billed || 0
+  })
+  totalAmount.value = accumulatedTotal
+  console.log('💰 Accumulated Total Amount:', totalAmount.value)
 
   // Close Sales Order Items modal
   salesOrderItemsModalOpen.value = false
 
-  // Check if taxOptions is loaded (should already be loaded from Check Sales Tax Screen)
+  // CPS Flow: Reopen Delivery Order Screen
+  // User can select more DOs or proceed to Final Screen
+  console.log('🔄 Returning to Delivery Order Screen (CPS Flow)')
+  doListModalOpen.value = true
+}
+
+/**
+ * Step 3c: User proceeds to Final Screen from DO Screen
+ * CPS Flow: User clicks "Proceed" or "Next" button
+ */
+async function proceedToFinalScreen(){
+  console.log('🎯 Proceeding to Final Screen with accumulated data')
+  
+  // Check if any items have been billed
+  if (billedItems.value.size === 0) {
+    alert('Please select and bill at least one delivery order')
+    return
+  }
+
+  // Close DO Screen
+  doListModalOpen.value = false
+
+  // Check if taxOptions is loaded
   if (!taxOptions.value || taxOptions.value.length === 0) {
-    console.warn('⚠️ Tax Options not loaded! This should not happen. Fetching now...')
+    console.warn('⚠️ Tax Options not loaded! Fetching now...')
     await fetchTaxOptions()
     console.log('✅ Tax Options fetched:', taxOptions.value.length)
   } else {
@@ -738,8 +779,8 @@ async function onSalesOrderItemsConfirm(itemsData){
   console.log('📤 Opening Final Screen with:', {
     totalAmount: totalAmount.value,
     taxIndexNo: taxIndexNo.value,
-    taxOptionsCount: taxOptions.value.length,
-    taxOptions: taxOptions.value.map(t => ({ code: t.code, rate: t.rate }))
+    billedItemsCount: billedItems.value.size,
+    taxOptionsCount: taxOptions.value.length
   })
 
   // Open Final Screen Modal

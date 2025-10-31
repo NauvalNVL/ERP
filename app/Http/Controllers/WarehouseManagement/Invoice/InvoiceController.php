@@ -575,6 +575,47 @@ class InvoiceController extends Controller
                     throw new \RuntimeException("Delivery Order {$doNumber} is already invoiced with {$do->Invoice_Num}");
                 }
 
+                // Fetch customer payment term from Customer Account table
+                $customerCode = $this->getProperty($do, 'AC_Num');
+                $paymentTerm = 30; // Default: 30 days (initialize first!)
+                
+                if ($customerCode) {
+                    // Try CUSTOMER table first (has TERM column as decimal - days)
+                    try {
+                        $customer = DB::table('CUSTOMER')
+                            ->where('CODE', $customerCode)
+                            ->first();
+                        
+                        if ($customer && isset($customer->TERM) && $customer->TERM > 0) {
+                            // TERM is decimal (number of days), cast to INT for INV table
+                            $paymentTerm = (int) round($customer->TERM); // Explicit INT cast
+                            
+                            Log::info('✅ Payment term found in CUSTOMER table', [
+                                'customer' => $customerCode,
+                                'term_days' => $paymentTerm,
+                                'original_value' => $customer->TERM
+                            ]);
+                        } else {
+                            Log::warning('⚠️ Customer found but TERM is NULL or 0', [
+                                'customer' => $customerCode,
+                                'term_value' => $customer->TERM ?? 'NULL'
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('❌ CUSTOMER table access failed', [
+                            'error' => $e->getMessage(),
+                            'customer' => $customerCode
+                        ]);
+                    }
+                    
+                    // Log final payment term value
+                    Log::info('💰 Final payment term for invoice', [
+                        'customer' => $customerCode,
+                        'payment_term' => $paymentTerm,
+                        'type' => gettype($paymentTerm)
+                    ]);
+                }
+
                 // Generate or use manual invoice number
                 if ($invoiceNumberMode === 'manual' && $manualInvoiceNumber) {
                     $ivNum = $manualInvoiceNumber;
@@ -617,6 +658,14 @@ class InvoiceController extends Controller
                     'netAmount' => $netAmount
                 ]);
 
+                // Log AR_TERM before insert
+                Log::info('🔍 AR_TERM value before INSERT', [
+                    'payment_term' => $paymentTerm,
+                    'type' => gettype($paymentTerm),
+                    'is_null' => $paymentTerm === null ? 'YES' : 'NO',
+                    'invoice_num' => $ivNum
+                ]);
+
                 // Insert invoice record into INV table
                 DB::table('INV')->insert([
                     // Period and identification
@@ -627,7 +676,7 @@ class InvoiceController extends Controller
                     'IV_DMY' => $invoiceDate,
 
                     // Payment terms and references
-                    'AR_TERM' => $this->toIntegerOrNull($this->getProperty($do, 'AR_Term')),
+                    'AR_TERM' => $paymentTerm, // From customer account table (COD, 30D, 60D, etc.)
                     'IV_SECOND_REF' => $secondRef ?? $this->getProperty($do, 'DO_Num'),
 
                     // Customer information
