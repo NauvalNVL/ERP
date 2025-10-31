@@ -391,80 +391,6 @@ const salesManagementItems = [
 // Warehouse Management Items
 const warehouseManagementItems = [
   {
-    title: 'Finished Goods',
-    icon: 'fas fa-boxes',
-    children: [
-      {
-        title: 'Setup Maintenance',
-        icon: 'fas fa-cogs',
-        children: [
-          { title: 'Setup F/Goods & D/Order Configuration', icon: 'fas fa-cogs', route: '/warehouse-management/finished-goods/setup-maintenance/fg-do-configuration' },
-          { title: 'Define Control Period', icon: 'fas fa-calendar-alt', route: '/warehouse-management/finished-goods/setup-maintenance/define-control-period' },
-          { title: 'Define Warehouse Location', icon: 'fas fa-map-marker-alt', route: '/warehouse-management/finished-goods/setup-maintenance/define-warehouse-location' },
-          { title: 'Define Customer Warehouse Location', icon: 'fas fa-users-cog', route: '/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-location' },
-          { title: 'Define Delivery Order Format', icon: 'fas fa-file-invoice', route: '/warehouse-management/finished-goods/setup-maintenance/define-delivery-order-format' },
-          { title: 'Define Customer Warehouse Requirement', icon: 'fas fa-tasks', route: '/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-requirement' },
-          { title: 'Define Analysis Code', icon: 'fas fa-tags', route: '/warehouse-management/finished-goods/setup-maintenance/define-analysis-code' },
-          { title: 'View & Print Control Period', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-control-period' },
-          { title: 'View & Print Warehouse Location', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-warehouse-location' },
-          { title: 'View & Print Customer Warehouse Location', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-customer-warehouse-location' },
-          { title: 'View & Print Delivery Order Format', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-delivery-order-format' },
-          { title: 'View & Print Customer Warehouse Requirement', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-customer-warehouse-requirement' },
-          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/setup-maintenance/view-print-analysis-code' },
-        ]
-      },
-      {
-        title: 'FG Normal',
-        icon: 'fas fa-box-open',
-        children: [
-          { title: 'Check FG Balance', icon: 'fas fa-balance-scale', route: '/warehouse-management/finished-goods/fg-normal/check-fg-balance' },
-          { title: 'Update FG Stock-In by SO', icon: 'fas fa-file-import', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-so' },
-          { title: 'Update FG Stock-In by WO', icon: 'fas fa-file-import', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-wo' },
-          { title: 'Update FG Stock-In by Barcode', icon: 'fas fa-barcode', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-in-by-barcode' },
-          { title: 'Update FG Stock-Out by MC', icon: 'fas fa-file-export', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-out-by-mc' },
-          { title: 'Update FG Location Transfer', icon: 'fas fa-exchange-alt', route: '/warehouse-management/finished-goods/fg-normal/update-fg-location-transfer' },
-          { title: 'Update FG Stock-Out by Batch', icon: 'fas fa-boxes', route: '/warehouse-management/finished-goods/fg-normal/update-fg-stock-out-by-batch' },
-          { title: 'Print FG Stock-In Log', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/fg-normal/print-fg-stock-in-log' },
-          { title: 'Print FG Stock-Out Log', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/fg-normal/print-fg-stock-out-log' },
-          { title: 'Clear FGMC Lock', icon: 'fas fa-lock-open', route: '/warehouse-management/finished-goods/fg-normal/clear-fg-mc-lock' },
-        ]
-      },
-      {
-        title: 'Period-End Closing',
-        icon: 'fas fa-calendar-alt',
-        children: [
-          { title: 'Perform Period-End Closing', icon: 'fas fa-calendar-check', route: '/warehouse-management/finished-goods/period-end-closing/perform' },
-          { title: 'Purge Finished Goods Ledger', icon: 'fas fa-trash-alt', route: '/warehouse-management/finished-goods/period-end-closing/purge-ledger' },
-        ]
-      },
-      {
-        title: 'Finished Goods Stock-Take V2',
-        icon: 'fas fa-clipboard-check',
-        children: [
-          { title: 'Define Stock-Take Configuration', icon: 'fas fa-cogs', route: '/warehouse-management/finished-goods/stock-take-v2/define-configuration' },
-          { title: 'Commence Stock-Take Exercise', icon: 'fas fa-play-circle', route: '/warehouse-management/finished-goods/stock-take-v2/commence-exercise' },
-          { title: 'Enter & Update Stock-Take Records', icon: 'fas fa-edit', route: '/warehouse-management/finished-goods/stock-take-v2/enter-update-records' },
-          { title: 'View & Print Stock-Take Records', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/stock-take-v2/view-print-records' },
-          { title: 'Print Stock-Take Matching Results', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/stock-take-v2/print-matching-results' },
-          { title: 'Update Stock-Take to FG Inventory [by SO]', icon: 'fas fa-file-invoice', route: '/warehouse-management/finished-goods/stock-take-v2/update-fg-inventory-so' },
-          { title: 'Update Stock-Take to FG Inventory [by Model]', icon: 'fas fa-cube', route: '/warehouse-management/finished-goods/stock-take-v2/update-fg-inventory-model' },
-        ]
-      },
-      {
-        title: 'FG Stock-Take V3 (GRX and Non-GRX)',
-        icon: 'fas fa-clipboard-check',
-        children: [
-          { title: 'Define Stock-Take Configuration', icon: 'fas fa-cogs', route: '/warehouse-management/finished-goods/stock-take-v3/define-configuration' },
-          { title: 'Commence Stock-Take Exercise', icon: 'fas fa-play-circle', route: '/warehouse-management/finished-goods/stock-take-v3/commence-exercise' },
-          { title: 'Enter & Update Stock-Take Records', icon: 'fas fa-edit', route: '/warehouse-management/finished-goods/stock-take-v3/enter-update-records' },
-          { title: 'View & Print Stock-Take Records', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/stock-take-v3/view-print-records' },
-          { title: 'Print Stock-Take Matching Results', icon: 'fas fa-print', route: '/warehouse-management/finished-goods/stock-take-v3/print-matching-results' },
-          { title: 'Update Stock-Take to FG Inventory', icon: 'fas fa-boxes', route: '/warehouse-management/finished-goods/stock-take-v3/update-fg-inventory' },
-        ]
-      }
-    ]
-  },
-  {
     title: 'Delivery Order',
     icon: 'fas fa-truck',
     children: [
@@ -598,51 +524,6 @@ const warehouseManagementItems = [
       },
     ]
   },
-  {
-    title: 'Custom Indonesia',
-    icon: 'fas fa-flag',
-    children: [
-      {
-        title: 'Setup',
-        icon: 'fas fa-cogs',
-        children: [
-          { title: 'Setup Faktur Pajak Configuration', icon: 'fas fa-cog', route: '/warehouse-management/custom-indonesia/setup/faktur-pajak-configuration' },
-          { title: 'Setup Faktur Pajak Counter', icon: 'fas fa-calculator', route: '/warehouse-management/custom-indonesia/setup/faktur-pajak-counter' },
-          { title: 'Setup Faktur Pajak Customer', icon: 'fas fa-user-tag', route: '/warehouse-management/custom-indonesia/setup/faktur-pajak-customer' },
-          { title: 'Setup Foreign Currency Control', icon: 'fas fa-money-bill-wave', route: '/warehouse-management/custom-indonesia/setup/foreign-currency-control' },
-          { title: 'View & Print Faktur Pajak Customer', icon: 'fas fa-print', route: '/warehouse-management/custom-indonesia/setup/view-print-faktur-pajak-customer' },
-          { title: 'View & Print Foreign Currency Control', icon: 'fas fa-print', route: '/warehouse-management/custom-indonesia/setup/view-print-foreign-currency-control' },
-          { title: 'Regen Faktur Pajak', icon: 'fas fa-sync-alt', route: '/warehouse-management/custom-indonesia/setup/regen-faktur-pajak' },
-        ]
-      },
-      {
-        title: 'Processing',
-        icon: 'fas fa-tasks',
-        children: [
-          { title: 'Prepare Faktuk Pajak + Print', icon: 'fas fa-file-invoice', route: '/warehouse-management/custom-indonesia/processing/prepare-faktur-pajak-print' },
-          { title: 'Amend Faktur Pajak + Print', icon: 'fas fa-edit', route: '/warehouse-management/custom-indonesia/processing/amend-faktur-pajak-print' },
-          { title: 'Print Faktur Pajak', icon: 'fas fa-print', route: '/warehouse-management/custom-indonesia/processing/print-faktur-pajak' },
-          { title: 'View & Print Faktur Pajak Log', icon: 'fas fa-history', route: '/warehouse-management/custom-indonesia/processing/view-print-faktur-pajak-log' },
-          { title: 'Print Faktur Pajak Month-End Report', icon: 'fas fa-file-alt', route: '/warehouse-management/custom-indonesia/processing/print-faktur-pajak-month-end-report' },
-        ]
-      },
-      {
-        title: 'e-Pajak',
-        icon: 'fas fa-file-invoice',
-        children: [
-          { title: 'e-Faktur Pajak', icon: 'fas fa-file-invoice-dollar', route: '/warehouse-management/custom-indonesia/e-pajak/e-faktur-pajak' },
-          { title: 'e-Faktur Pajak (Taxable - PPN)', icon: 'fas fa-percent', route: '/warehouse-management/custom-indonesia/e-pajak/e-faktur-pajak-taxable-ppn' },
-          { title: 'e-Faktur Pajak (Taxable - PPnBM)', icon: 'fas fa-percent', route: '/warehouse-management/custom-indonesia/e-pajak/e-faktur-pajak-taxable-ppnbm' },
-          { title: 'e-Faktur Pajak (Not Taxable)', icon: 'fas fa-times', route: '/warehouse-management/custom-indonesia/e-pajak/e-faktur-pajak-not-taxable' },
-          { title: 'e-Faktur Pajak (Free)', icon: 'fas fa-hand-holding-usd', route: '/warehouse-management/custom-indonesia/e-pajak/e-faktur-pajak-free' },
-          { title: 'e-Faktur Pajak (Exemption)', icon: 'fas fa-ban', route: '/warehouse-management/custom-indonesia/e-pajak/e-faktur-pajak-exemption' },
-          { title: 'e-Faktur Pajak (Export)', icon: 'fas fa-file-export', route: '/warehouse-management/custom-indonesia/e-pajak/e-faktur-pajak-export' },
-          { title: 'e-Faktur Pajak (Consolidated)', icon: 'fas fa-layer-group', route: '/warehouse-management/custom-indonesia/e-pajak/e-faktur-pajak-consolidated' },
-        ]
-      },
-    ]
-  },
-  { title: 'Accounts', icon: 'fas fa-cash-register', route: '/warehouse-management/accounts' },
 ];
 </script>
 
