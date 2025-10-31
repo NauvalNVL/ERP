@@ -306,7 +306,7 @@
         :taxIndexNo="taxIndexNo"
         :invoiceDate="invoiceDate"
         :selectedDeliveryOrders="selectedDOs"
-        @close="doListModalOpen = false"
+        @close="handleDOScreenClose"
         @select="onDOsSelected"
         @browse="openDetailedDOView"
         @viewItems="openSalesOrderItems"
@@ -469,13 +469,12 @@ const finalTaxModalOpen = ref(false)
 const invoiceNumberModalOpen = ref(false)
 const preparing = ref(false)
 
-// 🔍 DEBUG: Watch doListModalOpen changes to track unexpected closes
+// Monitor modal state changes (for debugging only - can be removed in production)
 watch(() => doListModalOpen.value, (newVal, oldVal) => {
   if (oldVal === true && newVal === false) {
-    console.log('⚠️ [MAIN PAGE] doListModalOpen changed: true → false')
-    console.trace('doListModalOpen closed from:')
+    console.log('⚠️ [MAIN PAGE] Delivery Order Screen modal closed')
   } else if (oldVal === false && newVal === true) {
-    console.log('✅ [MAIN PAGE] doListModalOpen changed: false → true (Screen Modal Opening)')
+    console.log('✅ [MAIN PAGE] Delivery Order Screen modal opened')
   }
 })
 
@@ -550,21 +549,21 @@ async function fetchTaxOptions(){
  */
 function onTaxConfirmed(data){
   console.log('✅ Tax confirmed in Check Sales Tax Screen:', data)
-  
+
   // Handle both old format (direct tax object) and new format (object with selectedTax)
   const selectedTax = data.selectedTax || data
   const allTaxOptions = data.allTaxOptions || []
-  
+
   // Update tax information from confirmed selection
   taxIndexNo.value = selectedTax.code
   console.log('💼 Tax Index No set to:', taxIndexNo.value)
-  
+
   // Store all tax options for later use
   if (allTaxOptions.length > 0) {
     taxOptions.value = allTaxOptions
     console.log('✅ Tax Options stored:', taxOptions.value.length, 'options')
   }
-  
+
   checkTaxModalOpen.value = false
 
   // Open Delivery Order List Modal (CPS workflow - simple list first)
@@ -588,6 +587,16 @@ function openDetailedDOView(){
 function handleDetailedDOClose(){
   doSelectionModalOpen.value = false
   // Simple list modal stays open
+}
+
+/**
+ * Handle closing the Delivery Order Screen modal
+ * Only close if user explicitly clicks cancel/close button
+ */
+function handleDOScreenClose(){
+  console.log('🚪 [MAIN PAGE] DO Screen close requested')
+  // Only close the modal, don't reset data
+  doListModalOpen.value = false
 }
 
 /**
@@ -616,13 +625,16 @@ function onDOsSelectedFromTable(dos){
   console.log('✅ Selected DOs updated:', selectedDOs.value.map(d => d.do_number))
   console.log('📊 Modal states AFTER:')
   console.log('   - Table Modal (doSelectionModalOpen):', doSelectionModalOpen.value, '❌ CLOSED')
-  console.log('   - Screen Modal (doListModalOpen):', doListModalOpen.value, '✅ STILL OPEN')
+  console.log('   - Screen Modal (doListModalOpen):', doListModalOpen.value)
 
-  // 🔒 CRITICAL: Ensure Screen Modal stays open
-  if (doListModalOpen.value === false) {
-    console.error('🚨 ERROR: Screen Modal was closed! Re-opening it...')
-    doListModalOpen.value = true
-  }
+  // 🔒 CRITICAL: Re-open Screen Modal if it was closed
+  // Use nextTick to ensure state is updated after any reactive changes
+  setTimeout(() => {
+    if (!doListModalOpen.value) {
+      console.log('🚀 Re-opening Delivery Order Screen modal...')
+      doListModalOpen.value = true
+    }
+  }, 50)
 
   console.log('🔓 User should now see Delivery Order Screen with selected DO')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
@@ -700,7 +712,7 @@ async function calculateTotalAmount(dos){
  */
 async function onSalesOrderItemsConfirm(itemsData){
   console.log('✅ Sales Order Items confirmed:', itemsData)
-  
+
   // Store total amount from Sales Order Items
   if (itemsData && itemsData.totalAmount) {
     totalAmount.value = itemsData.totalAmount
@@ -709,7 +721,7 @@ async function onSalesOrderItemsConfirm(itemsData){
     console.warn('⚠️ No totalAmount in itemsData, using 0')
     totalAmount.value = 0
   }
-  
+
   // Close Sales Order Items modal
   salesOrderItemsModalOpen.value = false
 
@@ -721,7 +733,7 @@ async function onSalesOrderItemsConfirm(itemsData){
   } else {
     console.log('✅ Tax Options already loaded:', taxOptions.value.length, 'options')
   }
-  
+
   // Log data being passed to Final Screen
   console.log('📤 Opening Final Screen with:', {
     totalAmount: totalAmount.value,
@@ -740,7 +752,7 @@ async function onSalesOrderItemsConfirm(itemsData){
  */
 function onFinalScreenConfirmed(finalData){
   console.log('✅ Final Screen confirmed with complete data:', finalData)
-  
+
   // Store final data (includes tax, periods, invoice info, etc.)
   finalTaxData.value = finalData
   finalTaxModalOpen.value = false

@@ -35,7 +35,7 @@
                 <div class="flex items-center">
                   <label class="w-32 text-sm font-semibold text-gray-700">Total Amount:</label>
                   <div class="flex-1">
-                    <input 
+                    <input
                       type="text"
                       :value="formatCurrency(totalAmount)"
                       readonly
@@ -48,28 +48,25 @@
                 <div class="flex items-center">
                   <label class="w-32 text-sm font-semibold text-gray-700">Tax Group:</label>
                   <div class="flex-1">
-                    <select 
-                      v-model="selectedTaxGroup"
-                      class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium text-gray-900"
-                      @change="calculateTax"
-                    >
-                      <option value="">Select Tax Group...</option>
-                      <option v-for="tax in taxOptions" :key="tax.code" :value="tax.code">
-                        {{ tax.name }} ({{ tax.rate }}%)
-                      </option>
-                    </select>
+                    <input
+                      type="text"
+                      :value="selectedTaxDisplay"
+                      readonly
+                      class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-300 rounded text-left font-medium text-gray-900"
+                    />
                   </div>
                 </div>
 
                 <!-- Tax Amount (Highlighted Blue like CPS) -->
                 <div class="flex items-center bg-blue-500 p-2 rounded">
-                  <label class="w-32 text-sm font-bold text-white">{{ selectedTaxGroup || 'M Taf/211' }}:</label>
+                  <label class="w-32 text-sm font-bold text-white">{{ selectedTaxGroup || 'PPN11' }}:</label>
                   <div class="flex-1">
-                    <input 
+                    <input
                       type="text"
-                      :value="formatCurrency(taxAmount)"
+                      :value="formatCurrencyForDisplay(taxAmount)"
                       readonly
-                      class="w-full px-3 py-2 text-sm bg-blue-400 border-2 border-blue-300 rounded text-right font-bold text-white"
+                      class="w-full px-3 py-2 text-sm !bg-blue-400 border-2 border-blue-300 rounded text-right font-bold !text-white placeholder-white"
+                      :placeholder="formatCurrencyForDisplay(0)"
                     />
                   </div>
                 </div>
@@ -78,7 +75,7 @@
                 <div class="flex items-center">
                   <label class="w-32 text-sm font-semibold text-gray-700">Net Amount:</label>
                   <div class="flex-1">
-                    <input 
+                    <input
                       type="text"
                       :value="formatCurrency(netAmount)"
                       readonly
@@ -90,14 +87,14 @@
 
               <!-- Footer Actions - Simple CPS Style -->
               <div class="px-5 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-center gap-3">
-                <button 
+                <button
                   class="px-10 py-2 text-sm font-semibold rounded border-2 border-gray-400 bg-white text-gray-700 hover:bg-gray-100 transition-colors"
                   @click="handleOK"
                   :disabled="!selectedTaxGroup"
                 >
                   OK
                 </button>
-                <button 
+                <button
                   class="px-10 py-2 text-sm font-semibold rounded border-2 border-gray-400 bg-white text-gray-700 hover:bg-gray-100 transition-colors"
                   @click="$emit('close')"
                 >
@@ -136,16 +133,16 @@ const taxAmount = ref(0)
 // Watch for tax code changes (with validation)
 watch(() => props.taxCode, (newVal, oldVal) => {
   console.log('👁️ Tax Code prop changed:', { old: oldVal, new: newVal })
-  
+
   if (newVal && newVal.trim() !== '') {
     console.log('🔍 Validating tax code:', newVal)
-    
+
     // Check if taxOptions is available
     if (!props.taxOptions || props.taxOptions.length === 0) {
       console.warn('⚠️ Tax Options not available yet, will wait...')
       return
     }
-    
+
     // Find tax in options
     const taxExists = props.taxOptions.find(t => t.code === newVal)
     if (taxExists) {
@@ -170,19 +167,19 @@ watch(() => props.open, (isOpen) => {
       taxOptions: props.taxOptions,
       formatted: formatCurrency(props.totalAmount)
     })
-    
+
     // Warn if total amount is 0
     if (!props.totalAmount || props.totalAmount === 0) {
       console.warn('⚠️ Total Amount is 0! Did user input To Bill quantity in Sales Order Items?')
     }
-    
+
     // Auto-select tax group from taxCode prop
     if (props.taxCode && props.taxCode.trim() !== '') {
       console.log('🎯 Auto-selecting Tax Group:', props.taxCode)
       console.log('📦 Available taxOptions:', props.taxOptions)
       console.log('📊 taxOptions count:', props.taxOptions?.length || 0)
       console.log('📋 taxOptions structure:', JSON.stringify(props.taxOptions, null, 2))
-      
+
       // Verify tax exists in options (case-insensitive check)
       const taxExists = props.taxOptions.find(t => {
         // Check both 'code' and 'tax_code' fields (API might use different field name)
@@ -190,15 +187,15 @@ watch(() => props.open, (isOpen) => {
         console.log('  Checking:', tCode, 'against', props.taxCode, '| Full object:', t)
         return tCode && tCode.toUpperCase() === props.taxCode.toUpperCase()
       })
-      
+
       console.log('🔍 Tax search result:', taxExists)
-      
+
       if (taxExists) {
         // Use the actual code from taxOptions (in case of case mismatch)
         const actualCode = taxExists.code || taxExists.tax_code || taxExists.Code || taxExists.TAX_CODE
         selectedTaxGroup.value = actualCode
         console.log('✅ Tax Group auto-selected:', actualCode)
-        
+
         // Calculate tax with delay to ensure state is updated
         setTimeout(() => {
           calculateTax()
@@ -243,23 +240,23 @@ watch(() => props.taxOptions, (newOptions, oldOptions) => {
     newCount: newOptions?.length || 0,
     options: newOptions?.map(t => ({ code: t.code, rate: t.rate }))
   })
-  
+
   if (newOptions && newOptions.length > 0) {
     // If taxCode is set but selectedTaxGroup is not, auto-select
     if (props.taxCode && props.taxCode.trim() !== '' && !selectedTaxGroup.value) {
       console.log('🎯 Tax Options now available, attempting auto-select:', props.taxCode)
-      
+
       // Case-insensitive search with multiple field support
       const taxExists = newOptions.find(t => {
         const tCode = t.code || t.tax_code || t.Code || t.TAX_CODE
         return tCode && tCode.toUpperCase() === props.taxCode.toUpperCase()
       })
-      
+
       if (taxExists) {
         const actualCode = taxExists.code || taxExists.tax_code || taxExists.Code || taxExists.TAX_CODE
         selectedTaxGroup.value = actualCode
         console.log('✅ Tax auto-selected from taxOptions watcher:', actualCode)
-        
+
         // Calculate tax after auto-select
         setTimeout(() => calculateTax(), 100)
       } else {
@@ -273,7 +270,7 @@ watch(() => props.taxOptions, (newOptions, oldOptions) => {
         })
       }
     }
-    
+
     // If already selected, recalculate
     if (selectedTaxGroup.value) {
       console.log('🔄 Tax already selected, recalculating...')
@@ -292,28 +289,34 @@ const selectedTaxRate = computed(() => {
   return tax?.rate || 0
 })
 
+const selectedTaxDisplay = computed(() => {
+  if (!selectedTaxGroup.value) return ''
+  const tax = props.taxOptions.find(t => t.code === selectedTaxGroup.value)
+  return tax ? `${tax.name} (${tax.rate}%)` : selectedTaxGroup.value
+})
+
 const calculateTax = () => {
   console.log('🧮 Calculating tax...', {
     selectedTaxGroup: selectedTaxGroup.value,
     totalAmount: props.totalAmount,
     taxOptions: props.taxOptions
   })
-  
+
   if (!selectedTaxGroup.value) {
     taxAmount.value = 0
     console.log('❌ No tax group selected, tax = 0')
     return
   }
-  
+
   if (!props.totalAmount || props.totalAmount === 0) {
     taxAmount.value = 0
     console.warn('⚠️ Total Amount is 0, cannot calculate tax')
     return
   }
-  
+
   const tax = props.taxOptions.find(t => t.code === selectedTaxGroup.value)
   console.log('📊 Found tax option:', tax)
-  
+
   if (tax && tax.rate) {
     taxAmount.value = props.totalAmount * (tax.rate / 100)
     console.log('✅ Tax calculated:', {
@@ -336,19 +339,29 @@ const formatCurrency = (value) => {
   }).format(value || 0)
 }
 
+const formatCurrencyForDisplay = (value) => {
+  // Format with thousand separator and 2 decimals
+  // CPS style: 485.100,00 (Indonesian) or 485,100.00 (International)
+  const formatted = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(value || 0)
+  return formatted
+}
+
 const handleOK = () => {
   if (!selectedTaxGroup.value) {
     console.warn('⚠️ Tax Group must be selected')
     return
   }
-  
+
   console.log('✅ Final Screen confirmed:', {
     taxCode: selectedTaxGroup.value,
     taxAmount: taxAmount.value,
     totalAmount: props.totalAmount,
     netAmount: netAmount.value
   })
-  
+
   emit('confirm', {
     taxCode: selectedTaxGroup.value,
     taxAmount: taxAmount.value,
