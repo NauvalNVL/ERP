@@ -148,26 +148,11 @@ const systemManagerItems = [
     children: [
       { title: 'Define User', icon: 'fas fa-user-plus', route: '/user' },
       { title: 'Amend User Password', icon: 'fas fa-key', route: '/system-security/amend-password' },
-      { title: 'Release Locked Password', icon: 'fas fa-unlock', route: null },
       { title: 'Define User Access Permission', icon: 'fas fa-user-lock', route: '/system-security/define-access' },
       { title: 'Copy & Paste User Access Permission', icon: 'fas fa-copy', route: '/system-security/copy-paste-access' },
       { title: 'View & Print User', icon: 'fas fa-users', route: '/system-security/view-print-user' }
     ]
-  },
-  {
-    title: 'System Maintenance',
-    icon: 'fas fa-wrench',
-    children: [
-      { title: 'Define ISO Currency', icon: 'fas fa-coins', route: '/iso-currency' },
-      { title: 'Define Foreign Currency', icon: 'fas fa-money-bill-wave', route: '/foreign-currency' },
-      { title: 'Define Business Form', icon: 'fas fa-file-alt', route: '/business-form' },
-      { title: 'View & Print ISO Currency', icon: 'fas fa-list', route: '/iso-currency/view-print' },
-      { title: 'View & Print Foreign Currency', icon: 'fas fa-list-alt', route: '/foreign-currency/view-print' },
-      { title: 'View & Print Business Form', icon: 'fas fa-print', route: '/business-form/view-print' }
-    ]
-  },
-  { title: 'System Administrator', icon: 'fas fa-user-cog', route: null },
-  { title: 'DB Integrity Check', icon: 'fas fa-database', route: null }
+  }
 ];
 
 // Sales Management Items
