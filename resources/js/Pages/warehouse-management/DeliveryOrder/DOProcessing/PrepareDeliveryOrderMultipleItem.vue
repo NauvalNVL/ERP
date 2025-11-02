@@ -610,6 +610,7 @@ const saveDeliveryOrder = async () => {
       remark1: deliveryOrder.remark1,
       remark2: deliveryOrder.remark2,
       unapply_fg: deliveryOrder.unapplyFG,
+      status: 'Active',
       // SO / MC mapping for DO
       so_number: deliveryOrder.soNumber,
       mcard_seq: deliveryOrder.mcardSeq,

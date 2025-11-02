@@ -111,6 +111,35 @@
               </div>
             </div>
 
+            <!-- Delivery To -->
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Delivery To:</label>
+              <div class="flex items-start gap-2">
+                <div class="flex-1">
+                  <input
+                    v-model="deliveryLocation.shipToName"
+                    type="text"
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white"
+                    placeholder="Select delivery location from table"
+                    readonly
+                  >
+                  <textarea
+                    v-model="deliveryLocation.shipToAddress"
+                    rows="2"
+                    class="w-full mt-2 px-3 py-2 border border-gray-300 rounded text-sm bg-gray-50"
+                    readonly
+                  ></textarea>
+                </div>
+                <button
+                  @click="openDeliveryLocationModal"
+                  class="p-2 text-orange-600 hover:bg-orange-100 rounded transition-colors"
+                  title="Delivery Location Table"
+                >
+                  <i class="fas fa-th"></i>
+                </button>
+              </div>
+            </div>
+
             <!-- Vehicle Information -->
             <div class="grid grid-cols-1 gap-4">
               <div>
@@ -285,6 +314,15 @@
       @close="showVehicleModal = false" 
       @select="selectVehicle"
     />
+
+    <!-- Delivery Location Modal -->
+    <DeliveryLocationModal
+      :show="showDeliveryLocationModal"
+      @close="showDeliveryLocationModal = false"
+      @save="saveDeliveryLocation"
+      :customer="{ code: selectedDeliveryOrder.customerCode, name: selectedDeliveryOrder.customerName }"
+      :order-details="{}"
+    />
   </AppLayout>
 </template>
 
@@ -293,6 +331,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import VehicleLookupModal from '@/Components/VehicleLookupModal.vue'
 import DeliveryOrderLookupModal from '@/Components/DeliveryOrderLookupModal.vue'
+import DeliveryLocationModal from '@/Components/DeliveryLocationModal.vue'
 import { useToast } from '@/Composables/useToast'
 import axios from 'axios'
 
@@ -326,6 +365,7 @@ const deliveryOrder = reactive({
 // Modal visibility
 const showDeliveryOrderModal = ref(false)
 const showVehicleModal = ref(false)
+const showDeliveryLocationModal = ref(false)
 
 // Selected Vehicle
 const selectedVehicle = reactive({
@@ -335,6 +375,13 @@ const selectedVehicle = reactive({
   driverPhone: '',
   vehicleClass: '',
   vehicleCompany: ''
+})
+
+// Delivery location state
+const deliveryLocation = reactive({
+  code: '',
+  shipToName: '',
+  shipToAddress: ''
 })
 
 // Computed properties
@@ -355,6 +402,14 @@ const dayOfWeek = computed(() => {
 // Functions
 const openDeliveryOrderLookup = () => {
   showDeliveryOrderModal.value = true
+}
+
+const openDeliveryLocationModal = () => {
+  if (!selectedDeliveryOrder.customerCode) {
+    info('Please select a Delivery Order first')
+    return
+  }
+  showDeliveryLocationModal.value = true
 }
 
 const selectDeliveryOrder = async (doData) => {
