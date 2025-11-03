@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TaxType extends Model
+class TaxGroup extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class TaxType extends Model
      *
      * @var string
      */
-    protected $table = 'tax_types';
+    protected $table = 'tax_groups';
 
     /**
      * The primary key for the model.
@@ -24,13 +24,6 @@ class TaxType extends Model
     protected $primaryKey = 'code';
 
     /**
-     * The "type" of the primary key.
-     *
-     * @var string
-     */
-    protected $keyType = 'string';
-
-    /**
      * Indicates if the IDs are auto-incrementing.
      *
      * @var bool
@@ -38,33 +31,38 @@ class TaxType extends Model
     public $incrementing = false;
 
     /**
+     * The data type of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
         'code',
         'name',
-        'apply',
-        'rate',
-        'custom_type',
-        'tax_group_code',
+        'sales_tax_applied',
     ];
 
     /**
      * The attributes that should be cast.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
-        'rate' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     /**
-     * Get the tax group that owns this tax type.
+     * Get the tax types for this tax group.
      */
-    public function taxGroup()
+    public function taxTypes()
     {
-        return $this->belongsTo(TaxGroup::class, 'tax_group_code', 'code');
+        return $this->hasMany(TaxType::class, 'tax_group_code', 'code');
     }
 }

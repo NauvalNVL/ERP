@@ -37,14 +37,22 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-xs">
-                            <tr v-for="item in filteredItems" :key="item.code"
+                            <tr v-if="loading">
+                                <td colspan="2" class="px-6 py-4 text-center text-gray-500">
+                                    <div class="flex items-center justify-center">
+                                        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mr-2"></div>
+                                        Loading...
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-else v-for="item in filteredItems" :key="item.code"
                                 :class="['hover:bg-blue-50 cursor-pointer', selected && selected.code === item.code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
                                 @click="selectRow(item)"
                                 @dblclick="selectAndClose(item)">
                                 <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ item.code }}</td>
                                 <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ item.name }}</td>
                             </tr>
-                            <tr v-if="filteredItems.length === 0">
+                            <tr v-if="!loading && filteredItems.length === 0">
                                 <td colspan="2" class="px-6 py-4 text-center text-gray-500">No data available.</td>
                             </tr>
                         </tbody>
@@ -74,14 +82,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 
 const props = defineProps({
-    show: Boolean,
-    items: {
-        type: Array,
-        default: () => []
-    }
+    show: Boolean
 });
 
 const emit = defineEmits(['close', 'select']);
@@ -90,10 +94,46 @@ const searchQuery = ref('');
 const selected = ref(null);
 const sortKey = ref('code');
 const sortAsc = ref(true);
+const stitchWires = ref([]);
+const loading = ref(false);
+
+// Fetch stitch wires from API
+const fetchStitchWires = async () => {
+    loading.value = true;
+    try {
+        const response = await fetch('/api/stitch-wires', {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch stitch wires');
+        }
+
+        const data = await response.json();
+
+        // Handle different response formats
+        if (Array.isArray(data)) {
+            stitchWires.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            stitchWires.value = data.data;
+        } else {
+            stitchWires.value = [];
+        }
+    } catch (error) {
+        console.error('Error fetching stitch wires:', error);
+        stitchWires.value = [];
+    } finally {
+        loading.value = false;
+    }
+};
 
 const filteredItems = computed(() => {
     const query = searchQuery.value.toLowerCase();
-    let list = props.items || [];
+    let list = stitchWires.value || [];
     if (query) {
         list = list.filter(it =>
             (it.code || '').toLowerCase().includes(query) ||
@@ -127,10 +167,19 @@ function toggleSort(key) {
     }
 }
 
+// Watch for modal opening and fetch data
 watch(() => props.show, (val) => {
     if (val) {
         selected.value = null;
         searchQuery.value = '';
+        fetchStitchWires(); // Fetch fresh data when modal opens
+    }
+});
+
+// Initial fetch on mount
+onMounted(() => {
+    if (props.show) {
+        fetchStitchWires();
     }
 });
 </script>

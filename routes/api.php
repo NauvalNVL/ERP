@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\StandardFormulaController;
-use App\Http\Controllers\SOConfigController;
 use App\Http\Controllers\UpdateCustomerAccountController;
 use App\Http\Controllers\CustomerAlternateAddressController;
 use App\Http\Controllers\CorrugatorConfigController;
@@ -175,37 +174,37 @@ Route::prefix('invoices')->group(function () {
     Route::post('/calculate-total', [InvoiceController::class, 'calculateTotal']);
     Route::get('/do-items', [InvoiceController::class, 'getDoItems']);
     Route::get('/delivery-orders', [InvoiceController::class, 'getDeliveryOrders']);
-    
+
     // Debug endpoint to test salesperson query
     Route::get('/test-salesperson/{customerCode}', function($customerCode) {
         $customerData = DB::select("
-            SELECT 
-                CODE as customer_code, 
-                NAME as customer_name, 
+            SELECT
+                CODE as customer_code,
+                NAME as customer_name,
                 SLM as salesperson_code,
                 AREA as area
-            FROM CUSTOMER 
+            FROM CUSTOMER
             WHERE CODE = ?
         ", [$customerCode]);
-        
+
         $result = [
             'customer_code' => $customerCode,
             'found' => !empty($customerData),
             'data' => $customerData,
             'count' => count($customerData)
         ];
-        
+
         // Also get salesperson name if found
         if (!empty($customerData) && !empty($customerData[0]->salesperson_code)) {
             $salespersonTeam = DB::select("
-                SELECT s_person_code, salesperson_name 
-                FROM salesperson_teams 
+                SELECT s_person_code, salesperson_name
+                FROM salesperson_teams
                 WHERE s_person_code = ?
             ", [$customerData[0]->salesperson_code]);
-            
+
             $result['salesperson_name'] = !empty($salespersonTeam) ? $salespersonTeam[0]->salesperson_name : 'Not found in salesperson_teams';
         }
-        
+
         return response()->json($result);
     });
 });
@@ -215,7 +214,7 @@ Route::get('/debug/customer-tables', function() {
     try {
         $tables = ['CUSTOMER', 'Customer_Account', 'customer_account', 'update_customer_accounts'];
         $result = [];
-        
+
         foreach ($tables as $table) {
             try {
                 $count = DB::table($table)->count();
@@ -233,7 +232,7 @@ Route::get('/debug/customer-tables', function() {
                 ];
             }
         }
-        
+
         // Try to find specific customer
         try {
             $testCustomer = DB::table('CUSTOMER')->where('CODE', '000283')->first();
@@ -244,7 +243,7 @@ Route::get('/debug/customer-tables', function() {
         } catch (\Exception $e) {
             $result['test_query'] = ['error' => $e->getMessage()];
         }
-        
+
         return response()->json($result);
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
@@ -252,17 +251,13 @@ Route::get('/debug/customer-tables', function() {
 });
 
 // Customer Accounts API routes for status change
-Route::put('/customer-accounts/{customer_code}/status', [App\Http\Controllers\UpdateCustomerAccountController::class, 'updateStatus']); 
+Route::put('/customer-accounts/{customer_code}/status', [App\Http\Controllers\UpdateCustomerAccountController::class, 'updateStatus']);
 
 // Standard Formula API routes
 Route::get('/standard-formula', [StandardFormulaController::class, 'apiIndex']);
 Route::post('/standard-formula', [StandardFormulaController::class, 'apiStore']);
 Route::post('/standard-formula/seed', [StandardFormulaController::class, 'apiSeed']);
 
-// SO Config API routes
-Route::post('/so-config', [SOConfigController::class, 'apiStore']); 
-Route::get('/so-periods', [SOConfigController::class, 'apiIndexPeriods']);
-Route::get('/so-rough-cut-capacity', [SOConfigController::class, 'apiIndexRoughCutCapacity']);
 
 // Customer Accounts API routes
 Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
@@ -282,7 +277,7 @@ Route::get('/corrugator-configs/{id}', [CorrugatorConfigController::class, 'apiS
 Route::post('/corrugator-configs', [CorrugatorConfigController::class, 'apiStore']);
 Route::put('/corrugator-configs/{id}', [CorrugatorConfigController::class, 'apiUpdate']);
 Route::delete('/corrugator-configs/{id}', [CorrugatorConfigController::class, 'apiDestroy']);
-Route::post('/corrugator-configs/seed', [CorrugatorConfigController::class, 'apiSeed']); 
+Route::post('/corrugator-configs/seed', [CorrugatorConfigController::class, 'apiSeed']);
 
 // Corrugator Specification by Product Routes
 Route::get('/corrugator-specs-by-product', [CorrugatorSpecByProductController::class, 'apiIndex']);
@@ -290,7 +285,7 @@ Route::get('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductControll
 Route::post('/corrugator-specs-by-product', [CorrugatorSpecByProductController::class, 'apiStore']);
 Route::post('/corrugator-specs-by-product/batch', [CorrugatorSpecByProductController::class, 'apiBatchUpdate']);
 Route::put('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiUpdate']);
-Route::delete('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiDestroy']); 
+Route::delete('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiDestroy']);
 Route::get('/corrugator-specs-by-product/export', [CorrugatorSpecByProductController::class, 'apiExport']);
 
 // Roll Trim By Corrugator API Routes
@@ -305,7 +300,7 @@ Route::post('/roll-trim-by-product-design/batch', [RollTrimByProductDesignContro
 Route::put('/roll-trim-by-product-design/{id}', [RollTrimByProductDesignController::class, 'apiUpdate']);
 Route::delete('/roll-trim-by-product-design/{id}', [RollTrimByProductDesignController::class, 'apiDestroy']);
 Route::get('/roll-trim-by-product-design/export', [RollTrimByProductDesignController::class, 'apiExport']);
-Route::post('/roll-trim-by-product-design/seed', [RollTrimByProductDesignController::class, 'apiSeed']); 
+Route::post('/roll-trim-by-product-design/seed', [RollTrimByProductDesignController::class, 'apiSeed']);
 
 // Roll Size API routes
 Route::get('/roll-sizes', [RollSizeController::class, 'apiIndex']);
@@ -314,7 +309,7 @@ Route::post('/roll-sizes/batch', [RollSizeController::class, 'apiBatchUpdate']);
 Route::put('/roll-sizes/{id}', [RollSizeController::class, 'apiUpdate']);
 Route::delete('/roll-sizes/{id}', [RollSizeController::class, 'apiDestroy']);
 Route::get('/roll-sizes/export', [RollSizeController::class, 'apiExport']);
-Route::post('/roll-sizes/seed', [RollSizeController::class, 'apiSeed']); 
+Route::post('/roll-sizes/seed', [RollSizeController::class, 'apiSeed']);
 
 // Side Trim By Flute API routes
 Route::get('/side-trims-by-flute', [SideTrimByFluteController::class, 'apiIndex']);
@@ -332,7 +327,7 @@ Route::post('/side-trims-by-product-design', [SideTrimByProductDesignController:
 Route::put('/side-trims-by-product-design/{id}', [SideTrimByProductDesignController::class, 'apiUpdate']);
 Route::delete('/side-trims-by-product-design/{id}', [SideTrimByProductDesignController::class, 'apiDestroy']);
 Route::get('/side-trims-by-product-design/export', [SideTrimByProductDesignController::class, 'apiExport']);
-Route::post('/side-trims-by-product-design/seed', [SideTrimByProductDesignController::class, 'apiSeed']); 
+Route::post('/side-trims-by-product-design/seed', [SideTrimByProductDesignController::class, 'apiSeed']);
 Route::post('/side-trims-by-product-design/batch', [SideTrimByProductDesignController::class, 'apiBatchUpdate']);
 
 // Product Design API routes
@@ -340,7 +335,7 @@ Route::get('/product-designs', [ProductDesignController::class, 'getDesignsJson'
 Route::post('/product-designs', [ProductDesignController::class, 'apiStore']);
 Route::put('/product-designs/{id}', [ProductDesignController::class, 'apiUpdate']);
 Route::delete('/product-designs/{id}', [ProductDesignController::class, 'apiDestroy']);
-Route::get('/product-designs/export', [ProductDesignController::class, 'apiExport']); 
+Route::get('/product-designs/export', [ProductDesignController::class, 'apiExport']);
 
 // Computation Method API routes
 Route::get('/computation-methods', [ComputationMethodController::class, 'apiIndex']);
@@ -349,14 +344,21 @@ Route::post('/computation-methods', [ComputationMethodController::class, 'apiSto
 Route::put('/computation-methods/{id}', [ComputationMethodController::class, 'apiUpdate']);
 Route::delete('/computation-methods/{id}', [ComputationMethodController::class, 'apiDestroy']);
 Route::get('/computation-methods/export', [ComputationMethodController::class, 'apiExport']);
-Route::post('/computation-methods/seed', [ComputationMethodController::class, 'apiSeed']); 
+Route::post('/computation-methods/seed', [ComputationMethodController::class, 'apiSeed']);
 
 // Finishing API routes
 Route::get('/finishings', [FinishingController::class, 'apiIndex']);
 Route::post('/finishings', [FinishingController::class, 'store']);
 Route::put('/finishings/{code}', [FinishingController::class, 'update']);
 Route::delete('/finishings/{code}', [FinishingController::class, 'destroy']);
-Route::post('/finishings/seed', [FinishingController::class, 'seed']); 
+Route::post('/finishings/seed', [FinishingController::class, 'seed']);
+
+// Stitch Wire API routes
+Route::get('/stitch-wires', [App\Http\Controllers\StitchWireController::class, 'apiIndex']);
+Route::post('/stitch-wires', [App\Http\Controllers\StitchWireController::class, 'store']);
+Route::put('/stitch-wires/{code}', [App\Http\Controllers\StitchWireController::class, 'update']);
+Route::delete('/stitch-wires/{code}', [App\Http\Controllers\StitchWireController::class, 'destroy']);
+Route::post('/stitch-wires/seed', [App\Http\Controllers\StitchWireController::class, 'seed']);
 
 // Approve MC API routes
 Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);
@@ -378,18 +380,9 @@ Route::get('/customer-service/delivery-schedule-data', [CustomerServiceControlle
 Route::get('/customer-service/finished-goods-data', [CustomerServiceController::class, 'apiFinishedGoodsData']);
 Route::get('/customer-service/production-monitoring-data', [CustomerServiceController::class, 'apiProductionMonitoringData']);
 
-// Sales Order API routes
-// Route moved to web.php for CSRF protection
-// Route::post('/sales-order', [App\Http\Controllers\SalesOrderController::class, 'store']);
-// Route moved to web.php for CSRF protection
-// Route::post('/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
-Route::get('/sales-order/delivery-schedule/{soNumber}', [App\Http\Controllers\SalesOrderController::class, 'getDeliveryScheduleSummary']);
-// Route moved to web.php for CSRF protection
-// Route::post('/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign'])->middleware('api.csrf');
-Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderController::class, 'getCustomer']); 
-// Save to legacy-style SO table (CPS compatibility)
+// Essential Sales Order API routes (read-only)
+Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderController::class, 'getCustomer']);
 Route::post('/sales-order/save-to-so', [App\Http\Controllers\SalesOrderController::class, 'apiStoreToSo']);
-// Get sales orders for Print SO and Sales Order Table Modal
 Route::get('/sales-orders', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrders']);
 
 // Debug route to test sales order data directly
@@ -397,16 +390,16 @@ Route::get('/debug/sales-orders', function(\Illuminate\Http\Request $request) {
     while (ob_get_level()) {
         ob_end_clean();
     }
-    
+
     $customerCode = $request->get('customer_code');
-    
+
     $query = DB::table('so');
     if ($customerCode) {
         $query->where('AC_Num', $customerCode);
     }
-    
+
     $orders = $query->limit(10)->get();
-    
+
     return response()->json([
         'success' => true,
         'customer_code' => $customerCode,
@@ -416,8 +409,6 @@ Route::get('/debug/sales-orders', function(\Illuminate\Http\Request $request) {
     ]);
 });
 
-// Get sales order detail by SO number
-Route::get('/sales-order/{soNumber}/detail', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrderDetail']);
 
 // Get current authenticated user info
 Route::get('/user/current', function() {
@@ -425,7 +416,7 @@ Route::get('/user/current', function() {
     while (ob_get_level()) {
         ob_end_clean();
     }
-    
+
     $user = Auth::user();
     if (!$user) {
         return response()->json([
@@ -433,7 +424,7 @@ Route::get('/user/current', function() {
             'message' => 'User not authenticated'
         ], 401, ['Content-Type' => 'application/json; charset=utf-8']);
     }
-    
+
     // Log user data for debugging
     try {
         Log::info('Current user data:', [
@@ -445,7 +436,7 @@ Route::get('/user/current', function() {
     } catch (\Exception $e) {
         Log::warning('Unable to log user data: ' . $e->getMessage());
     }
-    
+
     return response()->json([
         'success' => true,
         'data' => [
@@ -522,15 +513,15 @@ Route::prefix('material-management/inventory-reports')->group(function () {
             ]
         ]);
     });
-    
+
     Route::post('/sku-balance/generate', function() {
         return response()->json(['message' => 'Report generated successfully']);
     });
-    
+
     Route::post('/sku-balance/export', function() {
         return response()->json(['message' => 'Report exported successfully']);
     });
-    
+
     Route::get('/sku-reorder', function() {
         return response()->json([
             'data' => [
@@ -559,15 +550,15 @@ Route::prefix('material-management/inventory-reports')->group(function () {
             ]
         ]);
     });
-    
+
     Route::post('/sku-reorder/generate', function() {
         return response()->json(['message' => 'Report generated successfully']);
     });
-    
+
     Route::post('/sku-reorder/export', function() {
         return response()->json(['message' => 'Report exported successfully']);
     });
-    
+
     Route::get('/sku-ledger', function() {
         return response()->json([
             'data' => [
@@ -597,15 +588,15 @@ Route::prefix('material-management/inventory-reports')->group(function () {
             ]
         ]);
     });
-    
+
     Route::post('/sku-ledger/generate', function() {
         return response()->json(['message' => 'Report generated successfully']);
     });
-    
+
     Route::post('/sku-ledger/export', function() {
         return response()->json(['message' => 'Report exported successfully']);
     });
-    
+
     Route::get('/sku-aging', function() {
         return response()->json([
             'data' => [
@@ -636,15 +627,15 @@ Route::prefix('material-management/inventory-reports')->group(function () {
             ]
         ]);
     });
-    
+
     Route::post('/sku-aging/generate', function() {
         return response()->json(['message' => 'Report generated successfully']);
     });
-    
+
     Route::post('/sku-aging/export', function() {
         return response()->json(['message' => 'Report exported successfully']);
     });
-    
+
     Route::get('/sku-open-item-aging', function() {
         return response()->json([
             'data' => [
@@ -675,15 +666,15 @@ Route::prefix('material-management/inventory-reports')->group(function () {
             ]
         ]);
     });
-    
+
     Route::post('/sku-open-item-aging/generate', function() {
         return response()->json(['message' => 'Report generated successfully']);
     });
-    
+
     Route::post('/sku-open-item-aging/export', function() {
         return response()->json(['message' => 'Report exported successfully']);
     });
-    
+
     Route::get('/inquire-sku-account', function() {
         return response()->json([
             'sku' => [
@@ -722,11 +713,11 @@ Route::prefix('material-management/inventory-reports')->group(function () {
             ]
         ]);
     });
-    
+
     Route::post('/inquire-sku-account/export', function() {
         return response()->json(['message' => 'Report exported successfully']);
     });
-    
+
     Route::post('/inquire-sku-account/print', function() {
         return response()->json(['message' => 'Report printed successfully']);
     });
@@ -742,7 +733,7 @@ Route::get('/material-management/transaction-types', [MmTransactionTypeControlle
 Route::post('/material-management/transaction-types', [MmTransactionTypeController::class, 'store']);
 Route::get('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'show']);
 Route::put('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'update']);
-Route::delete('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'destroy']); 
+Route::delete('/material-management/transaction-types/{code}', [MmTransactionTypeController::class, 'destroy']);
 
 // Add Category API routes
 Route::prefix('material-management/categories')->group(function () {
@@ -772,7 +763,7 @@ Route::get('/material-management/tax-types', [MmTaxTypeController::class, 'getTa
 Route::post('/material-management/tax-types', [MmTaxTypeController::class, 'store']);
 Route::get('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'show']);
 Route::put('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'update']);
-Route::delete('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'destroy']); 
+Route::delete('/material-management/tax-types/{code}', [MmTaxTypeController::class, 'destroy']);
 
 // Add Tax Group API routes
 Route::get('/material-management/tax-groups', [MmTaxGroupController::class, 'getTaxGroups']);
@@ -788,7 +779,30 @@ Route::post('/invoices/tax-types', [App\Http\Controllers\Invoice\TaxTypeControll
 Route::get('/invoices/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'show']);
 Route::put('/invoices/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'update']);
 Route::delete('/invoices/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'destroy']);
-Route::post('/invoices/tax-types/seed', [App\Http\Controllers\Invoice\TaxTypeController::class, 'seed']); 
+Route::post('/invoices/tax-types/seed', [App\Http\Controllers\Invoice\TaxTypeController::class, 'seed']);
+
+// Invoice Tax Group API routes (CPS-style Define Tax Group)
+Route::get('/invoices/tax-groups', [App\Http\Controllers\Invoice\TaxGroupController::class, 'index']);
+Route::get('/invoices/tax-groups/with-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxGroupsWithTypes']);
+Route::post('/invoices/tax-groups', [App\Http\Controllers\Invoice\TaxGroupController::class, 'store']);
+Route::get('/invoices/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'show']);
+Route::get('/invoices/tax-groups/{code}/tax-items', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxItems']);
+Route::get('/invoices/tax-groups/{code}/tax-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxTypes']);
+Route::post('/invoices/tax-groups/{code}/tax-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'saveTaxTypes']);
+Route::put('/invoices/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'update']);
+Route::delete('/invoices/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'destroy']);
+Route::post('/invoices/tax-groups/seed', [App\Http\Controllers\Invoice\TaxGroupController::class, 'seed']);
+
+// Customer Sales Tax Index routes
+Route::get('/invoices/customer-tax-indices/{customerCode}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'getCustomerIndices']);
+Route::get('/invoices/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'show']);
+Route::post('/invoices/customer-tax-indices', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'store']);
+Route::delete('/invoices/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'destroy']);
+Route::get('/invoices/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'getProductTieups']);
+Route::post('/invoices/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'saveProductTieups']);
+
+// Product Groups API (for modals and lookups)
+Route::get('/product-groups', [App\Http\Controllers\ProductGroupController::class, 'index']);
 
 // Add Receive Destination API routes
 Route::get('/material-management/receive-destinations', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'getReceiveDestinations']);
@@ -796,7 +810,7 @@ Route::post('/material-management/receive-destinations', [App\Http\Controllers\M
 Route::get('/material-management/receive-destinations/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'show']);
 Route::put('/material-management/receive-destinations/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'update']);
 Route::delete('/material-management/receive-destinations/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'destroy']);
-Route::post('/material-management/receive-destinations/seed', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'seed']); 
+Route::post('/material-management/receive-destinations/seed', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'seed']);
 
 // Add Analysis Code API routes
 Route::get('/material-management/analysis-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'getAnalysisCodes']);
@@ -806,7 +820,7 @@ Route::post('/material-management/analysis-codes', [App\Http\Controllers\Materia
 Route::get('/material-management/analysis-codes/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'show']);
 Route::put('/material-management/analysis-codes/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'update']);
 Route::delete('/material-management/analysis-codes/{code}', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'destroy']);
-Route::post('/material-management/analysis-codes/seed', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'seed']); 
+Route::post('/material-management/analysis-codes/seed', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmAnalysisCodeController::class, 'seed']);
 
 Route::get('/material-management/control-periods/summary', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'getControlPeriodSummary']);
 
@@ -833,10 +847,10 @@ Route::prefix('warehouse-locations')->group(function () {
     Route::get('/{code}', [WarehouseLocationController::class, 'show']);
     Route::put('/{code}', [WarehouseLocationController::class, 'update']);
     Route::delete('/{code}', [WarehouseLocationController::class, 'destroy']);
-}); 
+});
 
 Route::get('/customer-sales-types', [CustomerSalesTypeController::class, 'index']);
-Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'store']); 
+Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'store']);
 
 // Diecut Computation Formula API routes
 Route::get('/diecut-computation-formulas', [App\Http\Controllers\ComputationFormulaController::class, 'apiIndex']);
@@ -844,7 +858,7 @@ Route::get('/diecut-computation-formulas/{id}', [App\Http\Controllers\Computatio
 Route::post('/diecut-computation-formulas', [App\Http\Controllers\ComputationFormulaController::class, 'apiStore']);
 Route::put('/diecut-computation-formulas/{id}', [App\Http\Controllers\ComputationFormulaController::class, 'apiUpdate']);
 Route::delete('/diecut-computation-formulas/{id}', [App\Http\Controllers\ComputationFormulaController::class, 'apiDestroy']);
-Route::post('/diecut-computation-formulas/seed', [App\Http\Controllers\ComputationFormulaController::class, 'apiSeed']); 
+Route::post('/diecut-computation-formulas/seed', [App\Http\Controllers\ComputationFormulaController::class, 'apiSeed']);
 
 Route::prefix('material-management/config-data')->group(function () {
     Route::get('transaction-types', [MmTransactionTypeController::class, 'getAll']);
@@ -899,18 +913,18 @@ Route::prefix('material-management/system-requirement/inventory-setup')->group(f
     // Route::delete('/sku/{sku}', [MmSkuController::class, 'destroy']);
     // Route::patch('/sku/{sku}/toggle-active', [MmSkuController::class, 'toggleActive']);
     // Route::post('/sku/seed', [MmSkuController::class, 'seed']);
-    
+
     // Supporting endpoints for SKU component (these are duplicates and should be removed or moved)
     // Route::get('/category', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmCategoryController::class, 'apiIndex']);
     // Route::get('/sku-types', [MmSkuController::class, 'getTypes']);
     // Route::get('/units', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmUnitController::class, 'apiIndex']);
-    
+
     // SKU Reorder Level View & Print with detailed data - MUST BE BEFORE apiResource
     Route::get('sku-reorder-levels/view-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'getViewPrint']);
-    
+
     Route::apiResource('sku-reorder-levels', App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class);
     Route::get('sku-reorder-levels/by-sku/{skuId}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'getBySku']);
-    
+
     // Copy & Paste functionality routes
     Route::post('sku-reorder-levels/copy', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'copyReorderLevels']);
     Route::post('sku-reorder-levels/copy-to-periods', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuReorderLevelController::class, 'copyToMultiplePeriods']);
@@ -1006,7 +1020,7 @@ Route::get('available-periods-fallback', function() {
             ->distinct()
             ->orderBy('period')
             ->pluck('period');
-        
+
         // If no periods exist in database, generate default periods for the next 12 months
         if ($periods->isEmpty()) {
             $periods = collect();
@@ -1015,7 +1029,7 @@ Route::get('available-periods-fallback', function() {
                 $periods->push($now->copy()->addMonths($i)->format('m/Y'));
             }
         }
-        
+
         return response()->json($periods);
     } catch (\Exception $e) {
         // Fallback: generate default periods if database query fails
@@ -1031,7 +1045,7 @@ Route::get('available-periods-fallback', function() {
 Route::get('sku-suggestions-fallback', function(\Illuminate\Http\Request $request) {
     try {
         $search = $request->query('search', '');
-        
+
         $skus = \App\Models\MmSku::where('is_active', true)
             ->where(function($query) use ($search) {
                 $query->where('sku', 'like', "%{$search}%")
@@ -1040,7 +1054,7 @@ Route::get('sku-suggestions-fallback', function(\Illuminate\Http\Request $reques
             ->select('sku', 'sku_name', 'category_code')
             ->limit(20)
             ->get();
-        
+
         return response()->json($skus);
     } catch (\Exception $e) {
         return response()->json([]);
@@ -1095,7 +1109,7 @@ Route::post('copy-reorder-levels-fallback', function(\Illuminate\Http\Request $r
 Route::prefix('material-management/system-requirement/inventory-setup')->group(function () {
     // SKU Consumption Budget View & Print - MUST BE BEFORE other routes
     Route::get('/sku-consumption-budgets/view-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'getViewPrint']);
-    
+
     Route::get('/sku-consumption-budgets', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'index']);
     Route::get('/sku-consumption-budgets/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'show']);
     Route::post('/sku-consumption-budgets', [App\Http\Controllers\MaterialManagement\SystemRequirement\SkuConsumptionBudgetController::class, 'store']);
@@ -1113,7 +1127,7 @@ Route::prefix('material-management/system-requirement/inventory-setup')->group(f
 Route::prefix('material-management/system-requirement/inventory-setup')->group(function () {
     // Custom Tariff Code View & Print - MUST BE BEFORE other routes
     Route::get('/custom-tariff-codes/view-print', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'getViewPrint']);
-    
+
     Route::get('/custom-tariff-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'index']);
     Route::get('/custom-tariff-codes/{id}', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'show']);
     Route::post('/custom-tariff-codes', [App\Http\Controllers\MaterialManagement\SystemRequirement\CustomTariffCodeController::class, 'store']);
@@ -1256,13 +1270,13 @@ Route::prefix('purchase-requisitions')->group(function () {
     Route::get('/{id}', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'show']);
     Route::put('/{id}', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'update']);
     Route::delete('/{id}', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'destroy']);
-    
+
     // PR Actions
     Route::post('/{id}/submit', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'submit']);
     Route::post('/{id}/approve', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'approve']);
     Route::post('/{id}/reject', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'reject']);
     Route::post('/{id}/cancel', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'cancel']);
-    
+
     // Utility endpoints
     Route::get('/statistics/dashboard', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'getStatistics']);
     Route::get('/approvals/my-pending', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'myPendingApprovals']);
@@ -1396,28 +1410,28 @@ Route::prefix('purchase-requisitions')->group(function () {
         Route::post('/generate', function (Request $request) {
             // Mock implementation - replace with actual report generation
             $filters = $request->all();
-            
+
             // Simulate report generation delay
             sleep(2);
-            
+
             // Return mock Excel file (CSV for now)
             $headers = [
                 'Content-Type' => 'text/csv',
                 'Content-Disposition' => 'attachment; filename="PO_Arrival_Schedule.csv"',
             ];
-            
+
             $data = [
                 ['PO Number', 'Supplier', 'SKU', 'Description', 'Quantity', 'ETA', 'Status'],
                 ['PO-2024-001', 'ABADI KARYA MAKMUR', 'SKU001', 'Bearing Type A', '100', '2024-06-25', 'Outstanding'],
                 ['PO-2024-002', 'ACCURA SOLIDTECH', 'SKU002', 'Locknut Type B', '50', '2024-06-28', 'Partial'],
                 ['PO-2024-003', 'ACEN JAYA ELEKTRIK', 'SKU003', 'Push Button', '200', '2024-07-01', 'Completed'],
             ];
-            
+
             $csv = '';
             foreach ($data as $row) {
                 $csv .= implode(',', $row) . "\n";
             }
-            
+
             return response($csv, 200, $headers);
         });
     });
@@ -1428,26 +1442,26 @@ Route::prefix('purchase-requisitions')->group(function () {
             // Mock implementation for PR/PO Reports
             $filters = $request->all();
             sleep(2);
-            
+
             $headers = [
                 'Content-Type' => 'text/csv',
                 'Content-Disposition' => 'attachment; filename="PR_PO_Reports.csv"',
             ];
-            
+
             $data = [
                 ['PR Number', 'PO Number', 'Supplier', 'SKU', 'Quantity', 'Amount', 'Status'],
                 ['PR-2024-001', 'PO-2024-001', 'ABADI KARYA MAKMUR', 'SKU001', '100', '15000000', 'Approved'],
                 ['PR-2024-002', 'PO-2024-002', 'ACCURA SOLIDTECH', 'SKU002', '50', '8500000', 'Pending'],
             ];
-            
+
             $csv = '';
             foreach ($data as $row) {
                 $csv .= implode(',', $row) . "\n";
             }
-            
+
             return response($csv, 200, $headers);
         });
-        
+
         Route::post('/preview', function (Request $request) {
             return response()->json([
                 'summary' => [
@@ -1482,7 +1496,7 @@ Route::prefix('purchase-requisitions')->group(function () {
                 ]
             ]);
         });
-        
+
         Route::get('/recent', function () {
             return response()->json([
                 [
@@ -1501,26 +1515,26 @@ Route::prefix('purchase-requisitions')->group(function () {
         Route::post('/generate', function (Request $request) {
             $filters = $request->all();
             sleep(2);
-            
+
             $headers = [
                 'Content-Type' => 'text/csv',
                 'Content-Disposition' => 'attachment; filename="PO_RC_RT_Report.csv"',
             ];
-            
+
             $data = [
                 ['Date', 'Type', 'PO Number', 'Vendor', 'SKU', 'Qty', 'Amount', 'Status'],
                 ['2024-01-15', 'RC', 'PO-2024-001', 'ABADI KARYA MAKMUR', 'SKU001', '100', '15000000', 'Posted'],
                 ['2024-01-16', 'RT', 'PO-2024-002', 'ACCURA SOLIDTECH', 'SKU002', '10', '1500000', 'Draft'],
             ];
-            
+
             $csv = '';
             foreach ($data as $row) {
                 $csv .= implode(',', $row) . "\n";
             }
-            
+
             return response($csv, 200, $headers);
         });
-        
+
         Route::post('/preview', function (Request $request) {
             return response()->json([
                 'summary' => [
@@ -1544,7 +1558,7 @@ Route::prefix('purchase-requisitions')->group(function () {
                 ]
             ]);
         });
-        
+
         Route::get('/recent', function () {
             return response()->json([
                 [
@@ -1563,26 +1577,26 @@ Route::prefix('purchase-requisitions')->group(function () {
         Route::post('/generate', function (Request $request) {
             $filters = $request->all();
             sleep(2);
-            
+
             $headers = [
                 'Content-Type' => 'text/csv',
                 'Content-Disposition' => 'attachment; filename="PSC_Report.csv"',
             ];
-            
+
             $data = [
                 ['PSC Code', 'PSC Name', 'Category', 'Purchaser', 'SKU Count', 'Total Value', 'Status'],
                 ['PSC001', 'Raw Materials Control', 'Raw Materials', 'John Doe', '150', '250000000', 'Active'],
                 ['PSC002', 'Packaging Materials Control', 'Packaging', 'Jane Smith', '75', '120000000', 'Active'],
             ];
-            
+
             $csv = '';
             foreach ($data as $row) {
                 $csv .= implode(',', $row) . "\n";
             }
-            
+
             return response($csv, 200, $headers);
         });
-        
+
         Route::post('/preview', function (Request $request) {
             return response()->json([
                 'summary' => [
@@ -1605,7 +1619,7 @@ Route::prefix('purchase-requisitions')->group(function () {
                 ]
             ]);
         });
-        
+
         Route::get('/recent', function () {
             return response()->json([
                 [
@@ -1624,26 +1638,26 @@ Route::prefix('purchase-requisitions')->group(function () {
         Route::post('/generate', function (Request $request) {
             $filters = $request->all();
             sleep(2);
-            
+
             $headers = [
                 'Content-Type' => 'text/csv',
                 'Content-Disposition' => 'attachment; filename="SKU_Historical_Price_Report.csv"',
             ];
-            
+
             $data = [
                 ['Date', 'SKU', 'Vendor', 'Price Type', 'Price', 'Currency', 'Change', 'Source'],
                 ['2024-01-15', 'SKU001', 'ABADI KARYA MAKMUR', 'Purchase', '150000', 'IDR', '+5.2%', 'PO'],
                 ['2024-01-16', 'SKU002', 'ACCURA SOLIDTECH', 'Standard', '85000', 'IDR', '-2.1%', 'Contract'],
             ];
-            
+
             $csv = '';
             foreach ($data as $row) {
                 $csv .= implode(',', $row) . "\n";
             }
-            
+
             return response($csv, 200, $headers);
         });
-        
+
         Route::post('/preview', function (Request $request) {
             return response()->json([
                 'summary' => [
@@ -1671,7 +1685,7 @@ Route::prefix('purchase-requisitions')->group(function () {
                 ]
             ]);
         });
-        
+
         Route::get('/recent', function () {
             return response()->json([
                 [
@@ -1703,7 +1717,7 @@ Route::prefix('purchase-orders')->group(function () {
             ],
             [
                 'id' => 2,
-                'po_number' => 'PO-2024-002', 
+                'po_number' => 'PO-2024-002',
                 'supplier' => 'CV Supplier XYZ',
                 'approved_date' => '2024-01-16',
                 'rejected_date' => '2024-01-16',
@@ -1727,18 +1741,18 @@ Route::prefix('rc-rt')->group(function () {
     // RC Transactions
     Route::get('/rc-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGetRcTransactions']);
     Route::get('/rt-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGetRtTransactions']);
-    
+
     // CRUD Operations
     Route::post('/transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiStore']);
     Route::put('/transactions/{id}', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiUpdate']);
     Route::post('/transactions/{id}/post', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiPost']);
     Route::post('/transactions/{id}/cancel', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiCancel']);
-    
+
     // Lookup Data
     Route::get('/suppliers', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGetSuppliers']);
     Route::get('/skus', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGetSkus']);
     Route::get('/locations', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGetLocations']);
-    
+
     // Reports
     Route::post('/generate-report', [App\Http\Controllers\MaterialManagement\InventoryControl\RcRtController::class, 'apiGenerateReport']);
 });
@@ -1747,22 +1761,22 @@ Route::prefix('rc-rt')->group(function () {
 Route::prefix('dr-cn')->group(function () {
     // Generate Note Number
     Route::post('/generate-number', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGenerateNoteNumber']);
-    
+
     // DN Transactions
     Route::get('/dn-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGetDnTransactions']);
     Route::get('/cn-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGetCnTransactions']);
-    
+
     // CRUD Operations
     Route::post('/transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiStore']);
     Route::put('/transactions/{id}', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiUpdate']);
     Route::post('/transactions/{id}/post', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiPost']);
     Route::post('/transactions/{id}/cancel', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiCancel']);
-    
+
     // Lookup Data
     Route::get('/vendors', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGetVendors']);
     Route::get('/skus', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGetSkus']);
     Route::get('/locations', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGetLocations']);
-    
+
     // Reports
     Route::post('/generate-report', [App\Http\Controllers\MaterialManagement\InventoryControl\DrCnController::class, 'apiGenerateReport']);
 });
@@ -1774,24 +1788,24 @@ Route::prefix('is-mi-mo-lt')->group(function () {
     Route::get('/mi-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetMiTransactions']);
     Route::get('/mo-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetMoTransactions']);
     Route::get('/lt-transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetLtTransactions']);
-    
+
     // All Transactions (for ViewPrintLog)
     Route::get('/transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetTransactions']);
-    
+
     // CRUD Operations
     Route::post('/transactions', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiStore']);
     Route::put('/transactions/{id}', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiUpdate']);
     Route::post('/transactions/{id}/post', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiPost']);
     Route::post('/transactions/{id}/cancel', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiCancel']);
-    
+
     // Generate Number
     Route::post('/generate-number', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGenerateNumber']);
-    
+
     // Lookup Data
     Route::get('/skus', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetSkus']);
     Route::get('/locations', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetLocations']);
     Route::get('/categories', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGetCategories']);
-    
+
     // Reports
     Route::post('/generate-report', [App\Http\Controllers\MaterialManagement\InventoryControl\IsMiMoLtController::class, 'apiGenerateReport']);
 });
@@ -1823,7 +1837,7 @@ Route::prefix('material-management/inventory-control/period-end-closing')->group
     Route::post('/perform-closing', function() {
         // Simulate processing time
         sleep(2);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Inventory period closed successfully',

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Tax Group API</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Tax Group API</h1>
+    
+    <button onclick="seedData()">1. Seed Sample Data</button>
+    <button onclick="getAllGroups()">2. Get All Tax Groups</button>
+    <button onclick="createTestGroup()">3. Create Test Group</button>
+    
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000/api/invoices/tax-groups';
+
+        function showResult(title, data, isError = false) {
+            const div = document.getElementById('result');
+            const className = isError ? 'error' : 'success';
+            div.innerHTML = `
+                <h3 class="${className}">${title}</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+        }
+
+        async function seedData() {
+            try {
+                const response = await fetch(`${API_BASE}/seed`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                showResult('✅ Seed Result', data);
+            } catch (error) {
+                showResult('❌ Seed Error', error.message, true);
+            }
+        }
+
+        async function getAllGroups() {
+            try {
+                const response = await fetch(API_BASE, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                showResult('✅ Get All Tax Groups', data);
+                
+                // Extra check
+                if (data.success && data.data) {
+                    console.log(`Found ${data.data.length} tax groups`);
+                }
+            } catch (error) {
+                showResult('❌ Get Error', error.message, true);
+            }
+        }
+
+        async function createTestGroup() {
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: 'TEST',
+                        name: 'Test Tax Group',
+                        sales_tax_applied: 'Y'
+                    })
+                });
+                const data = await response.json();
+                showResult('✅ Create Result', data);
+            } catch (error) {
+                showResult('❌ Create Error', error.message, true);
+            }
+        }
+
+        // Auto test on load
+        window.onload = () => {
+            console.log('Tax Group API Tester Ready!');
+            console.log('Click buttons to test API endpoints');
+        };
+    </script>
+</body>
+</html>
