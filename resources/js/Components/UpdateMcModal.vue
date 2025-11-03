@@ -134,14 +134,22 @@
                     </div>
                     <div class="text-white text-sm">
                         <span class="mr-2">Order:</span>
-                        <select :value="mcsSortOrder" @change="$emit('fetchMcsData')" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
+                        <select 
+                            :value="mcsSortOrder" 
+                            @input="$emit('update:mcsSortOrder', $event.target.value); $emit('fetchMcsData')"
+                            class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs"
+                        >
                             <option value="asc">Asc</option>
                             <option value="desc">Desc</option>
                         </select>
                     </div>
                     <div class="text-white text-sm">
                         <span class="mr-2">Status:</span>
-                        <select @change="$emit('fetchMcsData')" :value="mcsStatusFilter" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
+                        <select 
+                            :value="mcsStatusFilter" 
+                            @input="$emit('update:mcsStatusFilter', $event.target.value); $emit('fetchMcsData')"
+                            class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs"
+                        >
                             <option value="Act">Active</option>
                             <option value="Obsolete">Obsolete</option>
                             <option value="all">All</option>

@@ -546,7 +546,7 @@ Route::middleware('auth')->group(function () {
          Route::get('/sales-management/system-requirement/master-card/realese-approve-mc', [RealeseApproveMcController::class, 'index'])->name('vue.master-card.realese-approve-mc');
 
                   // Add route for obsolate-reactive-mc
-        Route::get('/sales-management/system-requirement/master-card/obsolete-reactive-mc', [ObsolateReactiveMcController::class, 'index'])->name('vue.master-card.obsolete-reactive-mc');
+        Route::get('/sales-management/system-requirement/master-card/obsolete-reactive-mc', [UpdateMcController::class, 'obsoleteReactiveIndex'])->name('vue.master-card.obsolete-reactive-mc');
 
         // Add route for view-and-print-MC
         Route::get('/sales-management/system-requirement/master-card/view-and-print-MC', [ObsolateReactiveMcController::class, 'viewAndPrint'])->name('vue.master-card.view-and-print-mc');
@@ -1278,12 +1278,13 @@ Route::prefix('api')->group(function () {
     Route::get('/scoring-formulas/paper-flute/{paperFluteId}', [ScoringFormulaController::class, 'getByPaperFlute']);
     Route::post('/scoring-formulas/seed', [ScoringFormulaController::class, 'apiSeed']);
 
-    // ObsolateReactiveMC API routes
-    Route::get('/obsolate-reactive-mc', [ObsolateReactiveMcController::class, 'apiIndex']);
-    Route::post('/obsolate-reactive-mc', [ObsolateReactiveMcController::class, 'store']);
-    Route::post('/obsolate-reactive-mc/obsolate/{id}', [ObsolateReactiveMcController::class, 'obsolate']);
-    Route::post('/obsolate-reactive-mc/reactive/{id}', [ObsolateReactiveMcController::class, 'reactive']);
-    Route::get('/obsolate-reactive-mc/by-customer/{customerId}', [ObsolateReactiveMcController::class, 'getByCustomer']);
+    // Obsolete & Reactive MC API routes (using UpdateMcController and MC table)
+    Route::post('/mc/bulk-obsolete', [UpdateMcController::class, 'bulkObsolete']);
+    Route::post('/mc/bulk-reactive', [UpdateMcController::class, 'bulkReactivate']);
+    Route::get('/mc/by-customer/{customerCode}', [UpdateMcController::class, 'getMcsByCustomer']);
+    Route::get('/mc/by-customer-paginated', [UpdateMcController::class, 'getMcsByCustomerPaginated']);
+    Route::get('/mc/details/{mcsNum}', [UpdateMcController::class, 'getMcDetails']);
+    Route::post('/mc/update-status', [UpdateMcController::class, 'updateMcStatus']);
 
     // Corrugator Configuration API routes
     Route::get('/corrugator-configs', [CorrugatorConfigController::class, 'apiIndex']);

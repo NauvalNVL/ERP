@@ -8,6 +8,7 @@ use App\Models\MasterCard;
 use App\Models\Mc;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
 
 class UpdateMcController extends Controller
@@ -143,7 +144,7 @@ class UpdateMcController extends Controller
 
         Log::info('MC Query Results:', [
             'customer_code' => $customerCode,
-            'count' => $result['total'], 
+            'count' => $result['total'],
         ]);
 
         return response()->json($result);
@@ -177,7 +178,7 @@ class UpdateMcController extends Controller
     {
         try {
             $customerCode = $request->input('customer_code');
-            
+
             $q = DB::table('MC')->where('MCS_Num', $mcsNumber);
             if ($customerCode) {
                 $q->where('AC_NUM', $customerCode);
@@ -217,7 +218,7 @@ class UpdateMcController extends Controller
                         ]);
                     }
                 }
-                
+
                 return response()->json([
                     'exists' => false,
                     'data' => null
@@ -326,7 +327,7 @@ class UpdateMcController extends Controller
             // Map and upsert to legacy MC table for reporting/compatibility
             // Get customer data to populate AC_NAME and CURRENCY
             $customer = \App\Models\Customer::where('CODE', $validated['customer_code'])->first();
-            
+
             $legacy = [
                 'AC_NUM' => $validated['customer_code'],
                 // Store customer NAME, not code
@@ -375,7 +376,7 @@ class UpdateMcController extends Controller
 
             // Colors and additional PD setup fields
             $pd = $validated['pd_setup'] ?? [];
-            
+
             // If no pd_setup array, build from direct request fields
             if (empty($pd)) {
                 $pd = [
@@ -430,7 +431,7 @@ class UpdateMcController extends Controller
                     'mcMoreDescription5' => $validated['mcMoreDescription5'] ?? null,
                 ];
             }
-            
+
             if (is_array($pd)) {
                 // Colors can come as array of codes or objects with code
                 $colors = $pd['printColorCodes'] ?? $pd['colors'] ?? [];
@@ -559,13 +560,13 @@ class UpdateMcController extends Controller
                 $dcShtW = $alias($pd, ['dcSheetW','dc_sht_w']);
                 $dcMouldL = $alias($pd, ['dcMouldL','dc_mould_l']);
                 $dcMouldW = $alias($pd, ['dcMouldW','dc_mould_w']);
-                
+
                 // Try nested array access
                 if ($dcShtL === null && isset($pd['dcutSheet']['L'])) $dcShtL = $pd['dcutSheet']['L'];
                 if ($dcShtW === null && isset($pd['dcutSheet']['W'])) $dcShtW = $pd['dcutSheet']['W'];
                 if ($dcMouldL === null && isset($pd['dcutMould']['L'])) $dcMouldL = $pd['dcutMould']['L'];
                 if ($dcMouldW === null && isset($pd['dcutMould']['W'])) $dcMouldW = $pd['dcutMould']['W'];
-                
+
                 $legacy['DC_SHT_L'] = $num($dcShtL);
                 $legacy['DC_SHT_W'] = $num($dcShtW);
                 $legacy['DC_MOULD_L'] = $num($dcMouldL);
@@ -601,15 +602,15 @@ class UpdateMcController extends Controller
                 // SL1..SL8 and SW1..SW8 and totals
                 $totalSL = 0;
                 $totalSW = 0;
-                
+
                 for ($i = 1; $i <= 8; $i++) {
                     $scoreLVal = null;
                     $scoreWVal = null;
-                    
+
                     // Try direct field names first
                     $scoreLVal = $alias($pd, ['sl' . $i, 'SL' . $i]);
                     $scoreWVal = $alias($pd, ['sw' . $i, 'SW' . $i]);
-                    
+
                     // If not found, try array access
                     if ($scoreLVal === null && isset($pd['scoreL']) && is_array($pd['scoreL']) && isset($pd['scoreL'][$i-1])) {
                         $scoreLVal = $pd['scoreL'][$i-1];
@@ -617,10 +618,10 @@ class UpdateMcController extends Controller
                     if ($scoreWVal === null && isset($pd['scoreW']) && is_array($pd['scoreW']) && isset($pd['scoreW'][$i-1])) {
                         $scoreWVal = $pd['scoreW'][$i-1];
                     }
-                    
+
                     $legacy['SL' . $i] = $num($scoreLVal);
                     $legacy['SW' . $i] = $num($scoreWVal);
-                    
+
                     // Calculate totals
                     if ($legacy['SL' . $i] !== null) {
                         $totalSL += (float)$legacy['SL' . $i];
@@ -629,11 +630,11 @@ class UpdateMcController extends Controller
                         $totalSW += (float)$legacy['SW' . $i];
                     }
                 }
-                
+
                 // Set calculated totals (override any passed value)
                 $legacy['TOTAL_SL'] = $totalSL > 0 ? $totalSL : null;
                 $legacy['TOTAL_SW'] = $totalSW > 0 ? $totalSW : null;
-                
+
                 // MC Special Instructions (1-4)
                 for ($i = 1; $i <= 4; $i++) {
                     $key = 'MC_SPECIAL_INST' . $i;
@@ -646,7 +647,7 @@ class UpdateMcController extends Controller
                     ]);
                     $legacy[$key] = $keep($key, $incoming);
                 }
-                
+
                 // MC More Descriptions (1-5)
                 for ($i = 1; $i <= 5; $i++) {
                     $key = 'MC_MORE_DESCRIPTION_' . $i;
@@ -703,6 +704,225 @@ class UpdateMcController extends Controller
                 'message' => 'Failed to save Master Card',
                 'error' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Display the Obsolete & Reactive MC page
+     */
+    public function obsoleteReactiveIndex()
+    {
+        return inertia('sales-management/system-requirement/master-card/obsolete-reactive-mc');
+    }
+
+    /**
+     * Get MCs by customer with pagination (for UpdateMcModal)
+     */
+    public function getMcsByCustomerPaginated(Request $request)
+    {
+        try {
+            $customerCode = $request->input('ac');
+            $sortBy = $request->input('sort', 'mc_seq');
+            $order = $request->input('order', 'asc');
+            $status = $request->input('status', 'Act');
+            $search = $request->input('search', '');
+            $perPage = $request->input('per_page', 10);
+
+            if (!$customerCode) {
+                return response()->json([
+                    'data' => [],
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'total' => 0,
+                ]);
+            }
+
+            $query = DB::table('MC')->where('AC_NUM', $customerCode);
+
+            // Filter by status
+            if ($status === 'Act') {
+                $query->where('STS', 'Active');
+            } elseif ($status === 'Obsolete') {
+                $query->where('STS', 'Obsolete');
+            }
+
+            // Search
+            if ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('MCS_Num', 'like', "%{$search}%")
+                      ->orWhere('MODEL', 'like', "%{$search}%")
+                      ->orWhere('PART_NO', 'like', "%{$search}%");
+                });
+            }
+
+            // Sort
+            $sortColumn = match($sortBy) {
+                'mc_seq' => 'MCS_Num',
+                'model' => 'MODEL',
+                'status' => 'STS',
+                default => 'MCS_Num',
+            };
+            $query->orderBy($sortColumn, $order);
+
+            // Paginate
+            $results = $query->paginate($perPage);
+
+            // Transform data
+            $transformedData = $results->map(function ($mc) {
+                return [
+                    'seq' => $mc->MCS_Num,
+                    'model' => $mc->MODEL,
+                    'part' => $mc->PART_NO ?? '',
+                    'comp' => $mc->COMP ?? '',
+                    'p_design' => $mc->P_DESIGN ?? '',
+                    'status' => $mc->STS === 'Active' ? 'Act' : $mc->STS,
+                ];
+            });
+
+            return response()->json([
+                'data' => $transformedData,
+                'current_page' => $results->currentPage(),
+                'last_page' => $results->lastPage(),
+                'total' => $results->total(),
+                'per_page' => $results->perPage(),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Get MCs by Customer Paginated Error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'message' => 'Error occurred while fetching master cards.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get MC details for Obsolete & Reactive MC (CPS style - get salesperson from Customer)
+     */
+    public function getMcDetails($mcsNum)
+    {
+        try {
+            Log::info('getMcDetails called', ['mcs_num' => $mcsNum]);
+
+            $mc = DB::table('MC')->where('MCS_Num', $mcsNum)->first();
+
+            if (!$mc) {
+                return response()->json(['message' => 'Master Card not found.'], 404);
+            }
+
+            // Get customer name from MC.AC_NAME or CUSTOMER table
+            $customerName = '';
+            if (!empty($mc->AC_NAME)) {
+                $customerName = $mc->AC_NAME;
+            } elseif (!empty($mc->AC_NUM)) {
+                $customerName = DB::table('CUSTOMER')->where('CODE', $mc->AC_NUM)->value('NAME') ?? '';
+            }
+
+            // Get salesperson from CUSTOMER.SLM field (CPS style - same as Update Customer Account)
+            $salespersonCode = '';
+            $salespersonName = '';
+            if (!empty($mc->AC_NUM)) {
+                $customer = DB::table('CUSTOMER')->where('CODE', $mc->AC_NUM)->first();
+
+                if ($customer && !empty($customer->SLM)) {
+                    $salespersonCode = $customer->SLM; // Use original SLM code (e.g., S101)
+
+                    // Get salesperson name from salesperson table (same as Update Customer Account)
+                    $salesperson = DB::table('salesperson')->where('Code', $customer->SLM)->first();
+                    if ($salesperson) {
+                        $salespersonName = $salesperson->Name ?? '';
+                    }
+                }
+            }
+
+            // Get last update log
+            $lastUpdate = DB::table('MC_UPDATE_LOG')
+                ->where('MCS_Num', $mcsNum)
+                ->orderBy('updated_at', 'desc')
+                ->first();
+
+            $totalUpdate = DB::table('MC_UPDATE_LOG')->where('MCS_Num', $mcsNum)->count();
+
+            return response()->json([
+                'customer_name' => $customerName,
+                'model' => $mc->MODEL ?? '',
+                'salesperson_code' => $salespersonCode,
+                'salesperson_name' => $salespersonName,
+                'status' => $mc->STS ?? 'Active',
+                'last_update' => $lastUpdate ? [
+                    'status' => $lastUpdate->status ?? '',
+                    'user_id' => $lastUpdate->user_id ?? '',
+                    'date' => $lastUpdate->updated_at ? \Carbon\Carbon::parse($lastUpdate->updated_at)->timezone('Asia/Jakarta')->format('d/m/Y') : '',
+                    'time' => $lastUpdate->updated_at ? \Carbon\Carbon::parse($lastUpdate->updated_at)->timezone('Asia/Jakarta')->format('H:i') : '',
+                    'reason' => $lastUpdate->reason ?? '',
+                    'total_update' => $totalUpdate,
+                ] : [
+                    'status' => $mc->STS ?? '',
+                    'user_id' => '',
+                    'date' => '',
+                    'time' => '',
+                    'reason' => '',
+                    'total_update' => $totalUpdate,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Get MC Details Error', ['error' => $e->getMessage()]);
+            return response()->json(['message' => 'Error occurred.', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update individual MC status (Obsolete or Reactivate)
+     */
+    public function updateMcStatus(Request $request)
+    {
+        try {
+            $mcsNum = $request->input('mcs_num');
+            $reason = $request->input('reason');
+            $action = $request->input('action');
+
+            if (!$mcsNum || !$reason || !$action) {
+                return response()->json(['success' => false, 'message' => 'Missing fields.'], 400);
+            }
+
+            $mc = DB::table('MC')->where('MCS_Num', $mcsNum)->first();
+            if (!$mc) {
+                return response()->json(['success' => false, 'message' => 'MC not found.'], 404);
+            }
+
+            $newStatus = ($action === 'To Obsolete') ? 'Obsolete' : 'Active';
+
+            // Update MC status (MC table doesn't have timestamps)
+            DB::table('MC')->where('MCS_Num', $mcsNum)->update(['STS' => $newStatus]);
+
+            // Get authenticated user ID
+            $userId = 'system';
+            if (Auth::check()) {
+                $user = Auth::user();
+                $userId = $user->name ?? $user->user_id ?? $user->userID ?? 'system';
+            }
+
+            DB::table('MC_UPDATE_LOG')->insert([
+                'MCS_Num' => $mcsNum,
+                'status' => $newStatus,
+                'user_id' => $userId,
+                'reason' => $reason,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => ($action === 'To Obsolete')
+                    ? "MC {$mcsNum} obsoleted successfully."
+                    : "MC {$mcsNum} reactivated successfully.",
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Update MC Status Error', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Error occurred.'], 500);
         }
     }
 }
