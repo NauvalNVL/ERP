@@ -413,50 +413,7 @@
                     {{ orderType.label }}
                   </option>
                   </select>
-                  <div v-if="selectedOrderTypeDescription" class="mt-1 text-xs text-gray-500 italic">
-                    {{ selectedOrderTypeDescription }}
-                  </div>
                   
-                  <!-- Workflow Steps Display -->
-                  <div v-if="currentOrderTypeConfig && currentOrderTypeConfig.workflow" class="mt-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 shadow-sm">
-                    <div class="text-xs font-semibold text-blue-900 mb-2 flex items-center">
-                      <i class="fas fa-route mr-1"></i>
-                      Workflow Process:
-                    </div>
-                    <div class="flex items-center space-x-2 text-xs flex-wrap gap-y-1">
-                      <template v-for="(step, index) in getWorkflowSteps()" :key="step.code">
-                        <div class="flex items-center px-2 py-1 bg-white rounded-md border border-blue-300 text-blue-800 font-medium shadow-sm">
-                          <i :class="step.icon + ' mr-1 text-blue-600'"></i>
-                          {{ step.name }}
-                        </div>
-                        <i v-if="index < getWorkflowSteps().length - 1" class="fas fa-chevron-right text-blue-500"></i>
-                      </template>
-                    </div>
-                    
-                    <!-- Special Indicators -->
-                    <div class="mt-2 flex items-center space-x-3 text-xs">
-                      <div v-if="currentOrderTypeConfig.isKanban" class="flex items-center text-orange-600">
-                        <i class="fas fa-clock mr-1"></i>
-                        <span class="font-medium">JIT/Kanban Mode</span>
-                      </div>
-                      <div v-if="currentOrderTypeConfig.skipCorrugator" class="flex items-center text-purple-600">
-                        <i class="fas fa-forward mr-1"></i>
-                        <span class="font-medium">Skip Corrugator</span>
-                      </div>
-                      <div v-if="currentOrderTypeConfig.corrugatorOnly" class="flex items-center text-green-600">
-                        <i class="fas fa-cog mr-1"></i>
-                        <span class="font-medium">Corrugator Only</span>
-                      </div>
-                      <div v-if="currentOrderTypeConfig.requiresInvoice" class="flex items-center text-blue-600">
-                        <i class="fas fa-file-invoice-dollar mr-1"></i>
-                        <span class="font-medium">With Invoice</span>
-                      </div>
-                      <div v-else class="flex items-center text-gray-600">
-                        <i class="fas fa-ban mr-1"></i>
-                        <span class="font-medium">No Invoice</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">

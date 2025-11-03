@@ -123,27 +123,6 @@
                                 </div>
                             </div>
 
-                            <div
-                                class="absolute top-6 right-6"
-                                v-if="showDetailedMcInfo"
-                            >
-                                <button
-                                    type="button"
-                                    :class="
-                                        recordMode === 'existing'
-                                            ? 'bg-orange-500 hover:bg-orange-600'
-                                            : 'bg-blue-500 hover:bg-blue-600'
-                                    "
-                                    class="text-white px-4 py-2 rounded-lg shadow-md transition-colors text-sm font-semibold"
-                                >
-                                    Record:
-                                    {{
-                                        recordMode === "existing"
-                                            ? "Review"
-                                            : "Add"
-                                    }}
-                                </button>
-                            </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>

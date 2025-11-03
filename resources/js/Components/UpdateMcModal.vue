@@ -123,14 +123,6 @@
                 </h3>
                 <div class="flex space-x-3 items-center">
                     <div class="text-white text-sm mr-2">
-                        <span class="mr-2">Zoom:</span>
-                        <select :value="zoomOption" @change="$emit('handleZoomChange')" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
-                            <option value="mc_specification">M/card specification</option>
-                            <option value="current_price">Current price</option>
-                            <option value="stand_by_price">Stand by price</option>
-                        </select>
-                    </div>
-                    <div class="text-white text-sm mr-2">
                         <span class="mr-2">Sort:</span>
                         <select :value="mcsSortOption" @change="handleSortOptionChange" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
                             <option value="mc_seq">MC Seq#</option>
