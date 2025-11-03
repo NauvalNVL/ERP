@@ -1,0 +1,52 @@
+================================================================================
+QUICK FIX INSTRUCTIONS - Define Tax Group
+================================================================================
+
+File DefineTaxGroup_NEW.vue sudah dibuat dengan code yang benar dan bersih!
+
+CARA MANUAL (2 langkah):
+1. Tutup file DefineTaxGroup.vue yang sedang terbuka di editor
+2. Di Windows Explorer, navigasi ke:
+   c:\laragon\www\ERP\resources\js\Pages\warehouse-management\Invoice\Setup\
+   
+3. Delete file lama:
+   DefineTaxGroup.vue (yang rusak)
+   
+4. Rename file baru:
+   DefineTaxGroup_NEW.vue → DefineTaxGroup.vue
+
+ATAU via CMD (jalan langsung):
+
+cd c:\laragon\www\ERP\resources\js\Pages\warehouse-management\Invoice\Setup
+del DefineTaxGroup.vue
+ren DefineTaxGroup_NEW.vue DefineTaxGroup.vue
+
+================================================================================
+
+SETELAH FIX, TEST:
+
+1. Seed data (jika belum):
+   Browser: POST http://localhost/api/invoices/tax-groups/seed
+
+2. Access menu:
+   Invoice → Setup → Define Tax Group
+
+3. Test features:
+   ✓ Click "New Tax Group" button
+   ✓ Click table icon untuk view list
+   ✓ Search by code/name
+   ✓ Create new group
+   ✓ Edit existing
+   ✓ View tax types per group (Tax Item Screen button)
+   ✓ Delete group
+
+================================================================================
+
+STATUS:
+✅ Migration: DONE (sudah di-run)
+✅ Backend API: WORKING
+✅ Components: READY (TaxGroupModal, TaxItemScreenModal)
+✅ New File: CREATED (DefineTaxGroup_NEW.vue)
+⏳ Action: REPLACE file lama dengan yang baru
+
+================================================================================

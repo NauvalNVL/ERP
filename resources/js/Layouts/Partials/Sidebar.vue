@@ -449,7 +449,7 @@ const warehouseManagementItems = [
         children: [
           { title: 'Define Tax Type', icon: 'fas fa-percent', route: '/warehouse-management/invoice/setup/define-tax-type' },
           { title: 'Define Tax Group', icon: 'fas fa-layer-group', route: '/warehouse-management/invoice/setup/define-tax-group' },
-          { title: 'Define Customer Sales Tax Index', icon: 'fas fa-tags', route: '/warehouse-management/invoice/setup/define-customer-sales-tax-index' },
+          { title: 'Define Customer Sales Tax Index', icon: 'fas fa-user-tag', route: '/warehouse-management/invoice/setup/define-customer-sales-tax-index' },
           { title: 'View & Print Tax Type', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/view-print-tax-type' },
           { title: 'View & Print Tax Group', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/view-print-tax-group' },
           { title: 'View & Print Customer Sales Tax Index', icon: 'fas fa-print', route: '/warehouse-management/invoice/setup/view-print-customer-sales-tax-index' },

@@ -1,0 +1,255 @@
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import TaxGroupModal from '@/Components/TaxGroupModal.vue';
+import TaxItemScreenModal from '@/Components/TaxItemScreenModal.vue';
+import axios from 'axios';
+
+// UI State
+const searchQuery = ref('');
+const showModal = ref(false);
+const showEditModal = ref(false);
+const showTaxItemScreen = ref(false);
+const isCreating = ref(false);
+const loading = ref(false);
+const saving = ref(false);
+const selectedRow = ref(null);
+const selectedTaxGroupCode = ref('');
+
+// Data
+const taxGroups = ref([]);
+const editForm = ref({
+    code: '',
+    name: '',
+    sales_tax_applied: 'Y'
+});
+
+// Notification
+const notification = ref({
+    show: false,
+    message: '',
+    type: 'success'
+});
+
+const showNotification = (message, type = 'success') => {
+    notification.value = {
+        show: true,
+        message,
+        type
+    };
+    setTimeout(() => {
+        notification.value.show = false;
+    }, 3000);
+};
+
+// Methods
+const fetchTaxGroups = async () => {
+    loading.value = true;
+    try {
+        const response = await axios.get('/api/invoices/tax-groups');
+        if (response.data && response.data.success) {
+            taxGroups.value = response.data.data || [];
+        }
+    } catch (e) {
+        console.error('Error fetching tax groups:', e);
+        taxGroups.value = [];
+        showNotification('Failed to load tax groups.', 'error');
+    } finally {
+        loading.value = false;
+    }
+};
+
+const createNewTaxGroup = () => {
+    isCreating.value = true;
+    editForm.value = {
+        code: '',
+        name: '',
+        sales_tax_applied: 'Y'
+    };
+    showEditModal.value = true;
+};
+
+const onTaxGroupSelected = (group) => {
+    selectedRow.value = group;
+    searchQuery.value = group.code;
+    showModal.value = false;
+    
+    isCreating.value = false;
+    editForm.value = {
+        code: group.code,
+        name: group.name || '',
+        sales_tax_applied: group.sales_tax_applied || 'Y'
+    };
+    showEditModal.value = true;
+};
+
+const closeEditModal = () => {
+    showEditModal.value = false;
+};
+
+const saveTaxGroupChanges = async () => {
+    if (!editForm.value.code || !editForm.value.name) {
+        showNotification('Tax Group Code and Name are required.', 'error');
+        return;
+    }
+    
+    saving.value = true;
+    try {
+        let response;
+        const payload = {
+            code: editForm.value.code.toUpperCase(),
+            name: editForm.value.name,
+            sales_tax_applied: editForm.value.sales_tax_applied || 'Y'
+        };
+        
+        if (isCreating.value) {
+            response = await axios.post('/api/invoices/tax-groups', payload);
+        } else {
+            response = await axios.put(`/api/invoices/tax-groups/${editForm.value.code}`, payload);
+        }
+        
+        const result = response.data;
+        if (result.success) {
+            showNotification(
+                isCreating.value ? 'Tax group created successfully!' : 'Tax group updated successfully!',
+                'success'
+            );
+            await fetchTaxGroups();
+            closeEditModal();
+        } else {
+            showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
+        }
+    } catch (e) {
+        const errorMessage = e.response?.data?.message || e.message || 'An error occurred';
+        console.error('Error saving tax group:', e);
+        showNotification(`Error saving tax group: ${errorMessage}`, 'error');
+    } finally {
+        saving.value = false;
+    }
+};
+
+const deleteTaxGroup = async (groupCode) => {
+    if (!confirm(`Are you sure you want to delete tax group "${groupCode}"? This action cannot be undone.`)) {
+        return;
+    }
+    
+    saving.value = true;
+    try {
+        const response = await axios.delete(`/api/invoices/tax-groups/${groupCode}`);
+        const result = response.data;
+        if (result.success) {
+            await fetchTaxGroups();
+            if (selectedRow.value && selectedRow.value.code === groupCode) {
+                selectedRow.value = null;
+                searchQuery.value = '';
+            }
+            closeEditModal();
+            showNotification('Tax group deleted successfully.', 'success');
+        } else {
+            showNotification('Error deleting tax group: ' + (result.message || 'Unknown error'), 'error');
+        }
+    } catch (e) {
+        const errorMessage = e.response?.data?.message || e.message || 'An error occurred';
+        console.error('Error deleting tax group:', e);
+        showNotification(`Error deleting tax group: ${errorMessage}`, 'error');
+    } finally {
+        saving.value = false;
+    }
+};
+
+const openTaxItemScreen = () => {
+    selectedTaxGroupCode.value = editForm.value.code;
+    showTaxItemScreen.value = true;
+};
+
+// Watch searchQuery for auto-selection
+watch(searchQuery, (newQuery) => {
+    if (newQuery && taxGroups.value.length > 0) {
+        const foundGroup = taxGroups.value.find(group =>
+            group.code.toLowerCase().includes(newQuery.toLowerCase()) ||
+            group.name.toLowerCase().includes(newQuery.toLowerCase())
+        );
+        selectedRow.value = foundGroup || null;
+    } else {
+        selectedRow.value = null;
+    }
+});
+
+onMounted(() => {
+    fetchTaxGroups();
+});
+</script>
+
+<style scoped>
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-field {
+    @apply flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border-gray-300 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 group-hover:border-purple-400 shadow-sm focus:shadow-md;
+}
+
+.lookup-button {
+    @apply inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r text-white shadow-sm hover:shadow-md transform hover:-translate-y-px;
+}
+
+.primary-button {
+    @apply h-full items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold py-2 px-6 rounded-md shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex relative overflow-hidden;
+}
+
+.secondary-button {
+    @apply items-center justify-center bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 font-bold py-2 px-6 rounded-md shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex relative overflow-hidden border border-gray-300;
+}
+
+.modal-input {
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-200 focus:ring-opacity-50 transition-shadow;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px) rotate(-2deg); }
+    75% { transform: translateX(3px) rotate(2deg); }
+}
+.group-hover\:animate-shake:hover {
+    animation: shake 0.3s ease-in-out;
+}
+
+.shimmer-effect {
+    @apply absolute top-0 -left-[150%] h-full w-[50%] skew-x-[-25deg] bg-white/20;
+    animation: shimmer 2.5s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        left: 150%;
+    }
+}
+
+@keyframes pulse-slow {
+    0%, 100% { transform: scale(1); opacity: 0.05; }
+    50% { transform: scale(1.1); opacity: 0.08; }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 5s infinite;
+}
+
+.animation-delay-500 {
+    animation-delay: 0.5s;
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out;
+}
+</style>

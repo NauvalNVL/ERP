@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Tax Group API</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        button { padding: 12px 24px; margin: 10px 5px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 4px; font-size: 14px; }
+        button:hover { background: #45a049; }
+        .result { margin-top: 20px; }
+        .success { color: green; background: #e8f5e9; padding: 15px; border-left: 4px solid green; }
+        .error { color: red; background: #ffebee; padding: 15px; border-left: 4px solid red; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 4px; overflow-x: auto; }
+        .status { display: inline-block; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+        .status.ok { background: #4CAF50; color: white; }
+        .status.error { background: #f44336; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Tax Group API</h1>
+        <p>Testing: <code>http://127.0.0.1:8000/api/invoices/tax-groups</code></p>
+        
+        <div>
+            <button onclick="testGetAll()">📋 Get All Tax Groups</button>
+            <button onclick="testCreate()">➕ Create Test Group</button>
+            <button onclick="clearResult()">🗑️ Clear</button>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000/api/invoices/tax-groups';
+
+        function showResult(title, data, isError = false) {
+            const div = document.getElementById('result');
+            const className = isError ? 'error' : 'success';
+            const status = isError ? 'error' : 'ok';
+            
+            let html = `
+                <div class="result ${className}">
+                    <h3><span class="status ${status}">${isError ? 'ERROR' : 'SUCCESS'}</span> ${title}</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                </div>
+            `;
+            
+            // If success and has data array, show count
+            if (!isError && data.success && Array.isArray(data.data)) {
+                html += `<p style="margin-top:10px; font-weight: bold; color: green;">✅ Found ${data.data.length} tax groups</p>`;
+                
+                // Show table
+                if (data.data.length > 0) {
+                    html += '<table style="width:100%; margin-top:10px; border-collapse: collapse;">';
+                    html += '<thead><tr style="background:#f0f0f0;"><th style="padding:8px; border:1px solid #ddd;">Code</th><th style="padding:8px; border:1px solid #ddd;">Name</th><th style="padding:8px; border:1px solid #ddd;">Tax Applied</th></tr></thead>';
+                    html += '<tbody>';
+                    data.data.forEach(item => {
+                        html += `<tr>
+                            <td style="padding:8px; border:1px solid #ddd;">${item.code}</td>
+                            <td style="padding:8px; border:1px solid #ddd;">${item.name}</td>
+                            <td style="padding:8px; border:1px solid #ddd; text-align:center;">${item.sales_tax_applied}</td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+            }
+            
+            div.innerHTML = html;
+        }
+
+        async function testGetAll() {
+            try {
+                console.log('Fetching:', API_BASE);
+                const response = await fetch(API_BASE, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    showResult('Get All Tax Groups', data);
+                } else {
+                    showResult('API Error', data, true);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showResult('Network Error', { message: error.message, stack: error.stack }, true);
+            }
+        }
+
+        async function testCreate() {
+            const timestamp = Date.now();
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: 'TEST' + timestamp,
+                        name: 'Test Tax Group ' + timestamp,
+                        sales_tax_applied: 'Y'
+                    })
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('Created Tax Group', data);
+                } else {
+                    showResult('Create Error', data, true);
+                }
+            } catch (error) {
+                showResult('Network Error', { message: error.message }, true);
+            }
+        }
+
+        function clearResult() {
+            document.getElementById('result').innerHTML = '';
+        }
+
+        // Auto test on load
+        window.onload = () => {
+            console.log('🧪 Tax Group API Tester Ready!');
+            testGetAll(); // Auto test
+        };
+    </script>
+</body>
+</html>

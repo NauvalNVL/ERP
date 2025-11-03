@@ -31,8 +31,9 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <div class="text-xs text-blue-800">
-                      <p class="font-medium mb-1">Tax Verification Required</p>
-                      <p>Please verify the sales tax configuration below. The selected tax will be applied to all invoices prepared in this session.</p>
+                      <p class="font-medium mb-1">Tax Index No: {{ selectedIndexData?.index_number || 'N/A' }}</p>
+                      <p v-if="selectedIndexData">Tax Group: <strong>{{ selectedIndexData.tax_group_code }}</strong> - {{ selectedIndexData.tax_group_name }}</p>
+                      <p class="mt-1">Please verify the sales tax configuration below. The selected tax will be applied to all invoices prepared in this session.</p>
                     </div>
                   </div>
                 </div>
@@ -113,8 +114,31 @@
                         </td>
                       </tr>
                       <tr v-if="!loading && taxOptions.length === 0">
-                        <td colspan="5" class="px-4 py-8 text-center text-sm text-gray-500">
-                          No active tax codes found
+                        <td colspan="5" class="px-4 py-8 text-center">
+                          <div class="flex flex-col items-center gap-3">
+                            <svg class="w-12 h-12 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            <div class="text-center">
+                              <p class="text-sm font-medium text-gray-900 mb-1">No Tax Items Found</p>
+                              <p class="text-xs text-gray-600 mb-2" v-if="selectedIndexData">
+                                Tax Group <strong>{{ selectedIndexData.tax_group_code }}</strong> does not have any tax types assigned.
+                              </p>
+                              <p class="text-xs text-blue-600 font-medium">
+                                ℹ️ Please assign tax types to this tax group in the <strong>Define Tax Group</strong> menu.
+                              </p>
+                              <div class="mt-3 p-2 bg-blue-50 rounded text-xs text-left text-gray-700">
+                                <p class="font-semibold mb-1">Steps to fix:</p>
+                                <ol class="list-decimal list-inside space-y-1">
+                                  <li>Go to <strong>Define Tax Group</strong> menu</li>
+                                  <li>Select Tax Group: <strong>{{ selectedIndexData?.tax_group_code || 'N/A' }}</strong></li>
+                                  <li>Click <strong>"Tax Item Screen"</strong> button</li>
+                                  <li>Select tax types to include</li>
+                                  <li>Save and return here</li>
+                                </ol>
+                              </div>
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     </tbody>
@@ -182,6 +206,7 @@ const props = defineProps({
   open: { type: Boolean, default: false },
   customerCode: { type: String, default: '' },
   preselectedTaxCode: { type: String, default: '' },
+  selectedIndexData: { type: Object, default: null }, // { index_number, tax_group_code, tax_group_name, status }
 })
 
 const emit = defineEmits(['close', 'confirm'])
@@ -217,53 +242,70 @@ watch(() => props.open, async (isOpen) => {
 const fetchTaxOptions = async () => {
   loading.value = true
   try {
-    // Use same API endpoint as SalesTaxIndexModal for data consistency
-    const res = await fetch('/api/material-management/tax-types', {
-      headers: { 'Accept': 'application/json' }
-    })
-    if (res.ok) {
-      const data = await res.json()
-      // Transform data to match expected format (same mapping as SalesTaxIndexModal)
-      let allTaxes = (Array.isArray(data) ? data : (data.data || [])).map(tax => {
-        const code = tax.code || tax.tax_code || tax.TaxCode || tax.Code || tax.taxtype || tax.type || tax.id || ''
-        const name = tax.name || tax.description || tax.tax_name || tax.TaxName || tax.Name || ''
-        const rate = parseFloat(tax.rate || tax.tax_rate || tax.RATEPPN || 0)
-        const status = (tax.status ?? tax.is_active ?? tax.active ?? true) ? true : false
-        
-        return {
-          code: code,
-          name: name,
-          rate: rate,
-          apply: !!status,
-          include: tax.include === true || tax.include === 'Yes' || tax.tax_included === true,
-        }
+    // If we have selectedIndexData, fetch tax items from that tax group
+    if (props.selectedIndexData && props.selectedIndexData.tax_group_code) {
+      console.log('📋 Fetching tax items for Tax Group:', props.selectedIndexData.tax_group_code)
+      
+      const res = await fetch(`/api/invoices/tax-groups/${props.selectedIndexData.tax_group_code}/tax-items`, {
+        headers: { 'Accept': 'application/json' }
       })
       
-      // CPS Behavior: If preselectedTaxCode exists, only show that specific tax
-      // This matches CPS where Check Sales Tax Screen only displays the tax selected in Tax Exemption Table
-      if (props.preselectedTaxCode) {
-        console.log('Searching for tax code:', props.preselectedTaxCode)
-        console.log('Available taxes:', allTaxes.map(t => t.code))
+      if (res.ok) {
+        const data = await res.json()
+        console.log('Tax items response:', data)
         
-        const selectedTaxOnly = allTaxes.find(t => 
-          t.code && props.preselectedTaxCode && 
-          t.code.toLowerCase() === props.preselectedTaxCode.toLowerCase()
-        )
+        const taxItems = Array.isArray(data) ? data : (data.data || [])
         
-        if (selectedTaxOnly) {
-          taxOptions.value = [selectedTaxOnly]
-          console.log('✅ CPS Mode: Showing only preselected tax:', selectedTaxOnly)
+        // Map tax items to display format
+        taxOptions.value = taxItems.map(item => ({
+          code: item.tax_code || item.code,
+          name: item.tax_name || item.name || item.tax_type?.name || '',
+          rate: parseFloat(item.rate || item.tax_rate || 0),
+          apply: item.status === 'A' || item.apply === true,
+          include: item.include === true || item.include === 'Y',
+        }))
+        
+        if (taxOptions.value.length > 0) {
+          console.log('✅ Loaded tax items from Tax Group:', taxOptions.value)
+          
+          // Auto-select first active tax
+          const firstActive = taxOptions.value.find(t => t.apply)
+          if (firstActive) {
+            selectedTax.value = firstActive
+            console.log('🎯 Auto-selected first active tax:', firstActive.code)
+          } else {
+            selectedTax.value = taxOptions.value[0]
+            console.log('🎯 Auto-selected first tax (no active found):', taxOptions.value[0].code)
+          }
         } else {
-          console.warn('⚠️ Preselected tax not found, showing all taxes')
-          taxOptions.value = allTaxes
+          console.warn('⚠️ Tax Group has no tax items. Please assign tax types in Define Tax Group menu.')
+          console.warn('   Tax Group:', props.selectedIndexData.tax_group_code)
+          console.warn('   Solution: Define Tax Group → Select', props.selectedIndexData.tax_group_code, '→ Tax Item Screen → Add tax types')
         }
       } else {
-        // If no preselection, show all taxes
-        taxOptions.value = allTaxes
-        console.log('No preselection, showing all taxes:', allTaxes.length)
+        throw new Error('Failed to fetch tax items from tax group')
       }
     } else {
-      taxOptions.value = []
+      // Fallback: fetch all tax types if no index selected
+      console.log('⚠️ No selectedIndexData, falling back to generic tax types')
+      const res = await fetch('/api/material-management/tax-types', {
+        headers: { 'Accept': 'application/json' }
+      })
+      
+      if (res.ok) {
+        const data = await res.json()
+        let allTaxes = (Array.isArray(data) ? data : (data.data || [])).map(tax => ({
+          code: tax.code || tax.tax_code || '',
+          name: tax.name || tax.description || '',
+          rate: parseFloat(tax.rate || tax.tax_rate || 0),
+          apply: !!(tax.status ?? tax.is_active ?? true),
+          include: tax.include === true || tax.include === 'Yes',
+        }))
+        
+        taxOptions.value = allTaxes
+      } else {
+        taxOptions.value = []
+      }
     }
   } catch (e) {
     console.error('Failed to fetch tax options:', e)

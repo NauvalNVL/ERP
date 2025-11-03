@@ -264,7 +264,7 @@
                 <div class="bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-4 py-3 rounded-t-lg flex justify-between items-center">
                     <div class="flex items-center gap-2">
                         <i class="fas fa-table"></i>
-                        <h3 class="text-sm font-semibold">Tax Sales Tax Type Table</h3>
+                        <h3 class="text-sm font-semibold">Sales Tax Type Table</h3>
                     </div>
                     <button @click="showTable = false" class="text-white/90 hover:text-white">
                         <i class="fas fa-times"></i>

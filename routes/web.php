@@ -813,6 +813,8 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('warehouse-management/Invoice/Setup/DefineTaxType');
     })->name('vue.warehouse-management.invoice.setup.define-tax-type');
 
+    Route::get('/warehouse-management/invoice/setup/define-customer-sales-tax-index', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'index'])->name('vue.warehouse-management.invoice.setup.define-customer-sales-tax-index');
+
     Route::get('/warehouse-management/invoice/setup/invoice-configuration', function () {
         return Inertia::render('warehouse-management/Invoice/Setup/SetupInvoiceConfiguration');
     })->name('vue.warehouse-management.invoice.setup.invoice-configuration');

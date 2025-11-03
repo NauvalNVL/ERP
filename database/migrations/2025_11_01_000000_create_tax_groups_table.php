@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tax_types', function (Blueprint $table) {
+        Schema::create('tax_groups', function (Blueprint $table) {
             $table->string('code', 20)->primary();
             $table->string('name', 100);
-            $table->char('apply', 1)->default('Y'); // Y or N
-            $table->decimal('rate', 8, 2)->default(0.00);
-            $table->string('custom_type', 50)->default('N-NIL');
-            $table->string('tax_group_code', 20)->nullable(); // Relation to tax_groups
+            $table->char('sales_tax_applied', 1)->default('Y'); // Y or N
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tax_types');
+        Schema::dropIfExists('tax_groups');
     }
 };

@@ -217,15 +217,30 @@
                 Tax Index No. <span class="text-red-600">*</span>
               </label>
               <div class="flex rounded-md shadow-sm ring-1 ring-inset overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200" :class="taxIndexNo ? 'ring-gray-300' : 'ring-red-300 bg-red-50'">
-                <input v-model="taxIndexNo" type="text" class="flex-1 px-3 py-2 text-sm outline-none border-0 bg-transparent" placeholder="Select tax from table..." />
+                <input 
+                  v-model="taxIndexNo" 
+                  type="text" 
+                  class="flex-1 px-3 py-2 text-sm outline-none border-0 bg-transparent" 
+                  placeholder="Type index (01, 02) or browse..."
+                  maxlength="2"
+                  @input="handleTaxIndexInput"
+                  @blur="fetchTaxIndexByNumber"
+                  @keyup.enter="fetchTaxIndexByNumber"
+                />
                 <button @click="taxModalOpen = true" class="px-3 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700" title="Browse Tax">
                   <i class="fa fa-search"></i>
                 </button>
               </div>
               <!-- Fixed height container to prevent layout jump -->
-              <div class="h-5 mt-1">
-                <p v-show="!taxIndexNo" class="text-xs text-red-600 transition-opacity duration-200" :class="!taxIndexNo ? 'opacity-100' : 'opacity-0'">
+              <div class="mt-1 min-h-[20px]">
+                <p v-if="!taxIndexNo" class="text-xs text-red-600">
                   <i class="fa fa-exclamation-circle"></i> Required: Please select a tax
+                </p>
+                <p v-else-if="selectedIndexData && selectedIndexData.tax_group_code" class="text-xs text-green-600">
+                  <i class="fa fa-check-circle"></i> Tax Group: <strong>{{ selectedIndexData.tax_group_code }}</strong> - {{ selectedIndexData.tax_group_name }}
+                </p>
+                <p v-else-if="taxIndexNo" class="text-xs text-yellow-600">
+                  <i class="fa fa-spinner fa-spin"></i> Loading tax group...
                 </p>
               </div>
             </div>
@@ -282,9 +297,10 @@
         @select="selectCustomer"
       />
 
-      <!-- Sales Tax Index Modal -->
-      <SalesTaxIndexModal
+      <!-- Customer Sales Tax Index Modal -->
+      <CustomerSalesTaxIndexTableModalForInvoice
         :open="taxModalOpen"
+        :customerCode="customerCode"
         @close="taxModalOpen = false"
         @select="selectTaxIndex"
       />
@@ -294,6 +310,7 @@
         :open="checkTaxModalOpen"
         :customerCode="customerCode"
         :preselectedTaxCode="taxIndexNo"
+        :selectedIndexData="selectedIndexData"
         @close="checkTaxModalOpen = false"
         @confirm="onTaxConfirmed"
       />
@@ -365,7 +382,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { ref, computed, watch } from 'vue'
 import CustomerAccountModal from '@/Components/customer-account-modal.vue'
-import SalesTaxIndexModal from '@/Components/SalesTaxIndexModal.vue'
+import CustomerSalesTaxIndexTableModalForInvoice from '@/Components/CustomerSalesTaxorSalesTaxExemptionTable.vue'
 import CheckSalesTaxModal from '@/Components/CheckSalesTaxModal.vue'
 import DeliveryOrderScreenModal from '@/Components/DeliveryOrderScreenModal.vue'
 import DeliveryOrderSelectionModal from '@/Components/DeliveryOrderTableModal.vue'
@@ -454,6 +471,7 @@ async function selectCustomer(customer){
 const customerName = ref('')
 const currency = ref('')
 const taxIndexNo = ref('')
+const selectedIndexData = ref(null) // Store full tax index data: { index_number, tax_group_code, tax_group_name, status }
 const taxModalOpen = ref(false)
 const invoiceDate = ref(new Date().toISOString().slice(0,10))
 const secondRef = ref('')
@@ -503,9 +521,146 @@ watch(() => invoiceDate.value, (val) => {
   } catch(_) { invoiceDay.value = '' }
 })
 
+// Reset tax index when customer changes
+watch(() => customerCode.value, (newVal, oldVal) => {
+  if (newVal !== oldVal && oldVal !== '') {
+    taxIndexNo.value = ''
+    selectedIndexData.value = null
+    console.log('🔄 Customer changed, tax index reset')
+  }
+})
+
 function selectTaxIndex(row){
-  taxIndexNo.value = row?.code || ''
+  // row contains: index_number, tax_group_code, tax_group_name, status
+  taxIndexNo.value = String(row?.index_number || '').padStart(2, '0')
+  // Store full index data for CheckSalesTaxModal
+  selectedIndexData.value = {
+    index_number: row?.index_number,
+    tax_group_code: row?.tax_group_code,
+    tax_group_name: row?.tax_group_name,
+    status: row?.status
+  }
   taxModalOpen.value = false
+  console.log('✅ Selected Tax Index Data:', selectedIndexData.value)
+}
+
+// Auto-format tax index input (only allow numbers, max 2 digits)
+function handleTaxIndexInput(event) {
+  const value = event.target.value
+  // Only allow numbers
+  const cleanValue = value.replace(/[^\d]/g, '')
+  taxIndexNo.value = cleanValue.slice(0, 2)
+}
+
+// Fetch tax index data by number when user types
+async function fetchTaxIndexByNumber() {
+  if (!customerCode.value) {
+    console.warn('⚠️ Cannot fetch tax index: No customer selected')
+    alert('Please select a customer first before entering tax index number.')
+    return
+  }
+  
+  if (!taxIndexNo.value || taxIndexNo.value.trim() === '') {
+    selectedIndexData.value = null
+    return
+  }
+  
+  try {
+    // Pad with leading zero if needed (e.g., "1" -> "01")
+    const indexNumber = parseInt(taxIndexNo.value)
+    if (isNaN(indexNumber) || indexNumber < 1) {
+      console.warn('⚠️ Invalid tax index number:', taxIndexNo.value)
+      return
+    }
+    
+    console.log('═══════════════════════════════════════════════════════════')
+    console.log('📋 FETCHING TAX INDEX FROM DEFINE CUSTOMER SALES TAX INDEX')
+    console.log('═══════════════════════════════════════════════════════════')
+    console.log(`   Customer Code: ${customerCode.value}`)
+    console.log(`   Index Number: ${indexNumber}`)
+    console.log(`   API Endpoint: /api/invoices/customer-tax-indices/${customerCode.value}`)
+    console.log(`   Data Source: customer_sales_tax_indices table (Define Customer Sales Tax Index menu)`)
+    
+    // Call API to get customer tax indices from Define Customer Sales Tax Index
+    const response = await fetch(`/api/invoices/customer-tax-indices/${customerCode.value}`)
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+    
+    const result = await response.json()
+    console.log('📦 API Response from customer_sales_tax_indices table:', result)
+    
+    if (result.success && result.data && Array.isArray(result.data)) {
+      // Find the tax index with matching index_number
+      const matchedIndex = result.data.find(item => 
+        parseInt(item.index_number) === indexNumber
+      )
+      
+      if (matchedIndex) {
+        // Auto-populate selectedIndexData
+        selectedIndexData.value = {
+          index_number: matchedIndex.index_number,
+          tax_group_code: matchedIndex.tax_group_code,
+          tax_group_name: matchedIndex.tax_group?.name || matchedIndex.tax_group_name || '',
+          status: matchedIndex.status
+        }
+        
+        // Format tax index with leading zero
+        taxIndexNo.value = String(indexNumber).padStart(2, '0')
+        
+        console.log('✅ SUCCESS! Tax Index Found in Define Customer Sales Tax Index')
+        console.log('═══════════════════════════════════════════════════════════')
+        console.log('📊 Retrieved Data from customer_sales_tax_indices table:')
+        console.log('   Index Number:', selectedIndexData.value.index_number)
+        console.log('   Tax Group Code:', selectedIndexData.value.tax_group_code)
+        console.log('   Tax Group Name:', selectedIndexData.value.tax_group_name)
+        console.log('   Status:', selectedIndexData.value.status)
+        console.log('   Source Table: customer_sales_tax_indices')
+        console.log('   Source Menu: Define Customer Sales Tax Index')
+        console.log('═══════════════════════════════════════════════════════════')
+      } else {
+        console.warn('═══════════════════════════════════════════════════════════')
+        console.warn(`⚠️ Tax index ${indexNumber} NOT FOUND in customer_sales_tax_indices table`)
+        console.warn(`   Customer: ${customerCode.value}`)
+        console.warn(`   Searched Index: ${indexNumber}`)
+        
+        if (result.data.length > 0) {
+          console.warn(`   Available indices for this customer:`)
+          result.data.forEach(idx => {
+            console.warn(`      - Index ${String(idx.index_number).padStart(2, '0')}: ${idx.tax_group_code} (${idx.tax_group?.name || 'No name'})`)
+          })
+        } else {
+          console.warn(`   No tax indices defined for customer ${customerCode.value}`)
+          console.warn(`   Please add indices in Define Customer Sales Tax Index menu`)
+        }
+        console.warn('═══════════════════════════════════════════════════════════')
+        
+        selectedIndexData.value = null
+        
+        const availableMsg = result.data.length > 0 
+          ? `\n\nAvailable indices for this customer:\n${result.data.map(i => `  ${String(i.index_number).padStart(2, '0')} - ${i.tax_group_code}`).join('\n')}`
+          : '\n\nNo tax indices found for this customer.\nPlease add indices in Define Customer Sales Tax Index menu.'
+        
+        alert(`Tax Index ${String(indexNumber).padStart(2, '0')} not found in Define Customer Sales Tax Index.${availableMsg}`)
+      }
+    } else {
+      console.warn('═══════════════════════════════════════════════════════════')
+      console.warn('⚠️ No tax indices found in customer_sales_tax_indices table')
+      console.warn(`   Customer: ${customerCode.value}`)
+      console.warn('   Please define tax indices in Define Customer Sales Tax Index menu')
+      console.warn('═══════════════════════════════════════════════════════════')
+      selectedIndexData.value = null
+      alert(`No tax indices defined for customer ${customerCode.value}.\n\nPlease add tax indices in:\nInvoice → Setup → Define Customer Sales Tax Index`)
+    }
+  } catch (error) {
+    console.error('═══════════════════════════════════════════════════════════')
+    console.error('❌ ERROR fetching tax index from customer_sales_tax_indices table')
+    console.error('   Error:', error.message)
+    console.error('   API Endpoint:', `/api/invoices/customer-tax-indices/${customerCode.value}`)
+    console.error('═══════════════════════════════════════════════════════════')
+    selectedIndexData.value = null
+    alert(`Error fetching tax index data: ${error.message}\n\nPlease check:\n1. Customer code is valid\n2. Tax indices are defined in Define Customer Sales Tax Index menu\n3. Database connection is working`)
+  }
 }
 
 // ============================================================================
@@ -521,7 +676,7 @@ function openFlow(){
 
   // CPS Validation: Tax Index No is MANDATORY
   if (!taxIndexNo.value || taxIndexNo.value.trim() === '') {
-    alert('Please select Tax Index No. from Customer Sales Tax or Sales Tax Exemption Table.\n\nClick the search icon (🔍) next to Tax Index No. field to select a tax.')
+    alert('Please select Tax Index No. from Customer\'s Sales Tax Index Table.\n\nClick the search icon (🔍) next to Tax Index No. field to select a tax.')
     return
   }
 
@@ -756,7 +911,7 @@ async function onSalesOrderItemsConfirm(itemsData){
  */
 async function proceedToFinalScreen(){
   console.log('🎯 Proceeding to Final Screen with accumulated data')
-  
+
   // Check if any items have been billed
   if (billedItems.value.size === 0) {
     alert('Please select and bill at least one delivery order')

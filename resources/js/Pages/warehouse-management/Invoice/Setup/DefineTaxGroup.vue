@@ -1,309 +1,585 @@
 <template>
     <AppLayout :header="'Define Tax Group'">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
-            <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20"></div>
-            <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10"></div>
-
+        <!-- Header Section -->
+        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 p-6 rounded-t-lg shadow-lg overflow-hidden relative">
+            <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -translate-y-20 translate-x-20 animate-pulse-slow"></div>
+            <div class="absolute bottom-0 left-0 w-20 h-20 bg-white opacity-5 rounded-full translate-y-10 -translate-x-10 animate-pulse-slow animation-delay-500"></div>
             <div class="flex items-center">
-                <div class="bg-gradient-to-br from-pink-500 to-purple-600 p-3 rounded-lg shadow-inner flex items-center justify-center relative overflow-hidden mr-4">
-                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-yellow-300 opacity-30 rounded-full animate-ping-slow"></div>
-                    <div class="absolute -bottom-1 -left-1 w-4 h-4 bg-blue-300 opacity-30 rounded-full animate-ping-slow animation-delay-500"></div>
-                    <i class="fas fa-percentage text-white text-2xl z-10"></i>
+                <div class="bg-gradient-to-br from-cyan-500 to-teal-600 p-3 rounded-lg shadow-inner mr-4">
+                    <i class="fas fa-layer-group text-white text-2xl"></i>
                 </div>
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-1 text-shadow">Define Tax Group</h2>
-                    <p class="text-blue-100 max-w-2xl">Create and manage tax groups used in invoicing</p>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white text-shadow">Define Tax Group</h2>
+                    <p class="text-teal-100">Organize tax types into groups for invoicing.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Body -->
-        <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-indigo-50">
-            <div class="relative">
-                <div class="absolute top-0 right-0">
-                    <span
-                        :class="recordMode === 'new' ? 'bg-blue-500' : (recordMode === 'add' ? 'bg-green-600' : 'bg-orange-500)')"
-                        class="text-white px-4 py-2 rounded-lg shadow-md text-sm font-semibold"
-                    >
-                        Record: {{ recordMode === 'add' ? 'Add' : 'Select' }}
-                    </span>
-                </div>
-            </div>
-
-            <!-- Tax Group Code Row -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
-                <div>
-                    <label for="code" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                        <span class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 shadow-sm">
-                            <i class="fas fa-barcode text-white text-xs"></i>
-                        </span>
-                        Tax Group Code:
-                    </label>
-                    <div class="relative flex group">
-                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                            <i class="fas fa-hashtag"></i>
-                        </span>
-                        <input
-                            id="code"
-                            v-model.trim="form.code"
-                            @input="handleCodeInput"
-                            type="text"
-                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 form-input"
-                            :class="{ filled: !!form.code }"
-                        />
-                        <button
-                            type="button"
-                            @click="openTable"
-                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-r-md transition-all shadow-sm"
-                        >
-                            <i class="fas fa-table"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- New Tax Group Form (only when code is new) -->
-            <div v-if="showNewForm" class="mt-6">
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
-                    <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg mr-3 shadow-md">
-                            <i class="fas fa-plus text-white"></i>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Add New Tax Group</h3>
-                    </div>
-
-                    <form @submit.prevent="saveTaxGroup" class="space-y-5">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tax Group Code</label>
-                                <input type="text" v-model="form.code" readonly class="block w-full px-3 py-2 rounded-md border border-gray-300 bg-gray-50 form-input" />
+        <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6 bg-gradient-to-br from-white to-cyan-50">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left: Main Form (col-span-2) -->
+                    <div class="lg:col-span-2">
+                        <div class="relative bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100 p-8 rounded-2xl shadow-2xl border-t-4 border-cyan-500 overflow-hidden mb-8 animate-fade-in-up">
+                            <div class="absolute -top-16 -right-16 w-40 h-40 bg-cyan-200 rounded-full opacity-30"></div>
+                            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-teal-200 rounded-full opacity-30"></div>
+                            <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
+                                <div class="p-2 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-lg mr-4 shadow-md">
+                                    <i class="fas fa-edit text-white"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-800">Tax Group Management</h3>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tax Group Name</label>
-                                <input type="text" v-model.trim="form.name" class="block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 form-input" />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Sales Tax Applied</label>
-                            <div class="flex items-center space-x-6">
-                                <label class="inline-flex items-center space-x-2">
-                                    <input type="radio" value="Y" v-model="form.sales_tax_applied" />
-                                    <span>Y-Yes</span>
-                                </label>
-                                <label class="inline-flex items-center space-x-2">
-                                    <input type="radio" value="N" v-model="form.sales_tax_applied" />
-                                    <span>N-No</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="pt-2 flex justify-end space-x-2">
-                            <button type="button" @click="resetForm" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md shadow">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tax Group Table Modal -->
-        <div v-if="showTable" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
-            <div class="bg-white rounded-lg shadow-xl w-3/4 max-w-3xl max-h-[80vh] flex flex-col animate-scaleIn">
-                <div class="bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 text-white px-6 py-4 rounded-t-lg flex justify-between items-center">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-white bg-opacity-20 p-2 rounded-lg shadow-inner"><i class="fas fa-table"></i></div>
-                        <h3 class="text-lg font-semibold">Tax Group Table</h3>
-                    </div>
-                    <button @click="showTable = false" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
-                </div>
-
-                <div class="p-4 border-b bg-gradient-to-r from-gray-50 to-white">
-                    <input type="text" v-model="search" placeholder="Search by code or name..." class="w-full pl-3 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
-                </div>
-
-                <div class="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-white to-gray-50">
-                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Code</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/4">Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Select</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="tg in filteredTaxGroups" :key="tg.code" class="hover:bg-blue-50">
-                                    <td class="px-6 py-3 whitespace-nowrap font-medium text-blue-700">{{ tg.code }}</td>
-                                    <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ tg.name }}</td>
-                                    <td class="px-6 py-3 whitespace-nowrap">
-                                        <button @click="selectFromTable(tg)" class="px-3 py-1.5 rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow">
-                                            Select
+                            <!-- Search and Actions -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative z-10">
+                                <div class="md:col-span-2">
+                                    <label for="taxGroupCode" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Tax Group Code:
+                                    </label>
+                                    <div class="relative flex group">
+                                        <input
+                                            id="taxGroupCode"
+                                            v-model.trim="form.code"
+                                            @input="handleCodeInput"
+                                            @keypress.enter="handleEnterKey"
+                                            type="text"
+                                            placeholder="Enter tax group code..."
+                                            class="input-field"
+                                            :readonly="recordMode === 'review'"
+                                            :class="{ 'bg-gray-100 cursor-not-allowed': recordMode === 'review', 'bg-white': recordMode !== 'review' }"
+                                        />
+                                        <button
+                                            type="button"
+                                            @click="openTableModal"
+                                            class="lookup-button from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                                            title="Tax Group Table"
+                                        >
+                                            <i class="fas fa-table"></i>
                                         </button>
-                                    </td>
-                                </tr>
-                                <tr v-if="!loading && filteredTaxGroups.length === 0">
-                                    <td colspan="3" class="px-6 py-6 text-center text-gray-500">No tax groups found</td>
-                                </tr>
-                                <tr v-if="loading">
-                                    <td colspan="3" class="px-6 py-6 text-center text-gray-500">Loading...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-1 flex flex-col justify-end">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
+                                    <button
+                                        type="button"
+                                        @click="handleNew"
+                                        class="primary-button group w-full h-[42px]"
+                                    >
+                                        <span class="shimmer-effect"></span>
+                                        <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300"></i>
+                                        New Tax Group
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Form Fields (shown only when tax group selected or creating new) -->
+                            <div v-if="recordMode !== 'select'" class="relative z-10 space-y-6">
+                                <!-- Tax Group Name -->
+                                <div>
+                                    <label for="taxGroupName" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Tax Group Name:
+                                    </label>
+                                    <input
+                                        id="taxGroupName"
+                                        type="text"
+                                        v-model="form.name"
+                                        placeholder="Enter tax group name..."
+                                        class="modal-input"
+                                        required
+                                    />
+                                </div>
+
+                                <!-- Sales Tax Applied -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Sales Tax Applied:
+                                    </label>
+                                    <div class="flex gap-8">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input 
+                                                type="radio" 
+                                                v-model="form.sales_tax_applied" 
+                                                value="Y" 
+                                                class="w-4 h-4 text-blue-600" 
+                                            />
+                                            <span class="text-sm font-medium">Y-Yes</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input 
+                                                type="radio" 
+                                                v-model="form.sales_tax_applied" 
+                                                value="N" 
+                                                class="w-4 h-4 text-blue-600" 
+                                            />
+                                            <span class="text-sm font-medium">N-No</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Tax Item Screen Button (only in review mode) -->
+                                <div v-if="recordMode === 'review'" class="pt-4 border-t border-gray-200">
+                                    <button
+                                        type="button"
+                                        @click="openTaxItemScreen"
+                                        class="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white rounded-lg flex items-center justify-center gap-2 font-medium shadow-lg hover:shadow-xl transition-all"
+                                    >
+                                        <i class="fas fa-list"></i>
+                                        Tax Item Screen
+                                    </button>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+                                    <button
+                                        v-if="recordMode === 'review'"
+                                        type="button"
+                                        @click="handleDelete"
+                                        class="secondary-button group text-red-600 border-red-300 hover:bg-red-50"
+                                    >
+                                        <i class="fas fa-trash-alt mr-2"></i>
+                                        Delete
+                                    </button>
+                                    <div v-else></div>
+                                    
+                                    <div class="flex gap-3">
+                                        <button
+                                            type="button"
+                                            @click="handleCancel"
+                                            class="secondary-button"
+                                        >
+                                            <i class="fas fa-times mr-2"></i>
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="button"
+                                            @click="handleSave"
+                                            class="primary-button"
+                                        >
+                                            <span class="shimmer-effect"></span>
+                                            <i class="fas fa-save mr-2"></i>
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Information & Quick Links (col-span-1) -->
+                    <div class="flex flex-col space-y-6">
+                        <!-- Information Card -->
+                        <div class="bg-white rounded-xl shadow-md border-t-4 border-blue-400 p-6">
+                            <div class="flex items-center mb-2">
+                                <div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-400 to-teal-400 rounded-lg mr-3">
+                                    <i class="fas fa-info text-white text-2xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800">Information</h3>
+                            </div>
+                            <hr class="my-2 border-blue-100">
+                            <div class="text-gray-700 mb-4">
+                                Use this form to define tax groups for invoicing. Tax groups categorize similar tax types.
+                            </div>
+                            <div class="bg-blue-50 rounded-lg p-4">
+                                <div class="font-bold text-blue-700 mb-2">Instructions:</div>
+                                <ul class="list-disc pl-5 text-blue-700 space-y-1 text-sm">
+                                    <li>Enter tax group code to search</li>
+                                    <li>Click table button to view all groups</li>
+                                    <li>Fill all required fields</li>
+                                    <li>View tax types per group</li>
+                                    <li>Click Save to apply changes</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Quick Links Card -->
+                        <div class="bg-white rounded-xl shadow-md border-t-4 border-cyan-400 p-6">
+                            <div class="flex items-center mb-2">
+                                <div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-400 rounded-lg mr-3">
+                                    <i class="fas fa-link text-white text-2xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800">Quick Links</h3>
+                            </div>
+                            <hr class="my-2 border-cyan-100">
+                            <div class="space-y-3 mt-4">
+                                <a href="#" class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition">
+                                    <span class="inline-flex items-center justify-center w-9 h-9 bg-green-400 rounded-lg mr-3">
+                                        <i class="fas fa-print text-white text-xl"></i>
+                                    </span>
+                                    <div>
+                                        <div class="font-bold text-green-800">View & Print</div>
+                                        <div class="text-xs text-green-700">Print tax group list</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="flex items-center p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition">
+                                    <span class="inline-flex items-center justify-center w-9 h-9 bg-blue-400 rounded-lg mr-3">
+                                        <i class="fas fa-list text-white text-xl"></i>
+                                    </span>
+                                    <div>
+                                        <div class="font-bold text-blue-800">Tax Types</div>
+                                        <div class="text-xs text-blue-700">Manage tax types per group</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-lg flex justify-end">
-                    <button @click="showTable = false" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg">Exit</button>
+        <!-- Tax Group Modal Component -->
+        <TaxGroupModal
+            v-if="showTableModal"
+            :show="showTableModal"
+            @close="showTableModal = false"
+            @select="onTaxGroupSelected"
+        />
+
+        <!-- Tax Item Screen Modal -->
+        <TaxItemScreenModal
+            v-if="showTaxItemScreen"
+            :show="showTaxItemScreen"
+            :taxGroupCode="form.code"
+            @close="showTaxItemScreen = false"
+        />
+
+        <!-- Loading Overlay -->
+        <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
+            <div class="w-12 h-12 border-4 border-solid border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+
+        <!-- Notification Toast -->
+        <div v-if="notification.show" class="fixed bottom-5 right-5 z-50 shadow-xl rounded-lg transition-all duration-300 transform"
+             :class="{
+                 'bg-green-100 border-l-4 border-green-500': notification.type === 'success',
+                 'bg-red-100 border-l-4 border-red-500': notification.type === 'error',
+                 'bg-yellow-100 border-l-4 border-yellow-500': notification.type === 'warning',
+                 'translate-x-0 opacity-100': notification.show,
+                 'translate-x-full opacity-0': !notification.show
+             }">
+            <div class="p-4 flex items-center">
+                <div class="mr-3">
+                    <i v-if="notification.type === 'success'" class="fas fa-check-circle text-green-500 text-xl"></i>
+                    <i v-else-if="notification.type === 'error'" class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                    <i v-else class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
+                </div>
+                <div>
+                    <p class="font-medium" :class="{
+                        'text-green-800': notification.type === 'success',
+                        'text-red-800': notification.type === 'error',
+                        'text-yellow-800': notification.type === 'warning'
+                    }">{{ notification.message }}</p>
                 </div>
             </div>
         </div>
     </AppLayout>
-    
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, onMounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import TaxGroupModal from '@/Components/TaxGroupModal.vue';
+import TaxItemScreenModal from '@/Components/TaxItemScreenModal.vue';
 import axios from 'axios';
-import { useToast } from '@/Composables/useToast';
-
-const toast = useToast();
 
 // UI State
-const recordMode = ref('new'); // 'new' | 'add' (for new entry only)
-const showTable = ref(false);
+const showTableModal = ref(false);
+const showTaxItemScreen = ref(false);
 const loading = ref(false);
-const search = ref('');
+const saving = ref(false);
+const recordMode = ref('select'); // 'select', 'add', 'review'
 
 // Data
+const taxGroups = ref([]);
 const form = ref({
     code: '',
     name: '',
-    sales_tax_applied: 'Y',
+    sales_tax_applied: 'Y'
+});
+const originalCode = ref(''); // Track original code for updates
+
+// Notification
+const notification = ref({
+    show: false,
+    message: '',
+    type: 'success'
 });
 
-const taxGroups = ref([]);
-
-const filteredTaxGroups = computed(() => {
-    if (!search.value) return taxGroups.value;
-    const q = search.value.toLowerCase();
-    return taxGroups.value.filter(x =>
-        (x.code || '').toLowerCase().includes(q) || (x.name || '').toLowerCase().includes(q)
-    );
-});
-
-const showNewForm = computed(() => !!form.value.code && recordMode.value === 'add');
-
-const resetForm = () => {
-    form.value.name = '';
-    form.value.sales_tax_applied = 'Y';
-    recordMode.value = 'new';
+const showNotification = (message, type = 'success') => {
+    notification.value = {
+        show: true,
+        message,
+        type
+    };
+    setTimeout(() => {
+        notification.value.show = false;
+    }, 3000);
 };
 
-const openTable = async () => {
-    showTable.value = true;
-    await loadTaxGroups();
-};
-
-const selectFromTable = (tg) => {
-    if (!tg) return;
-    form.value.code = tg.code || '';
-    form.value.name = tg.name || '';
-    form.value.sales_tax_applied = (tg.sales_tax_applied === 'N' ? 'N' : 'Y');
-    recordMode.value = 'new'; // selecting existing behaves like review mode (no add form)
-    showTable.value = false;
-    toast.success(`Selected Tax Group: ${form.value.code}`);
-};
-
-const handleCodeInput = async () => {
-    if (!form.value.code) {
-        resetForm();
-        return;
-    }
-    // Check if code exists
-    try {
-        const codeEnc = encodeURIComponent(form.value.code);
-        const res = await fetch(`/api/material-management/tax-groups/${codeEnc}`, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' });
-        if (res.ok) {
-            const data = await res.json();
-            if (data && (data.code || data.name)) {
-                // Exists -> do not show add form, just keep values
-                form.value.name = data.name || '';
-                form.value.sales_tax_applied = data.sales_tax_applied === 'N' ? 'N' : 'Y';
-                recordMode.value = 'new';
-                return;
-            }
-        }
-        // Not found -> switch to add mode
-        form.value.name = '';
-        form.value.sales_tax_applied = 'Y';
-        recordMode.value = 'add';
-    } catch (e) {
-        // If API not available, assume new
-        recordMode.value = 'add';
-    }
-};
-
-const loadTaxGroups = async () => {
+// Methods
+const fetchTaxGroups = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/api/material-management/tax-groups', { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' });
-        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-        const data = await res.json();
-        taxGroups.value = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+        const response = await axios.get('/api/invoices/tax-groups');
+        if (response.data && response.data.success) {
+            taxGroups.value = response.data.data || [];
+        }
     } catch (e) {
+        console.error('Error fetching tax groups:', e);
         taxGroups.value = [];
+        showNotification('Failed to load tax groups.', 'error');
     } finally {
         loading.value = false;
     }
 };
 
-const saveTaxGroup = async () => {
-    if (!form.value.code || !form.value.name) {
-        toast.error('Please fill Tax Group Code and Name');
-        return;
-    }
-    try {
-        const payload = {
-            code: form.value.code,
-            name: form.value.name,
-            sales_tax_applied: form.value.sales_tax_applied,
-        };
-        const res = await axios.post('/api/material-management/tax-groups', payload, { headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } });
-        if (res.data) {
-            toast.success('Tax Group saved');
-            recordMode.value = 'new';
-            await loadTaxGroups();
+const openTableModal = () => {
+    showTableModal.value = true;
+};
+
+const handleNew = () => {
+    // Create new tax group mode
+    form.value = {
+        code: '',
+        name: '',
+        sales_tax_applied: 'Y'
+    };
+    originalCode.value = '';
+    recordMode.value = 'add';
+    showNotification('Create new tax group - Enter code and details', 'success');
+    
+    // Focus on code input
+    setTimeout(() => {
+        const codeInput = document.getElementById('taxGroupCode');
+        if (codeInput) {
+            codeInput.removeAttribute('readonly');
+            codeInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+            codeInput.focus();
         }
-    } catch (e) {
-        toast.error(e?.response?.data?.message || 'Failed to save Tax Group');
+    }, 100);
+};
+
+const handleCodeInput = () => {
+    // User is typing a code
+    const code = form.value.code?.trim();
+    if (code && recordMode.value === 'select') {
+        // Prepare to check if this is new or existing when Enter is pressed
     }
 };
 
+const handleEnterKey = async () => {
+    const code = form.value.code?.trim().toUpperCase();
+    if (!code) return;
+    
+    // Try to find existing tax group
+    try {
+        const response = await axios.get(`/api/invoices/tax-groups/${code}`);
+        if (response.data && response.data.success && response.data.data) {
+            // Found existing tax group
+            onTaxGroupSelected(response.data.data);
+        }
+    } catch (e) {
+        // Not found, treat as new
+        if (e.response?.status === 404) {
+            form.value.code = code;
+            form.value.name = '';
+            form.value.sales_tax_applied = 'Y';
+            originalCode.value = '';
+            recordMode.value = 'add';
+            showNotification('Creating new tax group: ' + code, 'success');
+        } else {
+            console.error('Error checking tax group:', e);
+            showNotification('Error checking tax group', 'error');
+        }
+    }
+};
+
+const onTaxGroupSelected = (group) => {
+    showTableModal.value = false;
+    
+    // Load the selected tax group into form
+    form.value = {
+        code: group.code,
+        name: group.name || '',
+        sales_tax_applied: group.sales_tax_applied || 'Y'
+    };
+    originalCode.value = group.code;
+    recordMode.value = 'review';
+    
+    showNotification('Tax group loaded: ' + group.code, 'success');
+};
+
+const handleCancel = () => {
+    form.value = {
+        code: '',
+        name: '',
+        sales_tax_applied: 'Y'
+    };
+    originalCode.value = '';
+    recordMode.value = 'select';
+};
+
+const handleSave = async () => {
+    if (!form.value.code || !form.value.name) {
+        showNotification('Tax Group Code and Name are required.', 'error');
+        return;
+    }
+    
+    // Show confirmation dialog
+    if (!confirm('Confirm Saving / Updating ?')) {
+        return;
+    }
+    
+    saving.value = true;
+    try {
+        let response;
+        const payload = {
+            code: form.value.code.toUpperCase(),
+            name: form.value.name,
+            sales_tax_applied: form.value.sales_tax_applied || 'Y'
+        };
+        
+        if (recordMode.value === 'add' || !originalCode.value) {
+            // Create new tax group
+            response = await axios.post('/api/invoices/tax-groups', payload);
+        } else {
+            // Update existing tax group
+            response = await axios.put(`/api/invoices/tax-groups/${originalCode.value}`, payload);
+        }
+        
+        const result = response.data;
+        if (result.success) {
+            showNotification(
+                recordMode.value === 'add' ? 'Tax group created successfully!' : 'Tax group updated successfully!',
+                'success'
+            );
+            await fetchTaxGroups();
+            
+            // Keep in review mode after save
+            originalCode.value = form.value.code.toUpperCase();
+            recordMode.value = 'review';
+        } else {
+            showNotification('Error: ' + (result.message || 'Unknown error'), 'error');
+        }
+    } catch (e) {
+        const errorMessage = e.response?.data?.message || e.message || 'An error occurred';
+        console.error('Error saving tax group:', e);
+        showNotification(`Error saving tax group: ${errorMessage}`, 'error');
+    } finally {
+        saving.value = false;
+    }
+};
+
+const handleDelete = async () => {
+    if (!form.value.code) {
+        return;
+    }
+    
+    if (!confirm(`Are you sure you want to delete tax group "${form.value.code}"? This action cannot be undone.`)) {
+        return;
+    }
+    
+    saving.value = true;
+    try {
+        const response = await axios.delete(`/api/invoices/tax-groups/${form.value.code}`);
+        const result = response.data;
+        if (result.success) {
+            showNotification('Tax group deleted successfully.', 'success');
+            await fetchTaxGroups();
+            handleCancel(); // Reset form
+        } else {
+            showNotification('Error deleting tax group: ' + (result.message || 'Unknown error'), 'error');
+        }
+    } catch (e) {
+        const errorMessage = e.response?.data?.message || e.message || 'An error occurred';
+        console.error('Error deleting tax group:', e);
+        showNotification(`Error deleting tax group: ${errorMessage}`, 'error');
+    } finally {
+        saving.value = false;
+    }
+};
+
+const openTaxItemScreen = () => {
+    if (!form.value.code) {
+        showNotification('Please select a tax group first.', 'warning');
+        return;
+    }
+    showTaxItemScreen.value = true;
+};
+
 onMounted(() => {
-    loadTaxGroups();
+    fetchTaxGroups();
 });
 </script>
 
 <style scoped>
-.form-input {
-    transition: all 0.3s ease;
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-.form-input:focus {
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
-    border-color: #6366f1;
+
+.input-field {
+    @apply flex-1 min-w-0 block w-full px-3 py-2 rounded-l-md border-gray-300 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-300 group-hover:border-cyan-400 shadow-sm focus:shadow-md;
 }
-.form-input.filled { border-left: 4px solid #10b981; }
-.animate-fadeIn { animation: fadeIn 0.25s ease-out; }
-.animate-scaleIn { animation: scaleIn 0.3s ease-in-out; }
-@keyframes fadeIn { from { opacity: 0; transform: scale(0.95);} to { opacity: 1; transform: scale(1);} }
-@keyframes scaleIn { from { transform: scale(0.95); opacity: 0;} to { transform: scale(1); opacity: 1;} }
-.text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-.animate-ping-slow { animation: ping-slow 3s ease-in-out infinite; }
-@keyframes ping-slow { 0% { transform: scale(1); opacity: .5;} 50% { transform: scale(1.8);} 100% { transform: scale(2.2); opacity: 0;} }
-.animation-delay-500 { animation-delay: 1.5s; }
+
+.lookup-button {
+    @apply inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 rounded-r-md transition-all duration-300 bg-gradient-to-r text-white shadow-sm hover:shadow-md transform hover:-translate-y-px;
+}
+
+.primary-button {
+    @apply items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold py-2 px-6 rounded-md shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex relative overflow-hidden;
+}
+
+.secondary-button {
+    @apply items-center justify-center bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 font-bold py-2 px-6 rounded-md shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex relative overflow-hidden border border-gray-300;
+}
+
+.modal-input {
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-200 focus:ring-opacity-50 transition-shadow;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px) rotate(-2deg); }
+    75% { transform: translateX(3px) rotate(2deg); }
+}
+.group-hover\:animate-shake:hover {
+    animation: shake 0.3s ease-in-out;
+}
+
+.shimmer-effect {
+    @apply absolute top-0 -left-[150%] h-full w-[50%] skew-x-[-25deg] bg-white/20;
+    animation: shimmer 2.5s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        left: 150%;
+    }
+}
+
+@keyframes pulse-slow {
+    0%, 100% { transform: scale(1); opacity: 0.05; }
+    50% { transform: scale(1.1); opacity: 0.08; }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 5s infinite;
+}
+
+.animation-delay-500 {
+    animation-delay: 0.5s;
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out;
+}
 </style>
-
-

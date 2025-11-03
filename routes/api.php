@@ -790,6 +790,29 @@ Route::put('/invoices/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeCo
 Route::delete('/invoices/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'destroy']);
 Route::post('/invoices/tax-types/seed', [App\Http\Controllers\Invoice\TaxTypeController::class, 'seed']); 
 
+// Invoice Tax Group API routes (CPS-style Define Tax Group)
+Route::get('/invoices/tax-groups', [App\Http\Controllers\Invoice\TaxGroupController::class, 'index']);
+Route::get('/invoices/tax-groups/with-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxGroupsWithTypes']);
+Route::post('/invoices/tax-groups', [App\Http\Controllers\Invoice\TaxGroupController::class, 'store']);
+Route::get('/invoices/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'show']);
+Route::get('/invoices/tax-groups/{code}/tax-items', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxItems']);
+Route::get('/invoices/tax-groups/{code}/tax-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxTypes']);
+Route::post('/invoices/tax-groups/{code}/tax-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'saveTaxTypes']);
+Route::put('/invoices/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'update']);
+Route::delete('/invoices/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'destroy']);
+Route::post('/invoices/tax-groups/seed', [App\Http\Controllers\Invoice\TaxGroupController::class, 'seed']);
+
+// Customer Sales Tax Index routes
+Route::get('/invoices/customer-tax-indices/{customerCode}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'getCustomerIndices']);
+Route::get('/invoices/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'show']);
+Route::post('/invoices/customer-tax-indices', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'store']);
+Route::delete('/invoices/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'destroy']);
+Route::get('/invoices/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'getProductTieups']);
+Route::post('/invoices/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'saveProductTieups']);
+
+// Product Groups API (for modals and lookups)
+Route::get('/product-groups', [App\Http\Controllers\ProductGroupController::class, 'index']);
+
 // Add Receive Destination API routes
 Route::get('/material-management/receive-destinations', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'getReceiveDestinations']);
 Route::post('/material-management/receive-destinations', [App\Http\Controllers\MaterialManagement\SystemRequirement\MmReceiveDestinationController::class, 'store']);
