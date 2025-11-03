@@ -228,19 +228,8 @@ const salesManagementItems = [
         icon: 'fas fa-id-card',
         children: [
           { title: 'Update MC', icon: 'fas fa-edit', route: '/sales-management/system-requirement/master-card/update-mc' },
-          { title: 'Approve MC', icon: 'fas fa-check', route: '/sales-management/system-requirement/master-card/approve-mc' },
-          { title: 'Release Approved MC', icon: 'fas fa-unlock', route: '/sales-management/system-requirement/master-card/realese-approve-mc' },
           { title: 'Obsolete & Reactive MC', icon: 'fas fa-ban', route: '/sales-management/system-requirement/master-card/obsolete-reactive-mc' },
           { title: 'View & Print MC', icon: 'fas fa-print', route: '/sales-management/system-requirement/master-card/view-and-print-MC' },
-          { title: 'View & Print MC Maintenance Log', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/view-and-print-mc-maintenance-log' },
-          { title: 'View & Print MC Approval Log', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/view-and-print-mc-approval-log' },
-          { title: 'View & Print Non-Active MC', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/view-and-print-non-active-mc' },
-          { title: 'Initialized MC Maintenance Log', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/initialized-mc-maintenance-log' },
-          { title: 'View & Print MC Print/DC Block Listing', icon: 'fas fa-file-alt', route: '/sales-management/system-requirement/master-card/view-and-print-mc-print-dc-block-listing' },
-          { title: 'View & Print MC DC Block Matching', icon: 'fas fa-project-diagram', route: '/sales-management/system-requirement/master-card/view-and-print-mc-print-dc-block-matching' },
-          { title: 'View & Print MC by Color', icon: 'fas fa-palette', route: '/sales-management/system-requirement/master-card/view-and-print-mc-by-color' },
-          { title: 'View & Print MC by P/Size P/Quality', icon: 'fas fa-ruler-combined', route: '/sales-management/system-requirement/master-card/view-and-print-mc-by-psize-pquality' },
-          { title: 'View & Print MC by Machine', icon: 'fas fa-cogs', route: '/sales-management/system-requirement/master-card/view-and-print-mc-by-machine' }
         ]
       },
     ]
@@ -250,50 +239,13 @@ const salesManagementItems = [
     icon: 'fas fa-file-invoice-dollar',
     children: [
       {
-        title: 'Setup',
-        icon: 'fas fa-cogs',
-        children: [
-          { title: 'Define SO Config', icon: 'fas fa-cog', route: '/sales-order/setup/define-so-config' },
-          { title: 'Define SO Period', icon: 'fas fa-calendar-alt', route: '/sales-order/setup/define-so-period' },
-          { title: 'Define SO Rough Cut', icon: 'fas fa-cut', route: '/sales-order/setup/define-so-rough-cut' },
-          { title: 'Define AC# Auto WO', icon: 'fas fa-file-invoice', route: '/sales-order/setup/define-ac-auto-wo' },
-          { title: 'Define MC Auto WO', icon: 'fas fa-file-invoice-dollar', route: '/sales-order/setup/define-mc-auto-wo' },
-          { title: 'Print SO Period', icon: 'fas fa-print', route: '/sales-order/setup/print-so-period' },
-          { title: 'Print SO Rough Cut', icon: 'fas fa-print', route: '/sales-order/setup/print-so-rough-cut' },
-          { title: 'Print AC# Auto WO', icon: 'fas fa-print', route: '/sales-order/setup/print-ac-auto-wo' },
-          { title: 'Print MC Auto WO', icon: 'fas fa-print', route: '/sales-order/setup/print-mc-auto-wo' },
-        ]
-      },
-      {
         title: 'Transaction',
         icon: 'fas fa-exchange-alt',
         children: [
           { title: 'Prepare MC SO', icon: 'fas fa-file-invoice', route: '/sales-order/transaction/prepare-mc-so' },
-          { title: 'Prepare SB SO', icon: 'fas fa-file-invoice-dollar', route: '/sales-order/transaction/prepare-sb-so' },
-          { title: 'Prepare JIT SO', icon: 'fas fa-clock', route: '/sales-order/transaction/prepare-jit-so' },
           { title: 'Print SO', icon: 'fas fa-print', route: '/sales-order/transaction/print-so' },
           { title: 'Cancel SO', icon: 'fas fa-times-circle', route: '/sales-order/transaction/cancel-so' },
           { title: 'Amend SO', icon: 'fas fa-edit', route: '/sales-order/transaction/amend-so' },
-          { title: 'Amend Approved SO', icon: 'fas fa-check-double', route: '/sales-order/transaction/amend-approved-so' },
-          { title: 'Amend SO Price', icon: 'fas fa-dollar-sign', route: '/sales-order/transaction/amend-so-price' },
-          { title: 'Amend Approved SO Price', icon: 'fas fa-check-dollar', route: '/sales-order/transaction/amend-approved-so-price' },
-          { title: 'Close SO', icon: 'fas fa-check-circle', route: '/sales-order/transaction/close-so' },
-          { title: 'Close SO by Period', icon: 'fas fa-calendar-check', route: '/sales-order/transaction/close-so-by-period' },
-          { title: 'Unclose SO', icon: 'fas fa-undo', route: '/sales-order/transaction/unclose-so' },
-          { title: 'Re-Submit Rejected SO for Credit Check', icon: 'fas fa-redo', route: '/sales-order/transaction/resubmit-rejected-so' },
-          { title: 'Release WO by SO', icon: 'fas fa-unlock', route: '/sales-order/transaction/release-wo-by-so' },
-          { title: 'Print SO Log', icon: 'fas fa-list-alt', route: '/sales-order/transaction/print-so-log' },
-          { title: 'Print SO JIT Tracking', icon: 'fas fa-search', route: '/sales-order/transaction/print-so-jit-tracking' },
-        ]
-      },
-      {
-        title: 'Report',
-        icon: 'fas fa-chart-pie',
-        children: [
-          { title: 'Define Report Format', icon: 'fas fa-file-invoice', route: '/sales-order/report/rough-cut-report/define-report-format' },
-          { title: 'Print Rough Cut Report', icon: 'fas fa-print', route: '/sales-order/report/rough-cut-report/print-rough-cut-report' },
-          { title: 'Print SO Report', icon: 'fas fa-print', route: '/sales-order/report/print-so-report' },
-          { title: 'Print SO Cancel Report', icon: 'fas fa-print', route: '/sales-order/report/print-so-cancel-report' },
         ]
       },
     ]

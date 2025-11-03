@@ -36,7 +36,6 @@ use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\RealeseApproveMcController;
 use App\Http\Controllers\StandardFormulaController;
-use App\Http\Controllers\SOConfigController;
 use App\Http\Controllers\ScoringFormulaController;
 use App\Http\Controllers\ObsolateReactiveMcController;
 use App\Http\Controllers\CustomerSalesTypeController;
@@ -227,122 +226,38 @@ Route::middleware('auth')->group(function () {
          Route::get('/standard-formula/setup-roll-trim-by-product-design', [RollTrimByProductDesignController::class, 'index'])->name('vue.standard-formula.setup-roll-trim-by-product-design');
          Route::get('/standard-formula/setup-roll-trim-by-product-design/view-print', [RollTrimByProductDesignController::class, 'viewPrint'])->name('vue.standard-formula.setup-roll-trim-by-product-design.view-print');
 
-         // Sales Order Setup - Define SO Config
-         Route::get('/sales-order/setup/define-so-config', [SOConfigController::class, 'index'])->name('vue.sales-order.setup.define-so-config');
-
-         // Sales Order Setup - Define SO Period
-         Route::get('/sales-order/setup/define-so-period', function () {
-             return Inertia::render('sales-management/sales-order/setup/define-so-period');
-         })->name('vue.sales-order.setup.define-so-period');
-
-         // Sales Order Setup - Define SO Rough Cut
-         Route::get('/sales-order/setup/define-so-rough-cut', function () {
-             return Inertia::render('sales-management/sales-order/setup/define-so-rough-cut');
-         })->name('vue.sales-order.setup.define-so-rough-cut');
-
-         // Sales Order Setup - Define AC# Auto WO
-         Route::get('/sales-order/setup/define-ac-auto-wo', function () {
-             return Inertia::render('sales-management/sales-order/setup/define-ac-auto-wo');
-         })->name('vue.sales-order.setup.define-ac-auto-wo');
-
-         // Sales Order Setup - Define MC Auto WO
-         Route::get('/sales-order/setup/define-mc-auto-wo', function () {
-             return Inertia::render('sales-management/sales-order/setup/define-mc-auto-wo');
-         })->name('vue.sales-order.setup.define-mc-auto-wo');
-
-         // Sales Order Setup - Print SO Period
-         Route::get('/sales-order/setup/print-so-period', function () {
-             return Inertia::render('sales-management/sales-order/setup/print-so-period');
-         })->name('vue.sales-order.setup.print-so-period');
-
-         // Sales Order Setup - Print SO Rough Cut
-         Route::get('/sales-order/setup/print-so-rough-cut', function () {
-             return Inertia::render('sales-management/sales-order/setup/print-so-rough-cut');
-         })->name('vue.sales-order.setup.print-so-rough-cut');
-
-         // Sales Order Setup - Print AC# Auto WO
-         Route::get('/sales-order/setup/print-ac-auto-wo', function () {
-             return Inertia::render('sales-management/sales-order/setup/print-ac-auto-wo');
-         })->name('vue.sales-order.setup.print-ac-auto-wo');
-
-                 // Sales Order Setup - Print MC Auto WO
-        Route::get('/sales-order/setup/print-mc-auto-wo', function () {
-            return Inertia::render('sales-management/sales-order/setup/print-mc-auto-wo');
-        })->name('vue.sales-order.setup.print-mc-auto-wo');
 
         // Sales Order Transaction - Prepare MC SO
         Route::get('/sales-order/transaction/prepare-mc-so', function () {
             return Inertia::render('sales-management/sales-order/Transaction/PrepareMCSO');
         })->name('vue.sales-order.transaction.prepare-mc-so');
 
-        // Sales Order Product Design API (with CSRF protection)
-        Route::post('/api/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign']);
 
-        // Sales Order Delivery Schedule API (with CSRF protection)
-        Route::post('/api/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
-
-        // Sales Order Transaction - Prepare SB SO
-        Route::get('/sales-order/transaction/prepare-sb-so', function () {
-            return Inertia::render('sales-management/sales-order/Transaction/PrepareSBSO');
-        })->name('vue.sales-order.transaction.prepare-sb-so');
 
         // Sales Order Transaction - Print SO
         Route::get('/sales-order/transaction/print-so', function () {
             return Inertia::render('sales-management/sales-order/Transaction/PrintSO');
         })->name('vue.sales-order.transaction.print-so');
 
-        // Sales Order API routes for reports
-        Route::get('/api/sales-order/print-log', [SalesOrderController::class, 'printLog']);
-        Route::get('/api/sales-order/print-jit-tracking', [SalesOrderController::class, 'printJitTracking']);
+        // Sales Order Transaction - Cancel SO
+        Route::get('/sales-order/transaction/cancel-so', function () {
+            return Inertia::render('sales-management/sales-order/Transaction/CancelSO');
+        })->name('vue.sales-order.transaction.cancel-so');
 
-        // Get current authenticated user info (for PrintSO.vue)
-        Route::get('/api/user/current', function() {
-            // Clean any output buffers to prevent BOM issues
-            while (ob_get_level()) {
-                ob_end_clean();
-            }
+        // Sales Order Transaction - Amend SO
+        Route::get('/sales-order/transaction/amend-so', function () {
+            return Inertia::render('sales-management/sales-order/Transaction/AmendSO');
+        })->name('vue.sales-order.transaction.amend-so');
 
-            $user = Auth::user();
-            if (!$user) {
-                Log::warning('User not authenticated in /api/user/current');
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not authenticated'
-                ], 401, ['Content-Type' => 'application/json; charset=utf-8']);
-            }
 
-            // Log user data for debugging
-            Log::info('Web /api/user/current - Current user data:', [
-                'user_id' => $user->user_id,
-                'username' => $user->username,
-                'official_name' => $user->official_name,
-                'official_title' => $user->official_title
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'user_id' => $user->user_id ?? $user->username ?? 'N/A',
-                    'username' => $user->username ?? 'N/A',
-                    'official_name' => $user->official_name ?? $user->name ?? 'N/A',
-                    'official_title' => $user->official_title ?? 'N/A'
-                ]
-            ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
-        });
-
-        // Print SO API routes
-        Route::post('/api/so-report', [App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController::class, 'apiGenerateSoReport']);
-        Route::get('/api/sales-order/{soNumber}/delivery-schedules', [SalesOrderController::class, 'getDeliverySchedules']);
-
-        // Sales Order API routes
+        // Essential Sales Order API routes only
         Route::post('/api/sales-order', [SalesOrderController::class, 'store']);
         Route::get('/api/sales-order/master-card/{mcSeq}', [SalesOrderController::class, 'getMasterCard']);
-        Route::get('/api/sales-order/product-design/{masterCardSeq}', [SalesOrderController::class, 'getProductDesignData']);
         Route::get('/api/sales-order/salesperson/{salespersonCode}', [SalesOrderController::class, 'getSalesperson']);
-        Route::post('/api/sales-order/product-design', [SalesOrderController::class, 'saveProductDesign']);
-        Route::post('/api/sales-order/delivery-schedule', [SalesOrderController::class, 'saveDeliverySchedule']);
-        Route::get('/api/sales-order/{soNumber}/delivery-schedule-summary', [SalesOrderController::class, 'getDeliveryScheduleSummary']);
         Route::get('/api/sales-orders', [SalesOrderController::class, 'getSalesOrders']);
+        
+        // Print SO API route (minimal for Print SO functionality)
+        Route::post('/api/so-report', [App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController::class, 'apiGenerateSoReport']);
 
         // Delivery Order API routes (use web.php to keep session/CSRF context)
         Route::post('/api/delivery-orders', [DeliveryOrderController::class, 'store']);
@@ -356,25 +271,6 @@ Route::middleware('auth')->group(function () {
 
         // Delivery Order Transaction routes moved to warehouse management section
 
-         // Sales Order Report - Rough Cut Report - Define Report Format
-         Route::get('/sales-order/report/rough-cut-report/define-report-format', function () {
-             return Inertia::render('sales-management/sales-order/report/rough-cut-report/define-report-format');
-         })->name('vue.sales-order.report.rough-cut-report.define-report-format');
-
-         // Sales Order Report - Rough Cut Report - Print Rough Cut Report
-         Route::get('/sales-order/report/rough-cut-report/print-rough-cut-report', function () {
-             return Inertia::render('sales-management/sales-order/report/rough-cut-report/print-rough-cut-report');
-         })->name('vue.sales-order.report.rough-cut-report.print-rough-cut-report');
-
-         // Sales Order Report - Print SO Cancel Report
-         Route::get('/sales-order/report/print-so-cancel-report', function () {
-             return Inertia::render('sales-management/sales-order/report/print-so-cancel-report');
-         })->name('vue.sales-order.report.print-so-cancel-report');
-
-         // Sales Order Report - Print SO Report
-         Route::get('/sales-order/report/print-so-report', function () {
-             return Inertia::render('sales-management/sales-order/report/print-so-report');
-         })->name('vue.sales-order.report.print-so-report');
 
          Route::get('/scoring-formula', [ScoringFormulaController::class, 'index'])->name('vue.scoring-formula.index');
          Route::get('/scoring-formula/view-print', [ScoringFormulaController::class, 'viewAndPrint'])->name('vue.scoring-formula.view-print');
@@ -1677,11 +1573,6 @@ Route::get('/material-management/system-requirement/inventory-setup/unlock-sku-u
 // Add route for CustomerWarehouseRequirement
 Route::get('/warehouse-management/finished-goods/setup-maintenance/define-customer-warehouse-requirement', [CustomerWarehouseRequirementController::class, 'index'])->name('vue.warehouse-management.finished-goods.setup-maintenance.define-customer-warehouse-requirement');
 
-// Add route for Sales Orders API
-Route::get('/api/sales-orders', [SalesOrderController::class, 'getSalesOrders']);
-
-// Add route for Sales Orders API
-Route::get('/api/sales-orders', [SalesOrderController::class, 'getSalesOrders']);
 
         // Update MC Routes
         Route::prefix('update-mc')->group(function () {

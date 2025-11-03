@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\StandardFormulaController;
-use App\Http\Controllers\SOConfigController;
 use App\Http\Controllers\UpdateCustomerAccountController;
 use App\Http\Controllers\CustomerAlternateAddressController;
 use App\Http\Controllers\CorrugatorConfigController;
@@ -259,10 +258,6 @@ Route::get('/standard-formula', [StandardFormulaController::class, 'apiIndex']);
 Route::post('/standard-formula', [StandardFormulaController::class, 'apiStore']);
 Route::post('/standard-formula/seed', [StandardFormulaController::class, 'apiSeed']);
 
-// SO Config API routes
-Route::post('/so-config', [SOConfigController::class, 'apiStore']); 
-Route::get('/so-periods', [SOConfigController::class, 'apiIndexPeriods']);
-Route::get('/so-rough-cut-capacity', [SOConfigController::class, 'apiIndexRoughCutCapacity']);
 
 // Customer Accounts API routes
 Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
@@ -378,18 +373,9 @@ Route::get('/customer-service/delivery-schedule-data', [CustomerServiceControlle
 Route::get('/customer-service/finished-goods-data', [CustomerServiceController::class, 'apiFinishedGoodsData']);
 Route::get('/customer-service/production-monitoring-data', [CustomerServiceController::class, 'apiProductionMonitoringData']);
 
-// Sales Order API routes
-// Route moved to web.php for CSRF protection
-// Route::post('/sales-order', [App\Http\Controllers\SalesOrderController::class, 'store']);
-// Route moved to web.php for CSRF protection
-// Route::post('/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
-Route::get('/sales-order/delivery-schedule/{soNumber}', [App\Http\Controllers\SalesOrderController::class, 'getDeliveryScheduleSummary']);
-// Route moved to web.php for CSRF protection
-// Route::post('/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign'])->middleware('api.csrf');
+// Essential Sales Order API routes (read-only)
 Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderController::class, 'getCustomer']); 
-// Save to legacy-style SO table (CPS compatibility)
 Route::post('/sales-order/save-to-so', [App\Http\Controllers\SalesOrderController::class, 'apiStoreToSo']);
-// Get sales orders for Print SO and Sales Order Table Modal
 Route::get('/sales-orders', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrders']);
 
 // Debug route to test sales order data directly
@@ -416,8 +402,6 @@ Route::get('/debug/sales-orders', function(\Illuminate\Http\Request $request) {
     ]);
 });
 
-// Get sales order detail by SO number
-Route::get('/sales-order/{soNumber}/detail', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrderDetail']);
 
 // Get current authenticated user info
 Route::get('/user/current', function() {
