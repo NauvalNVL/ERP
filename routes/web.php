@@ -23,6 +23,7 @@ use App\Http\Controllers\PaperFluteController;
 use App\Http\Controllers\PaperQualityController;
 use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\FinishingController;
+use App\Http\Controllers\StitchWireController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\ForeignCurrencyController;
@@ -255,7 +256,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/api/sales-order/master-card/{mcSeq}', [SalesOrderController::class, 'getMasterCard']);
         Route::get('/api/sales-order/salesperson/{salespersonCode}', [SalesOrderController::class, 'getSalesperson']);
         Route::get('/api/sales-orders', [SalesOrderController::class, 'getSalesOrders']);
-        
+
         // Print SO API route (minimal for Print SO functionality)
         Route::post('/api/so-report', [App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController::class, 'apiGenerateSoReport']);
 
@@ -376,6 +377,11 @@ Route::middleware('auth')->group(function () {
          Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
          // Alias for search menu
          Route::get('/define-finishing', [FinishingController::class, 'vueIndex'])->name('vue.define-finishing');
+
+         Route::get('/stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.stitch-wire.index');
+         Route::get('/stitch-wire/view-print', [StitchWireController::class, 'vueViewAndPrint'])->name('vue.stitch-wire.view-print');
+         // Alias for search menu
+         Route::get('/define-stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.define-stitch-wire');
 
          // Customer Account Routes
          Route::get('/customer-group', function () {

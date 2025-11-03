@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="flex justify-end p-4 border-t border-gray-200">
-                <button 
+                <button
                     @click="$emit('closeErrorModal')"
                     class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
                     Close
@@ -134,8 +134,8 @@
                     </div>
                     <div class="text-white text-sm">
                         <span class="mr-2">Order:</span>
-                        <select 
-                            :value="mcsSortOrder" 
+                        <select
+                            :value="mcsSortOrder"
                             @input="$emit('update:mcsSortOrder', $event.target.value); $emit('fetchMcsData')"
                             class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs"
                         >
@@ -145,8 +145,8 @@
                     </div>
                     <div class="text-white text-sm">
                         <span class="mr-2">Status:</span>
-                        <select 
-                            :value="mcsStatusFilter" 
+                        <select
+                            :value="mcsStatusFilter"
                             @input="$emit('update:mcsStatusFilter', $event.target.value); $emit('fetchMcsData')"
                             class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs"
                         >
@@ -165,10 +165,10 @@
             <div class="p-2 overflow-y-auto flex-grow" style="max-height: 60vh;">
                 <div class="mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div class="relative w-full md:w-64">
-                        <input 
-                            type="text" 
-                            :value="mcsSearchTerm" 
-                            placeholder="Search..." 
+                        <input
+                            type="text"
+                            :value="mcsSearchTerm"
+                            placeholder="Search..."
                             @input="$emit('updateSearchTerm', $event.target.value)"
                             @keyup.enter="$emit('fetchMcsData')"
                             class="border border-gray-300 rounded-md py-1 px-2 text-xs focus:ring-blue-500 focus:border-blue-500 w-full shadow-sm"
@@ -176,12 +176,12 @@
                         <i class="fas fa-search absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     </div>
                 </div>
-                
+
                 <div v-if="mcsLoading" class="flex justify-center items-center p-4">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                     <span class="ml-2 text-gray-600">Loading data...</span>
                 </div>
-            
+
                 <div v-else-if="mcsError" class="p-4 text-red-500 bg-red-50 rounded border border-red-200">
                     <div class="font-bold mb-1">Error:</div>
                     <div>{{ mcsError }}</div>
@@ -193,7 +193,7 @@
                 <div v-else-if="mcsMasterCards.length === 0" class="p-4 text-amber-700 bg-amber-50 rounded border border-amber-200">
                     No master card records found. Please adjust your filter criteria.
                 </div>
-            
+
                 <table v-else class="min-w-full text-xs border border-gray-300">
                     <thead class="bg-gray-200 sticky top-0">
                         <tr v-if="mcsSortOption === 'mc_model'">
@@ -233,7 +233,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="mcs in mcsMasterCards" :key="mcs.seq" 
+                        <tr v-for="mcs in mcsMasterCards" :key="mcs.seq"
                             class="hover:bg-blue-100 cursor-pointer"
                             :class="{ 'bg-blue-200': selectedMcs?.seq === mcs.seq }"
                             @click="$emit('selectMcsItem', mcs)"
@@ -316,34 +316,34 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-16">Model:</label>
-                                <input 
-                                    type="text" 
-                                    :value="selectedMcs?.model || ''" 
-                                    readonly 
+                                <input
+                                    type="text"
+                                    :value="selectedMcs?.model || ''"
+                                    readonly
                                     class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-white"
                                 />
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-16">Ext. Dim:</label>
                                 <div class="flex items-center space-x-1 flex-1">
-                                    <input 
-                                        type="text" 
-                                        :value="selectedMcs?.ext_dim_1 || ''" 
-                                        readonly 
+                                    <input
+                                        type="text"
+                                        :value="selectedMcs?.ext_dim_1 || ''"
+                                        readonly
                                         class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
                                     />
                                     <span class="text-xs text-gray-600">x</span>
-                                    <input 
-                                        type="text" 
-                                        :value="selectedMcs?.ext_dim_2 || ''" 
-                                        readonly 
+                                    <input
+                                        type="text"
+                                        :value="selectedMcs?.ext_dim_2 || ''"
+                                        readonly
                                         class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
                                     />
                                     <span class="text-xs text-gray-600">x</span>
-                                    <input 
-                                        type="text" 
-                                        :value="selectedMcs?.ext_dim_3 || ''" 
-                                        readonly 
+                                    <input
+                                        type="text"
+                                        :value="selectedMcs?.ext_dim_3 || ''"
+                                        readonly
                                         class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
                                     />
                                 </div>
@@ -351,24 +351,24 @@
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-16">Int. Dim:</label>
                                 <div class="flex items-center space-x-1 flex-1">
-                                    <input 
-                                        type="text" 
-                                        :value="selectedMcs?.int_dim_1 || ''" 
-                                        readonly 
+                                    <input
+                                        type="text"
+                                        :value="selectedMcs?.int_dim_1 || ''"
+                                        readonly
                                         class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
                                     />
                                     <span class="text-xs text-gray-600">x</span>
-                                    <input 
-                                        type="text" 
-                                        :value="selectedMcs?.int_dim_2 || ''" 
-                                        readonly 
+                                    <input
+                                        type="text"
+                                        :value="selectedMcs?.int_dim_2 || ''"
+                                        readonly
                                         class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
                                     />
                                     <span class="text-xs text-gray-600">x</span>
-                                    <input 
-                                        type="text" 
-                                        :value="selectedMcs?.int_dim_3 || ''" 
-                                        readonly 
+                                    <input
+                                        type="text"
+                                        :value="selectedMcs?.int_dim_3 || ''"
+                                        readonly
                                         class="w-16 px-1 py-1 border border-gray-400 text-xs text-center bg-white"
                                     />
                                 </div>
@@ -385,10 +385,10 @@
                     <div class="p-3">
                         <div class="flex items-center">
                             <label class="text-xs font-medium w-16">Model:</label>
-                            <input 
-                                type="text" 
-                                :value="selectedMcs?.model || ''" 
-                                readonly 
+                            <input
+                                type="text"
+                                :value="selectedMcs?.model || ''"
+                                readonly
                                 class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-white"
                             />
                         </div>
@@ -403,10 +403,10 @@
                     <div class="p-3">
                         <div class="flex items-center">
                             <label class="text-xs font-medium w-16">Model:</label>
-                            <input 
-                                type="text" 
-                                :value="selectedMcs?.model || ''" 
-                                readonly 
+                            <input
+                                type="text"
+                                :value="selectedMcs?.model || ''"
+                                readonly
                                 class="flex-1 px-2 py-1 border border-gray-400 text-xs bg-white"
                             />
                         </div>
@@ -423,9 +423,9 @@
                 <button @click="$emit('goToMcsPage', mcsCurrentPage - 1)" :disabled="mcsCurrentPage === 1" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed"><i class="fas fa-chevron-left"></i> Previous</button>
                 <span class="text-gray-600 text-xs">Page {{ mcsCurrentPage }} of {{ mcsLastPage }}</span>
                 <button @click="$emit('goToMcsPage', mcsCurrentPage + 1)" :disabled="mcsCurrentPage === mcsLastPage" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed">Next <i class="fas fa-chevron-right"></i></button>
-                
-                <button 
-                    @click="$emit('selectMcs', selectedMcs)" 
+
+                <button
+                    @click="$emit('selectMcs', selectedMcs)"
                     :disabled="!selectedMcs"
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed">
                     Select
@@ -954,13 +954,13 @@
 
             <!-- Modal Footer -->
             <div class="flex items-center justify-end gap-2 p-3 border-t border-gray-200 bg-gray-100 rounded-b-lg flex-shrink-0">
-                <button 
+                <button
                     type="button"
                     @click="$emit('saveMasterCard', buildPdSetupPayload())"
                     class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
                     Save MasterCard
                 </button>
-                <button 
+                <button
                     type="button"
                     @click="$emit('closeSetupPdModal')"
                     class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded">
@@ -1032,7 +1032,6 @@
     />
     <StitchWireModal
         :show="showStitchWireModal"
-        :items="stitchWireItems"
         @close="showStitchWireModal = false"
         @select="onStitchWireSelected"
     />
@@ -1300,15 +1299,9 @@ const onFinishingSelected = (finishing) => {
 // Stitch Wire Modal
 const showStitchWireModal = ref(false);
 const selectedStitchWireCode = ref('');
-const stitchWireItems = ref([
-    { code: '001', name: 'TIPE 1+1+1+1+1' },
-    { code: '002', name: 'TIPE 2+1+1+1+2' },
-    { code: '003', name: 'TIPE 2+2+2+2+2' }
-]);
 const stitchWirePieces = ref('');
 
 const openStitchWireModal = async () => {
-    // If later there is an API, fetch here similarly to others
     showStitchWireModal.value = true;
 };
 
@@ -2126,4 +2119,4 @@ const buildPdSetupPayload = () => {
 table {
     border-collapse: collapse;
 }
-</style> 
+</style>

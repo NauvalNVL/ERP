@@ -188,6 +188,7 @@ const salesManagementItems = [
           { title: 'Define Color Group', icon: 'fas fa-palette', route: '/color-group' },
           { title: 'Define Color', icon: 'fas fa-fill-drip', route: '/color' },
           { title: 'Define Finishing', icon: 'fas fa-paint-roller', route: '/finishing' },
+          { title: 'Define Stitch Wire', icon: 'fas fa-paperclip', route: '/stitch-wire' },
           // View & Print Section
           { title: 'View & Print Sales Team', icon: 'fas fa-print', route: '/sales-team/view-print' },
           { title: 'View & Print Salesperson', icon: 'fas fa-print', route: '/sales-person/view-print' },
@@ -203,7 +204,8 @@ const salesManagementItems = [
           { title: 'View & Print Scoring Tool', icon: 'fas fa-print', route: '/scoring-tool/view-print' },
           { title: 'View & Print Color Group', icon: 'fas fa-print', route: '/color-group/view-print' },
           { title: 'View & Print Color', icon: 'fas fa-print', route: '/color/view-print' },
-          { title: 'View & Print Finishing', icon: 'fas fa-print', route: '/finishing/view-print' }
+          { title: 'View & Print Finishing', icon: 'fas fa-print', route: '/finishing/view-print' },
+          { title: 'View & Print Stitch Wire', icon: 'fas fa-print', route: '/stitch-wire/view-print' }
         ]
       },
       {
@@ -412,4 +414,4 @@ const warehouseManagementItems = [
 .pulse {
   animation: pulse 2s infinite;
 }
-</style> 
+</style>
