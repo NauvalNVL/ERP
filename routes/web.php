@@ -172,7 +172,9 @@ Route::middleware('auth')->group(function () {
          Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('vue.system-security.destroy');
          Route::get('/system-security/amend-password', [UserController::class, 'vueAmendPassword'])->name('vue.system-security.amend-password');
          Route::post('/system-security/update-password', [UserController::class, 'updatePassword'])->name('vue.system-security.update-password');
-         Route::get('/system-security/define-access', [UserController::class, 'vueDefineAccess'])->name('vue.system-security.define-access');
+         Route::get('/system-security/define-access', [UserController::class, 'defineAccess'])->name('vue.system-security.define-access');
+        Route::get('/api/users/search/{userId}', [UserController::class, 'searchUser'])->name('api.users.search');
+        Route::post('/user-permissions/{userId}', [UserController::class, 'updateUserPermissions'])->name('api.user-permissions.update');
          Route::get('/system-security/copy-paste-access', [UserController::class, 'vueCopyPasteAccess'])->name('vue.system-security.copy-paste-access');
          Route::get('/system-security/view-print-user', [UserController::class, 'vueViewPrintUser'])->name('vue.system-security.view-print-user');
 

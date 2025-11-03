@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\UserCps;
+use App\Models\UserPermission;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,7 +17,7 @@ class UserCpsSeeder extends Seeder
             $existingAdmin->delete();
         }
         
-        UserCps::createUser([
+        $adminUser = UserCps::createUser([
             'user_id' => 'ADMIN001',
             'username' => 'superadmin',
             'official_name' => 'Super Administrator',
@@ -29,13 +30,16 @@ class UserCpsSeeder extends Seeder
             'amend_expired_password' => 'Yes'
         ]);
 
+        // Create full permissions for admin
+        UserPermission::createDefaultPermissions('ADMIN001');
+
         // Data sample user
         $existingUser = UserCps::where('userID', 'USER001')->first();
         if ($existingUser) {
             $existingUser->delete();
         }
         
-        UserCps::createUser([
+        $sampleUser = UserCps::createUser([
             'user_id' => 'USER001',
             'username' => 'john.doe',
             'official_name' => 'John Doe',
@@ -47,6 +51,9 @@ class UserCpsSeeder extends Seeder
             'password_expiry_date' => 30,
             'amend_expired_password' => 'No'
         ]);
+
+        // Create full permissions for sample user
+        UserPermission::createDefaultPermissions('USER001');
     }
 }
 

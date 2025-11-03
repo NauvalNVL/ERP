@@ -201,6 +201,36 @@ class UserCps extends Authenticatable
     }
 
     /**
+     * Relationship with UserPermission
+     */
+    public function permissions()
+    {
+        return $this->hasMany(UserPermission::class, 'user_id', 'userID');
+    }
+
+    /**
+     * Check if user has permission for a specific menu
+     */
+    public function hasPermission($menuKey)
+    {
+        return $this->permissions()
+            ->where('menu_key', $menuKey)
+            ->where('can_access', true)
+            ->exists();
+    }
+
+    /**
+     * Get user permissions as array
+     */
+    public function getPermissionsArray()
+    {
+        return $this->permissions()
+            ->where('can_access', true)
+            ->pluck('menu_key')
+            ->toArray();
+    }
+
+    /**
      * Accessor methods for Vue component compatibility
      */
     public function getUserIdAttribute()
