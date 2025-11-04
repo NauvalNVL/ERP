@@ -608,52 +608,109 @@ export default {
             ],
             salesOrderList: [
                 {
-                    soNumber: '11-2025-00133',
-                    customerPO: 'PO/MAS/2025/10/01763',
-                    acNumber: '000552',
-                    mcNumber: '301438',
-                    status: 'Cancel',
-                    location: 'Same'
+                    id: 1,
+                    SO_Num: '11-2025-00145',
+                    PO_Num: 'PO/ABC/2025/11/00234',
+                    AC_Num: '000125',
+                    AC_NAME: 'PT ABADI CEMERLANG MANDIRI',
+                    MCS_Num: 'MC450123',
+                    STS: 'Outstanding',
+                    D_LOC_Num: 'WH01',
+                    SO_DMY: '03/11/2025',
+                    PO_DATE: '01/11/2025',
+                    MODEL: 'SINGLE FACE E-275',
+                    PRODUCT: 'CORRUGATED BOX',
+                    // Legacy field mapping for compatibility
+                    soNumber: '11-2025-00145',
+                    customerPO: 'PO/ABC/2025/11/00234',
+                    acNumber: '000125',
+                    mcNumber: 'MC450123',
+                    status: 'Outstanding',
+                    location: 'WH01'
                 },
                 {
-                    soNumber: '11-2025-00132',
-                    customerPO: 'PO/MAS/2025/10/01763',
-                    acNumber: '000552',
-                    mcNumber: '301438',
-                    status: 'Cancel',
-                    location: 'Same'
+                    id: 2,
+                    SO_Num: '11-2025-00144',
+                    PO_Num: 'PO/XYZ/2025/10/00891',
+                    AC_Num: '000234',
+                    AC_NAME: 'PT XAVIER YUDHA ZENTRAL',
+                    MCS_Num: 'MC450124',
+                    STS: 'Outstanding',
+                    D_LOC_Num: 'WH02',
+                    SO_DMY: '02/11/2025',
+                    PO_DATE: '30/10/2025',
+                    MODEL: 'DOUBLE WALL B-150',
+                    PRODUCT: 'PACKAGING BOX',
+                    // Legacy field mapping for compatibility
+                    soNumber: '11-2025-00144',
+                    customerPO: 'PO/XYZ/2025/10/00891',
+                    acNumber: '000234',
+                    mcNumber: 'MC450124',
+                    status: 'Outstanding',
+                    location: 'WH02'
                 },
                 {
-                    soNumber: '11-2025-00131',
-                    customerPO: 'C387/PD/ISP/X/2025',
-                    acNumber: '000754',
-                    mcNumber: '278744',
-                    status: 'Data',
-                    location: 'J217'
+                    id: 3,
+                    SO_Num: '11-2025-00143',
+                    PO_Num: 'PO/DEF/2025/10/00567',
+                    AC_Num: '000345',
+                    AC_NAME: 'PT DELTA ENGINEERING FABRIKASI',
+                    MCS_Num: 'MC450125',
+                    STS: 'Confirmed',
+                    D_LOC_Num: 'WH01',
+                    SO_DMY: '01/11/2025',
+                    PO_DATE: '28/10/2025',
+                    MODEL: 'TRIPLE WALL TC-200',
+                    PRODUCT: 'HEAVY DUTY BOX',
+                    // Legacy field mapping for compatibility
+                    soNumber: '11-2025-00143',
+                    customerPO: 'PO/DEF/2025/10/00567',
+                    acNumber: '000345',
+                    mcNumber: 'MC450125',
+                    status: 'Confirmed',
+                    location: 'WH01'
                 },
                 {
-                    soNumber: '11-2025-00130',
-                    customerPO: 'C387/PD/ISP/X/2025',
-                    acNumber: '000754',
-                    mcNumber: '278744',
-                    status: 'Data',
-                    location: 'Same'
+                    id: 4,
+                    SO_Num: '11-2025-00142',
+                    PO_Num: 'PO/GHI/2025/10/00789',
+                    AC_Num: '000456',
+                    AC_NAME: 'PT GLOBAL HARMONI INDUSTRI',
+                    MCS_Num: 'MC450126',
+                    STS: 'Outstanding',
+                    D_LOC_Num: 'WH03',
+                    SO_DMY: '31/10/2025',
+                    PO_DATE: '29/10/2025',
+                    MODEL: 'SINGLE FACE E-125',
+                    PRODUCT: 'DISPLAY BOX',
+                    // Legacy field mapping for compatibility
+                    soNumber: '11-2025-00142',
+                    customerPO: 'PO/GHI/2025/10/00789',
+                    acNumber: '000456',
+                    mcNumber: 'MC450126',
+                    status: 'Outstanding',
+                    location: 'WH03'
                 },
                 {
-                    soNumber: '11-2025-00129',
-                    customerPO: 'KDK125100/IB/2943268',
-                    acNumber: '000553',
-                    mcNumber: '000636/4',
-                    status: 'Data',
-                    location: 'Same'
-                },
-                {
-                    soNumber: '11-2025-00128',
-                    customerPO: 'KDK125100/IB/2943268',
-                    acNumber: '000553',
-                    mcNumber: '000636/4',
-                    status: 'Data',
-                    location: 'Same'
+                    id: 5,
+                    SO_Num: '11-2025-00141',
+                    PO_Num: 'PO/JKL/2025/10/00123',
+                    AC_Num: '000567',
+                    AC_NAME: 'PT JAYA KARYA LOGISTIK',
+                    MCS_Num: 'MC450127',
+                    STS: 'Confirmed',
+                    D_LOC_Num: 'WH02',
+                    SO_DMY: '30/10/2025',
+                    PO_DATE: '27/10/2025',
+                    MODEL: 'DOUBLE WALL BC-175',
+                    PRODUCT: 'SHIPPING BOX',
+                    // Legacy field mapping for compatibility
+                    soNumber: '11-2025-00141',
+                    customerPO: 'PO/JKL/2025/10/00123',
+                    acNumber: '000567',
+                    mcNumber: 'MC450127',
+                    status: 'Confirmed',
+                    location: 'WH02'
                 }
             ],
             customerInfo: {
@@ -751,27 +808,109 @@ export default {
         selectSalesOrder() {
             if (this.selectedRowIndex >= 0) {
                 const selectedOrder = this.salesOrderList[this.selectedRowIndex];
+                
+                // Update selectedSO with selected order data
                 this.selectedSO = {
-                    soNumber: selectedOrder.soNumber,
+                    soNumber: selectedOrder.SO_Num || selectedOrder.soNumber,
                     seq: '133',
-                    customerCode: selectedOrder.acNumber,
-                    customerName: this.customerInfo.name,
-                    mcardSeq: selectedOrder.mcNumber,
+                    customerCode: selectedOrder.AC_Num || selectedOrder.acNumber,
+                    customerName: selectedOrder.AC_NAME || 'PT CUSTOMER NAME',
+                    mcardSeq: selectedOrder.MCS_Num || selectedOrder.mcNumber,
                     sheetBreadth: 'SHEET BREADTH 1140 X 825 MM K 1540/M125/K125 CF',
-                    orderMode: this.customerInfo.orderMode,
-                    salesperson: this.customerInfo.salesperson,
-                    salespersonName: 'EKO',
-                    product: 'BOX',
-                    productDescription: 'BOX',
-                    orderStatus: 'Outstanding',
-                    customerPO: selectedOrder.customerPO,
-                    porderDate: '01/11/2025',
+                    orderMode: 'D-Order by Customer + Delivery & Invoice to Customer',
+                    salesperson: 'S103',
+                    salespersonName: 'EKO SALESPERSON',
+                    product: selectedOrder.PRODUCT || 'BOX',
+                    productDescription: selectedOrder.PRODUCT || 'BOX',
+                    orderStatus: selectedOrder.STS || selectedOrder.status,
+                    customerPO: selectedOrder.PO_Num || selectedOrder.customerPO,
+                    porderDate: selectedOrder.PO_DATE || '01/11/2025',
                     analysisCode: 'SLOR',
-                    soDate: new Date().toLocaleDateString(),
-                    status: 'Active',
+                    soDate: selectedOrder.SO_DMY || new Date().toLocaleDateString(),
+                    status: selectedOrder.STS || selectedOrder.status,
                     totalAmount: 150000
                 };
-                this.searchForm.soNumber = selectedOrder.soNumber;
+
+                // Update customerInfo to reflect selected order
+                this.customerInfo = {
+                    name: selectedOrder.AC_NAME || 'PT CUSTOMER NAME',
+                    model: selectedOrder.MODEL || 'SINGLE FACE E-275 / M150 - L 1200 CF',
+                    orderMode: 'D-Order by Customer + Delivery & Invoice to Customer',
+                    salesperson: 'S103',
+                    orderGroup: 'Sales',
+                    orderType: 'S1'
+                };
+
+                // Update orderItems with dynamic data based on selected order
+                this.orderItems = [
+                    {
+                        name: 'PCS',
+                        main: 'LEF',
+                        f1: '1,000',
+                        f2: '500',
+                        f3: '750',
+                        f4: '',
+                        f5: '',
+                        f6: '',
+                        f7: '',
+                        f8: '',
+                        f9: ''
+                    },
+                    {
+                        name: 'UNIT',
+                        main: '',
+                        f1: '',
+                        f2: '',
+                        f3: '',
+                        f4: '',
+                        f5: '',
+                        f6: '',
+                        f7: '',
+                        f8: '',
+                        f9: ''
+                    },
+                    {
+                        name: 'ORDER',
+                        main: '2,250',
+                        f1: '1,000',
+                        f2: '500',
+                        f3: '750',
+                        f4: '',
+                        f5: '',
+                        f6: '',
+                        f7: '',
+                        f8: '',
+                        f9: ''
+                    },
+                    {
+                        name: 'NET DELIVERY',
+                        main: '0',
+                        f1: '0',
+                        f2: '0',
+                        f3: '0',
+                        f4: '',
+                        f5: '',
+                        f6: '',
+                        f7: '',
+                        f8: '',
+                        f9: ''
+                    },
+                    {
+                        name: 'BALANCE',
+                        main: '2,250',
+                        f1: '1,000',
+                        f2: '500',
+                        f3: '750',
+                        f4: '',
+                        f5: '',
+                        f6: '',
+                        f7: '',
+                        f8: '',
+                        f9: ''
+                    }
+                ];
+
+                this.searchForm.soNumber = selectedOrder.SO_Num || selectedOrder.soNumber;
                 this.searchPerformed = true;
                 this.closeModal();
             } else {
@@ -894,6 +1033,10 @@ export default {
 
         getStatusClass(status) {
             switch (status) {
+                case 'Outstanding':
+                    return 'text-orange-600 font-medium';
+                case 'Confirmed':
+                    return 'text-green-600 font-medium';
                 case 'Active':
                     return 'text-green-600 font-medium';
                 case 'Cancel':
@@ -903,6 +1046,8 @@ export default {
                     return 'text-blue-600 font-medium';
                 case 'Completed':
                     return 'text-green-600 font-medium';
+                case 'Processing':
+                    return 'text-purple-600 font-medium';
                 default:
                     return 'text-gray-600';
             }

@@ -1,13 +1,13 @@
 <template>
-    <AppLayout :header="'View & Print Stitch Wire'">
-    <Head title="View & Print Stitch Wire" />
+    <AppLayout :header="'View & Print Glueing Materials'">
+    <Head title="View & Print Glueing Materials" />
 
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-print mr-3"></i> View & Print Stitch Wire
+            <i class="fas fa-print mr-3"></i> View & Print Glueing Materials
         </h2>
-        <p class="text-cyan-100">Preview and print stitch wire data</p>
+        <p class="text-cyan-100">Preview and print glueing material data</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
@@ -17,8 +17,8 @@
                 <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
-                <Link href="/stitch-wire" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Stitch Wire
+                <Link href="/glueing-material" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Glueing Materials
                 </Link>
             </div>
             <div class="relative">
@@ -29,7 +29,7 @@
                     type="text"
                     v-model="searchQuery"
                     class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Search stitch wire..."
+                    placeholder="Search glueing materials..."
                 >
             </div>
         </div>
@@ -41,11 +41,11 @@
                 <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 flex items-center">
                     <div class="flex items-center">
                         <div class="mr-4">
-                            <i class="fas fa-paperclip text-3xl"></i>
+                            <i class="fas fa-vial text-3xl"></i>
                         </div>
                         <div>
-                            <h2 class="text-xl font-bold">STITCH WIRE LIST</h2>
-                            <p class="text-sm opacity-80">View and print stitch wire data</p>
+                            <h2 class="text-xl font-bold">GLUEING MATERIAL LIST</h2>
+                            <p class="text-sm opacity-80">View and print glueing material data</p>
                         </div>
                     </div>
                 </div>
@@ -60,34 +60,40 @@
                             <th @click="sortTable('name')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                 Name <i :class="getSortIcon('name')" class="text-xs"></i>
                             </th>
+                            <th @click="sortTable('description')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
+                                Description <i :class="getSortIcon('description')" class="text-xs"></i>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white">
                         <tr v-if="loading">
-                            <td colspan="2" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                            <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
                                     <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
                                 </div>
-                                <p class="mt-2">Loading stitch wire data...</p>
+                                <p class="mt-2">Loading glueing material data...</p>
                             </td>
                         </tr>
-                        <tr v-else-if="filteredStitchWires.length === 0">
-                            <td colspan="2" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
-                                No stitch wires found.
+                        <tr v-else-if="filteredGlueingMaterials.length === 0">
+                            <td colspan="3" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
+                                No glueing materials found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
                                     <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
                                 </template>
                             </td>
                         </tr>
-                        <tr v-for="(stitchWire, index) in filteredStitchWires" :key="stitchWire.code"
+                        <tr v-for="(material, index) in filteredGlueingMaterials" :key="material.id || material.code"
                             :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
                             class="hover:bg-blue-200">
                             <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm font-medium text-gray-900">{{ stitchWire.code || 'N/A' }}</div>
+                                <div class="text-sm font-medium text-gray-900">{{ material.code || 'N/A' }}</div>
                             </td>
                             <td class="px-4 py-2 border border-gray-300">
-                                <div class="text-sm text-gray-900">{{ stitchWire.name || 'N/A' }}</div>
+                                <div class="text-sm text-gray-900">{{ material.name || 'N/A' }}</div>
+                            </td>
+                            <td class="px-4 py-2 border border-gray-300">
+                                <div class="text-sm text-gray-900">{{ material.description || '-' }}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -96,8 +102,8 @@
                 <!-- Table Footer -->
                 <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 text-sm text-gray-500">
                     <div class="flex items-center justify-between">
-                        <div>Total Stitch Wires: {{ filteredStitchWires.length }}</div>
-                        <div v-if="searchQuery">Filtered from {{ stitchWires.length }} total records</div>
+                        <div>Total Glueing Materials: {{ filteredGlueingMaterials.length }}</div>
+                        <div v-if="searchQuery">Filtered from {{ glueingMaterials.length }} total records</div>
                         <div class="text-xs text-gray-400">Generated: {{ currentDate }}</div>
                     </div>
                 </div>
@@ -127,18 +133,18 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-const stitchWires = ref([]);
+const glueingMaterials = ref([]);
 const loading = ref(true);
 const searchQuery = ref('');
 const sortColumn = ref('code');
 const sortDirection = ref('asc');
 const currentDate = new Date().toLocaleString();
 
-// Fetch stitch wires from API
-const fetchStitchWires = async () => {
+// Fetch Glueing Materials from API
+const fetchglueingMaterials = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/stitch-wires', {
+        const response = await fetch('/api/glueing-materials', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -153,22 +159,22 @@ const fetchStitchWires = async () => {
         const data = await response.json();
 
         if (Array.isArray(data)) {
-            stitchWires.value = data;
+            glueingMaterials.value = data;
         } else if (data.data && Array.isArray(data.data)) {
-            stitchWires.value = data.data;
+            glueingMaterials.value = data.data;
         } else {
-            stitchWires.value = [];
+            glueingMaterials.value = [];
         }
     } catch (error) {
-        console.error('Error fetching stitch wires:', error);
-        stitchWires.value = [];
+        console.error('Error fetching Glueing Materials:', error);
+        glueingMaterials.value = [];
     } finally {
         loading.value = false;
     }
 };
 
 onMounted(async () => {
-    await fetchStitchWires();
+    await fetchglueingMaterials();
     loading.value = false;
 });
 
@@ -193,16 +199,17 @@ const getSortIcon = (column) => {
         : 'fas fa-sort-down text-black';
 };
 
-// Filtered and sorted stitch wires
-const filteredStitchWires = computed(() => {
-    let filtered = [...stitchWires.value];
+// Filtered and sorted Glueing Materials
+const filteredGlueingMaterials = computed(() => {
+    let filtered = [...glueingMaterials.value];
 
     // Apply search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(sw =>
-            (sw.code && sw.code.toLowerCase().includes(query)) ||
-            (sw.name && sw.name.toLowerCase().includes(query))
+        filtered = filtered.filter(material =>
+            (material.code && material.code.toLowerCase().includes(query)) ||
+            (material.name && material.name.toLowerCase().includes(query)) ||
+            (material.description && material.description.toLowerCase().includes(query))
         );
     }
 
@@ -246,26 +253,27 @@ const printTable = () => {
         // Add title
         doc.setFontSize(16);
         doc.setTextColor(37, 99, 235); // Blue color
-        doc.text('STITCH WIRE LIST', 10, 15);
+        doc.text('GLUEING MATERIAL LIST', 10, 15);
 
         // Add subtitle
         doc.setFontSize(10);
         doc.setTextColor(100);
-        doc.text('View and print stitch wire data', 10, 22);
+        doc.text('View and print glueing material data', 10, 22);
 
         // Prepare table data
-        const tableData = filteredStitchWires.value.map(sw => [
-            sw.code || 'N/A',
-            sw.name || 'N/A'
+        const tableData = filteredGlueingMaterials.value.map(material => [
+            material.code || 'N/A',
+            material.name || 'N/A',
+            material.description || '-'
         ]);
 
-        // Add table using autoTable - call via imported function
+        // Add table using autoTable
         autoTable(doc, {
             startY: 28,
-            head: [['Code', 'Name']],
+            head: [['Code', 'Name', 'Description']],
             body: tableData,
             theme: 'grid',
-            tableWidth: 'auto',  // Let autoTable calculate optimal widths
+            tableWidth: 'auto',
             headStyles: {
                 fillColor: [37, 99, 235], // Blue background
                 textColor: [255, 255, 255], // White text
@@ -286,46 +294,26 @@ const printTable = () => {
 
         // Add footer
         const pageCount = doc.internal.getNumberOfPages();
-        const pageHeight = doc.internal.pageSize.height;
-
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
             doc.setFontSize(8);
             doc.setTextColor(100);
-            doc.text(
-                `Total Stitch Wires: ${filteredStitchWires.value.length} | Generated: ${currentDate}`,
-                10,
-                pageHeight - 10
-            );
-            doc.text(
-                `Page ${i} of ${pageCount}`,
-                doc.internal.pageSize.width - 35,
-                pageHeight - 10
-            );
+
+            // Page number
+            const pageText = `Page ${i} of ${pageCount}`;
+            doc.text(pageText, doc.internal.pageSize.width - 30, doc.internal.pageSize.height - 10);
+
+            // Date
+            doc.text(`Printed: ${new Date().toLocaleString()}`, 10, doc.internal.pageSize.height - 10);
         }
 
-        // Save PDF
-        doc.save(`stitch-wire-list-${new Date().getTime()}.pdf`);
+        // Save the PDF
+        doc.save(`glueing-material-list-${new Date().getTime()}.pdf`);
     } catch (error) {
         console.error('Error generating PDF:', error);
-        alert('Error generating PDF. Please try again.');
+        alert('Failed to generate PDF. Please try again.');
     }
 };
 </script>
 
-<style scoped>
-@media print {
-    body * {
-        visibility: hidden;
-    }
-    .overflow-x-auto, .overflow-x-auto * {
-        visibility: visible;
-    }
-    .overflow-x-auto {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-    }
-}
-</style>
+

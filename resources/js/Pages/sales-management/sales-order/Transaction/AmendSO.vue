@@ -463,7 +463,7 @@
 
     <!-- Analysis Code Modal -->
     <div v-if="showAnalysisCodeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-7xl max-h-[90vh] overflow-hidden">
+      <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl max-h-[80vh] overflow-hidden">
         <!-- Modal Header -->
         <div class="bg-blue-600 text-white px-6 py-3 flex items-center justify-between">
           <h3 class="text-lg font-semibold">Analysis Code Table</h3>
@@ -473,237 +473,30 @@
         </div>
 
         <!-- Modal Content -->
-        <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Left Column - Form Fields -->
-          <div class="space-y-3">
-            <!-- Current Period -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Current Period:</label>
-                <input 
-                  :value="currentPeriod.month + '/' + currentPeriod.year" 
-                  type="text" 
-                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                  readonly
-                >
-              </div>
-            </div>
-
-            <!-- Sales Order# -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Sales Order#:</label>
-                <input 
-                  v-model="selectedSO.soNumber" 
-                  type="text" 
-                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                  readonly
-                >
-              </div>
-            </div>
-
-            <!-- Customer -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Customer:</label>
-              <input 
-                v-model="selectedSO.customerCode" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- M/Card Seq# -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">M/Card Seq#:</label>
-              <input 
-                v-model="selectedSO.mcardSeq" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- Order Mode -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Order Mode:</label>
-              <input 
-                v-model="selectedSO.orderMode" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- Salesperson -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Salesperson:</label>
-              <input 
-                v-model="selectedSO.salesperson" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- Product -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Product:</label>
-              <input 
-                v-model="selectedSO.product" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- A/C Currency -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">A/C Currency:</label>
-              <input 
-                v-model="selectedSO.currency" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- Exchange Rate -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Exchange Rate:</label>
-              <input 
-                v-model="selectedSO.exchangeRate" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- Analysis Code -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Analysis Code:</label>
-              <input 
-                v-model="selectedSO.analysisCode" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-blue-100"
-                readonly
-              >
-            </div>
-
-            <!-- Cust P/Order# -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Cust P/Order#:</label>
-              <input 
-                v-model="selectedSO.customerPO" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- P/Order Date -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">P/Order Date:</label>
-              <input 
-                v-model="selectedSO.porderDate" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- Set Quantity -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Set Quantity:</label>
-              <input 
-                v-model="selectedSO.setQuantity" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- Order Group -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Order Group:</label>
-              <div class="flex items-center space-x-4">
-                <div class="flex items-center">
-                  <input type="radio" name="modalOrderGroup" value="Sales" v-model="selectedSO.orderGroup" disabled class="mr-1">
-                  <label class="text-xs">Sales</label>
-                </div>
-              </div>
-            </div>
-
-            <!-- Lot Number -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Lot Number:</label>
-              <input 
-                v-model="selectedSO.lotNumber" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- Remark -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Remark:</label>
-              <input 
-                v-model="selectedSO.remark" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- Instruction1 -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Instruction1:</label>
-              <input 
-                v-model="selectedSO.instruction1" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                readonly
-              >
-            </div>
-
-            <!-- Instruction2 -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Instruction2:</label>
-              <input 
-                v-model="selectedSO.instruction2" 
-                type="text" 
-                class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                placeholder="Enter instruction 2..."
-              >
-            </div>
-          </div>
-
-          <!-- Right Column - Analysis Code Table -->
-          <div class="space-y-4">
-            <div class="overflow-x-auto">
-              <table class="w-full border-collapse border border-gray-300 text-sm">
-                <thead>
-                  <tr class="bg-blue-100">
-                    <th class="border border-gray-300 px-3 py-2 text-left font-semibold">CODE</th>
-                    <th class="border border-gray-300 px-3 py-2 text-left font-semibold">NAME</th>
-                    <th class="border border-gray-300 px-3 py-2 text-left font-semibold">GROUP</th>
-                    <th class="border border-gray-300 px-3 py-2 text-left font-semibold">GROUP2</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(code, index) in analysisCodeList" :key="index" 
-                      :class="selectedAnalysisCodeIndex === index ? 'bg-blue-500 text-white' : 'hover:bg-gray-50'"
-                      @click="selectAnalysisCodeRow(index)"
-                      class="cursor-pointer">
-                    <td class="border border-gray-300 px-3 py-2">{{ code.code }}</td>
-                    <td class="border border-gray-300 px-3 py-2">{{ code.name }}</td>
-                    <td class="border border-gray-300 px-3 py-2">{{ code.group }}</td>
-                    <td class="border border-gray-300 px-3 py-2">{{ code.group2 }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+        <div class="p-6">
+          <!-- Analysis Code Table -->
+          <div class="overflow-x-auto mb-4">
+            <table class="w-full border-collapse border border-gray-300 text-sm">
+              <thead>
+                <tr class="bg-blue-100">
+                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">CODE</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">NAME</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">GROUP</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left font-semibold">GROUP2</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(code, index) in analysisCodeList" :key="index" 
+                    :class="selectedAnalysisCodeIndex === index ? 'bg-blue-200' : 'hover:bg-gray-50'"
+                    @click="selectAnalysisCodeRow(index)"
+                    class="cursor-pointer">
+                  <td class="border border-gray-300 px-3 py-2">{{ code.code }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ code.name }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ code.group }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ code.group2 }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -798,12 +591,6 @@ export default {
                     name: 'SPECIFICATION CHANGE',
                     group: 'SO',
                     group2: 'SP'
-                },
-                {
-                    code: 'CUST',
-                    name: 'CUSTOMER REQUEST',
-                    group: 'SO',
-                    group2: 'CR'
                 }
             ]
         }

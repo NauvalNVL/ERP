@@ -33,16 +33,24 @@
 							</tr>
 						</thead>
 						<tbody class="bg-white divide-y divide-gray-200 text-xs">
-							<tr v-for="coat in filteredCoats" :key="coat.id || coat.code"
+							<tr v-if="loading">
+								<td colspan="3" class="px-4 py-4 text-center text-gray-500">
+									<div class="flex items-center justify-center">
+										<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mr-3"></div>
+										<span>Loading chemical coat data...</span>
+									</div>
+								</td>
+							</tr>
+							<tr v-else-if="filteredCoats.length === 0">
+								<td colspan="3" class="px-4 py-4 text-center text-gray-500">No chemical coat data available.</td>
+							</tr>
+							<tr v-else v-for="coat in filteredCoats" :key="coat.id || coat.code"
 								:class="['hover:bg-blue-50 cursor-pointer', selectedCoat && (selectedCoat.id || selectedCoat.code) === (coat.id || coat.code) ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
 								@click="selectRow(coat)"
 								@dblclick="selectAndClose(coat)">
 								<td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ coat.code }}</td>
 								<td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ coat.name }}</td>
-								<td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ coat.dry_end_code }}</td>
-							</tr>
-							<tr v-if="filteredCoats.length === 0">
-								<td colspan="3" class="px-4 py-4 text-center text-gray-500">No chemical coat data available.</td>
+								<td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ coat.dry_end_code || '-' }}</td>
 							</tr>
 						</tbody>
 					</table>
@@ -65,7 +73,7 @@ import { ref, computed, watch } from 'vue';
 
 const props = defineProps({
 	show: Boolean,
-	coats: {
+	items: {
 		type: Array,
 		default: () => []
 	}
@@ -79,7 +87,7 @@ const sortKey = ref('code');
 const sortAsc = ref(true);
 
 const filteredCoats = computed(() => {
-	let rows = props.coats || [];
+	let rows = props.items || [];
 	if (searchQuery.value) {
 		const q = searchQuery.value.toLowerCase();
 		rows = rows.filter(c =>
@@ -93,6 +101,10 @@ const filteredCoats = computed(() => {
 		const bVal = (b[sortKey.value] || '').toString();
 		return sortAsc.value ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
 	});
+});
+
+const loading = computed(() => {
+	return props.items.length === 0;
 });
 
 function selectRow(coat) {

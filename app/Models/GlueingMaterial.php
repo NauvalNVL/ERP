@@ -5,15 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class StitchWire extends Model
+class GlueingMaterial extends Model
 {
     use HasFactory;
 
-    protected $table = 'stitch_wires';
+    protected $table = 'glueing_materials';
 
     protected $fillable = [
         'code',
         'name',
+        'description',
         'is_active'
     ];
 
@@ -22,7 +23,7 @@ class StitchWire extends Model
     ];
 
     /**
-     * Scope a query to only include active stitch wires.
+     * Scope to get only active glueing materials
      */
     public function scopeActive($query)
     {

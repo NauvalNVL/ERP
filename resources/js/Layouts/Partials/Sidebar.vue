@@ -464,6 +464,11 @@ const salesManagementItems = [
           { title: 'Define Color', icon: 'fas fa-fill-drip', route: '/color' },
           { title: 'Define Finishing', icon: 'fas fa-paint-roller', route: '/finishing' },
           { title: 'Define Stitch Wire', icon: 'fas fa-paperclip', route: '/stitch-wire' },
+          { title: 'Define Chemical Coat', icon: 'fas fa-vial', route: '/chemical-coat' },
+          { title: 'Define Reinforcement Tape', icon: 'fas fa-tape', route: '/reinforcement-tape' },
+          { title: 'Define Bundling String', icon: 'fas fa-link', route: '/bundling-string' },
+          { title: 'Define Wrapping Material', icon: 'fas fa-box-open', route: '/wrapping-material' },
+          { title: 'Define Glueing Material', icon: 'fas fa-vial', route: '/glueing-material' },
           // View & Print Section
           { title: 'View & Print Sales Team', icon: 'fas fa-print', route: '/sales-team/view-print' },
           { title: 'View & Print Salesperson', icon: 'fas fa-print', route: '/sales-person/view-print' },
@@ -480,7 +485,12 @@ const salesManagementItems = [
           { title: 'View & Print Color Group', icon: 'fas fa-print', route: '/color-group/view-print' },
           { title: 'View & Print Color', icon: 'fas fa-print', route: '/color/view-print' },
           { title: 'View & Print Finishing', icon: 'fas fa-print', route: '/finishing/view-print' },
-          { title: 'View & Print Stitch Wire', icon: 'fas fa-print', route: '/stitch-wire/view-print' }
+          { title: 'View & Print Stitch Wire', icon: 'fas fa-print', route: '/stitch-wire/view-print' },
+          { title: 'View & Print Chemical Coat', icon: 'fas fa-print', route: '/chemical-coat/view-print' },
+          { title: 'View & Print Reinforcement Tape', icon: 'fas fa-print', route: '/reinforcement-tape/view-print' },
+          { title: 'View & Print Bundling String', icon: 'fas fa-print', route: '/bundling-string/view-print' },
+          { title: 'View & Print Wrapping Material', icon: 'fas fa-print', route: '/wrapping-material/view-print' },
+          { title: 'View & Print Glueing Material', icon: 'fas fa-print', route: '/glueing-material/view-print' }
         ]
       },
       {

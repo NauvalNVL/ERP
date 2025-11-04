@@ -49,7 +49,6 @@ class StitchWireController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => 'required|string|max:50|unique:stitch_wires,code',
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
             'is_active' => 'boolean'
         ]);
 
@@ -64,7 +63,6 @@ class StitchWireController extends Controller
             $stitchWire = StitchWire::create([
                 'code' => $request->code,
                 'name' => $request->name,
-                'description' => $request->description,
                 'is_active' => $request->is_active ?? true
             ]);
 
@@ -95,7 +93,6 @@ class StitchWireController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
             'is_active' => 'boolean'
         ]);
 
@@ -109,7 +106,6 @@ class StitchWireController extends Controller
         try {
             $stitchWire->update([
                 'name' => $request->name,
-                'description' => $request->description,
                 'is_active' => $request->is_active ?? $stitchWire->is_active
             ]);
 

@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class StitchWire extends Model
+class BundlingString extends Model
 {
     use HasFactory;
 
-    protected $table = 'stitch_wires';
+    protected $table = 'bundling_strings';
 
     protected $fillable = [
         'code',
@@ -22,7 +22,7 @@ class StitchWire extends Model
     ];
 
     /**
-     * Scope a query to only include active stitch wires.
+     * Scope to get only active bundling strings
      */
     public function scopeActive($query)
     {

@@ -23,6 +23,7 @@ use App\Http\Controllers\PaperFluteController;
 use App\Http\Controllers\PaperQualityController;
 use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\FinishingController;
+use App\Http\Controllers\StitchWireController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\ForeignCurrencyController;
@@ -486,10 +487,15 @@ Route::get('/color/view-print', [ColorController::class, 'vueViewAndPrint'])->na
 // Alias for search menu
 Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.define-color');
 
-Route::get('/finishing', [FinishingController::class, 'vueIndex'])->name('vue.finishing.index');
-Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
-// Alias for search menu
-Route::get('/define-finishing', [FinishingController::class, 'vueIndex'])->name('vue.define-finishing');
+         Route::get('/finishing', [FinishingController::class, 'vueIndex'])->name('vue.finishing.index');
+         Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
+         // Alias for search menu
+         Route::get('/define-finishing', [FinishingController::class, 'vueIndex'])->name('vue.define-finishing');
+
+         Route::get('/stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.stitch-wire.index');
+         Route::get('/stitch-wire/view-print', [StitchWireController::class, 'vueViewAndPrint'])->name('vue.stitch-wire.view-print');
+         // Alias for search menu
+         Route::get('/define-stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.define-stitch-wire');
 
 // Customer Account Routes
 Route::get('/customer-group', function () {
@@ -1188,11 +1194,11 @@ Route::put('/sales-teams/{id}', [SalesTeamController::class, 'update']);
 Route::delete('/sales-teams/{id}', [SalesTeamController::class, 'destroy']);
 Route::post('/sales-teams/seed', [SalesTeamController::class, 'seed']);
 
-// Scoring Tool API routes
-Route::post('/scoring-tools', [ScoringToolController::class, 'apiStore']);
-Route::put('/scoring-tools/{id}', [ScoringToolController::class, 'update']);
-Route::delete('/scoring-tools/{id}', [ScoringToolController::class, 'destroy']);
-Route::post('/scoring-tools/seed', [ScoringToolController::class, 'seed']);
+    // Scoring Tool API routes
+    Route::post('/scoring-tools', [ScoringToolController::class, 'apiStore']);
+    Route::put('/scoring-tools/{id}', [ScoringToolController::class, 'update']);
+    Route::delete('/scoring-tools/{id}', [ScoringToolController::class, 'destroy']);
+    Route::post('/scoring-tools/seed', [ScoringToolController::class, 'seed']);
 
 // Business Form API routes
 Route::get('/business-forms', [BusinessFormController::class, 'apiIndex']);
