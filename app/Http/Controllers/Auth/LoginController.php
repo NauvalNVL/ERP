@@ -30,7 +30,9 @@ class LoginController extends Controller
 
         try {
             if (Auth::attempt($credentials, $request->remember)) {
+                // Regenerate session and CSRF token for security
                 $request->session()->regenerate();
+                $request->session()->regenerateToken();
                 
                 // Update login info di tabel usercps
                 $user = Auth::user();

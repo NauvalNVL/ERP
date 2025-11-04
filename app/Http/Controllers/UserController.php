@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserCps;
+use App\Models\UserPermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -40,16 +41,25 @@ class UserController extends Controller
             'official_tel' => 'required|digits_between:8,15',
             'password_expiry_date' => 'required|integer|min:0',
             'status' => 'required|in:A,O',
-            'amend_expired_password' => 'required|in:Yes,No'
+            'amend_expired_password' => 'required|in:Yes,No',
+            'permissions' => 'nullable|array'
         ]);
 
         try {
+            DB::beginTransaction();
+            
             $user = UserCps::createUser($validated);
+
+            // User created without any permissions
+            // Permissions will be set separately via Define User Access Permission menu
+            
+            DB::commit();
 
             return redirect()->route('vue.system-security.index')
                 ->with('success', 'User '.$user->userID.' berhasil dibuat');
 
         } catch (\Exception $e) {
+            DB::rollback();
             Log::error('Error creating user: '.$e->getMessage());
             return back()
                 ->withInput()
@@ -248,50 +258,147 @@ class UserController extends Controller
 
     public function getUserPermissions(UserCps $user)
     {
-        // Implementasi untuk mendapatkan daftar permission user
-        // Ini hanya contoh, sesuaikan dengan struktur database Anda
-        $permissions = DB::table('user_permissions')
-            ->where('user_id', $user->id)
-            ->pluck('permission_name')
-            ->toArray();
-        
-        // Jika tabel belum ada, kita berikan array kosong sebagai fallback
-        if (empty($permissions)) {
-            $permissions = [];
+        try {
+            // Get user permissions from user_permissions table
+            $permissions = UserPermission::where('user_id', $user->userID)
+                ->where('can_access', true)
+                ->get(['menu_key', 'menu_name', 'menu_route', 'menu_category', 'menu_parent', 'can_access'])
+                ->toArray();
+            
+            return response()->json($permissions);
+        } catch (\Exception $e) {
+            Log::error('Error getting user permissions: ' . $e->getMessage());
+            return response()->json([], 500);
         }
-        
-        return response()->json($permissions);
     }
 
     public function updateAccess(Request $request, UserCps $user)
     {
         // Validasi input
         $validated = $request->validate([
-            'permissions' => 'required|array'
+            'permissions' => 'nullable|array'
         ]);
         
         try {
-            // Hapus permission lama
-            DB::table('user_permissions')
-                ->where('user_id', $user->id)
-                ->delete();
+            DB::beginTransaction();
             
-            // Tambahkan permission baru
-            foreach ($validated['permissions'] as $permission) {
-                DB::table('user_permissions')->insert([
-                    'user_id' => $user->id,
-                    'permission_name' => $permission,
-                    'created_at' => now(),
-                    'updated_at' => now()
+            // Delete existing permissions for this user
+            UserPermission::where('user_id', $user->userID)->delete();
+            
+            // Create new permissions based on the copied permissions
+            foreach (($validated['permissions'] ?? []) as $permission) {
+                UserPermission::create([
+                    'user_id' => $user->userID,
+                    'menu_key' => $permission['menu_key'],
+                    'menu_name' => $permission['menu_name'],
+                    'menu_route' => $permission['menu_route'],
+                    'menu_category' => $permission['menu_category'],
+                    'menu_parent' => $permission['menu_parent'],
+                    'can_access' => true
                 ]);
             }
             
-            return redirect()->route('vue.system-security.define-access')
-                ->with('success', 'Permissions berhasil diperbarui untuk user: ' . $user->userID);
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Permissions berhasil disalin untuk user: ' . $user->userID
+            ]);
         } catch (\Exception $e) {
-            Log::error('Error updating permissions: ' . $e->getMessage());
-            return redirect()->back()
-                ->with('error', 'Gagal memperbarui permissions: ' . $e->getMessage());
+            DB::rollback();
+            Log::error('Error copying permissions: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyalin permissions: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function defineAccess()
+    {
+        return inertia('system-manager/system-security/DefineAccess');
+    }
+
+    public function searchUser($userId)
+    {
+        try {
+            $user = UserCps::where('userID', $userId)->first();
+            
+            if (!$user) {
+                return response()->json(['user' => null, 'permissions' => []], 404);
+            }
+
+            // Get user's current permissions
+            $userPermissions = UserPermission::where('user_id', $userId)
+                ->where('can_access', true)
+                ->pluck('menu_key')
+                ->toArray();
+
+            return response()->json([
+                'user' => $user,
+                'permissions' => $userPermissions
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error searching user: ' . $e->getMessage());
+            return response()->json(['error' => 'User search failed'], 500);
+        }
+    }
+
+    public function updateUserPermissions(Request $request, $userId)
+    {
+        $validated = $request->validate([
+            'permissions' => 'required|array'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Delete existing permissions
+            UserPermission::where('user_id', $userId)->delete();
+
+            // Create new permissions
+            $menuItems = UserPermission::getAllMenuItems();
+            
+            // Remove duplicates based on menu_key
+            $uniqueMenuItems = [];
+            $seenKeys = [];
+            
+            foreach ($menuItems as $item) {
+                if (!in_array($item['key'], $seenKeys)) {
+                    $uniqueMenuItems[] = $item;
+                    $seenKeys[] = $item['key'];
+                }
+            }
+            
+            foreach ($uniqueMenuItems as $item) {
+                $hasPermission = isset($validated['permissions'][$item['key']]) && $validated['permissions'][$item['key']];
+                
+                UserPermission::create([
+                    'user_id' => $userId,
+                    'menu_key' => $item['key'],
+                    'menu_name' => $item['name'],
+                    'menu_route' => $item['route'],
+                    'menu_category' => $item['category'],
+                    'menu_parent' => $item['parent'],
+                    'can_access' => $hasPermission
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permissions berhasil diperbarui untuk user: ' . $userId
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error updating user permissions: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui permissions: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

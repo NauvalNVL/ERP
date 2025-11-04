@@ -85,6 +85,16 @@ class UserCps extends Authenticatable
     ];
 
     /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'userID';
+    }
+
+    /**
      * Get the name of the unique identifier for the user.
      *
      * @return string
@@ -198,6 +208,36 @@ class UserCps extends Authenticatable
             'EXPIRY_DATE' => now()->addDays($expiryDays)->format('Y-m-d'),
             'EXPIRED' => 'No'
         ]);
+    }
+
+    /**
+     * Relationship with UserPermission
+     */
+    public function permissions()
+    {
+        return $this->hasMany(UserPermission::class, 'user_id', 'userID');
+    }
+
+    /**
+     * Check if user has permission for a specific menu
+     */
+    public function hasPermission($menuKey)
+    {
+        return $this->permissions()
+            ->where('menu_key', $menuKey)
+            ->where('can_access', true)
+            ->exists();
+    }
+
+    /**
+     * Get user permissions as array
+     */
+    public function getPermissionsArray()
+    {
+        return $this->permissions()
+            ->where('can_access', true)
+            ->pluck('menu_key')
+            ->toArray();
     }
 
     /**

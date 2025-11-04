@@ -1,9 +1,10 @@
 import "./bootstrap";
 import { createApp, h } from "vue";
-import { createInertiaApp, Link } from "@inertiajs/vue3";
+import { createInertiaApp, Link, router } from "@inertiajs/vue3";
 import AppLayout from "./Layouts/AppLayout.vue";
 import { ZiggyVue } from 'ziggy-js';
 import { Ziggy } from './ziggy'; // Pastikan path ini benar jika ziggy.js tidak di root js
+import { setupCsrfHandler } from './csrf-handler';
 
 // Fungsi global untuk mendapatkan CSRF token
 window.getCsrfToken = () => {
@@ -112,10 +113,32 @@ createInertiaApp({
         app.use(plugin);
         app.use(ZiggyVue, Ziggy);
         app.mount(el);
+        
+        // Setup CSRF handler after app is mounted
+        setupCsrfHandler();
     },
     progress: {
         color: '#4B5563',
         showSpinner: true,
         delay: 0,
     },
+});
+
+// Global error handler for 419 responses
+router.on('error', (event) => {
+    const response = event.detail.response;
+    if (response && response.status === 419) {
+        console.log('CSRF token expired (419), reloading page...');
+        router.reload({
+            preserveState: false,
+            preserveScroll: false,
+            onSuccess: () => {
+                console.log('Page reloaded with fresh CSRF token');
+            },
+            onError: () => {
+                console.log('Failed to reload, redirecting to login');
+                window.location.href = '/login';
+            }
+        });
+    }
 });

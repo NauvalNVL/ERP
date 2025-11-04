@@ -13,7 +13,7 @@
     <!-- Navigation Menu -->
     <nav class="flex-grow px-2 py-4 space-y-2 overflow-y-auto sidebar-content">
       <!-- Dashboard -->
-      <div class="relative group">
+      <div v-if="hasPermission('dashboard')" class="relative group">
         <Link
           href="/dashboard"
           class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
@@ -26,26 +26,32 @@
 
       <!-- System Manager -->
       <SidebarDropdown
+        v-if="hasPermission('system_manager')"
         title="System Manager"
         icon="fas fa-cogs"
-        :items="systemManagerItems"
+        :items="filterItemsByPermission(systemManagerItems)"
         :current-path="currentPath"
+        :has-permission="hasPermission"
       />
 
       <!-- Sales Management -->
       <SidebarDropdown
+        v-if="hasPermission('sales_management')"
         title="Sales Management"
         icon="fas fa-chart-line"
-        :items="salesManagementItems"
+        :items="filterItemsByPermission(salesManagementItems)"
         :current-path="currentPath"
+        :has-permission="hasPermission"
       />
 
       <!-- Warehouse Management -->
       <SidebarDropdown
+        v-if="hasPermission('warehouse_management')"
         title="Warehouse Management"
         icon="fas fa-warehouse"
-        :items="warehouseManagementItems"
+        :items="filterItemsByPermission(warehouseManagementItems)"
         :current-path="currentPath"
+        :has-permission="hasPermission"
       />
     </nav>
 
@@ -96,6 +102,7 @@ import sidebarStore from './sidebarStore';
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
+const userPermissions = computed(() => page.props.auth?.permissions || []);
 const userInitial = computed(() => user.value?.username ? user.value.username.charAt(0).toUpperCase() : 'G');
 const currentPath = computed(() => page.url);
 
@@ -112,15 +119,283 @@ const isActive = (route) => {
   return currentPath.value === route;
 };
 
+// Check if user has permission for a specific menu
+const hasPermission = (menuKey) => {
+  if (!user.value) return false;
+  return userPermissions.value.includes(menuKey);
+};
+
+// Filter menu items based on permissions (recursive for nested children)
+const filterItemsByPermission = (items) => {
+  return items.map(item => {
+    if (item.children) {
+      // For items with children, filter the children recursively
+      const filteredChildren = item.children
+        .map(child => {
+          if (child.children) {
+            // Handle nested children (sub-sub menu)
+            const nestedFilteredChildren = child.children.filter(nestedChild => {
+              const permissionKey = getPermissionKeyFromTitle(nestedChild.title);
+              return hasPermission(permissionKey);
+            });
+            
+            return {
+              ...child,
+              children: nestedFilteredChildren
+            };
+          } else {
+            // Handle direct children
+            const permissionKey = getPermissionKeyFromTitle(child.title);
+            return hasPermission(permissionKey) ? child : null;
+          }
+        })
+        .filter(child => {
+          // Keep item if it has children or if it passed permission check
+          return child !== null && (child.children?.length > 0 || !child.children);
+        });
+      
+      return {
+        ...item,
+        children: filteredChildren
+      };
+    }
+    return item;
+  });
+};
+
+// Map menu titles to permission keys
+const getPermissionKeyFromTitle = (title) => {
+  const titleMap = {
+    // System Manager
+    'Define User': 'define_user',
+    'Amend User Password': 'amend_user_password',
+    'Define User Access Permission': 'define_user_access_permission',
+    'Copy & Paste User Access Permission': 'copy_paste_user_access_permission',
+    'View & Print User': 'view_print_user',
+    
+    // Sales Management - Sales Configuration
+    'Define Sales Configuration': 'define_sales_configuration',
+    
+    // Sales Management - Standard Requirement
+    'Define Sales Team': 'define_sales_team',
+    'Define Salesperson': 'define_salesperson',
+    'Define Salesperson Team': 'define_salesperson_team',
+    'Define Industry': 'define_industry',
+    'Define Geo': 'define_geo',
+    'Define Product Group': 'define_product_group',
+    'Define Product': 'define_product',
+    'Define Product Design': 'define_product_design',
+    'Define Scoring Tool': 'define_scoring_tool',
+    'Define Paper Quality': 'define_paper_quality',
+    'Define Paper Flute': 'define_paper_flute',
+    'Define Paper Size': 'define_paper_size',
+    'Define Color Group': 'define_color_group',
+    'Define Color': 'define_color',
+    'Define Finishing': 'define_finishing',
+    
+    // Sales Management - Customer Account
+    'Define Customer Group': 'define_customer_group',
+    'Update Customer Account': 'update_customer_account',
+    'Define Customer Alternate Address': 'define_customer_alternate_address',
+    'Define Customer Sales Type': 'define_customer_sales_type',
+    
+    // Sales Management - Customer Account
+    'Obsolete/Reactive Customer A/C': 'obsolete_reactive_customer_ac',
+    
+    // Sales Management - Master Card
+    'Update MC': 'update_mc',
+    'Approve MC': 'approve_mc',
+    'Release Approved MC': 'release_approved_mc',
+    'Obsolete & Reactive MC': 'obsolete_reactive_mc',
+    'View & Print MC': 'view_print_mc',
+    'View & Print MC Maintenance Log': 'view_print_mc_maintenance_log',
+    'View & Print MC Approval Log': 'view_print_mc_approval_log',
+    'View & Print Non-Active MC': 'view_print_non_active_mc',
+    'Initialized MC Maintenance Log': 'initialized_mc_maintenance_log',
+    'View & Print MC Print/DC Block Listing': 'view_print_mc_print_dc_block_listing',
+    'View & Print MC DC Block Matching': 'view_print_mc_dc_block_matching',
+    'View & Print MC by Color': 'view_print_mc_by_color',
+    'View & Print MC by P/Size P/Quality': 'view_print_mc_by_psize_pquality',
+    'View & Print MC by Machine': 'view_print_mc_by_machine',
+    
+    // Sales Management - Standard Requirement
+    'Define Sales Team': 'define_sales_team',
+    'Define Salesperson': 'define_salesperson',
+    'Define Salesperson Team': 'define_salesperson_team',
+    'Define Industry': 'define_industry',
+    'Define Geo': 'define_geo',
+    'Define Product Group': 'define_product_group',
+    'Define Product': 'define_product',
+    'Define Product Design': 'define_product_design',
+    'Define Scoring Tool': 'define_scoring_tool',
+    'Define Paper Quality': 'define_paper_quality',
+    'Obsolete/Unobsolete Paper Quality': 'obsolete_unobsolete_paper_quality',
+    'Define Paper Flute': 'define_paper_flute',
+    'Define Paper Size': 'define_paper_size',
+    'Define Color Group': 'define_color_group',
+    'Define Color': 'define_color',
+    'Define Finishing': 'define_finishing',
+    'View & Print Sales Team': 'view_print_sales_team',
+    'View & Print Salesperson': 'view_print_salesperson',
+    'View & Print Salesperson Team': 'view_print_salesperson_team',
+    'View & Print Industry': 'view_print_industry',
+    'View & Print Geo': 'view_print_geo',
+    'View & Print Product Group': 'view_print_product_group',
+    'View & Print Product': 'view_print_product',
+    'View & Print Product Design': 'view_print_product_design',
+    'View & Print Paper Quality': 'view_print_paper_quality',
+    'View & Print Paper Flute': 'view_print_paper_flute',
+    'View & Print Paper Size': 'view_print_paper_size',
+    'View & Print Scoring Tool': 'view_print_scoring_tool',
+    'View & Print Color Group': 'view_print_color_group',
+    'View & Print Color': 'view_print_color',
+    'View & Print Finishing': 'view_print_finishing',
+    
+    // Sales Management - Customer Account
+    'Define Customer Group': 'define_customer_group',
+    'Update Customer Account': 'update_customer_account',
+    'Define Customer Alternate Address': 'define_customer_alternate_address',
+    'Define Customer Sales Type': 'define_customer_sales_type',
+    'View & Print Customer Group': 'view_print_customer_group',
+    'View & Print Customer Account': 'view_print_customer_account',
+    'View & Print Customer Alternate Address': 'view_print_customer_alternate_address',
+    'View & Print Customer Sales Type': 'view_print_customer_sales_type',
+    'View & Print Non-Active Customer': 'view_print_non_active_customer',
+    
+    // Sales Management - Sales Order
+    'Prepare MC SO': 'prepare_mc_so',
+    'Prepare SB SO': 'prepare_sb_so',
+    'Prepare JIT SO': 'prepare_jit_so',
+    'Print SO': 'print_so',
+    'Cancel SO': 'cancel_so',
+    'Amend SO': 'amend_so',
+    'Amend Approved SO': 'amend_approved_so',
+    'Amend SO Price': 'amend_so_price',
+    'Amend Approved SO Price': 'amend_approved_so_price',
+    'Close SO': 'close_so',
+    'Close SO by Period': 'close_so_by_period',
+    'Unclose SO': 'unclose_so',
+    'Re-Submit Rejected SO for Credit Check': 'resubmit_rejected_so',
+    'Release WO by SO': 'release_wo_by_so',
+    'Print SO Log': 'print_so_log',
+    'Print SO JIT Tracking': 'print_so_jit_tracking',
+    
+    // Sales Order Setup
+    'Define SO Config': 'define_so_config',
+    'Define SO Period': 'define_so_period',
+    'Define SO Rough Cut': 'define_so_rough_cut',
+    'Define AC# Auto WO': 'define_ac_auto_wo',
+    'Define MC Auto WO': 'define_mc_auto_wo',
+    'Print SO Period': 'print_so_period',
+    'Print SO Rough Cut': 'print_so_rough_cut',
+    'Print AC# Auto WO': 'print_ac_auto_wo',
+    'Print MC Auto WO': 'print_mc_auto_wo',
+    
+    // Sales Order Report
+    'Define Report Format': 'define_report_format',
+    'Print Rough Cut Report': 'print_rough_cut_report',
+    'Print SO Report': 'print_so_report',
+    'Print SO Cancel Report': 'print_so_cancel_report',
+    
+    // Customer Service
+    'Customer Service Dashboard': 'customer_service_dashboard',
+    
+    // Warehouse Management - Delivery Order Setup
+    'Define Analysis Code': 'define_analysis_code',
+    'Define Transport Contractor': 'define_transport_contractor',
+    'Define Vehicle Class': 'define_vehicle_class',
+    'Define Vehicle': 'define_vehicle',
+    'Define DORN Code': 'define_dorn_code',
+    'Define Greeting Message': 'define_greeting_message',
+    'Define Alternate Unit': 'define_alternate_unit',
+    'Define Master Card Alternate Unit': 'define_master_card_alternate_unit',
+    'Define D/Order Group': 'define_dorder_group',
+    'Define User\'s D/Order Group': 'define_users_dorder_group',
+    'View & Print Analysis Code': 'view_print_analysis_code',
+    'View & Print Vehicle Class': 'view_print_vehicle_class',
+    'View & Print Vehicle': 'view_print_vehicle',
+    
+    // Warehouse Management - DO Processing
+    'Prepare Delivery Order (Single Item)': 'prepare_delivery_order_single',
+    'Prepare Delivery Order (Multiple Item)': 'prepare_delivery_order_multiple',
+    'Print Delivery Order': 'print_delivery_order',
+    'Print DO Proforma Invoice': 'print_do_proforma_invoice',
+    'Print COA Result by WO#': 'print_coa_result_by_wo',
+    'Print COA Result by SO#': 'print_coa_result_by_so',
+    'Amend Delivery Order': 'amend_delivery_order',
+    'Cancel Delivery Order': 'cancel_delivery_order',
+    'Reconcile Delivery Order Unapplied F/Goods': 'reconcile_do_unapplied_fg',
+    'View & Print Delivery Order Log': 'view_print_do_log',
+    'View & Print Delivery Order Unapplied F/Goods': 'view_print_do_unapplied_fg',
+    'Customer S/Order Delivery Schedule - Obsolote': 'customer_so_delivery_obsolete',
+    'Sales Order Delivery Schedule': 'sales_order_delivery_schedule',
+    
+    // Warehouse Management - DORN Processing
+    'Issue DORN': 'issue_dorn',
+    'Print DORN': 'print_dorn',
+    'Amend DORN': 'amend_dorn',
+    'Cancel DORN': 'cancel_dorn',
+    'View & Print DORN Log': 'view_print_dorn_log',
+    
+    // Warehouse Management - Manual DO Processing
+    'Activate Manual Configuration': 'activate_manual_configuration',
+    'Register Manual Numbers': 'register_manual_numbers',
+    'View & Print Registered Manual Numbers Log': 'view_print_registered_manual_numbers_log',
+    
+    // Warehouse Management - Invoice Setup
+    'Define Tax Type': 'define_tax_type',
+    'Define Tax Group': 'define_tax_group',
+    'Define Customer Sales Tax Index': 'define_customer_sales_tax_index',
+    'View & Print Tax Type': 'view_print_tax_type',
+    'View & Print Tax Group': 'view_print_tax_group',
+    'View & Print Customer Sales Tax Index': 'view_print_customer_sales_tax_index',
+    
+    // Warehouse Management - IV Processing
+    'Prepare Invoice by D/Order (Current Period)': 'prepare_invoice_by_do_current_period',
+    'Prepare Invoice by D/Order (Open Period)': 'prepare_invoice_by_do_open_period',
+    'Print Invoice': 'print_invoice',
+    'Amend Invoice': 'amend_invoice',
+    'Cancel Active Invoice': 'cancel_active_invoice',
+    'View & Print Invoice Log': 'view_print_invoice_log'
+  };
+  
+  return titleMap[title] || title.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+};
+
 const logout = () => {
-  // Use Inertia router for logout
-  router.post('/logout', {}, {
-    preserveScroll: true,
-    onSuccess: () => {
-      window.location.href = '/login';
+  // Use Inertia router for logout with fresh CSRF token
+  router.post('/logout', {
+    _token: page.props.csrf
+  }, {
+    preserveScroll: false,
+    preserveState: false,
+    onStart: () => {
+      console.log('Logout started');
     },
-    onError: () => {
-      console.error('Logout failed');
+    onSuccess: () => {
+      console.log('Logout successful');
+      // Force redirect to login page
+      window.location.replace('/login');
+    },
+    onError: (errors) => {
+      console.error('Logout failed:', errors);
+      // Try to get fresh CSRF and retry once
+      if (!logout.retried) {
+        logout.retried = true;
+        setTimeout(() => {
+          router.reload({
+            onSuccess: () => {
+              logout();
+            }
+          });
+        }, 100);
+      } else {
+        // Force redirect even if logout fails after retry
+        window.location.replace('/login');
+      }
+    },
+    onFinish: () => {
+      console.log('Logout finished');
     }
   });
 };

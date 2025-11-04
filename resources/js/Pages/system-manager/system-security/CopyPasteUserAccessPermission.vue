@@ -208,7 +208,7 @@ export default {
                 return;
             }
 
-            if (this.copyFromUser.id === this.pasteToUser.id) {
+            if (this.copyFromUser.user_id === this.pasteToUser.user_id) {
                 this.showMessage('Cannot copy permissions to the same user', 'error');
                 return;
             }
@@ -217,11 +217,11 @@ export default {
 
             try {
                 // Get permissions from copy-from user
-                const permissionsResponse = await axios.get(`/api/users/${this.copyFromUser.id}/permissions`);
+                const permissionsResponse = await axios.get(`/api/users/${this.copyFromUser.user_id}/permissions`);
                 const permissions = permissionsResponse.data;
 
                 // Paste permissions to paste-to user
-                await axios.post(`/api/users/${this.pasteToUser.id}/permissions`, {
+                await axios.post(`/api/users/${this.pasteToUser.user_id}/permissions`, {
                     permissions: permissions
                 });
 
@@ -237,7 +237,8 @@ export default {
 
             } catch (error) {
                 console.error('Error copying permissions:', error);
-                this.showMessage('Error copying permissions', 'error');
+                const backendMsg = error?.response?.data?.message || error?.response?.data || error?.message || 'Error copying permissions';
+                this.showMessage(backendMsg, 'error');
             } finally {
                 this.isProcessing = false;
             }

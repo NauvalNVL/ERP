@@ -1,90 +1,160 @@
 <template>
     <AppLayout header="Define User Access Permission">
-        <Head title="Define User Access" />
+        <Head title="Define User Access Permission" />
         <div class="container mx-auto px-4 py-8">
-            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                    <i class="fas fa-user-lock text-blue-500 mr-3"></i>Define User Access Permission
-                </h2>
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                            <ShieldCheckIcon class="h-8 w-8 text-blue-600 mr-3" />
+                            Define User Access Permission
+                        </h1>
+                        <p class="text-gray-600 mt-2">Atur permission untuk user yang sudah terdaftar</p>
+                    </div>
+                </div>
 
-                <!-- Search Form -->
-                <div class="mb-8">
-                    <form @submit.prevent="searchUser" class="mb-8">
-                        <div class="flex flex-col md:flex-row md:items-end gap-4">
-                            <div class="flex-1">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Cari User ID
-                                    <span class="text-xs text-gray-500">(Contoh: ADMIN001)</span>
-                                </label>
-                                <input type="text" v-model="form.user_id" 
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                       placeholder="Masukkan User ID" required>
-                            </div>
+                <!-- Search User Section -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl mb-8 border border-blue-200">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <UserIcon class="h-6 w-6 text-blue-600 mr-2" />
+                        Cari User
+                    </h2>
+                    <form @submit.prevent="searchUser" class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                User ID
+                                <span class="text-xs text-gray-500">(Contoh: ADMIN001, USER001)</span>
+                            </label>
+                            <input type="text" 
+                                   v-model="searchForm.user_id" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                   placeholder="Masukkan User ID untuk dicari..."
+                                   required>
+                        </div>
+                        <div class="flex items-end">
                             <button type="submit" 
-                                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-all flex items-center">
-                                <i class="fas fa-search mr-2"></i>Cari User
+                                    :disabled="isSearching"
+                                    class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center">
+                                <SearchIcon class="h-5 w-5 mr-2" />
+                                {{ isSearching ? 'Mencari...' : 'Cari User' }}
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <!-- Permissions Form -->
-                <div v-if="foundUser" class="bg-gray-50 p-6 rounded-xl">
-                    <form @submit.prevent="savePermissions" class="space-y-6">
-                        <input type="hidden" v-model="form.user_id">
-                        
-                        <div class="flex items-center mb-6">
-                            <img :src="'https://ui-avatars.com/api/?name=' + encodeURIComponent(foundUser.official_name) + '&amp;background=random'" 
-                                 class="w-12 h-12 rounded-full mr-4" alt="Avatar">
-                            <div>
-                                <h3 class="text-lg font-semibold">{{ foundUser.official_name }}</h3>
-                                <p class="text-sm text-gray-600">{{ foundUser.user_id }} - {{ foundUser.official_title || 'No Title' }}</p>
+                <!-- Search Results -->
+                <div v-if="searchMessage" class="mb-6 p-4 rounded-lg" :class="searchMessageClass">
+                    <div class="flex items-center">
+                        <component :is="searchMessageIcon" class="h-5 w-5 mr-2" />
+                        {{ searchMessage }}
+                    </div>
+                </div>
+
+                <!-- User Permission Form -->
+                <div v-if="foundUser" class="bg-gradient-to-br from-gray-50 to-blue-50 p-8 rounded-xl border border-gray-200">
+                    <!-- User Info Header -->
+                    <div class="bg-white p-6 rounded-xl mb-8 shadow-sm border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
+                                    {{ foundUser.official_name.charAt(0).toUpperCase() }}
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-gray-900">{{ foundUser.official_name }}</h3>
+                                    <p class="text-gray-600">{{ foundUser.user_id }} • {{ foundUser.official_title || 'No Title' }}</p>
+                                    <p class="text-sm text-gray-500 mt-1">Status: <span class="font-medium" :class="foundUser.status === 'A' ? 'text-green-600' : 'text-red-600'">{{ foundUser.status === 'A' ? 'Active' : 'Inactive' }}</span></p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Total Permissions</p>
+                                <p class="text-3xl font-bold text-blue-600">{{ selectedPermissionsCount }}</p>
+                                <p class="text-xs text-gray-400">dari {{ totalPermissionsCount }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form @submit.prevent="savePermissions" class="space-y-8">
+                        <!-- Select All Toggle -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
+                                    <p class="text-sm text-gray-600">Pilih semua atau hapus semua permission</p>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <SwitchGroup>
+                                        <div class="flex items-center">
+                                            <SwitchLabel class="mr-3 text-sm font-medium text-gray-700">Select All</SwitchLabel>
+                                            <Switch v-model="selectAllPermissions" @click="toggleAllPermissions"
+                                                :class="[selectAllPermissions ? 'bg-blue-600' : 'bg-gray-200', 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2']">
+                                                <span :class="[selectAllPermissions ? 'translate-x-6' : 'translate-x-1', 'inline-block h-4 w-4 transform rounded-full bg-white transition-transform']" />
+                                            </Switch>
+                                        </div>
+                                    </SwitchGroup>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Permission Groups -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Permission Categories -->
+                        <div class="space-y-6">
+                            <!-- Dashboard -->
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4 border-b border-gray-200">
+                                    <h4 class="font-semibold text-gray-900 flex items-center">
+                                        <i class="fas fa-tachometer-alt w-5 h-5 mr-3 text-blue-600"></i>
+                                        Dashboard
+                                        <span class="ml-auto text-sm text-gray-600">({{ getSelectedCountForCategory('dashboard') }}/{{ getCategoryPermissions('dashboard').length }})</span>
+                                    </h4>
+                                </div>
+                                <div class="p-6">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" v-model="form.permissions.dashboard" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                        <span class="ml-3 text-sm text-gray-700">Dashboard Access</span>
+                                    </label>
+                                </div>
+                            </div>
+
                             <!-- System Manager -->
-                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                                <h4 class="font-semibold text-lg mb-4 text-blue-600">
-                                    <i class="fas fa-cogs mr-2"></i>System Manager
-                                </h4>
-                                <div class="space-y-2">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="system_manager_full" 
-                                               id="system_manager_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="system_manager_full" class="ml-2 block text-sm text-gray-900 font-bold">
-                                            Akses Penuh System Manager
-                                        </label>
-                                    </div>
-                                    <hr class="my-2">
-                                    <div class="ml-4 space-y-2">
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="system_security" 
-                                                id="system_security" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="system_security" class="ml-2 block text-sm text-gray-900">
-                                                System Security
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                <button @click="toggleCategory('system_manager')" 
+                                        class="w-full bg-gradient-to-r from-indigo-50 to-indigo-100 px-6 py-4 border-b border-gray-200 text-left hover:from-indigo-100 hover:to-indigo-200 transition-all">
+                                    <h4 class="font-semibold text-gray-900 flex items-center">
+                                        <i class="fas fa-cogs w-5 h-5 mr-3 text-indigo-600"></i>
+                                        System Manager
+                                        <i :class="['fas ml-2 transition-transform', openCategories.system_manager ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
+                                        <span class="ml-auto text-sm text-gray-600">({{ getSelectedCountForCategory('system_manager') }}/{{ getCategoryPermissions('system_manager').length }})</span>
+                                    </h4>
+                                </button>
+                                <div v-show="openCategories.system_manager" class="p-6 space-y-4">
+                                    <!-- Main Permission -->
+                                    <label class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                        <input type="checkbox" v-model="form.permissions.system_manager" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                        <span class="ml-3 text-sm font-medium text-gray-900">System Manager (Main Access)</span>
+                                    </label>
+                                    
+                                    <!-- Sub Permissions -->
+                                    <div class="ml-6 space-y-3">
+                                        <h5 class="text-sm font-medium text-gray-700 mb-3">System Security</h5>
+                                        <div class="grid grid-cols-1 gap-2">
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_user" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-sm text-gray-700">Define User</span>
                                             </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="system_maintenance" 
-                                                id="system_maintenance" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="system_maintenance" class="ml-2 block text-sm text-gray-900">
-                                                System Maintenance
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.amend_user_password" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-sm text-gray-700">Amend User Password</span>
                                             </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="system_administrator" 
-                                                id="system_administrator" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="system_administrator" class="ml-2 block text-sm text-gray-900">
-                                                System Administrator
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_user_access_permission" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-sm text-gray-700">Define User Access Permission</span>
                                             </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="db_integrity" 
-                                                id="db_integrity" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="db_integrity" class="ml-2 block text-sm text-gray-900">
-                                                DB Integrity Check
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.copy_paste_user_access_permission" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-sm text-gray-700">Copy & Paste User Access Permission</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.view_print_user" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-sm text-gray-700">View & Print User</span>
                                             </label>
                                         </div>
                                     </div>
@@ -92,268 +162,334 @@
                             </div>
 
                             <!-- Sales Management -->
-                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                                <h4 class="font-semibold text-lg mb-4 text-green-600">
-                                    <i class="fas fa-chart-line mr-2"></i>Sales Management
-                                </h4>
-                                <div class="space-y-2">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="sales_management_full" 
-                                               id="sales_management_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="sales_management_full" class="ml-2 block text-sm text-gray-900 font-bold">
-                                            Akses Penuh Sales Management
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                <button @click="toggleCategory('sales_management')" 
+                                        class="w-full bg-gradient-to-r from-green-50 to-green-100 px-6 py-4 border-b border-gray-200 text-left hover:from-green-100 hover:to-green-200 transition-all">
+                                    <h4 class="font-semibold text-gray-900 flex items-center">
+                                        <i class="fas fa-chart-line w-5 h-5 mr-3 text-green-600"></i>
+                                        Sales Management
+                                        <i :class="['fas ml-2 transition-transform', openCategories.sales_management ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
+                                        <span class="ml-auto text-sm text-gray-600">({{ getSelectedCountForCategory('sales_management') }}/{{ getCategoryPermissions('sales_management').length }})</span>
+                                    </h4>
+                                </button>
+                                <div v-show="openCategories.sales_management" class="p-6 space-y-6 max-h-96 overflow-y-auto">
+                                    <!-- Main Permission -->
+                                    <label class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                        <input type="checkbox" v-model="form.permissions.sales_management" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                        <span class="ml-3 text-sm font-medium text-gray-900">Sales Management (Main Access)</span>
+                                    </label>
+                                    
+                                    <!-- Sales Configuration -->
+                                    <div class="border-l-4 border-green-200 pl-4">
+                                        <h5 class="text-sm font-medium text-gray-700 mb-3">Sales Configuration</h5>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" v-model="form.permissions.define_sales_configuration" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                            <span class="ml-3 text-sm text-gray-700">Define Sales Configuration</span>
                                         </label>
                                     </div>
-                                    <hr class="my-2">
-                                    <div class="ml-4 space-y-2">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="sales_dashboard" 
-                                               id="sales_dashboard" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="sales_dashboard" class="ml-2 block text-sm text-gray-900">
-                                            Dashboard Sales
-                                        </label>
-                                    </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="sales_orders" 
-                                                id="sales_orders" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="sales_orders" class="ml-2 block text-sm text-gray-900">
-                                                Sales Orders
-                                            </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="customer_management" 
-                                                id="customer_management" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="customer_management" class="ml-2 block text-sm text-gray-900">
-                                                Customer Management
-                                        </label>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="sales_report" 
-                                               id="sales_report" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="sales_report" class="ml-2 block text-sm text-gray-900">
-                                                Sales Reports
-                                        </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Material Management -->
-                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                                <h4 class="font-semibold text-lg mb-4 text-purple-600">
-                                    <i class="fas fa-pallet mr-2"></i>Material Management
-                                </h4>
-                                <div class="space-y-2">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="material_management_full" 
-                                               id="material_management_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="material_management_full" class="ml-2 block text-sm text-gray-900 font-bold">
-                                            Akses Penuh Material Management
-                                        </label>
-                                    </div>
-                                    <hr class="my-2">
-                                    <div class="ml-4 space-y-2">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="material_inventory" 
-                                               id="material_inventory" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="material_inventory" class="ml-2 block text-sm text-gray-900">
-                                                Inventory Management
-                                        </label>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="material_orders" 
-                                               id="material_orders" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="material_orders" class="ml-2 block text-sm text-gray-900">
-                                                Purchase Orders
+                                    <!-- Standard Requirement -->
+                                    <div class="border-l-4 border-green-200 pl-4">
+                                        <h5 class="text-sm font-medium text-gray-700 mb-3">Standard Requirement</h5>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+                                            <!-- Basic Define Permissions -->
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_sales_team" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Sales Team</span>
                                             </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="material_suppliers" 
-                                                id="material_suppliers" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="material_suppliers" class="ml-2 block text-sm text-gray-900">
-                                                Supplier Management
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_salesperson" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Salesperson</span>
                                             </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="material_report" 
-                                                id="material_report" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="material_report" class="ml-2 block text-sm text-gray-900">
-                                                Material Reports
-                                        </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_salesperson_team" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Salesperson Team</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_industry" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Industry</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_geo" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Geo</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_product_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Product Group</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_product" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Product</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_product_design" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Product Design</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_scoring_tool" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Scoring Tool</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_paper_quality" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Paper Quality</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_paper_flute" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Paper Flute</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_paper_size" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Paper Size</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_color_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Color Group</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_color" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Color</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_finishing" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Finishing</span>
+                                            </label>
+                                            
+                                            <!-- View & Print Permissions -->
+                                            <div class="col-span-full">
+                                                <div class="border-t border-gray-200 pt-3 mt-3">
+                                                    <h6 class="text-xs font-medium text-gray-600 mb-2">View & Print Permissions</h6>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_sales_team" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Sales Team</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_salesperson" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Salesperson</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_product_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Product Group</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_product" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Product</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            <!-- Production Management -->
-                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                                <h4 class="font-semibold text-lg mb-4 text-red-600">
-                                    <i class="fas fa-industry mr-2"></i>Production Management
-                                </h4>
-                                <div class="space-y-2">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="production_management_full" 
-                                               id="production_management_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="production_management_full" class="ml-2 block text-sm text-gray-900 font-bold">
-                                            Akses Penuh Production Management
-                                        </label>
+                                    <!-- Customer Account -->
+                                    <div class="border-l-4 border-green-200 pl-4">
+                                        <h5 class="text-sm font-medium text-gray-700 mb-3">Customer Account</h5>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_customer_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Customer Group</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.update_customer_account" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Update Customer Account</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_reactive_customer_ac" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Reactive Customer A/C</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_customer_alternate_address" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Customer Alternate Address</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_customer_sales_type" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Customer Sales Type</span>
+                                            </label>
+                                        </div>
+                                        
+                                        <!-- Customer View & Print -->
+                                        <div class="border-t border-gray-200 pt-3 mt-3">
+                                            <h6 class="text-xs font-medium text-gray-600 mb-2">Customer View & Print</h6>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.view_print_customer_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-600">View & Print Customer Group</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.view_print_customer_account" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-600">View & Print Customer Account</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.view_print_customer_alternate_address" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-600">View & Print Customer Alt. Address</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.view_print_customer_sales_type" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-600">View & Print Customer Sales Type</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.view_print_non_active_customer" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-600">View & Print Non-Active Customer</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <hr class="my-2">
-                                    <div class="ml-4 space-y-2">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="production_schedule" 
-                                               id="production_schedule" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="production_schedule" class="ml-2 block text-sm text-gray-900">
-                                                Production Schedule
-                                            </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="production_workorders" 
-                                                id="production_workorders" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="production_workorders" class="ml-2 block text-sm text-gray-900">
-                                                Work Orders
-                                            </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="production_quality" 
-                                                id="production_quality" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="production_quality" class="ml-2 block text-sm text-gray-900">
-                                                Quality Control
-                                            </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="production_report" 
-                                                id="production_report" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="production_report" class="ml-2 block text-sm text-gray-900">
-                                                Production Reports
-                                            </label>
-                                        </div>
+
+                                    <!-- Quick Actions for Sales -->
+                                    <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
+                                        <button @click="selectAllSalesPermissions" 
+                                                class="px-3 py-1 text-xs bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors">
+                                            Select All Sales
+                                        </button>
+                                        <button @click="clearAllSalesPermissions" 
+                                                class="px-3 py-1 text-xs bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors">
+                                            Clear All Sales
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Warehouse Management -->
-                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                                <h4 class="font-semibold text-lg mb-4 text-yellow-600">
-                                    <i class="fas fa-warehouse mr-2"></i>Warehouse Management
-                                </h4>
-                                <div class="space-y-2">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="warehouse_management_full" 
-                                               id="warehouse_management_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="warehouse_management_full" class="ml-2 block text-sm text-gray-900 font-bold">
-                                            Akses Penuh Warehouse Management
-                                        </label>
-                                    </div>
-                                    <hr class="my-2">
-                                    <div class="ml-4 space-y-2">
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="warehouse_inventory" 
-                                                id="warehouse_inventory" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="warehouse_inventory" class="ml-2 block text-sm text-gray-900">
-                                                Warehouse Inventory
-                                            </label>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                <button @click="toggleCategory('warehouse_management')" 
+                                        class="w-full bg-gradient-to-r from-yellow-50 to-yellow-100 px-6 py-4 border-b border-gray-200 text-left hover:from-yellow-100 hover:to-yellow-200 transition-all">
+                                    <h4 class="font-semibold text-gray-900 flex items-center">
+                                        <i class="fas fa-warehouse w-5 h-5 mr-3 text-yellow-600"></i>
+                                        Warehouse Management
+                                        <i :class="['fas ml-2 transition-transform', openCategories.warehouse_management ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
+                                        <span class="ml-auto text-sm text-gray-600">({{ getSelectedCountForCategory('warehouse_management') }}/{{ getCategoryPermissions('warehouse_management').length }})</span>
+                                    </h4>
+                                </button>
+                                <div v-show="openCategories.warehouse_management" class="p-6 space-y-4 max-h-96 overflow-y-auto">
+                                    <!-- Main Permission -->
+                                    <label class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                        <input type="checkbox" v-model="form.permissions.warehouse_management" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                        <span class="ml-3 text-sm font-medium text-gray-900">Warehouse Management (Main Access)</span>
+                                    </label>
+                                    
+                                    <!-- Warehouse Sub Permissions -->
+                                    <div class="space-y-4">
+                                        <!-- Delivery Order Processing -->
+                                        <div class="border-l-4 border-yellow-200 pl-4">
+                                            <h5 class="text-sm font-medium text-gray-700 mb-3">Delivery Order Processing</h5>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.prepare_delivery_order_single" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Prepare DO (Single)</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.prepare_delivery_order_multiple" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Prepare DO (Multiple)</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.print_delivery_order" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Print Delivery Order</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.amend_delivery_order" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Amend Delivery Order</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.cancel_delivery_order" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Cancel Delivery Order</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.print_do_proforma_invoice" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Print DO Proforma Invoice</span>
+                                                </label>
+                                            </div>
                                         </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="warehouse_receiving" 
-                                                id="warehouse_receiving" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="warehouse_receiving" class="ml-2 block text-sm text-gray-900">
-                                                Receiving & Putaway
-                                            </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="warehouse_shipping" 
-                                                id="warehouse_shipping" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="warehouse_shipping" class="ml-2 block text-sm text-gray-900">
-                                                Shipping & Fulfillment
-                                            </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="warehouse_report" 
-                                                id="warehouse_report" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="warehouse_report" class="ml-2 block text-sm text-gray-900">
-                                                Warehouse Reports
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Data Mining -->
-                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                                <h4 class="font-semibold text-lg mb-4 text-indigo-600">
-                                    <i class="fas fa-chart-pie mr-2"></i>Data Mining
-                                </h4>
-                                <div class="space-y-2">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" v-model="permissions" value="data_mining_full" 
-                                               id="data_mining_full" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                        <label for="data_mining_full" class="ml-2 block text-sm text-gray-900 font-bold">
-                                            Akses Penuh Data Mining
-                                        </label>
+                                        <!-- DORN Processing -->
+                                        <div class="border-l-4 border-yellow-200 pl-4">
+                                            <h5 class="text-sm font-medium text-gray-700 mb-3">DORN Processing</h5>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.issue_dorn" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Issue DORN</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.print_dorn" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Print DORN</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.amend_dorn" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Amend DORN</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.cancel_dorn" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Cancel DORN</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Invoice Processing -->
+                                        <div class="border-l-4 border-yellow-200 pl-4">
+                                            <h5 class="text-sm font-medium text-gray-700 mb-3">Invoice Processing</h5>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.prepare_invoice_by_do_current_period" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Prepare Invoice (Current)</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.prepare_invoice_by_do_open_period" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Prepare Invoice (Open)</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.print_invoice" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Print Invoice</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.amend_invoice" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Amend Invoice</span>
+                                                </label>
+                                                <label class="flex items-center">
+                                                    <input type="checkbox" v-model="form.permissions.cancel_active_invoice" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                    <span class="ml-3 text-xs text-gray-700">Cancel Active Invoice</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <hr class="my-2">
-                                    <div class="ml-4 space-y-2">
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="data_analytics" 
-                                                id="data_analytics" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="data_analytics" class="ml-2 block text-sm text-gray-900">
-                                                Analytics Dashboard
-                                            </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="data_reports" 
-                                                id="data_reports" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="data_reports" class="ml-2 block text-sm text-gray-900">
-                                                Custom Reports
-                                            </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="data_export" 
-                                                id="data_export" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="data_export" class="ml-2 block text-sm text-gray-900">
-                                                Data Export
-                                            </label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="checkbox" v-model="permissions" value="data_forecasts" 
-                                                id="data_forecasts" class="h-5 w-5 text-blue-600 rounded-md border-gray-300 focus:ring-blue-500">
-                                            <label for="data_forecasts" class="ml-2 block text-sm text-gray-900">
-                                                Forecasting Tools
-                                            </label>
-                                        </div>
+
+                                    <!-- Quick Actions for Warehouse -->
+                                    <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
+                                        <button @click="selectAllWarehousePermissions" 
+                                                class="px-3 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-md hover:bg-yellow-200 transition-colors">
+                                            Select All Warehouse
+                                        </button>
+                                        <button @click="clearAllWarehousePermissions" 
+                                                class="px-3 py-1 text-xs bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors">
+                                            Clear All Warehouse
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Submit Button -->
-                        <div class="mt-8 flex justify-end">
+                        <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                            <Link href="/user" 
+                                class="inline-flex justify-center items-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                                <XIcon class="h-5 w-5 mr-2" />
+                                Kembali
+                            </Link>
                             <button type="submit" 
-                                    class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-all flex items-center">
-                                <i class="fas fa-save mr-2"></i>Simpan Permissions
+                                    :disabled="isSaving"
+                                    class="inline-flex justify-center items-center px-6 py-3 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                                <SaveIcon class="h-5 w-5 mr-2" />
+                                {{ isSaving ? 'Menyimpan...' : 'Simpan Permissions' }}
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <div v-if="searchMessage" class="mt-6 py-4 px-6 rounded-lg" :class="searchMessageClass">
-                    <i :class="searchMessageIcon + ' mr-2'"></i>{{ searchMessage }}
-                </div>
-
+                <!-- Flash Messages -->
                 <div v-if="$page.props.flash.success" class="mt-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg">
                     <i class="fas fa-check-circle mr-2"></i>{{ $page.props.flash.success }}
                 </div>
 
                 <div v-if="$page.props.flash.error" class="mt-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg">
                     <i class="fas fa-exclamation-circle mr-2"></i>{{ $page.props.flash.error }}
-                </div>
-
-                <!-- Kembali ke Daftar User -->
-                <div class="mt-6 text-center">
-                    <Link href="/user" class="text-blue-600 hover:text-blue-800 cursor-pointer">
-                        <i class="fas fa-arrow-left mr-1"></i> Kembali ke Daftar User
-                    </Link>
                 </div>
             </div>
         </div>
@@ -363,117 +499,383 @@
 <script>
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import axios from 'axios';
+import { 
+    Switch, 
+    SwitchGroup, 
+    SwitchLabel 
+} from '@headlessui/vue'
+import { 
+    UserIcon,
+    ShieldCheckIcon,
+    SearchIcon,
+    SaveIcon,
+    XIcon,
+    CheckCircleIcon,
+    ExclamationCircleIcon
+} from '@heroicons/vue/outline'
 
 export default {
     components: {
         AppLayout,
         Head,
-        Link
-    },
-    props: {
-        user: Object
+        Link,
+        Switch,
+        SwitchGroup,
+        SwitchLabel,
+        UserIcon,
+        ShieldCheckIcon,
+        SearchIcon,
+        SaveIcon,
+        XIcon,
+        CheckCircleIcon,
+        ExclamationCircleIcon
     },
     data() {
         return {
-            form: {
-                user_id: '',
+            searchForm: {
+                user_id: ''
             },
             foundUser: null,
-            permissions: [],
+            isSearching: false,
+            isSaving: false,
             searchMessage: null,
             searchMessageClass: '',
-            searchMessageIcon: ''
+            searchMessageIcon: null,
+            selectAllPermissions: false,
+            openCategories: {
+                system_manager: false,
+                sales_management: false,
+                warehouse_management: false
+            },
+            showAllStandardRequirement: false,
+            form: {
+                permissions: {
+                    'dashboard': false,
+                    'system_manager': false,
+                    'define_user': false,
+                    'amend_user_password': false,
+                    'define_user_access_permission': false,
+                    'copy_paste_user_access_permission': false,
+                    'view_print_user': false,
+                    'sales_management': false,
+                    'define_sales_configuration': false,
+                    'define_sales_team': false,
+                    'define_salesperson': false,
+                    'define_salesperson_team': false,
+                    'define_industry': false,
+                    'define_geo': false,
+                    'define_product_group': false,
+                    'define_product': false,
+                    'define_product_design': false,
+                    'define_scoring_tool': false,
+                    'define_paper_quality': false,
+                    'define_paper_flute': false,
+                    'define_paper_size': false,
+                    'define_color_group': false,
+                    'define_color': false,
+                    'define_finishing': false,
+                    'view_print_sales_team': false,
+                    'view_print_salesperson': false,
+                    'view_print_salesperson_team': false,
+                    'view_print_industry': false,
+                    'view_print_geo': false,
+                    'view_print_product_group': false,
+                    'view_print_product': false,
+                    'view_print_product_design': false,
+                    'view_print_paper_quality': false,
+                    'view_print_paper_flute': false,
+                    'view_print_paper_size': false,
+                    'view_print_scoring_tool': false,
+                    'view_print_color_group': false,
+                    'view_print_color': false,
+                    'view_print_finishing': false,
+                    'define_customer_group': false,
+                    'update_customer_account': false,
+                    'obsolete_reactive_customer_ac': false,
+                    'define_customer_alternate_address': false,
+                    'define_customer_sales_type': false,
+                    'view_print_customer_group': false,
+                    'view_print_customer_account': false,
+                    'view_print_customer_alternate_address': false,
+                    'view_print_customer_sales_type': false,
+                    'view_print_non_active_customer': false,
+                    'update_mc': false,
+                    'approve_mc': false,
+                    'release_approved_mc': false,
+                    'obsolete_reactive_mc': false,
+                    'view_print_mc': false,
+                    'view_print_mc_maintenance_log': false,
+                    'prepare_mc_so': false,
+                    'prepare_sb_so': false,
+                    'prepare_jit_so': false,
+                    'print_so': false,
+                    'cancel_so': false,
+                    'amend_so': false,
+                    'amend_approved_so': false,
+                    'amend_so_price': false,
+                    'amend_approved_so_price': false,
+                    'close_so': false,
+                    'close_so_by_period': false,
+                    'unclose_so': false,
+                    'resubmit_rejected_so': false,
+                    'release_wo_by_so': false,
+                    'print_so_log': false,
+                    'print_so_jit_tracking': false,
+                    'define_so_config': false,
+                    'define_so_period': false,
+                    'define_so_rough_cut': false,
+                    'define_ac_auto_wo': false,
+                    'define_mc_auto_wo': false,
+                    'print_so_period': false,
+                    'print_so_rough_cut': false,
+                    'print_ac_auto_wo': false,
+                    'print_mc_auto_wo': false,
+                    'define_report_format': false,
+                    'print_rough_cut_report': false,
+                    'print_so_report': false,
+                    'print_so_cancel_report': false,
+                    'customer_service_dashboard': false,
+                    'warehouse_management': false,
+                    'define_analysis_code': false,
+                    'define_transport_contractor': false,
+                    'define_vehicle_class': false,
+                    'define_vehicle': false,
+                    'define_dorn_code': false,
+                    'define_greeting_message': false,
+                    'define_alternate_unit': false,
+                    'define_master_card_alternate_unit': false,
+                    'define_dorder_group': false,
+                    'define_users_dorder_group': false,
+                    'view_print_analysis_code': false,
+                    'view_print_vehicle_class': false,
+                    'view_print_vehicle': false,
+                    'prepare_delivery_order_single': false,
+                    'prepare_delivery_order_multiple': false,
+                    'print_delivery_order': false,
+                    'print_do_proforma_invoice': false,
+                    'print_coa_result_by_wo': false,
+                    'print_coa_result_by_so': false,
+                    'amend_delivery_order': false,
+                    'cancel_delivery_order': false,
+                    'reconcile_do_unapplied_fg': false,
+                    'view_print_do_log': false,
+                    'view_print_do_unapplied_fg': false,
+                    'customer_so_delivery_obsolete': false,
+                    'sales_order_delivery_schedule': false,
+                    'issue_dorn': false,
+                    'print_dorn': false,
+                    'amend_dorn': false,
+                    'cancel_dorn': false,
+                    'view_print_dorn_log': false,
+                    'activate_manual_configuration': false,
+                    'register_manual_numbers': false,
+                    'view_print_registered_manual_numbers_log': false,
+                    'define_tax_type': false,
+                    'define_tax_group': false,
+                    'define_customer_sales_tax_index': false,
+                    'view_print_tax_type': false,
+                    'view_print_tax_group': false,
+                    'view_print_customer_sales_tax_index': false,
+                    'prepare_invoice_by_do_current_period': false,
+                    'prepare_invoice_by_do_open_period': false,
+                    'print_invoice': false,
+                    'amend_invoice': false,
+                    'cancel_active_invoice': false,
+                    'view_print_invoice_log': false
+                }
+            }
         }
     },
-    mounted() {
-        if (this.user) {
-            this.foundUser = this.user;
-            this.form.user_id = this.user.user_id;
-            this.loadUserPermissions();
+    computed: {
+        selectedPermissionsCount() {
+            return Object.values(this.form.permissions).filter(permission => permission).length;
+        },
+        totalPermissionsCount() {
+            return Object.keys(this.form.permissions).length;
         }
     },
     methods: {
-        searchUser() {
+        async searchUser() {
+            this.isSearching = true;
             this.searchMessage = null;
             
-            // Pencarian user berdasarkan user_id
-            axios.get(`/api/users?search=${this.form.user_id}`)
-                .then(response => {
-                    if (response.data && response.data.length > 0) {
-                        this.foundUser = response.data[0];
-                        this.loadUserPermissions();
-                        this.searchMessage = `User ${this.foundUser.official_name} ditemukan.`;
-                        this.searchMessageClass = 'bg-green-100 text-green-700';
-                        this.searchMessageIcon = 'fas fa-check-circle';
-                    } else {
-                        this.foundUser = null;
-                        this.searchMessage = `User dengan ID "${this.form.user_id}" tidak ditemukan.`;
-                        this.searchMessageClass = 'bg-yellow-100 text-yellow-700';
-                        this.searchMessageIcon = 'fas fa-exclamation-triangle';
+            try {
+                const response = await fetch(`/api/users/search/${this.searchForm.user_id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': this.$page.props.csrf || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
                     }
-                })
-                .catch(error => {
-                    console.error('Error searching user:', error);
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.user) {
+                    this.foundUser = data.user;
+                    this.searchMessage = `User ${data.user.official_name} ditemukan.`;
+                    this.searchMessageClass = 'bg-green-100 text-green-700 border border-green-200';
+                    this.searchMessageIcon = CheckCircleIcon;
+                    
+                    // Load existing permissions
+                    if (data.permissions) {
+                        Object.keys(this.form.permissions).forEach(key => {
+                            this.form.permissions[key] = data.permissions.includes(key);
+                        });
+                    }
+                } else {
                     this.foundUser = null;
-                    this.searchMessage = 'Terjadi kesalahan saat mencari user.';
-                    this.searchMessageClass = 'bg-red-100 text-red-700';
-                    this.searchMessageIcon = 'fas fa-times-circle';
-                });
+                    this.searchMessage = `User dengan ID "${this.searchForm.user_id}" tidak ditemukan.`;
+                    this.searchMessageClass = 'bg-yellow-100 text-yellow-700 border border-yellow-200';
+                    this.searchMessageIcon = ExclamationCircleIcon;
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                this.foundUser = null;
+                this.searchMessage = 'Terjadi kesalahan saat mencari user.';
+                this.searchMessageClass = 'bg-red-100 text-red-700 border border-red-200';
+                this.searchMessageIcon = ExclamationCircleIcon;
+            } finally {
+                this.isSearching = false;
+            }
         },
-        loadUserPermissions() {
-            // Load permissions pengguna
+        
+        async savePermissions() {
             if (!this.foundUser) return;
             
-            axios.get(`/api/users/${this.foundUser.id}/permissions`)
-                .then(response => {
-                    this.permissions = response.data;
-                })
-                .catch(error => {
-                    console.error('Error loading permissions:', error);
-                    this.searchMessage = 'Terjadi kesalahan saat mengambil data permission.';
-                    this.searchMessageClass = 'bg-red-100 text-red-700';
-                    this.searchMessageIcon = 'fas fa-times-circle';
-                });
-        },
-        savePermissions() {
-            if (!this.foundUser) return;
+            this.isSaving = true;
             
-            this.$inertia.post(`/api/users/${this.foundUser.id}/permissions`, {
-                permissions: this.permissions
-            }, {
-                onSuccess: () => {
-                    this.searchMessage = 'Permissions berhasil diperbarui.';
-                    this.searchMessageClass = 'bg-green-100 text-green-700';
-                    this.searchMessageIcon = 'fas fa-check-circle';
-                },
-                onError: () => {
-                    this.searchMessage = 'Terjadi kesalahan saat menyimpan permissions.';
-                    this.searchMessageClass = 'bg-red-100 text-red-700';
-                    this.searchMessageIcon = 'fas fa-times-circle';
+            try {
+                const response = await fetch(`/user-permissions/${this.foundUser.userID}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': this.$page.props.csrf || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        permissions: this.form.permissions
+                    })
+                });
+
+                if (response.ok) {
+                    this.searchMessage = 'Permissions berhasil diperbarui!';
+                    this.searchMessageClass = 'bg-green-100 text-green-700 border border-green-200';
+                    this.searchMessageIcon = CheckCircleIcon;
+                } else {
+                    const errorData = await response.json();
+                    this.searchMessage = errorData.message || 'Terjadi kesalahan saat menyimpan permissions.';
+                    this.searchMessageClass = 'bg-red-100 text-red-700 border border-red-200';
+                    this.searchMessageIcon = ExclamationCircleIcon;
                 }
+            } catch (error) {
+                console.error('Save error:', error);
+                this.searchMessage = 'Terjadi kesalahan saat menyimpan permissions.';
+                this.searchMessageClass = 'bg-red-100 text-red-700 border border-red-200';
+                this.searchMessageIcon = ExclamationCircleIcon;
+            } finally {
+                this.isSaving = false;
+            }
+        },
+        
+        toggleAllPermissions() {
+            const value = this.selectAllPermissions;
+            Object.keys(this.form.permissions).forEach(key => {
+                this.form.permissions[key] = value;
             });
         },
-        selectAllInCategory(category) {
-            // This is a function that could be implemented to select all permissions in a category
-            const categoryPermissions = this.getPermissionsByCategory(category);
-            categoryPermissions.forEach(permission => {
-                if (!this.permissions.includes(permission)) {
-                    this.permissions.push(permission);
-                }
+
+        formatPermissionName(key) {
+            // Convert snake_case to Title Case
+            return key
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        },
+
+        toggleCategory(category) {
+            this.openCategories[category] = !this.openCategories[category];
+        },
+
+        getCategoryPermissions(category) {
+            const categoryMaps = {
+                dashboard: ['dashboard'],
+                system_manager: [
+                    'system_manager', 'define_user', 'amend_user_password', 
+                    'define_user_access_permission', 'copy_paste_user_access_permission', 'view_print_user'
+                ],
+                sales_management: Object.keys(this.form.permissions).filter(key => 
+                    key.includes('sales') || key.includes('customer') || key.includes('product') || 
+                    key.includes('mc') || key.includes('so') || key.includes('industry') || 
+                    key.includes('geo') || key.includes('color') || key.includes('paper') || 
+                    key.includes('finishing') || key.includes('scoring')
+                ),
+                warehouse_management: Object.keys(this.form.permissions).filter(key => 
+                    key.includes('delivery') || key.includes('warehouse') || key.includes('dorn') || 
+                    key.includes('invoice') || key.includes('analysis') || key.includes('vehicle') || 
+                    key.includes('transport') || key.includes('tax')
+                )
+            };
+            return categoryMaps[category] || [];
+        },
+
+        getSelectedCountForCategory(category) {
+            const permissions = this.getCategoryPermissions(category);
+            return permissions.filter(key => this.form.permissions[key]).length;
+        },
+
+        selectAllSalesPermissions() {
+            const salesPermissions = this.getCategoryPermissions('sales_management');
+            salesPermissions.forEach(key => {
+                this.form.permissions[key] = true;
             });
         },
-        getPermissionsByCategory(category) {
-            // This would return all permissions that belong to a specific category
-            // Implementation would depend on how you structure your permissions
-            return [];
+
+        clearAllSalesPermissions() {
+            const salesPermissions = this.getCategoryPermissions('sales_management');
+            salesPermissions.forEach(key => {
+                this.form.permissions[key] = false;
+            });
+        },
+
+        selectAllWarehousePermissions() {
+            const warehousePermissions = this.getCategoryPermissions('warehouse_management');
+            warehousePermissions.forEach(key => {
+                this.form.permissions[key] = true;
+            });
+        },
+
+        clearAllWarehousePermissions() {
+            const warehousePermissions = this.getCategoryPermissions('warehouse_management');
+            warehousePermissions.forEach(key => {
+                this.form.permissions[key] = false;
+            });
+        },
+
+        toggleSalesSubcategory(subcategory) {
+            if (subcategory === 'standard_requirement') {
+                this.showAllStandardRequirement = !this.showAllStandardRequirement;
+            }
+        },
+
+        getSalesStandardRequirementPermissions() {
+            return Object.keys(this.form.permissions).filter(key => 
+                key.includes('define_sales') || key.includes('define_product') || 
+                key.includes('define_industry') || key.includes('define_geo') || 
+                key.includes('define_color') || key.includes('define_paper') || 
+                key.includes('define_finishing') || key.includes('define_scoring') ||
+                key.includes('view_print_sales') || key.includes('view_print_product') ||
+                key.includes('view_print_industry') || key.includes('view_print_geo') ||
+                key.includes('view_print_color') || key.includes('view_print_paper') ||
+                key.includes('view_print_finishing') || key.includes('view_print_scoring')
+            );
         }
     }
 }
-</script> 
+</script>
 
 <style scoped>
 .permission-group:hover {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-</style> 
+</style>

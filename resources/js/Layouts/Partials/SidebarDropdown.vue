@@ -22,13 +22,14 @@
     >
       <template v-for="(item, index) in items" :key="index">
         <!-- Item with children (nested dropdown) -->
-        <div v-if="item.children" class="relative">
+        <div v-if="item.children && item.children.length > 0" class="relative">
           <sidebar-dropdown 
             :title="item.title" 
             :icon="item.icon" 
             :items="item.children"
             :menu-id="`${menuId}-${index}`"
             :is-top-level="false"
+            :has-permission="hasPermission"
           />
         </div>
         
@@ -86,6 +87,10 @@ const props = defineProps({
   isTopLevel: {
     type: Boolean,
     default: true
+  },
+  hasPermission: {
+    type: Function,
+    default: () => () => true
   }
 });
 
