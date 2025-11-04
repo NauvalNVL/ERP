@@ -1127,7 +1127,8 @@ const getWoDisplay = (index) => {
         return '';
     }
 };
-import { defineEmits, defineProps, ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
+// defineProps and defineEmits are compiler macros and don't need to be imported
 import ProductDesignModal from '@/Components/product-design-modal.vue';
 import PaperFluteModal from '@/Components/paper-flute-selector-modal.vue';
 import ScoringToolModal from '@/Components/scoring-tool-modal.vue';

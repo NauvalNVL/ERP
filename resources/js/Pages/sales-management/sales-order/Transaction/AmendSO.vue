@@ -72,9 +72,10 @@
                       placeholder="Enter SO Number"
                       class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       @keyup.enter="searchSalesOrder"
+                      readonly
                     >
                     <button 
-                      @click="openSalesOrderModal" 
+                      @click="openSalesOrderTableModal" 
                       class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
                       title="Search SO"
                     >
@@ -306,8 +307,7 @@
                   <input 
                     v-model="selectedSO.month" 
                     type="text" 
-                    class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                    readonly
+                    class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                 </div>
               </div>
@@ -319,8 +319,7 @@
                   <input 
                     v-model="selectedSO.setQuantity" 
                     type="text" 
-                    class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                    readonly
+                    class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                   <span class="text-xs text-gray-500">Leave blank for loose item order</span>
                 </div>
@@ -331,9 +330,9 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Order Group:</label>
                   <div class="flex items-center space-x-2">
-                    <input type="radio" name="orderGroup" value="Sales" v-model="selectedSO.orderGroup" disabled>
+                    <input type="radio" name="orderGroup" value="Sales" v-model="selectedSO.orderGroup">
                     <label class="text-xs">Sales</label>
-                    <input type="radio" name="orderGroup" value="Non-Sales" v-model="selectedSO.orderGroup" disabled>
+                    <input type="radio" name="orderGroup" value="Non-Sales" v-model="selectedSO.orderGroup">
                     <label class="text-xs">Non-Sales</label>
                   </div>
                 </div>
@@ -341,8 +340,7 @@
                   <label class="block text-xs font-medium text-gray-600 mb-1">Order Type:</label>
                   <select 
                     v-model="selectedSO.orderType" 
-                    class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                    disabled
+                    class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                     <option value="S1">S1-Sales (SO-Cust-Ener-FG-DU-IV)</option>
                   </select>
@@ -355,8 +353,7 @@
                 <input 
                   v-model="selectedSO.lotNumber" 
                   type="text" 
-                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                  readonly
+                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
               </div>
 
@@ -365,7 +362,7 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Sales Tax:</label>
                   <div class="flex items-center space-x-2">
-                    <input type="checkbox" v-model="selectedSO.salesTax" disabled>
+                    <input type="checkbox" v-model="selectedSO.salesTax">
                     <label class="text-xs">Tax for Y-Yes</label>
                   </div>
                 </div>
@@ -377,8 +374,7 @@
                 <input 
                   v-model="selectedSO.remark" 
                   type="text" 
-                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                  readonly
+                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
               </div>
 
@@ -388,8 +384,7 @@
                 <input 
                   v-model="selectedSO.instruction1" 
                   type="text" 
-                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100"
-                  readonly
+                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
               </div>
 
@@ -398,7 +393,7 @@
                 <input 
                   v-model="selectedSO.instruction2" 
                   type="text" 
-                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   placeholder="Enter instruction 2..."
                 >
               </div>
@@ -413,11 +408,11 @@
                   Clear
                 </button>
                 <button 
-                  @click="amendSalesOrder" 
+                  @click="openProductDesignScreen" 
                   class="px-4 py-2 bg-orange-600 text-white text-sm rounded hover:bg-orange-700 transition-colors"
                 >
-                  <i class="fas fa-edit mr-1"></i>
-                  Amend SO
+                  <i class="fas fa-cogs mr-1"></i>
+                  Product Design Screen
                 </button>
               </div>
             </div>
@@ -434,133 +429,37 @@
       </div>
     </div>
 
-    <!-- Sales Order Search Modal -->
-    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl max-h-[90vh] overflow-hidden">
-        <!-- Modal Header -->
-        <div class="bg-blue-600 text-white px-6 py-4 flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Sales Order Table (Sorted by S/Order#)</h3>
-          <button @click="closeModal" class="text-white hover:text-gray-200">
-            <i class="fas fa-times text-xl"></i>
-          </button>
-        </div>
+    <!-- Sales Order Table Modal -->
+    <SalesOrderTableModal 
+      :is-open="showSalesOrderTableModal"
+      :customer-data="{ code: 'ALL' }"
+      @close="showSalesOrderTableModal = false"
+      @select="handleSalesOrderSelect"
+    />
 
-        <!-- Modal Content -->
-        <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          <!-- Sales Order Table -->
-          <div class="overflow-x-auto">
-            <table class="w-full border-collapse border border-gray-300 text-sm">
-              <thead>
-                <tr class="bg-blue-100">
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">SO#</th>
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">CUSTOMER PO#</th>
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">AC#</th>
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">MC#</th>
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">STATUS</th>
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">D/LOCATION</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(order, index) in salesOrderList" :key="index" 
-                    :class="selectedRowIndex === index ? 'bg-blue-200' : 'hover:bg-gray-50'"
-                    @click="selectRow(index)"
-                    class="cursor-pointer">
-                  <td class="border border-gray-300 px-2 py-1">{{ order.soNumber }}</td>
-                  <td class="border border-gray-300 px-2 py-1">{{ order.customerPO }}</td>
-                  <td class="border border-gray-300 px-2 py-1">{{ order.acNumber }}</td>
-                  <td class="border border-gray-300 px-2 py-1">{{ order.mcNumber }}</td>
-                  <td class="border border-gray-300 px-2 py-1">
-                    <span :class="getStatusClass(order.status)">{{ order.status }}</span>
-                  </td>
-                  <td class="border border-gray-300 px-2 py-1">{{ order.location }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+    <!-- Product Design Screen Modal -->
+    <ProductDesignScreenModal 
+      :show="showProductDesignModal"
+      :sales-order-data="selectedSO"
+      @close="showProductDesignModal = false"
+      @save="handleProductDesignSave"
+    />
 
-          <!-- Customer Information Section -->
-          <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Customer Name:</label>
-                <input v-model="customerInfo.name" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Model:</label>
-                <input v-model="customerInfo.model" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Order Mode:</label>
-                <input v-model="customerInfo.orderMode" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-            </div>
-            <div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Salesperson:</label>
-                <input v-model="customerInfo.salesperson" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Order Group:</label>
-                <input v-model="customerInfo.orderGroup" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Order Type:</label>
-                <input v-model="customerInfo.orderType" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-            </div>
-          </div>
+    <!-- Delivery Location Modal -->
+    <DeliveryLocationModal 
+      :show="showDeliveryLocationModal"
+      :sales-order-data="selectedSO"
+      @close="showDeliveryLocationModal = false"
+      @save="handleDeliveryLocationSave"
+    />
 
-          <!-- Order Items Table -->
-          <div class="mt-6">
-            <h4 class="text-sm font-semibold text-gray-700 mb-2">Order Items</h4>
-            <div class="overflow-x-auto">
-              <table class="w-full border-collapse border border-gray-300 text-sm">
-                <thead>
-                  <tr class="bg-blue-100">
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">ITEM</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">MAIN</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F1</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F2</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F3</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F4</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F5</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F6</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F7</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F8</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F9</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(item, index) in orderItems" :key="index" class="hover:bg-gray-50">
-                    <td class="border border-gray-300 px-2 py-1">{{ item.name }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.main }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f1 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f2 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f3 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f4 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f5 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f6 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f7 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f8 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f9 }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="bg-gray-50 px-6 py-4 flex items-center justify-end space-x-3">
-          <button @click="selectSalesOrder" class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
-            Select
-          </button>
-          <button @click="closeModal" class="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors">
-            Exit
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- Delivery Schedule Screen Modal -->
+    <DeliveryScheduleScreenModal 
+      :show="showDeliveryScheduleModal"
+      :delivery-data="selectedSO"
+      @close="showDeliveryScheduleModal = false"
+      @save="handleFinalSave"
+    />
 
     <!-- Analysis Code Modal -->
     <div v-if="showAnalysisCodeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -623,11 +522,19 @@
 
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import SalesOrderTableModal from '@/Components/SalesOrderTableModal.vue';
+import ProductDesignScreenModal from '@/Components/ProductDesignScreenModal.vue';
+import DeliveryLocationModal from '@/Components/DeliveryLocationModal.vue';
+import DeliveryScheduleScreenModal from '@/Components/DeliveryScheduleScreenModal.vue';
 
 export default {
     name: 'AmendSO',
     components: {
-        AppLayout
+        AppLayout,
+        SalesOrderTableModal,
+        ProductDesignScreenModal,
+        DeliveryLocationModal,
+        DeliveryScheduleScreenModal
     },
     data() {
         return {
@@ -647,7 +554,10 @@ export default {
             },
             amendedBy: 'Current User', // This should be populated from auth user
             searchPerformed: false,
-            showModal: false,
+            showSalesOrderTableModal: false,
+            showProductDesignModal: false,
+            showDeliveryLocationModal: false,
+            showDeliveryScheduleModal: false,
             selectedRowIndex: -1,
             showAnalysisCodeModal: false,
             selectedAnalysisCodeIndex: -1,
@@ -682,189 +592,82 @@ export default {
                     group: 'SO',
                     group2: 'SP'
                 }
-            ],
-            salesOrderList: [
-                {
-                    soNumber: '11-2025-00133',
-                    customerPO: 'PO/MAS/2025/10/01763',
-                    acNumber: '000552',
-                    mcNumber: '301438',
-                    status: 'Data',
-                    location: 'Same'
-                },
-                {
-                    soNumber: '11-2025-00132',
-                    customerPO: 'PO/MAS/2025/10/01763',
-                    acNumber: '000552',
-                    mcNumber: '301438',
-                    status: 'Data',
-                    location: 'Same'
-                },
-                {
-                    soNumber: '11-2025-00131',
-                    customerPO: 'C387/PD/ISP/X/2025',
-                    acNumber: '000754',
-                    mcNumber: '278744',
-                    status: 'Data',
-                    location: 'J217'
-                },
-                {
-                    soNumber: '11-2025-00130',
-                    customerPO: 'C387/PD/ISP/X/2025',
-                    acNumber: '000754',
-                    mcNumber: '278744',
-                    status: 'Data',
-                    location: 'Same'
-                },
-                {
-                    soNumber: '11-2025-00129',
-                    customerPO: 'KDK125100/IB/2943268',
-                    acNumber: '000553',
-                    mcNumber: '000636/4',
-                    status: 'Data',
-                    location: 'Same'
-                },
-                {
-                    soNumber: '11-2025-00128',
-                    customerPO: 'KDK125100/IB/2943268',
-                    acNumber: '000553',
-                    mcNumber: '000636/4',
-                    status: 'Data',
-                    location: 'Same'
-                }
-            ],
-            customerInfo: {
-                name: 'NUGRAHAA ATRIA SADJANA, PT',
-                model: 'SINGLE FACE E-275 / M150 - L 1200 CF',
-                orderMode: 'D-Order by Customer + Delivery & Invoice to Customer',
-                salesperson: 'S103',
-                orderGroup: 'Sales',
-                orderType: 'S1'
-            },
-            orderItems: [
-                {
-                    name: 'PCS',
-                    main: 'LEF',
-                    f1: '',
-                    f2: '',
-                    f3: '',
-                    f4: '',
-                    f5: '',
-                    f6: '',
-                    f7: '',
-                    f8: '',
-                    f9: ''
-                },
-                {
-                    name: 'UNIT',
-                    main: '',
-                    f1: '',
-                    f2: '',
-                    f3: '',
-                    f4: '',
-                    f5: '',
-                    f6: '',
-                    f7: '',
-                    f8: '',
-                    f9: ''
-                },
-                {
-                    name: 'ORDER',
-                    main: '1,100',
-                    f1: '',
-                    f2: '',
-                    f3: '',
-                    f4: '',
-                    f5: '',
-                    f6: '',
-                    f7: '',
-                    f8: '',
-                    f9: ''
-                },
-                {
-                    name: 'NET DELIVERY',
-                    main: '',
-                    f1: '',
-                    f2: '',
-                    f3: '',
-                    f4: '',
-                    f5: '',
-                    f6: '',
-                    f7: '',
-                    f8: '',
-                    f9: ''
-                },
-                {
-                    name: 'BALANCE',
-                    main: '1,100',
-                    f1: '',
-                    f2: '',
-                    f3: '',
-                    f4: '',
-                    f5: '',
-                    f6: '',
-                    f7: '',
-                    f8: '',
-                    f9: ''
-                }
             ]
         }
     },
     methods: {
-        openSalesOrderModal() {
-            this.showModal = true;
+        openSalesOrderTableModal() {
+            this.showSalesOrderTableModal = true;
             this.selectedRowIndex = -1;
         },
 
-        closeModal() {
-            this.showModal = false;
-            this.selectedRowIndex = -1;
+        handleSalesOrderSelect(selectedOrder) {
+            // Update the selected SO with the data from the table modal
+            this.selectedSO = {
+                soNumber: selectedOrder.soNumber,
+                seq: '133',
+                customerCode: selectedOrder.acNumber,
+                customerName: selectedOrder.customerName || 'CMC GLOBAL SPORT, PT',
+                mcardSeq: selectedOrder.mcsNumber + '-4',
+                orderMode: 'D-Order by Customer + Delivery & Invoice to Customer',
+                salesperson: 'S129',
+                salespersonName: 'MULTI NATIONAL COMPANY OIA',
+                product: '001',
+                productDescription: 'BOX',
+                currency: 'IDR',
+                exchangeRate: '0.000000',
+                exchangeMethod: 'N/A',
+                analysisCode: 'AMND',
+                orderStatus: 'Outstanding',
+                customerPO: selectedOrder.customerPo,
+                porderDate: '2025-10-27',
+                month: 'Mon',
+                setQuantity: '9600',
+                orderGroup: 'Sales',
+                orderType: 'S1',
+                lotNumber: '3-2851324',
+                salesTax: false,
+                remark: '2933268',
+                instruction1: '2933268',
+                instruction2: '',
+                soDate: new Date().toLocaleDateString(),
+                status: 'Active',
+                totalAmount: 150000
+            };
+            this.searchForm.soNumber = selectedOrder.soNumber;
+            this.searchPerformed = true;
+            this.showSalesOrderTableModal = false;
         },
 
-        selectRow(index) {
-            this.selectedRowIndex = index;
-        },
-
-        selectSalesOrder() {
-            if (this.selectedRowIndex >= 0) {
-                const selectedOrder = this.salesOrderList[this.selectedRowIndex];
-                this.selectedSO = {
-                    soNumber: selectedOrder.soNumber,
-                    seq: '133',
-                    customerCode: selectedOrder.acNumber,
-                    customerName: 'CMC GLOBAL SPORT, PT',
-                    mcardSeq: selectedOrder.mcNumber + '-4',
-                    orderMode: 'D-Order by Customer + Delivery & Invoice to Customer',
-                    salesperson: 'S129',
-                    salespersonName: 'MULTI NATIONAL COMPANY OIA',
-                    product: '001',
-                    productDescription: 'BOX',
-                    currency: 'IDR',
-                    exchangeRate: '0.000000',
-                    exchangeMethod: 'N/A',
-                    analysisCode: 'AMND',
-                    orderStatus: 'Outstanding',
-                    customerPO: selectedOrder.customerPO,
-                    porderDate: '2025-10-27',
-                    month: 'Mon',
-                    setQuantity: '9600',
-                    orderGroup: 'Sales',
-                    orderType: 'S1',
-                    lotNumber: '3-2851324',
-                    salesTax: false,
-                    remark: '2933268',
-                    instruction1: '2933268',
-                    instruction2: '',
-                    soDate: new Date().toLocaleDateString(),
-                    status: 'Active',
-                    totalAmount: 150000
-                };
-                this.searchForm.soNumber = selectedOrder.soNumber;
-                this.searchPerformed = true;
-                this.closeModal();
-            } else {
-                alert('Please select a sales order from the list.');
+        openProductDesignScreen() {
+            if (!this.selectedSO) {
+                alert('Please select a sales order first.');
+                return;
             }
+            this.showProductDesignModal = true;
+        },
+
+        handleProductDesignSave(data) {
+            // Handle product design data and move to next step
+            console.log('Product design data:', data);
+            this.showProductDesignModal = false;
+            this.showDeliveryLocationModal = true;
+        },
+
+        handleDeliveryLocationSave(data) {
+            // Handle delivery location data and move to next step
+            console.log('Delivery location data:', data);
+            this.showDeliveryLocationModal = false;
+            this.showDeliveryScheduleModal = true;
+        },
+
+        handleFinalSave(data) {
+            // Handle the final save of the amended SO data
+            console.log('Final save data:', data);
+            alert('Sales Order amendments saved successfully!');
+            this.showDeliveryScheduleModal = false;
+            // Optionally clear the form or navigate away
+            this.clearSelection();
         },
 
         openAnalysisCodeModal() {
@@ -934,43 +737,7 @@ export default {
             }
         },
 
-        async amendSalesOrder() {
-            if (!this.amendForm.reason.trim()) {
-                alert('Please enter a reason for amendment.');
-                return;
-            }
-
-            if (confirm(`Are you sure you want to amend Sales Order ${this.selectedSO.soNumber}?\n\nReason: ${this.amendForm.reason}`)) {
-                try {
-                    // Simulate API call for amendment
-                    const response = await fetch(`/api/sales-orders/${this.selectedSO.soNumber}/amend`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({
-                            reason: this.amendForm.reason,
-                            deliveryDate: this.amendForm.deliveryDate,
-                            priority: this.amendForm.priority,
-                            amendmentDate: this.amendForm.amendmentDate
-                        })
-                    });
-                    
-                    if (response.ok) {
-                        // Update status locally
-                        this.selectedSO.status = 'Amended';
-                        alert(`Sales Order ${this.selectedSO.soNumber} has been amended successfully.`);
-                        this.clearSelection();
-                    } else {
-                        alert('Error amending sales order. Please try again.');
-                    }
-                } catch (error) {
-                    console.error('Error amending sales order:', error);
-                    alert('Error amending sales order. Please try again.');
-                }
-            }
-        },
+        // Removed amendSalesOrder method as it's replaced by the modal flow
 
         clearSelection() {
             this.searchForm.soNumber = '';
@@ -982,6 +749,11 @@ export default {
                 amendmentDate: new Date().toISOString().split('T')[0]
             };
             this.searchPerformed = false;
+            // Close any open modals
+            this.showSalesOrderTableModal = false;
+            this.showProductDesignModal = false;
+            this.showDeliveryLocationModal = false;
+            this.showDeliveryScheduleModal = false;
         },
 
         refreshPage() {

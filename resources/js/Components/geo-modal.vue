@@ -96,7 +96,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';const props = defineProps({
+import { ref, computed, watch, onMounted } from 'vue';
+// defineProps and defineEmits are compiler macros and don't need to be imported
+
+const props = defineProps({
   show: Boolean,
   geos: {
     type: Array,

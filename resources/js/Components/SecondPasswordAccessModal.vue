@@ -34,7 +34,8 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref } from 'vue';
+// defineProps and defineEmits are compiler macros and don't need to be imported
 
 const props = defineProps({
   show: Boolean,

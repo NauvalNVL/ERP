@@ -246,38 +246,42 @@
               <div class="grid grid-cols-2 gap-8 mb-8">
                 <div>
                   <table class="w-full">
-                    <tr>
-                      <td class="font-bold text-gray-700 py-1">Transaction Number:</td>
-                      <td class="py-1">{{ selectedTransaction.transaction_number }}</td>
-                    </tr>
-                    <tr>
-                      <td class="font-bold text-gray-700 py-1">Transaction Date:</td>
-                      <td class="py-1">{{ selectedTransaction.formatted_transaction_date }}</td>
-                    </tr>
-                    <tr>
-                      <td class="font-bold text-gray-700 py-1">Status:</td>
-                      <td class="py-1">
-                        <span :class="getStatusBadgeClass(selectedTransaction.status)" class="px-2 py-1 rounded text-sm">
-                          {{ selectedTransaction.status }}
-                        </span>
-                      </td>
-                    </tr>
+                    <tbody>
+                      <tr>
+                        <td class="font-bold text-gray-700 py-1">Transaction Number:</td>
+                        <td class="py-1">{{ selectedTransaction.transaction_number }}</td>
+                      </tr>
+                      <tr>
+                        <td class="font-bold text-gray-700 py-1">Transaction Date:</td>
+                        <td class="py-1">{{ selectedTransaction.formatted_transaction_date }}</td>
+                      </tr>
+                      <tr>
+                        <td class="font-bold text-gray-700 py-1">Status:</td>
+                        <td class="py-1">
+                          <span :class="getStatusBadgeClass(selectedTransaction.status)" class="px-2 py-1 rounded text-sm">
+                            {{ selectedTransaction.status }}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
                   </table>
                 </div>
                 <div>
                   <table class="w-full">
-                    <tr>
-                      <td class="font-bold text-gray-700 py-1">SKU Code:</td>
-                      <td class="py-1">{{ selectedTransaction.sku_code }}</td>
-                    </tr>
-                    <tr>
-                      <td class="font-bold text-gray-700 py-1">Location Code:</td>
-                      <td class="py-1">{{ selectedTransaction.location_code }}</td>
-                    </tr>
-                    <tr>
-                      <td class="font-bold text-gray-700 py-1">Category Code:</td>
-                      <td class="py-1">{{ selectedTransaction.category_code }}</td>
-                    </tr>
+                    <tbody>
+                      <tr>
+                        <td class="font-bold text-gray-700 py-1">SKU Code:</td>
+                        <td class="py-1">{{ selectedTransaction.sku_code }}</td>
+                      </tr>
+                      <tr>
+                        <td class="font-bold text-gray-700 py-1">Location Code:</td>
+                        <td class="py-1">{{ selectedTransaction.location_code }}</td>
+                      </tr>
+                      <tr>
+                        <td class="font-bold text-gray-700 py-1">Category Code:</td>
+                        <td class="py-1">{{ selectedTransaction.category_code }}</td>
+                      </tr>
+                    </tbody>
                   </table>
                 </div>
               </div>
@@ -312,10 +316,12 @@
                 <div>
                   <h4 class="font-bold text-gray-700 mb-2">Reference Information</h4>
                   <table class="w-full">
-                    <tr>
-                      <td class="font-bold text-gray-700 py-1">Reference Number:</td>
-                      <td class="py-1">{{ selectedTransaction.reference_number || 'N/A' }}</td>
-                    </tr>
+                    <tbody>
+                      <tr>
+                        <td class="font-bold text-gray-700 py-1">Reference Number:</td>
+                        <td class="py-1">{{ selectedTransaction.reference_number || 'N/A' }}</td>
+                      </tr>
+                    </tbody>
                   </table>
                 </div>
                 <div>
