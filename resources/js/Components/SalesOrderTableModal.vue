@@ -28,7 +28,7 @@
               <!-- Header -->
               <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 rounded-t-xl -mx-6 -mt-6 mb-4">
                 <DialogTitle as="h3" class="text-lg font-semibold text-gray-900">
-                  Sales Order Table [Sorted by S/Order#]
+                  {{ props.customerData?.code === 'ALL' ? 'Outstanding Sales Orders [Sorted by S/Order#]' : 'Sales Order Table [Sorted by S/Order#]' }}
                 </DialogTitle>
                 <div class="flex items-center space-x-2">
                   <button @click="closeModal" class="p-2 rounded-full hover:bg-red-100 text-red-600 transition-colors" title="Close">
@@ -424,8 +424,16 @@ const searchOrders = async () => {
     console.log('Customer data:', props.customerData)
     
     // Fetch sales orders from API based on customer code
-    const params = {
-      customer_code: props.customerData?.code
+    const params = {}
+    
+    // If customer code is 'ALL', fetch all outstanding sales orders
+    // Otherwise, filter by specific customer
+    if (props.customerData?.code && props.customerData.code !== 'ALL') {
+      params.customer_code = props.customerData.code
+    } else {
+      // For AmendSO - get all outstanding sales orders
+      params.status = 'Outstanding'
+      params.all_customers = true
     }
     
     console.log('API params:', params)
@@ -445,7 +453,10 @@ const searchOrders = async () => {
     }
     
     console.log('Calling API /api/sales-orders with params:', params)
-    const response = await axios.get('/api/sales-orders', { params })
+    
+    // Use different endpoint for all outstanding orders
+    const endpoint = params.all_customers ? '/api/sales-orders/outstanding' : '/api/sales-orders'
+    const response = await axios.get(endpoint, { params })
     console.log('API response:', response.data)
     console.log('API response.data.data:', response.data.data)
     console.log('First order raw:', response.data.data[0])
@@ -453,6 +464,16 @@ const searchOrders = async () => {
     if (response.data.success) {
       console.log('Raw response.data.data:', response.data.data)
       console.log('Number of orders:', response.data.data.length)
+      
+      // Log debug information if available
+      if (response.data.debug) {
+        console.log('=== DEBUG INFO ===')
+        console.log('Total SO records in database:', response.data.debug.total_so_records)
+        console.log('All statuses found:', response.data.debug.all_statuses)
+        console.log('Status counts:', response.data.debug.status_counts)
+        console.log('Query result count:', response.data.debug.query_result_count)
+        console.log('==================')
+      }
       
       // Map API data to component format and sort by SO number
       salesOrders.value = response.data.data
@@ -491,9 +512,17 @@ const searchOrders = async () => {
       clearOrderInfo()
       
       if (salesOrders.value.length === 0) {
-        info('No sales orders found for this customer')
+        if (params.all_customers) {
+          info('No outstanding sales orders found')
+        } else {
+          info('No sales orders found for this customer')
+        }
       } else {
-        success(`Loaded ${salesOrders.value.length} sales order(s)`)
+        if (params.all_customers) {
+          success(`Loaded ${salesOrders.value.length} outstanding sales order(s)`)
+        } else {
+          success(`Loaded ${salesOrders.value.length} sales order(s)`)
+        }
       }
     } else {
       console.error('API Error:', response.data.message)
@@ -551,23 +580,29 @@ const clearOrderInfo = () => {
 
 const loadSalesOrders = async () => {
   try {
-    // Load sales orders for the customer
+    // Load sales orders for the customer or all outstanding orders
     if (props.customerData && props.customerData.code) {
       console.log('Loading sales orders for customer:', props.customerData.code)
       
-      // First, try the debug route to see raw data
-      try {
-        const debugResponse = await axios.get('/api/debug/sales-orders', {
-          params: { customer_code: props.customerData.code }
-        })
-        console.log('DEBUG ROUTE Response:', debugResponse.data)
-        console.log('DEBUG: Sample order:', debugResponse.data.sample)
-      } catch (debugErr) {
-        console.error('Debug route error:', debugErr)
+      // If customer code is 'ALL', load all outstanding sales orders
+      if (props.customerData.code === 'ALL') {
+        console.log('Loading all outstanding sales orders for AmendSO')
+        await searchOrders() // This will use the outstanding endpoint
+      } else {
+        // First, try the debug route to see raw data for specific customer
+        try {
+          const debugResponse = await axios.get('/api/debug/sales-orders', {
+            params: { customer_code: props.customerData.code }
+          })
+          console.log('DEBUG ROUTE Response:', debugResponse.data)
+          console.log('DEBUG: Sample order:', debugResponse.data.sample)
+        } catch (debugErr) {
+          console.error('Debug route error:', debugErr)
+        }
+        
+        // Then call the actual search for specific customer
+        await searchOrders()
       }
-      
-      // Then call the actual search
-      await searchOrders()
     } else {
       console.log('No customer selected')
       salesOrders.value = []

@@ -293,6 +293,8 @@ Route::put('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductControll
 Route::delete('/corrugator-specs-by-product/{id}', [CorrugatorSpecByProductController::class, 'apiDestroy']); 
 Route::get('/corrugator-specs-by-product/export', [CorrugatorSpecByProductController::class, 'apiExport']);
 
+       
+
 // Roll Trim By Corrugator API Routes
 Route::get('/roll-trim-by-corrugator/flutes', [RollTrimByCorrugatorController::class, 'getPaperFlutes']);
 Route::get('/roll-trim-by-corrugator', [RollTrimByCorrugatorController::class, 'apiIndex']);
@@ -391,6 +393,31 @@ Route::get('/sales-order/customer/{code}', [App\Http\Controllers\SalesOrderContr
 Route::post('/sales-order/save-to-so', [App\Http\Controllers\SalesOrderController::class, 'apiStoreToSo']);
 // Get sales orders for Print SO and Sales Order Table Modal
 Route::get('/sales-orders', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrders']);
+// Get all outstanding sales orders for AmendSO
+Route::get('/sales-orders/outstanding', [App\Http\Controllers\SalesOrderController::class, 'getOutstandingSalesOrders']);
+
+// Debug route to check SO table structure and data
+Route::get('/debug/so-table', function() {
+    try {
+        // Check if table exists and get sample data
+        $totalCount = DB::table('so')->count();
+        $sampleData = DB::table('so')->limit(5)->get();
+        $distinctStatuses = DB::table('so')->select('STS')->distinct()->get();
+        
+        return response()->json([
+            'success' => true,
+            'total_records' => $totalCount,
+            'sample_data' => $sampleData,
+            'distinct_statuses' => $distinctStatuses->pluck('STS')->toArray(),
+            'table_columns' => $sampleData->isNotEmpty() ? array_keys((array)$sampleData->first()) : []
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ]);
+    }
+});
 
 // Debug route to test sales order data directly
 Route::get('/debug/sales-orders', function(\Illuminate\Http\Request $request) {

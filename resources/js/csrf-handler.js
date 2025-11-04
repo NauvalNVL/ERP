@@ -6,10 +6,12 @@ export function setupCsrfHandler() {
     
     // Update CSRF token from response headers
     router.on('success', (event) => {
-        const response = event.detail.response;
-        const newToken = response.headers.get('X-CSRF-Token');
-        if (newToken) {
-            updateCsrfToken(newToken);
+        const response = event.detail?.response;
+        if (response && response.headers) {
+            const newToken = response.headers.get('X-CSRF-Token');
+            if (newToken) {
+                updateCsrfToken(newToken);
+            }
         }
     });
     

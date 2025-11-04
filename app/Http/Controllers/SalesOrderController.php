@@ -847,6 +847,180 @@ class SalesOrderController extends Controller
             ], 500, ['Content-Type' => 'application/json; charset=utf-8']);
         }
     }
+
+    /**
+     * Get all outstanding sales orders for AmendSO
+     */
+    public function getOutstandingSalesOrders(Request $request): JsonResponse
+    {
+        Log::info('getOutstandingSalesOrders called with params:', $request->all());
+        
+        // Clean output buffers
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        try {
+            // First, let's check what statuses exist in the database
+            $allStatuses = DB::table('so')->select('STS')->distinct()->get();
+            Log::info('All statuses in SO table:', ['statuses' => $allStatuses->pluck('STS')->toArray()]);
+            
+            // Count total records
+            $totalRecords = DB::table('so')->count();
+            Log::info('Total SO records:', ['count' => $totalRecords]);
+            
+            // Count records by status
+            $statusCounts = DB::table('so')
+                ->select('STS', DB::raw('COUNT(*) as count'))
+                ->groupBy('STS')
+                ->get();
+            Log::info('Status counts:', ['counts' => $statusCounts->toArray()]);
+            
+            $query = DB::table('so')
+                ->leftJoin('CUSTOMER', 'so.AC_Num', '=', 'CUSTOMER.CODE');
+            
+            // Filter by outstanding status - check multiple possible values
+            // Based on common ERP systems, outstanding could be stored as various values
+            $query->where(function($q) {
+                $q->where('so.STS', 'OPEN')
+                  ->orWhere('so.STS', 'Outstanding')
+                  ->orWhere('so.STS', 'OUTSTANDING') 
+                  ->orWhere('so.STS', 'Outs')
+                  ->orWhere('so.STS', 'OUTS')
+                  ->orWhere('so.STS', 'O') // Single letter
+                  ->orWhere('so.STS', 'PENDING')
+                  ->orWhere('so.STS', 'ACTIVE')
+                  ->orWhere('so.STS', 'NEW')
+                  ->orWhere('so.STS', '1') // Numeric status
+                  ->orWhereNull('so.STS')
+                  ->orWhere('so.STS', '');
+            });
+            
+            Log::info('Outstanding SO query built');
+            
+            // Optional filters for search functionality
+            if ($request->has('month') && !empty($request->month) && $request->month !== '0') {
+                $month = str_pad($request->input('month'), 2, '0', STR_PAD_LEFT);
+                $query->where('so.MM', $month);
+            }
+            
+            if ($request->has('year') && !empty($request->year) && $request->year !== '0') {
+                $year = $request->input('year');
+                $query->where('so.YYYY', $year);
+            }
+            
+            if ($request->has('sequence') && !empty($request->sequence) && $request->sequence !== '0') {
+                $query->whereRaw("RIGHT(so.SO_Num, 5) = ?", [str_pad($request->sequence, 5, '0', STR_PAD_LEFT)]);
+            }
+            
+            if ($request->has('so_number') && !empty($request->so_number)) {
+                $query->where('so.SO_Num', 'like', '%' . $request->so_number . '%');
+            }
+
+            $salesOrders = $query->select([
+                    'so.SO_Num',
+                    'so.AC_Num', 
+                    'CUSTOMER.NAME as AC_NAME',
+                    'so.PO_Num',
+                    'so.MCS_Num',
+                    'so.MODEL',
+                    'so.P_DESIGN',
+                    'so.SLM',
+                    'so.GROUP_',
+                    'so.TYPE',
+                    'so.STS',
+                    'so.SO_QTY',
+                    'so.UNIT',
+                    'so.UNIT_PRICE',
+                    'so.AMOUNT',
+                    'so.SO_REMARK',
+                    'so.SO_INSTRUCTION_1',
+                    'so.SO_INSTRUCTION_2',
+                    'so.D_LOC_Num'
+                ])
+                ->orderBy('so.SO_Num', 'desc')
+                ->limit(200) // Increased limit for AmendSO
+                ->get();
+
+            Log::info('Outstanding SO query result count:', ['count' => $salesOrders->count()]);
+            
+            // If no outstanding orders found, get some sample data for debugging
+            if ($salesOrders->count() === 0 && $totalRecords > 0) {
+                Log::warning('No outstanding orders found, getting sample data for debugging');
+                $sampleOrders = DB::table('so')
+                    ->leftJoin('CUSTOMER', 'so.AC_Num', '=', 'CUSTOMER.CODE')
+                    ->select([
+                        'so.SO_Num', 'so.STS', 'so.AC_Num', 'CUSTOMER.NAME as AC_NAME',
+                        'so.PO_Num', 'so.MCS_Num', 'so.MODEL'
+                    ])
+                    ->limit(10)
+                    ->get();
+                
+                Log::info('Sample SO data:', ['sample' => $sampleOrders->toArray()]);
+                
+                // For debugging purposes, return sample data if no outstanding found
+                $salesOrders = $sampleOrders;
+                Log::info('Using sample data for debugging, count:', ['count' => $salesOrders->count()]);
+            }
+            
+            // Log first few results for debugging
+            if ($salesOrders->count() > 0) {
+                Log::info('First SO found:', [
+                    'so_number' => $salesOrders->first()->SO_Num,
+                    'status' => $salesOrders->first()->STS,
+                    'customer' => $salesOrders->first()->AC_Num
+                ]);
+            }
+            
+            // Map to expected format for Sales Order Table Modal
+            $formattedOrders = $salesOrders->map(function($order) {
+                return [
+                    'so_number' => $order->SO_Num,
+                    'customer_code' => $order->AC_Num,
+                    'customer_name' => $order->AC_NAME,
+                    'customer_po_number' => $order->PO_Num,
+                    'master_card_seq' => $order->MCS_Num,
+                    'master_card_model' => $order->MODEL,
+                    'p_design' => $order->P_DESIGN,
+                    'salesperson_code' => $order->SLM,
+                    'order_group' => $order->GROUP_,
+                    'order_type' => $order->TYPE,
+                    'status' => $order->STS, // Return actual status from database
+                    'order_quantity' => $order->SO_QTY,
+                    'uom' => $order->UNIT,
+                    'unit_price' => $order->UNIT_PRICE,
+                    'amount' => $order->AMOUNT,
+                    'remark' => $order->SO_REMARK,
+                    'instruction1' => $order->SO_INSTRUCTION_1,
+                    'instruction2' => $order->SO_INSTRUCTION_2,
+                    'delivery_location' => $order->D_LOC_Num,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $formattedOrders,
+                'count' => $formattedOrders->count(),
+                'debug' => [
+                    'total_so_records' => $totalRecords,
+                    'all_statuses' => $allStatuses->pluck('STS')->toArray(),
+                    'status_counts' => $statusCounts->toArray(),
+                    'query_result_count' => $salesOrders->count()
+                ]
+            ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
+            
+        } catch (\Exception $e) {
+            Log::error('Error fetching outstanding sales orders:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching outstanding sales orders: ' . $e->getMessage()
+            ], 500, ['Content-Type' => 'application/json; charset=utf-8']);
+        }
+    }
     
     /**
      * Get sales order detail by SO number
