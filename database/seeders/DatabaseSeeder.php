@@ -58,6 +58,7 @@ class DatabaseSeeder extends Seeder
             UserCpsSeeder::class,
             FinishingSeeder::class,
             StitchWireSeeder::class,
+            ChemicalCoatSeeder::class,
             ComputationMethodSeeder::class,
             PaperFluteSeeder::class,
             ProductSeeder::class,

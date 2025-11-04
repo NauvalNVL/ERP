@@ -1,6 +1,6 @@
 <template>
-    <AppLayout :header="'Define Stitch Wire'">
-    <Head title="Define Stitch Wire" />
+    <AppLayout :header="'Define Bundling String'">
+    <Head title="Define Bundling String" />
 
     <!-- Hidden form with CSRF token -->
     <form ref="csrfForm" class="hidden">
@@ -10,9 +10,9 @@
     <!-- Header Section -->
     <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-paperclip mr-3"></i> Define Stitch Wire
+            <i class="fas fa-link mr-3"></i> Define Bundling String
         </h2>
-        <p class="text-cyan-100">Define stitch wire types for packaging requirements</p>
+        <p class="text-cyan-100">Manage bundling string definitions for production</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
@@ -24,16 +24,16 @@
                         <div class="p-2 bg-blue-500 rounded-lg mr-3">
                             <i class="fas fa-edit text-white"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800">Define Stitch Wire</h3>
+                        <h3 class="text-xl font-semibold text-gray-800">Define Bundling String</h3>
                     </div>
 
                     <!-- Search Section -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Stitch Wire Code:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bundling String Code:</label>
                             <div class="relative flex">
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
-                                    <i class="fas fa-paperclip"></i>
+                                    <i class="fas fa-link"></i>
                                 </span>
                                 <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                                 <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
@@ -43,66 +43,72 @@
                         </div>
                         <div class="col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
-                            <button type="button" @click="createNewStitchWire" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                            <button type="button" @click="createNewBundlingString" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
                                 <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
                     </div>
+
                     <!-- Data Status Information -->
                     <div v-if="loading" class="mt-4 bg-yellow-100 p-3 rounded">
                         <div class="flex items-center">
                             <div class="mr-3 animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-700"></div>
-                            <p class="text-sm font-medium text-yellow-800">Loading stitch wire data...</p>
+                            <p class="text-sm font-medium text-yellow-800">Loading bundling string data...</p>
                         </div>
                     </div>
-                    <div v-else-if="stitchWires.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
-                        <p class="text-sm font-medium text-yellow-800">No stitch wire data available.</p>
+                    <div v-else-if="bundlingStrings.length === 0" class="mt-4 bg-yellow-100 p-3 rounded">
+                        <p class="text-sm font-medium text-yellow-800">No bundling string data available.</p>
                         <p class="text-xs text-yellow-700 mt-1">Data will be automatically loaded when available.</p>
                     </div>
                     <div v-else class="mt-4 bg-green-100 p-3 rounded">
-                        <p class="text-sm font-medium text-green-800">Data available: {{ stitchWires.length }} stitch wires found.</p>
+                        <p class="text-sm font-medium text-green-800">Data available: {{ bundlingStrings.length }} bundling strings found.</p>
                         <p v-if="selectedRow" class="text-xs text-green-700 mt-1">
                             Selected: <span class="font-semibold">{{ selectedRow.code }}</span> - {{ selectedRow.name }}
                         </p>
                     </div>
                 </div>
             </div>
+
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
-                <!-- Stitch Wire Info Card -->
+                <!-- Bundling String Info Card -->
                 <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
                         <div class="p-2 bg-teal-500 rounded-lg mr-3">
                             <i class="fas fa-info-circle text-white"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-800">Stitch Wire Information</h3>
+                        <h3 class="text-lg font-semibold text-gray-800">Bundling String Info</h3>
                     </div>
 
                     <div class="space-y-4">
                         <div class="p-4 bg-teal-50 rounded-lg">
                             <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
                             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
-                                <li>Stitch wire code must be unique and cannot be changed</li>
-                                <li>Use the <span class="font-medium">search</span> button to select a stitch wire</li>
-                                <li>Name describes the stitch wire configuration</li>
+                                <li>Bundling string code must be unique</li>
+                                <li>Use the search button to select a string</li>
+                                <li>Specify string size and type</li>
                                 <li>Any changes must be saved</li>
                             </ul>
                         </div>
 
                         <div class="p-4 bg-blue-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common Stitch Wire Types</h4>
-                            <div class="grid grid-cols-1 gap-2 text-sm">
+                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common Sizes</h4>
+                            <div class="space-y-2 text-sm">
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">1</span>
-                                    <span>TIPE 1+1+1+1+1</span>
+                                    <span class="w-8 h-8 flex items-center justify-center bg-orange-500 text-white rounded-full font-bold mr-2">5</span>
+                                    <span>5 MM</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">2</span>
-                                    <span>TIPE 2+1+1+1+2</span>
+                                    <span class="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">7</span>
+                                    <span>7 MM</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-purple-500 text-white rounded-full font-bold mr-2">3</span>
-                                    <span>TIPE 2+2+2+2+2</span>
+                                    <span class="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full font-bold mr-2">10</span>
+                                    <span>10 MM</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-8 h-8 flex items-center justify-center bg-purple-500 text-white rounded-full font-bold mr-2">12</span>
+                                    <span>12 MM</span>
                                 </div>
                             </div>
                         </div>
@@ -119,23 +125,33 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <Link href="/finishing" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <Link href="/reinforcement-tape" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <div class="p-2 bg-blue-500 rounded-full mr-3">
-                                <i class="fas fa-th-list text-white text-sm"></i>
+                                <i class="fas fa-tape text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">Finishings</p>
-                                <p class="text-xs text-blue-700">Manage finishings</p>
+                                <p class="font-medium text-blue-900">Reinforcement Tape</p>
+                                <p class="text-xs text-blue-700">Manage reinforcement tape</p>
                             </div>
                         </Link>
 
-                        <Link href="/stitch-wire/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <Link href="/chemical-coat" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                             <div class="p-2 bg-green-500 rounded-full mr-3">
+                                <i class="fas fa-vial text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-green-900">Chemical Coat</p>
+                                <p class="text-xs text-green-700">Manage chemical coatings</p>
+                            </div>
+                        </Link>
+
+                        <Link href="/bundling-string/view-print" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                            <div class="p-2 bg-purple-500 rounded-full mr-3">
                                 <i class="fas fa-print text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-green-900">Print List</p>
-                                <p class="text-xs text-green-700">Print stitch wire list</p>
+                                <p class="font-medium text-purple-900">Print List</p>
+                                <p class="text-xs text-purple-700">Print bundling string list</p>
                             </div>
                         </Link>
                     </div>
@@ -144,12 +160,13 @@
         </div>
     </div>
 
-    <!-- Use StitchWireModal component -->
-    <StitchWireModal
-      v-if="showModal"
-      :show="showModal"
-      @close="showModal = false"
-      @select="onStitchWireSelected"
+    <!-- Use the existing BundlingStringModal component -->
+    <BundlingStringModal
+        v-if="showModal"
+        :show="showModal"
+        :items="bundlingStrings"
+        @close="showModal = false"
+        @select="onBundlingStringSelected"
     />
 
     <!-- Edit Modal -->
@@ -158,19 +175,19 @@
             <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
-                        <i class="fas fa-paperclip"></i>
+                        <i class="fas fa-link"></i>
                     </div>
-                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Stitch Wire' : 'Edit Stitch Wire' }}</h3>
+                    <h3 class="text-xl font-semibold">{{ isCreating ? 'Create Bundling String' : 'Edit Bundling String' }}</h3>
                 </div>
                 <button type="button" @click="closeEditModal" class="text-white hover:text-gray-200 transform active:translate-y-px">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
             <div class="p-6">
-                <form @submit.prevent="saveStitchWireChanges" class="space-y-4">
+                <form @submit.prevent="saveBundlingStringChanges" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Stitch Wire Code:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bundling String Code:</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-hashtag"></i>
@@ -179,7 +196,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Stitch Wire Name:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bundling String Name:</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-font"></i>
@@ -189,7 +206,7 @@
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteStitchWire(editForm.code)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm transform active:translate-y-px">
+                        <button type="button" v-if="!isCreating" @click="deleteBundlingString(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm transform active:translate-y-px">
                             <i class="fas fa-trash-alt mr-2"></i>Delete
                         </button>
                         <div v-else class="w-24"></div>
@@ -241,7 +258,15 @@
 import { ref, onMounted, watch } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import StitchWireModal from '@/Components/stitch-wire-modal.vue';
+import BundlingStringModal from '@/Components/bundling-string-modal.vue';
+
+// Get the header from props
+const props = defineProps({
+    header: {
+        type: String,
+        default: 'Bundling String Management'
+    }
+});
 
 // Reference to the CSRF form
 const csrfForm = ref(null);
@@ -271,7 +296,7 @@ const getCsrfToken = () => {
     return token || '';
 };
 
-const stitchWires = ref([]);
+const bundlingStrings = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
@@ -279,17 +304,18 @@ const showEditModal = ref(false);
 const selectedRow = ref(null);
 const searchQuery = ref('');
 const editForm = ref({
+    id: null,
     code: '',
     name: ''
 });
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 
-// Fetch stitch wires from API
-const fetchStitchWires = async () => {
+// Fetch bundling strings from API
+const fetchBundlingStrings = async () => {
     loading.value = true;
     try {
-        const response = await fetch('/api/stitch-wires', {
+        const response = await fetch('/api/bundling-strings', {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -303,38 +329,35 @@ const fetchStitchWires = async () => {
 
         const data = await response.json();
 
-        // Handle different response formats
         if (Array.isArray(data)) {
-            stitchWires.value = data;
+            bundlingStrings.value = data;
         } else if (data.data && Array.isArray(data.data)) {
-            stitchWires.value = data.data;
+            bundlingStrings.value = data.data;
         } else {
-            stitchWires.value = [];
-            console.error('Unexpected data format:', data);
+            bundlingStrings.value = [];
         }
     } catch (error) {
-        console.error('Error fetching stitch wires:', error);
-        showNotification('Failed to load stitch wires data', 'error');
-        stitchWires.value = [];
+        console.error('Error fetching bundling strings:', error);
+        bundlingStrings.value = [];
     } finally {
         loading.value = false;
     }
 };
 
 onMounted(() => {
-    fetchStitchWires();
+    fetchBundlingStrings();
 });
 
 // Watch for changes in search query to filter the data
 watch(searchQuery, (newQuery) => {
-    if (newQuery && stitchWires.value.length > 0) {
-        const foundStitchWire = stitchWires.value.find(sw =>
-            sw.code.toLowerCase().includes(newQuery.toLowerCase()) ||
-            sw.name.toLowerCase().includes(newQuery.toLowerCase())
+    if (newQuery && bundlingStrings.value.length > 0) {
+        const foundString = bundlingStrings.value.find(string =>
+            string.code.toLowerCase().includes(newQuery.toLowerCase()) ||
+            string.name.toLowerCase().includes(newQuery.toLowerCase())
         );
 
-        if (foundStitchWire) {
-            selectedRow.value = foundStitchWire;
+        if (foundString) {
+            selectedRow.value = foundString;
         }
     }
 });
@@ -342,24 +365,25 @@ watch(searchQuery, (newQuery) => {
 // Watch for modal opening to refresh data
 watch(showModal, (isOpen) => {
     if (isOpen) {
-        fetchStitchWires();
+        fetchBundlingStrings();
     }
 });
 
-const onStitchWireSelected = (stitchWire) => {
-    selectedRow.value = stitchWire;
-    searchQuery.value = stitchWire.code;
+const onBundlingStringSelected = (string) => {
+    selectedRow.value = string;
+    searchQuery.value = string.code;
     showModal.value = false;
 
     // Automatically open the edit modal for the selected row
     isCreating.value = false;
-    editForm.value = { ...stitchWire };
+    editForm.value = { ...string };
     showEditModal.value = true;
 };
 
-const createNewStitchWire = () => {
+const createNewBundlingString = () => {
     isCreating.value = true;
     editForm.value = {
+        id: null,
         code: '',
         name: ''
     };
@@ -369,21 +393,22 @@ const createNewStitchWire = () => {
 const closeEditModal = () => {
     showEditModal.value = false;
     editForm.value = {
+        id: null,
         code: '',
         name: ''
     };
     isCreating.value = false;
 };
 
-const saveStitchWireChanges = async () => {
+const saveBundlingStringChanges = async () => {
     // Validate form
     if (!editForm.value.code) {
-        showNotification('Stitch wire code is required', 'error');
+        showNotification('Bundling string code is required', 'error');
         return;
     }
 
     if (!editForm.value.name) {
-        showNotification('Stitch wire name is required', 'error');
+        showNotification('Bundling string name is required', 'error');
         return;
     }
 
@@ -392,8 +417,7 @@ const saveStitchWireChanges = async () => {
     try {
         const csrfToken = getCsrfToken();
 
-        // Different API call for create vs update
-        let url = isCreating.value ? '/api/stitch-wires' : `/api/stitch-wires/${editForm.value.code}`;
+        let url = isCreating.value ? '/api/bundling-strings' : `/api/bundling-strings/${editForm.value.id}`;
         let method = isCreating.value ? 'POST' : 'PUT';
 
         const response = await fetch(url, {
@@ -410,46 +434,40 @@ const saveStitchWireChanges = async () => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Error saving stitch wire');
+            throw new Error(errorData.message || 'Error saving bundling string');
         }
 
-        const result = await response.json();
+        await fetchBundlingStrings();
 
-        // Update the local data
-        await fetchStitchWires();
-
-        // Show success notification
         if (isCreating.value) {
-            showNotification('Stitch wire created successfully', 'success');
-            // Find and select the newly created stitch wire
-            const newStitchWire = stitchWires.value.find(sw => sw.code === editForm.value.code);
-            if (newStitchWire) {
-                selectedRow.value = newStitchWire;
-                searchQuery.value = newStitchWire.code;
+            showNotification('Bundling string created successfully', 'success');
+            const newString = bundlingStrings.value.find(s => s.code === editForm.value.code);
+            if (newString) {
+                selectedRow.value = newString;
+                searchQuery.value = newString.code;
             }
         } else {
-            showNotification('Stitch wire updated successfully', 'success');
+            showNotification('Bundling string updated successfully', 'success');
         }
 
-        // Close the edit modal
         closeEditModal();
     } catch (error) {
-        console.error('Error saving stitch wire:', error);
+        console.error('Error saving bundling string:', error);
         showNotification('Error: ' + error.message, 'error');
     } finally {
         saving.value = false;
     }
 };
 
-const deleteStitchWire = async (code) => {
-    if (!confirm(`Are you sure you want to delete stitch wire "${code}"?`)) return;
+const deleteBundlingString = async (id) => {
+    if (!confirm(`Are you sure you want to delete this bundling string?`)) return;
 
     saving.value = true;
 
     try {
         const csrfToken = getCsrfToken();
 
-        const response = await fetch(`/api/stitch-wires/${code}`, {
+        const response = await fetch(`/api/bundling-strings/${id}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
@@ -461,21 +479,21 @@ const deleteStitchWire = async (code) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Error deleting stitch wire');
+            throw new Error(errorData.message || 'Error deleting bundling string');
         }
 
-        showNotification('Stitch wire deleted successfully!', 'success');
-        await fetchStitchWires();
+        showNotification('Bundling string deleted successfully!', 'success');
+        await fetchBundlingStrings();
 
-        if (selectedRow.value && selectedRow.value.code === code) {
+        if (selectedRow.value && selectedRow.value.id === id) {
             selectedRow.value = null;
             searchQuery.value = '';
         }
 
         closeEditModal();
     } catch (error) {
-        console.error('Error deleting stitch wire:', error);
-        showNotification(`Error deleting stitch wire: ${error.message}`, 'error');
+        console.error('Error deleting bundling string:', error);
+        showNotification(`Error deleting bundling string: ${error.message}`, 'error');
     } finally {
         saving.value = false;
     }

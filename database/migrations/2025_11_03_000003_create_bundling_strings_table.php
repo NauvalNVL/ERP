@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stitch_wires', function (Blueprint $table) {
+        Schema::create('bundling_strings', function (Blueprint $table) {
             $table->id();
             $table->string('code', 50)->unique();
             $table->string('name', 255);
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stitch_wires');
+        Schema::dropIfExists('bundling_strings');
     }
 };

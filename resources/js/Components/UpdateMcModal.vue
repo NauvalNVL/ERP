@@ -686,7 +686,7 @@
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">R/F Tape:</label>
                                     <input type="text" :value="selectedReinforcementTape" readonly class="w-28 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="showReinforcementTapeModal = true" title="Select Reinforcement Tape">
+                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openReinforcementTapeModal" title="Select Reinforcement Tape">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
@@ -991,7 +991,6 @@
     <!-- Chemical Coat Modal -->
     <ChemicalCoatModal
         :show="showChemicalCoatModal"
-        :coats="chemicalCoatRows"
         @close="showChemicalCoatModal = false"
         @select="(coat) => { selectedChemicalCoat = coat?.name || coat?.code || ''; showChemicalCoatModal = false; }"
     />
@@ -1155,20 +1154,37 @@ const selectedPaperFlute = ref('');
 // Chemical Coat Modal
 const showChemicalCoatModal = ref(false);
 const selectedChemicalCoat = ref('');
-const chemicalCoatRows = ref([
-    { code: '001', name: 'VERNISH', dry_end_code: '' },
-    { code: '002', name: 'WATER BASE COATING', dry_end_code: '' },
-    { code: '003', name: 'GLOSS COAT', dry_end_code: '' },
-    { code: '004', name: 'MATTE COAT', dry_end_code: '' },
-    { code: '005', name: 'UV COATING', dry_end_code: '' }
-]);
 
 // Reinforcement Tape Modal
 const showReinforcementTapeModal = ref(false);
 const selectedReinforcementTape = ref('');
-const reinforcementTapeRows = ref([
-    { code: '001', name: 'LAKBAN SERAT', dry_end_code: '' }
-]);
+const reinforcementTapeRows = ref([]);
+
+// Fetch reinforcement tapes from API
+const fetchReinforcementTapes = async () => {
+    try {
+        const response = await fetch('/api/reinforcement-tapes', {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            reinforcementTapeRows.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+        } else {
+            reinforcementTapeRows.value = [];
+        }
+    } catch (e) {
+        console.error('Error fetching reinforcement tapes:', e);
+        reinforcementTapeRows.value = [];
+    }
+};
+
+// Open reinforcement tape modal and fetch data
+const openReinforcementTapeModal = async () => {
+    if (reinforcementTapeRows.value.length === 0) {
+        await fetchReinforcementTapes();
+    }
+    showReinforcementTapeModal.value = true;
+};
 
 // Paper Size Modal
 const showPaperSizeModal = ref(false);
@@ -1313,14 +1329,31 @@ const onStitchWireSelected = (item) => {
 // Bundling String Modal
 const showBundlingStringModal = ref(false);
 const selectedBundlingStringCode = ref('');
-const bundlingStringItems = ref([
-    { code: '001', name: '5 MM' },
-    { code: '002', name: '7 MM' }
-]);
+const bundlingStringItems = ref([]);
 const bundlingStringQty = ref('');
 
+// Fetch bundling strings from API
+const fetchBundlingStrings = async () => {
+    try {
+        const response = await fetch('/api/bundling-strings', {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            bundlingStringItems.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+        } else {
+            bundlingStringItems.value = [];
+        }
+    } catch (e) {
+        console.error('Error fetching bundling strings:', e);
+        bundlingStringItems.value = [];
+    }
+};
+
 const openBundlingStringModal = async () => {
-    // If later there is an API, fetch here similarly to others
+    if (bundlingStringItems.value.length === 0) {
+        await fetchBundlingStrings();
+    }
     showBundlingStringModal.value = true;
 };
 
@@ -1337,13 +1370,33 @@ const openSubMaterialModal = () => { showSubMaterialModal.value = true; };
 // Glueing Material Modal
 const showGlueingModal = ref(false);
 const selectedGlueingCode = ref('');
-const glueingItems = ref([
-    { code: '001', name: 'PVAC' }
-]);
+const glueingItems = ref([]);
+
+// Fetch glueing materials from API
+const fetchGlueingMaterials = async () => {
+    try {
+        const response = await fetch('/api/glueing-materials', {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            glueingItems.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+        } else {
+            glueingItems.value = [];
+        }
+    } catch (e) {
+        console.error('Error fetching glueing materials:', e);
+        glueingItems.value = [];
+    }
+};
+
 const openGlueingModal = async () => {
-    // Placeholder for future API fetch
+    if (glueingItems.value.length === 0) {
+        await fetchGlueingMaterials();
+    }
     showGlueingModal.value = true;
 };
+
 const onGlueingSelected = (item) => {
     selectedGlueingCode.value = item?.code || '';
     showGlueingModal.value = false;
@@ -1352,13 +1405,33 @@ const onGlueingSelected = (item) => {
 // Wrapping Material Modal
 const showWrappingModal = ref(false);
 const selectedWrappingCode = ref('');
-const wrappingItems = ref([
-    { code: '001', name: 'PLASTIK' },
-    { code: '002', name: 'KERTAS' }
-]);
+const wrappingItems = ref([]);
+
+// Fetch wrapping materials from API
+const fetchWrappingMaterials = async () => {
+    try {
+        const response = await fetch('/api/wrapping-materials', {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            wrappingItems.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+        } else {
+            wrappingItems.value = [];
+        }
+    } catch (e) {
+        console.error('Error fetching wrapping materials:', e);
+        wrappingItems.value = [];
+    }
+};
+
 const openWrappingModal = async () => {
+    if (wrappingItems.value.length === 0) {
+        await fetchWrappingMaterials();
+    }
     showWrappingModal.value = true;
 };
+
 const onWrappingSelected = (item) => {
     selectedWrappingCode.value = item?.code || '';
     showWrappingModal.value = false;

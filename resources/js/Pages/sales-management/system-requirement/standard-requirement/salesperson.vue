@@ -193,11 +193,13 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Group:</label>
-                            <input v-model="editForm.grup" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <select v-model="editForm.grup" @change="onSalesTeamChange" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <option v-for="team in salesTeams" :key="team.code" :value="team.name">{{ team.name }}</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Code Group:</label>
-                            <input v-model="editForm.code_grup" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input v-model="editForm.code_grup" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" readonly>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Target Sales:</label>
@@ -280,6 +282,7 @@ const props = defineProps({
 });
 
 const salespersons = ref([]);
+const salesTeams = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 const showModal = ref(false);
@@ -353,10 +356,50 @@ const fetchSalespersons = async () => {
     }
 };
 
+const fetchSalesTeams = async () => {
+    try {
+        const res = await fetch('/api/sales-teams', {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        });
+
+        if (!res.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await res.json();
+        console.log('Fetched sales teams data:', data);
+
+        if (Array.isArray(data)) {
+            salesTeams.value = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            salesTeams.value = data.data;
+        } else {
+            salesTeams.value = [];
+            console.error('Unexpected data format:', data);
+        }
+    } catch (e) {
+        console.error('Error fetching sales teams:', e);
+        salesTeams.value = [];
+    }
+};
+
+const onSalesTeamChange = () => {
+    const selectedTeam = salesTeams.value.find(team => team.name === editForm.value.grup);
+    if (selectedTeam) {
+        editForm.value.code_grup = selectedTeam.code;
+    } else {
+        editForm.value.code_grup = '';
+    }
+};
+
 
 
 onMounted(async () => {
-    await fetchSalespersons();
+    await Promise.all([fetchSalespersons(), fetchSalesTeams()]);
 });
 
 // Watch for changes in search query to filter the data

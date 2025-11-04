@@ -24,6 +24,11 @@ use App\Http\Controllers\PaperQualityController;
 use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\StitchWireController;
+use App\Http\Controllers\ChemicalCoatController;
+use App\Http\Controllers\ReinforcementTapeController;
+use App\Http\Controllers\BundlingStringController;
+use App\Http\Controllers\WrappingMaterialController;
+use App\Http\Controllers\GlueingMaterialController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\ForeignCurrencyController;
@@ -382,6 +387,31 @@ Route::middleware('auth')->group(function () {
          Route::get('/stitch-wire/view-print', [StitchWireController::class, 'vueViewAndPrint'])->name('vue.stitch-wire.view-print');
          // Alias for search menu
          Route::get('/define-stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.define-stitch-wire');
+
+         Route::get('/chemical-coat', [ChemicalCoatController::class, 'vueIndex'])->name('vue.chemical-coat.index');
+         Route::get('/chemical-coat/view-print', [ChemicalCoatController::class, 'vueViewAndPrint'])->name('vue.chemical-coat.view-print');
+         // Alias for search menu
+         Route::get('/define-chemical-coat', [ChemicalCoatController::class, 'vueIndex'])->name('vue.define-chemical-coat');
+
+         Route::get('/reinforcement-tape', [ReinforcementTapeController::class, 'index'])->name('vue.reinforcement-tape.index');
+         Route::get('/reinforcement-tape/view-print', [ReinforcementTapeController::class, 'vueViewAndPrint'])->name('vue.reinforcement-tape.view-print');
+         // Alias for search menu
+         Route::get('/define-reinforcement-tape', [ReinforcementTapeController::class, 'index'])->name('vue.define-reinforcement-tape');
+
+         Route::get('/bundling-string', [BundlingStringController::class, 'index'])->name('vue.bundling-string.index');
+         Route::get('/bundling-string/view-print', [BundlingStringController::class, 'vueViewAndPrint'])->name('vue.bundling-string.view-print');
+         // Alias for search menu
+         Route::get('/define-bundling-string', [BundlingStringController::class, 'index'])->name('vue.define-bundling-string');
+
+         Route::get('/wrapping-material', [WrappingMaterialController::class, 'index'])->name('vue.wrapping-material.index');
+         Route::get('/wrapping-material/view-print', [WrappingMaterialController::class, 'vueViewAndPrint'])->name('vue.wrapping-material.view-print');
+         // Alias for search menu
+         Route::get('/define-wrapping-material', [WrappingMaterialController::class, 'index'])->name('vue.define-wrapping-material');
+
+         Route::get('/glueing-material', [GlueingMaterialController::class, 'index'])->name('vue.glueing-material.index');
+         Route::get('/glueing-material/view-print', [GlueingMaterialController::class, 'vueViewAndPrint'])->name('vue.glueing-material.view-print');
+         // Alias for search menu
+         Route::get('/define-glueing-material', [GlueingMaterialController::class, 'index'])->name('vue.define-glueing-material');
 
          // Customer Account Routes
          Route::get('/customer-group', function () {
@@ -1085,6 +1115,40 @@ Route::prefix('api')->group(function () {
     Route::put('/scoring-tools/{id}', [ScoringToolController::class, 'update']);
     Route::delete('/scoring-tools/{id}', [ScoringToolController::class, 'destroy']);
     Route::post('/scoring-tools/seed', [ScoringToolController::class, 'seed']);
+
+    // Chemical Coat API routes
+    Route::get('/chemical-coats', [ChemicalCoatController::class, 'apiIndex']);
+    Route::post('/chemical-coats', [ChemicalCoatController::class, 'store']);
+    Route::put('/chemical-coats/{id}', [ChemicalCoatController::class, 'update']);
+    Route::delete('/chemical-coats/{id}', [ChemicalCoatController::class, 'destroy']);
+
+    // Reinforcement Tape API routes
+    Route::get('/reinforcement-tapes', [ReinforcementTapeController::class, 'index']);
+    Route::post('/reinforcement-tapes', [ReinforcementTapeController::class, 'store']);
+    Route::put('/reinforcement-tapes/{id}', [ReinforcementTapeController::class, 'update']);
+    Route::delete('/reinforcement-tapes/{id}', [ReinforcementTapeController::class, 'destroy']);
+    Route::post('/reinforcement-tapes/seed', [ReinforcementTapeController::class, 'seed']);
+
+    // Bundling String API routes
+    Route::get('/bundling-strings', [BundlingStringController::class, 'index']);
+    Route::post('/bundling-strings', [BundlingStringController::class, 'store']);
+    Route::put('/bundling-strings/{id}', [BundlingStringController::class, 'update']);
+    Route::delete('/bundling-strings/{id}', [BundlingStringController::class, 'destroy']);
+    Route::post('/bundling-strings/seed', [BundlingStringController::class, 'seed']);
+
+    // Wrapping Material API routes
+    Route::get('/wrapping-materials', [WrappingMaterialController::class, 'index']);
+    Route::post('/wrapping-materials', [WrappingMaterialController::class, 'store']);
+    Route::put('/wrapping-materials/{id}', [WrappingMaterialController::class, 'update']);
+    Route::delete('/wrapping-materials/{id}', [WrappingMaterialController::class, 'destroy']);
+    Route::post('/wrapping-materials/seed', [WrappingMaterialController::class, 'seed']);
+
+    // Glueing Material API routes
+    Route::get('/glueing-materials', [GlueingMaterialController::class, 'index']);
+    Route::post('/glueing-materials', [GlueingMaterialController::class, 'store']);
+    Route::put('/glueing-materials/{id}', [GlueingMaterialController::class, 'update']);
+    Route::delete('/glueing-materials/{id}', [GlueingMaterialController::class, 'destroy']);
+    Route::post('/glueing-materials/seed', [GlueingMaterialController::class, 'seed']);
 
     // Business Form API routes
     Route::get('/business-forms', [BusinessFormController::class, 'apiIndex']);

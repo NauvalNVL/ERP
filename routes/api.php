@@ -19,6 +19,7 @@ use App\Http\Controllers\ProductDesignController;
 use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\ColorGroupController;
+use App\Http\Controllers\ChemicalCoatController;
 use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController;
 use App\Http\Controllers\SalesManagement\CustomerService\CustomerServiceController;
@@ -359,6 +360,13 @@ Route::post('/stitch-wires', [App\Http\Controllers\StitchWireController::class, 
 Route::put('/stitch-wires/{code}', [App\Http\Controllers\StitchWireController::class, 'update']);
 Route::delete('/stitch-wires/{code}', [App\Http\Controllers\StitchWireController::class, 'destroy']);
 Route::post('/stitch-wires/seed', [App\Http\Controllers\StitchWireController::class, 'seed']);
+
+// Chemical Coat API routes
+Route::get('/chemical-coats', [App\Http\Controllers\ChemicalCoatController::class, 'apiIndex']);
+Route::post('/chemical-coats', [App\Http\Controllers\ChemicalCoatController::class, 'store']);
+Route::put('/chemical-coats/{code}', [App\Http\Controllers\ChemicalCoatController::class, 'update']);
+Route::delete('/chemical-coats/{code}', [App\Http\Controllers\ChemicalCoatController::class, 'destroy']);
+Route::post('/chemical-coats/seed', [App\Http\Controllers\ChemicalCoatController::class, 'seed']);
 
 // Approve MC API routes
 Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);

@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stitch_wires', function (Blueprint $table) {
+        Schema::create('wrapping_materials', function (Blueprint $table) {
             $table->id();
             $table->string('code', 50)->unique();
             $table->string('name', 255);
+            $table->string('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stitch_wires');
+        Schema::dropIfExists('wrapping_materials');
     }
 };
