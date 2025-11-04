@@ -85,6 +85,16 @@ class UserCps extends Authenticatable
     ];
 
     /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'userID';
+    }
+
+    /**
      * Get the name of the unique identifier for the user.
      *
      * @return string
