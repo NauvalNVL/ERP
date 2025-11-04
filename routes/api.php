@@ -5,8 +5,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\StandardFormulaController;
-use App\Http\Controllers\SOConfigController;
 use App\Http\Controllers\UpdateCustomerAccountController;
 use App\Http\Controllers\CustomerAlternateAddressController;
 use App\Http\Controllers\CorrugatorConfigController;
@@ -19,8 +19,13 @@ use App\Http\Controllers\SideTrimByProductDesignController;
 use App\Http\Controllers\ProductDesignController;
 use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\FinishingController;
+use App\Http\Controllers\StitchWireController;
 use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\ChemicalCoatController;
+use App\Http\Controllers\ReinforcementTapeController;
+use App\Http\Controllers\BundlingStringController;
+use App\Http\Controllers\WrappingMaterialController;
+use App\Http\Controllers\GlueingMaterialController;
 use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController;
 use App\Http\Controllers\SalesManagement\CustomerService\CustomerServiceController;
@@ -61,6 +66,10 @@ use App\Http\Controllers\WarehouseManagement\Invoice\InvoiceController;
 
 // NOTE: Material Management SKU routes are now defined in the material-management prefix group below (around line 1104)
 // to avoid duplication and ensure proper route ordering
+
+// User API routes
+Route::get('/users/search/{userId}', [UserController::class, 'searchUser']);
+Route::post('/users/{userId}/permissions', [UserController::class, 'updateUserPermissions']);
 
 // Purchaser API routes
 Route::get('/purchasers', [App\Http\Controllers\MaterialManagement\SystemRequirement\PurchaserController::class, 'index']);
@@ -261,9 +270,10 @@ Route::post('/standard-formula', [StandardFormulaController::class, 'apiStore'])
 Route::post('/standard-formula/seed', [StandardFormulaController::class, 'apiSeed']);
 
 // SO Config API routes
-Route::post('/so-config', [SOConfigController::class, 'apiStore']); 
-Route::get('/so-periods', [SOConfigController::class, 'apiIndexPeriods']);
-Route::get('/so-rough-cut-capacity', [SOConfigController::class, 'apiIndexRoughCutCapacity']);
+// TODO: SOConfigController tidak ditemukan, perlu dibuat atau gunakan SalesConfigurationController
+// Route::post('/so-config', [SOConfigController::class, 'apiStore']); 
+// Route::get('/so-periods', [SOConfigController::class, 'apiIndexPeriods']);
+// Route::get('/so-rough-cut-capacity', [SOConfigController::class, 'apiIndexRoughCutCapacity']);
 
 // Customer Accounts API routes
 Route::get('/customer-accounts', [UpdateCustomerAccountController::class, 'apiIndex']);
@@ -365,6 +375,41 @@ Route::post('/chemical-coats', [App\Http\Controllers\ChemicalCoatController::cla
 Route::put('/chemical-coats/{code}', [App\Http\Controllers\ChemicalCoatController::class, 'update']);
 Route::delete('/chemical-coats/{code}', [App\Http\Controllers\ChemicalCoatController::class, 'destroy']);
 Route::post('/chemical-coats/seed', [App\Http\Controllers\ChemicalCoatController::class, 'seed']);
+
+// Stitch Wire API routes
+Route::get('/stitch-wires', [App\Http\Controllers\StitchWireController::class, 'apiIndex']);
+Route::post('/stitch-wires', [App\Http\Controllers\StitchWireController::class, 'store']);
+Route::put('/stitch-wires/{code}', [App\Http\Controllers\StitchWireController::class, 'update']);
+Route::delete('/stitch-wires/{code}', [App\Http\Controllers\StitchWireController::class, 'destroy']);
+Route::post('/stitch-wires/seed', [App\Http\Controllers\StitchWireController::class, 'seed']);
+
+// Reinforcement Tape API routes
+Route::get('/reinforcement-tapes', [App\Http\Controllers\ReinforcementTapeController::class, 'apiIndex']);
+Route::post('/reinforcement-tapes', [App\Http\Controllers\ReinforcementTapeController::class, 'store']);
+Route::put('/reinforcement-tapes/{code}', [App\Http\Controllers\ReinforcementTapeController::class, 'update']);
+Route::delete('/reinforcement-tapes/{code}', [App\Http\Controllers\ReinforcementTapeController::class, 'destroy']);
+Route::post('/reinforcement-tapes/seed', [App\Http\Controllers\ReinforcementTapeController::class, 'seed']);
+
+// Bundling String API routes
+Route::get('/bundling-strings', [App\Http\Controllers\BundlingStringController::class, 'apiIndex']);
+Route::post('/bundling-strings', [App\Http\Controllers\BundlingStringController::class, 'store']);
+Route::put('/bundling-strings/{code}', [App\Http\Controllers\BundlingStringController::class, 'update']);
+Route::delete('/bundling-strings/{code}', [App\Http\Controllers\BundlingStringController::class, 'destroy']);
+Route::post('/bundling-strings/seed', [App\Http\Controllers\BundlingStringController::class, 'seed']);
+
+// Wrapping Material API routes
+Route::get('/wrapping-materials', [App\Http\Controllers\WrappingMaterialController::class, 'apiIndex']);
+Route::post('/wrapping-materials', [App\Http\Controllers\WrappingMaterialController::class, 'store']);
+Route::put('/wrapping-materials/{code}', [App\Http\Controllers\WrappingMaterialController::class, 'update']);
+Route::delete('/wrapping-materials/{code}', [App\Http\Controllers\WrappingMaterialController::class, 'destroy']);
+Route::post('/wrapping-materials/seed', [App\Http\Controllers\WrappingMaterialController::class, 'seed']);
+
+// Glueing Material API routes
+Route::get('/glueing-materials', [App\Http\Controllers\GlueingMaterialController::class, 'apiIndex']);
+Route::post('/glueing-materials', [App\Http\Controllers\GlueingMaterialController::class, 'store']);
+Route::put('/glueing-materials/{code}', [App\Http\Controllers\GlueingMaterialController::class, 'update']);
+Route::delete('/glueing-materials/{code}', [App\Http\Controllers\GlueingMaterialController::class, 'destroy']);
+Route::post('/glueing-materials/seed', [App\Http\Controllers\GlueingMaterialController::class, 'seed']);
 
 // Approve MC API routes
 Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);

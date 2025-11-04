@@ -24,6 +24,11 @@ use App\Http\Controllers\PaperQualityController;
 use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\StitchWireController;
+use App\Http\Controllers\ChemicalCoatController;
+use App\Http\Controllers\ReinforcementTapeController;
+use App\Http\Controllers\BundlingStringController;
+use App\Http\Controllers\WrappingMaterialController;
+use App\Http\Controllers\GlueingMaterialController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\ForeignCurrencyController;
@@ -37,7 +42,7 @@ use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\RealeseApproveMcController;
 use App\Http\Controllers\StandardFormulaController;
-use App\Http\Controllers\SOConfigController;
+// use App\Http\Controllers\SOConfigController; // TODO: Controller tidak ditemukan
 use App\Http\Controllers\ScoringFormulaController;
 use App\Http\Controllers\ObsolateReactiveMcController;
 use App\Http\Controllers\CustomerSalesTypeController;
@@ -174,6 +179,7 @@ Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('vue.sys
 Route::get('/system-security/amend-password', [UserController::class, 'vueAmendPassword'])->name('vue.system-security.amend-password');
 Route::post('/system-security/update-password', [UserController::class, 'updatePassword'])->name('vue.system-security.update-password');
 Route::get('/system-security/define-access', [UserController::class, 'vueDefineAccess'])->name('vue.system-security.define-access');
+Route::post('/user-permissions/{userId}', [UserController::class, 'updateUserPermissions'])->name('user-permissions.update');
 Route::get('/system-security/copy-paste-access', [UserController::class, 'vueCopyPasteAccess'])->name('vue.system-security.copy-paste-access');
 Route::get('/system-security/view-print-user', [UserController::class, 'vueViewPrintUser'])->name('vue.system-security.view-print-user');
 
@@ -229,7 +235,10 @@ Route::get('/standard-formula/setup-roll-trim-by-product-design', [RollTrimByPro
 Route::get('/standard-formula/setup-roll-trim-by-product-design/view-print', [RollTrimByProductDesignController::class, 'viewPrint'])->name('vue.standard-formula.setup-roll-trim-by-product-design.view-print');
 
          // Sales Order Setup - Define SO Config
-         Route::get('/sales-order/setup/define-so-config', [SOConfigController::class, 'index'])->name('vue.sales-order.setup.define-so-config');
+         // TODO: SOConfigController tidak ditemukan, perlu dibuat
+         Route::get('/sales-order/setup/define-so-config', function () {
+             return Inertia::render('sales-management/sales-order/setup/define-so-config');
+         })->name('vue.sales-order.setup.define-so-config');
 
          // Sales Order Setup - Define SO Period
          Route::get('/sales-order/setup/define-so-period', function () {
@@ -496,6 +505,31 @@ Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.def
          Route::get('/stitch-wire/view-print', [StitchWireController::class, 'vueViewAndPrint'])->name('vue.stitch-wire.view-print');
          // Alias for search menu
          Route::get('/define-stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.define-stitch-wire');
+
+         Route::get('/chemical-coat', [ChemicalCoatController::class, 'vueIndex'])->name('vue.chemical-coat.index');
+         Route::get('/chemical-coat/view-print', [ChemicalCoatController::class, 'vueViewAndPrint'])->name('vue.chemical-coat.view-print');
+         // Alias for search menu
+         Route::get('/define-chemical-coat', [ChemicalCoatController::class, 'vueIndex'])->name('vue.define-chemical-coat');
+
+         Route::get('/reinforcement-tape', [\App\Http\Controllers\ReinforcementTapeController::class, 'vueIndex'])->name('vue.reinforcement-tape.index');
+         Route::get('/reinforcement-tape/view-print', [\App\Http\Controllers\ReinforcementTapeController::class, 'vueViewAndPrint'])->name('vue.reinforcement-tape.view-print');
+         // Alias for search menu
+         Route::get('/define-reinforcement-tape', [\App\Http\Controllers\ReinforcementTapeController::class, 'vueIndex'])->name('vue.define-reinforcement-tape');
+
+         Route::get('/bundling-string', [\App\Http\Controllers\BundlingStringController::class, 'vueIndex'])->name('vue.bundling-string.index');
+         Route::get('/bundling-string/view-print', [\App\Http\Controllers\BundlingStringController::class, 'vueViewAndPrint'])->name('vue.bundling-string.view-print');
+         // Alias for search menu
+         Route::get('/define-bundling-string', [\App\Http\Controllers\BundlingStringController::class, 'vueIndex'])->name('vue.define-bundling-string');
+
+         Route::get('/wrapping-material', [\App\Http\Controllers\WrappingMaterialController::class, 'vueIndex'])->name('vue.wrapping-material.index');
+         Route::get('/wrapping-material/view-print', [\App\Http\Controllers\WrappingMaterialController::class, 'vueViewAndPrint'])->name('vue.wrapping-material.view-print');
+         // Alias for search menu
+         Route::get('/define-wrapping-material', [\App\Http\Controllers\WrappingMaterialController::class, 'vueIndex'])->name('vue.define-wrapping-material');
+
+         Route::get('/glueing-material', [\App\Http\Controllers\GlueingMaterialController::class, 'vueIndex'])->name('vue.glueing-material.index');
+         Route::get('/glueing-material/view-print', [\App\Http\Controllers\GlueingMaterialController::class, 'vueViewAndPrint'])->name('vue.glueing-material.view-print');
+         // Alias for search menu
+         Route::get('/define-glueing-material', [\App\Http\Controllers\GlueingMaterialController::class, 'vueIndex'])->name('vue.define-glueing-material');
 
 // Customer Account Routes
 Route::get('/customer-group', function () {

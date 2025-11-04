@@ -214,6 +214,48 @@ class UserPermission extends Model
                 'category' => 'sales_management',
                 'parent' => 'sales_management'
             ],
+            [
+                'key' => 'define_stitch_wire',
+                'name' => 'Define Stitch Wire',
+                'route' => '/stitch-wire',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'define_chemical_coat',
+                'name' => 'Define Chemical Coat',
+                'route' => '/chemical-coat',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'define_reinforcement_tape',
+                'name' => 'Define Reinforcement Tape',
+                'route' => '/reinforcement-tape',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'define_bundling_string',
+                'name' => 'Define Bundling String',
+                'route' => '/bundling-string',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'define_wrapping_material',
+                'name' => 'Define Wrapping Material',
+                'route' => '/wrapping-material',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'define_glueing_material',
+                'name' => 'Define Glueing Material',
+                'route' => '/glueing-material',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
             
             // Sales Management - Standard Requirement
             [
@@ -318,6 +360,48 @@ class UserPermission extends Model
                 'key' => 'view_print_finishing',
                 'name' => 'View & Print Finishing',
                 'route' => '/sales-management/system-requirement/standard-requirement/view-print-finishing',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'view_print_stitch_wire',
+                'name' => 'View & Print Stitch Wire',
+                'route' => '/stitch-wire/view-print',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'view_print_chemical_coat',
+                'name' => 'View & Print Chemical Coat',
+                'route' => '/chemical-coat/view-print',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'view_print_reinforcement_tape',
+                'name' => 'View & Print Reinforcement Tape',
+                'route' => '/reinforcement-tape/view-print',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'view_print_bundling_string',
+                'name' => 'View & Print Bundling String',
+                'route' => '/bundling-string/view-print',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'view_print_wrapping_material',
+                'name' => 'View & Print Wrapping Material',
+                'route' => '/wrapping-material/view-print',
+                'category' => 'sales_management',
+                'parent' => 'sales_management'
+            ],
+            [
+                'key' => 'view_print_glueing_material',
+                'name' => 'View & Print Glueing Material',
+                'route' => '/glueing-material/view-print',
                 'category' => 'sales_management',
                 'parent' => 'sales_management'
             ],

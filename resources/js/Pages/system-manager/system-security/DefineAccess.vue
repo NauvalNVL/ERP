@@ -253,6 +253,30 @@
                                                 <input type="checkbox" v-model="form.permissions.define_finishing" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Finishing</span>
                                             </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_stitch_wire" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Stitch Wire</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_chemical_coat" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Chemical Coat</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_reinforcement_tape" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Reinforcement Tape</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_bundling_string" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Bundling String</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_wrapping_material" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Wrapping Material</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_glueing_material" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Glueing Material</span>
+                                            </label>
                                             
                                             <!-- View & Print Permissions -->
                                             <div class="col-span-full">
@@ -274,6 +298,30 @@
                                                         <label class="flex items-center">
                                                             <input type="checkbox" v-model="form.permissions.view_print_product" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                             <span class="ml-3 text-xs text-gray-600">View & Print Product</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_stitch_wire" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Stitch Wire</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_chemical_coat" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Chemical Coat</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_reinforcement_tape" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Reinforcement Tape</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_bundling_string" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Bundling String</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_wrapping_material" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Wrapping Material</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_glueing_material" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Glueing Material</span>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -574,6 +622,12 @@ export default {
                     'define_color_group': false,
                     'define_color': false,
                     'define_finishing': false,
+                    'define_stitch_wire': false,
+                    'define_chemical_coat': false,
+                    'define_reinforcement_tape': false,
+                    'define_bundling_string': false,
+                    'define_wrapping_material': false,
+                    'define_glueing_material': false,
                     'view_print_sales_team': false,
                     'view_print_salesperson': false,
                     'view_print_salesperson_team': false,
@@ -589,6 +643,12 @@ export default {
                     'view_print_color_group': false,
                     'view_print_color': false,
                     'view_print_finishing': false,
+                    'view_print_stitch_wire': false,
+                    'view_print_chemical_coat': false,
+                    'view_print_reinforcement_tape': false,
+                    'view_print_bundling_string': false,
+                    'view_print_wrapping_material': false,
+                    'view_print_glueing_material': false,
                     'define_customer_group': false,
                     'update_customer_account': false,
                     'obsolete_reactive_customer_ac': false,
@@ -808,7 +868,9 @@ export default {
                     key.includes('sales') || key.includes('customer') || key.includes('product') || 
                     key.includes('mc') || key.includes('so') || key.includes('industry') || 
                     key.includes('geo') || key.includes('color') || key.includes('paper') || 
-                    key.includes('finishing') || key.includes('scoring')
+                    key.includes('finishing') || key.includes('scoring') || key.includes('stitch') ||
+                    key.includes('chemical') || key.includes('reinforcement') || key.includes('bundling') ||
+                    key.includes('wrapping') || key.includes('glueing')
                 ),
                 warehouse_management: Object.keys(this.form.permissions).filter(key => 
                     key.includes('delivery') || key.includes('warehouse') || key.includes('dorn') || 
