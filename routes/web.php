@@ -511,25 +511,25 @@ Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.def
          // Alias for search menu
          Route::get('/define-chemical-coat', [ChemicalCoatController::class, 'vueIndex'])->name('vue.define-chemical-coat');
 
-         Route::get('/reinforcement-tape', [\App\Http\Controllers\ReinforcementTapeController::class, 'vueIndex'])->name('vue.reinforcement-tape.index');
+         Route::get('/reinforcement-tape', [\App\Http\Controllers\ReinforcementTapeController::class, 'index'])->name('vue.reinforcement-tape.index');
          Route::get('/reinforcement-tape/view-print', [\App\Http\Controllers\ReinforcementTapeController::class, 'vueViewAndPrint'])->name('vue.reinforcement-tape.view-print');
          // Alias for search menu
-         Route::get('/define-reinforcement-tape', [\App\Http\Controllers\ReinforcementTapeController::class, 'vueIndex'])->name('vue.define-reinforcement-tape');
+         Route::get('/define-reinforcement-tape', [\App\Http\Controllers\ReinforcementTapeController::class, 'index'])->name('vue.define-reinforcement-tape');
 
-         Route::get('/bundling-string', [\App\Http\Controllers\BundlingStringController::class, 'vueIndex'])->name('vue.bundling-string.index');
+         Route::get('/bundling-string', [\App\Http\Controllers\BundlingStringController::class, 'index'])->name('vue.bundling-string.index');
          Route::get('/bundling-string/view-print', [\App\Http\Controllers\BundlingStringController::class, 'vueViewAndPrint'])->name('vue.bundling-string.view-print');
          // Alias for search menu
-         Route::get('/define-bundling-string', [\App\Http\Controllers\BundlingStringController::class, 'vueIndex'])->name('vue.define-bundling-string');
+         Route::get('/define-bundling-string', [\App\Http\Controllers\BundlingStringController::class, 'index'])->name('vue.define-bundling-string');
 
-         Route::get('/wrapping-material', [\App\Http\Controllers\WrappingMaterialController::class, 'vueIndex'])->name('vue.wrapping-material.index');
+         Route::get('/wrapping-material', [\App\Http\Controllers\WrappingMaterialController::class, 'index'])->name('vue.wrapping-material.index');
          Route::get('/wrapping-material/view-print', [\App\Http\Controllers\WrappingMaterialController::class, 'vueViewAndPrint'])->name('vue.wrapping-material.view-print');
          // Alias for search menu
-         Route::get('/define-wrapping-material', [\App\Http\Controllers\WrappingMaterialController::class, 'vueIndex'])->name('vue.define-wrapping-material');
+         Route::get('/define-wrapping-material', [\App\Http\Controllers\WrappingMaterialController::class, 'index'])->name('vue.define-wrapping-material');
 
-         Route::get('/glueing-material', [\App\Http\Controllers\GlueingMaterialController::class, 'vueIndex'])->name('vue.glueing-material.index');
+         Route::get('/glueing-material', [\App\Http\Controllers\GlueingMaterialController::class, 'index'])->name('vue.glueing-material.index');
          Route::get('/glueing-material/view-print', [\App\Http\Controllers\GlueingMaterialController::class, 'vueViewAndPrint'])->name('vue.glueing-material.view-print');
          // Alias for search menu
-         Route::get('/define-glueing-material', [\App\Http\Controllers\GlueingMaterialController::class, 'vueIndex'])->name('vue.define-glueing-material');
+         Route::get('/define-glueing-material', [\App\Http\Controllers\GlueingMaterialController::class, 'index'])->name('vue.define-glueing-material');
 
 // Customer Account Routes
 Route::get('/customer-group', function () {

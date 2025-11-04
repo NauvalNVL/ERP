@@ -2,17 +2,27 @@
   <div class="relative group">
     <button 
       @click="toggleMenu" 
-      class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
-      :class="{ 'bg-gray-700': hasActiveChild, 'text-sm': !isTopLevel, 'text-base': isTopLevel }"
+      class="flex items-center justify-between w-full px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-all duration-200"
+      :class="{ 
+        'bg-blue-600 text-white font-semibold shadow-lg border-l-4 border-blue-300': hasActiveChild, 
+        'sidebar-active': hasActiveChild,
+        'text-sm': !isTopLevel, 
+        'text-base': isTopLevel 
+      }"
+      :style="hasActiveChild ? 'background-color: #2563eb !important; color: white !important; border-left: 4px solid #93c5fd !important;' : ''"
     >
       <div class="flex items-center">
         <i :class="[icon, 'mr-3', isTopLevel ? 'w-5 h-5' : 'w-4 h-4', 'text-current']" style="display: inline-block !important;"></i>
         <span>{{ title }}</span>
       </div>
-      <i 
-        class="fas fa-chevron-down transition-transform" 
-        :class="{ 'transform rotate-180': isMenuOpen }"
-      ></i>
+      <div class="flex items-center">
+        <!-- Active indicator dot for parent menu -->
+        <div v-if="hasActiveChild" class="w-2 h-2 bg-blue-200 rounded-full animate-pulse mr-2"></div>
+        <i 
+          class="fas fa-chevron-down transition-transform" 
+          :class="{ 'transform rotate-180': isMenuOpen }"
+        ></i>
+      </div>
     </button>
 
     <!-- Dropdown Menu -->
@@ -38,13 +48,18 @@
           v-else-if="item.route" 
           :href="item.route" 
           @click="handleLinkClick"
-          class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
+          class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-all duration-200 relative"
           :class="{
-            'bg-blue-600 text-white font-medium': isActive(item.route),
+            'bg-blue-600 text-white font-semibold shadow-lg border-l-4 border-blue-300': isActive(item.route),
+            'sidebar-active': isActive(item.route)
           }"
+          :style="isActive(item.route) ? 'background-color: #2563eb !important; color: white !important; border-left: 4px solid #93c5fd !important;' : ''"
+          :title="`Current: ${currentPath} | Route: ${item.route} | Active: ${isActive(item.route)}`"
         >
           <i :class="[item.icon, 'w-4 h-4 mr-3', 'text-current']" style="display: inline-block !important;"></i>
           <span>{{ item.title }}</span>
+          <!-- Active indicator dot -->
+          <div v-if="isActive(item.route)" class="ml-auto w-2 h-2 bg-blue-200 rounded-full animate-pulse"></div>
         </Link>
         
         <!-- Simple item without route -->
@@ -95,14 +110,27 @@ const props = defineProps({
 });
 
 const page = usePage();
-const currentPath = computed(() => page.url.toLowerCase().replace(/\/+$/, ''));
+const currentPath = computed(() => page.url);
 
 const menuId = computed(() => props.menuId || props.title.toLowerCase().replace(/\s+/g, '-'));
 
 const isActive = (route) => {
-  if (!route) return false;
-  const normalizedRoute = route.toLowerCase().replace(/\/+$/, '');
-  return currentPath.value === normalizedRoute;
+  try {
+    if (!route || !currentPath.value) return false;
+    
+    // Normalize paths - remove trailing slashes and convert to lowercase
+    const current = currentPath.value.toLowerCase().replace(/\/+$/, '') || '/';
+    const target = route.toLowerCase().replace(/\/+$/, '') || '/';
+    
+    // Check for exact match or if current path starts with target path
+    const isExactMatch = current === target;
+    const isSubPath = current.startsWith(target + '/');
+    const isMatch = isExactMatch || isSubPath;
+    
+    return isMatch;
+  } catch (error) {
+    return false;
+  }
 };
 
 const hasActiveChild = computed(() => {
@@ -167,5 +195,13 @@ export default {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.sidebar-active {
+  background-color: #2563eb !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  border-left: 4px solid #93c5fd !important;
 }
 </style> 

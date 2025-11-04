@@ -54,8 +54,6 @@ createInertiaApp({
             }
         }
         
-        // Log which component we're returning for debugging purposes
-        console.log(`Resolving page: ${name} => ${page ? 'Found component' : 'Component not found'}`);
         return page;
     },
     setup({ el, App, props, plugin }) {

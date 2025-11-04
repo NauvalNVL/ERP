@@ -12,10 +12,36 @@ use Illuminate\Support\Facades\Validator;
 class ReinforcementTapeController extends Controller
 {
     /**
+     * API method to get reinforcement tapes data.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex(Request $request)
+    {
+        try {
+            $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
+            
+            if ($reinforcementTapes->isEmpty()) {
+                $this->seedData();
+                $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
+            }
+            
+            return response()->json($reinforcementTapes);
+        } catch (\Exception $e) {
+            Log::error('Error in ReinforcementTapeController@apiIndex: ' . $e->getMessage());
+            return response()->json([
+                'error' => true,
+                'message' => 'Error displaying reinforcement tape data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Display a listing of the reinforcement tapes.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|\Inertia\Response
      */
     public function index(Request $request)
     {
@@ -66,7 +92,7 @@ class ReinforcementTapeController extends Controller
      * Store a newly created reinforcement tape in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -174,7 +200,7 @@ class ReinforcementTapeController extends Controller
      * Remove the specified reinforcement tape from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {

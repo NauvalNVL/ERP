@@ -16,11 +16,18 @@
       <div v-if="hasPermission('dashboard')" class="relative group">
         <Link
           href="/dashboard"
-          class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
-          :class="{ 'bg-blue-600 text-white font-medium': currentPath === '/dashboard' }"
+          class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-all duration-200"
+          :class="{ 
+            'bg-blue-600 text-white font-semibold shadow-lg border-l-4 border-blue-300': isActive('/dashboard'),
+            'sidebar-active': isActive('/dashboard')
+          }"
+          :style="isActive('/dashboard') ? 'background-color: #2563eb !important; color: white !important; border-left: 4px solid #93c5fd !important;' : ''"
+          :title="`Current: ${currentPath} | Route: /dashboard | Active: ${isActive('/dashboard')}`"
         >
           <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
           <span>Dashboard</span>
+          <!-- Active indicator dot -->
+          <div v-if="isActive('/dashboard')" class="ml-auto w-2 h-2 bg-blue-200 rounded-full animate-pulse"></div>
         </Link>
       </div>
 
@@ -94,6 +101,72 @@
   </div>
 </template>
 
+<style scoped>
+.sidebar-active {
+  background-color: #2563eb !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  border-left: 4px solid #93c5fd !important;
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-up {
+  animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+</style>
+
 <script setup>
 import { ref, computed } from 'vue';
 import { usePage, Link, router } from '@inertiajs/vue3';
@@ -115,8 +188,22 @@ const getBasePath = (path) => {
 
 // Check if the current route matches the given route exactly
 const isActive = (route) => {
-  if (!route) return false;
-  return currentPath.value === route;
+  try {
+    if (!route || !currentPath.value) return false;
+    
+    // Normalize paths - remove trailing slashes and convert to lowercase
+    const current = currentPath.value.toLowerCase().replace(/\/+$/, '') || '/';
+    const target = route.toLowerCase().replace(/\/+$/, '') || '/';
+    
+    // Check for exact match or if current path starts with target path
+    const isExactMatch = current === target;
+    const isSubPath = current.startsWith(target + '/');
+    const isMatch = isExactMatch || isSubPath;
+    
+    return isMatch;
+  } catch (error) {
+    return false;
+  }
 };
 
 // Check if user has permission for a specific menu
