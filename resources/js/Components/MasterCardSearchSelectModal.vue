@@ -257,6 +257,7 @@ const selectRow = (mc) => {
 const selectMasterCard = () => {
   if (selectedRowMc.value) {
     emit('select-mc', selectedRowMc.value);
+    closeModal(); // Close modal after selection
   }
 };
 

@@ -12,6 +12,29 @@ use Illuminate\Support\Facades\Validator;
 class BundlingStringController extends Controller
 {
     /**
+     * API method to get bundling strings data.
+     */
+    public function apiIndex(Request $request)
+    {
+        try {
+            $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
+            
+            if ($bundlingStrings->isEmpty()) {
+                $this->seedData();
+                $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
+            }
+            
+            return response()->json($bundlingStrings);
+        } catch (\Exception $e) {
+            Log::error('Error in BundlingStringController@apiIndex: ' . $e->getMessage());
+            return response()->json([
+                'error' => true,
+                'message' => 'Error displaying bundling string data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Display a listing of the bundling strings.
      */
     public function index(Request $request)

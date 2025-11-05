@@ -33,7 +33,7 @@
 							</tr>
 						</thead>
 						<tbody class="bg-white divide-y divide-gray-200 text-xs">
-							<tr v-if="loading">
+							<tr v-if="isLoading">
 								<td colspan="3" class="px-4 py-4 text-center text-gray-500">
 									<div class="flex items-center justify-center">
 										<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mr-3"></div>
@@ -76,6 +76,10 @@ const props = defineProps({
 	items: {
 		type: Array,
 		default: () => []
+	},
+	loading: {
+		type: Boolean,
+		default: false
 	}
 });
 
@@ -103,8 +107,8 @@ const filteredCoats = computed(() => {
 	});
 });
 
-const loading = computed(() => {
-	return props.items.length === 0;
+const isLoading = computed(() => {
+	return props.loading || (props.items.length === 0 && !props.loading);
 });
 
 function selectRow(coat) {

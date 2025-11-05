@@ -478,14 +478,6 @@
                         </div>
                     </div>
 
-                    <div class="mt-6 text-center" v-if="recordSelected">
-                        <button
-                            type="button"
-                            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105"
-                        >
-                            View & Print MC by Machine
-                        </button>
-                    </div>
                 </div>
 
                 <!-- Right Column - Quick Info -->
@@ -862,10 +854,12 @@
         <!-- Chemical Coat Modal (parent copy for consistency; selection handled in child for now) -->
         <ChemicalCoatModal
             :show="showChemicalCoatModal"
-            :coats="chemicalCoats"
+            :items="chemicalCoats"
+            :loading="chemicalCoatLoading"
             @close="showChemicalCoatModal = false"
             @select="
-                () => {
+                (coat) => {
+                    console.log('Selected chemical coat:', coat);
                     showChemicalCoatModal = false;
                 }
             "
@@ -1150,7 +1144,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, computed, onMounted, nextTick, watch } from 'vue';
 
 const selectedMcsFull = ref(null);
 // Reset SO/WO paper quality arrays to empty values
@@ -1547,6 +1541,32 @@ const showErrorModal = ref(false);
 const showChemicalCoatModal = ref(false);
 const chemicalCoats = ref([]);
 const chemicalCoatLoading = ref(false);
+
+// Function to load chemical coat data
+const loadChemicalCoats = async () => {
+    try {
+        chemicalCoatLoading.value = true;
+        const response = await fetch('/api/chemical-coats', {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            chemicalCoats.value = data;
+        } else {
+            console.error('Failed to load chemical coats:', response.statusText);
+            chemicalCoats.value = [];
+        }
+    } catch (error) {
+        console.error('Error loading chemical coats:', error);
+        chemicalCoats.value = [];
+    } finally {
+        chemicalCoatLoading.value = false;
+    }
+};
 
 // Setup MC Component Modal state
 const showSetupMcModal = ref(false);
@@ -2808,6 +2828,13 @@ const handleSecondPasswordSelect = ({ userId, password }) => {
     showSecondPasswordAccessModal.value = false;
     alert(`Access granted for User ID: ${userId}`);
 };
+
+// Watch for chemical coat modal open to load data
+watch(showChemicalCoatModal, (newValue) => {
+    if (newValue && chemicalCoats.value.length === 0) {
+        loadChemicalCoats();
+    }
+});
 </script>
 
 <style scoped>

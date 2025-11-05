@@ -649,7 +649,7 @@
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">Chem Coat:</label>
                                     <input type="text" :value="selectedChemicalCoat" readonly class="w-24 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="showChemicalCoatModal = true" title="Select Chemical Coat">
+                                    <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openChemicalCoatModal" title="Select Chemical Coat">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
@@ -991,8 +991,10 @@
     <!-- Chemical Coat Modal -->
     <ChemicalCoatModal
         :show="showChemicalCoatModal"
+        :items="chemicalCoatRows"
+        :loading="chemicalCoatLoading"
         @close="showChemicalCoatModal = false"
-        @select="(coat) => { selectedChemicalCoat = coat?.name || coat?.code || ''; showChemicalCoatModal = false; }"
+        @select="(coat) => { selectedChemicalCoat = coat?.code || ''; showChemicalCoatModal = false; }"
     />
 
     <!-- Reinforcement Tape Modal -->
@@ -1000,7 +1002,7 @@
         :show="showReinforcementTapeModal"
         :rows="reinforcementTapeRows"
         @close="showReinforcementTapeModal = false"
-        @select="(row) => { selectedReinforcementTape = row?.name || row?.code || ''; showReinforcementTapeModal = false; }"
+        @select="(row) => { selectedReinforcementTape = row?.code || ''; showReinforcementTapeModal = false; }"
     />
 
     <!-- Paper Size Modal -->
@@ -1155,6 +1157,39 @@ const selectedPaperFlute = ref('');
 // Chemical Coat Modal
 const showChemicalCoatModal = ref(false);
 const selectedChemicalCoat = ref('');
+const chemicalCoatRows = ref([]);
+const chemicalCoatLoading = ref(false);
+
+// Fetch chemical coats from API
+const fetchChemicalCoats = async () => {
+    try {
+        chemicalCoatLoading.value = true;
+        const response = await fetch('/api/chemical-coats', {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            chemicalCoatRows.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+        } else {
+            chemicalCoatRows.value = [];
+        }
+    } catch (e) {
+        console.error('Error fetching chemical coats:', e);
+        chemicalCoatRows.value = [];
+    } finally {
+        chemicalCoatLoading.value = false;
+    }
+};
+
+// Open chemical coat modal and fetch data
+const openChemicalCoatModal = async () => {
+    if (chemicalCoatRows.value.length === 0) {
+        await fetchChemicalCoats();
+    }
+    showChemicalCoatModal.value = true;
+};
+
+// Helper functions removed - now displaying codes directly
 
 // Reinforcement Tape Modal
 const showReinforcementTapeModal = ref(false);
@@ -1624,19 +1659,23 @@ const formatTrimZeros = (value) => {
     return trimmed;
 };
 
+// Helper to coerce Yes/No strings into booleans
+const toBool = (v) => {
+    if (v === true || v === false) return !!v;
+    if (v === null || v === undefined) return false;
+    const s = String(v).toLowerCase();
+    return s === 'y' || s === 'yes' || s === 'true' || s === '1';
+};
+
 // When mcLoaded is provided, hydrate PD form fields
 const hydratePdFromLoaded = () => {
     const loaded = props.mcLoaded || {};
     const pd = loaded?.pd_setup || null;
 
-    // Helper to coerce Yes/No strings into booleans
-    const toBool = (v) => {
-        if (v === true || v === false) return !!v;
-        if (v === null || v === undefined) return false;
-        const s = String(v).toLowerCase();
-        return s === 'y' || s === 'yes' || s === 'true' || s === '1';
-    };
+    hydratePdFromObject(pd, loaded);
+};
 
+const hydratePdFromObject = (pd, loaded) => {
     if (!pd) {
         // Fallback: hydrate directly from MC table columns
         // Clear first
@@ -1813,7 +1852,11 @@ const makeEmptyPdState = () => ({
 });
 const componentForms = ref(Array.from({ length: 10 }, () => makeEmptyPdState()));
 // Now safe to hydrate PD from loaded MC/PD data
-watch(() => props.mcLoaded, hydratePdFromLoaded, { immediate: true });
+watch(() => props.mcLoaded, (newValue) => {
+    if (newValue) {
+        hydratePdFromLoaded();
+    }
+}, { immediate: true });
 
 // Prefer loaded components when available, else fallback to props.mcComponents
 // Always render exactly 10 rows with C# labels: Main, Fit1..Fit9

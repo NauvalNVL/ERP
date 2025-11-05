@@ -10,6 +10,23 @@ use Illuminate\Support\Facades\Validator;
 
 class WrappingMaterialController extends Controller
 {
+    public function apiIndex(Request $request)
+    {
+        try {
+            $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
+            
+            if ($wrappingMaterials->isEmpty()) {
+                $this->seedData();
+                $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
+            }
+            
+            return response()->json($wrappingMaterials);
+        } catch (\Exception $e) {
+            Log::error('Error in WrappingMaterialController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => true, 'message' => 'Error displaying wrapping material data'], 500);
+        }
+    }
+
     public function index(Request $request)
     {
         try {
