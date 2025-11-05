@@ -133,30 +133,6 @@ class GlueingMaterialController extends Controller
         }
     }
 
-    public function apiIndex()
-    {
-        try {
-            $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
-            
-            if ($glueingMaterials->isEmpty()) {
-                $this->seedData();
-                $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
-            }
-            
-            return response()->json([
-                'success' => true,
-                'data' => $glueingMaterials
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in GlueingMaterialController@apiIndex: ' . $e->getMessage());
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Error fetching glueing material data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
     public function vueIndex()
     {
         try {

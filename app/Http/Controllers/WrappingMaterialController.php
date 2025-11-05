@@ -133,30 +133,6 @@ class WrappingMaterialController extends Controller
         }
     }
 
-    public function apiIndex()
-    {
-        try {
-            $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
-            
-            if ($wrappingMaterials->isEmpty()) {
-                $this->seedData();
-                $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
-            }
-            
-            return response()->json([
-                'success' => true,
-                'data' => $wrappingMaterials
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in WrappingMaterialController@apiIndex: ' . $e->getMessage());
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Error fetching wrapping material data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
     public function vueIndex()
     {
         try {

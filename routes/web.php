@@ -851,7 +851,7 @@ return Inertia::render('warehouse-management/Invoice/index');
 })->name('vue.warehouse-management.invoice');
 // Invoice → IV Processing → Amend Invoice (Vue page)
 Route::get('/warehouse-management/invoice/iv-processing/amend-invoice', function () {
-return Inertia::render('warehouse-management/Invoice/IV-Processing/AmendInvoice');
+return Inertia::render('warehouse-management/Invoice/IVProcessing/AmendInvoice');
 })->name('vue.warehouse-management.invoice.iv-processing.amend-invoice');
 
 // Invoice → Setup pages (Vue)

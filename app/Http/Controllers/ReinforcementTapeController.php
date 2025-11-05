@@ -231,36 +231,6 @@ class ReinforcementTapeController extends Controller
     }
 
     /**
-     * Display a listing of the resource for API requests.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function apiIndex()
-    {
-        try {
-            $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
-            
-            // If no data exists, seed sample data
-            if ($reinforcementTapes->isEmpty()) {
-                $this->seedData();
-                $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
-            }
-            
-            return response()->json([
-                'success' => true,
-                'data' => $reinforcementTapes
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in ReinforcementTapeController@apiIndex: ' . $e->getMessage());
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Error fetching reinforcement tape data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
      * Display a listing of the resource with Vue.
      *
      * @return \Inertia\Response

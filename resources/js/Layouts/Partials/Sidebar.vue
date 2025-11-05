@@ -17,7 +17,7 @@
         <Link
           href="/dashboard"
           class="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-all duration-200"
-          :class="{ 
+          :class="{
             'bg-blue-600 text-white font-semibold shadow-lg border-l-4 border-blue-300': isActive('/dashboard'),
             'sidebar-active': isActive('/dashboard')
           }"
@@ -190,16 +190,16 @@ const getBasePath = (path) => {
 const isActive = (route) => {
   try {
     if (!route || !currentPath.value) return false;
-    
+
     // Normalize paths - remove trailing slashes and convert to lowercase
     const current = currentPath.value.toLowerCase().replace(/\/+$/, '') || '/';
     const target = route.toLowerCase().replace(/\/+$/, '') || '/';
-    
+
     // Check for exact match or if current path starts with target path
     const isExactMatch = current === target;
     const isSubPath = current.startsWith(target + '/');
     const isMatch = isExactMatch || isSubPath;
-    
+
     return isMatch;
   } catch (error) {
     return false;
@@ -225,7 +225,7 @@ const filterItemsByPermission = (items) => {
               const permissionKey = getPermissionKeyFromTitle(nestedChild.title);
               return hasPermission(permissionKey);
             });
-            
+
             return {
               ...child,
               children: nestedFilteredChildren
@@ -240,7 +240,7 @@ const filterItemsByPermission = (items) => {
           // Keep item if it has children or if it passed permission check
           return child !== null && (child.children?.length > 0 || !child.children);
         });
-      
+
       return {
         ...item,
         children: filteredChildren
@@ -259,10 +259,10 @@ const getPermissionKeyFromTitle = (title) => {
     'Define User Access Permission': 'define_user_access_permission',
     'Copy & Paste User Access Permission': 'copy_paste_user_access_permission',
     'View & Print User': 'view_print_user',
-    
+
     // Sales Management - Sales Configuration
     'Define Sales Configuration': 'define_sales_configuration',
-    
+
     // Sales Management - Standard Requirement
     'Define Sales Team': 'define_sales_team',
     'Define Salesperson': 'define_salesperson',
@@ -279,16 +279,16 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Color Group': 'define_color_group',
     'Define Color': 'define_color',
     'Define Finishing': 'define_finishing',
-    
+
     // Sales Management - Customer Account
     'Define Customer Group': 'define_customer_group',
     'Update Customer Account': 'update_customer_account',
     'Define Customer Alternate Address': 'define_customer_alternate_address',
     'Define Customer Sales Type': 'define_customer_sales_type',
-    
+
     // Sales Management - Customer Account
     'Obsolete/Reactive Customer A/C': 'obsolete_reactive_customer_ac',
-    
+
     // Sales Management - Master Card
     'Update MC': 'update_mc',
     'Approve MC': 'approve_mc',
@@ -304,7 +304,7 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print MC by Color': 'view_print_mc_by_color',
     'View & Print MC by P/Size P/Quality': 'view_print_mc_by_psize_pquality',
     'View & Print MC by Machine': 'view_print_mc_by_machine',
-    
+
     // Sales Management - Standard Requirement
     'Define Sales Team': 'define_sales_team',
     'Define Salesperson': 'define_salesperson',
@@ -349,7 +349,7 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print Bundling String': 'view_print_bundling_string',
     'View & Print Wrapping Material': 'view_print_wrapping_material',
     'View & Print Glueing Material': 'view_print_glueing_material',
-    
+
     // Sales Management - Customer Account
     'Define Customer Group': 'define_customer_group',
     'Update Customer Account': 'update_customer_account',
@@ -360,7 +360,7 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print Customer Alternate Address': 'view_print_customer_alternate_address',
     'View & Print Customer Sales Type': 'view_print_customer_sales_type',
     'View & Print Non-Active Customer': 'view_print_non_active_customer',
-    
+
     // Sales Management - Sales Order
     'Prepare MC SO': 'prepare_mc_so',
     'Prepare SB SO': 'prepare_sb_so',
@@ -378,7 +378,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Release WO by SO': 'release_wo_by_so',
     'Print SO Log': 'print_so_log',
     'Print SO JIT Tracking': 'print_so_jit_tracking',
-    
+
     // Sales Order Setup
     'Define SO Config': 'define_so_config',
     'Define SO Period': 'define_so_period',
@@ -389,16 +389,16 @@ const getPermissionKeyFromTitle = (title) => {
     'Print SO Rough Cut': 'print_so_rough_cut',
     'Print AC# Auto WO': 'print_ac_auto_wo',
     'Print MC Auto WO': 'print_mc_auto_wo',
-    
+
     // Sales Order Report
     'Define Report Format': 'define_report_format',
     'Print Rough Cut Report': 'print_rough_cut_report',
     'Print SO Report': 'print_so_report',
     'Print SO Cancel Report': 'print_so_cancel_report',
-    
+
     // Customer Service
     'Customer Service Dashboard': 'customer_service_dashboard',
-    
+
     // Warehouse Management - Delivery Order Setup
     'Define Analysis Code': 'define_analysis_code',
     'Define Transport Contractor': 'define_transport_contractor',
@@ -413,7 +413,7 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print Analysis Code': 'view_print_analysis_code',
     'View & Print Vehicle Class': 'view_print_vehicle_class',
     'View & Print Vehicle': 'view_print_vehicle',
-    
+
     // Warehouse Management - DO Processing
     'Prepare Delivery Order (Single Item)': 'prepare_delivery_order_single',
     'Prepare Delivery Order (Multiple Item)': 'prepare_delivery_order_multiple',
@@ -428,19 +428,19 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print Delivery Order Unapplied F/Goods': 'view_print_do_unapplied_fg',
     'Customer S/Order Delivery Schedule - Obsolote': 'customer_so_delivery_obsolete',
     'Sales Order Delivery Schedule': 'sales_order_delivery_schedule',
-    
+
     // Warehouse Management - DORN Processing
     'Issue DORN': 'issue_dorn',
     'Print DORN': 'print_dorn',
     'Amend DORN': 'amend_dorn',
     'Cancel DORN': 'cancel_dorn',
     'View & Print DORN Log': 'view_print_dorn_log',
-    
+
     // Warehouse Management - Manual DO Processing
     'Activate Manual Configuration': 'activate_manual_configuration',
     'Register Manual Numbers': 'register_manual_numbers',
     'View & Print Registered Manual Numbers Log': 'view_print_registered_manual_numbers_log',
-    
+
     // Warehouse Management - Invoice Setup
     'Define Tax Type': 'define_tax_type',
     'Define Tax Group': 'define_tax_group',
@@ -448,7 +448,7 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print Tax Type': 'view_print_tax_type',
     'View & Print Tax Group': 'view_print_tax_group',
     'View & Print Customer Sales Tax Index': 'view_print_customer_sales_tax_index',
-    
+
     // Warehouse Management - IV Processing
     'Prepare Invoice by D/Order (Current Period)': 'prepare_invoice_by_do_current_period',
     'Prepare Invoice by D/Order (Open Period)': 'prepare_invoice_by_do_open_period',
@@ -457,7 +457,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Cancel Active Invoice': 'cancel_active_invoice',
     'View & Print Invoice Log': 'view_print_invoice_log'
   };
-  
+
   return titleMap[title] || title.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
 };
 
