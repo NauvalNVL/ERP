@@ -31,27 +31,27 @@ class WrappingMaterialController extends Controller
     {
         try {
             $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
-            
+
             if ($wrappingMaterials->isEmpty()) {
                 $this->seedData();
                 $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
             }
-            
+
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json($wrappingMaterials);
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/WrappingMaterial', [
                 'wrappingMaterials' => $wrappingMaterials,
                 'header' => 'Define Wrapping Material'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in WrappingMaterialController@index: ' . $e->getMessage());
-            
+
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json(['error' => true, 'message' => 'Error displaying wrapping material data'], 500);
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/WrappingMaterial', [
                 'wrappingMaterials' => [],
                 'error' => 'Error displaying wrapping material data'
@@ -78,7 +78,7 @@ class WrappingMaterialController extends Controller
                 'description' => $request->description ? trim($request->description) : null,
                 'is_active' => true
             ]);
-            
+
             return response()->json(['success' => true, 'message' => 'Wrapping material berhasil ditambahkan', 'data' => $wrappingMaterial]);
         } catch (\Exception $e) {
             Log::error('Error in WrappingMaterialController@store: ' . $e->getMessage());
@@ -99,7 +99,7 @@ class WrappingMaterialController extends Controller
             }
 
             $wrappingMaterial = WrappingMaterial::find($id);
-            
+
             if (!$wrappingMaterial) {
                 return response()->json(['success' => false, 'message' => 'Wrapping material tidak ditemukan'], 404);
             }
@@ -108,7 +108,7 @@ class WrappingMaterialController extends Controller
                 'name' => trim($request->name),
                 'description' => $request->description ? trim($request->description) : null
             ]);
-            
+
             return response()->json(['success' => true, 'message' => 'Wrapping material berhasil diperbarui', 'data' => $wrappingMaterial]);
         } catch (\Exception $e) {
             Log::error('Error updating wrapping material: ' . $e->getMessage());
@@ -120,7 +120,7 @@ class WrappingMaterialController extends Controller
     {
         try {
             $wrappingMaterial = WrappingMaterial::find($id);
-            
+
             if ($wrappingMaterial) {
                 $wrappingMaterial->delete();
                 return response()->json(['success' => true, 'message' => 'Wrapping material berhasil dihapus']);
@@ -130,6 +130,55 @@ class WrappingMaterialController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in WrappingMaterialController@destroy: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Error deleting wrapping material'], 500);
+        }
+    }
+
+    public function apiIndex()
+    {
+        try {
+            $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
+            
+            if ($wrappingMaterials->isEmpty()) {
+                $this->seedData();
+                $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => $wrappingMaterials
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in WrappingMaterialController@apiIndex: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching wrapping material data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function vueIndex()
+    {
+        try {
+            $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
+            
+            if ($wrappingMaterials->isEmpty()) {
+                $this->seedData();
+                $wrappingMaterials = WrappingMaterial::orderBy('code', 'asc')->get();
+            }
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/WrappingMaterial', [
+                'wrappingMaterials' => $wrappingMaterials,
+                'header' => 'Define Wrapping Material'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in WrappingMaterialController@vueIndex: ' . $e->getMessage());
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/WrappingMaterial', [
+                'wrappingMaterials' => [],
+                'header' => 'Define Wrapping Material',
+                'error' => 'Error displaying wrapping material data'
+            ]);
         }
     }
 

@@ -219,12 +219,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
-import { useToast } from '@/Composables/useToast';
 
-const toast = useToast();
+// Toast notification helper
+const toast = {
+    success: (msg) => alert(msg),
+    error: (msg) => alert(msg),
+    info: (msg) => alert(msg)
+};
 
 const period = ref({ month: 10, year: 2025 });
 const query = ref({ part1: '', part2: '', part3: '' });
@@ -272,14 +276,20 @@ const openTable = () => {
 const fetchInvoices = async () => {
     loading.value = true;
     try {
-        const res = await fetch(`/api/invoices?mm=${encodeURIComponent(tableQuery.value.part1||'')}&yyyy=${encodeURIComponent(tableQuery.value.part2||'')}&seq=${encodeURIComponent(tableQuery.value.part3||'')}`, { headers: { 'Accept': 'application/json' } });
-        if (res.ok) {
-            const data = await res.json();
-            invoices.value = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+        const params = new URLSearchParams();
+        if (tableQuery.value.part1) params.append('mm', tableQuery.value.part1);
+        if (tableQuery.value.part2) params.append('yyyy', tableQuery.value.part2);
+        if (tableQuery.value.part3) params.append('seq', tableQuery.value.part3);
+        
+        const res = await axios.get(`/api/invoices?${params.toString()}`);
+        
+        if (res.data) {
+            invoices.value = Array.isArray(res.data.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []);
         } else {
             invoices.value = [...demoInvoices];
         }
     } catch (e) {
+        console.error('Error fetching invoices:', e);
         invoices.value = [...demoInvoices];
     } finally {
         loading.value = false;
@@ -291,21 +301,29 @@ const selectRow = (row) => {
 };
 
 const selectForEdit = async () => {
-    if (!selectedRow.value) return;
+    if (!selectedRow.value) {
+        toast.error('Please select an invoice first');
+        return;
+    }
+    
     try {
-        const res = await fetch(`/api/invoices/${encodeURIComponent(selectedRow.value.invoice_no)}`, { headers: { 'Accept': 'application/json' } });
-        if (res.ok) {
-            selectedInvoice.value = await res.json();
+        const res = await axios.get(`/api/invoices/${encodeURIComponent(selectedRow.value.invoice_no)}`);
+        
+        if (res.data) {
+            selectedInvoice.value = res.data;
             showTable.value = false;
             return;
         }
-    } catch (e) {}
+    } catch (e) {
+        console.error('Error fetching invoice details:', e);
+    }
+    
     // Fallback to demo detail if API unavailable
     const demo = demoDetailsByNo[selectedRow.value.invoice_no] || {
         invoice_no: selectedRow.value.invoice_no,
-        customer_code: selectedRow.value.customer_code,
-        customer_name: selectedRow.value.customer_name,
-        order_mode: selectedRow.value.order_mode,
+        customer_code: selectedRow.value.customer_code || '',
+        customer_name: selectedRow.value.customer_name || '',
+        order_mode: selectedRow.value.order_mode || '0-Order by Customer + Deliver & Invoice to Customer',
         salesperson: 'S108',
         currency: 'IDR',
         exchange_rate: 0,
@@ -321,10 +339,31 @@ const selectForEdit = async () => {
 };
 
 const saveInvoice = async () => {
+    if (!selectedInvoice.value) {
+        toast.error('No invoice selected');
+        return;
+    }
+    
     try {
-        const res = await axios.put(`/api/invoices/${encodeURIComponent(selectedInvoice.value.invoice_no)}`, selectedInvoice.value, { headers: { 'Content-Type': 'application/json' } });
-        if (res.data) toast.success('Invoice updated');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
+        const res = await axios.put(
+            `/api/invoices/${encodeURIComponent(selectedInvoice.value.invoice_no)}`, 
+            selectedInvoice.value,
+            { 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                } 
+            }
+        );
+        
+        if (res.data) {
+            toast.success('Invoice updated successfully');
+            selectedInvoice.value = null;
+        }
     } catch (e) {
+        console.error('Error saving invoice:', e);
         toast.error(e?.response?.data?.message || 'Failed to update invoice');
     }
 };

@@ -41,34 +41,34 @@ class BundlingStringController extends Controller
     {
         try {
             $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
-            
+
             // If no data exists, seed sample data
             if ($bundlingStrings->isEmpty()) {
                 $this->seedData();
                 $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
             }
-            
+
             Log::info('Found ' . $bundlingStrings->count() . ' bundling strings in the database');
-            
+
             // Only return JSON for explicit API requests
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json($bundlingStrings);
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/BundlingString', [
                 'bundlingStrings' => $bundlingStrings,
                 'header' => 'Define Bundling String'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in BundlingStringController@index: ' . $e->getMessage());
-            
+
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json([
                     'error' => true,
                     'message' => 'Error displaying bundling string data: ' . $e->getMessage()
                 ], 500);
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/BundlingString', [
                 'bundlingStrings' => [],
                 'error' => 'Error displaying bundling string data'
@@ -91,7 +91,7 @@ class BundlingStringController extends Controller
 
             if ($validator->fails()) {
                 Log::warning('Validation failed:', $validator->errors()->toArray());
-                
+
                 return response()->json([
                     'success' => false,
                     'message' => $validator->errors()->first()
@@ -103,9 +103,9 @@ class BundlingStringController extends Controller
                 'name' => trim($request->name),
                 'is_active' => true
             ]);
-            
+
             Log::info('Bundling string created successfully:', ['code' => $bundlingString->code]);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Bundling string berhasil ditambahkan',
@@ -115,7 +115,7 @@ class BundlingStringController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in BundlingStringController@store: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error creating bundling string: ' . $e->getMessage()
@@ -145,7 +145,7 @@ class BundlingStringController extends Controller
             }
 
             $bundlingString = BundlingString::find($id);
-            
+
             if (!$bundlingString) {
                 Log::warning('Bundling string not found with ID: ' . $id);
                 return response()->json([
@@ -159,7 +159,7 @@ class BundlingStringController extends Controller
             ]);
 
             Log::info('Bundling string updated successfully:', ['id' => $id]);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Bundling string berhasil diperbarui',
@@ -169,7 +169,7 @@ class BundlingStringController extends Controller
         } catch (\Exception $e) {
             Log::error('Error updating bundling string: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating bundling string: ' . $e->getMessage()
@@ -184,10 +184,10 @@ class BundlingStringController extends Controller
     {
         try {
             $bundlingString = BundlingString::find($id);
-            
+
             if ($bundlingString) {
                 $bundlingString->delete();
-                
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Bundling string berhasil dihapus'
@@ -200,11 +200,68 @@ class BundlingStringController extends Controller
             }
         } catch (\Exception $e) {
             Log::error('Error in BundlingStringController@destroy: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting bundling string: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Display a listing of the resource for API requests.
+     */
+    public function apiIndex()
+    {
+        try {
+            $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
+            
+            // If no data exists, seed sample data
+            if ($bundlingStrings->isEmpty()) {
+                $this->seedData();
+                $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => $bundlingStrings
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in BundlingStringController@apiIndex: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching bundling string data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Display a listing of the resource with Vue.
+     */
+    public function vueIndex()
+    {
+        try {
+            $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
+            
+            // If no data exists, seed sample data
+            if ($bundlingStrings->isEmpty()) {
+                $this->seedData();
+                $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
+            }
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/BundlingString', [
+                'bundlingStrings' => $bundlingStrings,
+                'header' => 'Define Bundling String'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in BundlingStringController@vueIndex: ' . $e->getMessage());
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/BundlingString', [
+                'bundlingStrings' => [],
+                'header' => 'Define Bundling String',
+                'error' => 'Error displaying bundling string data'
+            ]);
         }
     }
 
@@ -255,7 +312,7 @@ class BundlingStringController extends Controller
     {
         try {
             $this->seedData();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Bundling string seed data created successfully'

@@ -186,6 +186,11 @@ Route::post('/calculate-total', [InvoiceController::class, 'calculateTotal']);
 Route::get('/do-items', [InvoiceController::class, 'getDoItems']);
 Route::get('/delivery-orders', [InvoiceController::class, 'getDeliveryOrders']);
 
+// Amend Invoice endpoints
+Route::get('/', [InvoiceController::class, 'index']); // Get list of invoices
+Route::get('/{invoiceNo}', [InvoiceController::class, 'show']); // Get single invoice details
+Route::put('/{invoiceNo}', [InvoiceController::class, 'update']); // Update invoice
+
 // Debug endpoint to test salesperson query
 Route::get('/test-salesperson/{customerCode}', function($customerCode) {
 $customerData = DB::select("

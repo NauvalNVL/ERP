@@ -31,27 +31,27 @@ class GlueingMaterialController extends Controller
     {
         try {
             $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
-            
+
             if ($glueingMaterials->isEmpty()) {
                 $this->seedData();
                 $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
             }
-            
+
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json($glueingMaterials);
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/GlueingMaterial', [
                 'glueingMaterials' => $glueingMaterials,
                 'header' => 'Define Glueing Material'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in GlueingMaterialController@index: ' . $e->getMessage());
-            
+
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json(['error' => true, 'message' => 'Error displaying glueing material data'], 500);
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/GlueingMaterial', [
                 'glueingMaterials' => [],
                 'error' => 'Error displaying glueing material data'
@@ -78,7 +78,7 @@ class GlueingMaterialController extends Controller
                 'description' => $request->description ? trim($request->description) : null,
                 'is_active' => true
             ]);
-            
+
             return response()->json(['success' => true, 'message' => 'Glueing material berhasil ditambahkan', 'data' => $glueingMaterial]);
         } catch (\Exception $e) {
             Log::error('Error in GlueingMaterialController@store: ' . $e->getMessage());
@@ -99,7 +99,7 @@ class GlueingMaterialController extends Controller
             }
 
             $glueingMaterial = GlueingMaterial::find($id);
-            
+
             if (!$glueingMaterial) {
                 return response()->json(['success' => false, 'message' => 'Glueing material tidak ditemukan'], 404);
             }
@@ -108,7 +108,7 @@ class GlueingMaterialController extends Controller
                 'name' => trim($request->name),
                 'description' => $request->description ? trim($request->description) : null
             ]);
-            
+
             return response()->json(['success' => true, 'message' => 'Glueing material berhasil diperbarui', 'data' => $glueingMaterial]);
         } catch (\Exception $e) {
             Log::error('Error updating glueing material: ' . $e->getMessage());
@@ -120,7 +120,7 @@ class GlueingMaterialController extends Controller
     {
         try {
             $glueingMaterial = GlueingMaterial::find($id);
-            
+
             if ($glueingMaterial) {
                 $glueingMaterial->delete();
                 return response()->json(['success' => true, 'message' => 'Glueing material berhasil dihapus']);
@@ -130,6 +130,55 @@ class GlueingMaterialController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in GlueingMaterialController@destroy: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Error deleting glueing material'], 500);
+        }
+    }
+
+    public function apiIndex()
+    {
+        try {
+            $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
+            
+            if ($glueingMaterials->isEmpty()) {
+                $this->seedData();
+                $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => $glueingMaterials
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in GlueingMaterialController@apiIndex: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching glueing material data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function vueIndex()
+    {
+        try {
+            $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
+            
+            if ($glueingMaterials->isEmpty()) {
+                $this->seedData();
+                $glueingMaterials = GlueingMaterial::orderBy('code', 'asc')->get();
+            }
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/GlueingMaterial', [
+                'glueingMaterials' => $glueingMaterials,
+                'header' => 'Define Glueing Material'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in GlueingMaterialController@vueIndex: ' . $e->getMessage());
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/GlueingMaterial', [
+                'glueingMaterials' => [],
+                'header' => 'Define Glueing Material',
+                'error' => 'Error displaying glueing material data'
+            ]);
         }
     }
 
