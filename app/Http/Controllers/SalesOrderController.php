@@ -1035,9 +1035,16 @@ class SalesOrderController extends Controller
         try {
             Log::info('Fetching sales order detail', ['so_number' => $soNumber]);
             
-            // Fetch sales order from SO table
+            // Fetch sales order from SO table with customer data
             $salesOrder = DB::table('so')
-                ->where('SO_Num', $soNumber)
+                ->leftJoin('CUSTOMER', 'so.AC_Num', '=', 'CUSTOMER.CODE')
+                ->where('so.SO_Num', $soNumber)
+                ->select('so.*', 
+                    'CUSTOMER.NAME as AC_NAME',
+                    'CUSTOMER.ADDRESS1 as CUST_ADDRESS1',
+                    'CUSTOMER.ADDRESS2 as CUST_ADDRESS2',
+                    'CUSTOMER.ADDRESS3 as CUST_ADDRESS3'
+                )
                 ->first();
             
             if (!$salesOrder) {
@@ -1120,6 +1127,11 @@ class SalesOrderController extends Controller
             
             $orderInfo = [
                 'customer_name' => $salesOrder->AC_NAME ?? '',
+                'customer_address' => trim(implode("\n", array_filter([
+                    $salesOrder->CUST_ADDRESS1 ?? '',
+                    $salesOrder->CUST_ADDRESS2 ?? '',
+                    $salesOrder->CUST_ADDRESS3 ?? ''
+                ]))),
                 'model' => $salesOrder->MODEL ?? '',
                 'order_mode' => '0-Order by Customer + Deliver & Invoice to Customer',
                 'salesperson_code' => $salesOrder->SLM ?? '',
@@ -1131,6 +1143,20 @@ class SalesOrderController extends Controller
                 'so_date' => $salesOrder->SO_DMY ?? '',
                 'po_date' => $salesOrder->PO_DATE ?? '',
                 'customer_po_number' => $salesOrder->PO_Num ?? '',
+                // Additional fields for AmendSO
+                'lot_number' => $salesOrder->LOT_NUM ?? '',
+                // Note: TAX column does not exist in SO table
+                // 'sales_tax' => ($salesOrder->TAX ?? 'N') === 'Y',
+                'remark' => $salesOrder->SO_REMARK ?? '',
+                'instruction1' => $salesOrder->SO_INSTRUCTION_1 ?? '',
+                'instruction2' => $salesOrder->SO_INSTRUCTION_2 ?? '',
+                'set_quantity' => $salesOrder->SO_QTY ?? '',
+                'analysis_code' => $salesOrder->ANALYSIS_CODE ?? '',
+                // Delivery location fields
+                'delivery_code' => $salesOrder->D_LOC_Num ?? '',
+                'delivery_to' => $salesOrder->DELIVERY_TO ?? '',
+                'delivery_address_1' => $salesOrder->DELIVERY_ADD_1 ?? '',
+                'delivery_address_2' => $salesOrder->DELIVERY_ADD_2 ?? '',
             ];
             
             // Format item details from SO table
@@ -1233,6 +1259,265 @@ class SalesOrderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching sales order detail: ' . $e->getMessage(),
+                'debug' => [
+                    'line' => $e->getLine(),
+                    'file' => basename($e->getFile())
+                ]
+            ], 500, ['Content-Type' => 'application/json; charset=utf-8']);
+        }
+    }
+
+    /**
+     * Update sales order (Amend SO)
+     */
+    public function updateSalesOrder(Request $request, $soNumber): JsonResponse
+    {
+        // Clean output buffers
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        try {
+            Log::info('Updating sales order', [
+                'so_number' => $soNumber,
+                'request_data' => $request->all()
+            ]);
+            
+            // Validate request
+            $validated = $request->validate([
+                'po_date' => 'nullable|string',
+                'set_quantity' => 'nullable|string',
+                'order_group' => 'nullable|string',
+                'order_type' => 'nullable|string',
+                'lot_number' => 'nullable|string',
+                'sales_tax' => 'nullable|string',
+                'remark' => 'nullable|string',
+                'instruction1' => 'nullable|string',
+                'instruction2' => 'nullable|string',
+                'analysis_code' => 'nullable|string',
+            ]);
+            
+            // Check if SO exists
+            $salesOrder = DB::table('so')->where('SO_Num', $soNumber)->first();
+            
+            if (!$salesOrder) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sales order not found'
+                ], 404, ['Content-Type' => 'application/json; charset=utf-8']);
+            }
+            
+            // Prepare update data
+            $updateData = [];
+            
+            if ($request->has('po_date') && !empty($request->po_date)) {
+                $updateData['PO_DATE'] = $request->po_date;
+            }
+            
+            if ($request->has('set_quantity')) {
+                $updateData['SO_QTY'] = $request->set_quantity;
+            }
+            
+            if ($request->has('order_group')) {
+                $updateData['GROUP_'] = $request->order_group;
+            }
+            
+            if ($request->has('order_type')) {
+                $updateData['TYPE'] = $request->order_type;
+            }
+            
+            if ($request->has('lot_number')) {
+                $updateData['LOT_NUM'] = $request->lot_number;
+            }
+            
+            // Note: TAX column does not exist in SO table, skipping sales_tax update
+            // if ($request->has('sales_tax')) {
+            //     $updateData['TAX'] = $request->sales_tax;
+            // }
+            
+            if ($request->has('remark')) {
+                $updateData['SO_REMARK'] = $request->remark;
+            }
+            
+            if ($request->has('instruction1')) {
+                $updateData['SO_INSTRUCTION_1'] = $request->instruction1;
+            }
+            
+            if ($request->has('instruction2')) {
+                $updateData['SO_INSTRUCTION_2'] = $request->instruction2;
+            }
+            
+            // Note: ANALYSIS_CODE column does not exist in SO table
+            // if ($request->has('analysis_code')) {
+            //     $updateData['ANALYSIS_CODE'] = $request->analysis_code;
+            // }
+            
+            // Add amendment tracking
+            $updateData['AM_UID'] = auth()->user()->userID ?? 'SYSTEM';
+            $updateData['AM_DATE'] = now()->format('Ymd');
+            $updateData['AM_TIME'] = now()->format('His');
+            
+            // Update the SO record
+            if (!empty($updateData)) {
+                DB::table('so')
+                    ->where('SO_Num', $soNumber)
+                    ->update($updateData);
+                
+                Log::info('Sales order updated successfully', [
+                    'so_number' => $soNumber,
+                    'updated_fields' => array_keys($updateData)
+                ]);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Sales order updated successfully',
+                'data' => [
+                    'so_number' => $soNumber,
+                    'updated_fields' => array_keys($updateData)
+                ]
+            ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error updating sales order:', [
+                'so_number' => $soNumber,
+                'errors' => $e->errors()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422, ['Content-Type' => 'application/json; charset=utf-8']);
+            
+        } catch (\Exception $e) {
+            Log::error('Error updating sales order:', [
+                'so_number' => $soNumber,
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating sales order: ' . $e->getMessage(),
+                'debug' => [
+                    'line' => $e->getLine(),
+                    'file' => basename($e->getFile())
+                ]
+            ], 500, ['Content-Type' => 'application/json; charset=utf-8']);
+        }
+    }
+
+    /**
+     * Cancel sales order
+     */
+    public function cancelSalesOrder(Request $request, $soNumber): JsonResponse
+    {
+        // Clean output buffers
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        try {
+            Log::info('Cancelling sales order', [
+                'so_number' => $soNumber,
+                'request_data' => $request->all()
+            ]);
+            
+            // Validate request
+            $validated = $request->validate([
+                'cancel_reason' => 'required|string',
+                'cancel_date' => 'nullable|string',
+                'cancelled_by' => 'nullable|string',
+                'analysis_code' => 'nullable|string',
+            ]);
+            
+            // Check if SO exists
+            $salesOrder = DB::table('so')->where('SO_Num', $soNumber)->first();
+            
+            if (!$salesOrder) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sales order not found'
+                ], 404, ['Content-Type' => 'application/json; charset=utf-8']);
+            }
+            
+            // Check if SO is already cancelled
+            if ($salesOrder->STS === 'CANCEL' || $salesOrder->STS === 'Cancelled') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sales order is already cancelled'
+                ], 400, ['Content-Type' => 'application/json; charset=utf-8']);
+            }
+            
+            // Prepare cancel reason text with date, user info, and analysis code
+            $cancelInfo = sprintf(
+                "CANCELLED on %s by %s\nAnalysis Code: %s\nReason: %s",
+                $validated['cancel_date'] ?? now()->format('Y-m-d'),
+                $validated['cancelled_by'] ?? auth()->user()->userID ?? 'SYSTEM',
+                $validated['analysis_code'] ?? 'CANC',
+                $validated['cancel_reason']
+            );
+            
+            // Prepare update data - using SO_REMARK to store cancel reason since CANCEL_REASON column doesn't exist
+            $updateData = [
+                'STS' => 'CANCEL',
+                'SO_REMARK' => $cancelInfo,
+                // Add cancel tracking
+                'CX_UID' => $validated['cancelled_by'] ?? auth()->user()->userID ?? 'SYSTEM',
+                'CX_DATE' => now()->format('Ymd'),
+                'CX_TIME' => now()->format('His'),
+            ];
+            
+            // Note: ANALYSIS_CODE column does not exist in SO table
+            // Analysis code is stored in SO_REMARK as part of cancel info
+            
+            // Update the SO record
+            DB::table('so')
+                ->where('SO_Num', $soNumber)
+                ->update($updateData);
+            
+            Log::info('Sales order cancelled successfully', [
+                'so_number' => $soNumber,
+                'cancelled_by' => $validated['cancelled_by'] ?? 'SYSTEM'
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Sales order cancelled successfully',
+                'data' => [
+                    'so_number' => $soNumber,
+                    'status' => 'CANCEL',
+                    'cancel_reason' => $validated['cancel_reason']
+                ]
+            ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error cancelling sales order:', [
+                'so_number' => $soNumber,
+                'errors' => $e->errors()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422, ['Content-Type' => 'application/json; charset=utf-8']);
+            
+        } catch (\Exception $e) {
+            Log::error('Error cancelling sales order:', [
+                'so_number' => $soNumber,
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error cancelling sales order: ' . $e->getMessage(),
                 'debug' => [
                     'line' => $e->getLine(),
                     'file' => basename($e->getFile())

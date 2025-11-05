@@ -208,6 +208,7 @@ class ProductController extends Controller
                     'product_code',
                     'description',
                     'category',
+                    'unit',
                     'product_group_id',
                     'is_active',
                     'created_at',
@@ -226,11 +227,11 @@ class ProductController extends Controller
                     'category' => $product->category,
                     'category_id' => $product->category,
                     'category_code' => $product->category,
+                    'unit' => $product->unit ?? '',
                     'product_group_id' => $product->product_group_id,
                     'is_active' => $product->is_active ? true : false,
                     'created_at' => $product->created_at ? $product->created_at->toISOString() : null,
-                    'updated_at' => $product->updated_at ? $product->updated_at->toISOString() : null,
-                    'unit' => ''
+                    'updated_at' => $product->updated_at ? $product->updated_at->toISOString() : null
                 ];
             });
             
@@ -267,6 +268,7 @@ class ProductController extends Controller
                 'product_code' => strtoupper($request->product_code),
                 'description' => $request->name, // Map Vue 'name' to DB 'description'
                 'category' => $request->category_id, // Map Vue 'category_id' to DB 'category'
+                'unit' => $request->unit ?? '',
                 'product_group_id' => $request->product_group_id ?? '',
                 'is_active' => true
             ]);
@@ -279,8 +281,8 @@ class ProductController extends Controller
                 'description' => $product->description,
                 'category_id' => $product->category,
                 'category_code' => $product->category,
-                'product_group_id' => $product->product_group_id,
-                'unit' => ''
+                'unit' => $product->unit ?? '',
+                'product_group_id' => $product->product_group_id
             ];
 
             return response()->json([
@@ -332,6 +334,7 @@ class ProductController extends Controller
             $product->update([
                 'description' => $request->name, // Map Vue 'name' to DB 'description'
                 'category' => $request->category_id, // Map Vue 'category_id' to DB 'category'
+                'unit' => $request->unit ?? $product->unit,
                 'product_group_id' => $request->product_group_id ?? $product->product_group_id
             ]);
 
@@ -343,8 +346,8 @@ class ProductController extends Controller
                 'description' => $product->description,
                 'category_id' => $product->category,
                 'category_code' => $product->category,
-                'product_group_id' => $product->product_group_id,
-                'unit' => ''
+                'unit' => $product->unit ?? '',
+                'product_group_id' => $product->product_group_id
             ];
 
             return response()->json([

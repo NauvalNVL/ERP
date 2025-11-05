@@ -169,8 +169,8 @@
     />
 
     <!-- Edit Modal -->
-    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
+    <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl mx-auto my-8 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
@@ -182,22 +182,120 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div class="p-6">
+            <div class="flex-1 overflow-y-auto p-6">
                 <form @submit.prevent="saveProductChanges" class="space-y-4">
-                    <div class="grid grid-cols-1 gap-4">
+                    <!-- UOM Reference Table -->
+                    <div class="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-sm">
+                        <h4 class="text-sm font-semibold text-blue-800 mb-3 flex items-center">
+                            <i class="fas fa-table mr-2"></i>
+                            Product Category and UOM allowable:
+                        </h4>
+                        <div class="overflow-x-auto -mx-2">
+                            <table class="min-w-full text-xs border-collapse border border-gray-300">
+                                <thead>
+                                    <tr class="bg-teal-700 text-white">
+                                        <th class="border border-gray-300 px-2 py-1 text-left">Category</th>
+                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+                                        <th class="border border-gray-300 px-2 py-1 text-left">UOM</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white">
+                                    <tr>
+                                        <td class="border border-gray-300 px-2 py-1">1-Corrugated Carton Box</td>
+                                        <td class="border border-gray-300 px-2 py-1">P-Piece</td>
+                                        <td class="border border-gray-300 px-2 py-1">S-Set</td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-300 px-2 py-1">2-Single Facer Roll</td>
+                                        <td class="border border-gray-300 px-2 py-1">R-Roll</td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-300 px-2 py-1">3-Single Facer Roll/KG</td>
+                                        <td class="border border-gray-300 px-2 py-1">K-KG</td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-300 px-2 py-1">4-Single Facer Sheet</td>
+                                        <td class="border border-gray-300 px-2 py-1">T-Sheet</td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-300 px-2 py-1">5-Corrugated Sheet Board/Piece</td>
+                                        <td class="border border-gray-300 px-2 py-1">P-Piece(Gross M2)</td>
+                                        <td class="border border-gray-300 px-2 py-1">Q-Piece(Trim M2)</td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-300 px-2 py-1">6-Corrugated Sheet Board/M2</td>
+                                        <td class="border border-gray-300 px-2 py-1">M-Gross M2</td>
+                                        <td class="border border-gray-300 px-2 py-1">N-Trimmed M2</td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                        <td class="border border-gray-300 px-2 py-1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border border-gray-300 px-2 py-1">7-Other Packaging Products</td>
+                                        <td class="border border-gray-300 px-2 py-1">P-Piece</td>
+                                        <td class="border border-gray-300 px-2 py-1">S-Set</td>
+                                        <td class="border border-gray-300 px-2 py-1">D-Bundle</td>
+                                        <td class="border border-gray-300 px-2 py-1">L-Pallet</td>
+                                        <td class="border border-gray-300 px-2 py-1">K-KG</td>
+                                        <td class="border border-gray-300 px-2 py-1">B-Box</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Form Fields -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Product Code:</label>
-                            <input v-model="editForm.product_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
-                            <span class="text-xs text-gray-500">Product code must be unique</span>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-barcode text-blue-500 mr-1"></i>
+                                Product Code:
+                            </label>
+                            <input v-model="editForm.product_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <span class="text-xs text-gray-500 mt-1 block">Product code must be unique</span>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
-                            <input v-model="editForm.description" type="text" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-align-left text-blue-500 mr-1"></i>
+                                Description:
+                            </label>
+                            <input v-model="editForm.description" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Category:</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-tags text-blue-500 mr-1"></i>
+                                Category:
+                            </label>
                             <template v-if="isCreating">
-                                <select v-model="editForm.category" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                                <select v-model="editForm.category" @change="updateUnitBasedOnCategory" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                                     <option value="">Select a category</option>
                                     <option value="1-Corrugated Carton Box">1-Corrugated Carton Box</option>
                                     <option value="2-Single Facer Roll">2-Single Facer Roll</option>
@@ -207,41 +305,63 @@
                                     <option value="6-Corrugated Sheet Board/M2">6-Corrugated Sheet Board/M2</option>
                                     <option value="7-Other Packaging Products">7-Other Packaging Products</option>
                                 </select>
-                                <span class="text-xs text-gray-500">Select from one of the predefined product categories</span>
+                                <span class="text-xs text-gray-500 mt-1 block">Select from one of the predefined product categories</span>
                             </template>
                             <template v-else>
                                 <input type="text" :value="editForm.category" class="block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" readonly>
-                                <span class="text-xs text-gray-500">Category cannot be changed after creation</span>
+                                <span class="text-xs text-gray-500 mt-1 block">Category cannot be changed after creation</span>
                             </template>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Product Group ID:</label>
-                            <select v-model="editForm.product_group_id" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-ruler text-blue-500 mr-1"></i>
+                                Unit (UOM):
+                            </label>
+                            <input v-model="editForm.unit" type="text" class="block w-full rounded-md border-gray-300 shadow-sm bg-blue-50 font-medium text-blue-700" readonly>
+                            <span class="text-xs text-gray-500 mt-1 block">Unit is automatically set based on category selection</span>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-layer-group text-blue-500 mr-1"></i>
+                                Product Group ID:
+                            </label>
+                            <select v-model="editForm.product_group_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                                 <option value="">Select a product group</option>
                                 <option v-for="group in productGroups" :key="group.id || group.product_group_id" :value="group.product_group_id">
                                     {{ group.product_group_id }} - {{ group.product_group_name }}
                                 </option>
                             </select>
-                            <span class="text-xs text-gray-500 mt-1">Required: Select a valid product group (e.g., B for Box, R for Roll)</span>
+                            <span class="text-xs text-gray-500 mt-1 block">Required: Select a valid product group (e.g., B for Box, R for Roll)</span>
                         </div>
-                        <div>
-                            <label class="flex items-center">
-                                <input type="checkbox" v-model="editForm.is_active" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                                <span class="ml-2 text-sm text-gray-700">Active</span>
+                        <div class="md:col-span-2">
+                            <label class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer">
+                                <input type="checkbox" v-model="editForm.is_active" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 w-4 h-4">
+                                <span class="ml-3 text-sm font-medium text-gray-700">
+                                    <i class="fas fa-check-circle text-green-500 mr-1"></i>
+                                    Active Status
+                                </span>
                             </label>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                        <button type="button" v-if="!isCreating" @click="deleteProduct(editForm.id)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            <i class="fas fa-trash-alt mr-2"></i>Delete
-                        </button>
-                        <div v-else class="w-24"></div>
-                        <div class="flex space-x-3">
-                            <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
-                        </div>
-                    </div>
                 </form>
+            </div>
+            
+            <!-- Sticky Footer with Buttons -->
+            <div class="border-t border-gray-200 bg-gray-50 px-6 py-4 rounded-b-lg">
+                <div class="flex justify-between items-center">
+                    <button type="button" v-if="!isCreating" @click="deleteProduct(editForm.id)" class="px-5 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors shadow-sm flex items-center">
+                        <i class="fas fa-trash-alt mr-2"></i>Delete Product
+                    </button>
+                    <div v-else></div>
+                    <div class="flex space-x-3">
+                        <button type="button" @click="closeEditModal" class="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow-sm flex items-center">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </button>
+                        <button type="submit" @click="saveProductChanges" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-sm flex items-center">
+                            <i class="fas fa-save mr-2"></i>Save Changes
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -302,9 +422,21 @@ const editForm = ref({
     product_code: '', 
     description: '',
     category: '',
+    unit: '',
     product_group_id: '',
     is_active: true
 });
+
+// Category to Unit mapping based on UOM table
+const categoryUnitMap = {
+    '1-Corrugated Carton Box': 'P-Piece,S-Set',
+    '2-Single Facer Roll': 'R-Roll',
+    '3-Single Facer Roll/KG': 'K-KG',
+    '4-Single Facer Sheet': 'T-Sheet',
+    '5-Corrugated Sheet Board/Piece': 'P-Piece(Gross M2),Q-Piece(Trim M2)',
+    '6-Corrugated Sheet Board/M2': 'M-Gross M2,N-Trimmed M2',
+    '7-Other Packaging Products': 'P-Piece,S-Set,D-Bundle,L-Pallet,K-KG,B-Box'
+};
 const isCreating = ref(false);
 const notification = ref({ show: false, message: '', type: 'success' });
 const productGroups = ref([]);
@@ -333,6 +465,7 @@ const fetchProducts = async () => {
                 product_code: product.product_code,
                 description: product.description,
                 category: product.category || '1-Corrugated Carton Box', // Default to standard category if empty
+                unit: product.unit || '',
                 product_group_id: product.product_group_id,
                 is_active: typeof product.is_active !== 'undefined' ? product.is_active : true
             }));
@@ -463,6 +596,7 @@ const onProductSelected = (product) => {
         product_code: product.product_code,
         description: product.description,
         category: product.category,
+        unit: product.unit || '',
         product_group_id: product.product_group_id || '',
         is_active: product.is_active
     };
@@ -478,6 +612,7 @@ const editSelectedRow = () => {
             product_code: selectedRow.value.product_code,
             description: selectedRow.value.description,
             category: selectedRow.value.category,
+            unit: selectedRow.value.unit || '',
             product_group_id: selectedRow.value.product_group_id,
             is_active: selectedRow.value.is_active
         };
@@ -495,6 +630,7 @@ const createNewProduct = () => {
         product_code: '', 
         description: '',
         category: '1-Corrugated Carton Box', // Default to standard category
+        unit: 'P-Piece,S-Set', // Default unit for Corrugated Carton Box
         product_group_id: '',
         is_active: true
     };
@@ -510,10 +646,21 @@ const closeEditModal = () => {
         product_code: '', 
         description: '',
         category: '1-Corrugated Carton Box', // Default to standard category
+        unit: '',
         product_group_id: '',
         is_active: true
     };
     isCreating.value = false;
+};
+
+const updateUnitBasedOnCategory = () => {
+    const selectedCategory = editForm.value.category;
+    if (selectedCategory && categoryUnitMap[selectedCategory]) {
+        editForm.value.unit = categoryUnitMap[selectedCategory];
+        console.log('Unit updated to:', editForm.value.unit, 'for category:', selectedCategory);
+    } else {
+        editForm.value.unit = '';
+    }
 };
 
 const saveProductChanges = async () => {
@@ -549,6 +696,7 @@ const saveProductChanges = async () => {
             description: editForm.value.description,
             category_id: editForm.value.category, // API expects category_id
             category: editForm.value.category,
+            unit: editForm.value.unit,
             product_group_id: editForm.value.product_group_id,
             is_active: editForm.value.is_active
         };
@@ -576,6 +724,7 @@ const saveProductChanges = async () => {
                 if (selectedRow.value) {
                     selectedRow.value.description = editForm.value.description;
                     selectedRow.value.category = editForm.value.category;
+                    selectedRow.value.unit = editForm.value.unit;
                     selectedRow.value.product_group_id = editForm.value.product_group_id;
                     selectedRow.value.is_active = editForm.value.is_active;
                 }
