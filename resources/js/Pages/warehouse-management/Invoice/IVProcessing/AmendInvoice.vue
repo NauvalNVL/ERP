@@ -162,149 +162,13 @@
         </div>
 
         <!-- Invoice Table Modal -->
-        <div v-if="showTable" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
-            <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl max-h-[85vh] flex flex-col animate-scaleIn">
-                <div class="bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 text-white px-6 py-4 rounded-t-lg flex justify-between items-center">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-white bg-opacity-20 p-2 rounded-lg shadow-inner"><i class="fas fa-table"></i></div>
-                        <h3 class="text-lg font-semibold">Invoice Table</h3>
-                    </div>
-                    <button @click="showTable = false" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
-                </div>
-
-                <!-- Removed top search bar per request -->
-
-                <div class="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-white to-gray-50">
-                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                        <table class="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">INVOICE#</th>
-                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">INV DATE</th>
-                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">AC#</th>
-                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">TAX</th>
-                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">MODE</th>
-                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">PC STATUS</th>
-                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">POST STATUS</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="row in invoices" :key="row.invoice_no" @click="selectRow(row)" class="hover:bg-blue-50 cursor-pointer">
-                                    <td class="px-3 py-2 font-medium text-blue-700">{{ row.invoice_no }}</td>
-                                    <td class="px-3 py-2">{{ row.invoice_date }}</td>
-                                    <td class="px-3 py-2">{{ row.customer_code }}</td>
-                                    <td class="px-3 py-2">{{ row.tax_code }}</td>
-                                    <td class="px-3 py-2">{{ row.mode }}</td>
-                                    <td class="px-3 py-2">{{ row.pc_status }}</td>
-                                    <td class="px-3 py-2">{{ row.post_status }}</td>
-                                </tr>
-                                <tr v-if="!loading && invoices.length === 0">
-                                    <td colspan="7" class="px-6 py-8 text-center">
-                                        <div class="flex flex-col items-center gap-3">
-                                            <i class="fas fa-inbox text-4xl text-gray-300"></i>
-                                            <div>
-                                                <div class="text-gray-600 font-medium">No invoices found</div>
-                                                <div class="text-sm text-gray-400 mt-1">Try adjusting your search criteria or create a new invoice</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr v-if="loading">
-                                    <td colspan="7" class="px-6 py-6 text-center text-gray-500">
-                                        <i class="fas fa-spinner fa-spin mr-2"></i>
-                                        Loading invoices...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Detail Panel - CPS Style -->
-                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                        <div>
-                            <label class="block text-gray-600">Invoice#</label>
-                            <div class="flex gap-2">
-                                <input v-model="tableQuery.part1" class="w-16 px-2 py-1 border rounded" />
-                                <input v-model="tableQuery.part2" class="w-16 px-2 py-1 border rounded" />
-                                <input v-model="tableQuery.part3" class="w-24 px-2 py-1 border rounded" />
-                                <button @click="fetchInvoices" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded">Search</button>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-gray-600">Customer Name</label>
-                            <input type="text" :value="selectedRow?.customer_name || ''" readonly class="w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2" />
-                        </div>
-                        <div>
-                            <label class="block text-gray-600">Order Mode</label>
-                            <input type="text" :value="selectedRow?.order_mode || ''" readonly class="w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2" />
-                        </div>
-                        <!-- Audit Trail - Match CPS Layout -->
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-gray-600 text-xs">Amended by:</label>
-                                <input type="text" :value="selectedRow?.amended_by || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                            </div>
-                            <div>
-                                <label class="block text-gray-600 text-xs">Date:</label>
-                                <input type="text" :value="selectedRow?.amended_date || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-gray-600 text-xs">Cancelled by:</label>
-                                <input type="text" value="" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                            </div>
-                            <div>
-                                <label class="block text-gray-600 text-xs">Date:</label>
-                                <input type="text" value="" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-gray-600 text-xs">Issued by:</label>
-                                <input type="text" :value="selectedRow?.issued_by || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                            </div>
-                            <div>
-                                <label class="block text-gray-600 text-xs">Date:</label>
-                                <input type="text" :value="selectedRow?.issued_date || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-gray-600 text-xs">Printed by:</label>
-                                <input type="text" :value="selectedRow?.printed_by || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                            </div>
-                            <div>
-                                <label class="block text-gray-600 text-xs">Date:</label>
-                                <input type="text" :value="selectedRow?.printed_date || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-gray-600 text-xs">Posted by:</label>
-                                <input type="text" :value="selectedRow?.posted_by || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                            </div>
-                            <div>
-                                <label class="block text-gray-600 text-xs">Date:</label>
-                                <input type="text" :value="selectedRow?.posted_date || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                            </div>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-gray-600">Reason</label>
-                            <input type="text" v-model="reason" class="w-full border-gray-200 rounded-md px-3 py-2" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-lg flex justify-between items-center">
-                    <div class="flex gap-2">
-                        <button @click="zoom" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded shadow">Zoom</button>
-                        <button @click="selectForEdit" :disabled="!selectedRow" class="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded shadow">Select</button>
-                    </div>
-                    <button @click="showTable=false" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded">Exit</button>
-                </div>
-            </div>
-        </div>
+        <InvoiceTableModal
+            :open="showTable"
+            :initial-query="tableQuery"
+            @close="showTable = false"
+            @select="selectForEdit"
+            @zoom="zoom"
+        />
 
         <!-- Customer Sales Tax Modal -->
         <CustomerSalesTaxorSalesTaxExemptionTable
@@ -378,6 +242,7 @@ import { ref, onMounted, computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import CustomerSalesTaxorSalesTaxExemptionTable from '@/Components/CustomerSalesTaxorSalesTaxExemptionTable.vue';
 import FinalScreen from '@/Components/FinalScreen.vue';
+import InvoiceTableModal from '@/Components/InvoiceTableModal.vue';
 import axios from 'axios';
 
 // Toast notification helper
@@ -398,11 +263,7 @@ const query = ref({ part1: '', part2: '', part3: '' });
 const tableQuery = ref({ part1: '', part2: '', part3: '' });
 
 const showTable = ref(false);
-const invoices = ref([]);
-const loading = ref(false);
-const selectedRow = ref(null);
 const selectedInvoice = ref(null);
-const reason = ref('');
 
 // Modal states
 const showTaxModal = ref(false);
@@ -420,39 +281,12 @@ const selectedDate = ref(null);
 // Calculated values
 const calculatedTotal = ref(0);
 
-// Demo data (fallback when API is unavailable)
-const demoInvoices = [
-    { invoice_no: '10-2025-97009', invoice_date: '10/10/2025', customer_code: '000150-01', customer_name: 'MULTI MAKMUR INDAH INDUSTRI, PT', tax_code: 'PPN11', mode: 'Manual', pc_status: '0', post_status: 'UnPost', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', issued_by: 'fin03', issued_date: '10/10/2025', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-    { invoice_no: '10-2025-97008', invoice_date: '10/10/2025', customer_code: '000150-01', customer_name: 'MULTI MAKMUR INDAH INDUSTRI, PT', tax_code: 'PPN11', mode: 'Manual', pc_status: '0', post_status: 'UnPost', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', issued_by: 'fin03', issued_date: '10/10/2025', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-    { invoice_no: '10-2025-97007', invoice_date: '10/10/2025', customer_code: '000271-01', customer_name: 'SAMPLE CUSTOMER A', tax_code: 'PPN11', mode: 'Manual', pc_status: '0', post_status: 'UnPost', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', issued_by: 'fin03', issued_date: '10/10/2025', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-    { invoice_no: '10-2025-97006', invoice_date: '10/10/2025', customer_code: '000271-01', customer_name: 'SAMPLE CUSTOMER A', tax_code: 'PPN11', mode: 'Manual', pc_status: '0', post_status: 'UnPost', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', issued_by: 'fin03', issued_date: '10/10/2025', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-    { invoice_no: '10-2025-97005', invoice_date: '10/10/2025', customer_code: '000272-01', customer_name: 'SAMPLE CUSTOMER B', tax_code: 'PPN11', mode: 'Manual', pc_status: '0', post_status: 'UnPost', order_mode: '0-Order by Customer + Deliver & Invoice to Customer', issued_by: 'fin03', issued_date: '10/10/2025', printed_by: '', printed_date: '', posted_by: '', posted_date: '' },
-];
-
-const demoDetailsByNo = {
-    '10-2025-97009': {
-        invoice_no: '10-2025-97009',
-        customer_code: '000150-01',
-        customer_name: 'MULTI MAKMUR INDAH INDUSTRI, PT',
-        order_mode: '0-Order by Customer + Deliver & Invoice to Customer',
-        salesperson: 'S108',
-        currency: 'IDR',
-        exchange_rate: 0.0,
-        exchange_method: '1',
-        tax_index_no: '2',
-        invoice_date: '2025-10-10',
-        ref2: '',
-        remark: 'EVA KENPI',
-        status: 'New',
-    },
-};
-
 const openTable = async () => {
     // CPS Behavior: If full invoice# entered, load directly without table
     if (query.value.part1 && query.value.part2 && query.value.part3) {
         const fullInvoiceNo = `${query.value.part1}-${query.value.part2}-${query.value.part3}`;
         console.log('🔍 Direct search for invoice:', fullInvoiceNo);
-        
+
         try {
             const res = await axios.get(`/api/invoices/${encodeURIComponent(fullInvoiceNo)}`);
             if (res.data) {
@@ -476,68 +310,23 @@ const openTable = async () => {
             toast.error('Invoice not found');
         }
     }
-    
+
     // Otherwise, open table with filter
     tableQuery.value.part1 = query.value.part1 || period.value.month;
     tableQuery.value.part2 = query.value.part2 || period.value.year;
     tableQuery.value.part3 = query.value.part3 || '';
-    
+
     showTable.value = true;
-    fetchInvoices();
 };
 
-const fetchInvoices = async () => {
-    loading.value = true;
-    try {
-        const params = new URLSearchParams();
-        if (tableQuery.value.part1) params.append('mm', tableQuery.value.part1);
-        if (tableQuery.value.part2) params.append('yyyy', tableQuery.value.part2);
-        if (tableQuery.value.part3) params.append('seq', tableQuery.value.part3);
-
-        console.log('🔍 Fetching invoices from API:', `/api/invoices?${params.toString()}`);
-
-        const res = await axios.get(`/api/invoices?${params.toString()}`);
-
-        console.log('✅ API Response:', res.data);
-
-        if (res.data && res.data.success) {
-            const fetchedInvoices = Array.isArray(res.data.data) ? res.data.data : [];
-            
-            if (fetchedInvoices.length > 0) {
-                invoices.value = fetchedInvoices;
-                console.log(`✅ Loaded ${fetchedInvoices.length} invoices from DATABASE`);
-            } else {
-                invoices.value = [];
-                console.warn('⚠️ No invoices found in database');
-                toast.info('No invoices found. Database is empty.');
-            }
-        } else {
-            console.warn('⚠️ API returned no data, using demo data');
-            invoices.value = [...demoInvoices];
-            toast.info('Using demo data (API returned no data)');
-        }
-    } catch (e) {
-        console.error('❌ Error fetching invoices:', e);
-        console.error('Error details:', e.response?.data || e.message);
-        invoices.value = [];
-        toast.error('Failed to load invoices: ' + (e.response?.data?.message || e.message));
-    } finally {
-        loading.value = false;
-    }
-};
-
-const selectRow = (row) => {
-    selectedRow.value = row;
-};
-
-const selectForEdit = async () => {
-    if (!selectedRow.value) {
+const selectForEdit = async (selectedRow) => {
+    if (!selectedRow) {
         toast.error('Please select an invoice first');
         return;
     }
 
     try {
-        const res = await axios.get(`/api/invoices/${encodeURIComponent(selectedRow.value.invoice_no)}`);
+        const res = await axios.get(`/api/invoices/${encodeURIComponent(selectedRow.invoice_no)}`);
 
         if (res.data) {
             // Convert numeric fields from string to number, ensure tax fields are strings
@@ -557,26 +346,8 @@ const selectForEdit = async () => {
         }
     } catch (e) {
         console.error('Error fetching invoice details:', e);
+        toast.error('Failed to load invoice details');
     }
-
-    // Fallback to demo detail if API unavailable
-    const demo = demoDetailsByNo[selectedRow.value.invoice_no] || {
-        invoice_no: selectedRow.value.invoice_no,
-        customer_code: selectedRow.value.customer_code || '',
-        customer_name: selectedRow.value.customer_name || '',
-        order_mode: selectedRow.value.order_mode || '0-Order by Customer + Deliver & Invoice to Customer',
-        salesperson: 'S108',
-        currency: 'IDR',
-        exchange_rate: 0,
-        exchange_method: '1',
-        tax_index_no: '2',
-        invoice_date: '2025-10-10',
-        ref2: '',
-        remark: '',
-        status: 'New',
-    };
-    selectedInvoice.value = { ...demo };
-    showTable.value = false;
 };
 
 const saveInvoice = async () => {
@@ -620,42 +391,42 @@ const openTaxModal = () => {
         toast.error('Please select an invoice first');
         return;
     }
-    
+
     if (!selectedInvoice.value.customer_code) {
         toast.error('Customer code not found for this invoice');
         return;
     }
-    
+
     console.log('🔍 Opening Tax Modal for customer:', selectedInvoice.value.customer_code);
     showTaxModal.value = true;
 };
 
 const onTaxSelect = async (taxData) => {
     if (!selectedInvoice.value) return;
-    
+
     console.log('✅ Tax selected:', taxData);
-    
+
     // Convert to string to prevent type errors
     selectedInvoice.value.tax_index_no = String(taxData.index_number || '');
-    
+
     // Fetch tax details from tax group to get tax code and rate
     try {
         if (taxData.tax_group_code) {
             const res = await axios.get(`/api/invoices/tax-groups/${taxData.tax_group_code}/tax-items`);
             console.log('Tax Group Details:', res.data);
-            
+
             if (res.data && res.data.length > 0) {
                 // Use first tax item from group (or could show another modal to select)
                 const firstTax = res.data[0];
                 selectedInvoice.value.tax_code = String(firstTax.code || firstTax.tax_code || '');
                 selectedInvoice.value.tax_percent = parseFloat(firstTax.rate || firstTax.tax_rate || 0);
-                
+
                 console.log('✅ Tax details set:', {
                     tax_index_no: selectedInvoice.value.tax_index_no,
                     tax_code: selectedInvoice.value.tax_code,
                     tax_percent: selectedInvoice.value.tax_percent
                 });
-                
+
                 toast.success(`Tax Index ${taxData.index_number} selected`);
             }
         }
@@ -665,7 +436,7 @@ const onTaxSelect = async (taxData) => {
         selectedInvoice.value.tax_code = String(taxData.tax_group_code || '');
         selectedInvoice.value.tax_percent = 0;
     }
-    
+
     showTaxModal.value = false;
 };
 
@@ -753,13 +524,13 @@ const confirmDate = () => {
 
 const formatDisplayDate = (dateStr) => {
     if (!dateStr) return '';
-    
+
     // Handle different date formats from database
     // Format 1: YYYY-MM-DD (e.g., 2025-11-05)
     // Format 2: DD/MM/YYYY (e.g., 05/11/2025)
-    
+
     let date;
-    
+
     // Try parsing YYYY-MM-DD format
     if (dateStr.includes('-')) {
         date = new Date(dateStr);
@@ -772,7 +543,7 @@ const formatDisplayDate = (dateStr) => {
             date = new Date(parts[2], parts[1] - 1, parts[0]);
         }
     }
-    
+
     if (!date || isNaN(date)) return dateStr;
 
     const day = String(date.getDate()).padStart(2, '0');
@@ -784,14 +555,14 @@ const formatDisplayDate = (dateStr) => {
 
 const formatPeriod = (invoiceNo) => {
     if (!invoiceNo) return '';
-    
+
     // Handle various invoice formats:
     // Format 1: MM-YYYY-NNNN (e.g., 10-2025-97042)
     // Format 2: IV-YYYYMMDD-NNNN (e.g., IV-2025114-0001)
     // Format 3: YYYY-MM-NNNN (e.g., 2025-11-0001)
-    
+
     const parts = invoiceNo.split('-');
-    
+
     if (parts.length >= 3) {
         // Check if first part is "IV" prefix
         if (parts[0] === 'IV' && parts[1].length === 7) {
@@ -810,7 +581,7 @@ const formatPeriod = (invoiceNo) => {
             return `${parts[1]}/${parts[0]}`; // MM/YYYY
         }
     }
-    
+
     return invoiceNo; // Return as-is if format unknown
 };
 
@@ -825,21 +596,21 @@ const openFinalScreen = async () => {
 
     // CPS-Compatible: Calculate total amount (Priority order matches Prepare Invoice flow)
     let total = 0;
-    
+
     try {
         // Priority 1: Get from invoice header (IV_TRAN_AMT) if available
         const invoiceHeaderTotal = parseFloat(selectedInvoice.value?.total_amount) || 0;
-        
+
         if (invoiceHeaderTotal > 0) {
             total = invoiceHeaderTotal;
             console.log('✅ Using total from invoice header (IV_TRAN_AMT):', total);
         } else {
             console.log('⚠️ Invoice header total is 0, trying alternative methods...');
-            
+
             // Priority 2: Try to get invoice with items from INVDET table
             try {
                 const resWithItems = await axios.get(`/api/invoices/${encodeURIComponent(selectedInvoice.value.invoice_no)}/with-items`);
-                
+
                 if (resWithItems.data && resWithItems.data.items && resWithItems.data.items.length > 0) {
                     // Calculate from invoice items
                     total = resWithItems.data.items.reduce((sum, item) => {
@@ -851,22 +622,22 @@ const openFinalScreen = async () => {
             } catch (e) {
                 console.warn('⚠️ Cannot fetch invoice items:', e.message);
             }
-            
+
             // Priority 3: If still 0, calculate from related DO (CPS Flow - same as Prepare Invoice)
             if (total === 0 && selectedInvoice.value.invoice_no) {
                 console.log('⚠️ Total still 0, attempting to calculate from related DO...');
-                
+
                 try {
                     // Get invoice details to find related DO/SO
                     const invDetail = await axios.get(`/api/invoices/${encodeURIComponent(selectedInvoice.value.invoice_no)}`);
-                    
+
                     if (invDetail.data && invDetail.data.invoice_no) {
                         // Try to extract DO number from 2nd Reference or SO Number
                         const doNumber = invDetail.data.ref2 || invDetail.data.do_number || invDetail.data.second_ref;
                         const soNumber = invDetail.data.so_number;
-                        
+
                         console.log('📦 Related DO/SO found:', { doNumber, soNumber });
-                        
+
                         // If we have SO number, calculate from DO table
                         if (soNumber) {
                             try {
@@ -879,7 +650,7 @@ const openFinalScreen = async () => {
                                         'X-CSRF-TOKEN': csrfToken
                                     }
                                 });
-                                
+
                                 if (doRes.data && doRes.data.total_amount > 0) {
                                     total = doRes.data.total_amount;
                                     console.log('✅ Calculated from related DO via SO:', total);
@@ -888,12 +659,12 @@ const openFinalScreen = async () => {
                                 console.warn('⚠️ Cannot calculate from SO:', e.message);
                             }
                         }
-                        
+
                         // If we have DO number, try direct DO lookup
                         if (total === 0 && doNumber) {
                             try {
                                 const doDetailRes = await axios.get(`/api/invoices/do-items?do_number=${encodeURIComponent(doNumber)}`);
-                                
+
                                 if (doDetailRes.data && doDetailRes.data.total_amount > 0) {
                                     total = doDetailRes.data.total_amount;
                                     console.log('✅ Calculated from related DO directly:', total);
@@ -907,7 +678,7 @@ const openFinalScreen = async () => {
                     console.warn('⚠️ Cannot fetch invoice details for DO lookup:', e.message);
                 }
             }
-            
+
             // Priority 4: Use net amount if available (fallback)
             if (total === 0) {
                 const netAmount = parseFloat(selectedInvoice.value?.net_amount) || 0;
@@ -926,11 +697,11 @@ const openFinalScreen = async () => {
                 }
             }
         }
-        
+
         // Set the calculated total
         calculatedTotal.value = total;
         console.log('💰 Final total amount:', total, typeof total);
-        
+
     } catch (e) {
         console.error('❌ Error calculating total amount:', e);
         // Last resort fallback
@@ -965,10 +736,10 @@ const openFinalScreen = async () => {
             console.log('✅ Using fallback tax options:', taxOptions.value.length);
         }
     }
-    
+
     // Get tax code from invoice (use tax_index_no if tax_code is empty)
     const taxCodeToUse = selectedInvoice.value.tax_code || selectedInvoice.value.tax_index_no || '';
-    
+
     // Log all data being sent to Final Screen
     console.log('═══════════════════════════════════════════════════════');
     console.log('🎬 Opening Final Screen (Amend Invoice)');
@@ -997,7 +768,7 @@ const openFinalScreen = async () => {
 
 const onFinalConfirm = async (finalData) => {
     if (!selectedInvoice.value) return;
-    
+
     console.log('═══════════════════════════════════════════════════════');
     console.log('✅ Final Screen Confirmed (Amend Invoice)');
     console.log('═══════════════════════════════════════════════════════');
@@ -1008,14 +779,14 @@ const onFinalConfirm = async (finalData) => {
     console.log('  Tax Amount:', finalData.taxAmount);
     console.log('  Net Amount:', finalData.netAmount);
     console.log('');
-    
+
     // Update invoice data from final screen
     selectedInvoice.value.total_amount = finalData.totalAmount;
     selectedInvoice.value.tax_amount = finalData.taxAmount;
     selectedInvoice.value.net_amount = finalData.netAmount;
     selectedInvoice.value.tax_code = finalData.taxCode;
     selectedInvoice.value.tax_percent = finalData.taxPercent;
-    
+
     console.log('Updated Invoice Data:');
     console.log('  Invoice No:', selectedInvoice.value.invoice_no);
     console.log('  Total Amount:', selectedInvoice.value.total_amount);
@@ -1024,10 +795,10 @@ const onFinalConfirm = async (finalData) => {
     console.log('  Tax Amount:', selectedInvoice.value.tax_amount);
     console.log('  Net Amount:', selectedInvoice.value.net_amount);
     console.log('═══════════════════════════════════════════════════════');
-    
+
     // Close final screen
     showFinalScreen.value = false;
-    
+
     // CPS Flow: Auto-save after Final Screen OK
     await saveInvoice();
 };

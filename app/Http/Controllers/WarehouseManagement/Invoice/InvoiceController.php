@@ -1000,6 +1000,7 @@ class InvoiceController extends Controller
 
     /**
      * Cancel an active invoice
+     * CPS-Compatible: Supports two cancellation reasons
      */
     public function cancelInvoice(Request $request)
     {
@@ -1007,6 +1008,7 @@ class InvoiceController extends Controller
             $payload = $request->validate([
                 'invoice_number' => 'required|string|max:50',
                 'cancel_reason' => 'required|string|max:250',
+                'cancel_reason_2' => 'nullable|string|max:250',
             ]);
 
             DB::beginTransaction();
@@ -1021,35 +1023,92 @@ class InvoiceController extends Controller
                 throw new \RuntimeException("Invoice is already cancelled");
             }
 
+            // CPS Business Rule: Cannot cancel posted invoices
+            if ($invoice->IV_STS === 'Posted') {
+                throw new \RuntimeException("Cannot cancel invoice that has been posted to GL");
+            }
+
+            // Prepare update data
+            $updateData = [
+                'IV_STS' => 'Cancelled',
+                'CANCELLED_REASON_1' => $payload['cancel_reason'],
+                'CX_UID' => Auth::check() ? Auth::user()->name : 'system',
+                'CX_DATE' => now()->format('d/m/Y'),
+                'CX_TIME' => now()->format('H:i'),
+            ];
+
+            // Add second reason if provided
+            if (!empty($payload['cancel_reason_2'])) {
+                $updateData['cANCELLED_REASON_2'] = $payload['cancel_reason_2'];
+            }
+
             // Update invoice status
             DB::table('INV')
                 ->where('IV_NUM', $payload['invoice_number'])
-                ->update([
-                    'IV_STS' => 'Cancelled',
-                    'CANCELLED_REASON_1' => $payload['cancel_reason'],
-                    'CX_UID' => Auth::check() ? Auth::user()->name : 'system',
-                    'CX_DATE' => now()->format('d/m/Y'),
-                    'CX_TIME' => now()->format('H:i'),
-                ]);
+                ->update($updateData);
 
-            // Revert DO status if linked
+            // CPS-Compatible: Revert DO status if linked
             if ($invoice->IV_SECOND_REF) {
-                DB::table('DO')
-                    ->where('DO_Num', $invoice->IV_SECOND_REF)
-                    ->update([
-                        'Status' => null,
-                        'Invoice_Num' => null,
+                // Recalculate invoiced quantity after this cancellation
+                $invoicedQty = DB::table('INV')
+                    ->where('SO_NUM', $invoice->SO_NUM)
+                    ->where('IV_STS', '!=', 'Cancelled')
+                    ->where('IV_NUM', '!=', $payload['invoice_number']) // Exclude current invoice
+                    ->sum('IV_QTY');
+
+                // Get DO quantity
+                $do = DB::table('DO')->where('DO_Num', $invoice->IV_SECOND_REF)->first();
+                
+                if ($do) {
+                    $doQty = floatval($do->DO_Qty ?? 0);
+                    $remainingQty = $doQty - ($invoicedQty ?? 0);
+                    
+                    // Determine new DO status
+                    $newStatus = null; // Open (no status)
+                    if ($remainingQty <= 0) {
+                        $newStatus = 'Invoiced'; // Fully invoiced
+                    } elseif ($invoicedQty > 0) {
+                        $newStatus = 'Partial'; // Partially invoiced
+                    }
+                    
+                    DB::table('DO')
+                        ->where('DO_Num', $invoice->IV_SECOND_REF)
+                        ->update([
+                            'Status' => $newStatus,
+                        ]);
+                    
+                    Log::info('DO status reverted after invoice cancellation', [
+                        'invoice_num' => $payload['invoice_number'],
+                        'do_number' => $invoice->IV_SECOND_REF,
+                        'new_status' => $newStatus,
+                        'remaining_qty' => $remainingQty
                     ]);
+                }
             }
 
             DB::commit();
 
+            Log::info('Invoice cancelled successfully', [
+                'invoice_number' => $payload['invoice_number'],
+                'cancelled_by' => $updateData['CX_UID'],
+                'cancelled_at' => $updateData['CX_DATE'] . ' ' . $updateData['CX_TIME'],
+                'reason' => $payload['cancel_reason']
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Invoice cancelled successfully',
+                'invoice_number' => $payload['invoice_number'],
+                'cancelled_by' => $updateData['CX_UID'],
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
+            
+            Log::error('Failed to cancel invoice', [
+                'invoice_number' => $request->input('invoice_number'),
+                'error' => $e->getMessage()
+            ]);
+            
             return response()->json([
                 'success' => false,
                 'error' => 'Failed to cancel invoice: ' . $e->getMessage(),
