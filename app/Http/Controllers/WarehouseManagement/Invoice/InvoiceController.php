@@ -1366,4 +1366,149 @@ class InvoiceController extends Controller
         }
     }
 
+    /**
+     * Get list of invoices for Amend Invoice
+     */
+    public function index(Request $request)
+    {
+        try {
+            $query = DB::table('INVOICE');
+            
+            // Filter by month/year/sequence if provided
+            if ($request->has('mm')) {
+                $query->whereRaw('SUBSTRING(INVOICE_NO, 1, 2) = ?', [$request->mm]);
+            }
+            if ($request->has('yyyy')) {
+                $query->whereRaw('SUBSTRING(INVOICE_NO, 4, 4) = ?', [$request->yyyy]);
+            }
+            if ($request->has('seq')) {
+                $query->whereRaw('SUBSTRING(INVOICE_NO, 9, 5) = ?', [$request->seq]);
+            }
+            
+            $invoices = $query->select([
+                'INVOICE_NO as invoice_no',
+                'INVOICE_DATE as invoice_date',
+                'CUSTOMER_CODE as customer_code',
+                'TAX_CODE as tax_code',
+                'MODE as mode',
+                'PC_STATUS as pc_status',
+                'POST_STATUS as post_status',
+                'CUSTOMER_NAME as customer_name',
+                'ORDER_MODE as order_mode'
+            ])
+            ->orderBy('INVOICE_NO', 'desc')
+            ->limit(100)
+            ->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $invoices
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error fetching invoices: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to fetch invoices',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get single invoice details for editing
+     */
+    public function show($invoiceNo)
+    {
+        try {
+            $invoice = DB::table('INVOICE')
+                ->where('INVOICE_NO', $invoiceNo)
+                ->first();
+            
+            if (!$invoice) {
+                return response()->json([
+                    'error' => 'Invoice not found'
+                ], 404);
+            }
+            
+            return response()->json([
+                'invoice_no' => $invoice->INVOICE_NO ?? '',
+                'customer_code' => $invoice->CUSTOMER_CODE ?? '',
+                'customer_name' => $invoice->CUSTOMER_NAME ?? '',
+                'order_mode' => $invoice->ORDER_MODE ?? '',
+                'salesperson' => $invoice->SALESPERSON ?? '',
+                'currency' => $invoice->CURRENCY ?? 'IDR',
+                'exchange_rate' => $invoice->EXCHANGE_RATE ?? 0,
+                'exchange_method' => $invoice->EXCHANGE_METHOD ?? '1',
+                'tax_index_no' => $invoice->TAX_INDEX_NO ?? '',
+                'invoice_date' => $invoice->INVOICE_DATE ?? '',
+                'ref2' => $invoice->REF2 ?? '',
+                'remark' => $invoice->REMARK ?? '',
+                'status' => $invoice->STATUS ?? 'New'
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error fetching invoice details: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to fetch invoice details',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update invoice details
+     */
+    public function update(Request $request, $invoiceNo)
+    {
+        try {
+            $validated = $request->validate([
+                'order_mode' => 'nullable|string',
+                'salesperson' => 'nullable|string',
+                'currency' => 'nullable|string',
+                'exchange_rate' => 'nullable|numeric',
+                'exchange_method' => 'nullable|string',
+                'tax_index_no' => 'nullable|string',
+                'invoice_date' => 'nullable|date',
+                'ref2' => 'nullable|string',
+                'remark' => 'nullable|string',
+                'status' => 'nullable|string'
+            ]);
+            
+            $updated = DB::table('INVOICE')
+                ->where('INVOICE_NO', $invoiceNo)
+                ->update([
+                    'ORDER_MODE' => $validated['order_mode'] ?? null,
+                    'SALESPERSON' => $validated['salesperson'] ?? null,
+                    'CURRENCY' => $validated['currency'] ?? 'IDR',
+                    'EXCHANGE_RATE' => $validated['exchange_rate'] ?? 0,
+                    'EXCHANGE_METHOD' => $validated['exchange_method'] ?? '1',
+                    'TAX_INDEX_NO' => $validated['tax_index_no'] ?? null,
+                    'INVOICE_DATE' => $validated['invoice_date'] ?? null,
+                    'REF2' => $validated['ref2'] ?? null,
+                    'REMARK' => $validated['remark'] ?? null,
+                    'STATUS' => $validated['status'] ?? 'New',
+                    'UPDATED_AT' => now(),
+                    'UPDATED_BY' => Auth::user()->userID ?? 'system'
+                ]);
+            
+            if ($updated) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Invoice updated successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'error' => 'Invoice not found or no changes made'
+                ], 404);
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Error updating invoice: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to update invoice',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

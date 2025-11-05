@@ -21,32 +21,32 @@ class ReinforcementTapeController extends Controller
     {
         try {
             $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
-            
+
             // If no data exists, seed sample data
             if ($reinforcementTapes->isEmpty()) {
                 $this->seedData();
                 $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
             }
-            
+
             // For debugging
             if ($reinforcementTapes->isEmpty()) {
                 Log::info('No reinforcement tapes found in the database');
             } else {
                 Log::info('Found ' . $reinforcementTapes->count() . ' reinforcement tapes in the database');
             }
-            
+
             // Only return JSON for explicit API requests
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json($reinforcementTapes);
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/ReinforcementTape', [
                 'reinforcementTapes' => $reinforcementTapes,
                 'header' => 'Define Reinforcement Tape'
             ]);
         } catch (\Exception $e) {
             Log::error('Error in ReinforcementTapeController@index: ' . $e->getMessage());
-            
+
             // Only return JSON for explicit API requests
             if ($request->is('api/*') || ($request->header('X-Requested-With') === 'XMLHttpRequest' && !$request->header('X-Inertia'))) {
                 return response()->json([
@@ -54,7 +54,7 @@ class ReinforcementTapeController extends Controller
                     'message' => 'Error displaying reinforcement tape data: ' . $e->getMessage()
                 ], 500);
             }
-            
+
             return Inertia::render('sales-management/system-requirement/standard-requirement/ReinforcementTape', [
                 'reinforcementTapes' => [],
                 'error' => 'Error displaying reinforcement tape data'
@@ -81,7 +81,7 @@ class ReinforcementTapeController extends Controller
 
             if ($validator->fails()) {
                 Log::warning('Validation failed:', $validator->errors()->toArray());
-                
+
                 return response()->json([
                     'success' => false,
                     'message' => $validator->errors()->first()
@@ -94,9 +94,9 @@ class ReinforcementTapeController extends Controller
                 'dry_end_code' => $request->dry_end_code ? trim($request->dry_end_code) : null,
                 'is_active' => true
             ]);
-            
+
             Log::info('Reinforcement tape created successfully:', ['code' => $reinforcementTape->code]);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Reinforcement tape berhasil ditambahkan',
@@ -106,7 +106,7 @@ class ReinforcementTapeController extends Controller
         } catch (\Exception $e) {
             Log::error('Error in ReinforcementTapeController@store: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error creating reinforcement tape: ' . $e->getMessage()
@@ -137,7 +137,7 @@ class ReinforcementTapeController extends Controller
             }
 
             $reinforcementTape = ReinforcementTape::find($id);
-            
+
             if (!$reinforcementTape) {
                 Log::warning('Reinforcement tape not found with ID: ' . $id);
                 return response()->json([
@@ -152,7 +152,7 @@ class ReinforcementTapeController extends Controller
             ]);
 
             Log::info('Reinforcement tape updated successfully:', ['id' => $id]);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Reinforcement tape berhasil diperbarui',
@@ -162,7 +162,7 @@ class ReinforcementTapeController extends Controller
         } catch (\Exception $e) {
             Log::error('Error updating reinforcement tape: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating reinforcement tape: ' . $e->getMessage()
@@ -180,10 +180,10 @@ class ReinforcementTapeController extends Controller
     {
         try {
             $reinforcementTape = ReinforcementTape::find($id);
-            
+
             if ($reinforcementTape) {
                 $reinforcementTape->delete();
-                
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Reinforcement tape berhasil dihapus'
@@ -196,11 +196,72 @@ class ReinforcementTapeController extends Controller
             }
         } catch (\Exception $e) {
             Log::error('Error in ReinforcementTapeController@destroy: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting reinforcement tape: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Display a listing of the resource for API requests.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        try {
+            $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
+            
+            // If no data exists, seed sample data
+            if ($reinforcementTapes->isEmpty()) {
+                $this->seedData();
+                $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => $reinforcementTapes
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ReinforcementTapeController@apiIndex: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching reinforcement tape data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Display a listing of the resource with Vue.
+     *
+     * @return \Inertia\Response
+     */
+    public function vueIndex()
+    {
+        try {
+            $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
+            
+            // If no data exists, seed sample data
+            if ($reinforcementTapes->isEmpty()) {
+                $this->seedData();
+                $reinforcementTapes = ReinforcementTape::orderBy('code', 'asc')->get();
+            }
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ReinforcementTape', [
+                'reinforcementTapes' => $reinforcementTapes,
+                'header' => 'Define Reinforcement Tape'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in ReinforcementTapeController@vueIndex: ' . $e->getMessage());
+            
+            return Inertia::render('sales-management/system-requirement/standard-requirement/ReinforcementTape', [
+                'reinforcementTapes' => [],
+                'header' => 'Define Reinforcement Tape',
+                'error' => 'Error displaying reinforcement tape data'
+            ]);
         }
     }
 
@@ -257,7 +318,7 @@ class ReinforcementTapeController extends Controller
     {
         try {
             $this->seedData();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Reinforcement tape seed data created successfully'
