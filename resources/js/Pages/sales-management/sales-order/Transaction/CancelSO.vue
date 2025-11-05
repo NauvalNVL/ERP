@@ -361,133 +361,13 @@
       </div>
     </div>
 
-    <!-- Sales Order Search Modal -->
-    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl max-h-[90vh] overflow-hidden">
-        <!-- Modal Header -->
-        <div class="bg-blue-600 text-white px-6 py-4 flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Sales Order Table (Sorted by S/Order#)</h3>
-          <button @click="closeModal" class="text-white hover:text-gray-200">
-            <i class="fas fa-times text-xl"></i>
-          </button>
-        </div>
-
-        <!-- Modal Content -->
-        <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          <!-- Sales Order Table -->
-          <div class="overflow-x-auto">
-            <table class="w-full border-collapse border border-gray-300 text-sm">
-              <thead>
-                <tr class="bg-blue-100">
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">SO#</th>
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">CUSTOMER PO#</th>
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">AC#</th>
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">MC#</th>
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">STATUS</th>
-                  <th class="border border-gray-300 px-2 py-1 text-left font-semibold">D/LOCATION</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(order, index) in salesOrderList" :key="index" 
-                    :class="selectedRowIndex === index ? 'bg-blue-200' : 'hover:bg-gray-50'"
-                    @click="selectRow(index)"
-                    class="cursor-pointer">
-                  <td class="border border-gray-300 px-2 py-1">{{ order.soNumber }}</td>
-                  <td class="border border-gray-300 px-2 py-1">{{ order.customerPO }}</td>
-                  <td class="border border-gray-300 px-2 py-1">{{ order.acNumber }}</td>
-                  <td class="border border-gray-300 px-2 py-1">{{ order.mcNumber }}</td>
-                  <td class="border border-gray-300 px-2 py-1">
-                    <span :class="getStatusClass(order.status)">{{ order.status }}</span>
-                  </td>
-                  <td class="border border-gray-300 px-2 py-1">{{ order.location }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Customer Information Section -->
-          <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Customer Name:</label>
-                <input v-model="customerInfo.name" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Model:</label>
-                <input v-model="customerInfo.model" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Order Mode:</label>
-                <input v-model="customerInfo.orderMode" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-            </div>
-            <div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Salesperson:</label>
-                <input v-model="customerInfo.salesperson" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Order Group:</label>
-                <input v-model="customerInfo.orderGroup" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-              <div class="mb-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Order Type:</label>
-                <input v-model="customerInfo.orderType" type="text" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-50" readonly>
-              </div>
-            </div>
-          </div>
-
-          <!-- Order Items Table -->
-          <div class="mt-6">
-            <h4 class="text-sm font-semibold text-gray-700 mb-2">Order Items</h4>
-            <div class="overflow-x-auto">
-              <table class="w-full border-collapse border border-gray-300 text-sm">
-                <thead>
-                  <tr class="bg-blue-100">
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">ITEM</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">MAIN</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F1</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F2</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F3</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F4</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F5</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F6</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F7</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F8</th>
-                    <th class="border border-gray-300 px-2 py-1 text-left font-semibold">F9</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(item, index) in orderItems" :key="index" class="hover:bg-gray-50">
-                    <td class="border border-gray-300 px-2 py-1">{{ item.name }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.main }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f1 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f2 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f3 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f4 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f5 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f6 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f7 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f8 }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ item.f9 }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="bg-gray-50 px-6 py-4 flex items-center justify-end space-x-3">
-          <button @click="selectSalesOrder" class="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
-            Select
-          </button>
-          <button @click="closeModal" class="px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors">
-            Exit
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- Sales Order Table Modal -->
+    <SalesOrderTableModal 
+      :is-open="showSalesOrderTableModal"
+      :customer-data="{ code: 'ALL' }"
+      @close="showSalesOrderTableModal = false"
+      @select="handleSalesOrderSelect"
+    />
 
     <!-- Analysis Code Modal -->
     <div v-if="showAnalysisCodeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -550,11 +430,13 @@
 
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import SalesOrderTableModal from '@/Components/SalesOrderTableModal.vue';
 
 export default {
     name: 'CancelSO',
     components: {
-        AppLayout
+        AppLayout,
+        SalesOrderTableModal
     },
     data() {
         return {
@@ -568,9 +450,9 @@ export default {
             selectedSO: null,
             cancelReason: '',
             cancelDate: new Date().toISOString().split('T')[0],
-            cancelledBy: 'Current User', // This should be populated from auth user
+            cancelledBy: 'SYSTEM', // This should be populated from auth user
             searchPerformed: false,
-            showModal: false,
+            showSalesOrderTableModal: false,
             selectedRowIndex: -1,
             showAnalysisCodeModal: false,
             selectedAnalysisCodeIndex: -1,
@@ -792,129 +674,67 @@ export default {
     },
     methods: {
         openSalesOrderModal() {
-            this.showModal = true;
-            this.selectedRowIndex = -1;
+            this.showSalesOrderTableModal = true;
         },
 
-        closeModal() {
-            this.showModal = false;
-            this.selectedRowIndex = -1;
-        },
-
-        selectRow(index) {
-            this.selectedRowIndex = index;
-        },
-
-        selectSalesOrder() {
-            if (this.selectedRowIndex >= 0) {
-                const selectedOrder = this.salesOrderList[this.selectedRowIndex];
-                
-                // Update selectedSO with selected order data
-                this.selectedSO = {
-                    soNumber: selectedOrder.SO_Num || selectedOrder.soNumber,
-                    seq: '133',
-                    customerCode: selectedOrder.AC_Num || selectedOrder.acNumber,
-                    customerName: selectedOrder.AC_NAME || 'PT CUSTOMER NAME',
-                    mcardSeq: selectedOrder.MCS_Num || selectedOrder.mcNumber,
-                    sheetBreadth: 'SHEET BREADTH 1140 X 825 MM K 1540/M125/K125 CF',
-                    orderMode: 'D-Order by Customer + Delivery & Invoice to Customer',
-                    salesperson: 'S103',
-                    salespersonName: 'EKO SALESPERSON',
-                    product: selectedOrder.PRODUCT || 'BOX',
-                    productDescription: selectedOrder.PRODUCT || 'BOX',
-                    orderStatus: selectedOrder.STS || selectedOrder.status,
-                    customerPO: selectedOrder.PO_Num || selectedOrder.customerPO,
-                    porderDate: selectedOrder.PO_DATE || '01/11/2025',
-                    analysisCode: 'SLOR',
-                    soDate: selectedOrder.SO_DMY || new Date().toLocaleDateString(),
-                    status: selectedOrder.STS || selectedOrder.status,
-                    totalAmount: 150000
-                };
-
-                // Update customerInfo to reflect selected order
-                this.customerInfo = {
-                    name: selectedOrder.AC_NAME || 'PT CUSTOMER NAME',
-                    model: selectedOrder.MODEL || 'SINGLE FACE E-275 / M150 - L 1200 CF',
-                    orderMode: 'D-Order by Customer + Delivery & Invoice to Customer',
-                    salesperson: 'S103',
-                    orderGroup: 'Sales',
-                    orderType: 'S1'
-                };
-
-                // Update orderItems with dynamic data based on selected order
-                this.orderItems = [
-                    {
-                        name: 'PCS',
-                        main: 'LEF',
-                        f1: '1,000',
-                        f2: '500',
-                        f3: '750',
-                        f4: '',
-                        f5: '',
-                        f6: '',
-                        f7: '',
-                        f8: '',
-                        f9: ''
-                    },
-                    {
-                        name: 'UNIT',
-                        main: '',
-                        f1: '',
-                        f2: '',
-                        f3: '',
-                        f4: '',
-                        f5: '',
-                        f6: '',
-                        f7: '',
-                        f8: '',
-                        f9: ''
-                    },
-                    {
-                        name: 'ORDER',
-                        main: '2,250',
-                        f1: '1,000',
-                        f2: '500',
-                        f3: '750',
-                        f4: '',
-                        f5: '',
-                        f6: '',
-                        f7: '',
-                        f8: '',
-                        f9: ''
-                    },
-                    {
-                        name: 'NET DELIVERY',
-                        main: '0',
-                        f1: '0',
-                        f2: '0',
-                        f3: '0',
-                        f4: '',
-                        f5: '',
-                        f6: '',
-                        f7: '',
-                        f8: '',
-                        f9: ''
-                    },
-                    {
-                        name: 'BALANCE',
-                        main: '2,250',
-                        f1: '1,000',
-                        f2: '500',
-                        f3: '750',
-                        f4: '',
-                        f5: '',
-                        f6: '',
-                        f7: '',
-                        f8: '',
-                        f9: ''
+        async handleSalesOrderSelect(selectedOrder) {
+            try {
+                // Fetch complete SO data from detail API
+                const response = await fetch(`/api/sales-order/${selectedOrder.soNumber}/detail`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
-                ];
-
-                this.searchForm.soNumber = selectedOrder.SO_Num || selectedOrder.soNumber;
-                this.searchPerformed = true;
-                this.closeModal();
-            } else {
-                alert('Please select a sales order from the list.');
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const data = result.data;
+                        
+                        // Map API data to form fields
+                        this.selectedSO = {
+                            // Basic SO info
+                            soNumber: data.so_number || selectedOrder.soNumber,
+                            seq: data.so_number ? data.so_number.split('-').pop() : '',
+                            customerCode: selectedOrder.acNumber,
+                            customerName: data.order_info.customer_name || selectedOrder.customerName,
+                            mcardSeq: data.master_card_seq || selectedOrder.mcsNumber,
+                            orderMode: data.order_info.order_mode || 'D-Order by Customer + Delivery & Invoice to Customer',
+                            
+                            // Salesperson info
+                            salesperson: data.order_info.salesperson_code || '',
+                            salespersonName: data.order_info.salesperson_name || '',
+                            
+                            // Product info
+                            product: data.item_details.pd || '',
+                            productDescription: data.order_info.model || '',
+                            
+                            // Status and dates
+                            orderStatus: data.order_info.so_status || 'Outstanding',
+                            customerPO: data.order_info.customer_po_number || selectedOrder.customerPo,
+                            porderDate: data.order_info.po_date || '',
+                            analysisCode: data.order_info.analysis_code || 'CANC',
+                            soDate: data.order_info.so_date || new Date().toLocaleDateString(),
+                            status: data.order_info.so_status || 'Active',
+                            
+                            // Store original data
+                            _originalData: data
+                        };
+                        
+                        this.searchForm.soNumber = selectedOrder.soNumber;
+                        this.searchPerformed = true;
+                        this.showSalesOrderTableModal = false;
+                    } else {
+                        alert('Failed to load sales order details: ' + result.message);
+                    }
+                } else {
+                    alert('Failed to fetch sales order details');
+                }
+            } catch (error) {
+                console.error('Error fetching SO details:', error);
+                alert('Error loading sales order details');
             }
         },
 
@@ -991,31 +811,44 @@ export default {
                 return;
             }
 
+            if (!this.selectedSO || !this.selectedSO.soNumber) {
+                alert('No sales order selected.');
+                return;
+            }
+
             if (confirm(`Are you sure you want to cancel Sales Order ${this.selectedSO.soNumber}?\n\nReason: ${this.cancelReason}`)) {
                 try {
-                    // Simulate API call for cancellation
-                    const response = await fetch(`/api/sales-orders/${this.selectedSO.soNumber}/cancel`, {
-                        method: 'POST',
+                    const response = await fetch(`/api/sales-order/${this.selectedSO.soNumber}/cancel`, {
+                        method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         },
                         body: JSON.stringify({
-                            reason: this.cancelReason
+                            cancel_reason: this.cancelReason,
+                            cancel_date: this.cancelDate,
+                            cancelled_by: this.cancelledBy,
+                            analysis_code: this.selectedSO.analysisCode
                         })
                     });
                     
                     if (response.ok) {
-                        // Update status locally
-                        this.selectedSO.status = 'Cancelled';
-                        alert(`Sales Order ${this.selectedSO.soNumber} has been cancelled successfully.`);
-                        this.clearSelection();
+                        const result = await response.json();
+                        if (result.success) {
+                            this.selectedSO.status = 'Cancelled';
+                            this.selectedSO.orderStatus = 'Cancelled';
+                            alert(`Sales Order ${this.selectedSO.soNumber} has been cancelled successfully.`);
+                            this.clearSelection();
+                        } else {
+                            alert('Failed to cancel sales order: ' + result.message);
+                        }
                     } else {
-                        alert('Error cancelling sales order. Please try again.');
+                        const errorText = await response.text();
+                        alert('Error cancelling sales order: ' + errorText);
                     }
                 } catch (error) {
                     console.error('Error cancelling sales order:', error);
-                    alert('Error cancelling sales order. Please try again.');
+                    alert('Error cancelling sales order: ' + error.message);
                 }
             }
         },

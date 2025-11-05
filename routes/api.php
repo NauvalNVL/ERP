@@ -499,6 +499,12 @@ return response()->json([
 // Get sales order detail by SO number
 Route::get('/sales-order/{soNumber}/detail', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrderDetail']);
 
+// Update sales order (Amend SO)
+Route::put('/sales-order/{soNumber}/update', [App\Http\Controllers\SalesOrderController::class, 'updateSalesOrder']);
+
+// Cancel sales order
+Route::put('/sales-order/{soNumber}/cancel', [App\Http\Controllers\SalesOrderController::class, 'cancelSalesOrder']);
+
 // Get current authenticated user info
 Route::get('/user/current', function() {
 // Clean any output buffers to prevent BOM issues

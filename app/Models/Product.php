@@ -20,6 +20,7 @@ class Product extends Model
         'description',
         'product_group_id',
         'category',
+        'unit',
         'is_active'
     ];
 
