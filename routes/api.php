@@ -26,6 +26,7 @@ use App\Http\Controllers\ReinforcementTapeController;
 use App\Http\Controllers\BundlingStringController;
 use App\Http\Controllers\WrappingMaterialController;
 use App\Http\Controllers\GlueingMaterialController;
+use App\Http\Controllers\MachineController;
 use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController;
 use App\Http\Controllers\SalesManagement\CustomerService\CustomerServiceController;
@@ -412,6 +413,13 @@ Route::post('/glueing-materials', [App\Http\Controllers\GlueingMaterialControlle
 Route::put('/glueing-materials/{code}', [App\Http\Controllers\GlueingMaterialController::class, 'update']);
 Route::delete('/glueing-materials/{code}', [App\Http\Controllers\GlueingMaterialController::class, 'destroy']);
 Route::post('/glueing-materials/seed', [App\Http\Controllers\GlueingMaterialController::class, 'seed']);
+
+// Machine API routes
+Route::get('/machines', [MachineController::class, 'index']);
+Route::post('/machines', [MachineController::class, 'store']);
+Route::put('/machines/{id}', [MachineController::class, 'update']);
+Route::delete('/machines/{id}', [MachineController::class, 'destroy']);
+Route::post('/machines/seed', [MachineController::class, 'seed']);
 
 // Approve MC API routes
 Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);

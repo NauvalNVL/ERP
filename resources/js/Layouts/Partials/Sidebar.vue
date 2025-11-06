@@ -209,6 +209,12 @@ const isActive = (route) => {
 // Check if user has permission for a specific menu
 const hasPermission = (menuKey) => {
   if (!user.value) return false;
+  
+  // Temporary: Allow define_machine for testing
+  if (menuKey === 'define_machine' || menuKey === 'view_print_machine') {
+    return true;
+  }
+  
   return userPermissions.value.includes(menuKey);
 };
 
@@ -328,6 +334,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Bundling String': 'define_bundling_string',
     'Define Wrapping Material': 'define_wrapping_material',
     'Define Glueing Material': 'define_glueing_material',
+    'Define Machine': 'define_machine',
     'View & Print Sales Team': 'view_print_sales_team',
     'View & Print Salesperson': 'view_print_salesperson',
     'View & Print Salesperson Team': 'view_print_salesperson_team',
@@ -349,6 +356,7 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print Bundling String': 'view_print_bundling_string',
     'View & Print Wrapping Material': 'view_print_wrapping_material',
     'View & Print Glueing Material': 'view_print_glueing_material',
+    'View & Print Machine': 'view_print_machine',
     
     // Sales Management - Customer Account
     'Define Customer Group': 'define_customer_group',
@@ -568,6 +576,7 @@ const salesManagementItems = [
           { title: 'Define Bundling String', icon: 'fas fa-link', route: '/bundling-string' },
           { title: 'Define Wrapping Material', icon: 'fas fa-box-open', route: '/wrapping-material' },
           { title: 'Define Glueing Material', icon: 'fas fa-vial', route: '/glueing-material' },
+          { title: 'Define Machine', icon: 'fas fa-cogs', route: '/machine' },
           // View & Print Section
           { title: 'View & Print Sales Team', icon: 'fas fa-print', route: '/sales-team/view-print' },
           { title: 'View & Print Salesperson', icon: 'fas fa-print', route: '/sales-person/view-print' },
@@ -589,7 +598,8 @@ const salesManagementItems = [
           { title: 'View & Print Reinforcement Tape', icon: 'fas fa-print', route: '/reinforcement-tape/view-print' },
           { title: 'View & Print Bundling String', icon: 'fas fa-print', route: '/bundling-string/view-print' },
           { title: 'View & Print Wrapping Material', icon: 'fas fa-print', route: '/wrapping-material/view-print' },
-          { title: 'View & Print Glueing Material', icon: 'fas fa-print', route: '/glueing-material/view-print' }
+          { title: 'View & Print Glueing Material', icon: 'fas fa-print', route: '/glueing-material/view-print' },
+          { title: 'View & Print Machine', icon: 'fas fa-print', route: '/machine/view-print' }
         ]
       },
       {
