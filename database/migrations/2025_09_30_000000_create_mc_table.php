@@ -105,8 +105,8 @@ return new class extends Migration
 			$table->string('CURRENCY', 50)->nullable();
 			$table->decimal('UNIT_PRICE', 18, 4)->nullable();
 			$table->string('PART_NO', 50)->nullable();
-			$table->decimal('MC_GROSS_M2_PER_PCS', 18, 4)->nullable();
-			$table->decimal('MC_NET_M2_PER_PCS', 18, 4)->nullable();
+			$table->decimal('MC_GROSS_M2_PER_PCS', 18, 6)->nullable();
+			$table->decimal('MC_NET_M2_PER_PCS', 18, 6)->nullable();
 			$table->decimal('MC_GROSS_KG_PER_SET', 18, 4)->nullable();
 			$table->decimal('MC_NET_KG_PER_PCS', 18, 4)->nullable();
 			$table->string('MSP1_MCH', 50)->nullable();
