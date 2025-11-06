@@ -1010,7 +1010,7 @@
         :show="showPaperSizeModal"
         :paperSizes="paperSizeRows"
         @close="showPaperSizeModal = false"
-        @select="(size) => { selectedPaperSize = size?.size || ''; showPaperSizeModal = false; }"
+        @select="(size) => { selectedPaperSize = size?.millimeter || ''; showPaperSizeModal = false; }"
     />
     <ColorModal
         :show="showColorModal"
@@ -1226,11 +1226,11 @@ const openReinforcementTapeModal = async () => {
 const showPaperSizeModal = ref(false);
 const selectedPaperSize = ref('');
 const paperSizeRows = ref([
-    { id: 1, size: '210.00', inches: '8.27', description: 'A4 Paper Size' },
-    { id: 2, size: '297.00', inches: '11.69', description: 'A4 Paper Size' },
-    { id: 3, size: '148.00', inches: '5.83', description: 'A5 Paper Size' },
-    { id: 4, size: '105.00', inches: '4.13', description: 'A6 Paper Size' },
-    { id: 5, size: '74.00', inches: '2.91', description: 'A7 Paper Size' }
+    { id: 1, millimeter: '210.00', inches: '8.27', description: 'A4 Paper Size' },
+    { id: 2, millimeter: '297.00', inches: '11.69', description: 'A4 Paper Size' },
+    { id: 3, millimeter: '148.00', inches: '5.83', description: 'A5 Paper Size' },
+    { id: 4, millimeter: '105.00', inches: '4.13', description: 'A6 Paper Size' },
+    { id: 5, millimeter: '74.00', inches: '2.91', description: 'A7 Paper Size' }
 ]);
 
 // Scoring Tool Modal
@@ -1508,6 +1508,43 @@ const fullBlockPrint = ref(false);
 // Conv. Out 1x2 split inputs
 const convDuctX2A = ref('');
 const convDuctX2B = ref('');
+
+// Computed properties for automatic M2 calculations
+const mcGrossM2PerPcs = computed(() => {
+    // Gross M2 Pcs = ((Sheet Length * P/Size * joint) / (con out * conv out 1 * conv out 2)) / 1000000
+    const sheetLen = parseFloat(sheetLength.value) || 0;
+    const paperSize = parseFloat(selectedPaperSize.value) || 0;
+    const joint = parseFloat(pcsToJoint.value) || 1; // Default to 1 to avoid division by zero
+    const conOutVal = parseFloat(conOut.value) || 1;
+    const convOut1 = parseFloat(convDuctX2A.value) || 1;
+    const convOut2 = parseFloat(convDuctX2B.value) || 1;
+    
+    if (sheetLen === 0 || paperSize === 0) return 0;
+    
+    const numerator = sheetLen * paperSize * joint;
+    const denominator = conOutVal * convOut1 * convOut2;
+    
+    if (denominator === 0) return 0;
+    
+    return (numerator / denominator) / 1000000;
+});
+
+const mcNetM2PerPcs = computed(() => {
+    // Net M2 Pcs = (Sheet Length * Sheet Width) / 1000000 / (conv out 1 * conv out 2)
+    const sheetLen = parseFloat(sheetLength.value) || 0;
+    const sheetWid = parseFloat(sheetWidth.value) || 0;
+    const convOut1 = parseFloat(convDuctX2A.value) || 1;
+    const convOut2 = parseFloat(convDuctX2B.value) || 1;
+    
+    if (sheetLen === 0 || sheetWid === 0) return 0;
+    
+    const numerator = sheetLen * sheetWid;
+    const denominator = convOut1 * convOut2;
+    
+    if (denominator === 0) return 0;
+    
+    return (numerator / 1000000) / denominator;
+});
 
 const handleSortOptionChange = (event) => {
     const newSortOption = event.target.value;
@@ -2188,6 +2225,9 @@ const buildPdSetupPayload = () => {
         selectedWrappingCode: selectedWrappingCode.value,
         moreDescriptions: moreDescriptions.value,
         subMaterials: subMaterials.value,
+        // Calculated M2 values
+        mcGrossM2PerPcs: mcGrossM2PerPcs.value,
+        mcNetM2PerPcs: mcNetM2PerPcs.value,
         // Legacy root arrays for controller mapping
         soValues: rootSo,
         woValues: rootWo,
