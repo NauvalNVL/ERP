@@ -130,6 +130,43 @@ const emit = defineEmits(['close', 'confirm'])
 const selectedTaxGroup = ref('')
 const taxAmount = ref(0)
 
+// Define calculateTax FIRST before any watchers that use it
+const calculateTax = () => {
+  console.log('🧮 Calculating tax...', {
+    selectedTaxGroup: selectedTaxGroup.value,
+    totalAmount: props.totalAmount,
+    taxOptions: props.taxOptions
+  })
+
+  if (!selectedTaxGroup.value) {
+    taxAmount.value = 0
+    console.log('❌ No tax group selected, tax = 0')
+    return
+  }
+
+  if (!props.totalAmount || props.totalAmount === 0) {
+    taxAmount.value = 0
+    console.warn('⚠️ Total Amount is 0, cannot calculate tax')
+    return
+  }
+
+  const tax = props.taxOptions.find(t => t.code === selectedTaxGroup.value)
+  console.log('📊 Found tax option:', tax)
+
+  if (tax && tax.rate) {
+    taxAmount.value = props.totalAmount * (tax.rate / 100)
+    console.log('✅ Tax calculated:', {
+      taxCode: tax.code,
+      taxRate: tax.rate,
+      totalAmount: props.totalAmount,
+      taxAmount: taxAmount.value
+    })
+  } else {
+    taxAmount.value = 0
+    console.warn('⚠️ Tax rate not found or invalid')
+  }
+}
+
 // Watch for tax code changes (with validation)
 watch(() => props.taxCode, (newVal, oldVal) => {
   console.log('👁️ Tax Code prop changed:', { old: oldVal, new: newVal })
@@ -295,42 +332,7 @@ const selectedTaxDisplay = computed(() => {
   return tax ? `${tax.name} (${tax.rate}%)` : selectedTaxGroup.value
 })
 
-const calculateTax = () => {
-  console.log('🧮 Calculating tax...', {
-    selectedTaxGroup: selectedTaxGroup.value,
-    totalAmount: props.totalAmount,
-    taxOptions: props.taxOptions
-  })
-
-  if (!selectedTaxGroup.value) {
-    taxAmount.value = 0
-    console.log('❌ No tax group selected, tax = 0')
-    return
-  }
-
-  if (!props.totalAmount || props.totalAmount === 0) {
-    taxAmount.value = 0
-    console.warn('⚠️ Total Amount is 0, cannot calculate tax')
-    return
-  }
-
-  const tax = props.taxOptions.find(t => t.code === selectedTaxGroup.value)
-  console.log('📊 Found tax option:', tax)
-
-  if (tax && tax.rate) {
-    taxAmount.value = props.totalAmount * (tax.rate / 100)
-    console.log('✅ Tax calculated:', {
-      taxCode: tax.code,
-      taxRate: tax.rate,
-      totalAmount: props.totalAmount,
-      taxAmount: taxAmount.value,
-      formula: `${props.totalAmount} × ${tax.rate}% = ${taxAmount.value}`
-    })
-  } else {
-    taxAmount.value = 0
-    console.warn('⚠️ Tax option not found or no rate')
-  }
-}
+// calculateTax moved above watch statements (line 134-168) to fix hoisting error
 
 const formatCurrency = (value) => {
   // Format Indonesia: 3.036.360,00 (titik = thousand separator, koma = decimal)
@@ -357,6 +359,7 @@ const handleOK = () => {
 
   console.log('✅ Final Screen confirmed:', {
     taxCode: selectedTaxGroup.value,
+    taxPercent: selectedTaxRate.value,
     taxAmount: taxAmount.value,
     totalAmount: props.totalAmount,
     netAmount: netAmount.value
@@ -364,6 +367,7 @@ const handleOK = () => {
 
   emit('confirm', {
     taxCode: selectedTaxGroup.value,
+    taxPercent: selectedTaxRate.value,
     taxAmount: taxAmount.value,
     totalAmount: props.totalAmount,
     netAmount: netAmount.value

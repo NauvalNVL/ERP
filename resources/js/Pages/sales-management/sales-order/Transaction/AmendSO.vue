@@ -440,7 +440,8 @@
     <!-- Product Design Screen Modal -->
     <ProductDesignScreenModal 
       :show="showProductDesignModal"
-      :sales-order-data="selectedSO"
+      :initial-quantity="selectedSO ? Number(selectedSO.setQuantity) : 0"
+      :master-card="selectedSO ? { model: selectedSO.product } : null"
       @close="showProductDesignModal = false"
       @save="handleProductDesignSave"
     />
@@ -448,17 +449,45 @@
     <!-- Delivery Location Modal -->
     <DeliveryLocationModal 
       :show="showDeliveryLocationModal"
-      :sales-order-data="selectedSO"
+      :customer="selectedSO ? { 
+        customer_code: selectedSO.customerCode, 
+        customer_name: selectedSO.customerName 
+      } : null"
+      :order-details="selectedSO && selectedSO._originalData ? {
+        deliveryLocation: {
+          orderBy: {
+            name: selectedSO.customerName
+          },
+          billTo: {
+            name: selectedSO.customerName,
+            address: selectedSO._originalData.order_info.customer_address || ''
+          },
+          shipTo: {
+            code: selectedSO._originalData.order_info.delivery_code || '',
+            name: selectedSO._originalData.order_info.delivery_to || selectedSO.customerName,
+            address: [
+              selectedSO._originalData.order_info.delivery_address_1,
+              selectedSO._originalData.order_info.delivery_address_2
+            ].filter(Boolean).join('\n') || selectedSO._originalData.order_info.customer_address || ''
+          }
+        }
+      } : null"
       @close="showDeliveryLocationModal = false"
       @save="handleDeliveryLocationSave"
     />
 
-    <!-- Delivery Schedule Screen Modal -->
-    <DeliveryScheduleScreenModal 
+    <!-- Delivery Schedule Modal -->
+    <DeliveryScheduleModal 
       :show="showDeliveryScheduleModal"
-      :delivery-data="selectedSO"
+      :order-details="selectedSO ? {
+        so_number: selectedSO.soNumber,
+        customer_name: selectedSO.customerName,
+        model: selectedSO.product,
+        setQuantity: selectedSO.setQuantity,
+        mainQuantity: selectedSO.setQuantity
+      } : null"
       @close="showDeliveryScheduleModal = false"
-      @save="handleFinalSave"
+      @save="handleDeliveryScheduleSave"
     />
 
     <!-- Analysis Code Modal -->
@@ -525,7 +554,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import SalesOrderTableModal from '@/Components/SalesOrderTableModal.vue';
 import ProductDesignScreenModal from '@/Components/ProductDesignScreenModal.vue';
 import DeliveryLocationModal from '@/Components/DeliveryLocationModal.vue';
-import DeliveryScheduleScreenModal from '@/Components/DeliveryScheduleScreenModal.vue';
+import DeliveryScheduleModal from '@/Components/DeliveryScheduleModal.vue';
 
 export default {
     name: 'AmendSO',
@@ -534,7 +563,7 @@ export default {
         SalesOrderTableModal,
         ProductDesignScreenModal,
         DeliveryLocationModal,
-        DeliveryScheduleScreenModal
+        DeliveryScheduleModal
     },
     data() {
         return {
@@ -601,42 +630,84 @@ export default {
             this.selectedRowIndex = -1;
         },
 
-        handleSalesOrderSelect(selectedOrder) {
-            // Update the selected SO with the data from the table modal
-            this.selectedSO = {
-                soNumber: selectedOrder.soNumber,
-                seq: '133',
-                customerCode: selectedOrder.acNumber,
-                customerName: selectedOrder.customerName || 'CMC GLOBAL SPORT, PT',
-                mcardSeq: selectedOrder.mcsNumber + '-4',
-                orderMode: 'D-Order by Customer + Delivery & Invoice to Customer',
-                salesperson: 'S129',
-                salespersonName: 'MULTI NATIONAL COMPANY OIA',
-                product: '001',
-                productDescription: 'BOX',
-                currency: 'IDR',
-                exchangeRate: '0.000000',
-                exchangeMethod: 'N/A',
-                analysisCode: 'AMND',
-                orderStatus: 'Outstanding',
-                customerPO: selectedOrder.customerPo,
-                porderDate: '2025-10-27',
-                month: 'Mon',
-                setQuantity: '9600',
-                orderGroup: 'Sales',
-                orderType: 'S1',
-                lotNumber: '3-2851324',
-                salesTax: false,
-                remark: '2933268',
-                instruction1: '2933268',
-                instruction2: '',
-                soDate: new Date().toLocaleDateString(),
-                status: 'Active',
-                totalAmount: 150000
-            };
-            this.searchForm.soNumber = selectedOrder.soNumber;
-            this.searchPerformed = true;
-            this.showSalesOrderTableModal = false;
+        async handleSalesOrderSelect(selectedOrder) {
+            try {
+                // Fetch complete SO data from detail API
+                const response = await fetch(`/api/sales-order/${selectedOrder.soNumber}/detail`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const data = result.data;
+                        
+                        // Map API data to form fields
+                        this.selectedSO = {
+                            // Basic SO info
+                            soNumber: data.so_number || selectedOrder.soNumber,
+                            seq: data.so_number ? data.so_number.split('-').pop() : '',
+                            customerCode: selectedOrder.acNumber,
+                            customerName: data.order_info.customer_name || selectedOrder.customerName,
+                            mcardSeq: data.master_card_seq || selectedOrder.mcsNumber,
+                            orderMode: data.order_info.order_mode || 'D-Order by Customer + Delivery & Invoice to Customer',
+                            
+                            // Salesperson info
+                            salesperson: data.order_info.salesperson_code || '',
+                            salespersonName: data.order_info.salesperson_name || '',
+                            
+                            // Product info
+                            product: data.item_details.pd || '',
+                            productDescription: data.order_info.model || '',
+                            
+                            // Currency info
+                            currency: 'IDR',
+                            exchangeRate: '0.000000',
+                            exchangeMethod: 'N/A',
+                            
+                            // Analysis and status
+                            analysisCode: data.order_info.analysis_code || 'AMND',
+                            orderStatus: data.order_info.so_status || 'Outstanding',
+                            
+                            // Editable fields - use data from API
+                            customerPO: data.order_info.customer_po_number || selectedOrder.customerPo,
+                            porderDate: data.order_info.po_date || '',
+                            month: data.order_info.po_date ? new Date(data.order_info.po_date).toLocaleString('default', { month: 'short' }) : '',
+                            setQuantity: data.order_info.set_quantity || data.item_details.order_qty || '',
+                            orderGroup: data.order_info.order_group || 'Sales',
+                            orderType: data.order_info.order_type || 'S1',
+                            lotNumber: data.order_info.lot_number || '',
+                            salesTax: data.order_info.sales_tax || false,
+                            remark: data.order_info.remark || '',
+                            instruction1: data.order_info.instruction1 || '',
+                            instruction2: data.order_info.instruction2 || '',
+                            
+                            // Additional info
+                            soDate: data.order_info.so_date || new Date().toLocaleDateString(),
+                            status: data.order_info.so_status || 'Active',
+                            totalAmount: 0,
+                            
+                            // Store original data for update
+                            _originalData: data
+                        };
+                        
+                        this.searchForm.soNumber = selectedOrder.soNumber;
+                        this.searchPerformed = true;
+                        this.showSalesOrderTableModal = false;
+                    } else {
+                        alert('Failed to load sales order details: ' + result.message);
+                    }
+                } else {
+                    alert('Failed to fetch sales order details');
+                }
+            } catch (error) {
+                console.error('Error fetching SO details:', error);
+                alert('Error loading sales order details');
+            }
         },
 
         openProductDesignScreen() {
@@ -661,13 +732,98 @@ export default {
             this.showDeliveryScheduleModal = true;
         },
 
-        handleFinalSave(data) {
-            // Handle the final save of the amended SO data
-            console.log('Final save data:', data);
-            alert('Sales Order amendments saved successfully!');
-            this.showDeliveryScheduleModal = false;
-            // Optionally clear the form or navigate away
-            this.clearSelection();
+        async handleDeliveryScheduleSave(scheduleData) {
+            try {
+                console.log('handleDeliveryScheduleSave called with data:', scheduleData);
+                
+                // Validate required data
+                if (!scheduleData.entries || !Array.isArray(scheduleData.entries)) {
+                    console.error('Validation failed: entries missing or not array');
+                    alert('Delivery schedule entries are required');
+                    return;
+                }
+                
+                const soNumber = this.selectedSO.soNumber;
+                
+                if (!soNumber) {
+                    alert('Sales Order number is required');
+                    return;
+                }
+                
+                // First, update the SO with amended data
+                const updateData = {
+                    so_number: soNumber,
+                    po_date: this.selectedSO.porderDate,
+                    set_quantity: this.selectedSO.setQuantity,
+                    order_group: this.selectedSO.orderGroup,
+                    order_type: this.selectedSO.orderType,
+                    lot_number: this.selectedSO.lotNumber,
+                    // Note: sales_tax field skipped - TAX column does not exist in SO table
+                    // sales_tax: this.selectedSO.salesTax ? 'Y' : 'N',
+                    remark: this.selectedSO.remark,
+                    instruction1: this.selectedSO.instruction1,
+                    instruction2: this.selectedSO.instruction2,
+                    analysis_code: this.selectedSO.analysisCode
+                };
+                
+                const updateResponse = await fetch(`/api/sales-order/${soNumber}/update`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                
+                if (!updateResponse.ok) {
+                    const errorText = await updateResponse.text();
+                    throw new Error(`Failed to update SO: ${errorText}`);
+                }
+                
+                const updateResult = await updateResponse.json();
+                if (!updateResult.success) {
+                    throw new Error(updateResult.message || 'Failed to update SO');
+                }
+                
+                console.log('SO updated successfully, now saving delivery schedule...');
+                
+                // Now save the delivery schedule
+                const scheduleRequestData = {
+                    so_number: soNumber,
+                    entries: scheduleData.entries
+                };
+                
+                const scheduleResponse = await fetch('/api/sales-order/delivery-schedule', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(scheduleRequestData)
+                });
+                
+                if (!scheduleResponse.ok) {
+                    const errorText = await scheduleResponse.text();
+                    throw new Error(`Failed to save delivery schedule (${scheduleResponse.status}): ${errorText.slice(0, 120)}`);
+                }
+                
+                const scheduleResult = await scheduleResponse.json();
+                
+                if (scheduleResult.success) {
+                    console.log('Delivery schedule saved successfully');
+                    alert('Sales Order amendments and delivery schedule saved successfully!');
+                    this.showDeliveryScheduleModal = false;
+                    this.clearSelection();
+                } else {
+                    throw new Error(scheduleResult.message || 'Failed to save delivery schedule');
+                }
+            } catch (error) {
+                console.error('Error saving SO amendments:', error);
+                alert('Error saving amendments: ' + (error.message || 'Unknown error'));
+            }
         },
 
         openAnalysisCodeModal() {

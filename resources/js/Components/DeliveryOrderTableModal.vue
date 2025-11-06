@@ -93,16 +93,40 @@
                             {{ order.mode || 'Multiple' }}
                           </td>
                           <td :class="['px-4 py-3 text-sm', isSelected(order.do_number) ? 'text-white' : '']">
-                            <span :class="[
-                              'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                              isSelected(order.do_number) 
-                                ? 'bg-white bg-opacity-20 text-white' 
-                                : order.status === 'Draft' 
-                                  ? 'bg-yellow-100 text-yellow-800' 
-                                  : 'bg-green-100 text-green-800'
-                            ]">
-                              {{ order.status || 'Draft' }}
-                            </span>
+                            <div class="flex flex-col gap-1">
+                              <!-- DO Status Badge -->
+                              <span :class="[
+                                'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                                isSelected(order.do_number) 
+                                  ? 'bg-white bg-opacity-20 text-white' 
+                                  : order.status === 'Draft' 
+                                    ? 'bg-yellow-100 text-yellow-800' 
+                                    : 'bg-green-100 text-green-800'
+                              ]">
+                                {{ order.status || 'Draft' }}
+                              </span>
+                              <!-- Invoice Status Badge (CPS-compatible) -->
+                              <span v-if="order.invoice_status" :class="[
+                                'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+                                isSelected(order.do_number)
+                                  ? 'bg-white bg-opacity-20 text-white'
+                                  : order.invoice_status === 'Completed'
+                                    ? 'bg-gray-100 text-gray-600'
+                                    : order.invoice_status === 'Partial'
+                                      ? 'bg-yellow-100 text-yellow-800'
+                                      : 'bg-blue-100 text-blue-800'
+                              ]">
+                                <template v-if="order.invoice_status === 'Completed'">
+                                  ✓ Invoiced
+                                </template>
+                                <template v-else-if="order.invoice_status === 'Partial'">
+                                  ⚠ Partial: {{ order.invoiced_qty }}/{{ order.do_qty }}
+                                </template>
+                                <template v-else>
+                                  ○ Open
+                                </template>
+                              </span>
+                            </div>
                           </td>
                         </tr>
                       </tbody>
@@ -390,7 +414,12 @@ const fetchDeliveryOrders = async () => {
         status: r.Status || r.status || 'Draft',
         remark1: r.DO_Remark1 || r.do_remark1 || '',
         remark2: r.DO_Remark2 || r.do_remark2 || '',
-        salesperson: r.SLM || r.slm || ''
+        salesperson: r.SLM || r.slm || '',
+        // CPS-compatible invoice tracking (from backend calculation)
+        do_qty: r.do_qty || r.DO_Qty || 0,
+        invoiced_qty: r.invoiced_qty || 0,
+        remaining_qty: r.remaining_qty || r.do_qty || 0,
+        invoice_status: r.invoice_status || 'Open'
       }
     })
 

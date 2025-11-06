@@ -186,6 +186,50 @@ Route::get('/log', [InvoiceController::class, 'getInvoiceLog']);
 Route::post('/calculate-total', [InvoiceController::class, 'calculateTotal']);
 Route::get('/do-items', [InvoiceController::class, 'getDoItems']);
 Route::get('/delivery-orders', [InvoiceController::class, 'getDeliveryOrders']);
+Route::get('/do-status', [InvoiceController::class, 'getDoStatus']); // CPS-compatible DO status check
+
+// Tax Type API routes (CPS-style Define Tax Type) - MUST be before wildcard routes
+Route::get('/tax-types', [App\Http\Controllers\Invoice\TaxTypeController::class, 'getTaxTypes']);
+Route::post('/tax-types', [App\Http\Controllers\Invoice\TaxTypeController::class, 'store']);
+Route::post('/tax-types/seed', [App\Http\Controllers\Invoice\TaxTypeController::class, 'seed']);
+Route::get('/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'show']);
+Route::put('/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'update']);
+Route::delete('/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'destroy']);
+
+// Tax Group API routes (CPS-style Define Tax Group) - MUST be before wildcard routes
+Route::get('/tax-groups', [App\Http\Controllers\Invoice\TaxGroupController::class, 'index']);
+Route::get('/tax-groups/with-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxGroupsWithTypes']);
+Route::post('/tax-groups', [App\Http\Controllers\Invoice\TaxGroupController::class, 'store']);
+Route::post('/tax-groups/seed', [App\Http\Controllers\Invoice\TaxGroupController::class, 'seed']);
+Route::get('/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'show']);
+Route::get('/tax-groups/{code}/tax-items', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxItems']);
+Route::get('/tax-groups/{code}/tax-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxTypes']);
+Route::post('/tax-groups/{code}/tax-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'saveTaxTypes']);
+Route::put('/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'update']);
+Route::delete('/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'destroy']);
+
+// Customer Sales Tax Index routes - MUST be before wildcard routes
+Route::get('/customer-tax-indices/{customerCode}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'getCustomerIndices']);
+Route::get('/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'show']);
+Route::post('/customer-tax-indices', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'store']);
+Route::delete('/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'destroy']);
+Route::get('/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'getProductTieups']);
+Route::post('/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'saveProductTieups']);
+
+// Amend Invoice endpoints - Wildcard routes MUST be last
+Route::get('/test-inv-data', function() {
+    $count = DB::table('INV')->count();
+    $sample = DB::table('INV')->limit(5)->get();
+    return response()->json([
+        'total_invoices' => $count,
+        'sample_data' => $sample,
+        'message' => $count > 0 ? "Database has $count invoices" : "Database is empty (no invoices)"
+    ]);
+}); // Debug endpoint
+Route::get('/', [InvoiceController::class, 'index']); // Get list of invoices
+Route::get('/{invoiceNo}/with-items', [InvoiceController::class, 'showWithItems']); // Get invoice with items
+Route::get('/{invoiceNo}', [InvoiceController::class, 'show']); // Get single invoice details
+Route::put('/{invoiceNo}', [InvoiceController::class, 'update']); // Update invoice
 
 // Debug endpoint to test salesperson query
 Route::get('/test-salesperson/{customerCode}', function($customerCode) {
@@ -506,6 +550,12 @@ return response()->json([
 
 // Get sales order detail by SO number
 Route::get('/sales-order/{soNumber}/detail', [App\Http\Controllers\SalesOrderController::class, 'getSalesOrderDetail']);
+
+// Update sales order (Amend SO)
+Route::put('/sales-order/{soNumber}/update', [App\Http\Controllers\SalesOrderController::class, 'updateSalesOrder']);
+
+// Cancel sales order
+Route::put('/sales-order/{soNumber}/cancel', [App\Http\Controllers\SalesOrderController::class, 'cancelSalesOrder']);
 
 // Get current authenticated user info
 Route::get('/user/current', function() {
@@ -870,33 +920,8 @@ Route::put('/material-management/tax-groups/{code}', [MmTaxGroupController::clas
 Route::delete('/material-management/tax-groups/{code}', [MmTaxGroupController::class, 'destroy']);
 Route::post('/material-management/tax-groups/seed', [MmTaxGroupController::class, 'seed']);
 
-// Invoice Tax Type API routes (CPS-style Define Tax Type)
-Route::get('/invoices/tax-types', [App\Http\Controllers\Invoice\TaxTypeController::class, 'getTaxTypes']);
-Route::post('/invoices/tax-types', [App\Http\Controllers\Invoice\TaxTypeController::class, 'store']);
-Route::get('/invoices/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'show']);
-Route::put('/invoices/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'update']);
-Route::delete('/invoices/tax-types/{code}', [App\Http\Controllers\Invoice\TaxTypeController::class, 'destroy']);
-Route::post('/invoices/tax-types/seed', [App\Http\Controllers\Invoice\TaxTypeController::class, 'seed']); 
-
-// Invoice Tax Group API routes (CPS-style Define Tax Group)
-Route::get('/invoices/tax-groups', [App\Http\Controllers\Invoice\TaxGroupController::class, 'index']);
-Route::get('/invoices/tax-groups/with-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxGroupsWithTypes']);
-Route::post('/invoices/tax-groups', [App\Http\Controllers\Invoice\TaxGroupController::class, 'store']);
-Route::get('/invoices/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'show']);
-Route::get('/invoices/tax-groups/{code}/tax-items', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxItems']);
-Route::get('/invoices/tax-groups/{code}/tax-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'getTaxTypes']);
-Route::post('/invoices/tax-groups/{code}/tax-types', [App\Http\Controllers\Invoice\TaxGroupController::class, 'saveTaxTypes']);
-Route::put('/invoices/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'update']);
-Route::delete('/invoices/tax-groups/{code}', [App\Http\Controllers\Invoice\TaxGroupController::class, 'destroy']);
-Route::post('/invoices/tax-groups/seed', [App\Http\Controllers\Invoice\TaxGroupController::class, 'seed']);
-
-// Customer Sales Tax Index routes
-Route::get('/invoices/customer-tax-indices/{customerCode}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'getCustomerIndices']);
-Route::get('/invoices/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'show']);
-Route::post('/invoices/customer-tax-indices', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'store']);
-Route::delete('/invoices/customer-tax-indices/{customerCode}/{indexNumber}', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'destroy']);
-Route::get('/invoices/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'getProductTieups']);
-Route::post('/invoices/customer-tax-indices/{customerCode}/{indexNumber}/product-tieups', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'saveProductTieups']);
+// NOTE: Invoice Tax Type, Tax Group, and Customer Tax Index routes have been moved
+// into the Route::prefix('invoices')->group() above to prevent wildcard route conflicts
 
 // Product Groups API (for modals and lookups)
 Route::get('/product-groups', [App\Http\Controllers\ProductGroupController::class, 'index']);

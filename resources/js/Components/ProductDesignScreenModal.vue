@@ -529,6 +529,16 @@ watch(() => props.initialQuantity, (newVal) => {
     calculateAmount(items[0])
   }
 })
+
+// Apply quantity when modal is opened
+watch(() => props.show, (newVal) => {
+  if (newVal && props.initialQuantity && Number(props.initialQuantity) > 0) {
+    console.log('Modal opened, applying initial quantity:', props.initialQuantity)
+    const numericQty = Number(props.initialQuantity)
+    totalQuantity.value = numericQty
+    setQuantity()
+  }
+})
 </script>
 
 <style scoped>
