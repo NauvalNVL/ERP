@@ -174,19 +174,44 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 return $request->user();
 });
 
-// Invoice preparation endpoints (current-period DO listing + prepare)
+// 🔍 DEBUG: Check auth status (NO AUTH REQUIRED - for debugging)
+Route::get('/auth-status', function (Request $request) {
+    return response()->json([
+        'authenticated' => Auth::check(),
+        'user_id' => Auth::id(),
+        'user' => Auth::user() ? [
+            'id' => Auth::user()->id ?? null,
+            'userID' => Auth::user()->userID ?? null,
+            'userName' => Auth::user()->userName ?? null,
+            'class' => get_class(Auth::user()),
+        ] : null,
+        'session_id' => session()->getId(),
+        'has_session' => session()->has('login_web_59ba36addc2b2f9401580f014c7f58ea4e30989d'),
+    ]);
+});
+
+// Invoice preparation endpoints
 Route::prefix('invoices')->group(function () {
-Route::get('/current-period-do', [InvoiceController::class, 'currentPeriodDo']);
-Route::post('/prepare', [InvoiceController::class, 'prepare']);
-Route::get('/customer-details', [InvoiceController::class, 'getCustomerDetails']);
-Route::post('/seed-test-customers', [InvoiceController::class, 'seedTestCustomers']);
-Route::get('/sales-tax-options', [InvoiceController::class, 'getSalesTaxOptions']);
-Route::post('/cancel', [InvoiceController::class, 'cancelInvoice']);
-Route::get('/log', [InvoiceController::class, 'getInvoiceLog']);
-Route::post('/calculate-total', [InvoiceController::class, 'calculateTotal']);
-Route::get('/do-items', [InvoiceController::class, 'getDoItems']);
-Route::get('/delivery-orders', [InvoiceController::class, 'getDeliveryOrders']);
-Route::get('/do-status', [InvoiceController::class, 'getDoStatus']); // CPS-compatible DO status check
+    // 🔓 PUBLIC routes (no auth required) - Read-only data
+    Route::get('/customer-details', [InvoiceController::class, 'getCustomerDetails']);
+    Route::get('/sales-tax-options', [InvoiceController::class, 'getSalesTaxOptions']);
+    Route::get('/do-items', [InvoiceController::class, 'getDoItems']);
+    Route::get('/delivery-orders', [InvoiceController::class, 'getDeliveryOrders']);
+    Route::get('/do-status', [InvoiceController::class, 'getDoStatus']);
+    Route::post('/calculate-total', [InvoiceController::class, 'calculateTotal']);
+    
+    // 🔒 PROTECTED routes (auth required) - Write operations & sensitive data
+    // Using 'web' middleware to ensure session authentication works
+    Route::middleware(['web', 'auth'])->group(function () {
+        Route::get('/current-period-do', [InvoiceController::class, 'currentPeriodDo']);
+        Route::post('/prepare', [InvoiceController::class, 'prepare']);
+        Route::post('/cancel', [InvoiceController::class, 'cancelInvoice']);
+        Route::get('/log', [InvoiceController::class, 'getInvoiceLog']);
+        Route::post('/seed-test-customers', [InvoiceController::class, 'seedTestCustomers']);
+        // ✅ Amend Invoice routes (write operations)
+        Route::post('/{invoiceNo}/print', [InvoiceController::class, 'updatePrintAudit']); // Update print audit trail
+        Route::put('/{invoiceNo}', [InvoiceController::class, 'update']); // Update invoice (Amend Invoice)
+    });
 
 // Tax Type API routes (CPS-style Define Tax Type) - MUST be before wildcard routes
 Route::get('/tax-types', [App\Http\Controllers\Invoice\TaxTypeController::class, 'getTaxTypes']);
@@ -229,7 +254,7 @@ Route::get('/test-inv-data', function() {
 Route::get('/', [InvoiceController::class, 'index']); // Get list of invoices
 Route::get('/{invoiceNo}/with-items', [InvoiceController::class, 'showWithItems']); // Get invoice with items
 Route::get('/{invoiceNo}', [InvoiceController::class, 'show']); // Get single invoice details
-Route::put('/{invoiceNo}', [InvoiceController::class, 'update']); // Update invoice
+// ✅ Note: PUT /{invoiceNo} and POST /{invoiceNo}/print are now in protected middleware group above
 
 // Debug endpoint to test salesperson query
 Route::get('/test-salesperson/{customerCode}', function($customerCode) {

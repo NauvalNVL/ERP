@@ -329,7 +329,19 @@ export default {
     },
     methods: {
         submitForm() {
-            this.$inertia.put(`/user/${this.user.id}`, this.form);
+            // Add CSRF token to form data
+            const formData = {
+                ...this.form,
+                _token: this.$page.props.csrf_token || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+            };
+            
+            this.$inertia.put(`/user/${this.user.id}`, formData, {
+                preserveState: true,
+                preserveScroll: true,
+                onError: (errors) => {
+                    console.error('Update user errors:', errors);
+                }
+            });
         },
         updatePasswordStrength(password) {
             let score = 0;

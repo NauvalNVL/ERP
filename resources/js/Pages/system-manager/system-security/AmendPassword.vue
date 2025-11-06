@@ -228,11 +228,21 @@ export default {
         updatePassword() {
             if (!this.foundUser) return;
             
-            this.$inertia.post('/system-security/update-password', this.form, {
+            // Add CSRF token to form data
+            const formData = {
+                ...this.form,
+                _token: this.$page.props.csrf_token || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+            };
+            
+            this.$inertia.post('/system-security/update-password', formData, {
                 onSuccess: () => {
                     this.form.new_password = '';
                     this.form.new_password_confirmation = '';
                 },
+                onError: (errors) => {
+                    console.error('Update password errors:', errors);
+                    this.setMessage('Failed to update password', 'error');
+                }
             });
         },
         setMessage(text, type = 'info') {
