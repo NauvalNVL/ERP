@@ -54,20 +54,20 @@ class DeliveryOrderController extends Controller
             $orderDate = Carbon::parse($request->order_date);
             $doYear = $orderDate->format('Y');
             $doMonth = $orderDate->format('m');
-            
+
             // Get the last DO number for this month/year
             $lastDO = DB::table('DO')
                 ->where('DOYYYY', $doYear)
                 ->where('DOMM', $doMonth)
                 ->orderBy('DO_Num', 'desc')
                 ->value('DO_Num');
-            
+
             $seq = 1;
             if ($lastDO) {
                 $parts = explode('-', $lastDO);
                 $seq = isset($parts[2]) ? ((int) $parts[2]) + 1 : 1;
             }
-            
+
             $doNumber = $doYear . '-' . $doMonth . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
 
             // Get customer information
@@ -134,6 +134,22 @@ class DeliveryOrderController extends Controller
             $so = $salesOrder; // alias
             $mc = $masterCard; // alias
 
+            // Calculate DO_Tran_Amt and DO_Base_Amt
+            $unitPrice = (float) ($so ? ($so->UNIT_PRICE ?? 0) : 0);
+            $exRate = (float) ($so ? ($so->EX_RATE ?? 1) : 1);
+            $doTranAmt = $doQty > 0 && $unitPrice > 0 ? round($doQty * $unitPrice, 2) : 0.0;
+            $doBaseAmt = round($doTranAmt * $exRate, 2);
+
+            // Calculate Total_DO_Net_KG
+            $kgPerPcs = (float) ($mc->NET_KG_PER_PCS ?? 0);
+            $totalDoNetKg = $doQty > 0 && $kgPerPcs > 0 ? round($doQty * $kgPerPcs, 4) : 0.0;
+
+            // Get LOT_Num from SO table
+            $lotNum = $so ? ($so->LOT_Num ?? '') : '';
+
+            // NOTE: SO_Date, SODateSK, PODateSK are NOT in DO table schema
+            // These fields will be retrieved from SO table when creating invoice
+
             $doData = [
                 'DOYYYY' => $doYear,
                 'DOMM' => $doMonth,
@@ -170,7 +186,7 @@ class DeliveryOrderController extends Controller
                 'SO_Type' => $so ? ($so->TYPE ?? '') : '',
                 'PO_Num' => $request->po_number ?? ($so ? ($so->PO_Num ?? '') : ''),
                 'PO_Date' => $request->po_date ?? ($so ? ($so->PO_DATE ?? '') : ''),
-                'LOT_Num' => '',
+                'LOT_Num' => $lotNum, // ✅ FIXED: LOT_Num from SO table
                 'PQ1' => (string) (($so->PQ1 ?? '') ?: ($mc->SO_PQ1 ?? '')),
                 'PQ2' => (string) (($so->PQ2 ?? '') ?: ($mc->SO_PQ2 ?? '')),
                 'PQ3' => (string) (($so->PQ3 ?? '') ?: ($mc->SO_PQ3 ?? '')),
@@ -179,19 +195,19 @@ class DeliveryOrderController extends Controller
                 'DO_Qty' => $doQty,
                 'UNAPPLIED_FG' => $request->unapply_fg ? 'Y' : 'N',
                 'DO_M3' => 0.0,
-                'SO_Unit_Price' => (float) ($so ? ($so->UNIT_PRICE ?? 0) : 0),
+                'SO_Unit_Price' => $unitPrice,
                 'Curr' => $so ? ($so->CURR ?? 'IDR') : 'IDR',
-                'Ex_Rate' => 1.0,
-                'DO_Tran_Amt' => 0.0,
-                'DO_Base_Amt' => 0.0,
+                'Ex_Rate' => $exRate,
+                'DO_Tran_Amt' => $doTranAmt, // ✅ FIXED: Calculated from DO_Qty × Unit_Price
+                'DO_Base_Amt' => $doBaseAmt, // ✅ FIXED: Calculated from DO_Tran_Amt × Ex_Rate
                 'MC_Gross_M2_Per_Pcs' => (float) ($mc->GROSS_M2_PER_PCS ?? 0),
                 'MC_Net_M2_Per_Pcs' => (float) ($mc->NET_M2_PER_PCS ?? 0),
                 'Total_DO_Gross_M2' => 0.0,
                 'Total_DO_Net_M2' => 0.0,
                 'MC_Gross_Kg_Per_Pcs' => (float) ($mc->GROSS_KG_PER_PCS ?? 0),
-                'MC_Net_Kg_Per_Pcs' => (string) ($mc->NET_KG_PER_PCS ?? ''),
+                'MC_Net_Kg_Per_Pcs' => $kgPerPcs,
                 'Total_DO_Gross_KG' => 0.0,
-                'Total_DO_Net_KG' => 0.0,
+                'Total_DO_Net_KG' => $totalDoNetKg, // ✅ FIXED: Calculated from DO_Qty × KG_Per_Pcs
                 'DODateSK' => $orderDate->format('Ymd'),
                 'DO_Remark1' => $request->remark1 ?? '',
                 'DO_Remark2' => $request->remark2 ?? '',
@@ -236,9 +252,9 @@ class DeliveryOrderController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             Log::error('Error saving delivery order: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error saving delivery order: ' . $e->getMessage()
@@ -281,7 +297,7 @@ class DeliveryOrderController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error fetching delivery orders: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching delivery orders'
@@ -313,7 +329,7 @@ class DeliveryOrderController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error fetching delivery order: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching delivery order'
@@ -415,9 +431,9 @@ class DeliveryOrderController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             Log::error('Error amending delivery order: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error amending delivery order: ' . $e->getMessage()
@@ -449,7 +465,7 @@ class DeliveryOrderController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error fetching vehicle: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching vehicle'
@@ -519,9 +535,9 @@ class DeliveryOrderController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             Log::error('Error cancelling delivery order: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error cancelling delivery order: ' . $e->getMessage()
@@ -556,7 +572,7 @@ class DeliveryOrderController extends Controller
                     'DO.AC_Num',
                     'CUSTOMER.NAME as AC_Name',
                     'CUSTOMER.ADDRESS1',
-                    'CUSTOMER.ADDRESS2', 
+                    'CUSTOMER.ADDRESS2',
                     'CUSTOMER.ADDRESS3',
                     'CUSTOMER.TEL_NO',
                     'CUSTOMER.FAX_NO',
@@ -569,7 +585,7 @@ class DeliveryOrderController extends Controller
                     'DO.DO_Qty',
                     'DO.Unit',
                     'DO.INT_L',
-                    'DO.INT_W', 
+                    'DO.INT_W',
                     'DO.INT_H',
                     'DO.PCS_PER_SET',
                     'MC.PCS_PER_BLD',
@@ -624,9 +640,9 @@ class DeliveryOrderController extends Controller
                 if ($fMonth >= 1000 && $fYear > 0 && $fYear <= 12) {
                     [$fMonth, $fYear] = [$fYear, $fMonth];
                 }
-                $fromDO = sprintf('%02d-%04d-%05d', 
-                    $fMonth, 
-                    $fYear, 
+                $fromDO = sprintf('%02d-%04d-%05d',
+                    $fMonth,
+                    $fYear,
                     (int)$request->from_number
                 );
             }
@@ -638,9 +654,9 @@ class DeliveryOrderController extends Controller
                 if ($tMonth >= 1000 && $tYear > 0 && $tYear <= 12) {
                     [$tMonth, $tYear] = [$tYear, $tMonth];
                 }
-                $toDO = sprintf('%02d-%04d-%05d', 
-                    $tMonth, 
-                    $tYear, 
+                $toDO = sprintf('%02d-%04d-%05d',
+                    $tMonth,
+                    $tYear,
                     (int)$request->to_number
                 );
             }
@@ -716,7 +732,7 @@ class DeliveryOrderController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error fetching delivery orders for print: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching delivery orders for print: ' . $e->getMessage()

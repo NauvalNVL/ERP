@@ -29,6 +29,7 @@ use App\Http\Controllers\ReinforcementTapeController;
 use App\Http\Controllers\BundlingStringController;
 use App\Http\Controllers\WrappingMaterialController;
 use App\Http\Controllers\GlueingMaterialController;
+use App\Http\Controllers\MachineController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ColorGroupController;
 use App\Http\Controllers\ForeignCurrencyController;
@@ -531,6 +532,14 @@ Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.def
          // Alias for search menu
          Route::get('/define-glueing-material', [\App\Http\Controllers\GlueingMaterialController::class, 'index'])->name('vue.define-glueing-material');
 
+         Route::get('/machine', [MachineController::class, 'index'])->name('vue.machine.index');
+         Route::post('/machine', [MachineController::class, 'store'])->name('vue.machine.store');
+         Route::put('/machine/{id}', [MachineController::class, 'update'])->name('vue.machine.update');
+         Route::delete('/machine/{id}', [MachineController::class, 'destroy'])->name('vue.machine.destroy');
+         Route::get('/machine/view-print', [MachineController::class, 'vueViewAndPrint'])->name('vue.machine.view-print');
+         // Alias for search menu
+         Route::get('/define-machine', [MachineController::class, 'index'])->name('vue.define-machine');
+
 // Customer Account Routes
 Route::get('/customer-group', function () {
 return Inertia::render('sales-management/system-requirement/customer-account/customer-group');
@@ -851,8 +860,12 @@ return Inertia::render('warehouse-management/Invoice/index');
 })->name('vue.warehouse-management.invoice');
 // Invoice → IV Processing → Amend Invoice (Vue page)
 Route::get('/warehouse-management/invoice/iv-processing/amend-invoice', function () {
-return Inertia::render('warehouse-management/Invoice/IV-Processing/AmendInvoice');
+return Inertia::render('warehouse-management/Invoice/IVProcessing/AmendInvoice');
 })->name('vue.warehouse-management.invoice.iv-processing.amend-invoice');
+
+Route::get('/warehouse-management/invoice/iv-processing/cancel-active-invoice', function () {
+return Inertia::render('warehouse-management/Invoice/IVProcessing/CancelActiveInvoice');
+})->name('vue.warehouse-management.invoice.iv-processing.cancel-active-invoice');
 
 // Invoice → Setup pages (Vue)
 Route::get('/warehouse-management/invoice/setup/define-tax-group', function () {

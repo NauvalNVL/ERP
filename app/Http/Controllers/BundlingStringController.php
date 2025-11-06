@@ -209,34 +209,6 @@ class BundlingStringController extends Controller
     }
 
     /**
-     * Display a listing of the resource for API requests.
-     */
-    public function apiIndex()
-    {
-        try {
-            $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
-            
-            // If no data exists, seed sample data
-            if ($bundlingStrings->isEmpty()) {
-                $this->seedData();
-                $bundlingStrings = BundlingString::orderBy('code', 'asc')->get();
-            }
-            
-            return response()->json([
-                'success' => true,
-                'data' => $bundlingStrings
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in BundlingStringController@apiIndex: ' . $e->getMessage());
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Error fetching bundling string data: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
      * Display a listing of the resource with Vue.
      */
     public function vueIndex()

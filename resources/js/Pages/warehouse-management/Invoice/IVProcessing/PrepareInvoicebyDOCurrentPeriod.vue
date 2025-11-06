@@ -995,6 +995,8 @@ async function prepareInvoices(){
         do_numbers: doNumbers,
         customer_code: customerCode.value,
         tax_index_no: finalTaxData.value?.taxCode || taxIndexNo.value,
+        tax_code: finalTaxData.value?.taxCode || taxIndexNo.value, // ✅ ADDED: Pass tax code explicitly
+        tax_percent: finalTaxData.value?.taxPercent || null, // ✅ ADDED: Pass tax percent from Final Screen
         invoice_date: invoiceDate.value,
         second_ref: secondRef.value,
         remark: remark.value,
