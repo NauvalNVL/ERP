@@ -4,19 +4,76 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\ObsolateReactiveMC;
+use App\Models\UpdateMC;
 use App\Models\UpdateCustomerAccount;
+use App\Models\McUpdateLog;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ObsolateReactiveMcController extends Controller
 {
+    /**
+     * Get current logged in user ID
+     */
+    private function getCurrentUserId()
+    {
+        // Log session information
+        Log::info('ObsolateReactiveMcController - Session Info', [
+            'session_id' => session()->getId(),
+            'has_session' => session()->has('login_web_59ba36addc2b2f9401580f014c7f58ea4e30989d'),
+            'session_data' => session()->all(),
+        ]);
+        
+        // Try to get userID from authenticated user
+        if (Auth::check()) {
+            $user = Auth::user();
+            
+            // Log user information for debugging
+            Log::info('ObsolateReactiveMcController - Getting user ID', [
+                'auth_check' => true,
+                'user_class' => get_class($user),
+                'user_attributes' => $user->getAttributes(),
+                'has_userID' => isset($user->userID),
+                'has_id' => isset($user->id),
+                'userID_value' => $user->userID ?? null,
+                'id_value' => $user->id ?? null,
+            ]);
+            
+            // Check if user has userID property (from usercps table)
+            if (isset($user->userID) && !empty($user->userID)) {
+                Log::info('✅ Using userID from authenticated user', ['userID' => $user->userID]);
+                return $user->userID;
+            }
+            
+            // Fallback to id if userID doesn't exist
+            if (isset($user->id) && !empty($user->id)) {
+                Log::info('⚠️ Using id from authenticated user (userID not found)', ['id' => $user->id]);
+                return $user->id;
+            }
+        } else {
+            Log::warning('❌ ObsolateReactiveMcController - No authenticated user found', [
+                'guards' => config('auth.guards'),
+                'default_guard' => config('auth.defaults.guard'),
+            ]);
+        }
+        
+        // If no authenticated user, return 'SYSTEM'
+        Log::error('❌ Using fallback user ID: SYSTEM - This should not happen in production!');
+        return 'SYSTEM';
+    }
+    
     /**
      * Display the Obsolate Reactive MC page
      */
     public function index()
     {
-        $masterCards = ObsolateReactiveMC::orderBy('mc_seq')->get();
+        // Get all master cards from MC table
+        $masterCards = UpdateMC::select('MCS_Num', 'AC_NUM', 'AC_NAME', 'MODEL', 'STS', 'COMP', 'P_DESIGN')
+            ->orderBy('MCS_Num')
+            ->get();
+        
         $customers = UpdateCustomerAccount::orderBy('customer_name')->get();
         
         return Inertia::render('sales-management/system-requirement/master-card/obsolete-reactive-mc', [
@@ -30,107 +87,86 @@ class ObsolateReactiveMcController extends Controller
      */
     public function apiIndex()
     {
-        $masterCards = ObsolateReactiveMC::orderBy('mc_seq')->get();
+        $masterCards = UpdateMC::select('MCS_Num', 'AC_NUM', 'AC_NAME', 'MODEL', 'STS', 'COMP', 'P_DESIGN')
+            ->orderBy('MCS_Num')
+            ->get();
         return response()->json($masterCards);
     }
 
     /**
-     * Store a new master card
+     * Obsolate a master card - Change STS to 'OBSOLETE'
      */
-    public function store(Request $request)
+    public function obsolate(Request $request, $mcsNum)
     {
         $validator = Validator::make($request->all(), [
-            'mc_seq' => 'required|string|max:50|unique:obsolate_reactive_mcs',
-            'mc_model' => 'required|string|max:100',
-            'customer_id' => 'required|integer',
-            'customer_name' => 'required|string|max:100',
-            'description' => 'nullable|string|max:255',
+            'reason' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $userId = Auth::id() ?? 1; // Get authenticated user ID or default to 1
+        $masterCard = UpdateMC::where('MCS_Num', $mcsNum)->first();
+        
+        if (!$masterCard) {
+            return response()->json(['error' => 'Master Card not found'], 404);
+        }
 
-        $masterCard = ObsolateReactiveMC::create([
-            'mc_seq' => $request->mc_seq,
-            'mc_model' => $request->mc_model,
-            'customer_id' => $request->customer_id,
-            'customer_name' => $request->customer_name,
-            'description' => $request->description,
-            'status' => 'active', // Default status
-            'created_by' => $userId,
-            'updated_by' => $userId,
+        // Update status to OBSOLETE
+        DB::table('MC')
+            ->where('MCS_Num', $mcsNum)
+            ->update(['STS' => 'OBSOLETE']);
+
+        // Log the action using McUpdateLog model
+        McUpdateLog::create([
+            'MCS_Num' => $mcsNum,
+            'status' => 'OBSOLETE',
+            'reason' => $request->reason ?? 'No reason provided',
+            'user_id' => $this->getCurrentUserId(),
         ]);
 
-        return response()->json($masterCard);
+        return response()->json([
+            'message' => 'Master Card has been marked as obsolete',
+            'mcs_num' => $mcsNum
+        ]);
     }
 
     /**
-     * Update a master card
+     * Reactive a master card - Change STS back to 'ACTIVE' or 'APPROVED'
      */
-    public function update(Request $request, $id)
+    public function reactive(Request $request, $mcsNum)
     {
         $validator = Validator::make($request->all(), [
-            'mc_seq' => 'required|string|max:50|unique:obsolate_reactive_mcs,mc_seq,'.$id,
-            'mc_model' => 'required|string|max:100',
-            'customer_id' => 'required|integer',
-            'customer_name' => 'required|string|max:100',
-            'description' => 'nullable|string|max:255',
+            'reason' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $userId = Auth::id() ?? 1; // Get authenticated user ID or default to 1
+        $masterCard = UpdateMC::where('MCS_Num', $mcsNum)->first();
         
-        $masterCard = ObsolateReactiveMC::findOrFail($id);
-        $masterCard->update([
-            'mc_seq' => $request->mc_seq,
-            'mc_model' => $request->mc_model,
-            'customer_id' => $request->customer_id,
-            'customer_name' => $request->customer_name,
-            'description' => $request->description,
-            'updated_by' => $userId,
+        if (!$masterCard) {
+            return response()->json(['error' => 'Master Card not found'], 404);
+        }
+
+        // Update status to ACTIVE
+        DB::table('MC')
+            ->where('MCS_Num', $mcsNum)
+            ->update(['STS' => 'ACTIVE']);
+
+        // Log the action using McUpdateLog model
+        McUpdateLog::create([
+            'MCS_Num' => $mcsNum,
+            'status' => 'ACTIVE',
+            'reason' => $request->reason ?? 'No reason provided',
+            'user_id' => $this->getCurrentUserId(),
         ]);
 
-        return response()->json($masterCard);
-    }
-
-    /**
-     * Obsolate a master card
-     */
-    public function obsolate(Request $request, $id)
-    {
-        $userId = Auth::id() ?? 1; // Get authenticated user ID or default to 1
-        
-        $masterCard = ObsolateReactiveMC::findOrFail($id);
-        $masterCard->status = 'obsolete';
-        $masterCard->obsolate_date = now();
-        $masterCard->obsolate_by = $userId;
-        $masterCard->obsolate_reason = $request->reason;
-        $masterCard->save();
-
-        return response()->json($masterCard);
-    }
-
-    /**
-     * Reactive a master card
-     */
-    public function reactive(Request $request, $id)
-    {
-        $userId = Auth::id() ?? 1; // Get authenticated user ID or default to 1
-        
-        $masterCard = ObsolateReactiveMC::findOrFail($id);
-        $masterCard->status = 'active';
-        $masterCard->reactive_date = now();
-        $masterCard->reactive_by = $userId;
-        $masterCard->reactive_reason = $request->reason;
-        $masterCard->save();
-
-        return response()->json($masterCard);
+        return response()->json([
+            'message' => 'Master Card has been reactivated',
+            'mcs_num' => $mcsNum
+        ]);
     }
 
     /**
@@ -139,32 +175,37 @@ class ObsolateReactiveMcController extends Controller
     public function bulkObsolete(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:obsolate_reactive_mcs,id',
-            'reason' => 'required|string|max:255',
+            'mcs_nums' => 'required|array',
+            'mcs_nums.*' => 'string',
+            'reason' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $userId = Auth::id() ?? 1;
-        $ids = $request->input('ids');
-        $reason = $request->input('reason');
+        $userId = $this->getCurrentUserId();
+        $mcsNums = $request->input('mcs_nums');
+        $reason = $request->input('reason') ?? 'No reason provided';
 
-        ObsolateReactiveMC::whereIn('id', $ids)->update([
-            'status' => 'obsolete',
-            'obsolate_date' => now(),
-            'obsolate_by' => $userId,
-            'obsolate_reason' => $reason,
-        ]);
+        // Update all selected master cards to OBSOLETE
+        DB::table('MC')
+            ->whereIn('MCS_Num', $mcsNums)
+            ->update(['STS' => 'OBSOLETE']);
 
-        $updatedMasterCards = ObsolateReactiveMC::whereIn('id', $ids)->get();
+        // Log each action using McUpdateLog model
+        foreach ($mcsNums as $mcsNum) {
+            McUpdateLog::create([
+                'MCS_Num' => $mcsNum,
+                'status' => 'OBSOLETE',
+                'reason' => $reason,
+                'user_id' => $userId,
+            ]);
+        }
 
         return response()->json([
             'message' => 'Master cards have been obsoleted successfully.',
-            'count' => count($updatedMasterCards),
-            'data' => $updatedMasterCards,
+            'count' => count($mcsNums),
         ]);
     }
 
@@ -174,42 +215,96 @@ class ObsolateReactiveMcController extends Controller
     public function bulkReactivate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:obsolate_reactive_mcs,id',
-            'reason' => 'required|string|max:255',
+            'mcs_nums' => 'required|array',
+            'mcs_nums.*' => 'string',
+            'reason' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $userId = Auth::id() ?? 1;
-        $ids = $request->input('ids');
-        $reason = $request->input('reason');
+        $userId = $this->getCurrentUserId();
+        $mcsNums = $request->input('mcs_nums');
+        $reason = $request->input('reason') ?? 'No reason provided';
 
-        ObsolateReactiveMC::whereIn('id', $ids)->update([
-            'status' => 'active',
-            'reactive_date' => now(),
-            'reactive_by' => $userId,
-            'reactive_reason' => $reason,
-        ]);
+        // Update all selected master cards to ACTIVE
+        DB::table('MC')
+            ->whereIn('MCS_Num', $mcsNums)
+            ->update(['STS' => 'ACTIVE']);
 
-        $updatedMasterCards = ObsolateReactiveMC::whereIn('id', $ids)->get();
+        // Log each action using McUpdateLog model
+        foreach ($mcsNums as $mcsNum) {
+            McUpdateLog::create([
+                'MCS_Num' => $mcsNum,
+                'status' => 'ACTIVE',
+                'reason' => $reason,
+                'user_id' => $userId,
+            ]);
+        }
 
         return response()->json([
             'message' => 'Master cards have been reactivated successfully.',
-            'count' => count($updatedMasterCards),
-            'data' => $updatedMasterCards,
+            'count' => count($mcsNums),
         ]);
     }
 
     /**
      * Get master cards by customer
      */
-    public function getByCustomer($customerId)
+    public function getByCustomer($customerCode)
     {
-        $masterCards = ObsolateReactiveMC::where('customer_id', $customerId)->get();
+        $masterCards = UpdateMC::select('MCS_Num', 'AC_NUM', 'AC_NAME', 'MODEL', 'STS', 'COMP', 'P_DESIGN')
+            ->where('AC_NUM', $customerCode)
+            ->orderBy('MCS_Num')
+            ->get();
         return response()->json($masterCards);
+    }
+
+    /**
+     * Get update log for a master card
+     */
+    public function getUpdateLog($mcsNum)
+    {
+        $logs = McUpdateLog::where('MCS_Num', $mcsNum)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return response()->json($logs);
+    }
+    
+    /**
+     * Get master card details by MCS number with salesperson information
+     */
+    public function getMcDetails($mcsNum)
+    {
+        // Get MC details with customer information
+        $mc = DB::table('MC')
+            ->leftJoin('CUSTOMER', 'MC.AC_NUM', '=', 'CUSTOMER.CODE')
+            ->select(
+                'MC.*',
+                'CUSTOMER.NAME as AC_NAME',
+                'CUSTOMER.SLM as salesperson_code'
+            )
+            ->where('MC.MCS_Num', $mcsNum)
+            ->first();
+        
+        if (!$mc) {
+            return response()->json(['error' => 'Master Card not found'], 404);
+        }
+        
+        // Get salesperson name from salesperson table
+        if (!empty($mc->salesperson_code)) {
+            $salesperson = DB::table('salesperson')
+                ->where('Code', $mc->salesperson_code)
+                ->first();
+            
+            if ($salesperson) {
+                $mc->salesperson_name = $salesperson->Name;
+            }
+        }
+        
+        return response()->json($mc);
     }
     
     /**

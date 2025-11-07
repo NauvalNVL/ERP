@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\UserCps;
 
 class ObsolateReactiveMC extends Model
 {
@@ -14,7 +15,7 @@ class ObsolateReactiveMC extends Model
      *
      * @var string
      */
-    protected $table = 'obsolate_reactive_mcs';
+    protected $table = 'obsolete_reactive_mcs';
 
     /**
      * The attributes that are mass assignable.
@@ -63,7 +64,7 @@ class ObsolateReactiveMC extends Model
      */
     public function obsolateUser()
     {
-        return $this->belongsTo(User::class, 'obsolate_by');
+        return $this->belongsTo(UserCps::class, 'obsolate_by');
     }
 
     /**
@@ -71,7 +72,7 @@ class ObsolateReactiveMC extends Model
      */
     public function reactiveUser()
     {
-        return $this->belongsTo(User::class, 'reactive_by');
+        return $this->belongsTo(UserCps::class, 'reactive_by');
     }
 
     /**
@@ -79,7 +80,7 @@ class ObsolateReactiveMC extends Model
      */
     public function createdByUser()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(UserCps::class, 'created_by');
     }
 
     /**
@@ -87,6 +88,6 @@ class ObsolateReactiveMC extends Model
      */
     public function updatedByUser()
     {
-        return $this->belongsTo(User::class, 'updated_by');
+        return $this->belongsTo(UserCps::class, 'updated_by');
     }
 }

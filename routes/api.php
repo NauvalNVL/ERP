@@ -507,6 +507,21 @@ Route::get('/update-mc/master-cards', [App\Http\Controllers\UpdateMcController::
 Route::get('/update-mc/master-cards/{mcSeq}', [App\Http\Controllers\UpdateMcController::class, 'apiShow']);
 Route::post('/update-mc/master-cards', [App\Http\Controllers\UpdateMcController::class, 'store']);
 
+// Obsolete & Reactive MC API routes
+// Public routes (read-only)
+Route::get('/obsolete-reactive-mc', [App\Http\Controllers\ObsolateReactiveMcController::class, 'apiIndex']);
+Route::get('/obsolete-reactive-mc/by-customer/{customerCode}', [App\Http\Controllers\ObsolateReactiveMcController::class, 'getByCustomer']);
+Route::get('/mc/update-log/{mcsNum}', [App\Http\Controllers\ObsolateReactiveMcController::class, 'getUpdateLog']);
+Route::get('/mc/details/{mcsNum}', [App\Http\Controllers\ObsolateReactiveMcController::class, 'getMcDetails']);
+
+// Protected routes (write operations - require authentication)
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::post('/obsolete-reactive-mc/{mcsNum}/obsolete', [App\Http\Controllers\ObsolateReactiveMcController::class, 'obsolate']);
+    Route::post('/obsolete-reactive-mc/{mcsNum}/reactive', [App\Http\Controllers\ObsolateReactiveMcController::class, 'reactive']);
+    Route::post('/obsolete-reactive-mc/bulk-obsolete', [App\Http\Controllers\ObsolateReactiveMcController::class, 'bulkObsolete']);
+    Route::post('/obsolete-reactive-mc/bulk-reactive', [App\Http\Controllers\ObsolateReactiveMcController::class, 'bulkReactivate']);
+});
+
 // Sales Order Report API routes
 Route::get('/report-formats', [SalesOrderReportController::class, 'apiIndexReportFormats']);
 Route::post('/so-report', [SalesOrderReportController::class, 'apiGenerateSoReport']);

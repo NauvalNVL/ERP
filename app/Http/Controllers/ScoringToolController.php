@@ -55,7 +55,7 @@ class ScoringToolController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => 'required|string|max:10|unique:scoring_tools',
             'name' => 'required|string|max:100',
-            'scorer_gap' => 'required|numeric'
+            'scorer_gap' => 'required|numeric|min:0'
         ]);
 
         if ($validator->fails()) {
@@ -100,7 +100,7 @@ class ScoringToolController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => 'required|string|max:10|unique:scoring_tools,code,' . $id,
             'name' => 'required|string|max:100',
-            'scorer_gap' => 'required|numeric'
+            'scorer_gap' => 'required|numeric|min:0'
         ]);
 
         if ($validator->fails()) {
@@ -422,8 +422,8 @@ class ScoringToolController extends Controller
             $validator = Validator::make($request->all(), [
                 'code' => 'required|string|max:10|unique:scoring_tools',
                 'name' => 'required|string|max:100',
-                'scores' => 'required|numeric',
-                'gap' => 'required|numeric',
+                'scores' => 'required|numeric|min:0',
+                'gap' => 'required|numeric|min:0',
                 'specification' => 'nullable|string|max:255',
                 'description' => 'nullable|string',
                 'is_active' => 'boolean',

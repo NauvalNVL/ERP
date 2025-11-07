@@ -33,8 +33,6 @@
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('process')">Process</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('sub_process')">Sub-Process</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('resource_type')">Resource Type</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('track_capacity')">Track Capacity</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('track_option')">Track Option</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" @click="sortTable('finisher_type')">Finisher Type</th>
               </tr>
             </thead>
@@ -48,12 +46,10 @@
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ machine.process || '-' }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ machine.sub_process || '-' }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ machine.resource_type || '-' }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ machine.track_capacity || '-' }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ formatTrackOption(machine) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-gray-700">{{ machine.finisher_type || '-' }}</td>
               </tr>
               <tr v-if="filteredMachines.length === 0">
-                <td colspan="8" class="px-6 py-4 text-center text-gray-500">No machine data available.</td>
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No machine data available.</td>
               </tr>
             </tbody>
           </table>
@@ -113,13 +109,6 @@ const selectedMachine = ref(null);
 const sortKey = ref('machine_code');
 const sortAsc = ref(true);
 
-// Format track option display
-const formatTrackOption = (machine) => {
-  const options = [];
-  if (machine.track_option_yz) options.push('Y-Z/Track + Friends Auto Update');
-  if (machine.track_option_bypass) options.push('N-Bypass F/Track');
-  return options.length > 0 ? options.join(', ') : '-';
-};
 
 // Compute filtered machines based on search query
 const filteredMachines = computed(() => {
@@ -132,7 +121,6 @@ const filteredMachines = computed(() => {
       (machine.process && machine.process.toLowerCase().includes(q)) ||
       (machine.sub_process && machine.sub_process.toLowerCase().includes(q)) ||
       (machine.resource_type && machine.resource_type.toLowerCase().includes(q)) ||
-      (machine.track_capacity && machine.track_capacity.toLowerCase().includes(q)) ||
       (machine.finisher_type && machine.finisher_type.toLowerCase().includes(q))
     );
   }

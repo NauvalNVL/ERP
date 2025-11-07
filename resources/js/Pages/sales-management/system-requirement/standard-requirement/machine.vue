@@ -200,42 +200,6 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Track Capacity:</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                    <i class="fas fa-tachometer-alt"></i>
-                                </span>
-                                <div class="pl-10 flex items-center space-x-4">
-                                    <label class="flex items-center">
-                                        <input v-model="editForm.track_capacity" type="radio" value="Y-Yes" class="mr-2">
-                                        <span class="text-sm">Y-Yes</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input v-model="editForm.track_capacity" type="radio" value="N-No" class="mr-2">
-                                        <span class="text-sm">N-No</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Track Option:</label>
-                            <div class="relative">
-                                <span class="absolute top-3 left-0 flex items-start pl-3 text-gray-500">
-                                    <i class="fas fa-route"></i>
-                                </span>
-                                <div class="pl-10 space-y-2">
-                                    <label class="flex items-center">
-                                        <input v-model="editForm.track_option_yz" type="checkbox" class="mr-2">
-                                        <span class="text-sm">Y-Z/Track + Friends Auto Update</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input v-model="editForm.track_option_bypass" type="checkbox" class="mr-2">
-                                        <span class="text-sm">N-Bypass F/Track</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Finisher Type:</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -243,9 +207,12 @@
                                 </span>
                                 <select v-model="editForm.finisher_type" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                     <option value="">Select Finisher Type</option>
+                                    <option value="S-Stitcher">S-Stitcher</option>
+                                    <option value="L-Stitcher">L-Stitcher</option>
+                                    <option value="G-Gluer">G-Gluer</option>
+                                    <option value="A-Assembler">A-Assembler</option>
+                                    <option value="P-Packing">P-Packing</option>
                                     <option value="X-N/Applicable">X-N/Applicable</option>
-                                    <option value="Standard">Standard</option>
-                                    <option value="Premium">Premium</option>
                                 </select>
                             </div>
                         </div>
@@ -330,9 +297,6 @@ const editForm = ref({
     process: '',
     sub_process: '',
     resource_type: '',
-    track_capacity: '',
-    track_option_yz: false,
-    track_option_bypass: false,
     finisher_type: ''
 });
 const isCreating = ref(false);
@@ -377,9 +341,6 @@ const createNewMachine = () => {
         process: '',
         sub_process: '',
         resource_type: '',
-        track_capacity: '',
-        track_option_yz: false,
-        track_option_bypass: false,
         finisher_type: ''
     };
     isCreating.value = true;
@@ -400,8 +361,10 @@ const closeEditModal = () => {
         id: null,
         machine_code: '',
         machine_name: '',
-        description: '',
-        status: 'active'
+        process: '',
+        sub_process: '',
+        resource_type: '',
+        finisher_type: ''
     };
 };
 

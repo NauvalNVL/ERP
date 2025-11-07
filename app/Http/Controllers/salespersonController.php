@@ -61,7 +61,7 @@ class SalespersonController extends Controller
                 'name' => 'required|string|max:50',
                 'grup' => 'nullable|string|max:20',
                 'code_grup' => 'nullable|string|max:50',
-                'target_sales' => 'nullable|numeric',
+                'target_sales' => 'nullable|numeric|min:0',
                 'internal' => 'nullable|string|max:20',
                 'email' => 'nullable|email|max:100',
                 'status' => 'nullable|string|max:10'
@@ -130,7 +130,7 @@ class SalespersonController extends Controller
                 'name' => 'required|string|max:50',
                 'grup' => 'nullable|string|max:20',
                 'code_grup' => 'nullable|string|max:50',
-                'target_sales' => 'nullable|numeric',
+                'target_sales' => 'nullable|numeric|min:0',
                 'internal' => 'nullable|string|max:20',
                 'email' => 'nullable|email|max:100',
                 'status' => 'nullable|string|max:10'

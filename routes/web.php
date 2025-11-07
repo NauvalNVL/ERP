@@ -544,6 +544,7 @@ Route::get('/define-analysis-code', [AnalysisCodeController::class, 'index'])->n
          Route::get('/machine/view-print', [MachineController::class, 'vueViewAndPrint'])->name('vue.machine.view-print');
          // Alias for search menu
          Route::get('/define-machine', [MachineController::class, 'index'])->name('vue.define-machine');
+         Route::get('/view-and-print-machine', [MachineController::class, 'vueViewAndPrint'])->name('vue.view-and-print-machine');
 
 // Customer Account Routes
 Route::get('/customer-group', function () {

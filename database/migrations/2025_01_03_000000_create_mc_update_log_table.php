@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('MC_UPDATE_LOG', function (Blueprint $table) {
             $table->id();
             $table->string('MCS_Num', 50)->index();
-            $table->string('status', 20); // 'Active' or 'Obsolete'
+            $table->string('status', 20); // 'ACTIVE', 'OBSOLETE'
             $table->string('user_id', 100);
-            $table->text('reason');
+            $table->text('reason')->nullable();
             $table->timestamps();
             
             // Add index for better query performance
-            $table->index(['MCS_Num', 'updated_at']);
+            $table->index(['MCS_Num', 'created_at']);
         });
     }
 
