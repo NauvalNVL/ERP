@@ -13,10 +13,8 @@ class IndustrySeeder extends Seeder
      */
     public function run(): void
     {
-        // Disable constraints, truncate, and re-enable constraints for SQL Server
-        DB::statement('ALTER TABLE industry NOCHECK CONSTRAINT ALL');
-        DB::statement('TRUNCATE TABLE industry');
-        DB::statement('ALTER TABLE industry CHECK CONSTRAINT ALL');
+        // Clear existing data first
+        DB::table('industry')->delete();
 
         $industries = [
             ['code' => 'ID01', 'name' => 'AUTOMOTIVE'],
@@ -39,7 +37,7 @@ class IndustrySeeder extends Seeder
             ['code' => 'ID18', 'name' => 'OTHER INDUSTRY']
         ];
 
-        // Insert data using query builder instead of Eloquent
+        // Insert data using query builder
         DB::table('industry')->insert($industries);
     }
 }

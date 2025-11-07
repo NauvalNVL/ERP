@@ -38,9 +38,6 @@ class MachineController extends Controller
                     'process' => $machine->process,
                     'sub_process' => $machine->sub_process,
                     'resource_type' => $machine->resource_type,
-                    'track_capacity' => $machine->track_capacity,
-                    'track_option_yz' => $machine->track_option_yz,
-                    'track_option_bypass' => $machine->track_option_bypass,
                     'finisher_type' => $machine->finisher_type
                 ];
             });
@@ -99,9 +96,6 @@ class MachineController extends Controller
                 'process' => 'nullable|string|max:100',
                 'sub_process' => 'nullable|string|max:100',
                 'resource_type' => 'nullable|string|max:50',
-                'track_capacity' => 'nullable|string|max:20',
-                'track_option_yz' => 'boolean',
-                'track_option_bypass' => 'boolean',
                 'finisher_type' => 'nullable|string|max:50'
             ]);
 
@@ -124,9 +118,6 @@ class MachineController extends Controller
                 'process' => $request->process ? trim($request->process) : null,
                 'sub_process' => $request->sub_process ? trim($request->sub_process) : null,
                 'resource_type' => $request->resource_type ? trim($request->resource_type) : null,
-                'track_capacity' => $request->track_capacity,
-                'track_option_yz' => $request->track_option_yz ?? false,
-                'track_option_bypass' => $request->track_option_bypass ?? false,
                 'finisher_type' => $request->finisher_type ? trim($request->finisher_type) : null
             ]);
             
@@ -140,9 +131,6 @@ class MachineController extends Controller
                 'process' => $machine->process,
                 'sub_process' => $machine->sub_process,
                 'resource_type' => $machine->resource_type,
-                'track_capacity' => $machine->track_capacity,
-                'track_option_yz' => $machine->track_option_yz,
-                'track_option_bypass' => $machine->track_option_bypass,
                 'finisher_type' => $machine->finisher_type
             ];
             
@@ -184,9 +172,6 @@ class MachineController extends Controller
                 'process' => 'nullable|string|max:100',
                 'sub_process' => 'nullable|string|max:100',
                 'resource_type' => 'nullable|string|max:50',
-                'track_capacity' => 'nullable|string|max:20',
-                'track_option_yz' => 'boolean',
-                'track_option_bypass' => 'boolean',
                 'finisher_type' => 'nullable|string|max:50'
             ]);
 
@@ -213,9 +198,6 @@ class MachineController extends Controller
                 'process' => $request->process ? trim($request->process) : null,
                 'sub_process' => $request->sub_process ? trim($request->sub_process) : null,
                 'resource_type' => $request->resource_type ? trim($request->resource_type) : null,
-                'track_capacity' => $request->track_capacity,
-                'track_option_yz' => $request->track_option_yz ?? false,
-                'track_option_bypass' => $request->track_option_bypass ?? false,
                 'finisher_type' => $request->finisher_type ? trim($request->finisher_type) : null
             ]);
 
@@ -229,9 +211,6 @@ class MachineController extends Controller
                 'process' => $machine->process,
                 'sub_process' => $machine->sub_process,
                 'resource_type' => $machine->resource_type,
-                'track_capacity' => $machine->track_capacity,
-                'track_option_yz' => $machine->track_option_yz,
-                'track_option_bypass' => $machine->track_option_bypass,
                 'finisher_type' => $machine->finisher_type
             ];
             
@@ -333,10 +312,7 @@ class MachineController extends Controller
                     'process' => '10 - CORRUGATING',
                     'sub_process' => '10 - PRINTER',
                     'resource_type' => 'I-InHouse',
-                    'track_capacity' => 'Y-Yes',
-                    'track_option_yz' => true,
-                    'track_option_bypass' => false,
-                    'finisher_type' => 'Standard'
+                    'finisher_type' => 'S-Stitcher'
                 ],
                 [
                     'machine_code' => 'M002',
@@ -344,10 +320,7 @@ class MachineController extends Controller
                     'process' => '10 - CORRUGATING',
                     'sub_process' => '20 - DIECUTTER',
                     'resource_type' => 'I-InHouse',
-                    'track_capacity' => 'Y-Yes',
-                    'track_option_yz' => false,
-                    'track_option_bypass' => true,
-                    'finisher_type' => 'Premium'
+                    'finisher_type' => 'G-Gluer'
                 ],
                 [
                     'machine_code' => 'M003',
@@ -355,9 +328,6 @@ class MachineController extends Controller
                     'process' => '20 - CONVERTING',
                     'sub_process' => '10 - PRINTER',
                     'resource_type' => 'E-External',
-                    'track_capacity' => 'N-No',
-                    'track_option_yz' => false,
-                    'track_option_bypass' => false,
                     'finisher_type' => 'X-N/Applicable'
                 ],
                 [
@@ -366,10 +336,7 @@ class MachineController extends Controller
                     'process' => '20 - CONVERTING',
                     'sub_process' => '20 - DIECUTTER',
                     'resource_type' => 'I-InHouse',
-                    'track_capacity' => 'Y-Yes',
-                    'track_option_yz' => true,
-                    'track_option_bypass' => true,
-                    'finisher_type' => 'Standard'
+                    'finisher_type' => 'L-Stitcher'
                 ],
                 [
                     'machine_code' => 'M005',
@@ -377,10 +344,7 @@ class MachineController extends Controller
                     'process' => '30 - WAREHOUSE',
                     'sub_process' => '30 - FINISHER',
                     'resource_type' => 'I-InHouse',
-                    'track_capacity' => 'N-No',
-                    'track_option_yz' => false,
-                    'track_option_bypass' => false,
-                    'finisher_type' => 'Premium'
+                    'finisher_type' => 'A-Assembler'
                 ]
             ];
 

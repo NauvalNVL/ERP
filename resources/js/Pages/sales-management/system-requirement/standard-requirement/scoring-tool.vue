@@ -187,7 +187,8 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Scorer Gap:</label>
-                            <input v-model="editForm.scorer_gap" type="number" step="0.1" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <input v-model="editForm.scorer_gap" type="number" step="0.1" min="0" class="block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <span class="text-xs text-gray-500">Value must be 0 or greater</span>
                         </div>
                     </div>
                     <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
@@ -359,6 +360,12 @@ const closeEditModal = () => {
 };
 
 const saveScoringToolChanges = async () => {
+    // Validate scorer_gap is not negative
+    if (parseFloat(editForm.value.scorer_gap) < 0) {
+        showNotification('Scorer Gap cannot be negative. Please enter a value of 0 or greater.', 'error');
+        return;
+    }
+    
     saving.value = true;
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
