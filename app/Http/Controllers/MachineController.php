@@ -278,21 +278,45 @@ class MachineController extends Controller
     }
 
     /**
-     * Display a listing of the resource for printing with Vue.
+     * Display the View & Print Machine page.
      *
      * @return \Inertia\Response
      */
     public function vueViewAndPrint()
     {
         try {
+            // Get all machines from database
+            $machines = Machine::orderBy('machine_code')->get();
+            
+            // Check if machines table is empty and seed if needed
+            if ($machines->isEmpty()) {
+                Log::info('No machines found, seeding data...');
+                $this->seedData();
+                $machines = Machine::orderBy('machine_code')->get();
+            }
+            
+            // Transform data to match Vue component expected format
+            $machinesTransformed = $machines->map(function($machine) {
+                return [
+                    'id' => $machine->id,
+                    'machine_code' => $machine->machine_code,
+                    'machine_name' => $machine->machine_name,
+                    'process' => $machine->process,
+                    'sub_process' => $machine->sub_process,
+                    'resource_type' => $machine->resource_type,
+                    'finisher_type' => $machine->finisher_type
+                ];
+            });
+            
             return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-machine', [
-                'header' => 'View & Print Machines'
+                'machines' => $machinesTransformed
             ]);
         } catch (\Exception $e) {
             Log::error('Error in MachineController@vueViewAndPrint: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
             return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-machine', [
-                'header' => 'View & Print Machines',
-                'error' => 'Failed to load machine data for printing'
+                'machines' => []
             ]);
         }
     }
