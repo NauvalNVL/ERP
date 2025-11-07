@@ -555,12 +555,12 @@ import {
 import { 
     UserIcon,
     ShieldCheckIcon,
-    SearchIcon,
-    SaveIcon,
-    XIcon,
+    MagnifyingGlassIcon as SearchIcon,
+    ArrowDownTrayIcon as SaveIcon,
+    XMarkIcon as XIcon,
     CheckCircleIcon,
     ExclamationCircleIcon
-} from '@heroicons/vue/outline'
+} from '@heroicons/vue/24/outline'
 
 export default {
     components: {

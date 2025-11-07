@@ -250,22 +250,22 @@ import {
 import { 
     UserIcon, 
     UserCircleIcon,
-    UserAddIcon,
+    UserPlusIcon as UserAddIcon,
     AtSymbolIcon,
-    BadgeCheckIcon,
+    CheckBadgeIcon as BadgeCheckIcon,
     BriefcaseIcon,
     PhoneIcon,
-    OfficeBuildingIcon,
+    BuildingOfficeIcon as OfficeBuildingIcon,
     CogIcon,
     ShieldCheckIcon,
     CalendarIcon,
     KeyIcon,
-    XIcon,
-    SaveIcon,
+    XMarkIcon as XIcon,
+    ArrowDownTrayIcon as SaveIcon,
     IdentificationIcon,
     ExclamationCircleIcon,
     CheckIcon
-} from '@heroicons/vue/outline'
+} from '@heroicons/vue/24/outline'
 
 export default {
     components: {

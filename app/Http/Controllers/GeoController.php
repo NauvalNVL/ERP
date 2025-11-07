@@ -162,14 +162,14 @@ class GeoController extends Controller
         try {
             $geos = Geo::orderBy('country')->orderBy('state')->get();
 
-            \Illuminate\Support\Facades\Log::info('GeoController@vueIndex: Passing ' . $geos->count() . ' geo records to view');
+            Log::info('GeoController@vueIndex: Passing ' . $geos->count() . ' geo records to view');
 
             return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/geo', [
                 'geos' => $geos,
                 'header' => 'Geo Management'
             ]);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error in GeoController@vueIndex: ' . $e->getMessage());
+            Log::error('Error in GeoController@vueIndex: ' . $e->getMessage());
 
             return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/geo', [
                 'geos' => [],
@@ -189,7 +189,7 @@ class GeoController extends Controller
         try {
             return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-geo');
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error in GeoController@vueViewAndPrint: ' . $e->getMessage());
+            Log::error('Error in GeoController@vueViewAndPrint: ' . $e->getMessage());
             return \Inertia\Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-geo', [
                 'error' => 'Failed to load geo data for printing: ' . $e->getMessage()
             ]);
@@ -206,11 +206,11 @@ class GeoController extends Controller
         try {
             $geos = Geo::orderBy('country')->orderBy('state')->get();
 
-            \Illuminate\Support\Facades\Log::info('GeoController@apiIndex: Returning ' . $geos->count() . ' geo records');
+            Log::info('GeoController@apiIndex: Returning ' . $geos->count() . ' geo records');
 
             return response()->json($geos);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error in GeoController@apiIndex: ' . $e->getMessage());
+            Log::error('Error in GeoController@apiIndex: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to load geo data'], 500);
         }
     }

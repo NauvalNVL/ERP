@@ -27,7 +27,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- User ID -->
                             <div>
-                                <label for="user_id" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="user_id" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <IdentificationIcon class="h-4 w-4 text-blue-500 mr-1" />
                                     User ID
                                 </label>
@@ -40,7 +40,7 @@
 
                     <!-- Username -->
                             <div>
-                                <label for="username" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="username" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <AtSymbolIcon class="h-4 w-4 text-blue-500 mr-1" />
                                     Username
                                 </label>
@@ -55,7 +55,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Official Name -->
                             <div>
-                                <label for="official_name" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="official_name" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <UserCircleIcon class="h-4 w-4 text-blue-500 mr-1" />
                                     Official Name
                                 </label>
@@ -68,7 +68,7 @@
 
                     <!-- Official Title -->
                             <div>
-                                <label for="official_title" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="official_title" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <BriefcaseIcon class="h-4 w-4 text-blue-500 mr-1" />
                                     Position
                                 </label>
@@ -82,7 +82,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Mobile Number -->
                             <div>
-                                <label for="mobile_number" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="mobile_number" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <PhoneIcon class="h-4 w-4 text-blue-500 mr-1" />
                                     Mobile Number
                                 </label>
@@ -94,7 +94,7 @@
 
                     <!-- Official Tel -->
                             <div>
-                                <label for="official_tel" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="official_tel" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <OfficeBuildingIcon class="h-4 w-4 text-blue-500 mr-1" />
                                     Office Phone
                                 </label>
@@ -108,7 +108,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Password -->
                             <div>
-                                <label for="password" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="password" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <LockClosedIcon class="h-4 w-4 text-blue-500 mr-1" />
                                     Password 
                                     <span class="text-xs text-gray-500 ml-2">(Leave empty if you don't want to change the password)</span>
@@ -133,7 +133,7 @@
 
                             <!-- Confirm Password -->
                             <div>
-                                <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="password_confirmation" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <LockClosedIcon class="h-4 w-4 text-blue-500 mr-1" />
                                     Confirm Password
                                 </label>
@@ -153,7 +153,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Status -->
                             <div>
-                                <label for="status" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="status" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <ShieldCheckIcon class="h-4 w-4 text-blue-500 mr-1" />
                                     Status
                                 </label>
@@ -171,7 +171,7 @@
 
                             <!-- Password Expiry Date -->
                             <div>
-                                <label for="password_expiry_date" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="password_expiry_date" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <CalendarIcon class="h-4 w-4 text-blue-500 mr-1" />
                                     Password Validity Period (days)
                                 </label>
@@ -186,7 +186,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Amend Expired Password -->
                             <div>
-                                <label for="amend_expired_password" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="amend_expired_password" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <KeyIcon class="h-4 w-4 text-blue-500 mr-1" />
                                     Update Expired Password
                                 </label>
@@ -238,18 +238,18 @@ import {
     AtSymbolIcon,
     BriefcaseIcon,
     PhoneIcon,
-    OfficeBuildingIcon,
+    BuildingOfficeIcon as OfficeBuildingIcon,
     ShieldCheckIcon,
     CalendarIcon,
     KeyIcon,
-    XIcon,
-    SaveIcon,
+    XMarkIcon as XIcon,
+    ArrowDownTrayIcon as SaveIcon,
     IdentificationIcon,
     ExclamationCircleIcon,
     LockClosedIcon,
     EyeIcon,
-    EyeOffIcon
-} from '@heroicons/vue/outline';
+    EyeSlashIcon as EyeOffIcon
+} from '@heroicons/vue/24/outline';
 
 export default {
     components: {

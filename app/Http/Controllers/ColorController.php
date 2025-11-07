@@ -16,7 +16,7 @@ class ColorController extends Controller
      * Display a listing of the colors.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Contracts\View\View
      */
     public function index(Request $request)
     {
@@ -108,7 +108,7 @@ class ColorController extends Controller
     /**
      * Show the form for creating a new color.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
     public function create()
     {
@@ -122,7 +122,7 @@ class ColorController extends Controller
      * Store a newly created color in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -196,7 +196,7 @@ class ColorController extends Controller
      * Show the form for editing the specified color.
      *
      * @param  string  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
      */
     public function edit($id)
     {
@@ -343,7 +343,7 @@ class ColorController extends Controller
      * Remove the specified color from storage.
      *
      * @param  string  $color_id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function destroy($color_id)
     {

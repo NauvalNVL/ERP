@@ -1546,6 +1546,110 @@ const mcNetM2PerPcs = computed(() => {
     return (numerator / 1000000) / denominator;
 });
 
+// Computed property for MC_GROSS_KG_PER_SET calculation
+const mcGrossKgPerSet = computed(() => {
+    // Get the selected flute data to retrieve ratio layers
+    const selectedFlute = props.paperFlutes?.find(f => f.code === selectedPaperFlute.value || f.Flute === selectedPaperFlute.value);
+    
+    if (!selectedFlute || mcGrossM2PerPcs.value === 0) return 0;
+    
+    // Extract ratio layers from flute data
+    const ratioDB = parseFloat(selectedFlute.DB) || 0;
+    const ratioB = parseFloat(selectedFlute.B) || 0;
+    const ratio1L = parseFloat(selectedFlute._1L) || 0;
+    const ratioACE = parseFloat(selectedFlute.A_C_E) || 0;
+    const ratio2L = parseFloat(selectedFlute._2L) || 0;
+    
+    // Get SO values from component forms or props
+    const idx = selectedComponentIndex.value ?? 0;
+    const soArr = componentForms.value[idx]?.soValues ?? props.soValues ?? [];
+    
+    // Helper function to extract GSM from paper quality string (e.g., "AGBS200" -> 200)
+    const extractGSM = (paperQuality) => {
+        if (!paperQuality) return 0;
+        const str = String(paperQuality);
+        // Extract numbers from the string
+        const match = str.match(/\d+/);
+        return match ? parseFloat(match[0]) : 0;
+    };
+    
+    // Calculate each layer contribution
+    // SO PQ1 * mc_gross_m2_per_pcs * ratio layer 1 (DB)
+    const gsm1 = extractGSM(soArr[0]);
+    const layer1 = (gsm1 / 1000) * mcGrossM2PerPcs.value * ratioDB;
+    
+    // SO PQ2 / 1000 * mc_gross_m2_per_pcs * ratio layer 2 (B)
+    const gsm2 = extractGSM(soArr[1]);
+    const layer2 = (gsm2 / 1000) * mcGrossM2PerPcs.value * ratioB;
+    
+    // SO PQ3 / 1000 * mc_gross_m2_per_pcs * ratio layer 3 (1L)
+    const gsm3 = extractGSM(soArr[2]);
+    const layer3 = (gsm3 / 1000) * mcGrossM2PerPcs.value * ratio1L;
+    
+    // SO PQ4 / 1000 * mc_gross_m2_per_pcs * ratio layer 4 (A/C/E)
+    const gsm4 = extractGSM(soArr[3]);
+    const layer4 = (gsm4 / 1000) * mcGrossM2PerPcs.value * ratioACE;
+    
+    // SO PQ5 / 1000 * mc_gross_m2_per_pcs * ratio layer 5 (2L)
+    const gsm5 = extractGSM(soArr[4]);
+    const layer5 = (gsm5 / 1000) * mcGrossM2PerPcs.value * ratio2L;
+    
+    // Sum all layers
+    return layer1 + layer2 + layer3 + layer4 + layer5;
+});
+
+// Computed property for MC_NET_KG_PER_PCS calculation
+const mcNetKgPerPcs = computed(() => {
+    // Get the selected flute data to retrieve ratio layers
+    const selectedFlute = props.paperFlutes?.find(f => f.code === selectedPaperFlute.value || f.Flute === selectedPaperFlute.value);
+    
+    if (!selectedFlute || mcNetM2PerPcs.value === 0) return 0;
+    
+    // Extract ratio layers from flute data
+    const ratioDB = parseFloat(selectedFlute.DB) || 0;
+    const ratioB = parseFloat(selectedFlute.B) || 0;
+    const ratio1L = parseFloat(selectedFlute._1L) || 0;
+    const ratioACE = parseFloat(selectedFlute.A_C_E) || 0;
+    const ratio2L = parseFloat(selectedFlute._2L) || 0;
+    
+    // Get SO values from component forms or props
+    const idx = selectedComponentIndex.value ?? 0;
+    const soArr = componentForms.value[idx]?.soValues ?? props.soValues ?? [];
+    
+    // Helper function to extract GSM from paper quality string (e.g., "AGBS200" -> 200)
+    const extractGSM = (paperQuality) => {
+        if (!paperQuality) return 0;
+        const str = String(paperQuality);
+        // Extract numbers from the string
+        const match = str.match(/\d+/);
+        return match ? parseFloat(match[0]) : 0;
+    };
+    
+    // Calculate each layer contribution using NET M2 instead of GROSS M2
+    // SO PQ1 * mc_net_m2_per_pcs * ratio layer 1 (DB)
+    const gsm1 = extractGSM(soArr[0]);
+    const layer1 = (gsm1 / 1000) * mcNetM2PerPcs.value * ratioDB;
+    
+    // SO PQ2 / 1000 * mc_net_m2_per_pcs * ratio layer 2 (B)
+    const gsm2 = extractGSM(soArr[1]);
+    const layer2 = (gsm2 / 1000) * mcNetM2PerPcs.value * ratioB;
+    
+    // SO PQ3 / 1000 * mc_net_m2_per_pcs * ratio layer 3 (1L)
+    const gsm3 = extractGSM(soArr[2]);
+    const layer3 = (gsm3 / 1000) * mcNetM2PerPcs.value * ratio1L;
+    
+    // SO PQ4 / 1000 * mc_net_m2_per_pcs * ratio layer 4 (A/C/E)
+    const gsm4 = extractGSM(soArr[3]);
+    const layer4 = (gsm4 / 1000) * mcNetM2PerPcs.value * ratioACE;
+    
+    // SO PQ5 / 1000 * mc_net_m2_per_pcs * ratio layer 5 (2L)
+    const gsm5 = extractGSM(soArr[4]);
+    const layer5 = (gsm5 / 1000) * mcNetM2PerPcs.value * ratio2L;
+    
+    // Sum all layers
+    return layer1 + layer2 + layer3 + layer4 + layer5;
+});
+
 const handleSortOptionChange = (event) => {
     const newSortOption = event.target.value;
     emit('updateSortOption', newSortOption);
@@ -2225,9 +2329,11 @@ const buildPdSetupPayload = () => {
         selectedWrappingCode: selectedWrappingCode.value,
         moreDescriptions: moreDescriptions.value,
         subMaterials: subMaterials.value,
-        // Calculated M2 values
+        // Calculated M2 and KG values
         mcGrossM2PerPcs: mcGrossM2PerPcs.value,
         mcNetM2PerPcs: mcNetM2PerPcs.value,
+        mcGrossKgPerSet: mcGrossKgPerSet.value,
+        mcNetKgPerPcs: mcNetKgPerPcs.value,
         // Legacy root arrays for controller mapping
         soValues: rootSo,
         woValues: rootWo,

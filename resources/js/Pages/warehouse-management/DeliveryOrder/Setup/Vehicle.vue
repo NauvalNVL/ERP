@@ -458,9 +458,8 @@
 import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { useToast } from '@/Composables/useToast'
 import AppLayout from '@/Layouts/AppLayout.vue'
-// Use v1 heroicons path (package.json has @heroicons/vue ^1.x)
-// ArrowPathIcon is v2; in v1 the equivalent spinner is RefreshIcon
-import { RefreshIcon } from '@heroicons/vue/outline'
+// Updated to Heroicons v2
+import { ArrowPathIcon as RefreshIcon } from '@heroicons/vue/24/outline'
 
 const { addToast } = useToast()
 

@@ -75,7 +75,7 @@
                                 <div>
                                     <label
                                         for="ac"
-                                        class="block text-sm font-medium text-gray-700 mb-1 flex items-center"
+                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
                                     >
                                         <span
                                             class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full mr-2 shadow-sm"
@@ -97,7 +97,7 @@
                                             id="ac"
                                             v-model="form.ac"
                                             @input="handleAcInput"
-                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
+                                            class="flex-1 min-w-0 w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
                                             :class="{ filled: form.ac }"
                                         />
                                         <button
@@ -128,7 +128,7 @@
                                 <div>
                                     <label
                                         for="mcs"
-                                        class="block text-sm font-medium text-gray-700 mb-1 flex items-center"
+                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
                                     >
                                         <span
                                             class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-pink-500 to-red-500 rounded-full mr-2 shadow-sm"
@@ -150,7 +150,7 @@
                                             id="mcs"
                                             v-model="form.mcs"
                                             @input="handleMcsInput"
-                                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
+                                            class="flex-1 min-w-0 w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition-all group-hover:border-indigo-300 form-input"
                                             :class="{ filled: form.mcs }"
                                         />
                                         <button
@@ -197,7 +197,7 @@
                                 <div>
                                     <label
                                         for="customer_name"
-                                        class="block text-sm font-medium text-gray-700 mb-1 flex items-center"
+                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
                                     >
                                         <span
                                             class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mr-2 shadow-sm"
@@ -231,7 +231,7 @@
                                 <div>
                                     <label
                                         for="mc_model"
-                                        class="block text-sm font-medium text-gray-700 mb-1 flex items-center"
+                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
                                     >
                                         <span
                                             class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full mr-2 shadow-sm"
@@ -274,7 +274,7 @@
                                 <div>
                                     <label
                                         for="mc_short_model"
-                                        class="block text-sm font-medium text-gray-700 mb-1 flex items-center"
+                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
                                     >
                                         <span
                                             class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mr-2 shadow-sm"
@@ -324,7 +324,7 @@
                                 <div>
                                     <label
                                         for="mc_status"
-                                        class="block text-sm font-medium text-gray-700 mb-1 flex items-center"
+                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
                                     >
                                         <span
                                             class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mr-2 shadow-sm"
@@ -348,7 +348,7 @@
                                             id="mc_status"
                                             v-model="form.mc_status"
                                             readonly
-                                            class="flex-1 min-w-0 block w-full pl-10 pr-3 py-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-50"
+                                            class="flex-1 min-w-0 w-full pl-10 pr-3 py-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-50"
                                         />
                                         <button
                                             type="button"
@@ -361,7 +361,7 @@
                                 <div>
                                     <label
                                         for="mc_approval"
-                                        class="block text-sm font-medium text-gray-700 mb-1 flex items-center"
+                                        class="flex items-center text-sm font-medium text-gray-700 mb-1"
                                     >
                                         <span
                                             class="inline-flex items-center justify-center w-5 h-5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mr-2 shadow-sm"
@@ -390,7 +390,7 @@
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-red-100 text-red-800'
                                             "
-                                            class="flex-1 min-w-0 block w-full pl-10 pr-3 py-2 rounded-l-md border border-r-0 border-gray-300 font-semibold"
+                                            class="flex-1 min-w-0 w-full pl-10 pr-3 py-2 rounded-l-md border border-r-0 border-gray-300 font-semibold"
                                         />
                                         <button
                                             type="button"

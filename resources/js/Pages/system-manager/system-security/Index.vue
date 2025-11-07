@@ -173,7 +173,7 @@ import {
 import { 
     UserIcon, 
     UserGroupIcon, 
-    UserAddIcon, 
+    UserPlusIcon as UserAddIcon, 
     PencilIcon, 
     TrashIcon, 
     KeyIcon, 
@@ -181,11 +181,11 @@ import {
     CogIcon,
     IdentificationIcon,
     BriefcaseIcon,
-    BadgeCheckIcon,
+    CheckBadgeIcon as BadgeCheckIcon,
     CheckCircleIcon,
     ExclamationCircleIcon,
-    DotsVerticalIcon
-} from '@heroicons/vue/outline';
+    EllipsisVerticalIcon as DotsVerticalIcon
+} from '@heroicons/vue/24/outline';
 import Swal from 'sweetalert2';
 
 export default {

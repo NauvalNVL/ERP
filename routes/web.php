@@ -512,25 +512,25 @@ Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.def
          // Alias for search menu
          Route::get('/define-chemical-coat', [ChemicalCoatController::class, 'vueIndex'])->name('vue.define-chemical-coat');
 
-         Route::get('/reinforcement-tape', [\App\Http\Controllers\ReinforcementTapeController::class, 'index'])->name('vue.reinforcement-tape.index');
-         Route::get('/reinforcement-tape/view-print', [\App\Http\Controllers\ReinforcementTapeController::class, 'vueViewAndPrint'])->name('vue.reinforcement-tape.view-print');
+         Route::get('/reinforcement-tape', [ReinforcementTapeController::class, 'index'])->name('vue.reinforcement-tape.index');
+         Route::get('/reinforcement-tape/view-print', [ReinforcementTapeController::class, 'vueViewAndPrint'])->name('vue.reinforcement-tape.view-print');
          // Alias for search menu
-         Route::get('/define-reinforcement-tape', [\App\Http\Controllers\ReinforcementTapeController::class, 'index'])->name('vue.define-reinforcement-tape');
+         Route::get('/define-reinforcement-tape', [ReinforcementTapeController::class, 'index'])->name('vue.define-reinforcement-tape');
 
-         Route::get('/bundling-string', [\App\Http\Controllers\BundlingStringController::class, 'index'])->name('vue.bundling-string.index');
-         Route::get('/bundling-string/view-print', [\App\Http\Controllers\BundlingStringController::class, 'vueViewAndPrint'])->name('vue.bundling-string.view-print');
+         Route::get('/bundling-string', [BundlingStringController::class, 'index'])->name('vue.bundling-string.index');
+         Route::get('/bundling-string/view-print', [BundlingStringController::class, 'vueViewAndPrint'])->name('vue.bundling-string.view-print');
          // Alias for search menu
-         Route::get('/define-bundling-string', [\App\Http\Controllers\BundlingStringController::class, 'index'])->name('vue.define-bundling-string');
+         Route::get('/define-bundling-string', [BundlingStringController::class, 'index'])->name('vue.define-bundling-string');
 
-         Route::get('/wrapping-material', [\App\Http\Controllers\WrappingMaterialController::class, 'index'])->name('vue.wrapping-material.index');
-         Route::get('/wrapping-material/view-print', [\App\Http\Controllers\WrappingMaterialController::class, 'vueViewAndPrint'])->name('vue.wrapping-material.view-print');
+         Route::get('/wrapping-material', [WrappingMaterialController::class, 'index'])->name('vue.wrapping-material.index');
+         Route::get('/wrapping-material/view-print', [WrappingMaterialController::class, 'vueViewAndPrint'])->name('vue.wrapping-material.view-print');
          // Alias for search menu
-         Route::get('/define-wrapping-material', [\App\Http\Controllers\WrappingMaterialController::class, 'index'])->name('vue.define-wrapping-material');
+         Route::get('/define-wrapping-material', [WrappingMaterialController::class, 'index'])->name('vue.define-wrapping-material');
 
-         Route::get('/glueing-material', [\App\Http\Controllers\GlueingMaterialController::class, 'index'])->name('vue.glueing-material.index');
-         Route::get('/glueing-material/view-print', [\App\Http\Controllers\GlueingMaterialController::class, 'vueViewAndPrint'])->name('vue.glueing-material.view-print');
+         Route::get('/glueing-material', [GlueingMaterialController::class, 'index'])->name('vue.glueing-material.index');
+         Route::get('/glueing-material/view-print', [GlueingMaterialController::class, 'vueViewAndPrint'])->name('vue.glueing-material.view-print');
          // Alias for search menu
-         Route::get('/define-glueing-material', [\App\Http\Controllers\GlueingMaterialController::class, 'index'])->name('vue.define-glueing-material');
+         Route::get('/define-glueing-material', [GlueingMaterialController::class, 'index'])->name('vue.define-glueing-material');
 
          Route::get('/machine', [MachineController::class, 'index'])->name('vue.machine.index');
          Route::post('/machine', [MachineController::class, 'store'])->name('vue.machine.store');
@@ -1594,9 +1594,9 @@ Route::get('/material-management/system-requirement/standard-setup/receive-desti
 Route::get('/material-management/system-requirement/standard-setup/receive-destination/view-print', [MmReceiveDestinationController::class, 'viewPrint'])->name('mm.receive-destination.view-print');
 Route::get('/material-management/system-requirement/standard-setup/analysis-code', [MmAnalysisCodeController::class, 'index'])->name('mm.analysis-code');
 Route::get('/material-management/system-requirement/standard-setup/analysis-code/view-print', [MmAnalysisCodeController::class, 'viewPrint'])->name('mm.analysis-code.view-print');
-Route::get('/material-management/system-requirement/standard-setup/control-period/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmControlPeriodController::class, 'viewPrint'])->name('mm.control-period.view-print');
-Route::get('/material-management/system-requirement/standard-setup/transaction-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTransactionTypeController::class, 'viewPrint'])->name('mm.transaction-type.view-print');
-Route::get('/material-management/system-requirement/standard-setup/tax-type/view-print', [\App\Http\Controllers\MaterialManagement\SystemRequirement\MmTaxTypeController::class, 'viewPrint'])->name('mm.tax-type.view-print');
+Route::get('/material-management/system-requirement/standard-setup/control-period/view-print', [MmControlPeriodController::class, 'viewPrint'])->name('mm.control-period.view-print');
+Route::get('/material-management/system-requirement/standard-setup/transaction-type/view-print', [MmTransactionTypeController::class, 'viewPrint'])->name('mm.transaction-type.view-print');
+Route::get('/material-management/system-requirement/standard-setup/tax-type/view-print', [MmTaxTypeController::class, 'viewPrint'])->name('mm.tax-type.view-print');
 
 
 

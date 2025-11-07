@@ -148,7 +148,7 @@ class IndustryController extends Controller
     /**
      * Display the Vue version of the view and print page
      *
-     * @return \Inertia\Response
+     * @return \Inertia\Response|\Illuminate\Http\JsonResponse
      */
     public function vueViewAndPrint()
     {

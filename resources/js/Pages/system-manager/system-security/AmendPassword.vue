@@ -15,7 +15,7 @@
                     <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
                         <form @submit.prevent="searchUser" class="space-y-4">
                             <div>
-                                <label for="search_user_id" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <label for="search_user_id" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                     <SearchIcon class="h-5 w-5 text-gray-500 mr-2" />
                                     Search by User ID
                                 </label>
@@ -73,7 +73,7 @@
                         
                         <!-- New Password -->
                         <div>
-                            <label for="new_password" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <label for="new_password" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                 <LockClosedIcon class="h-4 w-4 text-gray-500 mr-1" />
                                 New Password
                             </label>
@@ -100,7 +100,7 @@
 
                         <!-- Confirm New Password -->
                         <div>
-                            <label for="new_password_confirmation" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <label for="new_password_confirmation" class="flex items-center text-sm font-medium text-gray-700 mb-2">
                                 <LockClosedIcon class="h-4 w-4 text-gray-500 mr-1" />
                                 Confirm New Password
                             </label>
@@ -143,17 +143,17 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
 import { 
     KeyIcon, 
-    SearchIcon,
+    MagnifyingGlassIcon as SearchIcon,
     UserCircleIcon,
     LockClosedIcon,
-    RefreshIcon,
+    ArrowPathIcon as RefreshIcon,
     ArrowLeftIcon,
     EyeIcon,
-    EyeOffIcon,
+    EyeSlashIcon as EyeOffIcon,
     CheckCircleIcon,
     ExclamationCircleIcon,
     InformationCircleIcon
-} from '@heroicons/vue/outline';
+} from '@heroicons/vue/24/outline';
 
 export default {
     components: {

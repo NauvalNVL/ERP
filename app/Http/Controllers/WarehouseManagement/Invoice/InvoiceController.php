@@ -494,10 +494,14 @@ class InvoiceController extends Controller
     /**
      * Prepare invoices from selected delivery orders
      * Compatible with CPS Enterprise 2020 workflow
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function prepare(Request $request)
+    public function prepare(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
+            /** @var array<string, mixed> $payload */
             $payload = $request->validate([
                 'do_numbers' => 'required|array|min:1',
                 'do_numbers.*' => 'required|string|max:50',
@@ -515,17 +519,27 @@ class InvoiceController extends Controller
             ]);
 
             $now = now();
+            /** @var string $yyyy */
             $yyyy = $request->input('year', $now->format('Y'));
+            /** @var string $mm */
             $mm = $request->input('month', $now->format('m'));
+            /** @var string $invoiceDate */
             $invoiceDate = $payload['invoice_date'] ?? $now->format('d/m/Y');
+            /** @var string|null $taxIndexNo */
             $taxIndexNo = $payload['tax_index_no'] ?? null;
+            /** @var string|null $secondRef */
             $secondRef = $payload['second_ref'] ?? null;
+            /** @var string|null $remark */
             $remark = $payload['remark'] ?? null;
+            /** @var string $invoiceNumberMode */
             $invoiceNumberMode = $payload['invoice_number_mode'] ?? 'auto';
+            /** @var string|null $manualInvoiceNumber */
             $manualInvoiceNumber = $payload['manual_invoice_number'] ?? null;
             
             // ✅ ADDED: Get tax_code and tax_percent from request (already confirmed in Final Screen)
+            /** @var string|null $taxCodeFromFrontend */
             $taxCodeFromFrontend = $payload['tax_code'] ?? null;
+            /** @var float|null $taxPercentFromFrontend */
             $taxPercentFromFrontend = $payload['tax_percent'] ?? null;
 
             Log::info('Invoice Preparation Started', [
@@ -539,92 +553,36 @@ class InvoiceController extends Controller
                 ]
             ]);
 
-            // ✅ PRIORITY 1: Use tax data from frontend (already confirmed by user in Final Screen)
-            $taxCode = $taxCodeFromFrontend;
-            $taxPercent = $taxPercentFromFrontend;
-            
-            if ($taxCode && $taxPercent) {
-                Log::info('✅ Using tax data from Final Screen (user confirmed)', [
-                    'tax_code' => $taxCode,
-                    'tax_percent' => $taxPercent,
-                    'source' => 'frontend_final_screen'
-                ]);
-            }
-            // ✅ PRIORITY 2: Fallback to database lookup if not provided from frontend
-            elseif ($taxIndexNo) {
-                Log::info('⚠️ Tax not provided from frontend, looking up in database', [
-                    'tax_index_no' => $taxIndexNo
-                ]);
-
-                try {
-                    // Try taxrate table first (standard table)
-                    $tax = DB::table('taxrate')
-                        ->where('TAXCODE', $taxIndexNo)
-                        ->first();
-
-                    if ($tax) {
-                        $taxCode = $tax->TAXCODE;
-                        $taxPercent = $tax->RATEPPN;
-                        Log::info('Tax found in taxrate table', [
-                            'code' => $taxCode,
-                            'rate' => $taxPercent,
-                            'source' => 'taxrate_table'
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    Log::warning('taxrate table not accessible: ' . $e->getMessage());
-                }
-
-                // If not found in taxrate, try Sales_Tax table (fallback)
-                if (!$taxCode) {
-                    try {
-                        $tax = DB::table('Sales_Tax')
-                            ->where('tax_code', $taxIndexNo)
-                            ->first();
-
-                        if ($tax) {
-                            $taxCode = $tax->tax_code;
-                            $taxPercent = $tax->tax_rate;
-                            Log::info('Tax found in Sales_Tax table', [
-                                'code' => $taxCode,
-                                'rate' => $taxPercent,
-                                'source' => 'sales_tax_table'
-                            ]);
-                        }
-                    } catch (\Exception $e) {
-                        Log::warning('Sales_Tax table not accessible: ' . $e->getMessage());
-                    }
-                }
-
-                // Final warning if tax not found in database
-                if (!$taxCode) {
-                    Log::warning('❌ Tax code not found in any table', [
-                        'tax_index_no' => $taxIndexNo,
-                        'searched_tables' => ['taxrate', 'Sales_Tax']
-                    ]);
-                }
-            } else {
-                Log::info('ℹ️ No tax information provided (tax-free invoice)');
-            }
+            // Resolve tax information using helper method
+            $taxInfo = $this->resolveTaxInformation($taxCodeFromFrontend, $taxPercentFromFrontend, $taxIndexNo);
+            /** @var string|null $taxCode */
+            $taxCode = $taxInfo['taxCode'];
+            /** @var float|null $taxPercent */
+            $taxPercent = $taxInfo['taxPercent'];
 
             // Get existing invoice count for auto-numbering
+            /** @var int $existingCount */
             $existingCount = (int) DB::table('INV')
                 ->where('YYYY', $yyyy)
                 ->where('MM', $mm)
                 ->count();
 
+            /** @var int $seq */
             $seq = $existingCount + 1;
 
             // Invoice number generator function (CPS format)
-            $generateNumber = function (int $seq) use ($yyyy, $mm) {
+            /** @var \Closure(int): string $generateNumber */
+            $generateNumber = function (int $seq) use ($yyyy, $mm): string {
                 return sprintf('IV-%s%s-%04d', $yyyy, $mm, $seq);
             };
 
+            /** @var array<int, array<string, mixed>> $created */
             $created = [];
 
             DB::beginTransaction();
 
             foreach ($payload['do_numbers'] as $doNumber) {
+                /** @var \stdClass|null $do */
                 $do = DB::table('DO')->where('DO_Num', $doNumber)->first();
 
                 if (!$do) {
@@ -632,12 +590,15 @@ class InvoiceController extends Controller
                 }
 
                 // CPS-Compatible: Check if DO is already fully invoiced by calculating from INV table
+                /** @var float $invoicedQty */
                 $invoicedQty = DB::table('INV')
                     ->where('SO_NUM', $this->getProperty($do, 'SO_Num'))
                     ->where('IV_STS', '!=', 'Cancelled')
                     ->sum('IV_QTY');
                 
+                /** @var float $doQty */
                 $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
+                /** @var float $remainingQty */
                 $remainingQty = $doQty - ($invoicedQty ?? 0);
                 
                 Log::info('DO Invoice Status Check', [
@@ -660,101 +621,26 @@ class InvoiceController extends Controller
                     throw new \RuntimeException("Delivery Order {$doNumber} is cancelled and cannot be invoiced");
                 }
 
-                // Fetch customer payment term from Customer Account table
+                // Fetch customer payment term using helper method
+                /** @var string|null $customerCode */
                 $customerCode = $this->getProperty($do, 'AC_Num');
-                $paymentTerm = 30; // Default: 30 days (initialize first!)
-                
-                if ($customerCode) {
-                    // Try CUSTOMER table first (has TERM column as decimal - days)
-                    try {
-                        $customer = DB::table('CUSTOMER')
-                            ->where('CODE', $customerCode)
-                            ->first();
-                        
-                        if ($customer && isset($customer->TERM) && $customer->TERM > 0) {
-                            // TERM is decimal (number of days), cast to INT for INV table
-                            $paymentTerm = (int) round($customer->TERM); // Explicit INT cast
-                            
-                            Log::info('✅ Payment term found in CUSTOMER table', [
-                                'customer' => $customerCode,
-                                'term_days' => $paymentTerm,
-                                'original_value' => $customer->TERM
-                            ]);
-                        } else {
-                            Log::warning('⚠️ Customer found but TERM is NULL or 0', [
-                                'customer' => $customerCode,
-                                'term_value' => $customer->TERM ?? 'NULL'
-                            ]);
-                        }
-                    } catch (\Exception $e) {
-                        Log::error('❌ CUSTOMER table access failed', [
-                            'error' => $e->getMessage(),
-                            'customer' => $customerCode
-                        ]);
-                    }
-                    
-                    // Log final payment term value
-                    Log::info('💰 Final payment term for invoice', [
-                        'customer' => $customerCode,
-                        'payment_term' => $paymentTerm,
-                        'type' => gettype($paymentTerm)
-                    ]);
-                }
+                /** @var int $paymentTerm */
+                $paymentTerm = $this->getCustomerPaymentTerm($customerCode);
 
-                // Generate or use manual invoice number
-                if ($invoiceNumberMode === 'manual' && $manualInvoiceNumber) {
-                    $ivNum = $manualInvoiceNumber;
+                // Generate or use manual invoice number using helper method
+                /** @var string $ivNum */
+                $ivNum = $this->generateInvoiceNumber($invoiceNumberMode, $manualInvoiceNumber, $generateNumber, $seq);
 
-                    // Validate manual number uniqueness
-                    $exists = DB::table('INV')->where('IV_NUM', $ivNum)->exists();
-                    if ($exists) {
-                        throw new \RuntimeException("Invoice number '{$ivNum}' already exists. Please choose a different number.");
-                    }
-
-                    Log::info('Using manual invoice number', ['number' => $ivNum]);
-                } else {
-                    // Auto-generate invoice number (CPS format)
-                    $ivNum = $generateNumber($seq++);
-
-                    // Double-check uniqueness (safety)
-                    while (DB::table('INV')->where('IV_NUM', $ivNum)->exists()) {
-                        $ivNum = $generateNumber($seq++);
-                    }
-
-                    Log::info('Generated auto invoice number', ['number' => $ivNum]);
-                }
-
-                // Calculate amounts (with proper decimal handling)
-                $tranAmount = $this->toDecimalOrNull($this->getProperty($do, 'DO_Tran_Amt'), 0);
-                $baseAmount = $this->toDecimalOrNull($this->getProperty($do, 'DO_Base_Amt'), 0);
-                
-                // If DO_Tran_Amt is 0, calculate from DO_Qty * SO_Unit_Price
-                if ($tranAmount == 0) {
-                    $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
-                    $unitPrice = $this->toDecimalOrNull($this->getProperty($do, 'SO_Unit_Price'), 0);
-                    $exRate = $this->toDecimalOrNull($this->getProperty($do, 'Ex_Rate'), 1);
-                    
-                    if ($doQty > 0 && $unitPrice > 0) {
-                        $tranAmount = round($doQty * $unitPrice, 2);
-                        $baseAmount = round($tranAmount * $exRate, 2);
-                        
-                        Log::info('Calculated amounts from DO_Qty × Unit_Price', [
-                            'do_qty' => $doQty,
-                            'unit_price' => $unitPrice,
-                            'ex_rate' => $exRate,
-                            'calculated_tran_amt' => $tranAmount,
-                            'calculated_base_amt' => $baseAmount
-                        ]);
-                    }
-                }
-
-                // Calculate tax amount if applicable
-                $taxAmount = 0;
-                if ($taxPercent && $tranAmount > 0) {
-                    $taxAmount = round($tranAmount * ($taxPercent / 100), 2);
-                }
-
-                $netAmount = $tranAmount + $taxAmount;
+                // Calculate amounts using helper method
+                $amounts = $this->calculateInvoiceAmounts($do, $taxPercent);
+                /** @var float $tranAmount */
+                $tranAmount = $amounts['tranAmount'];
+                /** @var float $baseAmount */
+                $baseAmount = $amounts['baseAmount'];
+                /** @var float $taxAmount */
+                $taxAmount = $amounts['taxAmount'];
+                /** @var float $netAmount */
+                $netAmount = $amounts['netAmount'];
 
                 Log::info('Inserting invoice with amounts', [
                     'tranAmount' => $tranAmount,
@@ -2064,6 +1950,211 @@ class InvoiceController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Resolve tax information from frontend or database
+     * 
+     * @param string|null $taxCodeFromFrontend
+     * @param float|null $taxPercentFromFrontend
+     * @param string|null $taxIndexNo
+     * @return array{taxCode: string|null, taxPercent: float|null}
+     */
+    private function resolveTaxInformation(?string $taxCodeFromFrontend, ?float $taxPercentFromFrontend, ?string $taxIndexNo): array
+    {
+        /** @var string|null $taxCode */
+        $taxCode = $taxCodeFromFrontend;
+        /** @var float|null $taxPercent */
+        $taxPercent = $taxPercentFromFrontend;
+        
+        if ($taxCode && $taxPercent) {
+            Log::info('✅ Using tax data from Final Screen (user confirmed)', [
+                'tax_code' => $taxCode,
+                'tax_percent' => $taxPercent,
+                'source' => 'frontend_final_screen'
+            ]);
+            return ['taxCode' => $taxCode, 'taxPercent' => $taxPercent];
+        }
+        
+        if ($taxIndexNo) {
+            Log::info('⚠️ Tax not provided from frontend, looking up in database', [
+                'tax_index_no' => $taxIndexNo
+            ]);
+
+            // Try taxrate table first
+            try {
+                $tax = DB::table('taxrate')->where('TAXCODE', $taxIndexNo)->first();
+                if ($tax) {
+                    $taxCode = $tax->TAXCODE;
+                    $taxPercent = $tax->RATEPPN;
+                    Log::info('Tax found in taxrate table', [
+                        'code' => $taxCode,
+                        'rate' => $taxPercent,
+                        'source' => 'taxrate_table'
+                    ]);
+                    return ['taxCode' => $taxCode, 'taxPercent' => $taxPercent];
+                }
+            } catch (\Exception $e) {
+                Log::warning('taxrate table not accessible: ' . $e->getMessage());
+            }
+
+            // Fallback to Sales_Tax table
+            try {
+                $tax = DB::table('Sales_Tax')->where('tax_code', $taxIndexNo)->first();
+                if ($tax) {
+                    $taxCode = $tax->tax_code;
+                    $taxPercent = $tax->tax_rate;
+                    Log::info('Tax found in Sales_Tax table', [
+                        'code' => $taxCode,
+                        'rate' => $taxPercent,
+                        'source' => 'sales_tax_table'
+                    ]);
+                    return ['taxCode' => $taxCode, 'taxPercent' => $taxPercent];
+                }
+            } catch (\Exception $e) {
+                Log::warning('Sales_Tax table not accessible: ' . $e->getMessage());
+            }
+
+            Log::warning('❌ Tax code not found in any table', [
+                'tax_index_no' => $taxIndexNo,
+                'searched_tables' => ['taxrate', 'Sales_Tax']
+            ]);
+        } else {
+            Log::info('ℹ️ No tax information provided (tax-free invoice)');
+        }
+        
+        return ['taxCode' => null, 'taxPercent' => null];
+    }
+
+    /**
+     * Get customer payment term from database
+     * 
+     * @param string|null $customerCode
+     * @return int
+     */
+    private function getCustomerPaymentTerm(?string $customerCode): int
+    {
+        /** @var int $paymentTerm */
+        $paymentTerm = 30; // Default: 30 days
+        
+        if (!$customerCode) {
+            return $paymentTerm;
+        }
+
+        try {
+            $customer = DB::table('CUSTOMER')->where('CODE', $customerCode)->first();
+            
+            if ($customer && isset($customer->TERM) && $customer->TERM > 0) {
+                $paymentTerm = (int) round($customer->TERM);
+                
+                Log::info('✅ Payment term found in CUSTOMER table', [
+                    'customer' => $customerCode,
+                    'term_days' => $paymentTerm,
+                    'original_value' => $customer->TERM
+                ]);
+            } else {
+                Log::warning('⚠️ Customer found but TERM is NULL or 0', [
+                    'customer' => $customerCode,
+                    'term_value' => $customer->TERM ?? 'NULL'
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('❌ CUSTOMER table access failed', [
+                'error' => $e->getMessage(),
+                'customer' => $customerCode
+            ]);
+        }
+        
+        Log::info('💰 Final payment term for invoice', [
+            'customer' => $customerCode,
+            'payment_term' => $paymentTerm,
+            'type' => gettype($paymentTerm)
+        ]);
+        
+        return $paymentTerm;
+    }
+
+    /**
+     * Generate or validate invoice number
+     * 
+     * @param string $mode
+     * @param string|null $manualNumber
+     * @param callable $generator
+     * @param int $seq
+     * @return string
+     */
+    private function generateInvoiceNumber(string $mode, ?string $manualNumber, callable $generator, int &$seq): string
+    {
+        if ($mode === 'manual' && $manualNumber) {
+            $exists = DB::table('INV')->where('IV_NUM', $manualNumber)->exists();
+            if ($exists) {
+                throw new \RuntimeException("Invoice number '{$manualNumber}' already exists. Please choose a different number.");
+            }
+            Log::info('Using manual invoice number', ['number' => $manualNumber]);
+            return $manualNumber;
+        }
+
+        // Auto-generate
+        /** @var string $ivNum */
+        $ivNum = $generator($seq++);
+        
+        while (DB::table('INV')->where('IV_NUM', $ivNum)->exists()) {
+            $ivNum = $generator($seq++);
+        }
+        
+        Log::info('Generated auto invoice number', ['number' => $ivNum]);
+        return $ivNum;
+    }
+
+    /**
+     * Calculate invoice amounts
+     * 
+     * @param \stdClass $do
+     * @param float|null $taxPercent
+     * @return array{tranAmount: float, baseAmount: float, taxAmount: float, netAmount: float}
+     */
+    private function calculateInvoiceAmounts(\stdClass $do, ?float $taxPercent): array
+    {
+        /** @var float $tranAmount */
+        $tranAmount = $this->toDecimalOrNull($this->getProperty($do, 'DO_Tran_Amt'), 0);
+        /** @var float $baseAmount */
+        $baseAmount = $this->toDecimalOrNull($this->getProperty($do, 'DO_Base_Amt'), 0);
+        
+        // Calculate from DO_Qty * Unit_Price if DO_Tran_Amt is 0
+        if ($tranAmount == 0) {
+            $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
+            $unitPrice = $this->toDecimalOrNull($this->getProperty($do, 'SO_Unit_Price'), 0);
+            $exRate = $this->toDecimalOrNull($this->getProperty($do, 'Ex_Rate'), 1);
+            
+            if ($doQty > 0 && $unitPrice > 0) {
+                $tranAmount = round($doQty * $unitPrice, 2);
+                $baseAmount = round($tranAmount * $exRate, 2);
+                
+                Log::info('Calculated amounts from DO_Qty × Unit_Price', [
+                    'do_qty' => $doQty,
+                    'unit_price' => $unitPrice,
+                    'ex_rate' => $exRate,
+                    'calculated_tran_amt' => $tranAmount,
+                    'calculated_base_amt' => $baseAmount
+                ]);
+            }
+        }
+
+        /** @var float $taxAmount */
+        $taxAmount = 0;
+        if ($taxPercent && $tranAmount > 0) {
+            $taxAmount = round($tranAmount * ($taxPercent / 100), 2);
+        }
+
+        /** @var float $netAmount */
+        $netAmount = $tranAmount + $taxAmount;
+
+        return [
+            'tranAmount' => $tranAmount,
+            'baseAmount' => $baseAmount,
+            'taxAmount' => $taxAmount,
+            'netAmount' => $netAmount
+        ];
     }
 
 }

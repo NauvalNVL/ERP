@@ -525,7 +525,7 @@ Route::get('/debug/so-table', function() {
 });
 
 // Debug route to test sales order data directly
-Route::get('/debug/sales-orders', function(\Illuminate\Http\Request $request) {
+Route::get('/debug/sales-orders', function(Request $request) {
 while (ob_get_level()) {
 ob_end_clean();
 }
@@ -1164,7 +1164,7 @@ return response()->json($periods);
 }
 });
 
-Route::get('sku-suggestions-fallback', function(\Illuminate\Http\Request $request) {
+Route::get('sku-suggestions-fallback', function(Request $request) {
 try {
 $search = $request->query('search', '');
 
@@ -1183,7 +1183,7 @@ return response()->json([]);
 }
 });
 
-Route::post('copy-reorder-levels-fallback', function(\Illuminate\Http\Request $request) {
+Route::post('copy-reorder-levels-fallback', function(Request $request) {
 try {
 $request->validate([
 'source_sku_id' => 'required|exists:mm_skus,sku',
@@ -1192,7 +1192,7 @@ $request->validate([
 'target_period' => 'required|string|max:7',
 ]);
 
-\Illuminate\Support\Facades\DB::beginTransaction();
+DB::beginTransaction();
 
 // Get source reorder level
 $sourceLevel = \App\Models\SkuReorderLevel::where('sku_id', $request->source_sku_id)
@@ -1213,7 +1213,7 @@ $targetLevel = \App\Models\SkuReorderLevel::updateOrCreate([
 'reorder_level' => $sourceLevel->reorder_level,
 ]);
 
-\Illuminate\Support\Facades\DB::commit();
+DB::commit();
 
 return response()->json([
 'success' => true,
@@ -1222,7 +1222,7 @@ return response()->json([
 ]);
 
 } catch (\Exception $e) {
-\Illuminate\Support\Facades\DB::rollBack();
+DB::rollBack();
 return response()->json(['error' => 'Failed to copy reorder levels: ' . $e->getMessage()], 500);
 }
 });

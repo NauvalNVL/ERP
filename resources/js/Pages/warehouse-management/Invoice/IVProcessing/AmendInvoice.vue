@@ -58,7 +58,7 @@
                 </h4>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                     <div>
-                        <label class="block text-gray-600 mb-1 flex items-center gap-1">
+                        <label class="flex items-center gap-1 text-gray-600 mb-1">
                             <i class="fas fa-calendar-alt text-xs"></i>
                             Current Period
                         </label>
@@ -66,7 +66,7 @@
                                class="w-full border-gray-300 rounded-md bg-white px-3 py-2 text-gray-700 font-medium cursor-not-allowed" />
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-gray-600 mb-1 flex items-center gap-1">
+                        <label class="flex items-center gap-1 text-gray-600 mb-1">
                             <i class="fas fa-file-invoice text-xs"></i>
                             Invoice#
                         </label>
@@ -75,7 +75,7 @@
                     </div>
                 </div>
                 <div class="mt-3">
-                    <label class="block text-gray-600 mb-1 flex items-center gap-1">
+                    <label class="flex items-center gap-1 text-gray-600 mb-1">
                         <i class="fas fa-user-tie text-xs"></i>
                         Customer
                     </label>

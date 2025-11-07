@@ -279,12 +279,19 @@ Result = (1,080,000 / 1,000,000) / 4 = 0.27 m²
 5. **Audit Trail:** Calculated values stored in database
 6. **Reporting:** M² values available for cost analysis
 
+## Related Calculations
+
+This M² calculation is also used as input for:
+- **MC_GROSS_KG_PER_SET**: Calculates material weight based on M², paper GSM, and flute ratios
+- See: `MC_GROSS_KG_PER_SET_CALCULATION.md` for details
+
 ## Related Files
 
 - **Frontend Component:** `resources/js/Components/UpdateMcModal.vue`
 - **Backend Controller:** `app/Http/Controllers/UpdateMcController.php`
 - **Database Migration:** `database/migrations/2025_09_30_000000_create_mc_table.php`
 - **Parent Page:** `resources/js/Pages/sales-management/system-requirement/master-card/update-mc.vue`
+- **Related Documentation:** `MC_GROSS_KG_PER_SET_CALCULATION.md`
 
 ## Summary
 

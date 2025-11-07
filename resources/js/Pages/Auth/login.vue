@@ -84,7 +84,7 @@
 import { useForm, router } from '@inertiajs/vue3';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import { EyeIcon, EyeOffIcon } from '@heroicons/vue/outline';
+import { EyeIcon, EyeSlashIcon as EyeOffIcon } from '@heroicons/vue/24/outline';
 
 const isLoading = ref(false);
 const showPassword = ref(false);

@@ -200,7 +200,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { XIcon } from '@heroicons/vue/outline'
+import { XMarkIcon as XIcon } from '@heroicons/vue/24/outline'
 
 const props = defineProps({
   open: { type: Boolean, default: false },
