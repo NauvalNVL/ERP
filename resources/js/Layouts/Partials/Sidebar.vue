@@ -285,6 +285,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Color Group': 'define_color_group',
     'Define Color': 'define_color',
     'Define Finishing': 'define_finishing',
+    'Define Analysis Code': 'define_analysis_code',
 
     // Sales Management - Customer Account
     'Define Customer Group': 'define_customer_group',
@@ -328,6 +329,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Color Group': 'define_color_group',
     'Define Color': 'define_color',
     'Define Finishing': 'define_finishing',
+    'Define Analysis Code': 'define_analysis_code',
     'Define Stitch Wire': 'define_stitch_wire',
     'Define Chemical Coat': 'define_chemical_coat',
     'Define Reinforcement Tape': 'define_reinforcement_tape',
@@ -569,6 +571,7 @@ const salesManagementItems = [
           { title: 'Define Color Group', icon: 'fas fa-palette', route: '/color-group' },
           { title: 'Define Color', icon: 'fas fa-fill-drip', route: '/color' },
           { title: 'Define Finishing', icon: 'fas fa-paint-roller', route: '/finishing' },
+          { title: 'Define Analysis Code', icon: 'fas fa-code-branch', route: '/analysis-code' },
           { title: 'Define Stitch Wire', icon: 'fas fa-paperclip', route: '/stitch-wire' },
           { title: 'Define Chemical Coat', icon: 'fas fa-vial', route: '/chemical-coat' },
           { title: 'Define Reinforcement Tape', icon: 'fas fa-tape', route: '/reinforcement-tape' },

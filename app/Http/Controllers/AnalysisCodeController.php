@@ -5,59 +5,192 @@ namespace App\Http\Controllers;
 use App\Models\AnalysisCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class AnalysisCodeController extends Controller
 {
+    /**
+     * Display the analysis code management page
+     */
     public function index()
     {
-        // Use the MmAnalysisCode model instead since that's what exists in the database
-        $analysisCodes = \App\Models\MmAnalysisCode::all();
-        return response()->json($analysisCodes);
+        $analysisCodes = AnalysisCode::orderBy('analysis_code')->get();
+        
+        return Inertia::render('sales-management/system-requirement/standard-requirement/AnalysisCode', [
+            'analysisCodes' => $analysisCodes
+        ]);
     }
 
+    /**
+     * Get all analysis codes (API)
+     */
+    public function apiIndex()
+    {
+        try {
+            $analysisCodes = AnalysisCode::orderBy('analysis_code')->get();
+            return response()->json($analysisCodes);
+        } catch (\Exception $e) {
+            Log::error('Error fetching analysis codes', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Failed to fetch analysis codes'], 500);
+        }
+    }
+
+    /**
+     * Get a specific analysis code (API)
+     */
     public function show($code)
     {
-        $analysisCode = \App\Models\MmAnalysisCode::where('code', $code)->first();
-        if (!$analysisCode) {
-            return response()->json(['message' => 'Not found'], 404);
+        try {
+            $analysisCode = AnalysisCode::find($code);
+            
+            if (!$analysisCode) {
+                return response()->json(['message' => 'Analysis code not found'], 404);
+            }
+            
+            return response()->json($analysisCode);
+        } catch (\Exception $e) {
+            Log::error('Error fetching analysis code', ['code' => $code, 'error' => $e->getMessage()]);
+            return response()->json(['error' => 'Failed to fetch analysis code'], 500);
         }
-        return response()->json($analysisCode);
     }
 
+    /**
+     * Store a new analysis code (API)
+     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'code' => 'required|string|unique:mm_analysis_codes,code',
-            'name' => 'required|string',
-            'group' => 'required|string',
-            'group2' => 'required|string',
-        ]);
-        $analysisCode = \App\Models\MmAnalysisCode::create($validated);
-        return response()->json($analysisCode, 201);
+        try {
+            $validated = $request->validate([
+                'analysis_code' => 'required|string|max:50|unique:analysis_codes,analysis_code',
+                'analysis_name' => 'required|string|max:255',
+                'analysis_group' => 'required|string|max:50',
+                'analysis_group2' => 'required|string|max:50',
+            ]);
+
+            // Validate business rules
+            $this->validateAnalysisGroupRules($validated['analysis_group'], $validated['analysis_group2']);
+
+            $analysisCode = AnalysisCode::create($validated);
+
+            Log::info('Analysis code created', ['code' => $analysisCode->analysis_code]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Analysis code created successfully',
+                'data' => $analysisCode
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error creating analysis code', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
+    /**
+     * Update an existing analysis code (API)
+     */
     public function update(Request $request, $code)
     {
-        $analysisCode = \App\Models\MmAnalysisCode::where('code', $code)->first();
-        if (!$analysisCode) {
-            return response()->json(['message' => 'Not found'], 404);
+        try {
+            $analysisCode = AnalysisCode::find($code);
+            
+            if (!$analysisCode) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Analysis code not found'
+                ], 404);
+            }
+
+            $validated = $request->validate([
+                'analysis_name' => 'required|string|max:255',
+                'analysis_group' => 'required|string|max:50',
+                'analysis_group2' => 'required|string|max:50',
+            ]);
+
+            // Validate business rules
+            $this->validateAnalysisGroupRules($validated['analysis_group'], $validated['analysis_group2']);
+
+            $analysisCode->update($validated);
+
+            Log::info('Analysis code updated', ['code' => $code]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Analysis code updated successfully',
+                'data' => $analysisCode
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error updating analysis code', ['code' => $code, 'error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'group' => 'required|string',
-            'group2' => 'required|string',
-        ]);
-        $analysisCode->update($validated);
-        return response()->json($analysisCode);
     }
 
+    /**
+     * Delete an analysis code (API)
+     */
     public function destroy($code)
     {
-        $analysisCode = \App\Models\MmAnalysisCode::where('code', $code)->first();
-        if (!$analysisCode) {
-            return response()->json(['message' => 'Not found'], 404);
+        try {
+            $analysisCode = AnalysisCode::find($code);
+            
+            if (!$analysisCode) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Analysis code not found'
+                ], 404);
+            }
+
+            $analysisCode->delete();
+
+            Log::info('Analysis code deleted', ['code' => $code]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Analysis code deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting analysis code', ['code' => $code, 'error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete analysis code'
+            ], 500);
         }
-        $analysisCode->delete();
-        return response()->json(['message' => 'Deleted']);
+    }
+
+    /**
+     * Validate business rules for Analysis Group 2
+     * 
+     * 'AM', 'CM', 'CL' & 'UN' of Analysis Group 2 are only applied to Analysis Group = 'SD'
+     */
+    private function validateAnalysisGroupRules($group, $group2)
+    {
+        $sdOnlyGroups = ['AM', 'CM', 'CL', 'UN'];
+        $mcOnlyGroups = ['CS', 'RS'];
+
+        if (in_array($group2, $sdOnlyGroups) && $group !== 'SD') {
+            throw new \Exception("Analysis Group2 '{$group2}' can only be used with Analysis Group 'SD-Sales Order'");
+        }
+
+        if (in_array($group2, $mcOnlyGroups) && $group !== 'MC') {
+            throw new \Exception("Analysis Group2 '{$group2}' can only be used with Analysis Group 'MC-Master Card'");
+        }
     }
 }

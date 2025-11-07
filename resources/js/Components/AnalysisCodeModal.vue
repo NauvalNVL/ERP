@@ -32,20 +32,23 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-blue-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Code</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer" @click="sortTable('analysis_code')">Analysis Code</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer" @click="sortTable('analysis_name')">Analysis Name</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Group</th>
-                                    <th scope="col" class="relative px-6 py-3"><span class="sr-only">Select</span></th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Group2</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="code in filteredAnalysisCodes" :key="code.code" @click="selectAnalysisCode(code)" class="hover:bg-blue-50 cursor-pointer transition-colors duration-150">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ code.code }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.group }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button @click.stop="selectAnalysisCode(code)" class="text-blue-600 hover:text-blue-900 font-semibold transition-colors duration-150">Select</button>
+                                <tr v-for="code in filteredAnalysisCodes" :key="code.analysis_code"
+                                    :class="['hover:bg-blue-50 cursor-pointer transition-colors duration-150', selectedCode && selectedCode.analysis_code === code.analysis_code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
+                                    @click="selectRow(code)"
+                                    @dblclick="selectAndClose(code)">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ code.analysis_code }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.analysis_name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ code.analysis_group }}</span>
                                     </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.analysis_group2 }}</td>
                                 </tr>
                                 <tr v-if="filteredAnalysisCodes.length === 0">
                                     <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No analysis codes found.</td>
@@ -55,14 +58,18 @@
                     </div>
                 </div>
                 <!-- Modal footer -->
-                <div class="flex items-center justify-end p-6 bg-gray-50 border-t border-solid border-gray-200 rounded-b-xl">
-                    <button 
-                        class="text-gray-700 bg-gray-200 hover:bg-gray-300 font-bold uppercase px-6 py-2 text-sm rounded-lg shadow hover:shadow-md outline-none focus:outline-none mr-3 transition-all duration-150"
-                        type="button"
-                        @click="$emit('close')"
-                    >
-                        Exit
-                    </button>
+                <div class="p-6 bg-gray-50 border-t border-solid border-gray-200 rounded-b-xl">
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" @click="sortTable('analysis_code')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+                            <i class="fas fa-sort mr-1"></i>By Code
+                        </button>
+                        <button type="button" @click="selectAndClose(selectedCode)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
+                            <i class="fas fa-edit mr-1"></i>Select
+                        </button>
+                        <button type="button" @click="$emit('close')" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
+                            <i class="fas fa-times mr-1"></i>Exit
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -71,106 +78,72 @@
 </template>
 
 <script setup>
-import { ref, watch, computed, onMounted } from 'vue';
-import debounce from 'lodash/debounce';
-import axios from 'axios';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
-    show: {
-        type: Boolean,
-        default: false,
-    },
-    group: {
-        type: String,
-        default: null,
-    },
+    show: Boolean,
+    analysisCodes: {
+        type: Array,
+        default: () => []
+    }
 });
 
-const emits = defineEmits(['close', 'select-analysis-code']);
+const emit = defineEmits(['close', 'select', 'refresh']);
 
 const searchQuery = ref('');
-const analysisCodes = ref([]); // Data yang fetched dari API
-const rawAnalysisCodes = ref([]); // Menyimpan data asli yang belum difilter
-
-const fetchAnalysisCodes = async (group = null) => {
-    try {
-        console.log('Fetching analysis codes with group:', group);
-        let url = '/api/material-management/analysis-codes';
-        if (group) {
-            url += `?group=${encodeURIComponent(group)}`;
-        }
-        console.log('API URL:', url);
-        const response = await axios.get(url);
-        console.log('API Response:', response.data);
-        // Ensure we're handling the response correctly
-        const data = Array.isArray(response.data) ? response.data : [];
-        rawAnalysisCodes.value = data; // Simpan data asli
-        analysisCodes.value = data; // Awalnya, data yang ditampilkan sama dengan data asli
-        console.log('Analysis codes loaded:', data.length);
-    } catch (error) {
-        console.error('Error fetching analysis codes:', error);
-        rawAnalysisCodes.value = [];
-        analysisCodes.value = [];
-    }
-};
+const selectedCode = ref(null);
+const sortKey = ref('analysis_code');
+const sortAsc = ref(true);
 
 const filteredAnalysisCodes = computed(() => {
-    if (!searchQuery.value) {
-        return analysisCodes.value;
-    }
-    const query = searchQuery.value.toLowerCase();
-    return analysisCodes.value.filter(code => 
-        (code.code && code.code.toLowerCase().includes(query)) || 
-        (code.name && code.name.toLowerCase().includes(query))
-    );
-});
-
-const selectAnalysisCode = (code) => {
-    // Ensure we're passing the correct data structure
-    const analysisCodeData = {
-        code: code.code,
-        name: code.name,
-        group: code.group
-    };
-    console.log('Selecting analysis code:', analysisCodeData);
-    emits('select-analysis-code', analysisCodeData);
-    emits('close');
-};
-
-const applySearchFilter = () => {
-    if (!searchQuery.value) {
-        analysisCodes.value = rawAnalysisCodes.value; // Reset ke data asli jika search kosong
-    } else {
+    let filtered = props.analysisCodes || [];
+    
+    // Apply search filter
+    if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        analysisCodes.value = rawAnalysisCodes.value.filter(code => 
-            (code.code && code.code.toLowerCase().includes(query)) || 
-            (code.name && code.name.toLowerCase().includes(query))
+        filtered = filtered.filter(code => 
+            code.analysis_code?.toLowerCase().includes(query) ||
+            code.analysis_name?.toLowerCase().includes(query) ||
+            code.analysis_group?.toLowerCase().includes(query) ||
+            code.analysis_group2?.toLowerCase().includes(query)
         );
     }
+    
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+        const aVal = a[sortKey.value] || '';
+        const bVal = b[sortKey.value] || '';
+        
+        if (sortAsc.value) {
+            return aVal.toString().localeCompare(bVal.toString());
+        } else {
+            return bVal.toString().localeCompare(aVal.toString());
+        }
+    });
+    
+    return sorted;
+});
+
+const sortTable = (key) => {
+    if (sortKey.value === key) {
+        sortAsc.value = !sortAsc.value;
+    } else {
+        sortKey.value = key;
+        sortAsc.value = true;
+    }
 };
 
-const debouncedSearch = debounce(applySearchFilter, 300); // Debounce search by 300ms
+const selectRow = (code) => {
+    selectedCode.value = code;
+};
 
-// Fetch data when component is mounted and shown
-onMounted(() => {
-    if (props.show) {
-        fetchAnalysisCodes(props.group);
+const selectAndClose = (code) => {
+    if (!code) {
+        return;
     }
-});
-
-watch(() => props.show, (newValue) => {
-    if (newValue) {
-        fetchAnalysisCodes(props.group);
-        searchQuery.value = ''; // Reset search query when modal opens
-    }
-});
-
-watch(() => props.group, (newGroup) => {
-    if (props.show) {
-        fetchAnalysisCodes(newGroup);
-    }
-});
-
+    emit('select', code);
+    emit('close');
+};
 </script>
 
 <style scoped>

@@ -21,6 +21,7 @@ use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\StitchWireController;
 use App\Http\Controllers\ColorGroupController;
+use App\Http\Controllers\AnalysisCodeController;
 use App\Http\Controllers\ChemicalCoatController;
 use App\Http\Controllers\ReinforcementTapeController;
 use App\Http\Controllers\BundlingStringController;
@@ -169,6 +170,13 @@ Route::post('/color-groups', [ColorGroupController::class, 'store']);
 Route::put('/color-groups/{code}', [ColorGroupController::class, 'update']);
 Route::delete('/color-groups/{code}', [ColorGroupController::class, 'destroy']);
 Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
+
+// Analysis Code API routes
+Route::get('/analysis-codes', [AnalysisCodeController::class, 'apiIndex']);
+Route::get('/analysis-codes/{code}', [AnalysisCodeController::class, 'show']);
+Route::post('/analysis-codes', [AnalysisCodeController::class, 'store']);
+Route::put('/analysis-codes/{code}', [AnalysisCodeController::class, 'update']);
+Route::delete('/analysis-codes/{code}', [AnalysisCodeController::class, 'destroy']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 return $request->user();

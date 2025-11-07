@@ -128,23 +128,17 @@
                 <input 
                   v-model="lastSOOrder.prefix" 
                   type="text" 
-                  class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
-                  readonly
-                  disabled
+                  class="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                 <input 
                   v-model="lastSOOrder.year" 
                   type="number" 
-                  class="w-20 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
-                  readonly
-                  disabled
+                  class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                 <input 
                   v-model="lastSOOrder.number" 
                   type="number" 
-                  class="w-24 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
-                  readonly
-                  disabled
+                  class="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                 </div>
               </div>
@@ -714,7 +708,7 @@ const orderDetails = reactive({
     name: ''
   },
   currency: 'IDR',
-  exchangeRate: 0.000000,
+  exchangeRate: 1,
   exchangeMethod: 'N/A',
   customerPOrder: '',
   pOrderDate: new Date().toISOString().split('T')[0],
