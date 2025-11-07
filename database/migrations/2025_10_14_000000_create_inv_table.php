@@ -93,19 +93,22 @@ return new class extends Migration
             $table->string('CANCELLED_REASON_1', 100)->nullable();
             $table->string('cANCELLED_REASON_2', 100)->nullable();
 
-            // Audit fields
-            $table->string('NW_UID', 50)->nullable();
+            // Audit fields - User IDs (references usercps.userID)
+            $table->string('NW_UID', 50)->nullable()->comment('New/Created by User ID');
             $table->string('NW_DATE', 50)->nullable();
             $table->string('NW_TIME', 50)->nullable();
-            $table->string('AM_UID', 50)->nullable();
+            $table->string('AM_UID', 50)->nullable()->comment('Amended by User ID');
             $table->string('AM_DATE', 50)->nullable();
             $table->string('AM_TIME', 50)->nullable();
-            $table->string('CX_UID', 50)->nullable();
+            $table->string('CX_UID', 50)->nullable()->comment('Cancelled by User ID');
             $table->string('CX_DATE', 50)->nullable();
             $table->string('CX_TIME', 50)->nullable();
-            $table->string('PT_UID', 50)->nullable();
+            $table->string('PT_UID', 50)->nullable()->comment('Printed by User ID');
             $table->string('PT_DATE', 50)->nullable();
             $table->string('PT_TIME', 50)->nullable();
+
+            // Note: Foreign keys not added because usercps.userID is not a primary key
+            // Relationships are handled via Eloquent (Invoice->createdByUser(), etc.)
 
             // Date surrogate keys
             $table->integer('IVDateSK')->nullable();

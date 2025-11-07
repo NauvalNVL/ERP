@@ -13,6 +13,141 @@ use App\Models\Customer;
 class InvoiceController extends Controller
 {
     /**
+     * Get current date/time in WIB timezone (UTC+7)
+     * 
+     * @return \Carbon\Carbon
+     */
+    private function getNowWib()
+    {
+        return now()->timezone('Asia/Jakarta'); // WIB = UTC+7
+    }
+
+    /**
+     * Calculate tax amount from invoice data (on-the-fly calculation)
+     * 
+     * @param object $invoice
+     * @return float
+     */
+    private function calculateTaxAmount($invoice)
+    {
+        $tranAmount = (float)($invoice->IV_TRAN_AMT ?? 0);
+        $taxPercent = (float)($invoice->IV_TAX_PERCENT ?? 0);
+        
+        if ($tranAmount > 0 && $taxPercent > 0) {
+            return round($tranAmount * ($taxPercent / 100), 2);
+        }
+        
+        return 0;
+    }
+
+    /**
+     * Calculate net amount from invoice data (on-the-fly calculation)
+     * 
+     * @param object $invoice
+     * @return float
+     */
+    private function calculateNetAmount($invoice)
+    {
+        $tranAmount = (float)($invoice->IV_TRAN_AMT ?? 0);
+        $taxAmount = $this->calculateTaxAmount($invoice);
+        
+        return $tranAmount + $taxAmount;
+    }
+
+    /**
+     * Get current authenticated user ID for audit trail
+     * Returns userID from UserCps model or null
+     * 
+     * @return string|null
+     */
+    private function getCurrentUserId()
+    {
+        try {
+            Log::info('🔍 getCurrentUserId() called - Starting user ID retrieval');
+
+            if (!Auth::check()) {
+                Log::warning('❌ User not authenticated for audit trail');
+                return null;
+            }
+
+            Log::info('✅ Auth::check() passed');
+
+            $user = Auth::user();
+            
+            if (!$user) {
+                Log::warning('❌ Auth::user() returned null');
+                return null;
+            }
+
+            Log::info('✅ Auth::user() returned user object', [
+                'class' => get_class($user)
+            ]);
+
+            // Try to get userID property from UserCps model
+            $userId = null;
+            $method = null;
+            
+            // Priority 1: Direct property access
+            if (isset($user->userID) && !empty($user->userID)) {
+                $userId = $user->userID;
+                $method = 'userID property';
+                Log::info('✅ Found via userID property', ['value' => $userId]);
+            } 
+            // Priority 2: Alternative naming
+            elseif (isset($user->user_id) && !empty($user->user_id)) {
+                $userId = $user->user_id;
+                $method = 'user_id property';
+                Log::info('✅ Found via user_id property', ['value' => $userId]);
+            } 
+            // Priority 3: Check NO_ as fallback
+            elseif (isset($user->NO_) && !empty($user->NO_)) {
+                $userId = $user->NO_;
+                $method = 'NO_ property (fallback)';
+                Log::info('⚠️ Found via NO_ fallback', ['value' => $userId]);
+            }
+
+            // ✅ Fallback: Try Auth::id() if userID property not found
+            if (empty($userId)) {
+                $authId = Auth::id();
+                if ($authId) {
+                    $userId = (string) $authId;
+                    $method = 'Auth::id() fallback';
+                    Log::info('✅ Using Auth::id() as fallback', ['value' => $userId]);
+                } else {
+                    Log::error('❌ Could not retrieve userID from authenticated user', [
+                        'user_class' => get_class($user),
+                        'has_userID' => property_exists($user, 'userID'),
+                        'has_user_id' => property_exists($user, 'user_id'),
+                        'has_NO_' => property_exists($user, 'NO_'),
+                        'userID_value' => $user->userID ?? 'NOT SET',
+                        'user_id_value' => $user->user_id ?? 'NOT SET',
+                        'NO__value' => $user->NO_ ?? 'NOT SET',
+                        'Auth::id()' => $authId,
+                    ]);
+                    return null;
+                }
+            }
+
+            Log::info('✅ User ID successfully retrieved for audit trail', [
+                'userId' => $userId,
+                'method' => $method,
+                'user_class' => get_class($user)
+            ]);
+
+            return $userId;
+
+        } catch (\Exception $e) {
+            Log::error('❌ EXCEPTION in getCurrentUserId()', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return null;
+        }
+    }
+
+    /**
      * Safely get property from object with default value
      * Handles undefined properties in stdClass objects
      */
@@ -33,14 +168,14 @@ class InvoiceController extends Controller
         if ($value === null || $value === '' || $value === '.00' || $value === '0.00' && $default !== null) {
             return $default;
         }
-        
+
         // Remove any non-numeric characters except decimal point and minus
         $cleaned = preg_replace('/[^0-9.-]/', '', (string)$value);
-        
+
         if ($cleaned === '' || $cleaned === '.' || $cleaned === '-') {
             return $default;
         }
-        
+
         return floatval($cleaned);
     }
 
@@ -52,7 +187,7 @@ class InvoiceController extends Controller
         if ($value === null || $value === '') {
             return $default;
         }
-        
+
         return intval($value);
     }
 
@@ -152,7 +287,7 @@ class InvoiceController extends Controller
 
                 $do->invoiced_qty = $invoicedQty ?? 0;
                 $do->remaining_qty = ($do->do_qty ?? 0) - $do->invoiced_qty;
-                
+
                 // Update status based on invoiced quantity
                 if ($do->remaining_qty <= 0) {
                     $do->invoice_status = 'Completed';
@@ -161,10 +296,10 @@ class InvoiceController extends Controller
                 } else {
                     $do->invoice_status = 'Open';
                 }
-                
+
                 // Extract currency codes only (remove full names)
                 $do->currency = $this->extractCurrencyCode($do->currency);
-                
+
                 return $do;
             });
 
@@ -535,7 +670,7 @@ class InvoiceController extends Controller
             $invoiceNumberMode = $payload['invoice_number_mode'] ?? 'auto';
             /** @var string|null $manualInvoiceNumber */
             $manualInvoiceNumber = $payload['manual_invoice_number'] ?? null;
-            
+
             // ✅ ADDED: Get tax_code and tax_percent from request (already confirmed in Final Screen)
             /** @var string|null $taxCodeFromFrontend */
             $taxCodeFromFrontend = $payload['tax_code'] ?? null;
@@ -553,12 +688,73 @@ class InvoiceController extends Controller
                 ]
             ]);
 
-            // Resolve tax information using helper method
-            $taxInfo = $this->resolveTaxInformation($taxCodeFromFrontend, $taxPercentFromFrontend, $taxIndexNo);
-            /** @var string|null $taxCode */
-            $taxCode = $taxInfo['taxCode'];
-            /** @var float|null $taxPercent */
-            $taxPercent = $taxInfo['taxPercent'];
+            // ✅ PRIORITY 1: Use tax data from frontend (already confirmed by user in Final Screen)
+            $taxCode = $taxCodeFromFrontend;
+            $taxPercent = $taxPercentFromFrontend;
+
+            if ($taxCode && $taxPercent) {
+                Log::info('✅ Using tax data from Final Screen (user confirmed)', [
+                    'tax_code' => $taxCode,
+                    'tax_percent' => $taxPercent,
+                    'source' => 'frontend_final_screen'
+                ]);
+            }
+            // ✅ PRIORITY 2: Fallback to database lookup if not provided from frontend
+            elseif ($taxIndexNo) {
+                Log::info('⚠️ Tax not provided from frontend, looking up in database', [
+                    'tax_index_no' => $taxIndexNo
+                ]);
+
+                try {
+                    // Try taxrate table first (standard table)
+                    $tax = DB::table('taxrate')
+                        ->where('TAXCODE', $taxIndexNo)
+                        ->first();
+
+                    if ($tax) {
+                        $taxCode = $tax->TAXCODE;
+                        $taxPercent = $tax->RATEPPN;
+                        Log::info('Tax found in taxrate table', [
+                            'code' => $taxCode,
+                            'rate' => $taxPercent,
+                            'source' => 'taxrate_table'
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('taxrate table not accessible: ' . $e->getMessage());
+                }
+
+                // If not found in taxrate, try Sales_Tax table (fallback)
+                if (!$taxCode) {
+                    try {
+                        $tax = DB::table('Sales_Tax')
+                            ->where('tax_code', $taxIndexNo)
+                            ->first();
+
+                        if ($tax) {
+                            $taxCode = $tax->tax_code;
+                            $taxPercent = $tax->tax_rate;
+                            Log::info('Tax found in Sales_Tax table', [
+                                'code' => $taxCode,
+                                'rate' => $taxPercent,
+                                'source' => 'sales_tax_table'
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        Log::warning('Sales_Tax table not accessible: ' . $e->getMessage());
+                    }
+                }
+
+                // Final warning if tax not found in database
+                if (!$taxCode) {
+                    Log::warning('❌ Tax code not found in any table', [
+                        'tax_index_no' => $taxIndexNo,
+                        'searched_tables' => ['taxrate', 'Sales_Tax']
+                    ]);
+                }
+            } else {
+                Log::info('ℹ️ No tax information provided (tax-free invoice)');
+            }
 
             // Get existing invoice count for auto-numbering
             /** @var int $existingCount */
@@ -579,6 +775,14 @@ class InvoiceController extends Controller
             /** @var array<int, array<string, mixed>> $created */
             $created = [];
 
+            // DEBUG: Log authentication state BEFORE transaction
+            Log::info('🔍 DEBUG: Authentication state before invoice creation', [
+                'Auth::check()' => Auth::check(),
+                'Auth::id()' => Auth::id(),
+                'Auth::user() exists' => Auth::user() !== null,
+                'User class' => Auth::user() ? get_class(Auth::user()) : null,
+            ]);
+
             DB::beginTransaction();
 
             foreach ($payload['do_numbers'] as $doNumber) {
@@ -595,19 +799,19 @@ class InvoiceController extends Controller
                     ->where('SO_NUM', $this->getProperty($do, 'SO_Num'))
                     ->where('IV_STS', '!=', 'Cancelled')
                     ->sum('IV_QTY');
-                
+
                 /** @var float $doQty */
                 $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
                 /** @var float $remainingQty */
                 $remainingQty = $doQty - ($invoicedQty ?? 0);
-                
+
                 Log::info('DO Invoice Status Check', [
                     'do_number' => $doNumber,
                     'do_qty' => $doQty,
                     'invoiced_qty' => $invoicedQty,
                     'remaining_qty' => $remainingQty
                 ]);
-                
+
                 // Prevent invoicing if already fully invoiced
                 if ($remainingQty <= 0) {
                     throw new \RuntimeException(
@@ -615,7 +819,7 @@ class InvoiceController extends Controller
                         . "DO Qty: {$doQty}, Already Invoiced: {$invoicedQty}"
                     );
                 }
-                
+
                 // Check if DO status is Cancelled
                 if ($do->Status === 'Cancelled') {
                     throw new \RuntimeException("Delivery Order {$doNumber} is cancelled and cannot be invoiced");
@@ -624,23 +828,112 @@ class InvoiceController extends Controller
                 // Fetch customer payment term using helper method
                 /** @var string|null $customerCode */
                 $customerCode = $this->getProperty($do, 'AC_Num');
-                /** @var int $paymentTerm */
-                $paymentTerm = $this->getCustomerPaymentTerm($customerCode);
+                $paymentTerm = 30; // Default: 30 days (initialize first!)
 
-                // Generate or use manual invoice number using helper method
-                /** @var string $ivNum */
-                $ivNum = $this->generateInvoiceNumber($invoiceNumberMode, $manualInvoiceNumber, $generateNumber, $seq);
+                if ($customerCode) {
+                    // Try CUSTOMER table first (has TERM column as decimal - days)
+                    try {
+                        $customer = DB::table('CUSTOMER')
+                            ->where('CODE', $customerCode)
+                            ->first();
 
-                // Calculate amounts using helper method
-                $amounts = $this->calculateInvoiceAmounts($do, $taxPercent);
-                /** @var float $tranAmount */
-                $tranAmount = $amounts['tranAmount'];
-                /** @var float $baseAmount */
-                $baseAmount = $amounts['baseAmount'];
-                /** @var float $taxAmount */
-                $taxAmount = $amounts['taxAmount'];
-                /** @var float $netAmount */
-                $netAmount = $amounts['netAmount'];
+                        if ($customer && isset($customer->TERM) && $customer->TERM > 0) {
+                            // TERM is decimal (number of days), cast to INT for INV table
+                            $paymentTerm = (int) round($customer->TERM); // Explicit INT cast
+
+                            Log::info('✅ Payment term found in CUSTOMER table', [
+                                'customer' => $customerCode,
+                                'term_days' => $paymentTerm,
+                                'original_value' => $customer->TERM
+                            ]);
+                        } else {
+                            Log::warning('⚠️ Customer found but TERM is NULL or 0', [
+                                'customer' => $customerCode,
+                                'term_value' => $customer->TERM ?? 'NULL'
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('❌ CUSTOMER table access failed', [
+                            'error' => $e->getMessage(),
+                            'customer' => $customerCode
+                        ]);
+                    }
+
+                    // Log final payment term value
+                    Log::info('💰 Final payment term for invoice', [
+                        'customer' => $customerCode,
+                        'payment_term' => $paymentTerm,
+                        'type' => gettype($paymentTerm)
+                    ]);
+                }
+
+                // Generate or use manual invoice number
+                if ($invoiceNumberMode === 'manual' && $manualInvoiceNumber) {
+                    $ivNum = $manualInvoiceNumber;
+
+                    // Validate manual number uniqueness
+                    $exists = DB::table('INV')->where('IV_NUM', $ivNum)->exists();
+                    if ($exists) {
+                        throw new \RuntimeException("Invoice number '{$ivNum}' already exists. Please choose a different number.");
+                    }
+
+                    Log::info('Using manual invoice number', ['number' => $ivNum]);
+                } else {
+                    // Auto-generate invoice number (CPS format)
+                    $ivNum = $generateNumber($seq++);
+
+                    // Double-check uniqueness (safety)
+                    while (DB::table('INV')->where('IV_NUM', $ivNum)->exists()) {
+                        $ivNum = $generateNumber($seq++);
+                    }
+
+                    Log::info('Generated auto invoice number', ['number' => $ivNum]);
+                }
+
+                // Calculate amounts (with proper decimal handling)
+                $tranAmount = $this->toDecimalOrNull($this->getProperty($do, 'DO_Tran_Amt'), 0);
+                $baseAmount = $this->toDecimalOrNull($this->getProperty($do, 'DO_Base_Amt'), 0);
+                $exRate = $this->toDecimalOrNull($this->getProperty($do, 'Ex_Rate'), 1);
+
+                // If DO_Tran_Amt is 0, calculate from DO_Qty * SO_Unit_Price
+                if ($tranAmount == 0) {
+                    $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
+                    $unitPrice = $this->toDecimalOrNull($this->getProperty($do, 'SO_Unit_Price'), 0);
+
+                    if ($doQty > 0 && $unitPrice > 0) {
+                        $tranAmount = round($doQty * $unitPrice, 2);
+                        $baseAmount = round($tranAmount * $exRate, 2);
+
+                        Log::info('Calculated amounts from DO_Qty × Unit_Price', [
+                            'do_qty' => $doQty,
+                            'unit_price' => $unitPrice,
+                            'ex_rate' => $exRate,
+                            'calculated_tran_amt' => $tranAmount,
+                            'calculated_base_amt' => $baseAmount
+                        ]);
+                    }
+                }
+
+                // ✅ CRITICAL FIX: If baseAmount is still 0 but tranAmount exists, calculate it
+                // This handles cases where DO_Base_Amt is NULL/0 in DO table
+                if ($baseAmount == 0 && $tranAmount > 0) {
+                    $baseAmount = round($tranAmount * $exRate, 2);
+                    
+                    Log::info('✅ Calculated IV_BASE_AMT from IV_TRAN_AMT × EX_RATE', [
+                        'tran_amount' => $tranAmount,
+                        'ex_rate' => $exRate,
+                        'calculated_base_amt' => $baseAmount,
+                        'reason' => 'DO_Base_Amt was 0 or NULL'
+                    ]);
+                }
+
+                // Calculate tax amount if applicable
+                $taxAmount = 0;
+                if ($taxPercent && $tranAmount > 0) {
+                    $taxAmount = round($tranAmount * ($taxPercent / 100), 2);
+                }
+
+                $netAmount = $tranAmount + $taxAmount;
 
                 Log::info('Inserting invoice with amounts', [
                     'tranAmount' => $tranAmount,
@@ -651,9 +944,20 @@ class InvoiceController extends Controller
                     'taxPercent' => $taxPercent
                 ]);
 
+                // Get User ID for audit trail with detailed logging
+                $currentUserId = $this->getCurrentUserId();
+                
+                Log::info('🔍 DEBUG: User ID for NW_UID', [
+                    'returned_value' => $currentUserId,
+                    'type' => gettype($currentUserId),
+                    'is_null' => $currentUserId === null ? 'YES' : 'NO',
+                    'is_empty' => empty($currentUserId) ? 'YES' : 'NO',
+                ]);
+
                 // Log critical values before INSERT
                 Log::info('🔍 Critical values before INSERT', [
                     'invoice_num' => $ivNum,
+                    'NW_UID' => $currentUserId, // ADDED: Log the actual value that will be inserted
                     'payment_term' => [
                         'value' => $paymentTerm,
                         'type' => gettype($paymentTerm),
@@ -680,7 +984,7 @@ class InvoiceController extends Controller
                     try {
                         $soData = DB::table('so')->where('SO_Num', $soNum)->first();
                         $soDmy = $soData ? ($soData->SO_DMY ?? null) : null;
-                        
+
                         Log::info('✅ Retrieved SO_DMY from SO table', [
                             'so_num' => $soNum,
                             'so_dmy' => $soDmy
@@ -692,7 +996,7 @@ class InvoiceController extends Controller
                         ]);
                     }
                 }
-                
+
                 // Calculate TOTAL_IV_NET_KG (KG calculation)
                 $totalNetKg = $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Net_KG'));
                 if (!$totalNetKg || $totalNetKg == 0) {
@@ -787,10 +1091,10 @@ class InvoiceController extends Controller
                     // Remarks
                     'IV_REMARK' => $remark,
 
-                    // Audit trail - New
-                    'NW_UID' => Auth::check() ? Auth::user()->name : 'system',
-                    'NW_DATE' => $now->format('d/m/Y'),
-                    'NW_TIME' => $now->format('H:i'),
+                    // Audit trail - New/Created by User ID (WIB timezone)
+                    'NW_UID' => $currentUserId, // Use pre-captured value with logging
+                    'NW_DATE' => $this->getNowWib()->format('d/m/Y'),
+                    'NW_TIME' => $this->getNowWib()->format('H:i'),
 
                     // Date surrogate keys (integers)
                     'IVDateSK' => $this->toIntegerOrNull($this->getProperty($do, 'DODateSK'), 0),
@@ -805,10 +1109,10 @@ class InvoiceController extends Controller
                         ->where('SO_NUM', $this->getProperty($do, 'SO_Num'))
                         ->where('IV_STS', '!=', 'Cancelled')
                         ->sum('IV_QTY');
-                    
+
                     $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
                     $newRemainingQty = $doQty - ($newInvoicedQty ?? 0);
-                    
+
                     // Determine new status based on CPS logic
                     $newStatus = 'Open';
                     if ($newRemainingQty <= 0) {
@@ -816,11 +1120,11 @@ class InvoiceController extends Controller
                     } elseif ($newInvoicedQty > 0) {
                         $newStatus = 'Partial'; // Partially invoiced
                     }
-                    
+
                     DB::table('DO')
                         ->where('DO_Num', $doNumber)
                         ->update(['Status' => $newStatus]);
-                        
+
                     Log::info('DO status updated successfully (CPS-compatible)', [
                         'do_number' => $doNumber,
                         'do_qty' => $doQty,
@@ -914,18 +1218,19 @@ class InvoiceController extends Controller
                 throw new \RuntimeException("Cannot cancel invoice that has been posted to GL");
             }
 
-            // Prepare update data
+            // Prepare update data (WIB timezone)
+            $nowWib = $this->getNowWib();
             $updateData = [
                 'IV_STS' => 'Cancelled',
                 'CANCELLED_REASON_1' => $payload['cancel_reason'],
-                'CX_UID' => Auth::check() ? Auth::user()->name : 'system',
-                'CX_DATE' => now()->format('d/m/Y'),
-                'CX_TIME' => now()->format('H:i'),
+                'CX_UID' => $this->getCurrentUserId(),
+                'CX_DATE' => $nowWib->format('d/m/Y'),
+                'CX_TIME' => $nowWib->format('H:i'),
             ];
 
             // Add second reason if provided
             if (!empty($payload['cancel_reason_2'])) {
-                $updateData['cANCELLED_REASON_2'] = $payload['cancel_reason_2'];
+                $updateData['CANCELLED_REASON_2'] = $payload['cancel_reason_2']; // ✅ Fixed column name
             }
 
             // Update invoice status
@@ -944,11 +1249,11 @@ class InvoiceController extends Controller
 
                 // Get DO quantity
                 $do = DB::table('DO')->where('DO_Num', $invoice->IV_SECOND_REF)->first();
-                
+
                 if ($do) {
                     $doQty = floatval($do->DO_Qty ?? 0);
                     $remainingQty = $doQty - ($invoicedQty ?? 0);
-                    
+
                     // Determine new DO status
                     $newStatus = null; // Open (no status)
                     if ($remainingQty <= 0) {
@@ -956,13 +1261,13 @@ class InvoiceController extends Controller
                     } elseif ($invoicedQty > 0) {
                         $newStatus = 'Partial'; // Partially invoiced
                     }
-                    
+
                     DB::table('DO')
                         ->where('DO_Num', $invoice->IV_SECOND_REF)
                         ->update([
                             'Status' => $newStatus,
                         ]);
-                    
+
                     Log::info('DO status reverted after invoice cancellation', [
                         'invoice_num' => $payload['invoice_number'],
                         'do_number' => $invoice->IV_SECOND_REF,
@@ -989,12 +1294,12 @@ class InvoiceController extends Controller
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
-            
+
             Log::error('Failed to cancel invoice', [
                 'invoice_number' => $request->input('invoice_number'),
                 'error' => $e->getMessage()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'error' => 'Failed to cancel invoice: ' . $e->getMessage(),
@@ -1495,25 +1800,25 @@ class InvoiceController extends Controller
     {
         try {
             $query = DB::table('INV');
-            
+
             // Filter by MM (month)
             if ($request->has('mm') && !empty($request->mm)) {
                 $query->where('MM', str_pad($request->mm, 2, '0', STR_PAD_LEFT));
             }
-            
+
             // Filter by YYYY (year)
             if ($request->has('yyyy') && !empty($request->yyyy)) {
                 $query->where('YYYY', $request->yyyy);
             }
-            
+
             // Filter by invoice number (full or partial)
             if ($request->has('seq') && !empty($request->seq)) {
                 $query->where('IV_NUM', 'like', '%' . $request->seq . '%');
             }
-            
+
             // Get column list to check which columns exist
             $columns = DB::getSchemaBuilder()->getColumnListing('INV');
-            
+
             // Build select array with only existing columns
             $selectColumns = [
                 'IV_NUM as invoice_no',
@@ -1521,46 +1826,53 @@ class InvoiceController extends Controller
                 'AC_NUM as customer_code',
                 'IV_STS as status',
             ];
-            
+
             // Add optional columns if they exist
             if (in_array('AC_NAME', $columns)) {
                 $selectColumns[] = 'AC_NAME as customer_name';
             } else {
                 $selectColumns[] = DB::raw("'' as customer_name");
             }
-            
+
             if (in_array('IV_TAX_CODE', $columns)) {
                 $selectColumns[] = 'IV_TAX_CODE as tax_code';
             } else {
                 $selectColumns[] = DB::raw("'' as tax_code");
             }
-            
+
             // Mode - default to Manual
             $selectColumns[] = DB::raw("'Manual' as mode");
-            
+
             // PC Status - check if printed
             if (in_array('PT_UID', $columns)) {
                 $selectColumns[] = DB::raw("CASE WHEN PT_UID IS NOT NULL AND PT_UID != '' THEN '1' ELSE '0' END as pc_status");
             } else {
                 $selectColumns[] = DB::raw("'0' as pc_status");
             }
-            
+
             // Post Status
             $selectColumns[] = DB::raw("CASE WHEN IV_STS = 'Posted' THEN 'Posted' ELSE 'UnPost' END as post_status");
-            
-            // Audit trail columns (optional)
+
+            // ✅ Audit trail columns with TIME fields (CPS-compatible)
             $auditColumns = [
                 'ORDER_MODE' => 'order_mode',
                 'NW_UID' => 'issued_by',
                 'NW_DATE' => 'issued_date',
+                'NW_TIME' => 'issued_time',
                 'AM_UID' => 'amended_by',
                 'AM_DATE' => 'amended_date',
+                'AM_TIME' => 'amended_time',
+                'CX_UID' => 'cancelled_by',
+                'CX_DATE' => 'cancelled_date',
+                'CX_TIME' => 'cancelled_time',
                 'PT_UID' => 'printed_by',
                 'PT_DATE' => 'printed_date',
+                'PT_TIME' => 'printed_time',
                 'PO_UID' => 'posted_by',
                 'PO_DATE' => 'posted_date',
+                'PO_TIME' => 'posted_time',
             ];
-            
+
             foreach ($auditColumns as $dbColumn => $alias) {
                 if (in_array($dbColumn, $columns)) {
                     $selectColumns[] = "$dbColumn as $alias";
@@ -1568,18 +1880,18 @@ class InvoiceController extends Controller
                     $selectColumns[] = DB::raw("'' as $alias");
                 }
             }
-            
+
             // Get invoices with dynamic column selection
             $invoices = $query->select($selectColumns)
                 ->orderBy('IV_NUM', 'desc')
                 ->limit(100)
                 ->get();
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $invoices
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Error fetching invoices: ' . $e->getMessage());
             return response()->json([
@@ -1598,13 +1910,13 @@ class InvoiceController extends Controller
             $invoice = DB::table('INV')
                 ->where('IV_NUM', $invoiceNo)
                 ->first();
-            
+
             if (!$invoice) {
                 return response()->json([
                     'error' => 'Invoice not found'
                 ], 404);
             }
-            
+
             // Convert IV_DMY to YYYY-MM-DD for input[type=date]
             $invoiceDate = '';
             if (!empty($invoice->IV_DMY)) {
@@ -1624,7 +1936,7 @@ class InvoiceController extends Controller
                     $invoiceDate = $invoice->IV_DMY;
                 }
             }
-            
+
             return response()->json([
                 'invoice_no' => $invoice->IV_NUM ?? '',
                 'customer_code' => $invoice->AC_NUM ?? '',
@@ -1633,32 +1945,46 @@ class InvoiceController extends Controller
                 'salesperson' => $invoice->SLM ?? '',
                 'currency' => $invoice->CURR ?? 'IDR',
                 'exchange_rate' => (float)($invoice->EX_RATE ?? 0),
-                'exchange_method' => $invoice->EXCHANGE_METHOD ?? '1',
-                'tax_index_no' => $invoice->TAX_INDEX_NO ?? '',
+                // ✅ UI-only fields (not stored in DB)
+                'exchange_method' => '1', // Default: Multiply (UI display only)
+                'tax_index_no' => '', // UI display only, actual tax stored in IV_TAX_CODE
+                // ✅ Actual tax data from database
                 'tax_code' => $invoice->IV_TAX_CODE ?? '',
                 'tax_percent' => (float)($invoice->IV_TAX_PERCENT ?? 0),
                 'invoice_date' => $invoiceDate,
-                'ref2' => $invoice->REF2 ?? '',
+                // ✅ Map IV_SECOND_REF to ref2 for frontend compatibility
+                'ref2' => $invoice->IV_SECOND_REF ?? '',
                 'second_ref' => $invoice->IV_SECOND_REF ?? '',
                 'remark' => $invoice->IV_REMARK ?? '',
                 'status' => $invoice->IV_STS ?? 'Prepared',
                 'total_amount' => (float)($invoice->IV_TRAN_AMT ?? 0),
-                'tax_amount' => (float)($invoice->IV_TAX_AMT ?? 0),
-                'net_amount' => (float)($invoice->IV_NET_AMT ?? 0),
+                // ✅ Calculate tax_amount and net_amount on-the-fly (not stored in table)
+                'tax_amount' => $this->calculateTaxAmount($invoice),
+                'net_amount' => $this->calculateNetAmount($invoice),
                 // Related documents (for calculating total if needed)
                 'so_number' => $invoice->SO_NUM ?? '',
                 'do_number' => $invoice->IV_SECOND_REF ?? '',
-                // Audit trail
+                // ✅ Complete Audit trail (CPS-compatible with TIME fields)
                 'issued_by' => $invoice->NW_UID ?? '',
                 'issued_date' => $invoice->NW_DATE ?? '',
+                'issued_time' => $invoice->NW_TIME ?? '',
                 'amended_by' => $invoice->AM_UID ?? '',
                 'amended_date' => $invoice->AM_DATE ?? '',
+                'amended_time' => $invoice->AM_TIME ?? '',
+                'cancelled_by' => $invoice->CX_UID ?? '',
+                'cancelled_date' => $invoice->CX_DATE ?? '',
+                'cancelled_time' => $invoice->CX_TIME ?? '',
                 'printed_by' => $invoice->PT_UID ?? '',
                 'printed_date' => $invoice->PT_DATE ?? '',
+                'printed_time' => $invoice->PT_TIME ?? '',
                 'posted_by' => $invoice->PO_UID ?? '',
-                'posted_date' => $invoice->PO_DATE ?? ''
+                'posted_date' => $invoice->PO_DATE ?? '',
+                'posted_time' => $invoice->PO_TIME ?? '',
+                // Cancellation reasons (if applicable)
+                'cancelled_reason_1' => $invoice->CANCELLED_REASON_1 ?? '',
+                'cancelled_reason_2' => $invoice->CANCELLED_REASON_2 ?? '',
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Error fetching invoice details: ' . $e->getMessage());
             return response()->json([
@@ -1676,17 +2002,17 @@ class InvoiceController extends Controller
         try {
             // Get invoice header
             $invoice = DB::table('INV')->where('IV_NUM', $invoiceNo)->first();
-            
+
             if (!$invoice) {
                 return response()->json([
                     'error' => 'Invoice not found'
                 ], 404);
             }
-            
+
             // Try to get invoice items from INVDET table (may not exist)
             $items = collect([]);
             $totalAmount = (float)($invoice->IV_TRAN_AMT ?? 0);
-            
+
             try {
                 // Check if INVDET table exists
                 $items = DB::table('INVDET')
@@ -1701,7 +2027,7 @@ class InvoiceController extends Controller
                     ])
                     ->orderBy('LINE_NO')
                     ->get();
-                
+
                 // Calculate total from items if header total is 0
                 if ($totalAmount == 0 && $items->count() > 0) {
                     $totalAmount = $items->sum(function($item) {
@@ -1712,12 +2038,12 @@ class InvoiceController extends Controller
                 // INVDET table doesn't exist or error querying, use header total only
                 Log::info('Cannot fetch items for invoice ' . $invoiceNo . ': ' . $e->getMessage());
             }
-            
+
             // If total still 0, try to use net amount
             if ($totalAmount == 0) {
                 $totalAmount = (float)($invoice->IV_NET_AMT ?? 0);
             }
-            
+
             // Return invoice header + items (empty if table doesn't exist)
             return response()->json([
                 'invoice_no' => $invoice->IV_NUM ?? '',
@@ -1738,7 +2064,7 @@ class InvoiceController extends Controller
                     ];
                 })
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Error fetching invoice with items: ' . $e->getMessage());
             return response()->json([
@@ -1756,33 +2082,33 @@ class InvoiceController extends Controller
     {
         try {
             $doNumber = $request->input('do_number');
-            
+
             if (!$doNumber) {
                 return response()->json([
                     'error' => 'DO number is required'
                 ], 400);
             }
-            
+
             // Get DO data
             $do = DB::table('DO')
                 ->where('DO_Num', $doNumber)
                 ->first();
-            
+
             if (!$do) {
                 return response()->json([
                     'error' => 'Delivery Order not found'
                 ], 404);
             }
-            
+
             // Calculate invoiced quantity from INV table
             $invoicedQty = DB::table('INV')
                 ->where('SO_NUM', $do->SO_Num)
                 ->where('IV_STS', '!=', 'Cancelled')
                 ->sum('IV_QTY');
-            
+
             $doQty = $do->DO_Qty ?? 0;
             $remainingQty = $doQty - ($invoicedQty ?? 0);
-            
+
             // Determine invoice status
             $invoiceStatus = 'Open';
             if ($remainingQty <= 0) {
@@ -1790,7 +2116,7 @@ class InvoiceController extends Controller
             } elseif ($invoicedQty > 0) {
                 $invoiceStatus = 'Partial';
             }
-            
+
             return response()->json([
                 'do_number' => $do->DO_Num,
                 'so_number' => $do->SO_Num,
@@ -1801,11 +2127,79 @@ class InvoiceController extends Controller
                 'do_status' => $do->Status,
                 'can_invoice' => $remainingQty > 0 && $do->Status !== 'Cancelled'
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Error getting DO status: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Failed to get DO status',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update print audit trail (Print Invoice - CPS Compatible)
+     */
+    public function updatePrintAudit(Request $request, $invoiceNo)
+    {
+        try {
+            // Get existing invoice
+            $invoice = DB::table('INV')
+                ->where('IV_NUM', $invoiceNo)
+                ->first();
+
+            if (!$invoice) {
+                return response()->json([
+                    'error' => 'Invoice not found'
+                ], 404);
+            }
+
+            // CPS Business Rules: Cannot update print audit for cancelled invoices
+            if ($invoice->IV_STS === 'Cancelled') {
+                return response()->json([
+                    'error' => 'Cannot print cancelled invoice'
+                ], 400);
+            }
+
+            // Prepare update data with print audit trail (WIB timezone)
+            $nowWib = $this->getNowWib();
+            $updateData = [
+                'PT_UID' => $this->getCurrentUserId(),
+                'PT_DATE' => $nowWib->format('d/m/Y'),
+                'PT_TIME' => $nowWib->format('H:i'),
+            ];
+
+            // Perform update
+            DB::beginTransaction();
+
+            $updated = DB::table('INV')
+                ->where('IV_NUM', $invoiceNo)
+                ->update($updateData);
+
+            DB::commit();
+
+            Log::info('Invoice print audit updated successfully', [
+                'invoice_no' => $invoiceNo,
+                'printed_by' => $updateData['PT_UID'],
+                'printed_at' => $updateData['PT_DATE'] . ' ' . $updateData['PT_TIME']
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Print audit updated successfully',
+                'invoice_no' => $invoiceNo,
+                'printed_by' => $updateData['PT_UID'],
+                'printed_at' => $updateData['PT_DATE'] . ' ' . $updateData['PT_TIME']
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating print audit: ' . $e->getMessage(), [
+                'invoice_no' => $invoiceNo,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'error' => 'Failed to update print audit',
                 'message' => $e->getMessage()
             ], 500);
         }
@@ -1817,31 +2211,41 @@ class InvoiceController extends Controller
     public function update(Request $request, $invoiceNo)
     {
         try {
-            // Validate request - ONLY editable fields per CPS rules
-            $validated = $request->validate([
-                'exchange_method' => 'nullable|string|in:1,2',
-                'tax_index_no' => 'nullable|string',
-                'tax_code' => 'nullable|string',
-                'tax_percent' => 'nullable|numeric',
-                'invoice_date' => 'nullable|string',
-                'ref2' => 'nullable|string',
-                'remark' => 'nullable|string',
-                'total_amount' => 'nullable|numeric',
-                'tax_amount' => 'nullable|numeric',
-                'net_amount' => 'nullable|numeric'
+            // ✅ Log authentication state for debugging
+            Log::info('🔍 Amend Invoice - Authentication check', [
+                'invoice_no' => $invoiceNo,
+                'Auth::check()' => Auth::check(),
+                'Auth::id()' => Auth::id(),
+                'Auth::user() exists' => Auth::user() !== null,
+                'user_class' => Auth::user() ? get_class(Auth::user()) : null,
             ]);
             
+            // ✅ Validate request - ONLY editable fields that are stored in DB (CPS rules)
+            $validated = $request->validate([
+                // Note: exchange_method and tax_index_no are UI-only fields, not validated/stored
+                // Note: tax_amount and net_amount are calculated fields, not stored in table
+                'tax_code' => 'nullable|string|max:50',
+                'tax_percent' => 'nullable|numeric|min:0|max:100',
+                'invoice_date' => 'nullable|string',
+                'ref2' => 'nullable|string|max:50', // Will map to IV_SECOND_REF
+                'remark' => 'nullable|string|max:50',
+                'total_amount' => 'nullable|numeric|min:0',
+                // tax_amount and net_amount are accepted but not stored (calculated on-the-fly)
+                'tax_amount' => 'nullable|numeric|min:0',
+                'net_amount' => 'nullable|numeric|min:0'
+            ]);
+
             // Get existing invoice
             $invoice = DB::table('INV')
                 ->where('IV_NUM', $invoiceNo)
                 ->first();
-            
+
             if (!$invoice) {
                 return response()->json([
                     'error' => 'Invoice not found'
                 ], 404);
             }
-            
+
             // CPS Business Rules: Check if invoice can be amended
             if (!empty($invoice->PT_UID)) {
                 return response()->json([
@@ -1849,37 +2253,66 @@ class InvoiceController extends Controller
                     'message' => 'Invoice was printed by ' . $invoice->PT_UID . ' on ' . $invoice->PT_DATE
                 ], 400);
             }
-            
+
             if ($invoice->IV_STS === 'Cancelled') {
                 return response()->json([
                     'error' => 'Cannot amend cancelled invoice'
                 ], 400);
             }
-            
+
             if ($invoice->IV_STS === 'Posted') {
                 return response()->json([
                     'error' => 'Cannot amend invoice that has been posted to GL'
                 ], 400);
             }
+
+            // ✅ Get current user ID for audit trail with fallback
+            $currentUserId = $this->getCurrentUserId();
             
-            // Prepare update data with audit trail
-            $now = now();
+            // ✅ Fallback: If getCurrentUserId() returns null, try Auth::id()
+            if (empty($currentUserId)) {
+                Log::warning('⚠️ getCurrentUserId() returned null, trying Auth::id() fallback', [
+                    'invoice_no' => $invoiceNo,
+                    'Auth::check()' => Auth::check(),
+                    'Auth::id()' => Auth::id(),
+                ]);
+                
+                if (Auth::check() && Auth::id()) {
+                    $currentUserId = (string) Auth::id();
+                    Log::info('✅ Using Auth::id() as fallback for AM_UID', ['user_id' => $currentUserId]);
+                } else {
+                    // Last resort: Use 'SYSTEM' if no user found (should not happen in production)
+                    $currentUserId = 'SYSTEM';
+                    Log::error('❌ No authenticated user found, using SYSTEM as AM_UID', [
+                        'invoice_no' => $invoiceNo,
+                        'warning' => 'This should not happen in production!'
+                    ]);
+                }
+            }
+            
+            // Prepare update data with audit trail (WIB timezone)
+            $nowWib = $this->getNowWib();
+            
+            Log::info('✅ AM_UID will be set to', [
+                'invoice_no' => $invoiceNo,
+                'AM_UID' => $currentUserId,
+                'AM_DATE' => $nowWib->format('d/m/Y'),
+                'AM_TIME' => $nowWib->format('H:i'),
+            ]);
+            
             $updateData = [
-                'AM_UID' => Auth::check() ? Auth::user()->name : 'system',
-                'AM_DATE' => $now->format('d/m/Y'),
-                'AM_TIME' => $now->format('H:i'),
+                'AM_UID' => $currentUserId, // ✅ Guaranteed to be non-null
+                'AM_DATE' => $nowWib->format('d/m/Y'),
+                'AM_TIME' => $nowWib->format('H:i'),
             ];
-            
-            // Update ONLY editable fields (CPS-compatible)
+
+            // ✅ Update ONLY editable fields that exist in table (CPS-compatible)
             // Readonly fields: Current Period, Invoice#, Customer, Order Mode, Salesperson, Currency, Exchange Rate, Status
-            // Editable fields: Exchange Method, Tax Index No, Invoice Date, 2nd Reference#, Remark
+            // Editable fields: Invoice Date, 2nd Reference#, Remark, Tax Code, Tax Percent
             
-            if (isset($validated['exchange_method'])) {
-                $updateData['EXCHANGE_METHOD'] = $validated['exchange_method'];
-            }
-            if (isset($validated['tax_index_no'])) {
-                $updateData['TAX_INDEX_NO'] = $validated['tax_index_no'];
-            }
+            // Note: EXCHANGE_METHOD and TAX_INDEX_NO don't exist in table schema
+            // These are UI-only fields, not stored in database
+            
             if (isset($validated['tax_code'])) {
                 $updateData['IV_TAX_CODE'] = $validated['tax_code'];
             }
@@ -1898,39 +2331,59 @@ class InvoiceController extends Controller
                 }
             }
             if (isset($validated['ref2'])) {
-                $updateData['REF2'] = $validated['ref2'];
+                // ✅ Correct column name is IV_SECOND_REF, not REF2
+                $updateData['IV_SECOND_REF'] = $validated['ref2'];
             }
             if (isset($validated['remark'])) {
                 $updateData['IV_REMARK'] = $validated['remark'];
             }
+
+            // ✅ Update amounts - ONLY fields that exist in table
+            // Note: IV_TAX_AMT and IV_NET_AMT don't exist in table schema
+            // These are calculated fields, not stored in database
             
-            // Update amounts if provided
             if (isset($validated['total_amount'])) {
                 $updateData['IV_TRAN_AMT'] = $validated['total_amount'];
             }
-            if (isset($validated['tax_amount'])) {
-                $updateData['IV_TAX_AMT'] = $validated['tax_amount'];
-            }
-            if (isset($validated['net_amount'])) {
-                $updateData['IV_NET_AMT'] = $validated['net_amount'];
-            }
             
+            // ✅ CPS Logic: If tax code/percent changed, log calculation (but don't store)
+            // Tax amount and net amount are calculated on-the-fly, not stored
+            if (isset($validated['tax_code']) || isset($validated['tax_percent'])) {
+                $tranAmount = $invoice->IV_TRAN_AMT ?? ($validated['total_amount'] ?? 0);
+                $taxPercent = $validated['tax_percent'] ?? $invoice->IV_TAX_PERCENT ?? 0;
+                
+                if ($tranAmount > 0 && $taxPercent > 0) {
+                    $taxAmount = round($tranAmount * ($taxPercent / 100), 2);
+                    $netAmount = $tranAmount + $taxAmount;
+                    
+                    // ✅ Log calculation for debugging (not stored in DB)
+                    Log::info('✅ Recalculated tax amounts on amend (not stored)', [
+                        'invoice_no' => $invoiceNo,
+                        'tran_amount' => $tranAmount,
+                        'tax_percent' => $taxPercent,
+                        'calculated_tax_amount' => $taxAmount,
+                        'calculated_net_amount' => $netAmount,
+                        'note' => 'IV_TAX_AMT and IV_NET_AMT are calculated fields, not stored in table'
+                    ]);
+                }
+            }
+
             // Perform update
             DB::beginTransaction();
-            
+
             $updated = DB::table('INV')
                 ->where('IV_NUM', $invoiceNo)
                 ->update($updateData);
-            
+
             DB::commit();
-            
+
             Log::info('Invoice amended successfully', [
                 'invoice_no' => $invoiceNo,
                 'amended_by' => $updateData['AM_UID'],
                 'amended_at' => $updateData['AM_DATE'] . ' ' . $updateData['AM_TIME'],
                 'fields_updated' => array_keys($updateData)
             ]);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Invoice amended successfully',
@@ -1938,7 +2391,7 @@ class InvoiceController extends Controller
                 'amended_by' => $updateData['AM_UID'],
                 'amended_at' => $updateData['AM_DATE'] . ' ' . $updateData['AM_TIME']
             ]);
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error amending invoice: ' . $e->getMessage(), [

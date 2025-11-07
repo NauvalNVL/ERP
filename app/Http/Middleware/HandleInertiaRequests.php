@@ -39,6 +39,9 @@ class HandleInertiaRequests extends Middleware
             'csrf' => function () {
                 return csrf_token();
             },
+            'csrf_token' => function () {
+                return csrf_token();
+            },
             'appName' => config('app.name'),
 
             'auth' => function () use ($request) {

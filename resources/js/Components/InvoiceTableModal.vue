@@ -77,7 +77,17 @@
                         <label class="block text-gray-600">Order Mode</label>
                         <input type="text" :value="selectedRow?.order_mode || ''" readonly class="w-full border-gray-200 rounded-md bg-gray-50 px-3 py-2" />
                     </div>
-                    <!-- Audit Trail - Match CPS Layout -->
+                    <!-- ✅ Audit Trail - Match CPS Layout (with TIME fields) -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-gray-600 text-xs">Issued by:</label>
+                            <input type="text" :value="selectedRow?.issued_by || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-gray-600 text-xs">Date:</label>
+                            <input type="text" :value="formatAuditDateTime(selectedRow?.issued_date, selectedRow?.issued_time)" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
+                        </div>
+                    </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-gray-600 text-xs">Amended by:</label>
@@ -85,7 +95,7 @@
                         </div>
                         <div>
                             <label class="block text-gray-600 text-xs">Date:</label>
-                            <input type="text" :value="selectedRow?.amended_date || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
+                            <input type="text" :value="formatAuditDateTime(selectedRow?.amended_date, selectedRow?.amended_time)" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
@@ -95,17 +105,7 @@
                         </div>
                         <div>
                             <label class="block text-gray-600 text-xs">Date:</label>
-                            <input type="text" :value="selectedRow?.cancelled_date || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-gray-600 text-xs">Issued by:</label>
-                            <input type="text" :value="selectedRow?.issued_by || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
-                        </div>
-                        <div>
-                            <label class="block text-gray-600 text-xs">Date:</label>
-                            <input type="text" :value="selectedRow?.issued_date || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
+                            <input type="text" :value="formatAuditDateTime(selectedRow?.cancelled_date, selectedRow?.cancelled_time)" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
@@ -115,7 +115,7 @@
                         </div>
                         <div>
                             <label class="block text-gray-600 text-xs">Date:</label>
-                            <input type="text" :value="selectedRow?.printed_date || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
+                            <input type="text" :value="formatAuditDateTime(selectedRow?.printed_date, selectedRow?.printed_time)" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
@@ -125,7 +125,7 @@
                         </div>
                         <div>
                             <label class="block text-gray-600 text-xs">Date:</label>
-                            <input type="text" :value="selectedRow?.posted_date || ''" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
+                            <input type="text" :value="formatAuditDateTime(selectedRow?.posted_date, selectedRow?.posted_time)" readonly class="w-full border-gray-300 rounded-md bg-gray-50 px-2 py-1 text-sm" />
                         </div>
                     </div>
                     <div class="md:col-span-2">
@@ -252,6 +252,18 @@ const handleZoom = () => {
 
 const closeModal = () => {
     emit('close');
+};
+
+// ✅ Format audit trail date/time (CPS style: DD/MM/YYYY HH:MM)
+const formatAuditDateTime = (date, time) => {
+    if (!date) return '';
+    
+    // Combine date and time if both available
+    if (time) {
+        return `${date} ${time}`;
+    }
+    
+    return date;
 };
 </script>
 

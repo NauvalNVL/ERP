@@ -867,6 +867,10 @@ Route::get('/warehouse-management/invoice/iv-processing/cancel-active-invoice', 
 return Inertia::render('warehouse-management/Invoice/IVProcessing/CancelActiveInvoice');
 })->name('vue.warehouse-management.invoice.iv-processing.cancel-active-invoice');
 
+Route::get('/warehouse-management/invoice/iv-processing/print-invoice', function () {
+return Inertia::render('warehouse-management/Invoice/IVProcessing/PrintInvoice');
+})->name('vue.warehouse-management.invoice.iv-processing.print-invoice');
+
 // Invoice → Setup pages (Vue)
 Route::get('/warehouse-management/invoice/setup/define-tax-group', function () {
 return Inertia::render('warehouse-management/Invoice/Setup/DefineTaxGroup');

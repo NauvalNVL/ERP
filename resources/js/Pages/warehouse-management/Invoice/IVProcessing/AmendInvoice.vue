@@ -153,6 +153,68 @@
                 <input type="text" :value="selectedInvoice.status" readonly class="w-full md:w-1/2 border-gray-300 rounded-md bg-gray-50 px-3 py-2 text-gray-700 cursor-not-allowed" />
             </div>
 
+            <!-- ✅ CPS Style: Audit Trail Section -->
+            <div class="mt-6 bg-gray-50 border-2 border-gray-300 rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <i class="fas fa-history text-gray-500"></i>
+                    Audit Trail
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <!-- Issued By -->
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="block text-gray-600 text-xs mb-1">Issued by:</label>
+                            <input type="text" :value="selectedInvoice?.issued_by || ''" readonly 
+                                   class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-gray-600 text-xs mb-1">Date:</label>
+                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.issued_date, selectedInvoice?.issued_time)" readonly 
+                                   class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
+                        </div>
+                    </div>
+                    <!-- Amended By -->
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="block text-gray-600 text-xs mb-1">Amended by:</label>
+                            <input type="text" :value="selectedInvoice?.amended_by || ''" readonly 
+                                   class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-gray-600 text-xs mb-1">Date:</label>
+                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.amended_date, selectedInvoice?.amended_time)" readonly 
+                                   class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
+                        </div>
+                    </div>
+                    <!-- Printed By -->
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="block text-gray-600 text-xs mb-1">Printed by:</label>
+                            <input type="text" :value="selectedInvoice?.printed_by || ''" readonly 
+                                   class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-gray-600 text-xs mb-1">Date:</label>
+                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.printed_date, selectedInvoice?.printed_time)" readonly 
+                                   class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
+                        </div>
+                    </div>
+                    <!-- Posted By -->
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="block text-gray-600 text-xs mb-1">Posted by:</label>
+                            <input type="text" :value="selectedInvoice?.posted_by || ''" readonly 
+                                   class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-gray-600 text-xs mb-1">Date:</label>
+                            <input type="text" :value="formatAuditDateTime(selectedInvoice?.posted_date, selectedInvoice?.posted_time)" readonly 
+                                   class="w-full border-gray-300 rounded-md bg-white px-2 py-1 text-sm" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- CPS Style: Only Next button -->
             <div class="mt-6 flex justify-end">
                 <button @click="openFinalScreen" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow-lg">
@@ -356,12 +418,49 @@ const saveInvoice = async () => {
         return;
     }
 
+    // ✅ CPS Business Rules: Check if invoice can be amended
+    if (selectedInvoice.value.printed_by && selectedInvoice.value.printed_by.trim() !== '') {
+        toast.error(`Cannot amend invoice that has been printed by ${selectedInvoice.value.printed_by}`);
+        return;
+    }
+
+    if (selectedInvoice.value.status === 'Cancelled') {
+        toast.error('Cannot amend cancelled invoice');
+        return;
+    }
+
+    if (selectedInvoice.value.status === 'Posted') {
+        toast.error('Cannot amend invoice that has been posted to GL');
+        return;
+    }
+
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
+        console.log('💾 Saving invoice amendment:', {
+            invoice_no: selectedInvoice.value.invoice_no,
+            tax_code: selectedInvoice.value.tax_code,
+            tax_percent: selectedInvoice.value.tax_percent,
+            tax_amount: selectedInvoice.value.tax_amount,
+            total_amount: selectedInvoice.value.total_amount,
+            net_amount: selectedInvoice.value.net_amount,
+            remark: selectedInvoice.value.remark
+        });
+
         const res = await axios.put(
             `/api/invoices/${encodeURIComponent(selectedInvoice.value.invoice_no)}`,
-            selectedInvoice.value,
+            {
+                exchange_method: selectedInvoice.value.exchange_method,
+                tax_index_no: selectedInvoice.value.tax_index_no,
+                tax_code: selectedInvoice.value.tax_code,
+                tax_percent: selectedInvoice.value.tax_percent,
+                invoice_date: selectedInvoice.value.invoice_date,
+                ref2: selectedInvoice.value.ref2,
+                remark: selectedInvoice.value.remark,
+                total_amount: selectedInvoice.value.total_amount,
+                tax_amount: selectedInvoice.value.tax_amount,
+                net_amount: selectedInvoice.value.net_amount
+            },
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -370,13 +469,30 @@ const saveInvoice = async () => {
             }
         );
 
-        if (res.data) {
-            toast.success('Invoice updated successfully');
-            selectedInvoice.value = null;
+        if (res.data && res.data.success) {
+            console.log('✅ Invoice amended successfully:', res.data);
+            toast.success(`Invoice ${selectedInvoice.value.invoice_no} amended successfully`);
+            
+            // Reload invoice details to show updated audit trail
+            const reloadRes = await axios.get(`/api/invoices/${encodeURIComponent(selectedInvoice.value.invoice_no)}`);
+            if (reloadRes.data) {
+                selectedInvoice.value = {
+                    ...reloadRes.data,
+                    exchange_rate: parseFloat(reloadRes.data.exchange_rate) || 0,
+                    total_amount: parseFloat(reloadRes.data.total_amount) || 0,
+                    tax_amount: parseFloat(reloadRes.data.tax_amount) || 0,
+                    net_amount: parseFloat(reloadRes.data.net_amount) || 0,
+                    tax_percent: parseFloat(reloadRes.data.tax_percent) || 0,
+                    tax_code: String(reloadRes.data.tax_code || ''),
+                    tax_index_no: String(reloadRes.data.tax_index_no || '')
+                };
+                console.log('✅ Invoice details reloaded with updated audit trail');
+            }
         }
     } catch (e) {
-        console.error('Error saving invoice:', e);
-        toast.error(e?.response?.data?.message || 'Failed to update invoice');
+        console.error('❌ Error saving invoice:', e);
+        const errorMsg = e?.response?.data?.error || e?.response?.data?.message || 'Failed to update invoice';
+        toast.error(errorMsg);
     }
 };
 
@@ -583,6 +699,18 @@ const formatPeriod = (invoiceNo) => {
     }
 
     return invoiceNo; // Return as-is if format unknown
+};
+
+// ✅ Format audit trail date/time (CPS style: DD/MM/YYYY HH:MM)
+const formatAuditDateTime = (date, time) => {
+    if (!date) return '';
+    
+    // Combine date and time if both available
+    if (time) {
+        return `${date} ${time}`;
+    }
+    
+    return date;
 };
 
 // Final Screen Functions
