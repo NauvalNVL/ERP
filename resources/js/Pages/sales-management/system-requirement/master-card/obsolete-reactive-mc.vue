@@ -566,15 +566,19 @@ const fetchMcsData = async () => {
 
     try {
         const params = {
-            ac: form.value.ac,
-            sort: mcsSortOption.value || 'mc_seq',
-            order: mcsSortOrder.value || 'asc',
-            status: mcsStatusFilter.value || 'Act',
-            search: mcsSearchTerm.value || '',
+            customer_code: form.value.ac,
+            sortBy: mcsSortOption.value || 'mc_seq',
+            sortOrder: mcsSortOrder.value || 'asc',
+            status: [mcsStatusFilter.value || 'Act'],
+            query: mcsSearchTerm.value || '',
             page: mcsCurrentPage.value || 1,
+            per_page: 10,
         };
 
-        const response = await axios.get('/api/mc/by-customer-paginated', { params });
+        console.log('Fetching MCS data with params:', params);
+        const response = await axios.get('/api/update-mc/master-cards', { params });
+        
+        console.log('MCS API Response:', response.data);
         
         if (response.data) {
             mcsMasterCards.value = response.data.data || response.data;
@@ -619,30 +623,51 @@ const loadMcDetails = async (mcsNum) => {
             // Preserve existing customer_name if already filled
             const existingCustomerName = mcDetails.value.customer_name;
             
-            // Populate MC details
+            // Populate MC details - using MC table structure with salesperson
             mcDetails.value = {
-                customer_name: mc.customer_name || existingCustomerName || '',
-                model: mc.model || '',
+                customer_name: mc.AC_NAME || existingCustomerName || '',
+                model: mc.MODEL || '',
                 salesperson_code: mc.salesperson_code || '',
                 salesperson_name: mc.salesperson_name || '',
-                current_status: mc.status || 'Active',
+                current_status: mc.STS || 'ACTIVE',
             };
             
             console.log('MC Details populated:', mcDetails.value);
 
-            // Populate last update log
-            if (mc.last_update) {
-                lastUpdate.value = {
-                    status: mc.last_update.status || '',
-                    user_id: mc.last_update.user_id || '',
-                    date: mc.last_update.date || '',
-                    time: mc.last_update.time || '',
-                    reason: mc.last_update.reason || '',
-                    total_update: mc.last_update.total_update || 0,
-                };
-                console.log('Last Update Log populated:', lastUpdate.value);
-            } else {
-                // Initialize empty last update if no data
+            // Get last update log from MC_UPDATE_LOG table
+            try {
+                const logResponse = await axios.get(`/api/mc/update-log/${mcsNum}`);
+                console.log('Update Log API Response:', logResponse.data);
+                
+                if (logResponse.data && logResponse.data.length > 0) {
+                    const lastLog = logResponse.data[0];
+                    
+                    // Format date and time
+                    const createdDate = lastLog.created_at ? new Date(lastLog.created_at) : null;
+                    
+                    lastUpdate.value = {
+                        status: lastLog.status || '',
+                        user_id: lastLog.user_id || '',
+                        date: createdDate ? createdDate.toLocaleDateString('id-ID') : '',
+                        time: createdDate ? createdDate.toLocaleTimeString('id-ID') : '',
+                        reason: lastLog.reason || '',
+                        total_update: logResponse.data.length || 0,
+                    };
+                    console.log('Last Update Log populated:', lastUpdate.value);
+                } else {
+                    // Initialize empty last update if no data
+                    lastUpdate.value = {
+                        status: '',
+                        user_id: '',
+                        date: '',
+                        time: '',
+                        reason: '',
+                        total_update: 0,
+                    };
+                    console.log('No last update data available');
+                }
+            } catch (logError) {
+                console.log('No update log found or error fetching log:', logError);
                 lastUpdate.value = {
                     status: '',
                     user_id: '',
@@ -651,7 +676,6 @@ const loadMcDetails = async (mcsNum) => {
                     reason: '',
                     total_update: 0,
                 };
-                console.log('No last update data available');
             }
         }
     } catch (error) {
@@ -680,10 +704,11 @@ const detectedAction = computed(() => {
     
     if (!status) return '';
     
-    if (status === 'Active' || status === 'Act') {
+    // Check for ACTIVE status (case insensitive)
+    if (status.toUpperCase() === 'ACTIVE' || status.toUpperCase() === 'ACT' || status.toUpperCase() === 'APPROVED') {
         console.log('Action detected: To Obsolete');
         return 'To Obsolete';
-    } else if (status === 'Obsolete') {
+    } else if (status.toUpperCase() === 'OBSOLETE') {
         console.log('Action detected: To Reactivate');
         return 'To Reactivate';
     }
@@ -763,43 +788,54 @@ const confirmSave = async () => {
     showConfirmModal.value = false;
 
     try {
+        const action = detectedAction.value;
+        const mcsNum = form.value.mcs;
+        const reason = form.value.reason.trim();
+        
+        let endpoint = '';
+        
+        // Determine endpoint based on action
+        if (action === 'To Obsolete') {
+            endpoint = `/api/obsolete-reactive-mc/${mcsNum}/obsolete`;
+        } else if (action === 'To Reactivate') {
+            endpoint = `/api/obsolete-reactive-mc/${mcsNum}/reactive`;
+        } else {
+            showToast('Error', 'Invalid action detected.', 'error');
+            return;
+        }
+
         const payload = {
-            mcs_num: form.value.mcs,
-            reason: form.value.reason.trim(),
-            action: detectedAction.value, // 'To Obsolete' or 'To Reactivate'
+            reason: reason,
         };
 
-        console.log('Sending payload:', payload);
-        const response = await axios.post('/api/mc/update-status', payload);
+        console.log('Sending request to:', endpoint);
+        console.log('Payload:', payload);
+        
+        const response = await axios.post(endpoint, payload);
         console.log('Response:', response.data);
         
-        if (response.data.success) {
-            console.log('Update successful, showing toast...');
-            
-            // Show success message
-            showToast('Success', response.data.message || 'Master Card updated successfully.', 'success');
-            
-            console.log('Waiting 1.5 seconds...');
-            // Wait a moment for user to see the toast
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            console.log('Resetting form...');
-            // Reset form back to initial state
-            resetFormToInitial();
-            
-            console.log('Showing info toast...');
-            // Show additional success message
-            showToast('Info', 'Form has been reset. You can now update another Master Card.', 'info');
-            
-            console.log('confirmSave complete');
-        } else {
-            console.log('Update failed:', response.data.message);
-            showToast('Error', response.data.message || 'Failed to update master card.', 'error');
-        }
+        console.log('Update successful, showing toast...');
+        
+        // Show success message
+        showToast('Success', response.data.message || 'Master Card updated successfully.', 'success');
+        
+        console.log('Waiting 1.5 seconds...');
+        // Wait a moment for user to see the toast
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        console.log('Resetting form...');
+        // Reset form back to initial state
+        resetFormToInitial();
+        
+        console.log('Showing info toast...');
+        // Show additional success message
+        showToast('Info', 'Form has been reset. You can now update another Master Card.', 'info');
+        
+        console.log('confirmSave complete');
     } catch (error) {
         console.error('Save error:', error);
         console.error('Error response:', error.response?.data);
-        showToast('Error', error.response?.data?.message || 'An unexpected error occurred.', 'error');
+        showToast('Error', error.response?.data?.message || error.response?.data?.error || 'An unexpected error occurred.', 'error');
     }
 };
 
