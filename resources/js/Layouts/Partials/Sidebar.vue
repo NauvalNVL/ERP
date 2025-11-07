@@ -210,8 +210,8 @@ const isActive = (route) => {
 const hasPermission = (menuKey) => {
   if (!user.value) return false;
   
-  // Temporary: Allow define_machine for testing
-  if (menuKey === 'define_machine' || menuKey === 'view_print_machine') {
+  // Temporary: Allow define_machine and obsolete_unobsolete_paper_quality for testing
+  if (menuKey === 'define_machine' || menuKey === 'view_print_machine' || menuKey === 'obsolete_unobsolete_paper_quality') {
     return true;
   }
   
@@ -280,6 +280,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Product Design': 'define_product_design',
     'Define Scoring Tool': 'define_scoring_tool',
     'Define Paper Quality': 'define_paper_quality',
+    'Obsolete/Unobsolete Paper Quality': 'obsolete_unobsolete_paper_quality',
     'Define Paper Flute': 'define_paper_flute',
     'Define Paper Size': 'define_paper_size',
     'Define Color Group': 'define_color_group',

@@ -57,13 +57,13 @@ class PaperFluteController extends Controller
             $validator = Validator::make($request->all(), [
                 'Flute' => 'required|string|max:25|unique:Flute_CPS,Flute',
                 'Descr' => 'required|string|max:100',
-                'DB' => 'nullable|numeric',
-                'B' => 'nullable|numeric',
-                '_1L' => 'nullable|numeric',
-                'A_C_E' => 'nullable|numeric',
-                '_2L' => 'nullable|numeric',
-                'Height' => 'nullable|numeric',
-                'Starch' => 'nullable|numeric',
+                'DB' => 'nullable|numeric|min:0',
+                'B' => 'nullable|numeric|min:0',
+                '_1L' => 'nullable|numeric|min:0',
+                'A_C_E' => 'nullable|numeric|min:0',
+                '_2L' => 'nullable|numeric|min:0',
+                'Height' => 'nullable|numeric|min:0',
+                'Starch' => 'nullable|numeric|min:0',
             ]);
 
             if ($validator->fails()) {
@@ -113,13 +113,13 @@ class PaperFluteController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'Descr' => 'required|string|max:100',
-                'DB' => 'nullable|numeric',
-                'B' => 'nullable|numeric',
-                '_1L' => 'nullable|numeric',
-                'A_C_E' => 'nullable|numeric',
-                '_2L' => 'nullable|numeric',
-                'Height' => 'nullable|numeric',
-                'Starch' => 'nullable|numeric',
+                'DB' => 'nullable|numeric|min:0',
+                'B' => 'nullable|numeric|min:0',
+                '_1L' => 'nullable|numeric|min:0',
+                'A_C_E' => 'nullable|numeric|min:0',
+                '_2L' => 'nullable|numeric|min:0',
+                'Height' => 'nullable|numeric|min:0',
+                'Starch' => 'nullable|numeric|min:0',
             ]);
 
             if ($validator->fails()) {
