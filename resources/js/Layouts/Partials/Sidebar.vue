@@ -310,6 +310,7 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print MC Print/DC Block Listing': 'view_print_mc_print_dc_block_listing',
     'View & Print MC DC Block Matching': 'view_print_mc_dc_block_matching',
     'View & Print MC by Color': 'view_print_mc_by_color',
+    'View & Print Analysis Code': 'view_print_analysis_code',
     'View & Print MC by P/Size P/Quality': 'view_print_mc_by_psize_pquality',
     'View & Print MC by Machine': 'view_print_mc_by_machine',
 
@@ -352,6 +353,7 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print Scoring Tool': 'view_print_scoring_tool',
     'View & Print Color Group': 'view_print_color_group',
     'View & Print Color': 'view_print_color',
+    'View & Print Analysis Code': 'view_print_analysis_code',
     'View & Print Finishing': 'view_print_finishing',
     'View & Print Stitch Wire': 'view_print_stitch_wire',
     'View & Print Chemical Coat': 'view_print_chemical_coat',
@@ -595,6 +597,7 @@ const salesManagementItems = [
           { title: 'View & Print Scoring Tool', icon: 'fas fa-print', route: '/scoring-tool/view-print' },
           { title: 'View & Print Color Group', icon: 'fas fa-print', route: '/color-group/view-print' },
           { title: 'View & Print Color', icon: 'fas fa-print', route: '/color/view-print' },
+          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/analysis-code/view-print' },
           { title: 'View & Print Finishing', icon: 'fas fa-print', route: '/finishing/view-print' },
           { title: 'View & Print Stitch Wire', icon: 'fas fa-print', route: '/stitch-wire/view-print' },
           { title: 'View & Print Chemical Coat', icon: 'fas fa-print', route: '/chemical-coat/view-print' },

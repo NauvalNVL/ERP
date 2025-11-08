@@ -125,6 +125,16 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
+                        <Link href="/analysis-code/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                            <div class="p-2 bg-green-500 rounded-full mr-3">
+                                <i class="fas fa-print text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-green-900">View & Print</p>
+                                <p class="text-xs text-green-700">Print analysis code list</p>
+                            </div>
+                        </Link>
+
                         <div class="flex items-center p-3 bg-purple-50 rounded-lg">
                             <div class="p-2 bg-purple-500 rounded-full mr-3">
                                 <i class="fas fa-chart-bar text-white text-sm"></i>
@@ -284,7 +294,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import AnalysisCodeModal from '@/Components/AnalysisCodeModal.vue';
 
