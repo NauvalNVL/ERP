@@ -1422,6 +1422,17 @@ Route::get('/master-cards', [UpdateMcController::class, 'apiIndex']);
 Route::get('/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs']);
 });
 
+// Delivery Order API Routes
+Route::prefix('delivery-orders')->group(function () {
+    Route::post('/fix-missing-data', [DeliveryOrderController::class, 'fixMissingData']);
+    Route::get('/print-range', [DeliveryOrderController::class, 'getPrintRange']);
+    Route::post('/', [DeliveryOrderController::class, 'store']);
+    Route::get('/', [DeliveryOrderController::class, 'index']);
+    Route::get('/{doNumber}', [DeliveryOrderController::class, 'show']);
+    Route::put('/{doNumber}', [DeliveryOrderController::class, 'update']);
+    Route::post('/{doNumber}/cancel', [DeliveryOrderController::class, 'cancel']);
+});
+
 // FG Stock-In by WO API routes
 Route::prefix('fg-stock-in-wo')->group(function () {
 Route::get('/work-orders', [App\Http\Controllers\Api\FgStockInByWoController::class, 'getWorkOrders']);
