@@ -11,7 +11,7 @@
                                 <UserAddIcon class="h-8 w-8 text-white" />
                             </div>
                             <div class="text-center">
-                                <h1 class="text-3xl font-bold text-white mb-2">Create New User - Modern UI</h1>
+                                <h1 class="text-3xl font-bold text-white mb-2">Create New User</h1>
                                 <p class="text-blue-100">Add new user to the ERP system with modern interface</p>
                             </div>
                         </div>

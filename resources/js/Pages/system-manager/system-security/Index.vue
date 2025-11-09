@@ -1,11 +1,22 @@
 <template>
     <AppLayout header="User List">
         <Head title="User Management" />
-        <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8">
-            <div class="max-w-7xl mx-auto">
+        <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+            <!-- Animated Bubbles Background -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <div class="bubble bubble-1"></div>
+                <div class="bubble bubble-2"></div>
+                <div class="bubble bubble-3"></div>
+                <div class="bubble bubble-4"></div>
+                <div class="bubble bubble-5"></div>
+                <div class="bubble bubble-6"></div>
+                <div class="bubble bubble-7"></div>
+                <div class="bubble bubble-8"></div>
+            </div>
+            <div class="max-w-7xl mx-auto relative z-10">
                 <!-- Header Card -->
                 <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-8">
+                    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8" style="background: linear-gradient(90deg, #2563eb 0%, #4f46e5 50%, #9333ea 100%);">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                             <div class="flex items-center mb-4 sm:mb-0">
                                 <div class="bg-white/20 backdrop-blur-sm rounded-full p-3 mr-4">
@@ -13,7 +24,7 @@
                                 </div>
                                 <div>
                                     <h1 class="text-3xl font-bold text-white mb-1">User Management</h1>
-                                    <p class="text-indigo-100">Manage system users and permissions</p>
+                                    <p class="text-blue-100">Manage system users and their information</p>
                                 </div>
                             </div>
                             <Link href="/user/create"
@@ -447,6 +458,106 @@ tr:hover {
     .py-6 {
         padding-top: 1rem;
         padding-bottom: 1rem;
+    }
+}
+
+/* Animated Bubbles */
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    animation: float 15s infinite ease-in-out;
+    pointer-events: none;
+}
+
+.bubble-1 {
+    width: 80px;
+    height: 80px;
+    left: 10%;
+    top: 20%;
+    animation-delay: 0s;
+    animation-duration: 20s;
+}
+
+.bubble-2 {
+    width: 120px;
+    height: 120px;
+    right: 15%;
+    top: 10%;
+    animation-delay: 2s;
+    animation-duration: 25s;
+}
+
+.bubble-3 {
+    width: 60px;
+    height: 60px;
+    left: 20%;
+    bottom: 30%;
+    animation-delay: 4s;
+    animation-duration: 18s;
+}
+
+.bubble-4 {
+    width: 100px;
+    height: 100px;
+    right: 25%;
+    bottom: 20%;
+    animation-delay: 6s;
+    animation-duration: 22s;
+}
+
+.bubble-5 {
+    width: 40px;
+    height: 40px;
+    left: 50%;
+    top: 15%;
+    animation-delay: 8s;
+    animation-duration: 16s;
+}
+
+.bubble-6 {
+    width: 90px;
+    height: 90px;
+    left: 5%;
+    bottom: 10%;
+    animation-delay: 10s;
+    animation-duration: 24s;
+}
+
+.bubble-7 {
+    width: 70px;
+    height: 70px;
+    right: 5%;
+    top: 50%;
+    animation-delay: 12s;
+    animation-duration: 19s;
+}
+
+.bubble-8 {
+    width: 50px;
+    height: 50px;
+    left: 80%;
+    bottom: 40%;
+    animation-delay: 14s;
+    animation-duration: 21s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) translateX(0px) rotate(0deg);
+        opacity: 0.3;
+    }
+    25% {
+        transform: translateY(-20px) translateX(10px) rotate(90deg);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translateY(-40px) translateX(-10px) rotate(180deg);
+        opacity: 0.4;
+    }
+    75% {
+        transform: translateY(-20px) translateX(15px) rotate(270deg);
+        opacity: 0.7;
     }
 }
 
