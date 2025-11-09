@@ -32,93 +32,128 @@
             </div>
         </div>
 
-        <!-- Stats Cards -->
+        <!-- ERP Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <!-- Card 1 -->
+            <!-- Sales Teams -->
             <div
                 class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-lg hover-float animate-fadeIn"
                 style="animation-delay: 100ms;"
             >
                 <div class="p-6 flex items-center">
                     <div class="rounded-full bg-blue-500 p-3 mr-4">
-                        <i class="fas fa-chart-line text-white text-xl"></i>
+                        <i class="fas fa-users-cog text-white text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Total Sales</p>
-                        <p class="text-2xl font-semibold text-gray-900">$24,780</p>
-                        <p class="text-sm text-green-600 flex items-center">
-                            <i class="fas fa-arrow-up mr-1"></i> 12% <span class="text-gray-500 ml-2">from last month</span>
+                        <p class="text-sm font-medium text-gray-500">Sales Teams</p>
+                        <p class="text-2xl font-semibold text-gray-900">12</p>
+                        <p class="text-sm text-blue-600 flex items-center">
+                            <i class="fas fa-info-circle mr-1"></i> <span class="text-gray-500">Active teams</span>
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 2 -->
+            <!-- Product Groups -->
             <div
                 class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-lg hover-float animate-fadeIn"
                 style="animation-delay: 200ms;"
             >
                 <div class="p-6 flex items-center">
                     <div class="rounded-full bg-green-500 p-3 mr-4">
-                        <i class="fas fa-users text-white text-xl"></i>
+                        <i class="fas fa-boxes text-white text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Active Customers</p>
-                        <p class="text-2xl font-semibold text-gray-900">573</p>
+                        <p class="text-sm font-medium text-gray-500">Product Groups</p>
+                        <p class="text-2xl font-semibold text-gray-900">45</p>
                         <p class="text-sm text-green-600 flex items-center">
-                            <i class="fas fa-arrow-up mr-1"></i> 5.3% <span class="text-gray-500 ml-2">from last month</span>
+                            <i class="fas fa-info-circle mr-1"></i> <span class="text-gray-500">Defined groups</span>
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 3 -->
+            <!-- Machines -->
             <div
                 class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-lg hover-float animate-fadeIn"
                 style="animation-delay: 300ms;"
             >
                 <div class="p-6 flex items-center">
                     <div class="rounded-full bg-purple-500 p-3 mr-4">
-                        <i class="fas fa-box text-white text-xl"></i>
+                        <i class="fas fa-cogs text-white text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Products</p>
-                        <p class="text-2xl font-semibold text-gray-900">128</p>
-                        <p class="text-sm text-green-600 flex items-center">
-                            <i class="fas fa-arrow-up mr-1"></i> 3.2% <span class="text-gray-500 ml-2">from last month</span>
+                        <p class="text-sm font-medium text-gray-500">Machines</p>
+                        <p class="text-2xl font-semibold text-gray-900">28</p>
+                        <p class="text-sm text-purple-600 flex items-center">
+                            <i class="fas fa-info-circle mr-1"></i> <span class="text-gray-500">Active machines</span>
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 4 -->
+            <!-- Paper Qualities -->
             <div
                 class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-lg hover-float animate-fadeIn"
                 style="animation-delay: 400ms;"
             >
                 <div class="p-6 flex items-center">
-                    <div class="rounded-full bg-red-500 p-3 mr-4">
-                        <i class="fas fa-tasks text-white text-xl"></i>
+                    <div class="rounded-full bg-orange-500 p-3 mr-4">
+                        <i class="fas fa-scroll text-white text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Pending Orders</p>
-                        <p class="text-2xl font-semibold text-gray-900">25</p>
-                        <p class="text-sm text-red-600 flex items-center">
-                            <i class="fas fa-arrow-down mr-1"></i> 2.5% <span class="text-gray-500 ml-2">from last month</span>
+                        <p class="text-sm font-medium text-gray-500">Paper Qualities</p>
+                        <p class="text-2xl font-semibold text-gray-900">67</p>
+                        <p class="text-sm text-orange-600 flex items-center">
+                            <i class="fas fa-info-circle mr-1"></i> <span class="text-gray-500">Defined qualities</span>
                         </p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Charts and Activities -->
+        <!-- ERP Module Shortcuts -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <div class="bg-white rounded-lg shadow-sm p-6 lg:col-span-2">
                 <h4 class="text-lg font-semibold text-gray-800 mb-4">
-                    Sales Chart
+                    ERP Module Access
                 </h4>
-                <div class="h-64">
-                    <canvas ref="salesChart"></canvas>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <a href="/sales-team" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <div class="p-2 bg-blue-500 rounded-full mr-3">
+                            <i class="fas fa-clipboard-list text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-blue-900">Standard Requirement</p>
+                            <p class="text-xs text-blue-700">Manage sales teams, products, machines</p>
+                        </div>
+                    </a>
+                    <a href="/customer-group" class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <div class="p-2 bg-green-500 rounded-full mr-3">
+                            <i class="fas fa-user-circle text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-green-900">Customer Account</p>
+                            <p class="text-xs text-green-700">Manage customer groups & accounts</p>
+                        </div>
+                    </a>
+                    <a href="/user" class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <div class="p-2 bg-purple-500 rounded-full mr-3">
+                            <i class="fas fa-shield-alt text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-purple-900">System Security</p>
+                            <p class="text-xs text-purple-700">User management & permissions</p>
+                        </div>
+                    </a>
+                    <a href="/machine/view-print" class="flex items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
+                        <div class="p-2 bg-orange-500 rounded-full mr-3">
+                            <i class="fas fa-print text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-orange-900">View & Print Reports</p>
+                            <p class="text-xs text-orange-700">Generate system reports</p>
+                        </div>
+                    </a>
                 </div>
             </div>
 
@@ -316,244 +351,187 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
+            <!-- ERP Quick Actions -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <h4 class="text-lg font-semibold text-gray-800 mb-4">
-                    Quick Actions
+                    Quick Actions - ERP Modules
                 </h4>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <a
-                        href="#"
+                        href="/sales-team"
                         class="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-300"
                     >
                         <div class="bg-blue-100 p-3 rounded-full mb-2">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6 text-blue-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                                />
-                            </svg>
+                            <i class="fas fa-users-cog text-blue-500 text-xl"></i>
                         </div>
                         <span class="text-sm font-medium text-gray-700"
-                            >Add Product</span
+                            >Define Sales Team</span
                         >
                     </a>
                     <a
-                        href="#"
+                        href="/product-group"
                         class="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition duration-300"
                     >
                         <div class="bg-green-100 p-3 rounded-full mb-2">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6 text-green-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                                />
-                            </svg>
+                            <i class="fas fa-boxes text-green-500 text-xl"></i>
                         </div>
                         <span class="text-sm font-medium text-gray-700"
-                            >Create Order</span
+                            >Define Product Group</span
                         >
                     </a>
                     <a
-                        href="#"
+                        href="/machine"
                         class="flex flex-col items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition duration-300"
                     >
                         <div class="bg-purple-100 p-3 rounded-full mb-2">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6 text-purple-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-                                />
-                            </svg>
+                            <i class="fas fa-cogs text-purple-500 text-xl"></i>
                         </div>
                         <span class="text-sm font-medium text-gray-700"
-                            >Add Customer</span
+                            >Define Machine</span
                         >
                     </a>
                     <a
-                        href="#"
-                        class="flex flex-col items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition duration-300"
+                        href="/paper-quality"
+                        class="flex flex-col items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition duration-300"
                     >
-                        <div class="bg-yellow-100 p-3 rounded-full mb-2">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6 text-yellow-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                />
-                            </svg>
+                        <div class="bg-orange-100 p-3 rounded-full mb-2">
+                            <i class="fas fa-scroll text-orange-500 text-xl"></i>
                         </div>
                         <span class="text-sm font-medium text-gray-700"
-                            >Reports</span
+                            >Define Paper Quality</span
                         >
                     </a>
                     <a
-                        href="#"
-                        class="flex flex-col items-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition duration-300"
-                    >
-                        <div class="bg-red-100 p-3 rounded-full mb-2">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6 text-red-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                />
-                            </svg>
-                        </div>
-                        <span class="text-sm font-medium text-gray-700"
-                            >Finance</span
-                        >
-                    </a>
-                    <a
-                        href="#"
+                        href="/machine/view-print"
                         class="flex flex-col items-center p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition duration-300"
                     >
                         <div class="bg-indigo-100 p-3 rounded-full mb-2">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6 text-indigo-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                                />
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                />
-                            </svg>
+                            <i class="fas fa-print text-indigo-500 text-xl"></i>
                         </div>
                         <span class="text-sm font-medium text-gray-700"
-                            >Settings</span
+                            >View & Print Machine</span
+                        >
+                    </a>
+                    <a
+                        href="/user"
+                        class="flex flex-col items-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition duration-300"
+                    >
+                        <div class="bg-red-100 p-3 rounded-full mb-2">
+                            <i class="fas fa-user-plus text-red-500 text-xl"></i>
+                        </div>
+                        <span class="text-sm font-medium text-gray-700"
+                            >System Security</span
                         >
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- Product Categories Chart -->
+        <!-- ERP System Information -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <h4 class="text-lg font-semibold text-gray-800 mb-4">
-                    Product Categories
+                    Recently Added Data
                 </h4>
-                <div class="h-64">
-                    <canvas ref="productChart"></canvas>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-users-cog text-blue-500 mr-3"></i>
+                            <span class="text-sm font-medium">Sales Team "Team Alpha"</span>
+                        </div>
+                        <span class="text-xs text-gray-500">2 hours ago</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-cogs text-green-500 mr-3"></i>
+                            <span class="text-sm font-medium">Machine "Corrugator-01"</span>
+                        </div>
+                        <span class="text-xs text-gray-500">4 hours ago</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-scroll text-purple-500 mr-3"></i>
+                            <span class="text-sm font-medium">Paper Quality "Premium Grade"</span>
+                        </div>
+                        <span class="text-xs text-gray-500">6 hours ago</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-boxes text-orange-500 mr-3"></i>
+                            <span class="text-sm font-medium">Product Group "Packaging"</span>
+                        </div>
+                        <span class="text-xs text-gray-500">8 hours ago</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Performance Metrics -->
+            <!-- System Status -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <h4 class="text-lg font-semibold text-gray-800 mb-4">
-                    Monthly Performance
+                    System Status
                 </h4>
                 <div class="space-y-4">
                     <div>
                         <div class="flex justify-between mb-1">
                             <span class="text-sm font-medium text-gray-700"
-                                >Sales Target</span
+                                >Data Completeness</span
                             >
                             <span class="text-sm font-medium text-gray-700"
-                                >85%</span
+                                >95%</span
                             >
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2.5">
                             <div
                                 class="bg-blue-600 h-2.5 rounded-full"
-                                style="width: 85%"
+                                style="width: 95%"
                             ></div>
                         </div>
                     </div>
                     <div>
                         <div class="flex justify-between mb-1">
                             <span class="text-sm font-medium text-gray-700"
-                                >Customer Satisfaction</span
+                                >Active Modules</span
                             >
                             <span class="text-sm font-medium text-gray-700"
-                                >92%</span
+                                >8/10</span
                             >
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2.5">
                             <div
                                 class="bg-green-600 h-2.5 rounded-full"
-                                style="width: 92%"
+                                style="width: 80%"
                             ></div>
                         </div>
                     </div>
                     <div>
                         <div class="flex justify-between mb-1">
                             <span class="text-sm font-medium text-gray-700"
-                                >On-time Delivery</span
+                                >User Activity</span
                             >
                             <span class="text-sm font-medium text-gray-700"
-                                >78%</span
+                                >Active</span
                             >
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2.5">
                             <div
-                                class="bg-yellow-500 h-2.5 rounded-full"
-                                style="width: 78%"
+                                class="bg-green-600 h-2.5 rounded-full"
+                                style="width: 100%"
                             ></div>
                         </div>
                     </div>
                     <div>
                         <div class="flex justify-between mb-1">
                             <span class="text-sm font-medium text-gray-700"
-                                >Visitor Conversion</span
+                                >System Health</span
                             >
                             <span class="text-sm font-medium text-gray-700"
-                                >65%</span
+                                >Excellent</span
                             >
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2.5">
                             <div
-                                class="bg-purple-600 h-2.5 rounded-full"
-                                style="width: 65%"
+                                class="bg-green-600 h-2.5 rounded-full"
+                                style="width: 98%"
                             ></div>
                         </div>
                     </div>
@@ -569,13 +547,9 @@ import { ref, onMounted, computed } from "vue";
 import { Head } from "@inertiajs/vue3";
 import { usePage } from '@inertiajs/vue3';
 import AppLayout from '../Layouts/AppLayout.vue';
-import Chart from "chart.js/auto";
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
-
-const salesChart = ref(null);
-const productChart = ref(null);
 
 const formattedDate = computed(() => {
     const now = new Date();
@@ -587,162 +561,10 @@ const formattedDate = computed(() => {
     });
 });
 
-// Chart configurations
-const initCharts = () => {
-    if (!salesChart.value || !productChart.value) return;
-
-    // Sales Chart
-    new Chart(salesChart.value, {
-        type: "line",
-        data: {
-            labels: [
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec",
-            ],
-            datasets: [
-                {
-                    label: "Sales 2023",
-                    data: [
-                        5.2, 6.3, 8.5, 7.8, 8.2, 7.5, 9.1, 10.5, 11.2, 9.8, 8.7,
-                        12.3,
-                    ],
-                    backgroundColor: "rgba(59, 130, 246, 0.1)",
-                    borderColor: "rgba(59, 130, 246, 0.8)",
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true,
-                },
-                {
-                    label: "Sales 2022",
-                    data: [
-                        4.8, 5.7, 7.2, 6.5, 7.1, 6.8, 8.2, 9.3, 9.8, 8.5, 7.9,
-                        10.5,
-                    ],
-                    backgroundColor: "rgba(16, 185, 129, 0.1)",
-                    borderColor: "rgba(16, 185, 129, 0.8)",
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: "top",
-                    labels: {
-                        usePointStyle: true,
-                        boxWidth: 6,
-                    },
-                },
-                tooltip: {
-                    backgroundColor: "rgba(17, 24, 39, 0.9)",
-                    titleColor: "#fff",
-                    bodyColor: "#fff",
-                    padding: 10,
-                    cornerRadius: 6,
-                    displayColors: false,
-                    callbacks: {
-                        label: function (context) {
-                            return (
-                                context.dataset.label +
-                                ": $" +
-                                context.parsed.y +
-                                "K"
-                            );
-                        },
-                    },
-                },
-            },
-            scales: {
-                x: { grid: { display: false } },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function (value) {
-                            return "$" + value + "K";
-                        },
-                    },
-                },
-            },
-        },
-    });
-
-    // Product Categories Chart
-    new Chart(productChart.value, {
-        type: "doughnut",
-        data: {
-            labels: ["Electronics", "Fashion", "Food", "Furniture", "Health"],
-            datasets: [
-                {
-                    label: "Sales by Category",
-                    data: [35, 25, 20, 15, 5],
-                    backgroundColor: [
-                        "rgba(59, 130, 246, 0.8)",
-                        "rgba(16, 185, 129, 0.8)",
-                        "rgba(245, 158, 11, 0.8)",
-                        "rgba(139, 92, 246, 0.8)",
-                        "rgba(239, 68, 68, 0.8)",
-                    ],
-                    borderWidth: 0,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: "right",
-                    labels: {
-                        usePointStyle: true,
-                        boxWidth: 6,
-                    },
-                },
-                tooltip: {
-                    backgroundColor: "rgba(17, 24, 39, 0.9)",
-                    titleColor: "#fff",
-                    bodyColor: "#fff",
-                    padding: 10,
-                    cornerRadius: 6,
-                    displayColors: false,
-                    callbacks: {
-                        label: function (context) {
-                            return context.label + ": " + context.parsed + "%";
-                        },
-                    },
-                },
-            },
-            cutout: "70%",
-        },
-    });
-};
-
+// ERP Dashboard initialization
 onMounted(() => {
-    initCharts();
+    console.log('ERP Dashboard loaded for user:', user.value?.username);
 });
-
-// Untuk responsive charts
-const resizeCharts = () => {
-    if (window.chartInstances) {
-        window.chartInstances.forEach((chart) => chart.destroy());
-        initCharts();
-    }
-};
-
-window.addEventListener("resize", resizeCharts);
 </script>
 
 <style scoped>

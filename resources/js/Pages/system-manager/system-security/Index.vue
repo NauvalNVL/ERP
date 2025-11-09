@@ -1,123 +1,199 @@
 <template>
     <AppLayout header="User List">
         <Head title="User Management" />
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="bg-white shadow-xl rounded-lg overflow-hidden">
-                <!-- Header Section -->
-                <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-6 border-b border-blue-200">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-4 sm:mb-0 flex items-center">
-                            <UserGroupIcon class="h-6 w-6 text-blue-600 mr-2" />
-                            User List
-                        </h2>
-                        <Link href="/user/create"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
-                            <UserAddIcon class="h-5 w-5 mr-2" />
-                            Add New User
-                        </Link>
+        <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <!-- Header Card -->
+                <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 mb-8">
+                    <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-8">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                            <div class="flex items-center mb-4 sm:mb-0">
+                                <div class="bg-white/20 backdrop-blur-sm rounded-full p-3 mr-4">
+                                    <UserGroupIcon class="h-8 w-8 text-white" />
+                                </div>
+                                <div>
+                                    <h1 class="text-3xl font-bold text-white mb-1">User Management</h1>
+                                    <p class="text-indigo-100">Manage system users and permissions</p>
+                                </div>
+                            </div>
+                            <Link href="/user/create"
+                                class="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-xl shadow-lg hover:bg-white/30 focus:outline-none focus:ring-4 focus:ring-white/30 transition-all duration-300 transform hover:scale-105">
+                                <UserAddIcon class="h-6 w-6 mr-3" />
+                                Add New User
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Success/Error Messages -->
-                <TransitionGroup name="fade" tag="div" class="px-6 pt-4">
-                    <div v-if="$page.props.flash.success" key="success" class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md shadow-sm animate-fadeIn">
-                        <div class="flex">
-                            <CheckCircleIcon class="h-5 w-5 text-green-500 mr-2" />
-                            <span>{{ $page.props.flash.success }}</span>
+                <TransitionGroup name="fade" tag="div" class="mb-8">
+                    <div v-if="$page.props.flash.success" key="success" class="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 text-green-800 p-6 rounded-xl shadow-lg animate-fadeIn">
+                        <div class="flex items-center">
+                            <div class="bg-green-500 rounded-full p-2 mr-4">
+                                <CheckCircleIcon class="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Success!</h3>
+                                <p>{{ $page.props.flash.success }}</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div v-if="$page.props.flash.error" key="error" class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md shadow-sm animate-fadeIn">
-                        <div class="flex">
-                            <ExclamationCircleIcon class="h-5 w-5 text-red-500 mr-2" />
-                            <span>{{ $page.props.flash.error }}</span>
+                    <div v-if="$page.props.flash.error" key="error" class="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 text-red-800 p-6 rounded-xl shadow-lg animate-fadeIn">
+                        <div class="flex items-center">
+                            <div class="bg-red-500 rounded-full p-2 mr-4">
+                                <ExclamationCircleIcon class="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Error!</h3>
+                                <p>{{ $page.props.flash.error }}</p>
+                            </div>
                         </div>
                     </div>
                 </TransitionGroup>
 
                 <!-- Users Table -->
-                <div class="px-6 pb-6">
-                    <div class="overflow-x-auto rounded-lg border border-gray-200 mt-4">
+                <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-6">
+                        <h2 class="text-xl font-semibold text-white flex items-center">
+                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-2 mr-3">
+                                <UserIcon class="h-6 w-6 text-white" />
+                            </div>
+                            User Directory
+                        </h2>
+                        <p class="text-blue-100 text-sm mt-1">Complete list of system users</p>
+                    </div>
+                    <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                            <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                         <div class="flex items-center">
-                                            <IdentificationIcon class="h-4 w-4 mr-1" />User ID
+                                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-1 mr-2">
+                                                <IdentificationIcon class="h-4 w-4 text-white" />
+                                            </div>
+                                            User ID
                                         </div>
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                         <div class="flex items-center">
-                                            <UserIcon class="h-4 w-4 mr-1" />Username
+                                            <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full p-1 mr-2">
+                                                <UserIcon class="h-4 w-4 text-white" />
+                                            </div>
+                                            Username
                                         </div>
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                         <div class="flex items-center">
-                                            <BadgeCheckIcon class="h-4 w-4 mr-1" />Official Name
+                                            <div class="bg-gradient-to-r from-teal-500 to-green-500 rounded-full p-1 mr-2">
+                                                <BadgeCheckIcon class="h-4 w-4 text-white" />
+                                            </div>
+                                            Official Name
                                         </div>
                                     </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                         <div class="flex items-center">
-                                            <BriefcaseIcon class="h-4 w-4 mr-1" />Position
+                                            <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-1 mr-2">
+                                                <BriefcaseIcon class="h-4 w-4 text-white" />
+                                            </div>
+                                            Position
                                         </div>
                                     </th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-8 py-4 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                         <div class="flex items-center justify-end">
-                                            <CogIcon class="h-4 w-4 mr-1" />Actions
+                                            <div class="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full p-1 mr-2">
+                                                <CogIcon class="h-4 w-4 text-white" />
+                                            </div>
+                                            Actions
                                         </div>
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="user in users.data" :key="user.id" class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-blue-600 font-medium">
-                                        {{ user.user_id }}
+                            <tbody class="bg-white/50 backdrop-blur-sm divide-y divide-gray-200">
+                                <tr v-for="user in users.data" :key="user.id" class="hover:bg-white/80 transition-all duration-300 hover:shadow-md">
+                                    <td class="px-8 py-6 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg px-3 py-2">
+                                                <span class="text-white font-mono font-semibold text-sm">{{ user.user_id }}</span>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                        {{ user.username }}
+                                    <td class="px-8 py-6 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="bg-gray-100 rounded-full p-2 mr-3">
+                                                <UserIcon class="h-5 w-5 text-gray-600" />
+                                            </div>
+                                            <span class="text-gray-900 font-medium text-lg">{{ user.username }}</span>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                                        {{ user.official_name }}
+                                    <td class="px-8 py-6 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="bg-gradient-to-r from-teal-500 to-green-500 rounded-full p-2 mr-3">
+                                                <BadgeCheckIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            <span class="text-gray-900 font-semibold text-lg">{{ user.official_name }}</span>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                    <td class="px-8 py-6 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 text-white border border-indigo-300 shadow-md">
+                                            <BriefcaseIcon class="h-4 w-4 mr-2" />
                                             {{ user.official_title || 'No Position' }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right">
+                                    <td class="px-8 py-6 whitespace-nowrap text-right">
                                         <Menu as="div" class="relative inline-block text-left">
                                             <div>
-                                                <MenuButton class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-2 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500">
+                                                <MenuButton class="inline-flex justify-center items-center px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl shadow-lg hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300 transform hover:scale-105">
                                                     <DotsVerticalIcon class="h-5 w-5" aria-hidden="true" />
                                                 </MenuButton>
                                             </div>
-                                            <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                                                <MenuItems class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                                                    <div class="py-1">
+                                            <transition enter-active-class="transition ease-out duration-200" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-150" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                                                <MenuItems class="origin-top-right absolute right-0 mt-2 w-64 rounded-2xl shadow-2xl bg-white/90 backdrop-blur-sm ring-1 ring-black ring-opacity-5 focus:outline-none z-20 border border-white/20">
+                                                    <div class="p-2">
                                                         <MenuItem v-slot="{ active }">
-                                                            <Link :href="`/user/${user.id}/edit`" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']">
-                                                                <PencilIcon class="mr-3 h-5 w-5 text-blue-400 group-hover:text-blue-500" aria-hidden="true" />
-                                                                Edit User
+                                                            <Link :href="`/user/${user.user_id}/edit`" :class="[active ? 'bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-900' : 'text-gray-700', 'group flex items-center px-4 py-3 text-sm rounded-xl transition-all duration-200 hover:scale-105']">
+                                                                <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-1 mr-3">
+                                                                    <PencilIcon class="h-4 w-4 text-white" aria-hidden="true" />
+                                                                </div>
+                                                                <div>
+                                                                    <p class="font-semibold">Edit User</p>
+                                                                    <p class="text-xs opacity-75">Modify user details</p>
+                                                                </div>
                                                             </Link>
                                                         </MenuItem>
                                                         <MenuItem v-slot="{ active }">
-                                                            <Link :href="`/system-security/amend-password?search_user_id=${user.user_id}`" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']">
-                                                                <KeyIcon class="mr-3 h-5 w-5 text-green-400 group-hover:text-green-500" aria-hidden="true" />
-                                                                Change Password
+                                                            <Link :href="`/system-security/amend-password?search_user_id=${user.user_id}`" :class="[active ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-900' : 'text-gray-700', 'group flex items-center px-4 py-3 text-sm rounded-xl transition-all duration-200 hover:scale-105']">
+                                                                <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-1 mr-3">
+                                                                    <KeyIcon class="h-4 w-4 text-white" aria-hidden="true" />
+                                                                </div>
+                                                                <div>
+                                                                    <p class="font-semibold">Change Password</p>
+                                                                    <p class="text-xs opacity-75">Update user password</p>
+                                                                </div>
                                                             </Link>
                                                         </MenuItem>
                                                         <MenuItem v-slot="{ active }">
-                                                            <Link href="/system-security/define-access" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']">
-                                                                <LockClosedIcon class="mr-3 h-5 w-5 text-purple-400 group-hover:text-purple-500" aria-hidden="true" />
-                                                                Define Access
+                                                            <Link href="/system-security/define-access" :class="[active ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-900' : 'text-gray-700', 'group flex items-center px-4 py-3 text-sm rounded-xl transition-all duration-200 hover:scale-105']">
+                                                                <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-1 mr-3">
+                                                                    <LockClosedIcon class="h-4 w-4 text-white" aria-hidden="true" />
+                                                                </div>
+                                                                <div>
+                                                                    <p class="font-semibold">Define Access</p>
+                                                                    <p class="text-xs opacity-75">Set user permissions</p>
+                                                                </div>
                                                             </Link>
                                                         </MenuItem>
                                                     </div>
-                                                    <div class="py-1">
+                                                    <div class="border-t border-gray-200 p-2">
                                                         <MenuItem v-slot="{ active }">
-                                                            <button @click="confirmDelete(user.id)" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm w-full']">
-                                                                <TrashIcon class="mr-3 h-5 w-5 text-red-400 group-hover:text-red-500" aria-hidden="true" />
-                                                                Delete User
+                                                            <button @click="confirmDelete(user.user_id)" :class="[active ? 'bg-gradient-to-r from-red-50 to-pink-50 text-red-900' : 'text-gray-700', 'group flex items-center px-4 py-3 text-sm w-full rounded-xl transition-all duration-200 hover:scale-105']">
+                                                                <div class="bg-gradient-to-r from-red-500 to-pink-500 rounded-full p-1 mr-3">
+                                                                    <TrashIcon class="h-4 w-4 text-white" aria-hidden="true" />
+                                                                </div>
+                                                                <div class="text-left">
+                                                                    <p class="font-semibold">Delete User</p>
+                                                                    <p class="text-xs opacity-75">Remove user permanently</p>
+                                                                </div>
                                                             </button>
                                                         </MenuItem>
                                                     </div>
@@ -127,10 +203,17 @@
                                     </td>
                                 </tr>
                                 <tr v-if="users.data.length === 0">
-                                    <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                                    <td colspan="5" class="px-8 py-16 text-center">
                                         <div class="flex flex-col items-center justify-center">
-                                            <UserIcon class="h-10 w-10 text-gray-300 mb-2" />
-                                            <span>No user data available</span>
+                                            <div class="bg-gradient-to-r from-gray-100 to-gray-200 rounded-full p-6 mb-4">
+                                                <UserIcon class="h-12 w-12 text-gray-400" />
+                                            </div>
+                                            <h3 class="text-xl font-semibold text-gray-600 mb-2">No Users Found</h3>
+                                            <p class="text-gray-500 mb-4">Start by adding your first user to the system</p>
+                                            <Link href="/user/create" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105">
+                                                <UserAddIcon class="h-5 w-5 mr-2" />
+                                                Add First User
+                                            </Link>
                                         </div>
                                     </td>
                                 </tr>
@@ -139,19 +222,24 @@
                     </div>
 
                     <!-- Pagination -->
-                    <div v-if="users.links && users.links.length > 3" class="mt-6 flex justify-center">
-                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                            <div v-for="(link, i) in users.links" :key="i" class="relative">
-                                <span v-if="link.url === null" 
-                                      class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-not-allowed"
-                                      v-html="link.label">
-                                </span>
-                                <Link v-else 
-                                      :href="link.url"
-                                      :class="{'z-10 bg-blue-50 border-blue-500 text-blue-600': link.active, 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': !link.active}"
-                                      class="relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors" 
-                                      v-html="link.label">
-                                </Link>
+                    <div v-if="users.links && users.links.length > 3" class="p-6 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200">
+                        <nav class="flex justify-center" aria-label="Pagination">
+                            <div class="flex space-x-2">
+                                <div v-for="(link, i) in users.links" :key="i">
+                                    <span v-if="link.url === null" 
+                                          class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-xl cursor-not-allowed"
+                                          v-html="link.label">
+                                    </span>
+                                    <Link v-else 
+                                          :href="link.url"
+                                          :class="{
+                                              'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg transform scale-105': link.active, 
+                                              'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-600 shadow-md hover:shadow-lg': !link.active
+                                          }"
+                                          class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-xl border border-gray-200 transition-all duration-300 hover:scale-105" 
+                                          v-html="link.label">
+                                    </Link>
+                                </div>
                             </div>
                         </nav>
                     </div>
@@ -236,22 +324,144 @@ export default {
 </script>
 
 <style scoped>
+/* Modern Animations */
 .animate-fadeIn {
-    animation: fadeIn 0.3s ease-in;
+    animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-slideIn {
+    animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { 
+        opacity: 0; 
+        transform: translateY(-20px) scale(0.95); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
 }
 
+@keyframes slideIn {
+    from { 
+        opacity: 0; 
+        transform: translateX(-30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0); 
+    }
+}
+
+/* Glass morphism effect */
+.backdrop-blur-sm {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Hover effects */
+.hover\:scale-105:hover {
+    transform: scale(1.05);
+}
+
+/* Focus effects */
+.focus\:ring-4:focus {
+    box-shadow: 0 0 0 4px rgba(var(--ring-color), 0.3);
+}
+
+/* Custom gradient backgrounds */
+.bg-gradient-to-br {
+    background: linear-gradient(135deg, var(--tw-gradient-stops));
+}
+
+/* Smooth transitions */
+* {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+}
+
+/* Table row hover effects */
+tr:hover {
+    transform: translateY(-1px);
+}
+
+/* Menu animations */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fade-enter-from,
 .fade-leave-to {
-  opacity: 0;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+    .max-w-7xl {
+        max-width: 100%;
+        margin: 0;
+        padding: 0 1rem;
+    }
+    
+    .rounded-2xl {
+        border-radius: 1rem;
+    }
+    
+    .p-8 {
+        padding: 1.5rem;
+    }
+    
+    .text-3xl {
+        font-size: 1.875rem;
+    }
+    
+    .px-8 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .py-6 {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .bg-white\/80 {
+        background-color: rgba(31, 41, 55, 0.8);
+    }
+    
+    .text-gray-800 {
+        color: #f9fafb;
+    }
+    
+    .border-gray-200 {
+        border-color: #374151;
+    }
 }
 </style> 
