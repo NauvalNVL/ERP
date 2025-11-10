@@ -302,6 +302,16 @@ class SalesOrderController extends Controller
         // ===================================================================
         
         $deliveryData = $request->input('delivery_location', []);
+        
+        // ===================================================================
+        // D_LOC_Num Logic (UPDATED: NOW STORES GEOGRAPHICAL CODE)
+        // ===================================================================
+        // D_LOC_Num now stores geographical delivery code (same as Del_Code in DO table)
+        // Sources:
+        // 1. If user selects alternate address: get delivery_code from customer_alternate_addresses
+        // 2. If user uses main address: get geographical code from update_customer_accounts or CUSTOMER.AREA
+        // ===================================================================
+        
         $dLocNum = (string) ($deliveryData['delivery_code'] ?? '');
         $deliveryTo = '';
         $deliveryAdd1 = '';
@@ -314,27 +324,26 @@ class SalesOrderController extends Controller
             // Frontend should already provide this data from the modal selection
             $deliveryTo = (string) ($deliveryData['customer_name'] ?? '');
             
-            // Split delivery address into 3 lines
+            // Split delivery address into 3 lines with intelligent handling
             if (isset($deliveryData['address']) && !empty($deliveryData['address'])) {
                 $rawAddress = $deliveryData['address'];
                 
-                // Try to split by newline first
+                // Check if address contains newline characters
                 if (strpos($rawAddress, "\n") !== false || strpos($rawAddress, "\r\n") !== false) {
-                    // Address has line breaks - split normally
+                    // Split by newline
                     $addressLines = preg_split('/\r\n|\r|\n/', $rawAddress);
                     $deliveryAdd1 = (string) trim($addressLines[0] ?? '');
                     $deliveryAdd2 = (string) trim($addressLines[1] ?? '');
                     $deliveryAdd3 = (string) trim($addressLines[2] ?? '');
                 } else {
-                    // Address is single line - check if it's too long for one field
-                    $maxLength = 250; // VARCHAR(250) limit
+                    // Single line address - check length
+                    $maxLength = 250; // Based on DB column size
                     if (strlen($rawAddress) <= $maxLength) {
-                        // Fit in one line
                         $deliveryAdd1 = $rawAddress;
                         $deliveryAdd2 = '';
                         $deliveryAdd3 = '';
                     } else {
-                        // Too long - split intelligently by commas or hyphens
+                        // Try to split by common delimiters
                         $parts = preg_split('/[,\-]/', $rawAddress, 3);
                         $deliveryAdd1 = (string) trim($parts[0] ?? '');
                         $deliveryAdd2 = (string) trim($parts[1] ?? '');
@@ -343,31 +352,30 @@ class SalesOrderController extends Controller
                 }
             }
             
-            Log::info('SO Delivery - Mode 2: Alternate Address', [
-                'delivery_code' => $dLocNum,
+            Log::info('SO D_LOC_Num - Mode 2: Alternate Address', [
+                'd_loc_num' => $dLocNum,
                 'delivery_to' => $deliveryTo,
                 'address_1' => $deliveryAdd1,
                 'address_2' => $deliveryAdd2,
                 'address_3' => $deliveryAdd3,
                 'address_raw' => $deliveryData['address'] ?? '',
-                'source' => 'customer_alternate_addresses table'
+                'source' => 'customer_alternate_addresses.delivery_code'
             ]);
             
         } else {
             // MODE 1: DEFAULT - Use main customer address from CUSTOMER table
-            // This is the "ship to same address" scenario
+            $customerData = DB::table('CUSTOMER')->where('CODE', $validated['customer_code'])->first();
+            
             if ($customerData) {
-                // Get geographical code from update_customer_accounts table
                 $updateCustomerAccount = DB::table('update_customer_accounts')
                     ->where('customer_code', $validated['customer_code'])
                     ->first();
                 
-                // D_LOC_Num should be geographical code, NOT empty!
+                // D_LOC_Num should be geographical code from customer
                 $dLocNum = '';
                 if ($updateCustomerAccount && !empty($updateCustomerAccount->geographical)) {
                     $dLocNum = $updateCustomerAccount->geographical;
                 } elseif (!empty($customerData->AREA)) {
-                    // Fallback to AREA column from CUSTOMER table
                     $dLocNum = $customerData->AREA;
                 }
                 
@@ -376,8 +384,8 @@ class SalesOrderController extends Controller
                 $deliveryAdd2 = $customerData->ADDRESS2 ?? '';
                 $deliveryAdd3 = $customerData->ADDRESS3 ?? '';
                 
-                Log::info('SO Delivery - Mode 1: Customer Main Address', [
-                    'delivery_code' => $dLocNum ?: '(no geographical code found)',
+                Log::info('SO D_LOC_Num - Mode 1: Customer Main Address', [
+                    'd_loc_num' => $dLocNum ?: '(no geographical code found)',
                     'delivery_to' => $deliveryTo,
                     'address_1' => $deliveryAdd1,
                     'address_2' => $deliveryAdd2,
@@ -386,7 +394,7 @@ class SalesOrderController extends Controller
                     'source' => 'CUSTOMER table'
                 ]);
             } else {
-                Log::warning('SO Delivery - No customer data found', [
+                Log::warning('SO D_LOC_Num - No customer data found', [
                     'customer_code' => $validated['customer_code']
                 ]);
             }
@@ -639,13 +647,10 @@ class SalesOrderController extends Controller
             $updates[$qtyCol]  = (float) ($entry['delivery_quantity'] ?? 0);
         }
 
-        // Also update delivery location if provided on first entry
-        if (!empty($entries[0]['delivery_location'])) {
-            $updates['DELIVERY_TO'] = (string) $entries[0]['delivery_location'];
-        }
-        if (!empty($entries[0]['delivery_code'])) {
-            $updates['D_LOC_Num'] = (string) $entries[0]['delivery_code'];
-        }
+        // D_LOC_Num is NOT updated here
+        // It was already set during SO creation with geographical delivery code
+        // (same logic as Del_Code in DO table)
+        // Sources: customer_alternate_addresses.delivery_code OR update_customer_accounts.geographical OR CUSTOMER.AREA
 
         $affected = DB::table('so')->where('SO_Num', $soNumber)->update($updates);
 
@@ -1713,6 +1718,7 @@ class SalesOrderController extends Controller
                 // Check if delivery code is provided
                 if (!empty($dLocNum)) {
                     // MODE 2: ALTERNATE ADDRESS
+                    // Update D_LOC_Num with geographical code from alternate address
                     $updateData['D_LOC_Num'] = $dLocNum;
                     $updateData['DELIVERY_TO'] = (string) ($deliveryData['customer_name'] ?? '');
                     
@@ -1749,15 +1755,15 @@ class SalesOrderController extends Controller
                         $updateData['DELIVERY_ADD_3'] = '';
                     }
                     
-                    Log::info('SO Update Delivery - Mode 2: Alternate Address', [
+                    Log::info('SO Update D_LOC_Num - Mode 2: Alternate Address', [
                         'so_number' => $soNumber,
-                        'delivery_code' => $dLocNum,
+                        'd_loc_num' => $dLocNum,
                         'delivery_to' => $updateData['DELIVERY_TO'],
                         'address_1' => $updateData['DELIVERY_ADD_1'],
                         'address_2' => $updateData['DELIVERY_ADD_2'],
                         'address_3' => $updateData['DELIVERY_ADD_3'],
                         'address_raw' => $rawAddress ?? '',
-                        'source' => 'customer_alternate_addresses table'
+                        'source' => 'customer_alternate_addresses.delivery_code'
                     ]);
                     
                 } else {
@@ -1765,29 +1771,27 @@ class SalesOrderController extends Controller
                     $customerData = DB::table('CUSTOMER')->where('CODE', $salesOrder->AC_Num)->first();
                     
                     if ($customerData) {
-                        // Get geographical code from update_customer_accounts table
+                        // Update D_LOC_Num with geographical code from customer
                         $updateCustomerAccount = DB::table('update_customer_accounts')
                             ->where('customer_code', $salesOrder->AC_Num)
                             ->first();
                         
-                        // D_LOC_Num should be geographical code, NOT empty!
-                        $geoCode = '';
+                        $dLocNum = '';
                         if ($updateCustomerAccount && !empty($updateCustomerAccount->geographical)) {
-                            $geoCode = $updateCustomerAccount->geographical;
+                            $dLocNum = $updateCustomerAccount->geographical;
                         } elseif (!empty($customerData->AREA)) {
-                            // Fallback to AREA column from CUSTOMER table
-                            $geoCode = $customerData->AREA;
+                            $dLocNum = $customerData->AREA;
                         }
                         
-                        $updateData['D_LOC_Num'] = $geoCode;
+                        $updateData['D_LOC_Num'] = $dLocNum;
                         $updateData['DELIVERY_TO'] = $customerData->NAME ?? '';
                         $updateData['DELIVERY_ADD_1'] = $customerData->ADDRESS1 ?? '';
                         $updateData['DELIVERY_ADD_2'] = $customerData->ADDRESS2 ?? '';
                         $updateData['DELIVERY_ADD_3'] = $customerData->ADDRESS3 ?? '';
                         
-                        Log::info('SO Update Delivery - Mode 1: Customer Main Address', [
+                        Log::info('SO Update D_LOC_Num - Mode 1: Customer Main Address', [
                             'so_number' => $soNumber,
-                            'delivery_code' => $geoCode ?: '(no geographical code found)',
+                            'd_loc_num' => $dLocNum ?: '(no geographical code found)',
                             'delivery_to' => $updateData['DELIVERY_TO'],
                             'geographical_source' => $updateCustomerAccount ? 'update_customer_accounts.geographical' : 'CUSTOMER.AREA',
                             'source' => 'CUSTOMER table'
