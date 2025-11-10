@@ -239,9 +239,26 @@
                 <!-- Time -->
                 <div class="flex items-center space-x-2">
                   <label class="text-xs font-medium w-12">Time:</label>
-                  <input v-model="scheduleForm.time.hours" type="text" value="0" class="px-2 py-1 border border-gray-400 text-xs w-8">
-                  <span class="text-xs">:</span>
-                  <input v-model="scheduleForm.time.minutes" type="text" value="0" class="px-2 py-1 border border-gray-400 text-xs w-8">
+                  <input 
+                    v-model="scheduleForm.time.hours" 
+                    type="number" 
+                    min="0" 
+                    max="23" 
+                    placeholder="HH"
+                    class="px-2 py-1 border border-gray-400 text-xs w-12 text-center"
+                    @blur="validateHours"
+                  >
+                  <span class="text-xs font-bold">:</span>
+                  <input 
+                    v-model="scheduleForm.time.minutes" 
+                    type="number" 
+                    min="0" 
+                    max="59" 
+                    placeholder="MM"
+                    class="px-2 py-1 border border-gray-400 text-xs w-12 text-center"
+                    @blur="validateMinutes"
+                  >
+                  <span class="text-xs text-gray-500 ml-2">(24h)</span>
                 </div>
                 
                 <!-- Due -->
@@ -327,8 +344,8 @@ const scheduleForm = reactive({
   fit9: '',
   date: '00/00/0000',
   time: {
-    hours: '0',
-    minutes: '0'
+    hours: '09',
+    minutes: '00'
   },
   due: 'ETD',
   remarks: '',
@@ -359,10 +376,46 @@ const scheduleForm = reactive({
 })
 
 // Methods
+const validateHours = () => {
+  let hours = parseInt(scheduleForm.time.hours)
+  if (isNaN(hours) || hours < 0) {
+    scheduleForm.time.hours = '0'
+  } else if (hours > 23) {
+    scheduleForm.time.hours = '23'
+  } else {
+    // Pad with leading zero if needed
+    scheduleForm.time.hours = hours.toString().padStart(2, '0')
+  }
+}
+
+const validateMinutes = () => {
+  let minutes = parseInt(scheduleForm.time.minutes)
+  if (isNaN(minutes) || minutes < 0) {
+    scheduleForm.time.minutes = '0'
+  } else if (minutes > 59) {
+    scheduleForm.time.minutes = '59'
+  } else {
+    // Pad with leading zero if needed
+    scheduleForm.time.minutes = minutes.toString().padStart(2, '0')
+  }
+}
+
 const saveSchedule = () => {
   // Validate required fields
   if (!scheduleForm.date || scheduleForm.date === '00/00/0000') {
     error('Please select a delivery date')
+    return
+  }
+
+  // Validate time format (24-hour)
+  const hours = parseInt(scheduleForm.time.hours)
+  const minutes = parseInt(scheduleForm.time.minutes)
+  if (isNaN(hours) || hours < 0 || hours > 23) {
+    error('Invalid hour. Please enter 0-23 for 24-hour format')
+    return
+  }
+  if (isNaN(minutes) || minutes < 0 || minutes > 59) {
+    error('Invalid minutes. Please enter 0-59')
     return
   }
 

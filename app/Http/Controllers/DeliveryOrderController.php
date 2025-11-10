@@ -155,13 +155,53 @@ class DeliveryOrderController extends Controller
             // Get LOT_Num from SO table
             $lotNum = $so ? ($so->LOT_Num ?? '') : '';
             
-            // Get Del_Code and Group_ from Customer
-            $delCode = $customer->DEL_CODE ?? ($customer->Del_Code ?? '');
+            // ===================================================================
+            // Del_Code (Delivery Code / Kode Geo) Logic
+            // ===================================================================
+            // Del_Code now directly taken from SO.D_LOC_Num
+            // SO.D_LOC_Num already stores geographical delivery code (same logic as Del_Code)
+            // No need to re-query customer_alternate_addresses or update_customer_accounts
+            // ===================================================================
+            
+            $delCode = $so ? ($so->D_LOC_Num ?? '') : '';
+            
+            Log::info('DO Del_Code - From SO.D_LOC_Num', [
+                'del_code' => $delCode,
+                'so_number' => $soNumber ?? 'N/A',
+                'source' => 'SO.D_LOC_Num (geographical code)'
+            ]);
+            
             $customerGroup = $customer->GROUP_ ?? ($customer->Group_ ?? '');
 
             // NOTE: SO_Date, SODateSK, PODateSK are NOT in DO table schema
             // These fields will be retrieved from SO table when creating invoice
 
+            // Get EXT dimensions for DO_M3 calculation
+            $extL = (float) (($so->EXT_L ?? null) !== null ? $so->EXT_L : ($mc->EXT_LENGTH ?? 0));
+            $extW = (float) (($so->EXT_W ?? null) !== null ? $so->EXT_W : ($mc->EXT_WIDTH ?? 0));
+            $extH = (float) (($so->EXT_H ?? null) !== null ? $so->EXT_H : ($mc->EXT_HEIGHT ?? 0));
+            
+            // Calculate DO_M3 (volume) = (L × W × H × Quantity) / 1,000,000,000 (convert mm³ to m³)
+            // Use EXT dimensions for outer carton volume
+            $doM3 = 0.0;
+            if ($extL > 0 && $extW > 0 && $extH > 0 && $doQty > 0) {
+                $doM3 = ($extL * $extW * $extH * $doQty) / 1000000000;
+                Log::info('DO_M3 calculated from EXT dimensions', [
+                    'do_number' => $doNumber,
+                    'ext_l' => $extL,
+                    'ext_w' => $extW,
+                    'ext_h' => $extH,
+                    'do_qty' => $doQty,
+                    'do_m3' => $doM3
+                ]);
+            } else {
+                Log::warning('DO_M3 calculation failed - no valid dimensions', [
+                    'do_number' => $doNumber,
+                    'ext_dimensions' => [$extL, $extW, $extH],
+                    'do_qty' => $doQty
+                ]);
+            }
+            
             $doData = [
                 'DOYYYY' => $doYear,
                 'DOMM' => $doMonth,
@@ -185,9 +225,9 @@ class DeliveryOrderController extends Controller
                 'INT_L' => (float) (($so->INT_L ?? null) !== null ? $so->INT_L : ($mc->INT_LENGTH ?? 0)),
                 'INT_W' => (float) (($so->INT_W ?? null) !== null ? $so->INT_W : ($mc->INT_WIDTH ?? 0)),
                 'INT_H' => (float) (($so->INT_H ?? null) !== null ? $so->INT_H : ($mc->INT_HEIGHT ?? 0)),
-                'EXT_L' => (float) (($so->EXT_L ?? null) !== null ? $so->EXT_L : ($mc->EXT_LENGTH ?? 0)),
-                'EXT_W' => (float) (($so->EXT_W ?? null) !== null ? $so->EXT_W : ($mc->EXT_WIDTH ?? 0)),
-                'EXT_H' => (float) (($so->EXT_H ?? null) !== null ? $so->EXT_H : ($mc->EXT_HEIGHT ?? 0)),
+                'EXT_L' => $extL,
+                'EXT_W' => $extW,
+                'EXT_H' => $extH,
                 'Flute' => (string) (($so->FLUTE ?? '') ?: ($mc->FLUTE ?? '')),
                 'SLM' => $customer->SLM ?? ($so ? ($so->SLM ?? '') : ''),
                 'IND' => $customer->IND ?? ($customer->INDUSTRY ?? ''),
@@ -206,7 +246,7 @@ class DeliveryOrderController extends Controller
                 'PQ5' => (string) (($so->PQ5 ?? '') ?: ($mc->SO_PQ5 ?? '')),
                 'DO_Qty' => $doQty,
                 'UNAPPLIED_FG' => $request->unapply_fg ? 'Y' : 'N',
-                'DO_M3' => 0.0,
+                'DO_M3' => round($doM3, 2), // ✅ FIXED: Calculated from (EXT_L × EXT_W × EXT_H × DO_Qty) / 1,000,000,000
                 'SO_Unit_Price' => $unitPrice,
                 'Curr' => $so ? ($so->CURR ?? 'IDR') : 'IDR',
                 'Ex_Rate' => $exRate,
@@ -586,13 +626,23 @@ class DeliveryOrderController extends Controller
                     
                     // Get Customer data for Del_Code and Group_
                     if (empty($do->Del_Code) || empty($do->Group_)) {
-                        $customer = DB::table('CUSTOMER')
-                            ->where('CODE', $do->AC_Num)
-                            ->first();
+                        // Get Del_Code from SO.D_LOC_Num (which stores geographical code)
+                        if (empty($do->Del_Code)) {
+                            $so = DB::table('so')->where('SO_Num', $do->SO_Num)->first();
+                            if ($so && !empty($so->D_LOC_Num)) {
+                                $updateData['Del_Code'] = $so->D_LOC_Num;
+                            }
+                        }
                         
-                        if ($customer) {
-                            $updateData['Del_Code'] = $customer->DEL_CODE ?? ($customer->Del_Code ?? '');
-                            $updateData['Group_'] = $customer->GROUP_ ?? ($customer->Group_ ?? '');
+                        // Get Group_ from customer
+                        if (empty($do->Group_)) {
+                            $customer = DB::table('CUSTOMER')
+                                ->where('CODE', $do->AC_Num)
+                                ->first();
+                            
+                            if ($customer) {
+                                $updateData['Group_'] = $customer->GROUP_ ?? ($customer->Group_ ?? '');
+                            }
                         }
                     }
                     

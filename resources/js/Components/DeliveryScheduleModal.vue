@@ -231,12 +231,31 @@
                       >
                     </div>
                     <div>
-                      <label class="block text-xs font-medium text-gray-600 mb-1">Time</label>
-                      <input 
-                        v-model="scheduleEntry.time" 
-                        type="time"
-                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Time (24-hour format)</label>
+                      <div class="flex items-center space-x-2">
+                        <input 
+                          v-model="timeHours" 
+                          type="number"
+                          min="0"
+                          max="23"
+                          placeholder="HH"
+                          class="w-20 px-2 py-1 border border-gray-300 rounded text-sm text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          @input="updateTime"
+                          @blur="padTimeInputs"
+                        >
+                        <span class="text-lg font-bold">:</span>
+                        <input 
+                          v-model="timeMinutes" 
+                          type="number"
+                          min="0"
+                          max="59"
+                          placeholder="MM"
+                          class="w-20 px-2 py-1 border border-gray-300 rounded text-sm text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          @input="updateTime"
+                          @blur="padTimeInputs"
+                        >
+                      </div>
+                      <p class="text-xs text-gray-500 mt-1">24-hour format: 00-23 hours, 00-59 minutes</p>
                     </div>
                   </div>
 
@@ -374,6 +393,53 @@ const emit = defineEmits(['close', 'save'])
 
 const { success, error, info } = useToast()
 
+// Time input refs for 24-hour format
+const timeHours = ref('09')
+const timeMinutes = ref('00')
+
+// Update scheduleEntry.time from separate hour/minute inputs
+const updateTime = () => {
+  // Validate hours
+  let hours = parseInt(timeHours.value)
+  if (isNaN(hours) || hours < 0) hours = 0
+  if (hours > 23) hours = 23
+  
+  // Validate minutes
+  let minutes = parseInt(timeMinutes.value)
+  if (isNaN(minutes) || minutes < 0) minutes = 0
+  if (minutes > 59) minutes = 59
+  
+  // Update scheduleEntry.time in HH:MM format
+  const formattedHours = hours.toString().padStart(2, '0')
+  const formattedMinutes = minutes.toString().padStart(2, '0')
+  scheduleEntry.time = `${formattedHours}:${formattedMinutes}`
+}
+
+// Pad hours and minutes on blur
+const padTimeInputs = () => {
+  let hours = parseInt(timeHours.value)
+  if (isNaN(hours) || hours < 0) hours = 0
+  if (hours > 23) hours = 23
+  timeHours.value = hours.toString().padStart(2, '0')
+  
+  let minutes = parseInt(timeMinutes.value)
+  if (isNaN(minutes) || minutes < 0) minutes = 0
+  if (minutes > 59) minutes = 59
+  timeMinutes.value = minutes.toString().padStart(2, '0')
+}
+
+// Parse time string to hours and minutes
+const parseTime = (timeString) => {
+  if (!timeString) {
+    timeHours.value = '09'
+    timeMinutes.value = '00'
+    return
+  }
+  const parts = timeString.split(':')
+  timeHours.value = (parts[0] || '09').padStart(2, '0')
+  timeMinutes.value = (parts[1] || '00').padStart(2, '0')
+}
+
 // Schedule entry data
 const scheduleEntry = reactive({
   id: null,
@@ -394,6 +460,9 @@ const scheduleEntry = reactive({
   due: 'ETD',
   remark: ''
 })
+
+// Initialize time inputs
+parseTime(scheduleEntry.time)
 
 // Schedule entries list
 const scheduleEntries = ref([])
@@ -447,6 +516,7 @@ const selectEntry = (entry, index) => {
   selectedIndex.value = index
   if (entry) {
     Object.assign(scheduleEntry, { ...entry })
+    parseTime(entry.time) // Parse time to hour/minute inputs
     isEditing.value = true
   }
 }
@@ -553,6 +623,9 @@ const resetForm = () => {
     due: 'ETD',
     remark: ''
   })
+  // Reset time inputs
+  timeHours.value = '09'
+  timeMinutes.value = '00'
 }
 
 const calculateTotals = () => {
@@ -562,6 +635,18 @@ const calculateTotals = () => {
 // Keep Main in sync with Set input
 watch(() => scheduleEntry.set, (val) => {
   scheduleEntry.main = val
+})
+
+// Watch timeHours and timeMinutes changes
+watch([timeHours, timeMinutes], () => {
+  updateTime()
+})
+
+// Watch scheduleEntry.time changes (when entry is loaded)
+watch(() => scheduleEntry.time, (newTime) => {
+  if (newTime && newTime !== `${timeHours.value}:${timeMinutes.value}`) {
+    parseTime(newTime)
+  }
 })
 
 const formatDate = (dateString) => {

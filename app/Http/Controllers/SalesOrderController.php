@@ -294,20 +294,110 @@ class SalesOrderController extends Controller
             ]);
         }
         
-        // Extract delivery location data from request
+        // ===================================================================
+        // DELIVERY LOCATION LOGIC - Dual Mode System
+        // ===================================================================
+        // Mode 1: Default - Ship to CUSTOMER main address (when delivery_code is empty)
+        // Mode 2: Alternate - Ship to alternate address from customer_alternate_addresses table (when delivery_code is provided)
+        // ===================================================================
+        
         $deliveryData = $request->input('delivery_location', []);
+        
+        // ===================================================================
+        // D_LOC_Num Logic (UPDATED: NOW STORES GEOGRAPHICAL CODE)
+        // ===================================================================
+        // D_LOC_Num now stores geographical delivery code (same as Del_Code in DO table)
+        // Sources:
+        // 1. If user selects alternate address: get delivery_code from customer_alternate_addresses
+        // 2. If user uses main address: get geographical code from update_customer_accounts or CUSTOMER.AREA
+        // ===================================================================
+        
         $dLocNum = (string) ($deliveryData['delivery_code'] ?? '');
-        $deliveryTo = (string) ($deliveryData['customer_name'] ?? '');
+        $deliveryTo = '';
         $deliveryAdd1 = '';
         $deliveryAdd2 = '';
         $deliveryAdd3 = '';
         
-        // Split delivery address into 3 lines
-        if (isset($deliveryData['address'])) {
-            $addressLines = explode("\n", $deliveryData['address']);
-            $deliveryAdd1 = (string) ($addressLines[0] ?? '');
-            $deliveryAdd2 = (string) ($addressLines[1] ?? '');
-            $deliveryAdd3 = (string) ($addressLines[2] ?? '');
+        // Check if delivery code is provided
+        if (!empty($dLocNum)) {
+            // MODE 2: ALTERNATE ADDRESS - Use data from customer_alternate_addresses
+            // Frontend should already provide this data from the modal selection
+            $deliveryTo = (string) ($deliveryData['customer_name'] ?? '');
+            
+            // Split delivery address into 3 lines with intelligent handling
+            if (isset($deliveryData['address']) && !empty($deliveryData['address'])) {
+                $rawAddress = $deliveryData['address'];
+                
+                // Check if address contains newline characters
+                if (strpos($rawAddress, "\n") !== false || strpos($rawAddress, "\r\n") !== false) {
+                    // Split by newline
+                    $addressLines = preg_split('/\r\n|\r|\n/', $rawAddress);
+                    $deliveryAdd1 = (string) trim($addressLines[0] ?? '');
+                    $deliveryAdd2 = (string) trim($addressLines[1] ?? '');
+                    $deliveryAdd3 = (string) trim($addressLines[2] ?? '');
+                } else {
+                    // Single line address - check length
+                    $maxLength = 250; // Based on DB column size
+                    if (strlen($rawAddress) <= $maxLength) {
+                        $deliveryAdd1 = $rawAddress;
+                        $deliveryAdd2 = '';
+                        $deliveryAdd3 = '';
+                    } else {
+                        // Try to split by common delimiters
+                        $parts = preg_split('/[,\-]/', $rawAddress, 3);
+                        $deliveryAdd1 = (string) trim($parts[0] ?? '');
+                        $deliveryAdd2 = (string) trim($parts[1] ?? '');
+                        $deliveryAdd3 = (string) trim($parts[2] ?? '');
+                    }
+                }
+            }
+            
+            Log::info('SO D_LOC_Num - Mode 2: Alternate Address', [
+                'd_loc_num' => $dLocNum,
+                'delivery_to' => $deliveryTo,
+                'address_1' => $deliveryAdd1,
+                'address_2' => $deliveryAdd2,
+                'address_3' => $deliveryAdd3,
+                'address_raw' => $deliveryData['address'] ?? '',
+                'source' => 'customer_alternate_addresses.delivery_code'
+            ]);
+            
+        } else {
+            // MODE 1: DEFAULT - Use main customer address from CUSTOMER table
+            $customerData = DB::table('CUSTOMER')->where('CODE', $validated['customer_code'])->first();
+            
+            if ($customerData) {
+                $updateCustomerAccount = DB::table('update_customer_accounts')
+                    ->where('customer_code', $validated['customer_code'])
+                    ->first();
+                
+                // D_LOC_Num should be geographical code from customer
+                $dLocNum = '';
+                if ($updateCustomerAccount && !empty($updateCustomerAccount->geographical)) {
+                    $dLocNum = $updateCustomerAccount->geographical;
+                } elseif (!empty($customerData->AREA)) {
+                    $dLocNum = $customerData->AREA;
+                }
+                
+                $deliveryTo = $customerData->NAME ?? '';
+                $deliveryAdd1 = $customerData->ADDRESS1 ?? '';
+                $deliveryAdd2 = $customerData->ADDRESS2 ?? '';
+                $deliveryAdd3 = $customerData->ADDRESS3 ?? '';
+                
+                Log::info('SO D_LOC_Num - Mode 1: Customer Main Address', [
+                    'd_loc_num' => $dLocNum ?: '(no geographical code found)',
+                    'delivery_to' => $deliveryTo,
+                    'address_1' => $deliveryAdd1,
+                    'address_2' => $deliveryAdd2,
+                    'address_3' => $deliveryAdd3,
+                    'geographical_source' => $updateCustomerAccount ? 'update_customer_accounts.geographical' : 'CUSTOMER.AREA',
+                    'source' => 'CUSTOMER table'
+                ]);
+            } else {
+                Log::warning('SO D_LOC_Num - No customer data found', [
+                    'customer_code' => $validated['customer_code']
+                ]);
+            }
         }
         
         // Extract delivery schedules (up to 10 schedules)
@@ -557,13 +647,10 @@ class SalesOrderController extends Controller
             $updates[$qtyCol]  = (float) ($entry['delivery_quantity'] ?? 0);
         }
 
-        // Also update delivery location if provided on first entry
-        if (!empty($entries[0]['delivery_location'])) {
-            $updates['DELIVERY_TO'] = (string) $entries[0]['delivery_location'];
-        }
-        if (!empty($entries[0]['delivery_code'])) {
-            $updates['D_LOC_Num'] = (string) $entries[0]['delivery_code'];
-        }
+        // D_LOC_Num is NOT updated here
+        // It was already set during SO creation with geographical delivery code
+        // (same logic as Del_Code in DO table)
+        // Sources: customer_alternate_addresses.delivery_code OR update_customer_accounts.geographical OR CUSTOMER.AREA
 
         $affected = DB::table('so')->where('SO_Num', $soNumber)->update($updates);
 
@@ -1563,6 +1650,7 @@ class SalesOrderController extends Controller
                 'instruction1' => 'nullable|string',
                 'instruction2' => 'nullable|string',
                 'analysis_code' => 'nullable|string',
+                'delivery_location' => 'nullable|array',
             ]);
             
             // Check if SO exists
@@ -1619,6 +1707,98 @@ class SalesOrderController extends Controller
             // if ($request->has('analysis_code')) {
             //     $updateData['ANALYSIS_CODE'] = $request->analysis_code;
             // }
+            
+            // ===================================================================
+            // DELIVERY LOCATION UPDATE - Dual Mode System
+            // ===================================================================
+            if ($request->has('delivery_location')) {
+                $deliveryData = $request->input('delivery_location', []);
+                $dLocNum = (string) ($deliveryData['delivery_code'] ?? '');
+                
+                // Check if delivery code is provided
+                if (!empty($dLocNum)) {
+                    // MODE 2: ALTERNATE ADDRESS
+                    // Update D_LOC_Num with geographical code from alternate address
+                    $updateData['D_LOC_Num'] = $dLocNum;
+                    $updateData['DELIVERY_TO'] = (string) ($deliveryData['customer_name'] ?? '');
+                    
+                    // Split delivery address into 3 lines with intelligent handling
+                    if (isset($deliveryData['address']) && !empty($deliveryData['address'])) {
+                        $rawAddress = $deliveryData['address'];
+                        
+                        // Try to split by newline first
+                        if (strpos($rawAddress, "\n") !== false || strpos($rawAddress, "\r\n") !== false) {
+                            // Address has line breaks - split normally
+                            $addressLines = preg_split('/\r\n|\r|\n/', $rawAddress);
+                            $updateData['DELIVERY_ADD_1'] = (string) trim($addressLines[0] ?? '');
+                            $updateData['DELIVERY_ADD_2'] = (string) trim($addressLines[1] ?? '');
+                            $updateData['DELIVERY_ADD_3'] = (string) trim($addressLines[2] ?? '');
+                        } else {
+                            // Address is single line - check if it's too long for one field
+                            $maxLength = 250; // VARCHAR(250) limit
+                            if (strlen($rawAddress) <= $maxLength) {
+                                // Fit in one line
+                                $updateData['DELIVERY_ADD_1'] = $rawAddress;
+                                $updateData['DELIVERY_ADD_2'] = '';
+                                $updateData['DELIVERY_ADD_3'] = '';
+                            } else {
+                                // Too long - split intelligently by commas or hyphens
+                                $parts = preg_split('/[,\-]/', $rawAddress, 3);
+                                $updateData['DELIVERY_ADD_1'] = (string) trim($parts[0] ?? '');
+                                $updateData['DELIVERY_ADD_2'] = (string) trim($parts[1] ?? '');
+                                $updateData['DELIVERY_ADD_3'] = (string) trim($parts[2] ?? '');
+                            }
+                        }
+                    } else {
+                        $updateData['DELIVERY_ADD_1'] = '';
+                        $updateData['DELIVERY_ADD_2'] = '';
+                        $updateData['DELIVERY_ADD_3'] = '';
+                    }
+                    
+                    Log::info('SO Update D_LOC_Num - Mode 2: Alternate Address', [
+                        'so_number' => $soNumber,
+                        'd_loc_num' => $dLocNum,
+                        'delivery_to' => $updateData['DELIVERY_TO'],
+                        'address_1' => $updateData['DELIVERY_ADD_1'],
+                        'address_2' => $updateData['DELIVERY_ADD_2'],
+                        'address_3' => $updateData['DELIVERY_ADD_3'],
+                        'address_raw' => $rawAddress ?? '',
+                        'source' => 'customer_alternate_addresses.delivery_code'
+                    ]);
+                    
+                } else {
+                    // MODE 1: DEFAULT - Use main customer address from CUSTOMER table
+                    $customerData = DB::table('CUSTOMER')->where('CODE', $salesOrder->AC_Num)->first();
+                    
+                    if ($customerData) {
+                        // Update D_LOC_Num with geographical code from customer
+                        $updateCustomerAccount = DB::table('update_customer_accounts')
+                            ->where('customer_code', $salesOrder->AC_Num)
+                            ->first();
+                        
+                        $dLocNum = '';
+                        if ($updateCustomerAccount && !empty($updateCustomerAccount->geographical)) {
+                            $dLocNum = $updateCustomerAccount->geographical;
+                        } elseif (!empty($customerData->AREA)) {
+                            $dLocNum = $customerData->AREA;
+                        }
+                        
+                        $updateData['D_LOC_Num'] = $dLocNum;
+                        $updateData['DELIVERY_TO'] = $customerData->NAME ?? '';
+                        $updateData['DELIVERY_ADD_1'] = $customerData->ADDRESS1 ?? '';
+                        $updateData['DELIVERY_ADD_2'] = $customerData->ADDRESS2 ?? '';
+                        $updateData['DELIVERY_ADD_3'] = $customerData->ADDRESS3 ?? '';
+                        
+                        Log::info('SO Update D_LOC_Num - Mode 1: Customer Main Address', [
+                            'so_number' => $soNumber,
+                            'd_loc_num' => $dLocNum ?: '(no geographical code found)',
+                            'delivery_to' => $updateData['DELIVERY_TO'],
+                            'geographical_source' => $updateCustomerAccount ? 'update_customer_accounts.geographical' : 'CUSTOMER.AREA',
+                            'source' => 'CUSTOMER table'
+                        ]);
+                    }
+                }
+            }
             
             // Add amendment tracking with WIB timezone
             $nowWib = $this->getNowWib();
