@@ -470,7 +470,7 @@
                                 <div class="flex items-center">
                                     <label class="text-xs font-medium w-16">P/Design:</label>
                                     <input type="text" v-model="selectedProductDesign" class="w-32 px-2 py-1 border border-gray-400 text-xs" readonly>
-                                    <button @click="showProductDesignModal = true" class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
+                                    <button @click="openProductDesignModal" class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
@@ -975,9 +975,11 @@
         :show="showProductDesignModal"
         :designs="productDesigns"
         :products="[]"
+        :loading="productDesignsLoading"
         :doubleClickAction="'select'"
         @close="showProductDesignModal = false"
         @select="onProductDesignSelected"
+        @data-changed="fetchProductDesigns"
     />
 
     <!-- Paper Flute Modal -->
@@ -1158,6 +1160,39 @@ import MachineSelectingProcedureModal from '@/Components/MachineSelectingProcedu
 // Product Design Modal
 const showProductDesignModal = ref(false);
 const selectedProductDesign = ref('');
+const productDesigns = ref([]);
+const productDesignsLoading = ref(false);
+
+// Fetch product designs from API
+const fetchProductDesigns = async () => {
+    try {
+        productDesignsLoading.value = true;
+        const response = await fetch('/api/product-designs', {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            productDesigns.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+            console.log('Product Designs loaded:', productDesigns.value.length);
+        } else {
+            productDesigns.value = [];
+            console.error('Failed to fetch product designs');
+        }
+    } catch (e) {
+        console.error('Error fetching product designs:', e);
+        productDesigns.value = [];
+    } finally {
+        productDesignsLoading.value = false;
+    }
+};
+
+// Open product design modal and fetch data
+const openProductDesignModal = async () => {
+    if (productDesigns.value.length === 0) {
+        await fetchProductDesigns();
+    }
+    showProductDesignModal.value = true;
+};
 
 // Paper Flute Modal
 const showPaperFluteModal = ref(false);
