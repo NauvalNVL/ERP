@@ -475,6 +475,9 @@ Route::get('/bundling-strings', [App\Http\Controllers\BundlingStringController::
 Route::post('/bundling-strings', [App\Http\Controllers\BundlingStringController::class, 'store']);
 Route::put('/bundling-strings/{code}', [App\Http\Controllers\BundlingStringController::class, 'update']);
 Route::delete('/bundling-strings/{code}', [App\Http\Controllers\BundlingStringController::class, 'destroy']);
+
+// Machine API routes
+Route::get('/machines', [MachineController::class, 'index']);
 Route::post('/bundling-strings/seed', [App\Http\Controllers\BundlingStringController::class, 'seed']);
 
 // Wrapping Material API routes

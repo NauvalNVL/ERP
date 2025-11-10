@@ -944,7 +944,7 @@
                                 <input type="text" v-model="peelOffPercent" class="w-24 px-2 py-1 border border-gray-400 text-xs text-right">
                             </div>
                             <div class="ml-auto flex items-center space-x-2">
-                                <button class="px-3 py-1 bg-gray-200 border border-gray-400 text-xs font-bold cursor-default" disabled>MSP</button>
+                                <button class="px-3 py-1 bg-blue-500 hover:bg-blue-600 border border-blue-600 text-xs font-bold text-white transition-colors" @click="openMspModal">MSP</button>
                                 <button class="px-3 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openSubMaterialModal">Sub-Material</button>
                             </div>
                         </div>
@@ -1066,6 +1066,14 @@
         @update:value="(v) => { subMaterials = v }"
         @close="showSubMaterialModal = false"
     />
+    
+    <!-- Machine Selecting Procedure Modal -->
+    <MachineSelectingProcedureModal
+        :show="showMspModal"
+        :existingMspData="mspData"
+        @close="showMspModal = false"
+        @save="onMspSave"
+    />
 </template>
 
 <script setup>
@@ -1145,6 +1153,7 @@ import MoreDescriptionModal from '@/Components/more-description-modal.vue';
 import ChemicalCoatModal from '@/Components/chemical-coat-modal.vue';
 import ReinforcementTapeModal from '@/Components/reinforcement-tape-modal.vue';
 import PaperSizeModal from '@/Components/paper-size-modal.vue';
+import MachineSelectingProcedureModal from '@/Components/MachineSelectingProcedureModal.vue';
 
 // Product Design Modal
 const showProductDesignModal = ref(false);
@@ -1402,6 +1411,37 @@ const onBundlingStringSelected = (item) => {
 const showSubMaterialModal = ref(false);
 let subMaterials = ref([]);
 const openSubMaterialModal = () => { showSubMaterialModal.value = true; };
+
+// MSP (Machine Selecting Procedure) Modal
+const showMspModal = ref(false);
+const mspData = ref({});
+const openMspModal = () => {
+    // Load existing MSP data from mcLoaded if available
+    const loaded = props.mcLoaded || {};
+    const existingMspData = {};
+    
+    // Load MSP1 to MSP12 fields from loaded MC data
+    for (let i = 1; i <= 12; i++) {
+        const mchKey = `MSP${i}_MCH`;
+        const upKey = `MSP${i}_UP`;
+        const instKey = `MSP${i}_SPECIAL_INST`;
+        
+        if (loaded[mchKey]) {
+            existingMspData[`msp${i}_mch`] = loaded[mchKey];
+            existingMspData[`msp${i}_up`] = loaded[upKey] || '';
+            existingMspData[`msp${i}_special_inst`] = loaded[instKey] || '';
+        }
+    }
+    
+    // Pass existing data to modal
+    mspData.value = existingMspData;
+    showMspModal.value = true; 
+};
+const onMspSave = (data) => {
+    mspData.value = data;
+    console.log('MSP Data saved:', data);
+    showMspModal.value = false;
+};
 
 // Glueing Material Modal
 const showGlueingModal = ref(false);
@@ -1996,6 +2036,9 @@ const componentForms = ref(Array.from({ length: 10 }, () => makeEmptyPdState()))
 watch(() => props.mcLoaded, (newValue) => {
     if (newValue) {
         hydratePdFromLoaded();
+    } else {
+        // Reset MSP data when creating new MC (mcLoaded is null)
+        mspData.value = {};
     }
 }, { immediate: true });
 
@@ -2329,6 +2372,8 @@ const buildPdSetupPayload = () => {
         selectedWrappingCode: selectedWrappingCode.value,
         moreDescriptions: moreDescriptions.value,
         subMaterials: subMaterials.value,
+        // MSP (Machine Selecting Procedure) data
+        mspData: mspData.value,
         // Calculated M2 and KG values
         mcGrossM2PerPcs: mcGrossM2PerPcs.value,
         mcNetM2PerPcs: mcNetM2PerPcs.value,
