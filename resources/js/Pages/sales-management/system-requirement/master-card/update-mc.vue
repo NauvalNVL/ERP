@@ -1163,14 +1163,28 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
     const selectedComponent = mcComponents.value.find(c => c.selected);
     const componentName = selectedComponent ? selectedComponent.c_num : 'Main';
 
+    // Ensure status is valid (Active or Obsolete)
+    let validStatus = 'Active';
+    if (form.value.mc_status === 'Active' || form.value.mc_status === 'Obsolete') {
+        validStatus = form.value.mc_status;
+    } else if (form.value.mc_status === 'Act') {
+        validStatus = 'Active';
+    }
+    
+    // Ensure mc_approval is valid (Yes or No)
+    let validApproval = 'No';
+    if (form.value.mc_approval === 'Yes' || form.value.mc_approval === 'No') {
+        validApproval = form.value.mc_approval;
+    }
+
     const payload = {
             mc_seq: form.value.mcs,
             customer_code: form.value.ac,
             customer_name: form.value.customer_name || '', // Pass customer name to backend
             mc_model: form.value.mc_model || '',
             mc_short_model: form.value.mc_short_model || '',
-            status: form.value.mc_status || 'Active',
-            mc_approval: form.value.mc_approval || 'No',
+            status: validStatus,
+            mc_approval: validApproval,
             part_no: '',
             comp_no: componentName, // Use selected component (Main, Fit1, Fit2, etc.)
             p_design: '',
@@ -1216,7 +1230,37 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         }
         // Keep Setup PD modal open after save as requested
     } catch (e) {
-        toast.error(e.message || 'Failed to save Master Card');
+        console.error('=== SAVE MASTERCARD ERROR ===');
+        console.error('Full Error:', e);
+        console.error('Error Response:', e.response?.data);
+        
+        // Display detailed error information
+        if (e.response?.data?.errors) {
+            console.error('=== VALIDATION ERRORS ===');
+            console.table(e.response.data.errors);
+            Object.keys(e.response.data.errors).forEach(field => {
+                console.error(`Field "${field}":`, e.response.data.errors[field]);
+            });
+        }
+        
+        if (e.response?.data?.debug) {
+            console.error('=== DEBUG INFO ===');
+            console.error('Received Fields Count:', e.response.data.debug.received_fields?.length);
+            console.error('Received Fields:', e.response.data.debug.received_fields);
+            console.error('Missing Validations Count:', e.response.data.debug.missing_validations?.length);
+            console.error('Missing Validations:', e.response.data.debug.missing_validations);
+            
+            // Show which fields are missing validation
+            if (Array.isArray(e.response.data.debug.missing_validations) && e.response.data.debug.missing_validations.length > 0) {
+                console.error('⚠️ FIELDS WITHOUT VALIDATION RULES:');
+                e.response.data.debug.missing_validations.forEach(field => {
+                    console.error(`  - ${field}`);
+                });
+            }
+        }
+        
+        const errorMsg = e.response?.data?.message || e.message || 'Failed to save Master Card';
+        toast.error(errorMsg);
     }
 };
 import { Link } from "@inertiajs/vue3";
@@ -2099,6 +2143,12 @@ const handleMcsInput = () => {
     if (form.value.mcs && !selectedMcs.value) {
         recordMode.value = "new";
         form.value.mc_approval = "No";
+        
+        // Reset SO, WO, and MSP data for new MC
+        soValues.value = ["", "", "", "", ""];
+        woValues.value = ["", "", "", "", ""];
+        selectedMcsFull.value = null;
+        
         // Require AC selection before showing detailed form for a new MC
         if (!form.value.ac) {
             showDetailedMcInfo.value = false;
@@ -2112,6 +2162,11 @@ const handleMcsInput = () => {
         // Hide detailed MC info when MCS input is cleared
         showDetailedMcInfo.value = false;
         recordMode.value = "new";
+        
+        // Reset SO, WO, and MSP data when MCS is cleared
+        soValues.value = ["", "", "", "", ""];
+        woValues.value = ["", "", "", "", ""];
+        selectedMcsFull.value = null;
     }
 };
 
@@ -2160,6 +2215,13 @@ const addNewRecord = () => {
     form.value.mc_approval = "No";
     recordSelected.value = true;
     showDetailedMcInfo.value = true; // Show detailed MC info for new record
+    
+    // Reset SO, WO, and MSP data for new MC
+    soValues.value = ["", "", "", "", ""];
+    woValues.value = ["", "", "", "", ""];
+    
+    // Clear selectedMcsFull to ensure fresh data
+    selectedMcsFull.value = null;
 };
 
 const searchAc = async () => {
@@ -2730,6 +2792,13 @@ const handleNextSetup = () => {
     if (recordMode.value === "new" && !form.value.mc_model.trim()) {
         showErrorModal.value = true;
         return;
+    }
+
+    // Reset SO, WO, and MSP data for new MC
+    if (recordMode.value === "new") {
+        soValues.value = ["", "", "", "", ""];
+        woValues.value = ["", "", "", "", ""];
+        selectedMcsFull.value = null;
     }
 
     // Show Setup MC Component modal

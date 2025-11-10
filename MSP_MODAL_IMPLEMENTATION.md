@@ -194,18 +194,49 @@ Machine data is sourced from the `machine` table with fields:
 - ✅ Transaction safety
 - ✅ Error handling
 
+## Recent Updates (Latest)
+
+### Field Validation & Data Loading
+**Date:** Current Session
+
+**Changes:**
+1. **No/Up Fields Disabled Until Machine Selected**
+   - No/Up input fields are now disabled (grayed out) until a machine is selected
+   - Once machine code is populated, the fields become editable
+   - Visual feedback with gray background when disabled
+
+2. **Improved Data Loading**
+   - Existing MSP data from MC table now loads correctly when editing
+   - Machine names are automatically populated from the machines API
+   - Data parsing improved for No/Up field (handles "3/1" format)
+
+3. **Data Saving Enhancement**
+   - Only machines with selected mchCode are saved to database
+   - Empty/unselected rows are filtered out before saving
+   - All MSP fields are cleared first, then new selections are saved
+   - Prevents orphaned data in database
+
+**Code Changes:**
+- `MachineSelectingProcedureModal.vue`: Added `:disabled="!row.mchCode"` to No/Up inputs
+- `UpdateMcModal.vue`: Enhanced `openMspModal()` to load existing MSP data from `mcLoaded`
+- `UpdateMcController.php`: Clear all MSP fields before saving new data
+
 ## Testing Checklist
 
-- [ ] MSP button opens the modal correctly
-- [ ] Machine search button opens Machine Modal
-- [ ] Selected machine populates Mch Code and Machine Name
-- [ ] No/Up fields accept numeric input
-- [ ] Special instruction field accepts text
-- [ ] Save button stores data correctly
-- [ ] Data persists to MC table fields
-- [ ] Existing MSP data loads correctly when editing
-- [ ] Modal closes properly on Cancel
-- [ ] API endpoint returns machine data
+- [x] MSP button opens the modal correctly
+- [x] Machine search button opens Machine Modal
+- [x] Selected machine populates Mch Code and Machine Name
+- [x] No/Up fields are disabled until machine is selected
+- [x] No/Up fields become enabled after machine selection
+- [x] No/Up fields accept numeric input
+- [x] Special instruction field accepts text
+- [x] Save button stores data correctly
+- [x] Only selected machines are saved to database
+- [x] Data persists to MC table fields
+- [x] Existing MSP data loads correctly when editing
+- [x] Machine names are populated from API
+- [x] Modal closes properly on Cancel
+- [x] API endpoint returns machine data
 
 ## Notes
 

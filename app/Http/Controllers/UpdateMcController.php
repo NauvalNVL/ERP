@@ -238,13 +238,21 @@ class UpdateMcController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // Log incoming request for debugging
+        Log::info('UpdateMC Store Request', [
+            'has_mspData' => $request->has('mspData'),
+            'mspData' => $request->input('mspData')
+        ]);
+        
+        try {
+            $validated = $request->validate([
             'mc_seq' => 'required|string',
             'customer_code' => 'required|string|max:20',
+            'customer_name' => 'nullable|string',
             'mc_model' => 'nullable|string',
             'mc_short_model' => 'nullable|string',
-            'status' => 'required|string|in:Active,Obsolete',
-            'mc_approval' => 'required|string|in:Yes,No',
+            'status' => 'nullable|string|in:Active,Obsolete',
+            'mc_approval' => 'nullable|string|in:Yes,No',
             'part_no' => 'nullable|string',
             'comp_no' => 'nullable|string',
             'p_design' => 'nullable|string',
@@ -313,7 +321,53 @@ class UpdateMcController extends Controller
             'mcMoreDescription4' => 'nullable|string',
             'mcMoreDescription5' => 'nullable|string',
             'mspData' => 'nullable|array',
+            'components' => 'nullable|array',
+            'subMaterials' => 'nullable|array',
+            'colorAreaPercents' => 'nullable|array',
+            'partNo' => 'nullable|string',
         ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation Error in UpdateMC Store', [
+                'errors' => $e->errors(),
+                'message' => $e->getMessage(),
+                'request_keys' => array_keys($request->all())
+            ]);
+            
+            // Return detailed error response
+            $receivedFields = array_keys($request->all());
+            $validationRules = [
+                'mc_seq', 'customer_code', 'customer_name', 'mc_model', 'mc_short_model', 'status', 'mc_approval',
+                'part_no', 'comp_no', 'p_design', 'ext_dim_1', 'ext_dim_2', 'ext_dim_3',
+                'int_dim_1', 'int_dim_2', 'int_dim_3', 'detailed_master_card', 'pd_setup',
+                'selectedProductDesign', 'selectedPaperFlute', 'selectedChemicalCoat',
+                'selectedReinforcementTape', 'selectedPaperSize', 'selectedScoringToolCode',
+                'printColorCodes', 'scoreL', 'scoreW', 'sheetLength', 'sheetWidth',
+                'conOut', 'convDuctX2', 'slitOut', 'dieOut', 'pcsToJoint',
+                'mcGrossM2PerPcs', 'mcNetM2PerPcs', 'mcGrossKgPerSet', 'mcNetKgPerPcs',
+                'id', 'ed', 'pcsPerSet', 'creaseValue', 'nestSlot', 'dcutSheet', 'dcutMould',
+                'dcutBlockNo', 'pitBlockNo', 'stitchWirePieces', 'bdlPerPallet', 'peelOffPercent',
+                'itemRemark', 'handHole', 'rotaryDCut', 'fullBlockPrint',
+                'selectedFinishingCode', 'selectedStitchWireCode', 'selectedBundlingStringCode',
+                'bundlingStringQty', 'selectedGlueingCode', 'selectedWrappingCode',
+                'soValues', 'woValues', 'specialInstructions', 'moreDescriptions',
+                'mcSpecialInst1', 'mcSpecialInst2', 'mcSpecialInst3', 'mcSpecialInst4',
+                'mcMoreDescription1', 'mcMoreDescription2', 'mcMoreDescription3',
+                'mcMoreDescription4', 'mcMoreDescription5',
+                'mspData', 'components', 'subMaterials', 'colorAreaPercents', 'partNo'
+            ];
+            $missingValidations = array_values(array_diff($receivedFields, $validationRules));
+            
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+                'debug' => [
+                    'received_fields' => $receivedFields,
+                    'missing_validations' => $missingValidations,
+                    'received_count' => count($receivedFields),
+                    'missing_count' => count($missingValidations)
+                ]
+            ], 422);
+        }
 
         try {
             return DB::transaction(function () use ($validated) {
@@ -552,13 +606,20 @@ class UpdateMcController extends Controller
                 // First check if mspData is provided from the new MSP modal
                 $mspData = $validated['mspData'] ?? null;
                 if (is_array($mspData) && isset($mspData['machines']) && is_array($mspData['machines'])) {
+                    // Clear all MSP fields first
+                    for ($i = 1; $i <= 12; $i++) {
+                        $legacy["MSP{$i}_MCH"] = null;
+                        $legacy["MSP{$i}_UP"] = null;
+                        $legacy["MSP{$i}_SPECIAL_INST"] = null;
+                    }
+                    
                     // Process MSP data from the new modal format
                     foreach ($mspData['machines'] as $index => $machine) {
                         $mspNum = $index + 1;
                         if ($mspNum <= 12) {
-                            $legacy["MSP{$mspNum}_MCH"] = $keep("MSP{$mspNum}_MCH", $machine['mchCode'] ?? null);
-                            $legacy["MSP{$mspNum}_UP"] = $keep("MSP{$mspNum}_UP", $machine['noUp'] ?? null);
-                            $legacy["MSP{$mspNum}_SPECIAL_INST"] = $keep("MSP{$mspNum}_SPECIAL_INST", $machine['specialInstruction'] ?? null);
+                            $legacy["MSP{$mspNum}_MCH"] = $machine['mchCode'] ?? null;
+                            $legacy["MSP{$mspNum}_UP"] = $machine['noUp'] ?? null;
+                            $legacy["MSP{$mspNum}_SPECIAL_INST"] = $machine['specialInstruction'] ?? null;
                         }
                     }
                 } else {

@@ -108,13 +108,17 @@
                                                 <input 
                                                     type="number" 
                                                     v-model="row.noUp1" 
+                                                    :disabled="!row.mchCode"
                                                     class="w-12 px-1 py-1 border border-gray-300 rounded text-sm text-center"
+                                                    :class="{ 'bg-gray-100 cursor-not-allowed': !row.mchCode }"
                                                 >
                                                 <span class="text-gray-500">/</span>
                                                 <input 
                                                     type="number" 
                                                     v-model="row.noUp2" 
+                                                    :disabled="!row.mchCode"
                                                     class="w-12 px-1 py-1 border border-gray-300 rounded text-sm text-center"
+                                                    :class="{ 'bg-gray-100 cursor-not-allowed': !row.mchCode }"
                                                 >
                                             </div>
                                         </td>
@@ -296,10 +300,10 @@ const machines = ref([]);
 
 // Initialize MSP rows (Steps 10-80, matching the image)
 const mspRows = ref([
-    { step: 10, mchCode: '', machineName: '', pDay: 2, noUp1: 3, noUp2: 1, setupMin: null, setupAdjust: null, netMin: null, targetSpeed: 170, speedAdjust: null, netSpeed: 170, specialInstruction: '' },
-    { step: 20, mchCode: '', machineName: '', pDay: null, noUp1: 1, noUp2: 1, setupMin: null, setupAdjust: null, netMin: null, targetSpeed: null, speedAdjust: null, netSpeed: null, specialInstruction: '' },
-    { step: 30, mchCode: '', machineName: '', pDay: null, noUp1: 1, noUp2: 1, setupMin: null, setupAdjust: null, netMin: null, targetSpeed: null, speedAdjust: null, netSpeed: null, specialInstruction: '' },
-    { step: 40, mchCode: '', machineName: '', pDay: null, noUp1: 1, noUp2: 1, setupMin: null, setupAdjust: null, netMin: null, targetSpeed: null, speedAdjust: null, netSpeed: null, specialInstruction: '' },
+    { step: 10, mchCode: '', machineName: '', pDay: null, noUp1: null, noUp2: null, setupMin: null, setupAdjust: null, netMin: null, targetSpeed: null, speedAdjust: null, netSpeed: null, specialInstruction: '' },
+    { step: 20, mchCode: '', machineName: '', pDay: null, noUp1: null, noUp2: null, setupMin: null, setupAdjust: null, netMin: null, targetSpeed: null, speedAdjust: null, netSpeed: null, specialInstruction: '' },
+    { step: 30, mchCode: '', machineName: '', pDay: null, noUp1: null, noUp2: null, setupMin: null, setupAdjust: null, netMin: null, targetSpeed: null, speedAdjust: null, netSpeed: null, specialInstruction: '' },
+    { step: 40, mchCode: '', machineName: '', pDay: null, noUp1: null, noUp2: null, setupMin: null, setupAdjust: null, netMin: null, targetSpeed: null, speedAdjust: null, netSpeed: null, specialInstruction: '' },
     { step: 50, mchCode: '', machineName: '', pDay: null, noUp1: null, noUp2: null, setupMin: null, setupAdjust: null, netMin: null, targetSpeed: null, speedAdjust: null, netSpeed: null, specialInstruction: '' },
     { step: 60, mchCode: '', machineName: '', pDay: null, noUp1: null, noUp2: null, setupMin: null, setupAdjust: null, netMin: null, targetSpeed: null, speedAdjust: null, netSpeed: null, specialInstruction: '' },
     { step: 70, mchCode: '', machineName: '', pDay: null, noUp1: null, noUp2: null, setupMin: null, setupAdjust: null, netMin: null, targetSpeed: null, speedAdjust: null, netSpeed: null, specialInstruction: '' },
@@ -374,6 +378,16 @@ const fetchMachines = async () => {
 
         const data = await response.json();
         machines.value = data.machines || [];
+        
+        // After loading machines, populate machine names for existing mchCodes
+        mspRows.value.forEach(row => {
+            if (row.mchCode && !row.machineName) {
+                const machine = machines.value.find(m => m.machine_code === row.mchCode);
+                if (machine) {
+                    row.machineName = machine.machine_name;
+                }
+            }
+        });
     } catch (error) {
         console.error('Error fetching machines:', error);
         machines.value = [];
@@ -398,20 +412,21 @@ const onMachineSelected = (machine) => {
 
 // Save MSP data
 const saveMspData = () => {
-    const mspData = {
-        releaseMode: releaseMode.value,
-        maxFgLevel: maxFgLevel.value,
-        machines: mspRows.value.map((row, index) => ({
+    // Only include rows where machine is selected (has mchCode)
+    const selectedMachines = mspRows.value
+        .filter(row => row.mchCode && row.mchCode.trim() !== '')
+        .map(row => ({
             step: row.step,
             mchCode: row.mchCode,
             machineName: row.machineName,
             noUp: `${row.noUp1 || ''}/${row.noUp2 || ''}`,
-            specialInstruction: row.specialInstruction,
-            // Map to MC table fields
-            [`msp${index + 1}_mch`]: row.mchCode,
-            [`msp${index + 1}_up`]: `${row.noUp1 || ''}/${row.noUp2 || ''}`,
-            [`msp${index + 1}_special_inst`]: row.specialInstruction
-        }))
+            specialInstruction: row.specialInstruction || ''
+        }));
+    
+    const mspData = {
+        releaseMode: releaseMode.value,
+        maxFgLevel: maxFgLevel.value,
+        machines: selectedMachines
     };
     
     emit('save', mspData);
@@ -426,19 +441,29 @@ const close = () => {
 // Load existing MSP data if provided
 watch(() => props.existingMspData, (newData) => {
     if (newData && Object.keys(newData).length > 0) {
+        console.log('Loading existing MSP data:', newData);
         // Load existing data into mspRows
-        for (let i = 0; i < mspRows.value.length; i++) {
-            const mspNum = i + 1;
-            if (newData[`msp${mspNum}_mch`]) {
-                mspRows.value[i].mchCode = newData[`msp${mspNum}_mch`];
-            }
-            if (newData[`msp${mspNum}_up`]) {
-                const upParts = newData[`msp${mspNum}_up`].split('/');
-                mspRows.value[i].noUp1 = upParts[0] || null;
-                mspRows.value[i].noUp2 = upParts[1] || null;
-            }
-            if (newData[`msp${mspNum}_special_inst`]) {
-                mspRows.value[i].specialInstruction = newData[`msp${mspNum}_special_inst`];
+        for (let i = 1; i <= 12; i++) {
+            if (newData[`msp${i}_mch`]) {
+                // Find the row index (i-1 because array is 0-indexed)
+                const rowIndex = i - 1;
+                if (rowIndex < mspRows.value.length) {
+                    mspRows.value[rowIndex].mchCode = newData[`msp${i}_mch`];
+                    
+                    // Parse No/Up field
+                    if (newData[`msp${i}_up`]) {
+                        const upParts = String(newData[`msp${i}_up`]).split('/');
+                        mspRows.value[rowIndex].noUp1 = upParts[0] ? parseInt(upParts[0]) : null;
+                        mspRows.value[rowIndex].noUp2 = upParts[1] ? parseInt(upParts[1]) : null;
+                    }
+                    
+                    // Load special instruction
+                    if (newData[`msp${i}_special_inst`]) {
+                        mspRows.value[rowIndex].specialInstruction = newData[`msp${i}_special_inst`];
+                    }
+                    
+                    // Note: machineName will be loaded when we fetch machines
+                }
             }
         }
     }

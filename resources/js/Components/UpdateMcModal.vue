@@ -1415,7 +1415,26 @@ const openSubMaterialModal = () => { showSubMaterialModal.value = true; };
 // MSP (Machine Selecting Procedure) Modal
 const showMspModal = ref(false);
 const mspData = ref({});
-const openMspModal = () => { 
+const openMspModal = () => {
+    // Load existing MSP data from mcLoaded if available
+    const loaded = props.mcLoaded || {};
+    const existingMspData = {};
+    
+    // Load MSP1 to MSP12 fields from loaded MC data
+    for (let i = 1; i <= 12; i++) {
+        const mchKey = `MSP${i}_MCH`;
+        const upKey = `MSP${i}_UP`;
+        const instKey = `MSP${i}_SPECIAL_INST`;
+        
+        if (loaded[mchKey]) {
+            existingMspData[`msp${i}_mch`] = loaded[mchKey];
+            existingMspData[`msp${i}_up`] = loaded[upKey] || '';
+            existingMspData[`msp${i}_special_inst`] = loaded[instKey] || '';
+        }
+    }
+    
+    // Pass existing data to modal
+    mspData.value = existingMspData;
     showMspModal.value = true; 
 };
 const onMspSave = (data) => {
@@ -2017,6 +2036,9 @@ const componentForms = ref(Array.from({ length: 10 }, () => makeEmptyPdState()))
 watch(() => props.mcLoaded, (newValue) => {
     if (newValue) {
         hydratePdFromLoaded();
+    } else {
+        // Reset MSP data when creating new MC (mcLoaded is null)
+        mspData.value = {};
     }
 }, { immediate: true });
 
