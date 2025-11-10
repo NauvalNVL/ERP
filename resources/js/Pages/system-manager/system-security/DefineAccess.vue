@@ -1,77 +1,139 @@
 <template>
     <AppLayout header="Define User Access Permission">
         <Head title="Define User Access Permission" />
-        <div class="container mx-auto px-4 py-8">
-            <div class="bg-white rounded-xl shadow-lg p-8">
-                <div class="flex items-center justify-between mb-8">
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-900 flex items-center">
-                            <ShieldCheckIcon class="h-8 w-8 text-blue-600 mr-3" />
-                            Define User Access Permission
-                        </h1>
-                        <p class="text-gray-600 mt-2">Atur permission untuk user yang sudah terdaftar</p>
+        <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+            <!-- Animated Bubbles Background -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <div class="bubble bubble-1"></div>
+                <div class="bubble bubble-2"></div>
+                <div class="bubble bubble-3"></div>
+                <div class="bubble bubble-4"></div>
+                <div class="bubble bubble-5"></div>
+                <div class="bubble bubble-6"></div>
+                <div class="bubble bubble-7"></div>
+                <div class="bubble bubble-8"></div>
+            </div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <!-- Header Card -->
+                <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 mb-8">
+                    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8" style="background: linear-gradient(90deg, #2563eb 0%, #4f46e5 50%, #9333ea 100%);">
+                        <div class="flex items-center justify-center">
+                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-4 mr-4">
+                                <ShieldCheckIcon class="h-8 w-8 text-white" />
+                            </div>
+                            <div class="text-center">
+                                <h1 class="text-3xl font-bold text-white mb-2">User Access Permission</h1>
+                                <p class="text-blue-100">Define and manage user permissions for system access</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Search User Section -->
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl mb-8 border border-blue-200">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                        <UserIcon class="h-6 w-6 text-blue-600 mr-2" />
-                        Cari User
-                    </h2>
-                    <form @submit.prevent="searchUser" class="flex flex-col md:flex-row gap-4">
-                        <div class="flex-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                User ID
-                                <span class="text-xs text-gray-500">(Contoh: ADMIN001, USER001)</span>
-                            </label>
-                            <input type="text" 
-                                   v-model="searchForm.user_id" 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                                   placeholder="Masukkan User ID untuk dicari..."
-                                   required>
-                        </div>
-                        <div class="flex items-end">
-                            <button type="submit" 
-                                    :disabled="isSearching"
-                                    class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center">
-                                <SearchIcon class="h-5 w-5 mr-2" />
-                                {{ isSearching ? 'Mencari...' : 'Cari User' }}
-                            </button>
-                        </div>
-                    </form>
+                <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden mb-8">
+                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-6">
+                        <h2 class="text-xl font-semibold text-white flex items-center">
+                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-2 mr-3">
+                                <UserIcon class="h-6 w-6 text-white" />
+                            </div>
+                            Find User
+                        </h2>
+                        <p class="text-blue-100 text-sm mt-1">Search for user to define permissions</p>
+                    </div>
+                    <div class="p-8">
+                        <form @submit.prevent="searchUser" class="flex flex-col lg:flex-row gap-6">
+                            <div class="flex-1">
+                                <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                    <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full p-2 mr-3">
+                                        <IdentificationIcon class="h-5 w-5 text-white" />
+                                    </div>
+                                    User ID
+                                </label>
+                                <input type="text" 
+                                       v-model="searchForm.user_id" 
+                                       class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                       placeholder="Enter User ID (e.g., ADMIN001, USER001)..."
+                                       required>
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit" 
+                                        :disabled="isSearching"
+                                        class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-600 to-teal-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-cyan-700 hover:to-teal-700 focus:outline-none focus:ring-4 focus:ring-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300">
+                                    <SearchIcon class="h-6 w-6 mr-3" />
+                                    {{ isSearching ? 'Searching...' : 'Search User' }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Search Results -->
-                <div v-if="searchMessage" class="mb-6 p-4 rounded-lg" :class="searchMessageClass">
-                    <div class="flex items-center">
-                        <component :is="searchMessageIcon" class="h-5 w-5 mr-2" />
-                        {{ searchMessage }}
+                <div v-if="searchMessage" class="mb-8">
+                    <div class="bg-gradient-to-r from-green-600 to-emerald-600 border-l-4 border-green-700 p-6 rounded-xl shadow-lg animate-fadeIn" v-if="searchMessageType === 'success'">
+                        <div class="flex items-center">
+                            <div class="bg-green-500 rounded-full p-2 mr-4">
+                                <component :is="searchMessageIcon" class="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg text-white">Success!</h3>
+                                <p class="text-white">{{ searchMessage }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-yellow-500 to-orange-500 border-l-4 border-yellow-600 p-6 rounded-xl shadow-lg animate-fadeIn" v-else-if="searchMessageType === 'warning'">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-500 rounded-full p-2 mr-4">
+                                <component :is="searchMessageIcon" class="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg text-white">Warning!</h3>
+                                <p class="text-white">{{ searchMessage }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-r from-red-500 to-pink-500 border-l-4 border-red-600 p-6 rounded-xl shadow-lg animate-fadeIn" v-else>
+                        <div class="flex items-center">
+                            <div class="bg-red-500 rounded-full p-2 mr-4">
+                                <component :is="searchMessageIcon" class="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg text-white">Error!</h3>
+                                <p class="text-white">{{ searchMessage }}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- User Permission Form -->
-                <div v-if="foundUser" class="bg-gradient-to-br from-gray-50 to-blue-50 p-8 rounded-xl border border-gray-200">
+                <div v-if="foundUser" class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden">
                     <!-- User Info Header -->
-                    <div class="bg-white p-6 rounded-xl mb-8 shadow-sm border border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-8">
+                        <div class="flex flex-col lg:flex-row items-center justify-between">
+                            <div class="flex items-center mb-4 lg:mb-0">
+                                <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white font-bold text-2xl mr-6">
                                     {{ foundUser.official_name.charAt(0).toUpperCase() }}
                                 </div>
-                                <div>
-                                    <h3 class="text-2xl font-bold text-gray-900">{{ foundUser.official_name }}</h3>
-                                    <p class="text-gray-600">{{ foundUser.user_id }} • {{ foundUser.official_title || 'No Title' }}</p>
-                                    <p class="text-sm text-gray-500 mt-1">Status: <span class="font-medium" :class="foundUser.status === 'A' ? 'text-green-600' : 'text-red-600'">{{ foundUser.status === 'A' ? 'Active' : 'Inactive' }}</span></p>
+                                <div class="text-center lg:text-left">
+                                    <h3 class="text-2xl font-bold text-white mb-1">{{ foundUser.official_name }}</h3>
+                                    <p class="text-purple-100">{{ foundUser.user_id }} • {{ foundUser.official_title || 'No Title' }}</p>
+                                    <p class="text-sm text-purple-200 mt-2">
+                                        Status: 
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" :class="foundUser.status === 'A' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'">
+                                            {{ foundUser.status === 'A' ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    </p>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <p class="text-sm text-gray-500">Total Permissions</p>
-                                <p class="text-3xl font-bold text-blue-600">{{ selectedPermissionsCount }}</p>
-                                <p class="text-xs text-gray-400">dari {{ totalPermissionsCount }}</p>
+                            <div class="text-center lg:text-right">
+                                <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+                                    <p class="text-sm text-purple-200 mb-1">Total Permissions</p>
+                                    <p class="text-4xl font-bold text-white">{{ selectedPermissionsCount }}</p>
+                                    <p class="text-xs text-purple-300">of {{ totalPermissionsCount }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div class="p-8">
 
                     <form @submit.prevent="savePermissions" class="space-y-8">
                         <!-- Select All Toggle -->
@@ -99,11 +161,11 @@
                         <div class="space-y-6">
                             <!-- Dashboard -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                                <div class="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4 border-b border-gray-200">
-                                    <h4 class="font-semibold text-gray-900 flex items-center">
-                                        <i class="fas fa-tachometer-alt w-5 h-5 mr-3 text-blue-600"></i>
+                                <div class="dashboard-header bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 border-b border-blue-800">
+                                    <h4 class="font-semibold text-white flex items-center">
+                                        <i class="fas fa-tachometer-alt w-5 h-5 mr-3 text-blue-200"></i>
                                         Dashboard
-                                        <span class="ml-auto text-sm text-gray-600">({{ getSelectedCountForCategory('dashboard') }}/{{ getCategoryPermissions('dashboard').length }})</span>
+                                        <span class="ml-auto text-sm text-blue-200">({{ getSelectedCountForCategory('dashboard') }}/{{ getCategoryPermissions('dashboard').length }})</span>
                                     </h4>
                                 </div>
                                 <div class="p-6">
@@ -117,12 +179,12 @@
                             <!-- System Manager -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                                 <button @click="toggleCategory('system_manager')" 
-                                        class="w-full bg-gradient-to-r from-indigo-50 to-indigo-100 px-6 py-4 border-b border-gray-200 text-left hover:from-indigo-100 hover:to-indigo-200 transition-all">
-                                    <h4 class="font-semibold text-gray-900 flex items-center">
-                                        <i class="fas fa-cogs w-5 h-5 mr-3 text-indigo-600"></i>
+                                        class="system-manager-header w-full bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 border-b border-indigo-800 text-left hover:from-indigo-700 hover:to-indigo-800 transition-all">
+                                    <h4 class="font-semibold text-white flex items-center">
+                                        <i class="fas fa-cogs w-5 h-5 mr-3 text-indigo-200"></i>
                                         System Manager
-                                        <i :class="['fas ml-2 transition-transform', openCategories.system_manager ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
-                                        <span class="ml-auto text-sm text-gray-600">({{ getSelectedCountForCategory('system_manager') }}/{{ getCategoryPermissions('system_manager').length }})</span>
+                                        <i :class="['fas ml-2 transition-transform text-indigo-200', openCategories.system_manager ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
+                                        <span class="ml-auto text-sm text-indigo-200">({{ getSelectedCountForCategory('system_manager') }}/{{ getCategoryPermissions('system_manager').length }})</span>
                                     </h4>
                                 </button>
                                 <div v-show="openCategories.system_manager" class="p-6 space-y-4">
@@ -164,12 +226,12 @@
                             <!-- Sales Management -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                                 <button @click="toggleCategory('sales_management')" 
-                                        class="w-full bg-gradient-to-r from-green-50 to-green-100 px-6 py-4 border-b border-gray-200 text-left hover:from-green-100 hover:to-green-200 transition-all">
-                                    <h4 class="font-semibold text-gray-900 flex items-center">
-                                        <i class="fas fa-chart-line w-5 h-5 mr-3 text-green-600"></i>
+                                        class="sales-management-header w-full bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 border-b border-green-800 text-left hover:from-green-700 hover:to-green-800 transition-all">
+                                    <h4 class="font-semibold text-white flex items-center">
+                                        <i class="fas fa-chart-line w-5 h-5 mr-3 text-green-200"></i>
                                         Sales Management
-                                        <i :class="['fas ml-2 transition-transform', openCategories.sales_management ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
-                                        <span class="ml-auto text-sm text-gray-600">({{ getSelectedCountForCategory('sales_management') }}/{{ getCategoryPermissions('sales_management').length }})</span>
+                                        <i :class="['fas ml-2 transition-transform text-green-200', openCategories.sales_management ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
+                                        <span class="ml-auto text-sm text-green-200">({{ getSelectedCountForCategory('sales_management') }}/{{ getCategoryPermissions('sales_management').length }})</span>
                                     </h4>
                                 </button>
                                 <div v-show="openCategories.sales_management" class="p-6 space-y-6 max-h-96 overflow-y-auto">
@@ -400,12 +462,12 @@
                             <!-- Warehouse Management -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                                 <button @click="toggleCategory('warehouse_management')" 
-                                        class="w-full bg-gradient-to-r from-yellow-50 to-yellow-100 px-6 py-4 border-b border-gray-200 text-left hover:from-yellow-100 hover:to-yellow-200 transition-all">
-                                    <h4 class="font-semibold text-gray-900 flex items-center">
-                                        <i class="fas fa-warehouse w-5 h-5 mr-3 text-yellow-600"></i>
+                                        class="warehouse-management-header w-full bg-gradient-to-r from-yellow-600 to-yellow-700 px-6 py-4 border-b border-yellow-800 text-left hover:from-yellow-700 hover:to-yellow-800 transition-all">
+                                    <h4 class="font-semibold text-white flex items-center">
+                                        <i class="fas fa-warehouse w-5 h-5 mr-3 text-yellow-200"></i>
                                         Warehouse Management
-                                        <i :class="['fas ml-2 transition-transform', openCategories.warehouse_management ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
-                                        <span class="ml-auto text-sm text-gray-600">({{ getSelectedCountForCategory('warehouse_management') }}/{{ getCategoryPermissions('warehouse_management').length }})</span>
+                                        <i :class="['fas ml-2 transition-transform text-yellow-200', openCategories.warehouse_management ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
+                                        <span class="ml-auto text-sm text-yellow-200">({{ getSelectedCountForCategory('warehouse_management') }}/{{ getCategoryPermissions('warehouse_management').length }})</span>
                                     </h4>
                                 </button>
                                 <div v-show="openCategories.warehouse_management" class="p-6 space-y-4 max-h-96 overflow-y-auto">
@@ -529,6 +591,7 @@
                             </button>
                         </div>
                     </form>
+                    </div>
                 </div>
 
                 <!-- Flash Messages -->
@@ -559,7 +622,8 @@ import {
     ArrowDownTrayIcon as SaveIcon,
     XMarkIcon as XIcon,
     CheckCircleIcon,
-    ExclamationCircleIcon
+    ExclamationCircleIcon,
+    IdentificationIcon
 } from '@heroicons/vue/24/outline'
 
 export default {
@@ -576,7 +640,8 @@ export default {
         SaveIcon,
         XIcon,
         CheckCircleIcon,
-        ExclamationCircleIcon
+        ExclamationCircleIcon,
+        IdentificationIcon
     },
     data() {
         return {
@@ -589,6 +654,7 @@ export default {
             searchMessage: null,
             searchMessageClass: '',
             searchMessageIcon: null,
+            searchMessageType: 'info',
             selectAllPermissions: false,
             openCategories: {
                 system_manager: false,
@@ -773,8 +839,8 @@ export default {
 
                 if (response.ok && data.user) {
                     this.foundUser = data.user;
-                    this.searchMessage = `User ${data.user.official_name} ditemukan.`;
-                    this.searchMessageClass = 'bg-green-100 text-green-700 border border-green-200';
+                    this.searchMessage = `User ${data.user.official_name} found successfully.`;
+                    this.searchMessageType = 'success';
                     this.searchMessageIcon = CheckCircleIcon;
                     
                     // Load existing permissions
@@ -785,15 +851,15 @@ export default {
                     }
                 } else {
                     this.foundUser = null;
-                    this.searchMessage = `User dengan ID "${this.searchForm.user_id}" tidak ditemukan.`;
-                    this.searchMessageClass = 'bg-yellow-100 text-yellow-700 border border-yellow-200';
+                    this.searchMessage = `User with ID "${this.searchForm.user_id}" not found.`;
+                    this.searchMessageType = 'warning';
                     this.searchMessageIcon = ExclamationCircleIcon;
                 }
             } catch (error) {
                 console.error('Search error:', error);
                 this.foundUser = null;
-                this.searchMessage = 'Terjadi kesalahan saat mencari user.';
-                this.searchMessageClass = 'bg-red-100 text-red-700 border border-red-200';
+                this.searchMessage = 'An error occurred while searching for user.';
+                this.searchMessageType = 'error';
                 this.searchMessageIcon = ExclamationCircleIcon;
             } finally {
                 this.isSearching = false;
@@ -939,5 +1005,266 @@ export default {
 <style scoped>
 .permission-group:hover {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Modern Animations */
+.animate-fadeIn {
+    animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-slideIn {
+    animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-20px) scale(0.95); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0; 
+        transform: translateX(-30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0); 
+    }
+}
+
+/* Animated Bubbles */
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    animation: float 15s infinite ease-in-out;
+    pointer-events: none;
+}
+
+.bubble-1 {
+    width: 80px;
+    height: 80px;
+    left: 10%;
+    top: 20%;
+    animation-delay: 0s;
+    animation-duration: 20s;
+}
+
+.bubble-2 {
+    width: 120px;
+    height: 120px;
+    right: 15%;
+    top: 10%;
+    animation-delay: 2s;
+    animation-duration: 25s;
+}
+
+.bubble-3 {
+    width: 60px;
+    height: 60px;
+    left: 20%;
+    bottom: 30%;
+    animation-delay: 4s;
+    animation-duration: 18s;
+}
+
+.bubble-4 {
+    width: 100px;
+    height: 100px;
+    right: 25%;
+    bottom: 20%;
+    animation-delay: 6s;
+    animation-duration: 22s;
+}
+
+.bubble-5 {
+    width: 40px;
+    height: 40px;
+    left: 50%;
+    top: 15%;
+    animation-delay: 8s;
+    animation-duration: 16s;
+}
+
+.bubble-6 {
+    width: 90px;
+    height: 90px;
+    left: 5%;
+    bottom: 10%;
+    animation-delay: 10s;
+    animation-duration: 24s;
+}
+
+.bubble-7 {
+    width: 70px;
+    height: 70px;
+    right: 5%;
+    top: 50%;
+    animation-delay: 12s;
+    animation-duration: 19s;
+}
+
+.bubble-8 {
+    width: 50px;
+    height: 50px;
+    left: 80%;
+    bottom: 40%;
+    animation-delay: 14s;
+    animation-duration: 21s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) translateX(0px) rotate(0deg);
+        opacity: 0.3;
+    }
+    25% {
+        transform: translateY(-20px) translateX(10px) rotate(90deg);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translateY(-40px) translateX(-10px) rotate(180deg);
+        opacity: 0.4;
+    }
+    75% {
+        transform: translateY(-20px) translateX(15px) rotate(270deg);
+        opacity: 0.7;
+    }
+}
+
+/* Glass morphism effect */
+.backdrop-blur-sm {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Hover effects */
+.hover\:scale-105:hover {
+    transform: scale(1.05);
+}
+
+/* Focus effects */
+.focus\:ring-4:focus {
+    box-shadow: 0 0 0 4px rgba(var(--ring-color), 0.3);
+}
+
+/* Smooth transitions */
+* {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+    .max-w-6xl {
+        max-width: 100%;
+        margin: 0;
+        padding: 0 1rem;
+    }
+    
+    .rounded-2xl {
+        border-radius: 1rem;
+    }
+    
+    .p-8 {
+        padding: 1.5rem;
+    }
+    
+    .text-3xl {
+        font-size: 1.875rem;
+    }
+}
+
+/* Explicit gradient definitions for category headers */
+.dashboard-header {
+    background: linear-gradient(to right, #2563eb, #1d4ed8) !important;
+    color: white !important;
+    border-bottom-color: #1e40af !important;
+}
+
+.system-manager-header {
+    background: linear-gradient(to right, #4f46e5, #4338ca) !important;
+    color: white !important;
+    border-bottom-color: #3730a3 !important;
+}
+
+.system-manager-header:hover {
+    background: linear-gradient(to right, #4338ca, #3730a3) !important;
+}
+
+.sales-management-header {
+    background: linear-gradient(to right, #16a34a, #15803d) !important;
+    color: white !important;
+    border-bottom-color: #166534 !important;
+}
+
+.sales-management-header:hover {
+    background: linear-gradient(to right, #15803d, #166534) !important;
+}
+
+.warehouse-management-header {
+    background: linear-gradient(to right, #ca8a04, #a16207) !important;
+    color: white !important;
+    border-bottom-color: #92400e !important;
+}
+
+.warehouse-management-header:hover {
+    background: linear-gradient(to right, #a16207, #92400e) !important;
+}
+
+/* Icon colors for better visibility */
+.dashboard-header .fas {
+    color: #bfdbfe !important;
+}
+
+.system-manager-header .fas {
+    color: #c7d2fe !important;
+}
+
+.sales-management-header .fas {
+    color: #bbf7d0 !important;
+}
+
+.warehouse-management-header .fas {
+    color: #fef3c7 !important;
+}
+
+/* Counter text colors */
+.dashboard-header .ml-auto {
+    color: #bfdbfe !important;
+}
+
+.system-manager-header .ml-auto {
+    color: #c7d2fe !important;
+}
+
+.sales-management-header .ml-auto {
+    color: #bbf7d0 !important;
+}
+
+.warehouse-management-header .ml-auto {
+    color: #fef3c7 !important;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .bg-white\/80 {
+        background-color: rgba(31, 41, 55, 0.8);
+    }
+    
+    .text-gray-800 {
+        color: #f9fafb;
+    }
+    
+    .border-gray-200 {
+        border-color: #374151;
+    }
 }
 </style>

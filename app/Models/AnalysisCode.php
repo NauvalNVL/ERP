@@ -9,7 +9,20 @@ class AnalysisCode extends Model
 {
     use HasFactory;
 
+    protected $table = 'analysis_codes';
+    protected $primaryKey = 'analysis_code';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
-        'code', 'name', 'grouping',
+        'analysis_code',
+        'analysis_name',
+        'analysis_group',
+        'analysis_group2',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 }

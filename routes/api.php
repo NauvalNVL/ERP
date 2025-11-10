@@ -21,6 +21,7 @@ use App\Http\Controllers\ComputationMethodController;
 use App\Http\Controllers\FinishingController;
 use App\Http\Controllers\StitchWireController;
 use App\Http\Controllers\ColorGroupController;
+use App\Http\Controllers\AnalysisCodeController;
 use App\Http\Controllers\ChemicalCoatController;
 use App\Http\Controllers\ReinforcementTapeController;
 use App\Http\Controllers\BundlingStringController;
@@ -169,6 +170,13 @@ Route::post('/color-groups', [ColorGroupController::class, 'store']);
 Route::put('/color-groups/{code}', [ColorGroupController::class, 'update']);
 Route::delete('/color-groups/{code}', [ColorGroupController::class, 'destroy']);
 Route::post('/color-groups/seed', [ColorGroupController::class, 'seed']);
+
+// Analysis Code API routes
+Route::get('/analysis-codes', [AnalysisCodeController::class, 'apiIndex']);
+Route::get('/analysis-codes/{code}', [AnalysisCodeController::class, 'show']);
+Route::post('/analysis-codes', [AnalysisCodeController::class, 'store']);
+Route::put('/analysis-codes/{code}', [AnalysisCodeController::class, 'update']);
+Route::delete('/analysis-codes/{code}', [AnalysisCodeController::class, 'destroy']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 return $request->user();
@@ -1415,6 +1423,17 @@ Route::post('/search-ac', [UpdateMcController::class, 'searchAc']);
 Route::post('/search-mcs', [UpdateMcController::class, 'searchMcs']);
 Route::get('/master-cards', [UpdateMcController::class, 'apiIndex']);
 Route::get('/check-mcs/{mcsNumber}', [UpdateMcController::class, 'checkMcs']);
+});
+
+// Delivery Order API Routes
+Route::prefix('delivery-orders')->group(function () {
+    Route::post('/fix-missing-data', [DeliveryOrderController::class, 'fixMissingData']);
+    Route::get('/print-range', [DeliveryOrderController::class, 'getPrintRange']);
+    Route::post('/', [DeliveryOrderController::class, 'store']);
+    Route::get('/', [DeliveryOrderController::class, 'index']);
+    Route::get('/{doNumber}', [DeliveryOrderController::class, 'show']);
+    Route::put('/{doNumber}', [DeliveryOrderController::class, 'update']);
+    Route::post('/{doNumber}/cancel', [DeliveryOrderController::class, 'cancel']);
 });
 
 // FG Stock-In by WO API routes

@@ -23,6 +23,7 @@ use App\Http\Controllers\PaperFluteController;
 use App\Http\Controllers\PaperQualityController;
 use App\Http\Controllers\ScoringToolController;
 use App\Http\Controllers\FinishingController;
+use App\Http\Controllers\AnalysisCodeController;
 use App\Http\Controllers\StitchWireController;
 use App\Http\Controllers\ChemicalCoatController;
 use App\Http\Controllers\ReinforcementTapeController;
@@ -501,6 +502,13 @@ Route::get('/define-color', [ColorController::class, 'vueIndex'])->name('vue.def
          Route::get('/finishing/view-print', [FinishingController::class, 'vueViewAndPrint'])->name('vue.finishing.view-print');
          // Alias for search menu
          Route::get('/define-finishing', [FinishingController::class, 'vueIndex'])->name('vue.define-finishing');
+
+Route::get('/analysis-code', [AnalysisCodeController::class, 'index'])->name('vue.analysis-code.index');
+Route::get('/analysis-code/view-print', function () {
+    return Inertia::render('sales-management/system-requirement/standard-requirement/view-and-print-analysis-code');
+})->name('vue.analysis-code.view-print');
+// Alias for search menu
+Route::get('/define-analysis-code', [AnalysisCodeController::class, 'index'])->name('vue.define-analysis-code');
 
          Route::get('/stitch-wire', [StitchWireController::class, 'vueIndex'])->name('vue.stitch-wire.index');
          Route::get('/stitch-wire/view-print', [StitchWireController::class, 'vueViewAndPrint'])->name('vue.stitch-wire.view-print');

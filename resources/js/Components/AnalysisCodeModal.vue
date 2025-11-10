@@ -1,195 +1,141 @@
 <template>
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none backdrop-blur-sm bg-black bg-opacity-50 transition-opacity duration-300">
-        <div class="relative w-full max-w-3xl mx-auto my-6 transform transition-all duration-300 scale-100 opacity-100" :class="{'scale-95 opacity-0': !show}">
-            <!-- Modal content -->
-            <div class="relative flex flex-col w-full bg-white border-0 rounded-xl shadow-2xl outline-none focus:outline-none overflow-hidden">
-                <!-- Modal header -->
-                <div class="flex items-center justify-between p-6 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-xl shadow-md">
-                    <h3 class="text-2xl font-bold text-white">
-                        Analysis Code Table
-                    </h3>
-                    <button 
-                        class="p-2 ml-auto bg-transparent border-0 text-white hover:text-gray-200 transition-colors duration-200 text-3xl leading-none font-semibold outline-none focus:outline-none"
-                        @click="$emit('close')"
-                    >
-                        <span class="block outline-none focus:outline-none transform hover:rotate-90 transition-transform duration-300">
-                            ×
-                        </span>
-                    </button>
-                </div>
-                <!-- Modal body -->
-                <div class="relative p-6 flex-auto max-h-[70vh] overflow-y-auto custom-scrollbar">
-                    <div class="mb-6">
-                        <input 
-                            type="text" 
-                            v-model="searchQuery"
-                            @input="debouncedSearch"
-                            placeholder="Search by Code or Name..."
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                        />
-                    </div>
-                    <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-blue-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Code</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Group</th>
-                                    <th scope="col" class="relative px-6 py-3"><span class="sr-only">Select</span></th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="code in filteredAnalysisCodes" :key="code.code" @click="selectAnalysisCode(code)" class="hover:bg-blue-50 cursor-pointer transition-colors duration-150">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ code.code }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ code.group }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button @click.stop="selectAnalysisCode(code)" class="text-blue-600 hover:text-blue-900 font-semibold transition-colors duration-150">Select</button>
-                                    </td>
-                                </tr>
-                                <tr v-if="filteredAnalysisCodes.length === 0">
-                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No analysis codes found.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <!-- Modal footer -->
-                <div class="flex items-center justify-end p-6 bg-gray-50 border-t border-solid border-gray-200 rounded-b-xl">
-                    <button 
-                        class="text-gray-700 bg-gray-200 hover:bg-gray-300 font-bold uppercase px-6 py-2 text-sm rounded-lg shadow hover:shadow-md outline-none focus:outline-none mr-3 transition-all duration-150"
-                        type="button"
-                        @click="$emit('close')"
-                    >
-                        Exit
-                    </button>
-                </div>
-            </div>
+  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-auto">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+        <div class="flex items-center">
+          <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
+            <i class="fas fa-code-branch"></i>
+          </div>
+          <h3 class="text-xl font-semibold">Analysis Code Table</h3>
         </div>
+        <button @click="$emit('close')" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <!-- Modal Content -->
+      <div class="p-5">
+        <div class="mb-4">
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+              <i class="fas fa-search"></i>
+            </span>
+            <input type="text" v-model="searchQuery" placeholder="Search analysis codes..."
+              class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+          </div>
+        </div>
+        <div class="overflow-x-auto rounded-lg border border-gray-200 max-h-96">
+          <table class="w-full divide-y divide-gray-200 table-fixed">
+            <thead class="bg-gray-50 sticky top-0">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4 cursor-pointer" @click="sortTable('analysis_code')">Analysis Code</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 cursor-pointer" @click="sortTable('analysis_name')">Analysis Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Group</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">Group2</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200 text-xs">
+              <tr v-for="code in filteredAnalysisCodes" :key="code.analysis_code"
+                :class="['hover:bg-blue-50 cursor-pointer', selectedCode && selectedCode.analysis_code === code.analysis_code ? 'bg-blue-100 border-l-4 border-blue-500' : '']"
+                @click="selectRow(code)"
+                @dblclick="selectAndClose(code)">
+                <td class="px-6 py-3 whitespace-nowrap font-medium text-gray-900">{{ code.analysis_code }}</td>
+                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ code.analysis_name }}</td>
+                <td class="px-6 py-3 whitespace-nowrap">
+                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">{{ code.analysis_group }}</span>
+                </td>
+                <td class="px-6 py-3 whitespace-nowrap text-gray-700">{{ code.analysis_group2 }}</td>
+              </tr>
+              <tr v-if="filteredAnalysisCodes.length === 0">
+                <td colspan="4" class="px-6 py-4 text-center text-gray-500">No analysis codes found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-2 text-xs text-gray-500 italic">
+          <p>Click on a row to select and edit its details.</p>
+        </div>
+        <div class="mt-4 grid grid-cols-3 gap-2">
+          <button type="button" @click="sortTable('analysis_code')" class="py-2 px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-lg transform active:translate-y-px">
+            <i class="fas fa-sort mr-1"></i>By Code
+          </button>
+          <button type="button" @click="selectAndClose(selectedCode)" class="py-2 px-3 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transform active:translate-y-px">
+            <i class="fas fa-edit mr-1"></i>Select
+          </button>
+          <button type="button" @click="$emit('close')" class="py-2 px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-lg transform active:translate-y-px">
+            <i class="fas fa-times mr-1"></i>Exit
+          </button>
+        </div>
+      </div>
     </div>
-    <div v-if="show" class="fixed inset-0 z-40 bg-black opacity-50 transition-opacity duration-300"></div>
+  </div>
 </template>
 
 <script setup>
-import { ref, watch, computed, onMounted } from 'vue';
-import debounce from 'lodash/debounce';
-import axios from 'axios';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
-    show: {
-        type: Boolean,
-        default: false,
-    },
-    group: {
-        type: String,
-        default: null,
-    },
+    show: Boolean,
+    analysisCodes: {
+        type: Array,
+        default: () => []
+    }
 });
 
-const emits = defineEmits(['close', 'select-analysis-code']);
+const emit = defineEmits(['close', 'select', 'refresh']);
 
 const searchQuery = ref('');
-const analysisCodes = ref([]); // Data yang fetched dari API
-const rawAnalysisCodes = ref([]); // Menyimpan data asli yang belum difilter
-
-const fetchAnalysisCodes = async (group = null) => {
-    try {
-        console.log('Fetching analysis codes with group:', group);
-        let url = '/api/material-management/analysis-codes';
-        if (group) {
-            url += `?group=${encodeURIComponent(group)}`;
-        }
-        console.log('API URL:', url);
-        const response = await axios.get(url);
-        console.log('API Response:', response.data);
-        // Ensure we're handling the response correctly
-        const data = Array.isArray(response.data) ? response.data : [];
-        rawAnalysisCodes.value = data; // Simpan data asli
-        analysisCodes.value = data; // Awalnya, data yang ditampilkan sama dengan data asli
-        console.log('Analysis codes loaded:', data.length);
-    } catch (error) {
-        console.error('Error fetching analysis codes:', error);
-        rawAnalysisCodes.value = [];
-        analysisCodes.value = [];
-    }
-};
+const selectedCode = ref(null);
+const sortKey = ref('analysis_code');
+const sortAsc = ref(true);
 
 const filteredAnalysisCodes = computed(() => {
-    if (!searchQuery.value) {
-        return analysisCodes.value;
-    }
-    const query = searchQuery.value.toLowerCase();
-    return analysisCodes.value.filter(code => 
-        (code.code && code.code.toLowerCase().includes(query)) || 
-        (code.name && code.name.toLowerCase().includes(query))
-    );
-});
-
-const selectAnalysisCode = (code) => {
-    // Ensure we're passing the correct data structure
-    const analysisCodeData = {
-        code: code.code,
-        name: code.name,
-        group: code.group
-    };
-    console.log('Selecting analysis code:', analysisCodeData);
-    emits('select-analysis-code', analysisCodeData);
-    emits('close');
-};
-
-const applySearchFilter = () => {
-    if (!searchQuery.value) {
-        analysisCodes.value = rawAnalysisCodes.value; // Reset ke data asli jika search kosong
-    } else {
+    let filtered = props.analysisCodes || [];
+    
+    // Apply search filter
+    if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        analysisCodes.value = rawAnalysisCodes.value.filter(code => 
-            (code.code && code.code.toLowerCase().includes(query)) || 
-            (code.name && code.name.toLowerCase().includes(query))
+        filtered = filtered.filter(code => 
+            code.analysis_code?.toLowerCase().includes(query) ||
+            code.analysis_name?.toLowerCase().includes(query) ||
+            code.analysis_group?.toLowerCase().includes(query) ||
+            code.analysis_group2?.toLowerCase().includes(query)
         );
     }
+    
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+        const aVal = a[sortKey.value] || '';
+        const bVal = b[sortKey.value] || '';
+        
+        if (sortAsc.value) {
+            return aVal.toString().localeCompare(bVal.toString());
+        } else {
+            return bVal.toString().localeCompare(aVal.toString());
+        }
+    });
+    
+    return sorted;
+});
+
+const sortTable = (key) => {
+    if (sortKey.value === key) {
+        sortAsc.value = !sortAsc.value;
+    } else {
+        sortKey.value = key;
+        sortAsc.value = true;
+    }
 };
 
-const debouncedSearch = debounce(applySearchFilter, 300); // Debounce search by 300ms
+const selectRow = (code) => {
+    selectedCode.value = code;
+};
 
-// Fetch data when component is mounted and shown
-onMounted(() => {
-    if (props.show) {
-        fetchAnalysisCodes(props.group);
+const selectAndClose = (code) => {
+    if (!code) {
+        return;
     }
-});
-
-watch(() => props.show, (newValue) => {
-    if (newValue) {
-        fetchAnalysisCodes(props.group);
-        searchQuery.value = ''; // Reset search query when modal opens
-    }
-});
-
-watch(() => props.group, (newGroup) => {
-    if (props.show) {
-        fetchAnalysisCodes(newGroup);
-    }
-});
-
+    emit('select', code);
+    emit('close');
+};
 </script>
-
-<style scoped>
-/* Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-</style>

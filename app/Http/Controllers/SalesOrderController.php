@@ -6,11 +6,117 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Customer;
 use App\Models\Salesperson;
 
 class SalesOrderController extends Controller
 {
+    /**
+     * Get current time in WIB timezone (UTC+7)
+     * Same implementation as InvoiceController
+     * 
+     * @return \Carbon\Carbon
+     */
+    private function getNowWib()
+    {
+        return now()->timezone('Asia/Jakarta'); // WIB = UTC+7
+    }
+
+    /**
+     * Get current authenticated user ID for audit trail
+     * Same implementation as InvoiceController
+     * 
+     * @return string|null
+     */
+    private function getCurrentUserId()
+    {
+        try {
+            Log::info('🔍 getCurrentUserId() called - Starting user ID retrieval');
+
+            if (!Auth::check()) {
+                Log::warning('❌ User not authenticated for audit trail');
+                return 'System'; // Fallback to 'System' if not authenticated
+            }
+
+            Log::info('✅ Auth::check() passed');
+
+            $user = Auth::user();
+            
+            if (!$user) {
+                Log::warning('❌ Auth::user() returned null');
+                return 'System';
+            }
+
+            Log::info('✅ Auth::user() returned user object', [
+                'class' => get_class($user)
+            ]);
+
+            // Try to get userID property from UserCps model
+            $userId = null;
+            $method = null;
+            
+            // Priority 1: Direct property access
+            if (isset($user->userID) && !empty($user->userID)) {
+                $userId = $user->userID;
+                $method = 'userID property';
+                Log::info('✅ Found via userID property', ['value' => $userId]);
+            } 
+            // Priority 2: Alternative naming
+            elseif (isset($user->user_id) && !empty($user->user_id)) {
+                $userId = $user->user_id;
+                $method = 'user_id property';
+                Log::info('✅ Found via user_id property', ['value' => $userId]);
+            } 
+            // Priority 3: Check NO_ as fallback
+            elseif (isset($user->NO_) && !empty($user->NO_)) {
+                $userId = $user->NO_;
+                $method = 'NO_ property (fallback)';
+                Log::info('⚠️ Found via NO_ fallback', ['value' => $userId]);
+            }
+
+            // ✅ Fallback: Try Auth::id() if userID property not found
+            if (empty($userId)) {
+                $authId = Auth::id();
+                if ($authId) {
+                    $userId = (string) $authId;
+                    $method = 'Auth::id() fallback';
+                    Log::info('✅ Using Auth::id() as fallback', ['value' => $userId]);
+                } else {
+                    Log::error('❌ Could not retrieve userID from authenticated user', [
+                        'user_class' => get_class($user),
+                        'has_userID' => property_exists($user, 'userID'),
+                        'has_user_id' => property_exists($user, 'user_id'),
+                        'has_NO_' => property_exists($user, 'NO_'),
+                        'userID_value' => $user->userID ?? 'NOT SET',
+                        'user_id_value' => $user->user_id ?? 'NOT SET',
+                        'NO__value' => $user->NO_ ?? 'NOT SET',
+                        'Auth::id()' => $authId,
+                    ]);
+                    return 'System'; // Final fallback
+                }
+            }
+
+            Log::info('✅ User ID successfully retrieved for audit trail', [
+                'userId' => $userId,
+                'method' => $method,
+                'user_class' => get_class($user)
+            ]);
+
+            return $userId;
+
+        } catch (\Exception $e) {
+            Log::error('❌ EXCEPTION in getCurrentUserId()', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return 'System'; // Safe fallback on exception
+        }
+    }
+
+
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -84,12 +190,28 @@ class SalesOrderController extends Controller
         // Fetch customer data from database
         $customerData = DB::table('CUSTOMER')->where('CODE', $validated['customer_code'])->first();
         $customerName = $customerData ? $customerData->NAME : '';
+        $customerIndustry = $customerData ? ($customerData->IND ?? $customerData->INDUSTRY ?? '') : '';
+        $customerArea = $customerData ? ($customerData->AREA ?? $customerData->REGION ?? '') : '';
 
         // Fetch master card data from database
         $masterCardData = DB::table('MC')
             ->where('MCS_Num', $validated['master_card_seq'])
             ->where('AC_NUM', $validated['customer_code'])
             ->first();
+            
+        // Log MC data fetch result
+        Log::info('MC Data Fetch', [
+            'customer_code' => $validated['customer_code'],
+            'master_card_seq' => $validated['master_card_seq'],
+            'mc_found' => $masterCardData ? 'yes' : 'no',
+            'mc_model' => $masterCardData ? $masterCardData->MODEL : 'N/A',
+            'has_dimensions' => $masterCardData ? [
+                'ext_l' => !empty($masterCardData->EXT_LENGTH),
+                'ext_w' => !empty($masterCardData->EXT_WIDTH),
+                'ext_h' => !empty($masterCardData->EXT_HEIGHT),
+            ] : 'N/A'
+        ]);
+        
         $mcModel = $masterCardData ? $masterCardData->MODEL : '';
         $mcPDesign = $masterCardData ? $masterCardData->P_DESIGN : '';
         $mcPartNumber = $masterCardData ? $masterCardData->PART_NO : '';
@@ -109,6 +231,16 @@ class SalesOrderController extends Controller
         $pq3 = $masterCardData ? ($masterCardData->SO_PQ3 ?? '') : '';
         $pq4 = $masterCardData ? ($masterCardData->SO_PQ4 ?? '') : '';
         $pq5 = $masterCardData ? ($masterCardData->SO_PQ5 ?? '') : '';
+        
+        // Extract material calculation data from MC table
+        $mcGrossM2 = $masterCardData ? (float)($masterCardData->MC_GROSS_M2_PER_PCS ?? 0) : 0;
+        $mcNetM2 = $masterCardData ? (float)($masterCardData->MC_NET_M2_PER_PCS ?? 0) : 0;
+        $mcGrossKg = $masterCardData ? (float)($masterCardData->MC_GROSS_KG_PER_SET ?? 0) : 0;
+        $mcNetKg = $masterCardData ? (float)($masterCardData->MC_NET_KG_PER_PCS ?? 0) : 0;
+        
+        // Extract sheet dimensions for LM calculation (Linear Meter)
+        $sheetLength = $masterCardData ? (float)($masterCardData->SHEET_LENGTH ?? 0) : 0;
+        $sheetWidth = $masterCardData ? (float)($masterCardData->SHEET_WIDTH ?? 0) : 0;
 
         // Prepare minimal legacy SO row so schedule updates can find it
         $qty = (float) ($validated['details'][0]['order_quantity'] ?? 0);
@@ -118,12 +250,85 @@ class SalesOrderController extends Controller
         // Use master card part number, fallback to request data
         $partNumber = $mcPartNumber ?: (string) ($request->input('part_number') ?? $request->input('partNo') ?? $request->input('master_card_model') ?? '');
 
-        $nowDate = date('Y-m-d');
-        $nowTime = date('H:i');
+        // Calculate totals based on MC data and SO quantity
+        $totalGrossM2 = $mcGrossM2 * $qty;
+        $totalNetM2 = $mcNetM2 * $qty;
+        $totalGrossKg = $mcGrossKg * $qty;
+        $totalNetKg = $mcNetKg * $qty;
+        
+        // Calculate TOTAL_LM (Linear Meter) = (SHEET_LENGTH × Quantity) / 1,000 (convert mm to meter)
+        $totalLM = 0;
+        if ($sheetLength > 0 && $qty > 0) {
+            $totalLM = ($sheetLength * $qty) / 1000;
+        }
+        
+        // Calculate total M3 (volume) = (L × W × H × Quantity) / 1,000,000,000 (convert mm³ to m³)
+        // Use EXT dimensions for outer carton volume
+        $totalM3 = 0;
+        
+        // Log dimensions for debugging
+        Log::info('TOTAL_M3 Calculation Debug', [
+            'customer_code' => $validated['customer_code'],
+            'master_card_seq' => $validated['master_card_seq'],
+            'so_qty' => $qty,
+            'int_l' => $intL,
+            'int_w' => $intW,
+            'int_h' => $intH,
+            'ext_l' => $extL,
+            'ext_w' => $extW,
+            'ext_h' => $extH,
+        ]);
+        
+        // Try EXT dimensions first, fallback to INT dimensions
+        if ($extL > 0 && $extW > 0 && $extH > 0 && $qty > 0) {
+            $totalM3 = ($extL * $extW * $extH * $qty) / 1000000000;
+            Log::info('TOTAL_M3 calculated from EXT dimensions', ['totalM3' => $totalM3]);
+        } elseif ($intL > 0 && $intW > 0 && $intH > 0 && $qty > 0) {
+            $totalM3 = ($intL * $intW * $intH * $qty) / 1000000000;
+            Log::info('TOTAL_M3 calculated from INT dimensions', ['totalM3' => $totalM3]);
+        } else {
+            Log::warning('TOTAL_M3 calculation failed - no valid dimensions', [
+                'ext_dimensions' => [$extL, $extW, $extH],
+                'int_dimensions' => [$intL, $intW, $intH],
+                'qty' => $qty
+            ]);
+        }
+        
+        // Extract delivery location data from request
+        $deliveryData = $request->input('delivery_location', []);
+        $dLocNum = (string) ($deliveryData['delivery_code'] ?? '');
+        $deliveryTo = (string) ($deliveryData['customer_name'] ?? '');
+        $deliveryAdd1 = '';
+        $deliveryAdd2 = '';
+        $deliveryAdd3 = '';
+        
+        // Split delivery address into 3 lines
+        if (isset($deliveryData['address'])) {
+            $addressLines = explode("\n", $deliveryData['address']);
+            $deliveryAdd1 = (string) ($addressLines[0] ?? '');
+            $deliveryAdd2 = (string) ($addressLines[1] ?? '');
+            $deliveryAdd3 = (string) ($addressLines[2] ?? '');
+        }
+        
+        // Extract delivery schedules (up to 10 schedules)
+        $deliverySchedules = $request->input('delivery_schedules', []);
+
+        // Get current time in WIB timezone (UTC+7)
+        $nowWib = $this->getNowWib();
+        $nowDate = $nowWib->format('Y-m-d');
+        $nowTime = $nowWib->format('H:i');
+        
+        // Get authenticated user ID for audit trail
+        $currentUserId = $this->getCurrentUserId();
+        Log::info('Creating SO with user audit trail', [
+            'user_id' => $currentUserId,
+            'so_number' => $soNumber,
+            'timestamp_wib' => $nowWib->format('Y-m-d H:i:s')
+        ]);
 
         $base = [
-            'YYYY' => date('Y'),
-            'MM' => date('m'),
+            'YYYY' => $nowWib->format('Y'),
+            'MM' => $nowWib->format('m'),
             'SO_Num' => $soNumber,
             'STS' => 'Outstanding',
             'TYPE' => (string) ($validated['order_type'] ?? 'S1'),
@@ -131,8 +336,8 @@ class SalesOrderController extends Controller
             'AC_Num' => (string) $validated['customer_code'],
             'AC_NAME' => $customerName,
             'SLM' => (string) ($validated['salesperson_code'] ?? ''),
-            'IND' => '',
-            'AREA' => '',
+            'IND' => $customerIndustry,
+            'AREA' => $customerArea,
             'GROUP_' => (string) ($validated['order_group'] ?? 'Sales'),
             'PO_Num' => (string) ($validated['customer_po_number'] ?? ''),
             'PO_DATE' => (string) ($validated['po_date'] ?? $nowDate),
@@ -162,43 +367,83 @@ class SalesOrderController extends Controller
             'SO_QTY' => $qty,
             'UNIT_PRICE' => $price,
             'CURR' => (string) ($validated['currency'] ?? ''),
-            'EX_RATE' => (float) ($validated['exchange_rate'] ?? 0),
+            'EX_RATE' => (float) ($validated['exchange_rate'] ?? 1),
             'AMOUNT' => $amount,
             'BASE_AMOUNT' => $amount,
-            'MC_GROSS_M2_PER_PCS' => 0,
-            'MC_NET_M2_PER_PCS' => 0,
-            'TOTAL_SO_GROSS_M2' => 0,
-            'TOTAL_SO_NET_M2' => 0,
-            'TOTAL_LM' => '0',
-            'TOTAL_M3' => 0,
-            'MC_GROSS_KG_PER_PCS' => 0,
-            'MC_NET_KG_PER_PCS' => 0,
-            'TOTAL_SO_GROSS_KG' => 0,
-            'TOTAL_SO_NET_KG' => 0,
+            'MC_GROSS_M2_PER_PCS' => $mcGrossM2,
+            'MC_NET_M2_PER_PCS' => $mcNetM2,
+            'TOTAL_SO_GROSS_M2' => $totalGrossM2,
+            'TOTAL_SO_NET_M2' => $totalNetM2,
+            'TOTAL_LM' => (string) number_format($totalLM, 2, '.', ''),
+            'TOTAL_M3' => (int) round($totalM3),
+            'MC_GROSS_KG_PER_PCS' => $mcGrossKg,
+            'MC_NET_KG_PER_PCS' => $mcNetKg,
+            'TOTAL_SO_GROSS_KG' => $totalGrossKg,
+            'TOTAL_SO_NET_KG' => $totalNetKg,
             'SO_REMARK' => (string) ($validated['remark'] ?? ''),
             'SO_INSTRUCTION_1' => (string) ($validated['instruction1'] ?? ''),
             'SO_INSTRUCTION_2' => (string) ($validated['instruction2'] ?? ''),
-            'D_LOC_Num' => '',
-            'DELIVERY_TO' => '',
-            'DELIVERY_ADD_1' => '',
-            'DELIVERY_ADD_2' => '',
-            'DELIVERY_ADD_3' => '',
-            'D_DATE_1' => '', 'D_TIME_1' => '', 'D_DUE_1' => '', 'D_QTY_1' => 0,
-            'D_DATE_2' => '', 'D_TIME_2' => '', 'D_DUE_2' => '', 'D_QTY_2' => 0,
-            'D_DATE_3' => '', 'D_TIME_3' => '', 'D_DUE_3' => '', 'D_QTY_3' => 0,
-            'D_DATE_4' => '', 'D_TIME_4' => '', 'D_DUE_4' => '', 'D_QTY_4' => 0,
-            'D_DATE_5' => '', 'D_TIME_5' => '', 'D_DUE_5' => '', 'D_QTY_5' => 0,
-            'D_DATE_6' => '', 'D_TIME_6' => '', 'D_DUE_6' => '', 'D_QTY_6' => 0,
-            'D_DATE_7' => '', 'D_TIME_7' => '', 'D_DUE_7' => '', 'D_QTY_7' => 0,
-            'D_DATE_8' => '', 'D_TIME_8' => '', 'D_DUE_8' => '', 'D_QTY_8' => 0,
-            'D_DATE_9' => '', 'D_TIME_9' => '', 'D_DUE_9' => '', 'D_QTY_9' => 0,
-            'D_DATE10' => '', 'D_TIME10' => '', 'D_DUE10' => '', 'D_QTY_10' => 0,
-            'NW_UID' => 'System',
+            'D_LOC_Num' => $dLocNum,
+            'DELIVERY_TO' => $deliveryTo,
+            'DELIVERY_ADD_1' => $deliveryAdd1,
+            'DELIVERY_ADD_2' => $deliveryAdd2,
+            'DELIVERY_ADD_3' => $deliveryAdd3,
+            'D_DATE_1' => (string) ($deliverySchedules[0]['date'] ?? ''), 
+            'D_TIME_1' => (string) ($deliverySchedules[0]['time'] ?? ''), 
+            'D_DUE_1' => (string) ($deliverySchedules[0]['due'] ?? ''), 
+            'D_QTY_1' => (float) ($deliverySchedules[0]['quantity'] ?? 0),
+            'D_DATE_2' => (string) ($deliverySchedules[1]['date'] ?? ''), 
+            'D_TIME_2' => (string) ($deliverySchedules[1]['time'] ?? ''), 
+            'D_DUE_2' => (string) ($deliverySchedules[1]['due'] ?? ''), 
+            'D_QTY_2' => (float) ($deliverySchedules[1]['quantity'] ?? 0),
+            'D_DATE_3' => (string) ($deliverySchedules[2]['date'] ?? ''), 
+            'D_TIME_3' => (string) ($deliverySchedules[2]['time'] ?? ''), 
+            'D_DUE_3' => (string) ($deliverySchedules[2]['due'] ?? ''), 
+            'D_QTY_3' => (float) ($deliverySchedules[2]['quantity'] ?? 0),
+            'D_DATE_4' => (string) ($deliverySchedules[3]['date'] ?? ''), 
+            'D_TIME_4' => (string) ($deliverySchedules[3]['time'] ?? ''), 
+            'D_DUE_4' => (string) ($deliverySchedules[3]['due'] ?? ''), 
+            'D_QTY_4' => (float) ($deliverySchedules[3]['quantity'] ?? 0),
+            'D_DATE_5' => (string) ($deliverySchedules[4]['date'] ?? ''), 
+            'D_TIME_5' => (string) ($deliverySchedules[4]['time'] ?? ''), 
+            'D_DUE_5' => (string) ($deliverySchedules[4]['due'] ?? ''), 
+            'D_QTY_5' => (float) ($deliverySchedules[4]['quantity'] ?? 0),
+            'D_DATE_6' => (string) ($deliverySchedules[5]['date'] ?? ''), 
+            'D_TIME_6' => (string) ($deliverySchedules[5]['time'] ?? ''), 
+            'D_DUE_6' => (string) ($deliverySchedules[5]['due'] ?? ''), 
+            'D_QTY_6' => (float) ($deliverySchedules[5]['quantity'] ?? 0),
+            'D_DATE_7' => (string) ($deliverySchedules[6]['date'] ?? ''), 
+            'D_TIME_7' => (string) ($deliverySchedules[6]['time'] ?? ''), 
+            'D_DUE_7' => (string) ($deliverySchedules[6]['due'] ?? ''), 
+            'D_QTY_7' => (float) ($deliverySchedules[6]['quantity'] ?? 0),
+            'D_DATE_8' => (string) ($deliverySchedules[7]['date'] ?? ''), 
+            'D_TIME_8' => (string) ($deliverySchedules[7]['time'] ?? ''), 
+            'D_DUE_8' => (string) ($deliverySchedules[7]['due'] ?? ''), 
+            'D_QTY_8' => (float) ($deliverySchedules[7]['quantity'] ?? 0),
+            'D_DATE_9' => (string) ($deliverySchedules[8]['date'] ?? ''), 
+            'D_TIME_9' => (string) ($deliverySchedules[8]['time'] ?? ''), 
+            'D_DUE_9' => (string) ($deliverySchedules[8]['due'] ?? ''), 
+            'D_QTY_9' => (float) ($deliverySchedules[8]['quantity'] ?? 0),
+            'D_DATE10' => (string) ($deliverySchedules[9]['date'] ?? ''), 
+            'D_TIME10' => (string) ($deliverySchedules[9]['time'] ?? ''), 
+            'D_DUE10' => (string) ($deliverySchedules[9]['due'] ?? ''), 
+            'D_QTY_10' => (float) ($deliverySchedules[9]['quantity'] ?? 0),
+            // Audit trail - New/Created (WIB timezone)
+            'NW_UID' => $currentUserId,
             'NW_DATE' => $nowDate,
             'NW_TIME' => $nowTime,
-            'AM_UID' => '', 'AM_DATE' => '', 'AM_TIME' => '',
-            'CX_UID' => '', 'CX_DATE' => '', 'CX_TIME' => '',
-            'PT_UID' => '', 'PT_DATE' => '', 'PT_TIME' => '',
+            // Audit trail - Amended (will be filled on update, WIB timezone)
+            'AM_UID' => '',
+            'AM_DATE' => '',
+            'AM_TIME' => '',
+            // Audit trail - Cancelled (will be filled on cancel, WIB timezone)
+            'CX_UID' => '',
+            'CX_DATE' => '',
+            'CX_TIME' => '',
+            // Audit trail - Printed (will be filled on print, WIB timezone)
+            'PT_UID' => '',
+            'PT_DATE' => '',
+            'PT_TIME' => '',
             'SODateSK' => 0,
             'PODateSK' => 0,
             'created_at' => now(),
@@ -583,12 +828,22 @@ class SalesOrderController extends Controller
         $pq4 = $masterCardData ? ($masterCardData->SO_PQ4 ?? '') : '';
         $pq5 = $masterCardData ? ($masterCardData->SO_PQ5 ?? '') : '';
 
-        $nowDate = date('Y-m-d');
-        $nowTime = date('H:i');
+        // Get current time in WIB timezone (UTC+7)
+        $nowWib = $this->getNowWib();
+        $nowDate = $nowWib->format('Y-m-d');
+        $nowTime = $nowWib->format('H:i');
+        
+        // Get authenticated user ID for audit trail
+        $currentUserId = $this->getCurrentUserId();
+        Log::info('Creating SO (API) with user audit trail', [
+            'user_id' => $currentUserId,
+            'so_number' => $soNumber,
+            'timestamp_wib' => $nowWib->format('Y-m-d H:i:s')
+        ]);
 
         $base = [
-            'YYYY' => date('Y'),
-            'MM' => date('m'),
+            'YYYY' => $nowWib->format('Y'),
+            'MM' => $nowWib->format('m'),
             'SO_Num' => $soNumber,
             'STS' => 'OPEN',
             'TYPE' => (string) ($validated['order_type'] ?? 'S1'),
@@ -627,7 +882,7 @@ class SalesOrderController extends Controller
             'SO_QTY' => $qty,
             'UNIT_PRICE' => $price,
             'CURR' => (string) ($validated['currency'] ?? ''),
-            'EX_RATE' => (float) ($validated['exchange_rate'] ?? 0),
+            'EX_RATE' => (float) ($validated['exchange_rate'] ?? 1),
             'AMOUNT' => $amount,
             'BASE_AMOUNT' => $amount,
             'MC_GROSS_M2_PER_PCS' => 0,
@@ -658,12 +913,22 @@ class SalesOrderController extends Controller
             'D_DATE_8' => '', 'D_TIME_8' => '', 'D_DUE_8' => '', 'D_QTY_8' => 0,
             'D_DATE_9' => '', 'D_TIME_9' => '', 'D_DUE_9' => '', 'D_QTY_9' => 0,
             'D_DATE10' => '', 'D_TIME10' => '', 'D_DUE10' => '', 'D_QTY_10' => 0,
-            'NW_UID' => 'System',
+            // Audit trail - New/Created (WIB timezone)
+            'NW_UID' => $currentUserId,
             'NW_DATE' => $nowDate,
             'NW_TIME' => $nowTime,
-            'AM_UID' => '', 'AM_DATE' => '', 'AM_TIME' => '',
-            'CX_UID' => '', 'CX_DATE' => '', 'CX_TIME' => '',
-            'PT_UID' => '', 'PT_DATE' => '', 'PT_TIME' => '',
+            // Audit trail - Amended (will be filled on update, WIB timezone)
+            'AM_UID' => '',
+            'AM_DATE' => '',
+            'AM_TIME' => '',
+            // Audit trail - Cancelled (will be filled on cancel, WIB timezone)
+            'CX_UID' => '',
+            'CX_DATE' => '',
+            'CX_TIME' => '',
+            // Audit trail - Printed (will be filled on print, WIB timezone)
+            'PT_UID' => '',
+            'PT_DATE' => '',
+            'PT_TIME' => '',
             'SODateSK' => 0,
             'PODateSK' => 0,
             'created_at' => now(),
@@ -1138,6 +1403,9 @@ class SalesOrderController extends Controller
                 'salesperson_name' => $salespersonName,
                 'order_group' => $salesOrder->GROUP_ ?? 'Sales',
                 'order_type' => $salesOrder->TYPE ?? 'S1',
+                // Currency and exchange rate
+                'currency' => $salesOrder->CURR ?? 'IDR',
+                'exchange_rate' => $salesOrder->EX_RATE ?? 1,
                 // Added fields for UI bindings
                 'so_status' => $salesOrder->STS ?? '',
                 'so_date' => $salesOrder->SO_DMY ?? '',
@@ -1352,10 +1620,11 @@ class SalesOrderController extends Controller
             //     $updateData['ANALYSIS_CODE'] = $request->analysis_code;
             // }
             
-            // Add amendment tracking
-            $updateData['AM_UID'] = auth()->user()->userID ?? 'SYSTEM';
-            $updateData['AM_DATE'] = now()->format('Ymd');
-            $updateData['AM_TIME'] = now()->format('His');
+            // Add amendment tracking with WIB timezone
+            $nowWib = $this->getNowWib();
+            $updateData['AM_UID'] = $this->getCurrentUserId();
+            $updateData['AM_DATE'] = $nowWib->format('Y-m-d');
+            $updateData['AM_TIME'] = $nowWib->format('H:i');
             
             // Update the SO record
             if (!empty($updateData)) {
@@ -1452,11 +1721,15 @@ class SalesOrderController extends Controller
                 ], 400, ['Content-Type' => 'application/json; charset=utf-8']);
             }
             
+            // Get WIB timezone and user ID
+            $nowWib = $this->getNowWib();
+            $currentUserId = $this->getCurrentUserId();
+            
             // Prepare cancel reason text with date, user info, and analysis code
             $cancelInfo = sprintf(
                 "CANCELLED on %s by %s\nAnalysis Code: %s\nReason: %s",
-                $validated['cancel_date'] ?? now()->format('Y-m-d'),
-                $validated['cancelled_by'] ?? auth()->user()->userID ?? 'SYSTEM',
+                $validated['cancel_date'] ?? $nowWib->format('Y-m-d'),
+                $currentUserId,
                 $validated['analysis_code'] ?? 'CANC',
                 $validated['cancel_reason']
             );
@@ -1465,10 +1738,10 @@ class SalesOrderController extends Controller
             $updateData = [
                 'STS' => 'CANCEL',
                 'SO_REMARK' => $cancelInfo,
-                // Add cancel tracking
-                'CX_UID' => $validated['cancelled_by'] ?? auth()->user()->userID ?? 'SYSTEM',
-                'CX_DATE' => now()->format('Ymd'),
-                'CX_TIME' => now()->format('His'),
+                // Add cancel tracking with WIB timezone
+                'CX_UID' => $currentUserId,
+                'CX_DATE' => $nowWib->format('Y-m-d'),
+                'CX_TIME' => $nowWib->format('H:i'),
             ];
             
             // Note: ANALYSIS_CODE column does not exist in SO table

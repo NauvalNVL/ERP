@@ -664,9 +664,9 @@ export default {
                             product: data.item_details.pd || '',
                             productDescription: data.order_info.model || '',
                             
-                            // Currency info
-                            currency: 'IDR',
-                            exchangeRate: '0.000000',
+                            // Currency info - use data from API
+                            currency: data.order_info.currency || 'IDR',
+                            exchangeRate: data.order_info.exchange_rate || 1,
                             exchangeMethod: 'N/A',
                             
                             // Analysis and status

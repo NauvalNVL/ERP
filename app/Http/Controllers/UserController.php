@@ -195,7 +195,8 @@ class UserController extends Controller
     public function vueCreate()
     {
         return Inertia::render('system-manager/system-security/Create', [
-            'header' => 'Tambah User Baru'
+            'header' => 'Tambah User Baru',
+            'timestamp' => now()->timestamp
         ]);
     }
 

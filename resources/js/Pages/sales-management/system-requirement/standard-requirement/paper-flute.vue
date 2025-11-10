@@ -205,23 +205,23 @@
                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">L1: DB</label>
-                                    <input v-model.number="editForm.DB" type="number" step="0.01" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
+                                    <input v-model.number="editForm.DB" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">L2: B</label>
-                                    <input v-model.number="editForm.B" type="number" step="0.01" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
+                                    <input v-model.number="editForm.B" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">L3: 1L</label>
-                                    <input v-model.number="editForm._1L" type="number" step="0.01" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
+                                    <input v-model.number="editForm._1L" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">L4: A/C/E</label>
-                                    <input v-model.number="editForm.A_C_E" type="number" step="0.01" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
+                                    <input v-model.number="editForm.A_C_E" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">L5: 2L</label>
-                                    <input v-model.number="editForm._2L" type="number" step="0.01" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
+                                    <input v-model.number="editForm._2L" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm text-sm px-2 py-1.5">
                                 </div>
                             </div>
                         </div>
@@ -231,7 +231,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Flute Height:</label>
                                 <div class="flex items-center space-x-2">
-                                    <input v-model.number="editForm.Height" type="number" step="0.01" class="block flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                                    <input v-model.number="editForm.Height" type="number" step="0.01" min="0" class="block flex-1 rounded-md border-gray-300 shadow-sm text-sm">
                                     <span class="text-xs text-gray-600 whitespace-nowrap">mm</span>
                                 </div>
                             </div>
@@ -239,7 +239,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Starch Consumption:</label>
                                 <div class="flex items-center space-x-2">
-                                    <input v-model.number="editForm.Starch" type="number" step="0.01" class="block flex-1 rounded-md border-gray-300 shadow-sm text-sm">
+                                    <input v-model.number="editForm.Starch" type="number" step="0.01" min="0" class="block flex-1 rounded-md border-gray-300 shadow-sm text-sm">
                                     <span class="text-xs text-gray-600 whitespace-nowrap">Factor</span>
                                 </div>
                             </div>

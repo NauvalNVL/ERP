@@ -140,12 +140,24 @@ class DeliveryOrderController extends Controller
             $doTranAmt = $doQty > 0 && $unitPrice > 0 ? round($doQty * $unitPrice, 2) : 0.0;
             $doBaseAmt = round($doTranAmt * $exRate, 2);
 
-            // Calculate Total_DO_Net_KG
-            $kgPerPcs = (float) ($mc->NET_KG_PER_PCS ?? 0);
-            $totalDoNetKg = $doQty > 0 && $kgPerPcs > 0 ? round($doQty * $kgPerPcs, 4) : 0.0;
+            // Calculate M2 (Square Meter) - MC table uses MC_GROSS_M2_PER_PCS and MC_NET_M2_PER_PCS
+            $grossM2PerPcs = (float) ($mc ? ($mc->MC_GROSS_M2_PER_PCS ?? 0) : 0);
+            $netM2PerPcs = (float) ($mc ? ($mc->MC_NET_M2_PER_PCS ?? 0) : 0);
+            $totalGrossM2 = $doQty > 0 && $grossM2PerPcs > 0 ? round($doQty * $grossM2PerPcs, 4) : 0.0;
+            $totalNetM2 = $doQty > 0 && $netM2PerPcs > 0 ? round($doQty * $netM2PerPcs, 4) : 0.0;
+
+            // Calculate KG (Kilogram) - MC table uses MC_GROSS_KG_PER_SET and MC_NET_KG_PER_PCS
+            $grossKgPerPcs = (float) ($mc ? ($mc->MC_GROSS_KG_PER_SET ?? 0) : 0);
+            $netKgPerPcs = (float) ($mc ? ($mc->MC_NET_KG_PER_PCS ?? 0) : 0);
+            $totalGrossKg = $doQty > 0 && $grossKgPerPcs > 0 ? round($doQty * $grossKgPerPcs, 4) : 0.0;
+            $totalNetKg = $doQty > 0 && $netKgPerPcs > 0 ? round($doQty * $netKgPerPcs, 4) : 0.0;
 
             // Get LOT_Num from SO table
             $lotNum = $so ? ($so->LOT_Num ?? '') : '';
+            
+            // Get Del_Code and Group_ from Customer
+            $delCode = $customer->DEL_CODE ?? ($customer->Del_Code ?? '');
+            $customerGroup = $customer->GROUP_ ?? ($customer->Group_ ?? '');
 
             // NOTE: SO_Date, SODateSK, PODateSK are NOT in DO table schema
             // These fields will be retrieved from SO table when creating invoice
@@ -180,8 +192,8 @@ class DeliveryOrderController extends Controller
                 'SLM' => $customer->SLM ?? ($so ? ($so->SLM ?? '') : ''),
                 'IND' => $customer->IND ?? ($customer->INDUSTRY ?? ''),
                 'Area1' => $customer->AREA ?? ($customer->AREA1 ?? ''),
-                'Del_Code' => '',
-                'Group_' => '',
+                'Del_Code' => $delCode,
+                'Group_' => $customerGroup,
                 'SO_Num' => $soNumber ?? '',
                 'SO_Type' => $so ? ($so->TYPE ?? '') : '',
                 'PO_Num' => $request->po_number ?? ($so ? ($so->PO_Num ?? '') : ''),
@@ -200,14 +212,14 @@ class DeliveryOrderController extends Controller
                 'Ex_Rate' => $exRate,
                 'DO_Tran_Amt' => $doTranAmt, // ✅ FIXED: Calculated from DO_Qty × Unit_Price
                 'DO_Base_Amt' => $doBaseAmt, // ✅ FIXED: Calculated from DO_Tran_Amt × Ex_Rate
-                'MC_Gross_M2_Per_Pcs' => (float) ($mc->GROSS_M2_PER_PCS ?? 0),
-                'MC_Net_M2_Per_Pcs' => (float) ($mc->NET_M2_PER_PCS ?? 0),
-                'Total_DO_Gross_M2' => 0.0,
-                'Total_DO_Net_M2' => 0.0,
-                'MC_Gross_Kg_Per_Pcs' => (float) ($mc->GROSS_KG_PER_PCS ?? 0),
-                'MC_Net_Kg_Per_Pcs' => $kgPerPcs,
-                'Total_DO_Gross_KG' => 0.0,
-                'Total_DO_Net_KG' => $totalDoNetKg, // ✅ FIXED: Calculated from DO_Qty × KG_Per_Pcs
+                'MC_Gross_M2_Per_Pcs' => $grossM2PerPcs, // ✅ FIXED: From MC
+                'MC_Net_M2_Per_Pcs' => $netM2PerPcs, // ✅ FIXED: From MC
+                'Total_DO_Gross_M2' => $totalGrossM2, // ✅ FIXED: Calculated from DO_Qty × Gross_M2_Per_Pcs
+                'Total_DO_Net_M2' => $totalNetM2, // ✅ FIXED: Calculated from DO_Qty × Net_M2_Per_Pcs
+                'MC_Gross_Kg_Per_Pcs' => $grossKgPerPcs, // ✅ FIXED: From MC
+                'MC_Net_Kg_Per_Pcs' => $netKgPerPcs, // ✅ FIXED: From MC
+                'Total_DO_Gross_KG' => $totalGrossKg, // ✅ FIXED: Calculated from DO_Qty × Gross_KG_Per_Pcs
+                'Total_DO_Net_KG' => $totalNetKg, // ✅ FIXED: Calculated from DO_Qty × Net_KG_Per_Pcs
                 'DODateSK' => $orderDate->format('Ymd'),
                 'DO_Remark1' => $request->remark1 ?? '',
                 'DO_Remark2' => $request->remark2 ?? '',
@@ -541,6 +553,124 @@ class DeliveryOrderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error cancelling delivery order: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Fix missing data in existing DO records
+     */
+    public function fixMissingData()
+    {
+        try {
+            DB::beginTransaction();
+            
+            $updated = 0;
+            $errors = 0;
+            
+            // Get all DO records with missing data
+            $doRecords = DB::table('DO')
+                ->whereRaw('(Del_Code IS NULL OR Del_Code = "")')
+                ->orWhereRaw('(Group_ IS NULL OR Group_ = "")')
+                ->orWhereRaw('(MC_Gross_M2_Per_Pcs = 0 OR MC_Gross_M2_Per_Pcs IS NULL)')
+                ->orWhereRaw('(Total_DO_Gross_M2 = 0 OR Total_DO_Gross_M2 IS NULL)')
+                ->orWhereRaw('(Total_DO_Net_M2 = 0 OR Total_DO_Net_M2 IS NULL)')
+                ->orWhereRaw('(MC_Gross_Kg_Per_Pcs = 0 OR MC_Gross_Kg_Per_Pcs IS NULL)')
+                ->orWhereRaw('(Total_DO_Gross_KG = 0 OR Total_DO_Gross_KG IS NULL)')
+                ->orWhereRaw('(Total_DO_Net_KG = 0 OR Total_DO_Net_KG IS NULL)')
+                ->get();
+            
+            foreach ($doRecords as $do) {
+                try {
+                    $updateData = [];
+                    
+                    // Get Customer data for Del_Code and Group_
+                    if (empty($do->Del_Code) || empty($do->Group_)) {
+                        $customer = DB::table('CUSTOMER')
+                            ->where('CODE', $do->AC_Num)
+                            ->first();
+                        
+                        if ($customer) {
+                            $updateData['Del_Code'] = $customer->DEL_CODE ?? ($customer->Del_Code ?? '');
+                            $updateData['Group_'] = $customer->GROUP_ ?? ($customer->Group_ ?? '');
+                        }
+                    }
+                    
+                    // Get Master Card data for M2 and KG calculations
+                    if (!empty($do->MCS_Num) && !empty($do->AC_Num)) {
+                        $mc = DB::table('MC')
+                            ->where('MCS_Num', $do->MCS_Num)
+                            ->where('AC_NUM', $do->AC_Num)
+                            ->first();
+                        
+                        if ($mc) {
+                            $doQty = (float) ($do->DO_Qty ?? 0);
+                            
+                            // M2 calculations - MC table uses MC_GROSS_M2_PER_PCS and MC_NET_M2_PER_PCS
+                            $grossM2PerPcs = (float) ($mc->MC_GROSS_M2_PER_PCS ?? 0);
+                            $netM2PerPcs = (float) ($mc->MC_NET_M2_PER_PCS ?? 0);
+                            
+                            if ($grossM2PerPcs > 0) {
+                                $updateData['MC_Gross_M2_Per_Pcs'] = $grossM2PerPcs;
+                                $updateData['Total_DO_Gross_M2'] = round($doQty * $grossM2PerPcs, 4);
+                            }
+                            
+                            if ($netM2PerPcs > 0) {
+                                $updateData['MC_Net_M2_Per_Pcs'] = $netM2PerPcs;
+                                $updateData['Total_DO_Net_M2'] = round($doQty * $netM2PerPcs, 4);
+                            }
+                            
+                            // KG calculations - MC table uses MC_GROSS_KG_PER_SET and MC_NET_KG_PER_PCS
+                            $grossKgPerPcs = (float) ($mc->MC_GROSS_KG_PER_SET ?? 0);
+                            $netKgPerPcs = (float) ($mc->MC_NET_KG_PER_PCS ?? 0);
+                            
+                            if ($grossKgPerPcs > 0) {
+                                $updateData['MC_Gross_Kg_Per_Pcs'] = $grossKgPerPcs;
+                                $updateData['Total_DO_Gross_KG'] = round($doQty * $grossKgPerPcs, 4);
+                            }
+                            
+                            if ($netKgPerPcs > 0) {
+                                $updateData['MC_Net_Kg_Per_Pcs'] = $netKgPerPcs;
+                                $updateData['Total_DO_Net_KG'] = round($doQty * $netKgPerPcs, 4);
+                            }
+                        }
+                    }
+                    
+                    // Update record if there's data to update
+                    if (!empty($updateData)) {
+                        DB::table('DO')
+                            ->where('DO_Num', $do->DO_Num)
+                            ->update($updateData);
+                        $updated++;
+                    }
+                    
+                } catch (\Exception $e) {
+                    Log::error('Error fixing DO record: ' . $do->DO_Num, [
+                        'error' => $e->getMessage()
+                    ]);
+                    $errors++;
+                }
+            }
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Data fixed successfully',
+                'data' => [
+                    'total_records' => $doRecords->count(),
+                    'updated' => $updated,
+                    'errors' => $errors
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error fixing DO data: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fixing DO data: ' . $e->getMessage()
             ], 500);
         }
     }

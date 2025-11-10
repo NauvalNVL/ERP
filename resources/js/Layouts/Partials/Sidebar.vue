@@ -210,8 +210,8 @@ const isActive = (route) => {
 const hasPermission = (menuKey) => {
   if (!user.value) return false;
   
-  // Temporary: Allow define_machine for testing
-  if (menuKey === 'define_machine' || menuKey === 'view_print_machine') {
+  // Temporary: Allow define_machine and obsolete_unobsolete_paper_quality for testing
+  if (menuKey === 'define_machine' || menuKey === 'view_print_machine' || menuKey === 'obsolete_unobsolete_paper_quality') {
     return true;
   }
   
@@ -280,11 +280,13 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Product Design': 'define_product_design',
     'Define Scoring Tool': 'define_scoring_tool',
     'Define Paper Quality': 'define_paper_quality',
+    'Obsolete/Unobsolete Paper Quality': 'obsolete_unobsolete_paper_quality',
     'Define Paper Flute': 'define_paper_flute',
     'Define Paper Size': 'define_paper_size',
     'Define Color Group': 'define_color_group',
     'Define Color': 'define_color',
     'Define Finishing': 'define_finishing',
+    'Define Analysis Code': 'define_analysis_code',
 
     // Sales Management - Customer Account
     'Define Customer Group': 'define_customer_group',
@@ -308,6 +310,7 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print MC Print/DC Block Listing': 'view_print_mc_print_dc_block_listing',
     'View & Print MC DC Block Matching': 'view_print_mc_dc_block_matching',
     'View & Print MC by Color': 'view_print_mc_by_color',
+    'View & Print Analysis Code': 'view_print_analysis_code',
     'View & Print MC by P/Size P/Quality': 'view_print_mc_by_psize_pquality',
     'View & Print MC by Machine': 'view_print_mc_by_machine',
 
@@ -328,6 +331,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Define Color Group': 'define_color_group',
     'Define Color': 'define_color',
     'Define Finishing': 'define_finishing',
+    'Define Analysis Code': 'define_analysis_code',
     'Define Stitch Wire': 'define_stitch_wire',
     'Define Chemical Coat': 'define_chemical_coat',
     'Define Reinforcement Tape': 'define_reinforcement_tape',
@@ -349,6 +353,7 @@ const getPermissionKeyFromTitle = (title) => {
     'View & Print Scoring Tool': 'view_print_scoring_tool',
     'View & Print Color Group': 'view_print_color_group',
     'View & Print Color': 'view_print_color',
+    'View & Print Analysis Code': 'view_print_analysis_code',
     'View & Print Finishing': 'view_print_finishing',
     'View & Print Stitch Wire': 'view_print_stitch_wire',
     'View & Print Chemical Coat': 'view_print_chemical_coat',
@@ -569,6 +574,7 @@ const salesManagementItems = [
           { title: 'Define Color Group', icon: 'fas fa-palette', route: '/color-group' },
           { title: 'Define Color', icon: 'fas fa-fill-drip', route: '/color' },
           { title: 'Define Finishing', icon: 'fas fa-paint-roller', route: '/finishing' },
+          { title: 'Define Analysis Code', icon: 'fas fa-code-branch', route: '/analysis-code' },
           { title: 'Define Stitch Wire', icon: 'fas fa-paperclip', route: '/stitch-wire' },
           { title: 'Define Chemical Coat', icon: 'fas fa-vial', route: '/chemical-coat' },
           { title: 'Define Reinforcement Tape', icon: 'fas fa-tape', route: '/reinforcement-tape' },
@@ -591,6 +597,7 @@ const salesManagementItems = [
           { title: 'View & Print Scoring Tool', icon: 'fas fa-print', route: '/scoring-tool/view-print' },
           { title: 'View & Print Color Group', icon: 'fas fa-print', route: '/color-group/view-print' },
           { title: 'View & Print Color', icon: 'fas fa-print', route: '/color/view-print' },
+          { title: 'View & Print Analysis Code', icon: 'fas fa-print', route: '/analysis-code/view-print' },
           { title: 'View & Print Finishing', icon: 'fas fa-print', route: '/finishing/view-print' },
           { title: 'View & Print Stitch Wire', icon: 'fas fa-print', route: '/stitch-wire/view-print' },
           { title: 'View & Print Chemical Coat', icon: 'fas fa-print', route: '/chemical-coat/view-print' },
