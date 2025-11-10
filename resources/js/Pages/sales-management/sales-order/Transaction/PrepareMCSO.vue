@@ -1870,6 +1870,14 @@ const createSalesOrder = async () => {
       set_quantity: (orderDetails.setQuantity !== undefined && orderDetails.setQuantity !== null)
         ? String(orderDetails.setQuantity)
         : '',
+      // ===================================================================
+      // DELIVERY LOCATION DATA - Dual Mode System
+      // ===================================================================
+      delivery_location: orderDetails.deliveryLocation ? {
+        delivery_code: orderDetails.deliveryLocation.shipTo?.code || '',
+        customer_name: orderDetails.deliveryLocation.shipTo?.name || '',
+        address: orderDetails.deliveryLocation.shipTo?.address || ''
+      } : {},
       details: [
         {
           line_number: 1,
@@ -1882,6 +1890,14 @@ const createSalesOrder = async () => {
         }
       ]
     }
+    
+    // Log delivery location data for debugging
+    console.log('Sales Order - Delivery Location Data:', {
+      delivery_code: requestData.delivery_location.delivery_code,
+      customer_name: requestData.delivery_location.customer_name,
+      address: requestData.delivery_location.address,
+      source: requestData.delivery_location.delivery_code ? 'customer_alternate_addresses' : 'CUSTOMER table'
+    })
     
     const response = await fetch('/api/sales-order', {
       method: 'POST',
