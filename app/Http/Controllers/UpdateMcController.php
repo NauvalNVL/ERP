@@ -312,6 +312,7 @@ class UpdateMcController extends Controller
             'mcMoreDescription3' => 'nullable|string',
             'mcMoreDescription4' => 'nullable|string',
             'mcMoreDescription5' => 'nullable|string',
+            'mspData' => 'nullable|array',
         ]);
 
         try {
@@ -548,16 +549,31 @@ class UpdateMcController extends Controller
                 if (!isset($legacy['TAPE'])) $legacy['TAPE'] = $alias($pd, ['tape']);
 
                 // MSP1..MSP12 mapping if provided in a flat or grouped form
-                for ($i = 1; $i <= 12; $i++) {
-                    $group = $alias($pd, ["MSP{$i}", strtolower("msp{$i}"), "msp{$i}"]); // may return array
-                    if (is_array($group)) {
-                        $legacy["MSP{$i}_MCH"] = $alias($group, ['mch','machine','MSP_MCH']);
-                        $legacy["MSP{$i}_UP"] = $alias($group, ['up','unit_price','MSP_UP']);
-                        $legacy["MSP{$i}_SPECIAL_INST"] = $alias($group, ['special','special_inst','instruction']);
-                    } else {
-                        $legacy["MSP{$i}_MCH"] = $alias($pd, ["MSP{$i}_MCH", strtolower("MSP{$i}_MCH")]);
-                        $legacy["MSP{$i}_UP"] = $alias($pd, ["MSP{$i}_UP", strtolower("MSP{$i}_UP")]);
-                        $legacy["MSP{$i}_SPECIAL_INST"] = $alias($pd, ["MSP{$i}_SPECIAL_INST", strtolower("MSP{$i}_SPECIAL_INST")]);
+                // First check if mspData is provided from the new MSP modal
+                $mspData = $validated['mspData'] ?? null;
+                if (is_array($mspData) && isset($mspData['machines']) && is_array($mspData['machines'])) {
+                    // Process MSP data from the new modal format
+                    foreach ($mspData['machines'] as $index => $machine) {
+                        $mspNum = $index + 1;
+                        if ($mspNum <= 12) {
+                            $legacy["MSP{$mspNum}_MCH"] = $keep("MSP{$mspNum}_MCH", $machine['mchCode'] ?? null);
+                            $legacy["MSP{$mspNum}_UP"] = $keep("MSP{$mspNum}_UP", $machine['noUp'] ?? null);
+                            $legacy["MSP{$mspNum}_SPECIAL_INST"] = $keep("MSP{$mspNum}_SPECIAL_INST", $machine['specialInstruction'] ?? null);
+                        }
+                    }
+                } else {
+                    // Fallback to old format for backward compatibility
+                    for ($i = 1; $i <= 12; $i++) {
+                        $group = $alias($pd, ["MSP{$i}", strtolower("msp{$i}"), "msp{$i}"]); // may return array
+                        if (is_array($group)) {
+                            $legacy["MSP{$i}_MCH"] = $keep("MSP{$i}_MCH", $alias($group, ['mch','machine','MSP_MCH']));
+                            $legacy["MSP{$i}_UP"] = $keep("MSP{$i}_UP", $alias($group, ['up','unit_price','MSP_UP']));
+                            $legacy["MSP{$i}_SPECIAL_INST"] = $keep("MSP{$i}_SPECIAL_INST", $alias($group, ['special','special_inst','instruction']));
+                        } else {
+                            $legacy["MSP{$i}_MCH"] = $keep("MSP{$i}_MCH", $alias($pd, ["MSP{$i}_MCH", strtolower("MSP{$i}_MCH")]));
+                            $legacy["MSP{$i}_UP"] = $keep("MSP{$i}_UP", $alias($pd, ["MSP{$i}_UP", strtolower("MSP{$i}_UP")]));
+                            $legacy["MSP{$i}_SPECIAL_INST"] = $keep("MSP{$i}_SPECIAL_INST", $alias($pd, ["MSP{$i}_SPECIAL_INST", strtolower("MSP{$i}_SPECIAL_INST")]));
+                        }
                     }
                 }
 
