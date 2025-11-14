@@ -15,7 +15,7 @@ class SalesOrderController extends Controller
     /**
      * Get current time in WIB timezone (UTC+7)
      * Same implementation as InvoiceController
-     * 
+     *
      * @return \Carbon\Carbon
      */
     private function getNowWib()
@@ -26,7 +26,7 @@ class SalesOrderController extends Controller
     /**
      * Get current authenticated user ID for audit trail
      * Same implementation as InvoiceController
-     * 
+     *
      * @return string|null
      */
     private function getCurrentUserId()
@@ -42,7 +42,7 @@ class SalesOrderController extends Controller
             Log::info('✅ Auth::check() passed');
 
             $user = Auth::user();
-            
+
             if (!$user) {
                 Log::warning('❌ Auth::user() returned null');
                 return 'System';
@@ -55,19 +55,19 @@ class SalesOrderController extends Controller
             // Try to get userID property from UserCps model
             $userId = null;
             $method = null;
-            
+
             // Priority 1: Direct property access
             if (isset($user->userID) && !empty($user->userID)) {
                 $userId = $user->userID;
                 $method = 'userID property';
                 Log::info('✅ Found via userID property', ['value' => $userId]);
-            } 
+            }
             // Priority 2: Alternative naming
             elseif (isset($user->user_id) && !empty($user->user_id)) {
                 $userId = $user->user_id;
                 $method = 'user_id property';
                 Log::info('✅ Found via user_id property', ['value' => $userId]);
-            } 
+            }
             // Priority 3: Check NO_ as fallback
             elseif (isset($user->NO_) && !empty($user->NO_)) {
                 $userId = $user->NO_;
@@ -161,7 +161,7 @@ class SalesOrderController extends Controller
         // Generate SO number in format: MM-YYYY-XXXXX (matching the filter format)
         $month = date('m');
         $year = date('Y');
-        
+
         // Get the ACTUAL last sequence number by checking the max sequence in SO_Num column
         // SQL Server compatible: Use CHARINDEX and REVERSE for extracting last part
         $lastSO = DB::table('so')
@@ -169,14 +169,14 @@ class SalesOrderController extends Controller
             ->where('YYYY', $year)
             ->orderByRaw('CAST(RIGHT(SO_Num, 5) AS INT) DESC')
             ->first();
-        
+
         $sequence = 1;
         if ($lastSO && $lastSO->SO_Num) {
             // Extract last 5 characters (sequence) from format MM-YYYY-XXXXX
             $lastSequence = substr($lastSO->SO_Num, -5);
             $sequence = intval($lastSequence) + 1;
         }
-        
+
         // Ensure uniqueness by checking if SO_Num already exists
         do {
             $seqPart = str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
@@ -198,7 +198,7 @@ class SalesOrderController extends Controller
             ->where('MCS_Num', $validated['master_card_seq'])
             ->where('AC_NUM', $validated['customer_code'])
             ->first();
-            
+
         // Log MC data fetch result
         Log::info('MC Data Fetch', [
             'customer_code' => $validated['customer_code'],
@@ -211,11 +211,11 @@ class SalesOrderController extends Controller
                 'ext_h' => !empty($masterCardData->EXT_HEIGHT),
             ] : 'N/A'
         ]);
-        
+
         $mcModel = $masterCardData ? $masterCardData->MODEL : '';
         $mcPDesign = $masterCardData ? $masterCardData->P_DESIGN : '';
         $mcPartNumber = $masterCardData ? $masterCardData->PART_NO : '';
-        
+
         // Extract dimensions and flute data from MC table
         $intL = $masterCardData ? (float)($masterCardData->INT_LENGTH ?? 0) : 0;
         $intW = $masterCardData ? (float)($masterCardData->INT_WIDTH ?? 0) : 0;
@@ -224,20 +224,20 @@ class SalesOrderController extends Controller
         $extW = $masterCardData ? (float)($masterCardData->EXT_WIDTH ?? 0) : 0;
         $extH = $masterCardData ? (float)($masterCardData->EXT_HEIGHT ?? 0) : 0;
         $flute = $masterCardData ? ($masterCardData->FLUTE ?? '') : '';
-        
+
         // Extract paper quality (PQ1-PQ5) from MC table (SO_PQ1-SO_PQ5)
         $pq1 = $masterCardData ? ($masterCardData->SO_PQ1 ?? '') : '';
         $pq2 = $masterCardData ? ($masterCardData->SO_PQ2 ?? '') : '';
         $pq3 = $masterCardData ? ($masterCardData->SO_PQ3 ?? '') : '';
         $pq4 = $masterCardData ? ($masterCardData->SO_PQ4 ?? '') : '';
         $pq5 = $masterCardData ? ($masterCardData->SO_PQ5 ?? '') : '';
-        
+
         // Extract material calculation data from MC table
         $mcGrossM2 = $masterCardData ? (float)($masterCardData->MC_GROSS_M2_PER_PCS ?? 0) : 0;
         $mcNetM2 = $masterCardData ? (float)($masterCardData->MC_NET_M2_PER_PCS ?? 0) : 0;
         $mcGrossKg = $masterCardData ? (float)($masterCardData->MC_GROSS_KG_PER_SET ?? 0) : 0;
         $mcNetKg = $masterCardData ? (float)($masterCardData->MC_NET_KG_PER_PCS ?? 0) : 0;
-        
+
         // Extract sheet dimensions for LM calculation (Linear Meter)
         $sheetLength = $masterCardData ? (float)($masterCardData->SHEET_LENGTH ?? 0) : 0;
         $sheetWidth = $masterCardData ? (float)($masterCardData->SHEET_WIDTH ?? 0) : 0;
@@ -246,7 +246,11 @@ class SalesOrderController extends Controller
         $qty = (float) ($validated['details'][0]['order_quantity'] ?? 0);
         $price = (float) ($validated['details'][0]['unit_price'] ?? 0);
         $amount = $qty * $price;
-        
+        $exRate = isset($validated['exchange_rate']) ? (float) $validated['exchange_rate'] : 1.0;
+        if ($exRate <= 0) {
+            $exRate = 1.0;
+        }
+
         // Use master card part number, fallback to request data
         $partNumber = $mcPartNumber ?: (string) ($request->input('part_number') ?? $request->input('partNo') ?? $request->input('master_card_model') ?? '');
 
@@ -255,17 +259,17 @@ class SalesOrderController extends Controller
         $totalNetM2 = $mcNetM2 * $qty;
         $totalGrossKg = $mcGrossKg * $qty;
         $totalNetKg = $mcNetKg * $qty;
-        
+
         // Calculate TOTAL_LM (Linear Meter) = (SHEET_LENGTH × Quantity) / 1,000 (convert mm to meter)
         $totalLM = 0;
         if ($sheetLength > 0 && $qty > 0) {
             $totalLM = ($sheetLength * $qty) / 1000;
         }
-        
+
         // Calculate total M3 (volume) = (L × W × H × Quantity) / 1,000,000,000 (convert mm³ to m³)
         // Use EXT dimensions for outer carton volume
         $totalM3 = 0;
-        
+
         // Log dimensions for debugging
         Log::info('TOTAL_M3 Calculation Debug', [
             'customer_code' => $validated['customer_code'],
@@ -278,7 +282,7 @@ class SalesOrderController extends Controller
             'ext_w' => $extW,
             'ext_h' => $extH,
         ]);
-        
+
         // Try EXT dimensions first, fallback to INT dimensions
         if ($extL > 0 && $extW > 0 && $extH > 0 && $qty > 0) {
             $totalM3 = ($extL * $extW * $extH * $qty) / 1000000000;
@@ -293,16 +297,16 @@ class SalesOrderController extends Controller
                 'qty' => $qty
             ]);
         }
-        
+
         // ===================================================================
         // DELIVERY LOCATION LOGIC - Dual Mode System
         // ===================================================================
         // Mode 1: Default - Ship to CUSTOMER main address (when delivery_code is empty)
         // Mode 2: Alternate - Ship to alternate address from customer_alternate_addresses table (when delivery_code is provided)
         // ===================================================================
-        
+
         $deliveryData = $request->input('delivery_location', []);
-        
+
         // ===================================================================
         // D_LOC_Num Logic (UPDATED: NOW STORES GEOGRAPHICAL CODE)
         // ===================================================================
@@ -311,23 +315,23 @@ class SalesOrderController extends Controller
         // 1. If user selects alternate address: get delivery_code from customer_alternate_addresses
         // 2. If user uses main address: get geographical code from update_customer_accounts or CUSTOMER.AREA
         // ===================================================================
-        
+
         $dLocNum = (string) ($deliveryData['delivery_code'] ?? '');
         $deliveryTo = '';
         $deliveryAdd1 = '';
         $deliveryAdd2 = '';
         $deliveryAdd3 = '';
-        
+
         // Check if delivery code is provided
         if (!empty($dLocNum)) {
             // MODE 2: ALTERNATE ADDRESS - Use data from customer_alternate_addresses
             // Frontend should already provide this data from the modal selection
             $deliveryTo = (string) ($deliveryData['customer_name'] ?? '');
-            
+
             // Split delivery address into 3 lines with intelligent handling
             if (isset($deliveryData['address']) && !empty($deliveryData['address'])) {
                 $rawAddress = $deliveryData['address'];
-                
+
                 // Check if address contains newline characters
                 if (strpos($rawAddress, "\n") !== false || strpos($rawAddress, "\r\n") !== false) {
                     // Split by newline
@@ -351,7 +355,7 @@ class SalesOrderController extends Controller
                     }
                 }
             }
-            
+
             Log::info('SO D_LOC_Num - Mode 2: Alternate Address', [
                 'd_loc_num' => $dLocNum,
                 'delivery_to' => $deliveryTo,
@@ -361,16 +365,16 @@ class SalesOrderController extends Controller
                 'address_raw' => $deliveryData['address'] ?? '',
                 'source' => 'customer_alternate_addresses.delivery_code'
             ]);
-            
+
         } else {
             // MODE 1: DEFAULT - Use main customer address from CUSTOMER table
             $customerData = DB::table('CUSTOMER')->where('CODE', $validated['customer_code'])->first();
-            
+
             if ($customerData) {
                 $updateCustomerAccount = DB::table('update_customer_accounts')
                     ->where('customer_code', $validated['customer_code'])
                     ->first();
-                
+
                 // D_LOC_Num should be geographical code from customer
                 $dLocNum = '';
                 if ($updateCustomerAccount && !empty($updateCustomerAccount->geographical)) {
@@ -378,12 +382,12 @@ class SalesOrderController extends Controller
                 } elseif (!empty($customerData->AREA)) {
                     $dLocNum = $customerData->AREA;
                 }
-                
+
                 $deliveryTo = $customerData->NAME ?? '';
                 $deliveryAdd1 = $customerData->ADDRESS1 ?? '';
                 $deliveryAdd2 = $customerData->ADDRESS2 ?? '';
                 $deliveryAdd3 = $customerData->ADDRESS3 ?? '';
-                
+
                 Log::info('SO D_LOC_Num - Mode 1: Customer Main Address', [
                     'd_loc_num' => $dLocNum ?: '(no geographical code found)',
                     'delivery_to' => $deliveryTo,
@@ -399,7 +403,7 @@ class SalesOrderController extends Controller
                 ]);
             }
         }
-        
+
         // Extract delivery schedules (up to 10 schedules)
         $deliverySchedules = $request->input('delivery_schedules', []);
 
@@ -407,7 +411,7 @@ class SalesOrderController extends Controller
         $nowWib = $this->getNowWib();
         $nowDate = $nowWib->format('Y-m-d');
         $nowTime = $nowWib->format('H:i');
-        
+
         // Get authenticated user ID for audit trail
         $currentUserId = $this->getCurrentUserId();
         Log::info('Creating SO with user audit trail', [
@@ -457,9 +461,9 @@ class SalesOrderController extends Controller
             'SO_QTY' => $qty,
             'UNIT_PRICE' => $price,
             'CURR' => (string) ($validated['currency'] ?? ''),
-            'EX_RATE' => (float) ($validated['exchange_rate'] ?? 1),
+            'EX_RATE' => $exRate,
             'AMOUNT' => $amount,
-            'BASE_AMOUNT' => $amount,
+            'BASE_AMOUNT' => $amount * $exRate,
             'MC_GROSS_M2_PER_PCS' => $mcGrossM2,
             'MC_NET_M2_PER_PCS' => $mcNetM2,
             'TOTAL_SO_GROSS_M2' => $totalGrossM2,
@@ -478,45 +482,45 @@ class SalesOrderController extends Controller
             'DELIVERY_ADD_1' => $deliveryAdd1,
             'DELIVERY_ADD_2' => $deliveryAdd2,
             'DELIVERY_ADD_3' => $deliveryAdd3,
-            'D_DATE_1' => (string) ($deliverySchedules[0]['date'] ?? ''), 
-            'D_TIME_1' => (string) ($deliverySchedules[0]['time'] ?? ''), 
-            'D_DUE_1' => (string) ($deliverySchedules[0]['due'] ?? ''), 
+            'D_DATE_1' => (string) ($deliverySchedules[0]['date'] ?? ''),
+            'D_TIME_1' => (string) ($deliverySchedules[0]['time'] ?? ''),
+            'D_DUE_1' => (string) ($deliverySchedules[0]['due'] ?? ''),
             'D_QTY_1' => (float) ($deliverySchedules[0]['quantity'] ?? 0),
-            'D_DATE_2' => (string) ($deliverySchedules[1]['date'] ?? ''), 
-            'D_TIME_2' => (string) ($deliverySchedules[1]['time'] ?? ''), 
-            'D_DUE_2' => (string) ($deliverySchedules[1]['due'] ?? ''), 
+            'D_DATE_2' => (string) ($deliverySchedules[1]['date'] ?? ''),
+            'D_TIME_2' => (string) ($deliverySchedules[1]['time'] ?? ''),
+            'D_DUE_2' => (string) ($deliverySchedules[1]['due'] ?? ''),
             'D_QTY_2' => (float) ($deliverySchedules[1]['quantity'] ?? 0),
-            'D_DATE_3' => (string) ($deliverySchedules[2]['date'] ?? ''), 
-            'D_TIME_3' => (string) ($deliverySchedules[2]['time'] ?? ''), 
-            'D_DUE_3' => (string) ($deliverySchedules[2]['due'] ?? ''), 
+            'D_DATE_3' => (string) ($deliverySchedules[2]['date'] ?? ''),
+            'D_TIME_3' => (string) ($deliverySchedules[2]['time'] ?? ''),
+            'D_DUE_3' => (string) ($deliverySchedules[2]['due'] ?? ''),
             'D_QTY_3' => (float) ($deliverySchedules[2]['quantity'] ?? 0),
-            'D_DATE_4' => (string) ($deliverySchedules[3]['date'] ?? ''), 
-            'D_TIME_4' => (string) ($deliverySchedules[3]['time'] ?? ''), 
-            'D_DUE_4' => (string) ($deliverySchedules[3]['due'] ?? ''), 
+            'D_DATE_4' => (string) ($deliverySchedules[3]['date'] ?? ''),
+            'D_TIME_4' => (string) ($deliverySchedules[3]['time'] ?? ''),
+            'D_DUE_4' => (string) ($deliverySchedules[3]['due'] ?? ''),
             'D_QTY_4' => (float) ($deliverySchedules[3]['quantity'] ?? 0),
-            'D_DATE_5' => (string) ($deliverySchedules[4]['date'] ?? ''), 
-            'D_TIME_5' => (string) ($deliverySchedules[4]['time'] ?? ''), 
-            'D_DUE_5' => (string) ($deliverySchedules[4]['due'] ?? ''), 
+            'D_DATE_5' => (string) ($deliverySchedules[4]['date'] ?? ''),
+            'D_TIME_5' => (string) ($deliverySchedules[4]['time'] ?? ''),
+            'D_DUE_5' => (string) ($deliverySchedules[4]['due'] ?? ''),
             'D_QTY_5' => (float) ($deliverySchedules[4]['quantity'] ?? 0),
-            'D_DATE_6' => (string) ($deliverySchedules[5]['date'] ?? ''), 
-            'D_TIME_6' => (string) ($deliverySchedules[5]['time'] ?? ''), 
-            'D_DUE_6' => (string) ($deliverySchedules[5]['due'] ?? ''), 
+            'D_DATE_6' => (string) ($deliverySchedules[5]['date'] ?? ''),
+            'D_TIME_6' => (string) ($deliverySchedules[5]['time'] ?? ''),
+            'D_DUE_6' => (string) ($deliverySchedules[5]['due'] ?? ''),
             'D_QTY_6' => (float) ($deliverySchedules[5]['quantity'] ?? 0),
-            'D_DATE_7' => (string) ($deliverySchedules[6]['date'] ?? ''), 
-            'D_TIME_7' => (string) ($deliverySchedules[6]['time'] ?? ''), 
-            'D_DUE_7' => (string) ($deliverySchedules[6]['due'] ?? ''), 
+            'D_DATE_7' => (string) ($deliverySchedules[6]['date'] ?? ''),
+            'D_TIME_7' => (string) ($deliverySchedules[6]['time'] ?? ''),
+            'D_DUE_7' => (string) ($deliverySchedules[6]['due'] ?? ''),
             'D_QTY_7' => (float) ($deliverySchedules[6]['quantity'] ?? 0),
-            'D_DATE_8' => (string) ($deliverySchedules[7]['date'] ?? ''), 
-            'D_TIME_8' => (string) ($deliverySchedules[7]['time'] ?? ''), 
-            'D_DUE_8' => (string) ($deliverySchedules[7]['due'] ?? ''), 
+            'D_DATE_8' => (string) ($deliverySchedules[7]['date'] ?? ''),
+            'D_TIME_8' => (string) ($deliverySchedules[7]['time'] ?? ''),
+            'D_DUE_8' => (string) ($deliverySchedules[7]['due'] ?? ''),
             'D_QTY_8' => (float) ($deliverySchedules[7]['quantity'] ?? 0),
-            'D_DATE_9' => (string) ($deliverySchedules[8]['date'] ?? ''), 
-            'D_TIME_9' => (string) ($deliverySchedules[8]['time'] ?? ''), 
-            'D_DUE_9' => (string) ($deliverySchedules[8]['due'] ?? ''), 
+            'D_DATE_9' => (string) ($deliverySchedules[8]['date'] ?? ''),
+            'D_TIME_9' => (string) ($deliverySchedules[8]['time'] ?? ''),
+            'D_DUE_9' => (string) ($deliverySchedules[8]['due'] ?? ''),
             'D_QTY_9' => (float) ($deliverySchedules[8]['quantity'] ?? 0),
-            'D_DATE10' => (string) ($deliverySchedules[9]['date'] ?? ''), 
-            'D_TIME10' => (string) ($deliverySchedules[9]['time'] ?? ''), 
-            'D_DUE10' => (string) ($deliverySchedules[9]['due'] ?? ''), 
+            'D_DATE10' => (string) ($deliverySchedules[9]['date'] ?? ''),
+            'D_TIME10' => (string) ($deliverySchedules[9]['time'] ?? ''),
+            'D_DUE10' => (string) ($deliverySchedules[9]['due'] ?? ''),
             'D_QTY_10' => (float) ($deliverySchedules[9]['quantity'] ?? 0),
             // Audit trail - New/Created (WIB timezone)
             'NW_UID' => $currentUserId,
@@ -543,7 +547,7 @@ class SalesOrderController extends Controller
         // Always INSERT new record, NEVER update existing
         // This ensures each sales order is unique even for same customer and master card
         DB::table('so')->insert($base);
-        
+
         Log::info('New sales order created', [
             'so_number' => $soNumber,
             'customer_code' => $validated['customer_code'],
@@ -677,10 +681,10 @@ class SalesOrderController extends Controller
         while (ob_get_level()) {
             ob_end_clean();
         }
-        
+
         // Get sales order from SO table
         $so = DB::table('so')->where('SO_Num', $soNumber)->first();
-        
+
         if (!$so) {
             return response()->json([
                 'success' => false,
@@ -695,12 +699,12 @@ class SalesOrderController extends Controller
             $timeCol = $i === 10 ? 'D_TIME10' : 'D_TIME_' . $i;
             $dueCol  = $i === 10 ? 'D_DUE10'  : 'D_DUE_' . $i;
             $qtyCol  = $i === 10 ? 'D_QTY_10' : 'D_QTY_' . $i;
-            
+
             $date = $so->$dateCol ?? '';
             $time = $so->$timeCol ?? '';
             $due = $so->$dueCol ?? '';
             $qty = $so->$qtyCol ?? 0;
-            
+
             if ($date || $qty > 0) {
                 $schedules[] = [
                     'schedule_date' => $date,
@@ -859,7 +863,7 @@ class SalesOrderController extends Controller
         if (!isset($validated['so_number'])) {
             $month = date('m');
             $year = date('Y');
-            
+
             // Get the ACTUAL last sequence number by checking the max sequence in SO_Num column
             // SQL Server compatible: Use RIGHT() function
             $lastSO = DB::table('so')
@@ -867,14 +871,14 @@ class SalesOrderController extends Controller
                 ->where('YYYY', $year)
                 ->orderByRaw('CAST(RIGHT(SO_Num, 5) AS INT) DESC')
                 ->first();
-            
+
             $sequence = 1;
             if ($lastSO && $lastSO->SO_Num) {
                 // Extract last 5 characters (sequence) from format MM-YYYY-XXXXX
                 $lastSequence = substr($lastSO->SO_Num, -5);
                 $sequence = intval($lastSequence) + 1;
             }
-            
+
             // Ensure uniqueness by checking if SO_Num already exists
             do {
                 $seqPart = str_pad((string) $sequence, 5, '0', STR_PAD_LEFT);
@@ -887,18 +891,22 @@ class SalesOrderController extends Controller
         } else {
             $soNumber = $validated['so_number'];
         }
-        
+
         $qty = (float) ($validated['details'][0]['order_quantity'] ?? 0);
         $price = (float) ($validated['details'][0]['unit_price'] ?? 0);
         $amount = $qty * $price;
+        $exRate = isset($validated['exchange_rate']) ? (float) $validated['exchange_rate'] : 1.0;
+        if ($exRate <= 0) {
+            $exRate = 1.0;
+        }
         $partNumber = (string) ($request->input('part_number') ?? $request->input('partNo') ?? $request->input('master_card_model') ?? '');
-        
+
         // Fetch master card data from MC table to populate dimensions and paper quality
         $masterCardData = DB::table('MC')
             ->where('MCS_Num', $validated['master_card_seq'])
             ->where('AC_NUM', $validated['customer_code'])
             ->first();
-        
+
         // Extract dimensions and flute data from MC table
         $intL = $masterCardData ? (float)($masterCardData->INT_LENGTH ?? 0) : 0;
         $intW = $masterCardData ? (float)($masterCardData->INT_WIDTH ?? 0) : 0;
@@ -907,7 +915,7 @@ class SalesOrderController extends Controller
         $extW = $masterCardData ? (float)($masterCardData->EXT_WIDTH ?? 0) : 0;
         $extH = $masterCardData ? (float)($masterCardData->EXT_HEIGHT ?? 0) : 0;
         $flute = $masterCardData ? ($masterCardData->FLUTE ?? '') : '';
-        
+
         // Extract paper quality (PQ1-PQ5) from MC table (SO_PQ1-SO_PQ5)
         $pq1 = $masterCardData ? ($masterCardData->SO_PQ1 ?? '') : '';
         $pq2 = $masterCardData ? ($masterCardData->SO_PQ2 ?? '') : '';
@@ -919,7 +927,7 @@ class SalesOrderController extends Controller
         $nowWib = $this->getNowWib();
         $nowDate = $nowWib->format('Y-m-d');
         $nowTime = $nowWib->format('H:i');
-        
+
         // Get authenticated user ID for audit trail
         $currentUserId = $this->getCurrentUserId();
         Log::info('Creating SO (API) with user audit trail', [
@@ -969,9 +977,9 @@ class SalesOrderController extends Controller
             'SO_QTY' => $qty,
             'UNIT_PRICE' => $price,
             'CURR' => (string) ($validated['currency'] ?? ''),
-            'EX_RATE' => (float) ($validated['exchange_rate'] ?? 1),
+            'EX_RATE' => $exRate,
             'AMOUNT' => $amount,
-            'BASE_AMOUNT' => $amount,
+            'BASE_AMOUNT' => $amount * $exRate,
             'MC_GROSS_M2_PER_PCS' => 0,
             'MC_NET_M2_PER_PCS' => 0,
             'TOTAL_SO_GROSS_M2' => 0,
@@ -1025,7 +1033,7 @@ class SalesOrderController extends Controller
         // Always INSERT new record, NEVER update existing
         // This ensures each sales order is unique even for same customer and master card
         DB::table('so')->insert($base);
-        
+
         Log::info('Legacy SO record created', [
             'so_number' => $soNumber,
             'customer_code' => $validated['customer_code'],
@@ -1042,15 +1050,15 @@ class SalesOrderController extends Controller
     public function getSalesOrders(Request $request): JsonResponse
     {
         Log::info('getSalesOrders called with params:', $request->all());
-        
+
         // Clean output buffers
         while (ob_get_level()) {
             ob_end_clean();
         }
-        
+
         try {
             $query = DB::table('so');
-            
+
             // Filter by customer code (for Sales Order Table Modal)
             if ($request->has('customer_code') && !empty($request->customer_code)) {
                 $query->where('AC_Num', $request->customer_code);
@@ -1063,20 +1071,20 @@ class SalesOrderController extends Controller
                 $query->where('MM', $month);
                 Log::info('Filtering by month:', ['month' => $month]);
             }
-            
+
             if ($request->has('year') && !empty($request->year) && $request->year !== '0') {
                 $year = $request->input('year');
                 $query->where('YYYY', $year);
                 Log::info('Filtering by year:', ['year' => $year]);
             }
-            
+
             // Filter by sequence
             if ($request->has('sequence') && !empty($request->sequence) && $request->sequence !== '0') {
                 // Extract sequence from SO_Num format MM-YYYY-XXXXX using SQL Server compatible RIGHT()
                 $query->whereRaw("RIGHT(SO_Num, 5) = ?", [str_pad($request->sequence, 5, '0', STR_PAD_LEFT)]);
                 Log::info('Filtering by sequence:', ['sequence' => $request->sequence]);
             }
-            
+
             // Filter by SO number (partial match)
             if ($request->has('so_number') && !empty($request->so_number)) {
                 $query->where('SO_Num', 'like', '%' . $request->so_number . '%');
@@ -1087,13 +1095,13 @@ class SalesOrderController extends Controller
             if ($request->has('from_so') && $request->has('to_so')) {
                 $fromSO = $request->input('from_so');
                 $toSO = $request->input('to_so');
-                
+
                 Log::info('Filtering SO range:', ['from_so' => $fromSO, 'to_so' => $toSO]);
-                
+
                 $query->where(function($q) use ($fromSO, $toSO) {
                     // New format: MM-YYYY-XXXXX
                     $q->whereBetween('SO_Num', [$fromSO, $toSO]);
-                    
+
                     // Old format: SO-YYYYMMDD-XXXX (always include for backward compatibility)
                     $q->orWhere('SO_Num', 'like', 'SO-%');
                 });
@@ -1139,18 +1147,18 @@ class SalesOrderController extends Controller
                 Log::info('Last result:', ['last' => $salesOrders->last()]);
             } else {
                 Log::warning('No sales orders found with current filters');
-                
+
                 // Check if there are any records in the table at all
                 $totalCount = DB::table('so')->count();
                 Log::info('Total SO records in database:', ['total' => $totalCount]);
-                
+
                 if ($totalCount > 0) {
                     // Get some sample records
                     $samples = DB::table('so')->limit(5)->get(['SO_Num', 'MM', 'YYYY', 'STS', 'AC_Num']);
                     Log::info('Sample SO records:', ['samples' => $samples]);
                 }
             }
-            
+
             // Map to expected format for Sales Order Table Modal
             $formattedOrders = $salesOrders->map(function($order) {
                 return [
@@ -1186,13 +1194,13 @@ class SalesOrderController extends Controller
                     'count' => $salesOrders->count()
                 ]
             ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
-            
+
         } catch (\Exception $e) {
             Log::error('Error fetching sales orders:', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching sales orders: ' . $e->getMessage()
@@ -1206,37 +1214,37 @@ class SalesOrderController extends Controller
     public function getOutstandingSalesOrders(Request $request): JsonResponse
     {
         Log::info('getOutstandingSalesOrders called with params:', $request->all());
-        
+
         // Clean output buffers
         while (ob_get_level()) {
             ob_end_clean();
         }
-        
+
         try {
             // First, let's check what statuses exist in the database
             $allStatuses = DB::table('so')->select('STS')->distinct()->get();
             Log::info('All statuses in SO table:', ['statuses' => $allStatuses->pluck('STS')->toArray()]);
-            
+
             // Count total records
             $totalRecords = DB::table('so')->count();
             Log::info('Total SO records:', ['count' => $totalRecords]);
-            
+
             // Count records by status
             $statusCounts = DB::table('so')
                 ->select('STS', DB::raw('COUNT(*) as count'))
                 ->groupBy('STS')
                 ->get();
             Log::info('Status counts:', ['counts' => $statusCounts->toArray()]);
-            
+
             $query = DB::table('so')
                 ->leftJoin('CUSTOMER', 'so.AC_Num', '=', 'CUSTOMER.CODE');
-            
+
             // Filter by outstanding status - check multiple possible values
             // Based on common ERP systems, outstanding could be stored as various values
             $query->where(function($q) {
                 $q->where('so.STS', 'OPEN')
                   ->orWhere('so.STS', 'Outstanding')
-                  ->orWhere('so.STS', 'OUTSTANDING') 
+                  ->orWhere('so.STS', 'OUTSTANDING')
                   ->orWhere('so.STS', 'Outs')
                   ->orWhere('so.STS', 'OUTS')
                   ->orWhere('so.STS', 'O') // Single letter
@@ -1247,31 +1255,31 @@ class SalesOrderController extends Controller
                   ->orWhereNull('so.STS')
                   ->orWhere('so.STS', '');
             });
-            
+
             Log::info('Outstanding SO query built');
-            
+
             // Optional filters for search functionality
             if ($request->has('month') && !empty($request->month) && $request->month !== '0') {
                 $month = str_pad($request->input('month'), 2, '0', STR_PAD_LEFT);
                 $query->where('so.MM', $month);
             }
-            
+
             if ($request->has('year') && !empty($request->year) && $request->year !== '0') {
                 $year = $request->input('year');
                 $query->where('so.YYYY', $year);
             }
-            
+
             if ($request->has('sequence') && !empty($request->sequence) && $request->sequence !== '0') {
                 $query->whereRaw("RIGHT(so.SO_Num, 5) = ?", [str_pad($request->sequence, 5, '0', STR_PAD_LEFT)]);
             }
-            
+
             if ($request->has('so_number') && !empty($request->so_number)) {
                 $query->where('so.SO_Num', 'like', '%' . $request->so_number . '%');
             }
 
             $salesOrders = $query->select([
                     'so.SO_Num',
-                    'so.AC_Num', 
+                    'so.AC_Num',
                     'CUSTOMER.NAME as AC_NAME',
                     'so.PO_Num',
                     'so.MCS_Num',
@@ -1295,7 +1303,7 @@ class SalesOrderController extends Controller
                 ->get();
 
             Log::info('Outstanding SO query result count:', ['count' => $salesOrders->count()]);
-            
+
             // If no outstanding orders found, get some sample data for debugging
             if ($salesOrders->count() === 0 && $totalRecords > 0) {
                 Log::warning('No outstanding orders found, getting sample data for debugging');
@@ -1307,14 +1315,14 @@ class SalesOrderController extends Controller
                     ])
                     ->limit(10)
                     ->get();
-                
+
                 Log::info('Sample SO data:', ['sample' => $sampleOrders->toArray()]);
-                
+
                 // For debugging purposes, return sample data if no outstanding found
                 $salesOrders = $sampleOrders;
                 Log::info('Using sample data for debugging, count:', ['count' => $salesOrders->count()]);
             }
-            
+
             // Log first few results for debugging
             if ($salesOrders->count() > 0) {
                 Log::info('First SO found:', [
@@ -1323,7 +1331,7 @@ class SalesOrderController extends Controller
                     'customer' => $salesOrders->first()->AC_Num
                 ]);
             }
-            
+
             // Map to expected format for Sales Order Table Modal
             $formattedOrders = $salesOrders->map(function($order) {
                 return [
@@ -1360,20 +1368,20 @@ class SalesOrderController extends Controller
                     'query_result_count' => $salesOrders->count()
                 ]
             ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
-            
+
         } catch (\Exception $e) {
             Log::error('Error fetching outstanding sales orders:', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching outstanding sales orders: ' . $e->getMessage()
             ], 500, ['Content-Type' => 'application/json; charset=utf-8']);
         }
     }
-    
+
     /**
      * Get sales order detail by SO number
      */
@@ -1383,22 +1391,22 @@ class SalesOrderController extends Controller
         while (ob_get_level()) {
             ob_end_clean();
         }
-        
+
         try {
             Log::info('Fetching sales order detail', ['so_number' => $soNumber]);
-            
+
             // Fetch sales order from SO table with customer data
             $salesOrder = DB::table('so')
                 ->leftJoin('CUSTOMER', 'so.AC_Num', '=', 'CUSTOMER.CODE')
                 ->where('so.SO_Num', $soNumber)
-                ->select('so.*', 
+                ->select('so.*',
                     'CUSTOMER.NAME as AC_NAME',
                     'CUSTOMER.ADDRESS1 as CUST_ADDRESS1',
                     'CUSTOMER.ADDRESS2 as CUST_ADDRESS2',
                     'CUSTOMER.ADDRESS3 as CUST_ADDRESS3'
                 )
                 ->first();
-            
+
             if (!$salesOrder) {
                 Log::warning('Sales order not found', ['so_number' => $soNumber]);
                 return response()->json([
@@ -1406,9 +1414,9 @@ class SalesOrderController extends Controller
                     'message' => 'Sales order not found'
                 ], 404, ['Content-Type' => 'application/json; charset=utf-8']);
             }
-            
+
             Log::info('Sales order found', ['so_data' => $salesOrder]);
-            
+
             // Get salesperson data from SALESPERSON table
             $salesperson = null;
             if (!empty($salesOrder->SLM)) {
@@ -1417,14 +1425,14 @@ class SalesOrderController extends Controller
                     $salesperson = DB::table('SALESPERSON')
                         ->where('CODE', $salesOrder->SLM)
                         ->first();
-                    
+
                     // If not found, try lowercase table name
                     if (!$salesperson) {
                         $salesperson = DB::table('salesperson')
                             ->where('code', $salesOrder->SLM)
                             ->first();
                     }
-                    
+
                     if ($salesperson) {
                         Log::info('Salesperson found', [
                             'code' => $salesOrder->SLM,
@@ -1442,7 +1450,7 @@ class SalesOrderController extends Controller
                     ]);
                 }
             }
-            
+
             // Get master card data for additional details
             $masterCard = null;
             if (!empty($salesOrder->MCS_Num) && !empty($salesOrder->AC_Num)) {
@@ -1451,7 +1459,7 @@ class SalesOrderController extends Controller
                         ->where('MCS_Num', $salesOrder->MCS_Num)
                         ->where('AC_NUM', $salesOrder->AC_Num)
                         ->first();
-                    
+
                     if ($masterCard) {
                         Log::info('Master card found', ['mc_seq' => $salesOrder->MCS_Num]);
                     } else {
@@ -1467,7 +1475,7 @@ class SalesOrderController extends Controller
                     ]);
                 }
             }
-            
+
             // Format order information
             $salespersonName = '';
             if ($salesperson) {
@@ -1476,7 +1484,7 @@ class SalesOrderController extends Controller
             } else {
                 $salespersonName = $salesOrder->SLM ?? '';
             }
-            
+
             $orderInfo = [
                 'customer_name' => $salesOrder->AC_NAME ?? '',
                 'customer_address' => trim(implode("\n", array_filter([
@@ -1513,7 +1521,7 @@ class SalesOrderController extends Controller
                 'delivery_address_1' => $salesOrder->DELIVERY_ADD_1 ?? '',
                 'delivery_address_2' => $salesOrder->DELIVERY_ADD_2 ?? '',
             ];
-            
+
             // Format item details from SO table
             $itemDetails = [
                 'pd' => $salesOrder->P_DESIGN ?? '',
@@ -1523,7 +1531,7 @@ class SalesOrderController extends Controller
                 'net_delivery' => '0',
                 'balance' => $salesOrder->SO_QTY ?? '0',
             ];
-            
+
             // Calculate net delivery from DO table (sum of DO_Qty) for this SO
             $netDelivery = 0;
             $hasDoRows = false;
@@ -1554,19 +1562,19 @@ class SalesOrderController extends Controller
             if ($masterCard && isset($masterCard->PCS_PER_BLD)) {
                 $itemDetails['pcs_per_bdl'] = (float) $masterCard->PCS_PER_BLD;
             }
-            
+
             // Get fittings from master card if available
             $fittings = [];
             if ($masterCard) {
                 // Convert object to array for easier access
                 $mcArray = (array)$masterCard;
-                
+
                 // Check for fitting data in MC table
                 for ($i = 1; $i <= 9; $i++) {
                     $designField = "FIT{$i}_DESIGN";
                     $pcsField = "FIT{$i}_PCS";
                     $unitField = "FIT{$i}_UNIT";
-                    
+
                     // Check if design field exists and has value
                     if (isset($mcArray[$designField]) && !empty($mcArray[$designField])) {
                         $fittings[] = [
@@ -1577,14 +1585,14 @@ class SalesOrderController extends Controller
                     }
                 }
             }
-            
+
             Log::info('Successfully prepared response', [
                 'fittings_count' => count($fittings),
                 'net_delivery' => $netDelivery,
                 'salesperson_code' => $orderInfo['salesperson_code'],
                 'salesperson_name' => $orderInfo['salesperson_name']
             ]);
-            
+
             $responseData = [
                 'success' => true,
                 'data' => [
@@ -1597,11 +1605,11 @@ class SalesOrderController extends Controller
                     'part_number' => $salesOrder->PART_NUMBER ?? '',
                 ]
             ];
-            
+
             Log::info('Response data', ['response' => $responseData]);
-            
+
             return response()->json($responseData, 200, ['Content-Type' => 'application/json; charset=utf-8']);
-            
+
         } catch (\Exception $e) {
             Log::error('Error fetching sales order detail:', [
                 'so_number' => $soNumber,
@@ -1610,7 +1618,7 @@ class SalesOrderController extends Controller
                 'file' => $e->getFile(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching sales order detail: ' . $e->getMessage(),
@@ -1631,13 +1639,13 @@ class SalesOrderController extends Controller
         while (ob_get_level()) {
             ob_end_clean();
         }
-        
+
         try {
             Log::info('Updating sales order', [
                 'so_number' => $soNumber,
                 'request_data' => $request->all()
             ]);
-            
+
             // Validate request
             $validated = $request->validate([
                 'po_date' => 'nullable|string',
@@ -1652,80 +1660,80 @@ class SalesOrderController extends Controller
                 'analysis_code' => 'nullable|string',
                 'delivery_location' => 'nullable|array',
             ]);
-            
+
             // Check if SO exists
             $salesOrder = DB::table('so')->where('SO_Num', $soNumber)->first();
-            
+
             if (!$salesOrder) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Sales order not found'
                 ], 404, ['Content-Type' => 'application/json; charset=utf-8']);
             }
-            
+
             // Prepare update data
             $updateData = [];
-            
+
             if ($request->has('po_date') && !empty($request->po_date)) {
                 $updateData['PO_DATE'] = $request->po_date;
             }
-            
+
             if ($request->has('set_quantity')) {
                 $updateData['SO_QTY'] = $request->set_quantity;
             }
-            
+
             if ($request->has('order_group')) {
                 $updateData['GROUP_'] = $request->order_group;
             }
-            
+
             if ($request->has('order_type')) {
                 $updateData['TYPE'] = $request->order_type;
             }
-            
+
             if ($request->has('lot_number')) {
                 $updateData['LOT_NUM'] = $request->lot_number;
             }
-            
+
             // Note: TAX column does not exist in SO table, skipping sales_tax update
             // if ($request->has('sales_tax')) {
             //     $updateData['TAX'] = $request->sales_tax;
             // }
-            
+
             if ($request->has('remark')) {
                 $updateData['SO_REMARK'] = $request->remark;
             }
-            
+
             if ($request->has('instruction1')) {
                 $updateData['SO_INSTRUCTION_1'] = $request->instruction1;
             }
-            
+
             if ($request->has('instruction2')) {
                 $updateData['SO_INSTRUCTION_2'] = $request->instruction2;
             }
-            
+
             // Note: ANALYSIS_CODE column does not exist in SO table
             // if ($request->has('analysis_code')) {
             //     $updateData['ANALYSIS_CODE'] = $request->analysis_code;
             // }
-            
+
             // ===================================================================
             // DELIVERY LOCATION UPDATE - Dual Mode System
             // ===================================================================
             if ($request->has('delivery_location')) {
                 $deliveryData = $request->input('delivery_location', []);
                 $dLocNum = (string) ($deliveryData['delivery_code'] ?? '');
-                
+
                 // Check if delivery code is provided
                 if (!empty($dLocNum)) {
                     // MODE 2: ALTERNATE ADDRESS
                     // Update D_LOC_Num with geographical code from alternate address
                     $updateData['D_LOC_Num'] = $dLocNum;
                     $updateData['DELIVERY_TO'] = (string) ($deliveryData['customer_name'] ?? '');
-                    
+
                     // Split delivery address into 3 lines with intelligent handling
                     if (isset($deliveryData['address']) && !empty($deliveryData['address'])) {
                         $rawAddress = $deliveryData['address'];
-                        
+
                         // Try to split by newline first
                         if (strpos($rawAddress, "\n") !== false || strpos($rawAddress, "\r\n") !== false) {
                             // Address has line breaks - split normally
@@ -1754,7 +1762,7 @@ class SalesOrderController extends Controller
                         $updateData['DELIVERY_ADD_2'] = '';
                         $updateData['DELIVERY_ADD_3'] = '';
                     }
-                    
+
                     Log::info('SO Update D_LOC_Num - Mode 2: Alternate Address', [
                         'so_number' => $soNumber,
                         'd_loc_num' => $dLocNum,
@@ -1765,30 +1773,30 @@ class SalesOrderController extends Controller
                         'address_raw' => $rawAddress ?? '',
                         'source' => 'customer_alternate_addresses.delivery_code'
                     ]);
-                    
+
                 } else {
                     // MODE 1: DEFAULT - Use main customer address from CUSTOMER table
                     $customerData = DB::table('CUSTOMER')->where('CODE', $salesOrder->AC_Num)->first();
-                    
+
                     if ($customerData) {
                         // Update D_LOC_Num with geographical code from customer
                         $updateCustomerAccount = DB::table('update_customer_accounts')
                             ->where('customer_code', $salesOrder->AC_Num)
                             ->first();
-                        
+
                         $dLocNum = '';
                         if ($updateCustomerAccount && !empty($updateCustomerAccount->geographical)) {
                             $dLocNum = $updateCustomerAccount->geographical;
                         } elseif (!empty($customerData->AREA)) {
                             $dLocNum = $customerData->AREA;
                         }
-                        
+
                         $updateData['D_LOC_Num'] = $dLocNum;
                         $updateData['DELIVERY_TO'] = $customerData->NAME ?? '';
                         $updateData['DELIVERY_ADD_1'] = $customerData->ADDRESS1 ?? '';
                         $updateData['DELIVERY_ADD_2'] = $customerData->ADDRESS2 ?? '';
                         $updateData['DELIVERY_ADD_3'] = $customerData->ADDRESS3 ?? '';
-                        
+
                         Log::info('SO Update D_LOC_Num - Mode 1: Customer Main Address', [
                             'so_number' => $soNumber,
                             'd_loc_num' => $dLocNum ?: '(no geographical code found)',
@@ -1799,25 +1807,25 @@ class SalesOrderController extends Controller
                     }
                 }
             }
-            
+
             // Add amendment tracking with WIB timezone
             $nowWib = $this->getNowWib();
             $updateData['AM_UID'] = $this->getCurrentUserId();
             $updateData['AM_DATE'] = $nowWib->format('Y-m-d');
             $updateData['AM_TIME'] = $nowWib->format('H:i');
-            
+
             // Update the SO record
             if (!empty($updateData)) {
                 DB::table('so')
                     ->where('SO_Num', $soNumber)
                     ->update($updateData);
-                
+
                 Log::info('Sales order updated successfully', [
                     'so_number' => $soNumber,
                     'updated_fields' => array_keys($updateData)
                 ]);
             }
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Sales order updated successfully',
@@ -1826,19 +1834,19 @@ class SalesOrderController extends Controller
                     'updated_fields' => array_keys($updateData)
                 ]
             ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
-            
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Validation error updating sales order:', [
                 'so_number' => $soNumber,
                 'errors' => $e->errors()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
                 'errors' => $e->errors()
             ], 422, ['Content-Type' => 'application/json; charset=utf-8']);
-            
+
         } catch (\Exception $e) {
             Log::error('Error updating sales order:', [
                 'so_number' => $soNumber,
@@ -1847,7 +1855,7 @@ class SalesOrderController extends Controller
                 'file' => $e->getFile(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating sales order: ' . $e->getMessage(),
@@ -1868,13 +1876,13 @@ class SalesOrderController extends Controller
         while (ob_get_level()) {
             ob_end_clean();
         }
-        
+
         try {
             Log::info('Cancelling sales order', [
                 'so_number' => $soNumber,
                 'request_data' => $request->all()
             ]);
-            
+
             // Validate request
             $validated = $request->validate([
                 'cancel_reason' => 'required|string',
@@ -1882,17 +1890,17 @@ class SalesOrderController extends Controller
                 'cancelled_by' => 'nullable|string',
                 'analysis_code' => 'nullable|string',
             ]);
-            
+
             // Check if SO exists
             $salesOrder = DB::table('so')->where('SO_Num', $soNumber)->first();
-            
+
             if (!$salesOrder) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Sales order not found'
                 ], 404, ['Content-Type' => 'application/json; charset=utf-8']);
             }
-            
+
             // Check if SO is already cancelled
             if ($salesOrder->STS === 'CANCEL' || $salesOrder->STS === 'Cancelled') {
                 return response()->json([
@@ -1900,11 +1908,11 @@ class SalesOrderController extends Controller
                     'message' => 'Sales order is already cancelled'
                 ], 400, ['Content-Type' => 'application/json; charset=utf-8']);
             }
-            
+
             // Get WIB timezone and user ID
             $nowWib = $this->getNowWib();
             $currentUserId = $this->getCurrentUserId();
-            
+
             // Prepare cancel reason text with date, user info, and analysis code
             $cancelInfo = sprintf(
                 "CANCELLED on %s by %s\nAnalysis Code: %s\nReason: %s",
@@ -1913,7 +1921,7 @@ class SalesOrderController extends Controller
                 $validated['analysis_code'] ?? 'CANC',
                 $validated['cancel_reason']
             );
-            
+
             // Prepare update data - using SO_REMARK to store cancel reason since CANCEL_REASON column doesn't exist
             $updateData = [
                 'STS' => 'CANCEL',
@@ -1923,20 +1931,20 @@ class SalesOrderController extends Controller
                 'CX_DATE' => $nowWib->format('Y-m-d'),
                 'CX_TIME' => $nowWib->format('H:i'),
             ];
-            
+
             // Note: ANALYSIS_CODE column does not exist in SO table
             // Analysis code is stored in SO_REMARK as part of cancel info
-            
+
             // Update the SO record
             DB::table('so')
                 ->where('SO_Num', $soNumber)
                 ->update($updateData);
-            
+
             Log::info('Sales order cancelled successfully', [
                 'so_number' => $soNumber,
                 'cancelled_by' => $validated['cancelled_by'] ?? 'SYSTEM'
             ]);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Sales order cancelled successfully',
@@ -1946,19 +1954,19 @@ class SalesOrderController extends Controller
                     'cancel_reason' => $validated['cancel_reason']
                 ]
             ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
-            
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Validation error cancelling sales order:', [
                 'so_number' => $soNumber,
                 'errors' => $e->errors()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
                 'errors' => $e->errors()
             ], 422, ['Content-Type' => 'application/json; charset=utf-8']);
-            
+
         } catch (\Exception $e) {
             Log::error('Error cancelling sales order:', [
                 'so_number' => $soNumber,
@@ -1967,7 +1975,7 @@ class SalesOrderController extends Controller
                 'file' => $e->getFile(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error cancelling sales order: ' . $e->getMessage(),

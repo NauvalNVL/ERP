@@ -12,23 +12,23 @@
             </div>
             </div>
           <div class="flex items-center space-x-2">
-            <button 
-              @click="refreshPage" 
+            <button
+              @click="refreshPage"
               class="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
               title="Refresh (F5)"
             >
               <i class="fas fa-sync-alt"></i>
             </button>
-              <button 
-              @click="printLog" 
+              <button
+              @click="printLog"
               class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
               title="Print SO Log (Ctrl+P)"
               >
               <i class="fas fa-print mr-1"></i>
               Print SO Log
               </button>
-              <button 
-              @click="printJitTracking" 
+              <button
+              @click="printJitTracking"
               class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
               title="Print JIT Tracking"
               >
@@ -51,17 +51,17 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Current Period:</label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="currentPeriod.month" 
-                      type="number" 
-                      min="1" 
+                    <input
+                      v-model="currentPeriod.month"
+                      type="number"
+                      min="1"
                       max="12"
                       class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
                     >
-                    <input 
-                      v-model="currentPeriod.year" 
+                    <input
+                      v-model="currentPeriod.year"
                       type="number"
                       class="w-20 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
@@ -72,15 +72,15 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Update Period:</label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="updatePeriod.month" 
-                      type="number" 
-                      min="1" 
+                    <input
+                      v-model="updatePeriod.month"
+                      type="number"
+                      min="1"
                       max="12"
                       class="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
                     >
-                    <input 
-                      v-model="updatePeriod.year" 
+                    <input
+                      v-model="updatePeriod.year"
                       type="number"
                       class="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
                     >
@@ -92,10 +92,10 @@
                   <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Forward Period:</label>
                     <div class="flex items-center space-x-2">
-                      <input 
-                      v-model="forwardPeriod" 
+                      <input
+                      v-model="forwardPeriod"
                         type="number"
-                      min="1" 
+                      min="1"
                       class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
@@ -106,10 +106,10 @@
                   <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Backward Period:</label>
                     <div class="flex items-center space-x-2">
-                      <input 
-                      v-model="backwardPeriod" 
+                      <input
+                      v-model="backwardPeriod"
                         type="number"
-                      min="1" 
+                      min="1"
                       class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
@@ -125,19 +125,19 @@
               <h3 class="text-sm font-medium text-gray-700 mb-3">Order Information</h3>
               <div class="flex items-center space-x-2">
                 <label class="text-xs font-medium text-gray-600">Last S/Order#:</label>
-                <input 
-                  v-model="lastSOOrder.prefix" 
-                  type="text" 
+                <input
+                  v-model="lastSOOrder.prefix"
+                  type="text"
                   class="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                <input 
-                  v-model="lastSOOrder.year" 
-                  type="number" 
+                <input
+                  v-model="lastSOOrder.year"
+                  type="number"
                   class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                <input 
-                  v-model="lastSOOrder.number" 
-                  type="number" 
+                <input
+                  v-model="lastSOOrder.number"
+                  type="number"
                   class="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                 </div>
@@ -152,14 +152,14 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Customer Code:</label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="selectedCustomer.code" 
+                    <input
+                      v-model="selectedCustomer.code"
                       type="text"
                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter customer code"
                       @blur="validateCustomer"
                     >
-                    <button 
+                    <button
                       @click="openCustomerLookup"
                       class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                       title="Customer Lookup"
@@ -171,18 +171,18 @@
                     {{ selectedCustomer.name }}
                   </div>
                 </div>
-                
+
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">M/Card Seq#:</label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="selectedMasterCard.seq" 
+                    <input
+                      v-model="selectedMasterCard.seq"
                       type="text"
                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter master card sequence"
                       @blur="validateMasterCard"
                     >
-                    <button 
+                    <button
                       @click="openMasterCardLookup"
                       class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                       title="Master Card Lookup"
@@ -193,9 +193,9 @@
                   <div v-if="selectedMasterCard.model" class="mt-1 text-sm text-gray-600">
                     {{ selectedMasterCard.model }}
                   </div>
-                  
+
                   <!-- Master Card Approval Status -->
-                  <div v-if="selectedMasterCard.seq && approvalStatusMessage" class="mt-2 p-3 rounded" 
+                  <div v-if="selectedMasterCard.seq && approvalStatusMessage" class="mt-2 p-3 rounded"
                        :class="{
                          'bg-green-100 border border-green-200': approvalStatusMessage.type === 'success',
                          'bg-yellow-100 border border-yellow-200': approvalStatusMessage.type === 'warning',
@@ -216,7 +216,7 @@
                       </p>
                     </div>
                   </div>
-                  
+
                   <div v-if="!selectedMasterCard.seq" class="mt-2 bg-yellow-100 p-3 rounded">
                     <p class="text-sm font-medium text-yellow-800">No master card data available.</p>
                     <p class="text-xs text-yellow-700 mt-1">Please select a customer and use the master card lookup to find available master cards.</p>
@@ -230,15 +230,15 @@
         <!-- Sales Order Details -->
         <div class="bg-gray-50 rounded-lg p-4 mb-6" v-if="selectedCustomer.code && selectedMasterCard.seq">
           <h3 class="text-sm font-medium text-gray-700 mb-4">Sales Order Details</h3>
-          
+
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Order Information -->
               <div class="space-y-4">
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Order Mode:</label>
-                  <select 
-                    v-model="orderDetails.orderMode" 
+                  <select
+                    v-model="orderDetails.orderMode"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
                     disabled
                   >
@@ -251,15 +251,15 @@
                   <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Product:</label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="orderDetails.product.code" 
+                    <input
+                      v-model="orderDetails.product.code"
                       type="text"
                       class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
                     >
-                    <input 
-                      v-model="orderDetails.product.name" 
+                    <input
+                      v-model="orderDetails.product.name"
                       type="text"
                       class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
@@ -273,16 +273,16 @@
                   <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Salesperson:</label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="orderDetails.salesperson.code" 
+                    <input
+                      v-model="orderDetails.salesperson.code"
                       type="text"
                       class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
                     >
-                    <input 
-                      v-model="orderDetails.salesperson.name" 
-                      type="text" 
+                    <input
+                      v-model="orderDetails.salesperson.name"
+                      type="text"
                       class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
@@ -291,8 +291,8 @@
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">A/C Currency:</label>
-                  <input 
-                    v-model="orderDetails.currency" 
+                  <input
+                    v-model="orderDetails.currency"
                     type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
                     readonly
@@ -304,19 +304,17 @@
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Exchange Rate:</label>
-                  <input 
-                    v-model="orderDetails.exchangeRate" 
-                    type="number" 
-                    step="0.000001" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
-                    readonly
-                    disabled
+                  <input
+                    v-model="orderDetails.exchangeRate"
+                    type="number"
+                    step="0.000001"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Exchange Method:</label>
-                  <select 
-                    v-model="orderDetails.exchangeMethod" 
+                  <select
+                    v-model="orderDetails.exchangeMethod"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
                     disabled
                   >
@@ -330,9 +328,9 @@
 
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Cust.P/Order#:</label>
-                <input 
-                  v-model="orderDetails.customerPOrder" 
-                  type="text" 
+                <input
+                  v-model="orderDetails.customerPOrder"
+                  type="text"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter customer PO number"
                 >
@@ -341,9 +339,9 @@
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">P/Order Date:</label>
                 <div class="flex items-center space-x-2">
-                    <input 
+                    <input
                     ref="pOrderDateInput"
-                    v-model="orderDetails.pOrderDate" 
+                    v-model="orderDetails.pOrderDate"
                       type="date"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     @change="updateDayOfWeek"
@@ -358,9 +356,9 @@
                 <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Set Quantity:</label>
                 <div class="flex items-center space-x-2">
-                  <input 
-                    v-model="orderDetails.setQuantity" 
-                    type="text" 
+                  <input
+                    v-model="orderDetails.setQuantity"
+                    type="text"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Leave blank for loose item order">
                   </div>
@@ -370,20 +368,20 @@
                 <label class="block text-xs font-medium text-gray-600 mb-1">Order Group:</label>
                 <div class="flex items-center space-x-4">
                     <label class="flex items-center">
-                    <input 
-                      v-model="orderDetails.orderGroup" 
-                      type="radio" 
-                      value="Sales" 
+                    <input
+                      v-model="orderDetails.orderGroup"
+                      type="radio"
+                      value="Sales"
                       class="mr-2 border-gray-300 text-blue-600 focus:ring-blue-500"
                       @change="handleOrderGroupChange"
                     >
                     <span class="text-sm text-gray-700">Sales</span>
                     </label>
                     <label class="flex items-center">
-                    <input 
-                      v-model="orderDetails.orderGroup" 
-                      type="radio" 
-                      value="Non-Sales" 
+                    <input
+                      v-model="orderDetails.orderGroup"
+                      type="radio"
+                      value="Non-Sales"
                       class="mr-2 border-gray-300 text-blue-600 focus:ring-blue-500"
                       @change="handleOrderGroupChange"
                     >
@@ -394,12 +392,12 @@
 
                 <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Order Type:</label>
-                  <select 
-                  v-model="orderDetails.orderType" 
+                  <select
+                  v-model="orderDetails.orderType"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   @change="handleOrderTypeChange"
                 >
-                  <option 
+                  <option
                     v-for="orderType in availableOrderTypes"
                     :key="orderType.code"
                     :value="orderType.code"
@@ -426,7 +424,7 @@
                         <i v-if="index < getWorkflowSteps().length - 1" class="fas fa-chevron-right text-blue-500"></i>
                       </template>
                     </div>
-                    
+
                     <!-- Special Indicators -->
                     <div class="mt-2 flex items-center space-x-3 text-xs">
                       <div v-if="currentOrderTypeConfig.isKanban" class="flex items-center text-orange-600">
@@ -460,9 +458,9 @@
                     <span class="text-xs text-gray-400 font-normal">Tick for Y-Yes</span>
                   </label>
                   <div class="flex items-center space-x-2">
-                    <input 
-                      v-model="orderDetails.salesTax" 
-                      type="checkbox" 
+                    <input
+                      v-model="orderDetails.salesTax"
+                      type="checkbox"
                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       title="Tick for Y-Yes"
                     >
@@ -473,9 +471,9 @@
                 </div>
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Lot Number:</label>
-                  <input 
-                    v-model="orderDetails.lotNumber" 
-                    type="text" 
+                  <input
+                    v-model="orderDetails.lotNumber"
+                    type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter lot number"
                   >
@@ -484,8 +482,8 @@
 
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Remark:</label>
-                  <textarea 
-                  v-model="orderDetails.remark" 
+                  <textarea
+                  v-model="orderDetails.remark"
                     rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder=""
@@ -494,8 +492,8 @@
 
                 <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Instruction1:</label>
-                  <textarea 
-                  v-model="orderDetails.instruction1" 
+                  <textarea
+                  v-model="orderDetails.instruction1"
                     rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder=""
@@ -504,8 +502,8 @@
 
                 <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Instruction2:</label>
-                  <textarea 
-                  v-model="orderDetails.instruction2" 
+                  <textarea
+                  v-model="orderDetails.instruction2"
                     rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder=""
@@ -516,7 +514,7 @@
 
           <!-- Action Buttons -->
           <div class="flex justify-center space-x-4 mt-6">
-                <button 
+                <button
                   @click="openProductDesignScreen"
               class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center disabled:bg-gray-400 disabled:cursor-not-allowed"
               :disabled="!canProceed"
@@ -525,7 +523,7 @@
               Continue to Product Design
                 </button>
               </div>
-              
+
               <!-- Form validation summary -->
               <div v-if="!canProceed" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <div class="flex items-center">
@@ -539,7 +537,7 @@
                   <li v-if="!selectedMasterCard.seq">Select a master card sequence</li>
                 </ul>
               </div>
-              
+
               <!-- Master Card Approval Warning -->
               <div v-if="canProceed && !isMasterCardApproved" class="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                 <div class="flex items-center">
@@ -549,7 +547,7 @@
                   </span>
                 </div>
                 <p class="text-xs text-orange-700 mt-1">
-                  The selected master card is not yet approved. You can proceed with creating the sales order, 
+                  The selected master card is not yet approved. You can proceed with creating the sales order,
                   but the master card may need to be approved before production can begin.
                 </p>
               </div>
@@ -558,9 +556,9 @@
             </div>
 
     <!-- Customer Lookup Modal -->
-    <CustomerAccountModal 
-      :show="showCustomerModal" 
-      @close="showCustomerModal = false" 
+    <CustomerAccountModal
+      :show="showCustomerModal"
+      @close="showCustomerModal = false"
           @select="selectCustomer"
       :initial-sort-by="'customer_code'"
       :initial-status-filter="['Active']"
@@ -605,9 +603,9 @@
     />
 
     <!-- Product Design Screen Modal -->
-    <ProductDesignScreenModal 
-      :show="showProductDesignModal" 
-      @close="showProductDesignModal = false" 
+    <ProductDesignScreenModal
+      :show="showProductDesignModal"
+      @close="showProductDesignModal = false"
       @save="saveProductDesign"
           :master-card="selectedMasterCard"
           :customer="selectedCustomer"
@@ -616,26 +614,26 @@
     />
 
     <!-- Delivery Location Modal -->
-    <DeliveryLocationModal 
-      :show="showDeliveryLocationModal" 
-      @close="showDeliveryLocationModal = false" 
+    <DeliveryLocationModal
+      :show="showDeliveryLocationModal"
+      @close="showDeliveryLocationModal = false"
       @save="saveDeliveryLocation"
           :customer="selectedCustomer"
       :order-details="orderDetails"
     />
 
     <!-- Delivery Schedule Modal -->
-    <DeliveryScheduleModal 
-      :show="showDeliveryScheduleModal" 
-      @close="showDeliveryScheduleModal = false" 
+    <DeliveryScheduleModal
+      :show="showDeliveryScheduleModal"
+      @close="showDeliveryScheduleModal = false"
       @save="saveDeliverySchedule"
       :order-details="orderDetails"
     />
 
     <!-- Sales Order Table Modal -->
-    <SalesOrderTableModal 
-      :is-open="showSalesOrderTableModal" 
-      @close="showSalesOrderTableModal = false" 
+    <SalesOrderTableModal
+      :is-open="showSalesOrderTableModal"
+      @close="showSalesOrderTableModal = false"
       @select="selectSalesOrderFromTable"
       :customer-data="selectedCustomer"
     />
@@ -777,7 +775,7 @@ const isMasterCardApproved = computed(() => {
 // Computed property to get approval status message
 const approvalStatusMessage = computed(() => {
   if (!selectedMasterCard.seq) return ''
-  
+
   switch (selectedMasterCard.approval) {
     case 'Yes':
       return { type: 'success', message: 'Master Card is approved and ready for use' }
@@ -790,15 +788,15 @@ const approvalStatusMessage = computed(() => {
 
 const dayOfWeek = computed(() => {
   if (!orderDetails.pOrderDate) return ''
-  
+
   try {
   const date = new Date(orderDetails.pOrderDate)
-    
+
     // Check if date is valid
     if (isNaN(date.getTime())) {
       return ''
     }
-    
+
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   return days[date.getDay()]
   } catch (err) {
@@ -917,17 +915,17 @@ const currentOrderTypeConfig = computed(() => {
 // Handle Order Group change
 const handleOrderGroupChange = () => {
   console.log('Order Group changed to:', orderDetails.orderGroup)
-  
+
   // Reset to first available order type when group changes
   const availableTypes = orderTypesConfig[orderDetails.orderGroup] || []
   if (availableTypes.length > 0) {
     orderDetails.orderType = availableTypes[0].code
     console.log('Auto-selected order type:', orderDetails.orderType)
   }
-  
+
   // Update UI based on order type requirements
   updateOrderTypeUI()
-  
+
   // Show notification
   success(`Order group changed to ${orderDetails.orderGroup}. Order type auto-selected.`)
 }
@@ -936,7 +934,7 @@ const handleOrderGroupChange = () => {
 const handleOrderTypeChange = () => {
   console.log('Order Type changed to:', orderDetails.orderType)
   updateOrderTypeUI()
-  
+
   const typeConfig = currentOrderTypeConfig.value
   if (typeConfig) {
     info(`Selected: ${typeConfig.label}`)
@@ -946,9 +944,9 @@ const handleOrderTypeChange = () => {
 // Update UI based on order type requirements
 const updateOrderTypeUI = () => {
   const typeConfig = currentOrderTypeConfig.value
-  
+
   if (!typeConfig) return
-  
+
   console.log('Updating UI for order type:', typeConfig.code)
   console.log('Workflow steps:', typeConfig.workflow)
   console.log('Requirements:', {
@@ -957,22 +955,22 @@ const updateOrderTypeUI = () => {
     delivery: typeConfig.requiresDelivery,
     invoice: typeConfig.requiresInvoice
   })
-  
+
   // Update sales tax based on order type configuration
   orderDetails.salesTax = typeConfig.salesTax || false
-  
+
   // Special handling for Kanban/JIT orders
   if (typeConfig.isKanban) {
     console.log('Kanban/JIT order detected - special handling enabled')
     info('Kanban/JIT mode: Production will be scheduled based on delivery requirements')
   }
-  
+
   // Special handling for corrugator-only orders
   if (typeConfig.corrugatorOnly) {
     console.log('Corrugator-only order detected')
     info('Corrugator-only mode: Order will stop after corrugator process')
   }
-  
+
   // Special handling for orders that skip corrugator
   if (typeConfig.skipCorrugator) {
     console.log('Skip corrugator mode detected')
@@ -984,12 +982,12 @@ const updateOrderTypeUI = () => {
 const getWorkflowSteps = () => {
   const typeConfig = currentOrderTypeConfig.value
   if (!typeConfig) return []
-  
+
   return typeConfig.workflow.map(step => {
     const stepNames = {
       'SO': 'Sales Order',
       'Corr': 'Corrugator',
-      'Conv': 'Converting', 
+      'Conv': 'Converting',
       'FG': 'Finished Goods',
       'DO': 'Delivery Order',
       'IV': 'Invoice'
@@ -1058,7 +1056,7 @@ const refreshPage = () => {
       name: ''
     },
     currency: 'IDR',
-    exchangeRate: 0.000000,
+    exchangeRate: 1.000000,
     exchangeMethod: 'N/A',
     customerPOrder: '',
     pOrderDate: new Date().toISOString().split('T')[0],
@@ -1072,10 +1070,10 @@ const refreshPage = () => {
     instruction2: '',
     so_number: ''
   })
-  
+
   // Update UI after reset
   updateOrderTypeUI()
-  
+
   success('Form reset successfully')
 }
 
@@ -1108,11 +1106,11 @@ const openSalesOrderTable = () => {
 // Handle selection from Sales Order Table Modal
 const selectSalesOrderFromTable = (orderData) => {
   console.log('Sales Order selected from table:', orderData)
-  
+
   // You can use the selected order data to populate the form or navigate to a detail screen
   // For now, we'll just show a success message
   success(`Sales Order ${orderData.soNumber} selected`)
-  
+
   // Optionally, you could navigate to a detail page or populate form fields
   // For example:
   // orderDetails.so_number = orderData.soNumber
@@ -1130,11 +1128,11 @@ const selectCustomer = async (customer) => {
   selectedCustomer.address = customer.address || ''
   selectedCustomer.salesperson = customer.salesperson_code || ''
   selectedCustomer.currency = customer.currency_code || 'IDR'
-  
+
   // Update order details
   orderDetails.salesperson.code = customer.salesperson_code || ''
   orderDetails.currency = customer.currency_code || 'IDR'
-  
+
   // Populate salesperson name immediately if code exists
   try {
     if (orderDetails.salesperson.code) {
@@ -1152,7 +1150,7 @@ const selectCustomer = async (customer) => {
     console.warn('Could not fetch salesperson details on select:', spErr)
     orderDetails.salesperson.name = ''
   }
-  
+
   // Reset previously selected Master Card when customer changes
   Object.assign(selectedMasterCard, {
     seq: '',
@@ -1170,22 +1168,22 @@ const selectCustomer = async (customer) => {
 
 const validateCustomer = async () => {
   if (!selectedCustomer.code.trim()) return
-  
+
   try {
     const response = await fetch(`/api/sales-order/customer/${selectedCustomer.code}`)
     const data = await response.json()
-    
+
     if (data.success && data.data) {
       const customer = data.data
       selectedCustomer.name = customer.customer_name
       selectedCustomer.address = customer.address || ''
       selectedCustomer.salesperson = customer.salesperson_code || ''
       selectedCustomer.currency = customer.currency_code || 'IDR'
-      
+
       // Update order details with customer info
       orderDetails.salesperson.code = customer.salesperson_code || ''
       orderDetails.currency = customer.currency_code || 'IDR'
-      
+
       // Reset previously selected Master Card when customer validated
       Object.assign(selectedMasterCard, {
         seq: '',
@@ -1209,7 +1207,7 @@ const validateCustomer = async () => {
           console.warn('Could not fetch salesperson details:', spErr)
         }
       }
-      
+
       success('Customer validated successfully')
     } else {
       error(data.message || 'Customer not found')
@@ -1240,7 +1238,7 @@ const openMasterCardLookup = () => {
 
 const selectMcs = (mc) => {
   if (!mc) return
-  
+
   // Normalize possible API field names to match the expected format
   const seq = mc.seq || mc.mc_seq || mc.mc_sequence || ''
   const model = mc.model || mc.mc_model || ''
@@ -1249,7 +1247,7 @@ const selectMcs = (mc) => {
   const partNo = mc.part || mc.part_no || mc.part_num || ''
   const compNo = mc.comp || mc.comp_no || mc.component || ''
   const pDesign = mc.p_design || mc.pd || ''
-  
+
   selectedMasterCard.seq = String(seq)
   selectedMasterCard.model = String(model)
   selectedMasterCard.status = String(status)
@@ -1257,9 +1255,9 @@ const selectMcs = (mc) => {
   selectedMasterCard.partNo = String(partNo)
   selectedMasterCard.compNo = String(compNo)
   selectedMasterCard.pDesign = String(pDesign)
-  
+
   showMcsTableModal.value = false
-  
+
   // Show appropriate message based on approval status
   if (selectedMasterCard.approval === 'Yes') {
     success('Master card selected successfully - Approved and ready for use')
@@ -1270,11 +1268,11 @@ const selectMcs = (mc) => {
 
 const validateMasterCard = async () => {
   if (!selectedMasterCard.seq.trim()) return
-  
+
   try {
     const response = await fetch(`/api/update-mc/check-mcs/${selectedMasterCard.seq}`)
     const data = await response.json()
-    
+
     if (data.exists && data.data) {
       const masterCard = data.data
       selectedMasterCard.model = masterCard.mc_model || ''
@@ -1283,7 +1281,7 @@ const validateMasterCard = async () => {
       selectedMasterCard.partNo = masterCard.part_no || ''
       selectedMasterCard.compNo = masterCard.comp_no || ''
       selectedMasterCard.pDesign = masterCard.p_design || ''
-      
+
       // Show appropriate message based on approval status
       if (selectedMasterCard.approval === 'Yes') {
         success('Master card validated successfully - Approved and ready for use')
@@ -1431,23 +1429,23 @@ const updateDayOfWeek = () => {
   if (orderDetails.pOrderDate) {
     // Validate the date
     const date = new Date(orderDetails.pOrderDate)
-    
+
     if (isNaN(date.getTime())) {
       error('Invalid date format. Please select a valid date.')
       return
     }
-    
+
     // Check if date is not too far in the past or future
     const today = new Date()
     const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate())
     const twoYearsFromNow = new Date(today.getFullYear() + 2, today.getMonth(), today.getDate())
-    
+
     if (date < oneYearAgo) {
       error('Warning: Selected date is more than 1 year in the past')
     } else if (date > twoYearsFromNow) {
       error('Warning: Selected date is more than 2 years in the future')
     }
-    
+
     // The computed property dayOfWeek will automatically update
     // Close explicit calendar state after selection
     calendarExplicitlyOpened.value = false
@@ -1460,25 +1458,25 @@ const updateDayOfWeek = () => {
 // Add date validation helper
 const validateDate = (dateString) => {
   if (!dateString) return { valid: false, message: 'Date is required' }
-  
+
   const date = new Date(dateString)
-  
+
   if (isNaN(date.getTime())) {
     return { valid: false, message: 'Invalid date format' }
   }
-  
+
   const today = new Date()
   const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate())
   const fiveYearsFromNow = new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())
-  
+
   if (date < oneYearAgo) {
     return { valid: false, message: 'Date cannot be more than 1 year in the past' }
   }
-  
+
   if (date > fiveYearsFromNow) {
     return { valid: false, message: 'Date cannot be more than 5 years in the future' }
   }
-  
+
   return { valid: true, message: 'Valid date' }
 }
 
@@ -1497,7 +1495,7 @@ const saveProductDesign = async (designData) => {
       error('Master card is required for product design')
       return
     }
-    
+
     const requestData = {
       master_card_seq: selectedMasterCard.seq,
       items: designData.items || [],
@@ -1506,14 +1504,14 @@ const saveProductDesign = async (designData) => {
       total_gross_kg: designData.totalGrossKg || 0,
       ...designData
     }
-    
+
     // Debug CSRF token
     const csrfToken = (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
     console.log('CSRF Token:', csrfToken ? 'Found' : 'Missing')
     console.log('CSRF Token Value:', csrfToken.substring(0, 20) + '...')
     console.log('Request URL:', '/api/sales-order/product-design')
     console.log('Request Method:', 'POST')
-    
+
     const response = await fetch('/api/sales-order/product-design', {
       method: 'POST',
       headers: {
@@ -1525,16 +1523,16 @@ const saveProductDesign = async (designData) => {
       credentials: 'same-origin',
       body: JSON.stringify(requestData)
     })
-    
+
     console.log('Response status:', response.status)
     console.log('Response headers:', Object.fromEntries(response.headers.entries()))
-    
+
     if (!response.ok) {
       const text = await response.text()
       throw new Error(`Request failed (${response.status}). ${text?.slice(0, 120)}`)
     }
     const data = await response.json()
-    
+
     if (data.success) {
   console.log('Product design saved:', designData)
 
@@ -1558,10 +1556,10 @@ const saveProductDesign = async (designData) => {
 
   showProductDesignModal.value = false
   success('Product design saved successfully')
-  
+
   // Fetch customer alternate delivery location data and populate orderDetails
   await fetchCustomerAlternateDeliveryData()
-  
+
   // After saving product design, open Delivery Location modal
   setTimeout(() => {
     showDeliveryLocationModal.value = true
@@ -1584,24 +1582,24 @@ const fetchCustomerAlternateDeliveryData = async () => {
     }
 
     console.log('Fetching customer alternate delivery data for:', customerCode)
-    
+
     // First, get the main customer account data
     const customerResponse = await fetch(`/api/sales-order/customer/${customerCode}`)
     const customerData = await customerResponse.json()
-    
+
     let mainCustomerData = null
     if (customerData?.success && customerData.data) {
       mainCustomerData = customerData.data
     }
-    
+
     // Then, get alternate addresses
     const response = await fetch(`/api/customer-alternate-addresses/${customerCode}`)
     const data = await response.json()
-    
+
     if (Array.isArray(data) && data.length > 0) {
       // Use the first alternate address if multiple exist
       const alternateAddress = data[0]
-      
+
       // Populate orderDetails with delivery location data from customer alternate delivery location table
       orderDetails.deliveryLocation = {
         orderBy: {
@@ -1624,7 +1622,7 @@ const fetchCustomerAlternateDeliveryData = async () => {
           contact: alternateAddress.contact_person || mainCustomerData?.contact_person || mainCustomerData?.contact || selectedCustomer.contact || ''
         }
       }
-      
+
       console.log('Customer alternate delivery data populated:', orderDetails.deliveryLocation)
       success('Customer delivery location data loaded from alternate address table')
     } else {
@@ -1650,7 +1648,7 @@ const fetchCustomerAlternateDeliveryData = async () => {
           contact: mainCustomerData?.contact_person || mainCustomerData?.contact || selectedCustomer.contact || ''
         }
       }
-      
+
       console.log('No alternate address found, using main customer data')
     }
   } catch (err) {
@@ -1677,7 +1675,7 @@ const fetchCustomerAlternateDeliveryData = async () => {
         contact: selectedCustomer.contact || ''
       }
     }
-    
+
     console.log('Error occurred, using fallback customer data')
   }
 }
@@ -1695,7 +1693,7 @@ const saveDeliveryLocation = async (locationData) => {
     // Store delivery location data locally for now
     // In a real implementation, you might save this to the database
   console.log('Delivery location saved:', locationData)
-    
+
     // Persist full structure into orderDetails to be used on SO creation
     orderDetails.deliveryLocation = {
       orderBy: {
@@ -1720,7 +1718,7 @@ const saveDeliveryLocation = async (locationData) => {
     }
     // Backward compatible single field for quick view
     orderDetails.deliveryAddress = orderDetails.deliveryLocation.shipTo.address || orderDetails.deliveryLocation.billTo.address
-    
+
   showDeliveryLocationModal.value = false
   success('Delivery location saved successfully')
 
@@ -1730,7 +1728,7 @@ const saveDeliveryLocation = async (locationData) => {
     if (soResponse?.success) {
       orderDetails.so_number = soResponse.so_number
       success(`Sales Order ${soResponse.so_number} created successfully!`)
-      
+
       // After creating SO, proceed to Delivery Schedule
       setTimeout(() => {
         showDeliveryScheduleModal.value = true
@@ -1753,18 +1751,18 @@ const saveDeliverySchedule = async (scheduleData) => {
     console.log('saveDeliverySchedule called with data:', scheduleData)
     console.log('scheduleData.entries:', scheduleData.entries)
     console.log('Array.isArray(scheduleData.entries):', Array.isArray(scheduleData.entries))
-    
+
     // Validate required data
     if (!scheduleData.entries || !Array.isArray(scheduleData.entries)) {
       console.error('Validation failed: entries missing or not array')
       error('Delivery schedule entries are required')
       return
     }
-    
+
     // First, we need to create the Sales Order if it doesn't exist
     let soNumber = orderDetails.so_number
     console.log('Current SO number:', soNumber)
-    
+
     if (!soNumber) {
       console.log('No SO number found, creating new Sales Order...')
       // Create the Sales Order first
@@ -1778,18 +1776,18 @@ const saveDeliverySchedule = async (scheduleData) => {
       orderDetails.so_number = soNumber
       console.log('New SO number:', soNumber)
     }
-    
+
     // Now save the delivery schedule (entries already validated by modal)
     const requestData = {
       so_number: soNumber,
       entries: scheduleData.entries
     }
-    
+
     // Debug CSRF token for delivery schedule
     const csrfToken = (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
     console.log('Delivery Schedule - CSRF Token:', csrfToken ? 'Found' : 'Missing')
     console.log('Delivery Schedule - Request data:', requestData)
-    
+
     const response = await fetch('/api/sales-order/delivery-schedule', {
       method: 'POST',
       headers: {
@@ -1801,20 +1799,20 @@ const saveDeliverySchedule = async (scheduleData) => {
       credentials: 'same-origin',
       body: JSON.stringify(requestData)
     })
-    
+
     console.log('Delivery Schedule - Response status:', response.status)
-    
+
     if (!response.ok) {
       const text = await response.text()
       throw new Error(`Request failed (${response.status}). ${text?.slice(0, 120)}`)
     }
     const data = await response.json()
-    
+
     if (data.success) {
       console.log('Delivery schedule saved:', scheduleData)
       showDeliveryScheduleModal.value = false
       success('Delivery schedule saved successfully')
-      
+
       // Optionally, you can proceed with final sales order creation here
     } else {
       throw new Error(data.message || 'Failed to save delivery schedule')
@@ -1833,7 +1831,7 @@ const createSalesOrder = async () => {
       error('Customer is required')
       return
     }
-    
+
     if (!selectedMasterCard.seq) {
       error('Master card is required')
       return
@@ -1843,12 +1841,12 @@ const createSalesOrder = async () => {
     if (selectedMasterCard.approval !== 'Yes') {
       info('Warning: Selected Master Card is not approved yet. Proceeding with sales order creation.')
     }
-    
+
     if (!orderDetails.pOrderDate) {
       error('Purchase order date is required')
       return
     }
-    
+
     const requestData = {
       customer_code: selectedCustomer.code,
       master_card_seq: selectedMasterCard.seq,
@@ -1890,7 +1888,7 @@ const createSalesOrder = async () => {
         }
       ]
     }
-    
+
     // Log delivery location data for debugging
     console.log('Sales Order - Delivery Location Data:', {
       delivery_code: requestData.delivery_location.delivery_code,
@@ -1898,7 +1896,7 @@ const createSalesOrder = async () => {
       address: requestData.delivery_location.address,
       source: requestData.delivery_location.delivery_code ? 'customer_alternate_addresses' : 'CUSTOMER table'
     })
-    
+
     const response = await fetch('/api/sales-order', {
       method: 'POST',
       headers: {
@@ -1910,18 +1908,18 @@ const createSalesOrder = async () => {
       credentials: 'same-origin',
       body: JSON.stringify(requestData)
     })
-    
+
     if (!response.ok) {
       const text = await response.text()
       throw new Error(`Request failed (${response.status}). ${text?.slice(0, 120)}`)
     }
     const data = await response.json()
-    
+
     if (data.success) {
       // Note: Removed duplicate save to legacy SO table to prevent data duplication
       // The main API endpoint '/api/sales-order' should handle all necessary data storage
       console.log('Sales Order created successfully:', data.data.so_number)
-      
+
       return {
         success: true,
         so_number: data.data.so_number,
@@ -1973,34 +1971,34 @@ const validatePeriod = () => {
 
 const validateForm = () => {
   if (!validatePeriod()) return false
-  
+
   if (!selectedCustomer.code) {
     error('Please select a customer')
     return false
   }
-  
+
   if (!selectedMasterCard.seq) {
     error('Please select a master card')
     return false
   }
-  
+
   // Validate P/Order Date using the new validation function
   const dateValidation = validateDate(orderDetails.pOrderDate)
   if (!dateValidation.valid) {
     error('P/Order Date: ' + dateValidation.message)
     return false
   }
-  
+
   if (forwardPeriod.value < 1) {
     error('Forward period must be at least 1 month')
     return false
   }
-  
+
   if (backwardPeriod.value < 1) {
     error('Backward period must be at least 1 month')
     return false
   }
-  
+
   return true
 }
 
@@ -2032,7 +2030,7 @@ watch(() => selectedCustomer.currency, (newCurrency) => {
   if (newCurrency && newCurrency !== 'IDR') {
     orderDetails.exchangeRate = 1.000000 // Default, should be fetched from API
   } else {
-    orderDetails.exchangeRate = 0.000000
+    orderDetails.exchangeRate = 1.000000
     orderDetails.exchangeMethod = 'N/A'
   }
 })
@@ -2045,7 +2043,7 @@ onMounted(() => {
   currentPeriod.year = today.getFullYear()
   updatePeriod.month = today.getMonth() + 1
   updatePeriod.year = today.getFullYear()
-  
+
   // Set CSRF token for all requests
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
   if (csrfToken) {
@@ -2054,10 +2052,10 @@ onMounted(() => {
       window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken
     }
   }
-  
+
   // Initialize form validation
   validatePeriod()
-  
+
   // Initialize Order Type UI
   updateOrderTypeUI()
 })
@@ -2073,37 +2071,37 @@ const handleKeyDown = (event) => {
       error('Please complete required fields first')
     }
   }
-  
+
   // F2 to open customer lookup
   if (event.key === 'F2') {
     event.preventDefault()
     openCustomerLookup()
   }
-  
+
   // F3 to open master card lookup
   if (event.key === 'F3') {
     event.preventDefault()
     openMasterCardLookup()
   }
-  
+
   // F4 to open calendar
   if (event.key === 'F4') {
     event.preventDefault()
     openCalendar()
   }
-  
+
   // F5 to refresh
   if (event.key === 'F5') {
     event.preventDefault()
     refreshPage()
   }
-  
+
   // F6 to open Sales Order Table
   if (event.key === 'F6') {
     event.preventDefault()
     openSalesOrderTable()
   }
-  
+
   // Ctrl/Cmd + P to print log
   if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
     event.preventDefault()
@@ -2120,7 +2118,7 @@ onMounted(async () => {
   currentPeriod.year = today.getFullYear()
   updatePeriod.month = today.getMonth() + 1
   updatePeriod.year = today.getFullYear()
-  
+
   // Set CSRF token for all requests
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
   if (csrfToken) {
@@ -2129,20 +2127,20 @@ onMounted(async () => {
       window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken
     }
   }
-  
+
   // Initialize form validation
   validatePeriod()
-  
+
   // Initialize Order Type UI
   updateOrderTypeUI()
-  
+
   // Setup keyboard shortcuts
   document.addEventListener('keydown', handleKeyDown)
-  
+
   // Ensure date input is properly initialized
   await nextTick()
   console.log('PrepareMCSO component mounted successfully, date input ref:', pOrderDateInput.value)
-  
+
             // Add event listener to prevent calendar from showing on other elements
       const dateInput = pOrderDateInput.value
       // We rely on native picker behavior; no extra listeners needed
@@ -2153,7 +2151,7 @@ onUnmounted(() => {
   clearTimeout(window.customerValidationTimeout)
   clearTimeout(window.mcValidationTimeout)
   document.removeEventListener('keydown', handleKeyDown)
-  
+
   // No calendar-related listeners registered
 })
 </script>

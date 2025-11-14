@@ -282,6 +282,20 @@ const formatCurrency = (value) => {
     });
 };
 
+// Format date helper (YYYY-MM-DD -> DD/MM/YYYY)
+const formatDateForPrint = (value) => {
+    if (!value) return '';
+    const str = String(value).trim();
+    if (str.includes('/')) {
+        return str;
+    }
+    if (str.length === 10 && str[4] === '-' && str[7] === '-') {
+        const [y, m, d] = str.split('-');
+        return `${d}/${m}/${y}`;
+    }
+    return str;
+};
+
 // Convert number to Indonesian words (Terbilang)
 const numberToWords = (num) => {
     if (!num || num === 0) return 'NOL RUPIAH';
@@ -372,6 +386,9 @@ const selectInvoice = async (invoice) => {
                 salesperson: res.data.salesperson,
                 currency: res.data.currency,
                 exchange_rate: res.data.exchange_rate,
+                payment_term: res.data.payment_term,
+                due_date: res.data.due_date,
+                tax_invoice_no: res.data.tax_invoice_no,
                 status: res.data.status,
                 total_amount: res.data.total_amount,
                 tax_amount: res.data.tax_amount,
@@ -382,6 +399,10 @@ const selectInvoice = async (invoice) => {
                 second_ref: res.data.second_ref,
                 so_number: res.data.so_number,
                 do_number: res.data.do_number,
+                quantity: res.data.quantity,
+                unit_price: res.data.unit_price,
+                po_number: res.data.po_number,
+                model: res.data.model,
                 printed_by: res.data.printed_by,
                 printed_date: res.data.printed_date
             };
@@ -487,13 +508,23 @@ const generateInvoicePDF = (invoice) => {
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     const rightX = 140;
+
+    const paymentTermText =
+      invoice.payment_term !== undefined && invoice.payment_term !== null
+        ? String(invoice.payment_term)
+        : '';
+    const exchangeRateText =
+      invoice.exchange_rate !== undefined && invoice.exchange_rate !== null
+        ? String(invoice.exchange_rate)
+        : '';
+
     doc.text(`No Invoice    : ${invoice.invoice_no || ''}`, rightX, 15);
-    doc.text(`Invoice Date  : ${invoice.invoice_date || ''}`, rightX, 20);
-    doc.text(`AR Term       : ${invoice.payment_term || '90'}`, rightX, 25);
-    doc.text(`Tanggal JT    : ${invoice.due_date || ''}`, rightX, 30);
+    doc.text(`Invoice Date  : ${formatDateForPrint(invoice.invoice_date)}`, rightX, 20);
+    doc.text(`AR Term       : ${paymentTermText}`, rightX, 25);
+    doc.text(`Tanggal JT    : ${formatDateForPrint(invoice.due_date)}`, rightX, 30);
     doc.text(`Halaman       : 01`, rightX, 35);
     doc.text(`Kurs          : ${invoice.currency || 'IDR'}`, rightX, 40);
-    doc.text(`Nilai Kurs    : ${invoice.exchange_rate || '1.00'}`, rightX, 45);
+    doc.text(`Nilai Kurs    : ${exchangeRateText}`, rightX, 45);
     doc.text(`Nomor FP      : ${invoice.tax_invoice_no || ''}`, rightX, 50);
 
     // ==== CUSTOMER NAME (Below Title) ====
@@ -528,21 +559,27 @@ const generateInvoicePDF = (invoice) => {
         doc.setFont('helvetica', 'normal');
 
         // Item 1 - Main line
-        doc.text('1  SO#  : ' + (invoice.so_number || '10-2025-00186'), 15, currentY);
-        doc.text('PO#  : ' + (invoice.po_number || '3349/SGB/09/25/KPB-CKG'), 25, currentY + 4);
+        doc.text('1  SO#  : ' + (invoice.so_number || ''), 15, currentY);
+        doc.text('PO#  : ' + (invoice.po_number || ''), 25, currentY + 4);
 
         // Model info
-        const modelText = invoice.model || 'STKF 390 ML MANUAL CARUNG';
-        doc.text('Model : ' + modelText, 25, currentY + 8);
+        const modelText = invoice.model || '';
+        if (modelText) {
+          doc.text('Model : ' + modelText, 25, currentY + 8);
+        }
         doc.text('Main  : BOX', 25, currentY + 12);
 
         // DO reference
-        doc.text('DO#   : ' + (invoice.do_number || invoice.second_ref || '10-2025-02691'), 25, currentY + 16);
+        doc.text('DO#   : ' + (invoice.do_number || invoice.second_ref || ''), 25, currentY + 16);
 
         // Quantities and amounts
-        const qty = invoice.quantity || '11,400';
-        const unitPrice = formatCurrency(invoice.unit_price || 1501.00);
-        const amount = formatCurrency(invoice.total_amount || 17111400.00);
+        const qtyNumber =
+          invoice.quantity !== undefined && invoice.quantity !== null
+            ? Number(invoice.quantity)
+            : 0;
+        const qty = qtyNumber.toLocaleString('en-US');
+        const unitPrice = formatCurrency(invoice.unit_price ?? 0);
+        const amount = formatCurrency(invoice.total_amount ?? 0);
 
         doc.text(qty + 'Pcs', 110, currentY, { align: 'right' });
         doc.text(unitPrice, 140, currentY, { align: 'right' });
@@ -557,11 +594,6 @@ const generateInvoicePDF = (invoice) => {
     // Separator line before totals
     doc.setLineWidth(0.3);
     doc.line(110, totalsY - 5, 195, totalsY - 5);
-
-    // JUMLAH label (left aligned)
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.text('JUMLAH:', 15, totalsY);
 
     // Subtotal row
     doc.setFontSize(8);
@@ -581,38 +613,25 @@ const generateInvoicePDF = (invoice) => {
     doc.text(':', 155, totalsY + 10);
     doc.text(formatCurrency(invoice.net_amount || 0), 190, totalsY + 10, { align: 'right' });
 
-    // ==== PAYMENT INFO ====
-    const paymentY = totalsY + 20;
+    // ==== PAYMENT INFO (Amount in words, neatly below totals) ====
+    const paymentY = totalsY + 18; // Push below totals block like CPS layout
+
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.text('JUMLAH:', 15, paymentY);
 
-    // Convert net amount to words (Terbilang)
+    // Convert net amount to words (Terbilang) and render on lines under the label
     doc.setFont('helvetica', 'normal');
     const amountInWords = numberToWords(invoice.net_amount || 0);
 
-    // Split long text into multiple lines (using text width calculation)
-    const maxWidth = 180; // Max width in mm
-    const words = amountInWords.split(' ');
-    let currentLine = '';
-    let lineY = paymentY + 4;
+    // Wrap text within the lower area width
+    const maxWidth = 175; // Safe full width below totals
+    const lines = doc.splitTextToSize(amountInWords, maxWidth);
 
-    words.forEach((word, index) => {
-        const testLine = currentLine + (currentLine ? ' ' : '') + word;
-        const textWidth = doc.getTextWidth(testLine);
-
-        if (textWidth > maxWidth && currentLine) {
-            doc.text(currentLine, 15, lineY);
-            currentLine = word;
-            lineY += 4;
-        } else {
-            currentLine = testLine;
-        }
-
-        // Last word
-        if (index === words.length - 1 && currentLine) {
-            doc.text(currentLine, 15, lineY);
-        }
+    let lineY = paymentY + 4; // Start a bit under the JUMLAH label
+    lines.forEach((line) => {
+        doc.text(line, 15, lineY);
+        lineY += 4;
     });
 
     // Payment instructions
@@ -630,15 +649,15 @@ const generateInvoicePDF = (invoice) => {
     // ==== SIGNATURE SECTION (Right side) ====
     const sigY = paymentInfoY;
     doc.setFontSize(8);
-    doc.text('Banten, ' + (invoice.invoice_date || new Date().toLocaleDateString('id-ID')), 140, sigY);
+    const signDate = invoice.invoice_date
+        ? formatDateForPrint(invoice.invoice_date)
+        : new Date().toLocaleDateString('id-ID');
+    doc.text('Banten, ' + signDate, 140, sigY);
     doc.text('PT. MULTIBOX INDAH', 140, sigY + 4);
 
-    // Signature box
-    doc.rect(140, sigY + 10, 40, 20);
-
-    // Signature name (from printed_by or current user)
+    // Signature name (fixed as EVA KENPI to match CPS layout)
     doc.setFont('helvetica', 'bold');
-    const signerName = invoice.printed_by || 'AUTHORIZED SIGNATURE';
+    const signerName = 'EVA KENPI';
     doc.text(signerName.toUpperCase(), 160, sigY + 33, { align: 'center' });
 
     // ==== FOOTER ====

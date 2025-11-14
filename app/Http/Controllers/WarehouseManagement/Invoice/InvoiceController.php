@@ -14,7 +14,7 @@ class InvoiceController extends Controller
 {
     /**
      * Get current date/time in WIB timezone (UTC+7)
-     * 
+     *
      * @return \Carbon\Carbon
      */
     private function getNowWib()
@@ -24,7 +24,7 @@ class InvoiceController extends Controller
 
     /**
      * Calculate tax amount from invoice data (on-the-fly calculation)
-     * 
+     *
      * @param object $invoice
      * @return float
      */
@@ -32,17 +32,17 @@ class InvoiceController extends Controller
     {
         $tranAmount = (float)($invoice->IV_TRAN_AMT ?? 0);
         $taxPercent = (float)($invoice->IV_TAX_PERCENT ?? 0);
-        
+
         if ($tranAmount > 0 && $taxPercent > 0) {
             return round($tranAmount * ($taxPercent / 100), 2);
         }
-        
+
         return 0;
     }
 
     /**
      * Calculate net amount from invoice data (on-the-fly calculation)
-     * 
+     *
      * @param object $invoice
      * @return float
      */
@@ -50,14 +50,14 @@ class InvoiceController extends Controller
     {
         $tranAmount = (float)($invoice->IV_TRAN_AMT ?? 0);
         $taxAmount = $this->calculateTaxAmount($invoice);
-        
+
         return $tranAmount + $taxAmount;
     }
 
     /**
      * Get current authenticated user ID for audit trail
      * Returns userID from UserCps model or null
-     * 
+     *
      * @return string|null
      */
     private function getCurrentUserId()
@@ -73,7 +73,7 @@ class InvoiceController extends Controller
             Log::info('✅ Auth::check() passed');
 
             $user = Auth::user();
-            
+
             if (!$user) {
                 Log::warning('❌ Auth::user() returned null');
                 return null;
@@ -86,19 +86,19 @@ class InvoiceController extends Controller
             // Try to get userID property from UserCps model
             $userId = null;
             $method = null;
-            
+
             // Priority 1: Direct property access
             if (isset($user->userID) && !empty($user->userID)) {
                 $userId = $user->userID;
                 $method = 'userID property';
                 Log::info('✅ Found via userID property', ['value' => $userId]);
-            } 
+            }
             // Priority 2: Alternative naming
             elseif (isset($user->user_id) && !empty($user->user_id)) {
                 $userId = $user->user_id;
                 $method = 'user_id property';
                 Log::info('✅ Found via user_id property', ['value' => $userId]);
-            } 
+            }
             // Priority 3: Check NO_ as fallback
             elseif (isset($user->NO_) && !empty($user->NO_)) {
                 $userId = $user->NO_;
@@ -629,7 +629,7 @@ class InvoiceController extends Controller
     /**
      * Prepare invoices from selected delivery orders
      * Compatible with CPS Enterprise 2020 workflow
-     * 
+     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -658,8 +658,17 @@ class InvoiceController extends Controller
             $yyyy = $request->input('year', $now->format('Y'));
             /** @var string $mm */
             $mm = $request->input('month', $now->format('m'));
+
+            // Normalize invoice date so IV_DMY is always stored as DD/MM/YYYY
+            /** @var string $invoiceDateInput */
+            $invoiceDateInput = $payload['invoice_date'] ?? $now->format('Y-m-d');
             /** @var string $invoiceDate */
-            $invoiceDate = $payload['invoice_date'] ?? $now->format('d/m/Y');
+            try {
+                $invoiceDate = \Carbon\Carbon::parse($invoiceDateInput)->format('d/m/Y');
+            } catch (\Exception $e) {
+                // Fallback to current date if parsing fails
+                $invoiceDate = $now->format('d/m/Y');
+            }
             /** @var string|null $taxIndexNo */
             $taxIndexNo = $payload['tax_index_no'] ?? null;
             /** @var string|null $secondRef */
@@ -918,7 +927,7 @@ class InvoiceController extends Controller
                 // This handles cases where DO_Base_Amt is NULL/0 in DO table
                 if ($baseAmount == 0 && $tranAmount > 0) {
                     $baseAmount = round($tranAmount * $exRate, 2);
-                    
+
                     Log::info('✅ Calculated IV_BASE_AMT from IV_TRAN_AMT × EX_RATE', [
                         'tran_amount' => $tranAmount,
                         'ex_rate' => $exRate,
@@ -946,7 +955,7 @@ class InvoiceController extends Controller
 
                 // Get User ID for audit trail with detailed logging
                 $currentUserId = $this->getCurrentUserId();
-                
+
                 Log::info('🔍 DEBUG: User ID for NW_UID', [
                     'returned_value' => $currentUserId,
                     'type' => gettype($currentUserId),
@@ -1937,6 +1946,21 @@ class InvoiceController extends Controller
                 }
             }
 
+            // Calculate payment term and due date (invoice date + AR_TERM days)
+            $paymentTerm = (int) ($invoice->AR_TERM ?? 0);
+            $dueDate = '';
+            if (!empty($invoiceDate)) {
+                try {
+                    $due = \Carbon\Carbon::parse($invoiceDate);
+                    if ($paymentTerm > 0) {
+                        $due->addDays($paymentTerm);
+                    }
+                    $dueDate = $due->format('Y-m-d');
+                } catch (\Exception $e) {
+                    $dueDate = $invoiceDate;
+                }
+            }
+
             return response()->json([
                 'invoice_no' => $invoice->IV_NUM ?? '',
                 'customer_code' => $invoice->AC_NUM ?? '',
@@ -1945,6 +1969,9 @@ class InvoiceController extends Controller
                 'salesperson' => $invoice->SLM ?? '',
                 'currency' => $invoice->CURR ?? 'IDR',
                 'exchange_rate' => (float)($invoice->EX_RATE ?? 0),
+                'payment_term' => $paymentTerm,
+                'due_date' => $dueDate,
+                'tax_invoice_no' => $invoice->TAX_INVOICE_NO ?? ($invoice->TaxInvoiceNo ?? ''),
                 // ✅ UI-only fields (not stored in DB)
                 'exchange_method' => '1', // Default: Multiply (UI display only)
                 'tax_index_no' => '', // UI display only, actual tax stored in IV_TAX_CODE
@@ -1961,6 +1988,10 @@ class InvoiceController extends Controller
                 // ✅ Calculate tax_amount and net_amount on-the-fly (not stored in table)
                 'tax_amount' => $this->calculateTaxAmount($invoice),
                 'net_amount' => $this->calculateNetAmount($invoice),
+                'quantity' => (float)($invoice->IV_QTY ?? 0),
+                'unit_price' => (float)($invoice->IV_UNIT_PRICE ?? 0),
+                'po_number' => $invoice->PO_NUM ?? '',
+                'model' => $invoice->MODEL ?? '',
                 // Related documents (for calculating total if needed)
                 'so_number' => $invoice->SO_NUM ?? '',
                 'do_number' => $invoice->IV_SECOND_REF ?? '',
@@ -2219,7 +2250,7 @@ class InvoiceController extends Controller
                 'Auth::user() exists' => Auth::user() !== null,
                 'user_class' => Auth::user() ? get_class(Auth::user()) : null,
             ]);
-            
+
             // ✅ Validate request - ONLY editable fields that are stored in DB (CPS rules)
             $validated = $request->validate([
                 // Note: exchange_method and tax_index_no are UI-only fields, not validated/stored
@@ -2268,7 +2299,7 @@ class InvoiceController extends Controller
 
             // ✅ Get current user ID for audit trail with fallback
             $currentUserId = $this->getCurrentUserId();
-            
+
             // ✅ Fallback: If getCurrentUserId() returns null, try Auth::id()
             if (empty($currentUserId)) {
                 Log::warning('⚠️ getCurrentUserId() returned null, trying Auth::id() fallback', [
@@ -2276,7 +2307,7 @@ class InvoiceController extends Controller
                     'Auth::check()' => Auth::check(),
                     'Auth::id()' => Auth::id(),
                 ]);
-                
+
                 if (Auth::check() && Auth::id()) {
                     $currentUserId = (string) Auth::id();
                     Log::info('✅ Using Auth::id() as fallback for AM_UID', ['user_id' => $currentUserId]);
@@ -2289,17 +2320,17 @@ class InvoiceController extends Controller
                     ]);
                 }
             }
-            
+
             // Prepare update data with audit trail (WIB timezone)
             $nowWib = $this->getNowWib();
-            
+
             Log::info('✅ AM_UID will be set to', [
                 'invoice_no' => $invoiceNo,
                 'AM_UID' => $currentUserId,
                 'AM_DATE' => $nowWib->format('d/m/Y'),
                 'AM_TIME' => $nowWib->format('H:i'),
             ]);
-            
+
             $updateData = [
                 'AM_UID' => $currentUserId, // ✅ Guaranteed to be non-null
                 'AM_DATE' => $nowWib->format('d/m/Y'),
@@ -2309,10 +2340,10 @@ class InvoiceController extends Controller
             // ✅ Update ONLY editable fields that exist in table (CPS-compatible)
             // Readonly fields: Current Period, Invoice#, Customer, Order Mode, Salesperson, Currency, Exchange Rate, Status
             // Editable fields: Invoice Date, 2nd Reference#, Remark, Tax Code, Tax Percent
-            
+
             // Note: EXCHANGE_METHOD and TAX_INDEX_NO don't exist in table schema
             // These are UI-only fields, not stored in database
-            
+
             if (isset($validated['tax_code'])) {
                 $updateData['IV_TAX_CODE'] = $validated['tax_code'];
             }
@@ -2341,21 +2372,21 @@ class InvoiceController extends Controller
             // ✅ Update amounts - ONLY fields that exist in table
             // Note: IV_TAX_AMT and IV_NET_AMT don't exist in table schema
             // These are calculated fields, not stored in database
-            
+
             if (isset($validated['total_amount'])) {
                 $updateData['IV_TRAN_AMT'] = $validated['total_amount'];
             }
-            
+
             // ✅ CPS Logic: If tax code/percent changed, log calculation (but don't store)
             // Tax amount and net amount are calculated on-the-fly, not stored
             if (isset($validated['tax_code']) || isset($validated['tax_percent'])) {
                 $tranAmount = $invoice->IV_TRAN_AMT ?? ($validated['total_amount'] ?? 0);
                 $taxPercent = $validated['tax_percent'] ?? $invoice->IV_TAX_PERCENT ?? 0;
-                
+
                 if ($tranAmount > 0 && $taxPercent > 0) {
                     $taxAmount = round($tranAmount * ($taxPercent / 100), 2);
                     $netAmount = $tranAmount + $taxAmount;
-                    
+
                     // ✅ Log calculation for debugging (not stored in DB)
                     Log::info('✅ Recalculated tax amounts on amend (not stored)', [
                         'invoice_no' => $invoiceNo,
@@ -2407,7 +2438,7 @@ class InvoiceController extends Controller
 
     /**
      * Resolve tax information from frontend or database
-     * 
+     *
      * @param string|null $taxCodeFromFrontend
      * @param float|null $taxPercentFromFrontend
      * @param string|null $taxIndexNo
@@ -2419,7 +2450,7 @@ class InvoiceController extends Controller
         $taxCode = $taxCodeFromFrontend;
         /** @var float|null $taxPercent */
         $taxPercent = $taxPercentFromFrontend;
-        
+
         if ($taxCode && $taxPercent) {
             Log::info('✅ Using tax data from Final Screen (user confirmed)', [
                 'tax_code' => $taxCode,
@@ -2428,7 +2459,7 @@ class InvoiceController extends Controller
             ]);
             return ['taxCode' => $taxCode, 'taxPercent' => $taxPercent];
         }
-        
+
         if ($taxIndexNo) {
             Log::info('⚠️ Tax not provided from frontend, looking up in database', [
                 'tax_index_no' => $taxIndexNo
@@ -2475,13 +2506,13 @@ class InvoiceController extends Controller
         } else {
             Log::info('ℹ️ No tax information provided (tax-free invoice)');
         }
-        
+
         return ['taxCode' => null, 'taxPercent' => null];
     }
 
     /**
      * Get customer payment term from database
-     * 
+     *
      * @param string|null $customerCode
      * @return int
      */
@@ -2489,17 +2520,17 @@ class InvoiceController extends Controller
     {
         /** @var int $paymentTerm */
         $paymentTerm = 30; // Default: 30 days
-        
+
         if (!$customerCode) {
             return $paymentTerm;
         }
 
         try {
             $customer = DB::table('CUSTOMER')->where('CODE', $customerCode)->first();
-            
+
             if ($customer && isset($customer->TERM) && $customer->TERM > 0) {
                 $paymentTerm = (int) round($customer->TERM);
-                
+
                 Log::info('✅ Payment term found in CUSTOMER table', [
                     'customer' => $customerCode,
                     'term_days' => $paymentTerm,
@@ -2517,19 +2548,19 @@ class InvoiceController extends Controller
                 'customer' => $customerCode
             ]);
         }
-        
+
         Log::info('💰 Final payment term for invoice', [
             'customer' => $customerCode,
             'payment_term' => $paymentTerm,
             'type' => gettype($paymentTerm)
         ]);
-        
+
         return $paymentTerm;
     }
 
     /**
      * Generate or validate invoice number
-     * 
+     *
      * @param string $mode
      * @param string|null $manualNumber
      * @param callable $generator
@@ -2550,18 +2581,18 @@ class InvoiceController extends Controller
         // Auto-generate
         /** @var string $ivNum */
         $ivNum = $generator($seq++);
-        
+
         while (DB::table('INV')->where('IV_NUM', $ivNum)->exists()) {
             $ivNum = $generator($seq++);
         }
-        
+
         Log::info('Generated auto invoice number', ['number' => $ivNum]);
         return $ivNum;
     }
 
     /**
      * Calculate invoice amounts
-     * 
+     *
      * @param \stdClass $do
      * @param float|null $taxPercent
      * @return array{tranAmount: float, baseAmount: float, taxAmount: float, netAmount: float}
@@ -2572,17 +2603,17 @@ class InvoiceController extends Controller
         $tranAmount = $this->toDecimalOrNull($this->getProperty($do, 'DO_Tran_Amt'), 0);
         /** @var float $baseAmount */
         $baseAmount = $this->toDecimalOrNull($this->getProperty($do, 'DO_Base_Amt'), 0);
-        
+
         // Calculate from DO_Qty * Unit_Price if DO_Tran_Amt is 0
         if ($tranAmount == 0) {
             $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
             $unitPrice = $this->toDecimalOrNull($this->getProperty($do, 'SO_Unit_Price'), 0);
             $exRate = $this->toDecimalOrNull($this->getProperty($do, 'Ex_Rate'), 1);
-            
+
             if ($doQty > 0 && $unitPrice > 0) {
                 $tranAmount = round($doQty * $unitPrice, 2);
                 $baseAmount = round($tranAmount * $exRate, 2);
-                
+
                 Log::info('Calculated amounts from DO_Qty × Unit_Price', [
                     'do_qty' => $doQty,
                     'unit_price' => $unitPrice,
