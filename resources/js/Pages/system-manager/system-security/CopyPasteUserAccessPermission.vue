@@ -1,28 +1,17 @@
 <template>
     <AppLayout header="Copy & Paste User Access Permission">
         <Head title="Copy & Paste User Access" />
-        <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            <!-- Animated Bubbles Background -->
-            <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                <div class="bubble bubble-1"></div>
-                <div class="bubble bubble-2"></div>
-                <div class="bubble bubble-3"></div>
-                <div class="bubble bubble-4"></div>
-                <div class="bubble bubble-5"></div>
-                <div class="bubble bubble-6"></div>
-                <div class="bubble bubble-7"></div>
-                <div class="bubble bubble-8"></div>
-            </div>
-            <div class="max-w-5xl mx-auto relative z-10">
+        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden overflow-x-hidden">
+            <div class="max-w-5xl w-full mx-auto relative z-10">
                 <!-- Header Card -->
-                <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8" style="background: linear-gradient(90deg, #2563eb 0%, #4f46e5 50%, #9333ea 100%);">
+                <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
+                    <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 md:p-8">
                         <div class="flex items-center justify-center">
-                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-4 mr-4">
+                            <div class="bg-white/20 rounded-full p-4 mr-4">
                                 <CopyIcon class="h-8 w-8 text-white" />
                             </div>
                             <div class="text-center">
-                                <h1 class="text-3xl font-bold text-white mb-2">Copy & Paste Permissions</h1>
+                                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Copy & Paste Permissions</h1>
                                 <p class="text-blue-100">Transfer user access permissions between users</p>
                             </div>
                         </div>
@@ -30,13 +19,13 @@
                 </div>
 
                 <!-- Main Form -->
-                <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden mb-8">
-                    <div class="p-8 space-y-8">
+                <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden mb-8" style="content-visibility:auto; contain-intrinsic-size: 1px 560px; contain: content;">
+                    <div class="p-4 md:p-8 space-y-6 md:space-y-8">
                         <!-- Copy from User ID Section -->
-                        <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
-                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 rounded-lg mb-6">
+                        <div class="bg-white/80 rounded-xl p-4 md:p-6 border border-white/20">
+                            <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 rounded-lg mb-6">
                                 <h3 class="text-xl font-semibold text-white flex items-center">
-                                    <div class="bg-white/20 backdrop-blur-sm rounded-full p-2 mr-3">
+                                    <div class="bg-white/20 rounded-full p-2 mr-3">
                                         <UserIcon class="h-6 w-6 text-white" />
                                     </div>
                                     Source User (Copy From)
@@ -54,7 +43,7 @@
                                     <input 
                                         v-model="form.copyFromUserId" 
                                         type="text"
-                                        class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                        class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                         placeholder="Enter source User ID..."
                                         @keyup.enter="searchCopyFromUser"
                                     >
@@ -62,7 +51,7 @@
                                 <div class="flex items-end">
                                     <button 
                                         @click="searchCopyFromUser"
-                                        class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-blue-700 hover:to-cyan-700 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300"
+                                        class="inline-flex items-center px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                         :disabled="!form.copyFromUserId"
                                     >
                                         <SearchIcon class="h-6 w-6 mr-3" />
@@ -73,9 +62,9 @@
                         </div>
 
                         <!-- Display Copy From User Info -->
-                        <div v-if="copyFromUser" class="bg-gradient-to-r from-blue-600 to-cyan-600 p-6 rounded-xl shadow-lg animate-fadeIn">
+                        <div v-if="copyFromUser" class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:to-indigo-600 p-4 md:p-6 rounded-xl shadow animate-fadeIn">
                             <div class="flex items-center">
-                                <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
+                                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
                                     {{ copyFromUser.official_name.charAt(0).toUpperCase() }}
                                 </div>
                                 <div class="text-white">
@@ -87,10 +76,10 @@
                         </div>
 
                         <!-- Paste to User ID Section -->
-                        <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
-                            <div class="bg-gradient-to-r from-green-500 to-emerald-500 p-4 rounded-lg mb-6">
+                        <div class="bg-white/80 rounded-xl p-4 md:p-6 border border-white/20">
+                            <div class="bg-green-500 md:bg-gradient-to-r md:from-green-500 md:to-emerald-500 p-4 rounded-lg mb-6">
                                 <h3 class="text-xl font-semibold text-white flex items-center">
-                                    <div class="bg-white/20 backdrop-blur-sm rounded-full p-2 mr-3">
+                                    <div class="bg-white/20 rounded-full p-2 mr-3">
                                         <UserIcon class="h-6 w-6 text-white" />
                                     </div>
                                     Target User (Paste To)
@@ -108,7 +97,7 @@
                                     <input 
                                         v-model="form.pasteToUserId" 
                                         type="text"
-                                        class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                        class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                         placeholder="Enter target User ID..."
                                         @keyup.enter="searchPasteToUser"
                                     >
@@ -116,7 +105,7 @@
                                 <div class="flex items-end">
                                     <button 
                                         @click="searchPasteToUser"
-                                        class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300"
+                                        class="inline-flex items-center px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                         :disabled="!form.pasteToUserId"
                                     >
                                         <SearchIcon class="h-6 w-6 mr-3" />
@@ -127,15 +116,15 @@
                         </div>
 
                         <!-- Display Paste To User Info -->
-                        <div v-if="pasteToUser" class="bg-gradient-to-r from-green-600 to-emerald-600 p-6 rounded-xl shadow-lg animate-fadeIn">
+                        <div v-if="pasteToUser" class="bg-indigo-600 md:bg-gradient-to-r md:from-indigo-600 md:to-purple-600 p-4 md:p-6 rounded-xl shadow animate-fadeIn">
                             <div class="flex items-center">
-                                <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
+                                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
                                     {{ pasteToUser.official_name.charAt(0).toUpperCase() }}
                                 </div>
                                 <div class="text-white">
                                     <h4 class="text-lg font-semibold">{{ pasteToUser.official_name }}</h4>
-                                    <p class="text-green-100">{{ pasteToUser.user_id }} • {{ pasteToUser.official_title || 'No Title' }}</p>
-                                    <p class="text-xs text-green-200 mt-1">✓ Target user selected</p>
+                                    <p class="text-indigo-100">{{ pasteToUser.user_id }} • {{ pasteToUser.official_title || 'No Title' }}</p>
+                                    <p class="text-xs text-indigo-200 mt-1">✓ Target user selected</p>
                                 </div>
                             </div>
                         </div>
@@ -144,7 +133,7 @@
                         <div class="flex justify-center pt-8 border-t border-gray-200">
                             <button 
                                 @click="confirmPaste"
-                                class="inline-flex items-center px-12 py-5 bg-gradient-to-r from-violet-600 to-purple-600 text-white text-xl font-bold rounded-2xl shadow-2xl hover:from-violet-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-violet-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300"
+                                class="inline-flex items-center px-8 py-4 md:px-12 md:py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg md:text-xl font-bold rounded-2xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                 :disabled="!copyFromUser || !pasteToUser || isProcessing"
                             >
                                 <CheckIcon class="h-7 w-7 mr-4" />
@@ -210,7 +199,7 @@
 
                 <!-- Back to User List -->
                 <div class="text-center">
-                    <Link href="/user" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-gray-700 hover:to-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-300 transform hover:scale-105 transition-all duration-300">
+                    <Link href="/user" class="inline-flex items-center px-6 py-3 md:px-8 md:py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
                         <ArrowLeftIcon class="h-6 w-6 mr-3" />
                         Back to User List
                     </Link>
@@ -549,11 +538,11 @@ button:disabled {
     box-shadow: 0 0 0 4px rgba(var(--ring-color), 0.3);
 }
 
-/* Smooth transitions */
-* {
-    transition-property: all;
+/* Smooth transitions (scoped to interactive elements) */
+button, a, input, select, textarea, .transition, .transition-all {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 300ms;
+    transition-duration: 200ms;
 }
 
 /* Mobile responsiveness */

@@ -18,9 +18,10 @@
                 class="sticky top-0 z-10 transition-transform duration-300 ease-out"
                 :class="
                     headerHidden
-                        ? '-translate-y-full -mt-16 shadow-none'
-                        : 'translate-y-0 mt-0 bg-white shadow-sm'
+                        ? '-translate-y-full shadow-none'
+                        : 'translate-y-0 bg-white shadow-sm'
                 "
+                style="height: 4rem"
             >
                 <div class="px-4 sm:px-6 lg:px-8">
                     <div class="flex items-center justify-between h-16">
@@ -122,8 +123,9 @@
             <!-- Page Content -->
             <main
                 ref="scrollArea"
-                class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto"
+                class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto overflow-x-hidden"
                 @click="closeSidebarOnMobile"
+                style="scrollbar-gutter: stable both-edges"
             >
                 <slot></slot>
             </main>

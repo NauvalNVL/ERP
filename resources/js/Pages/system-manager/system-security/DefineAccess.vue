@@ -1,28 +1,17 @@
 <template>
     <AppLayout header="Define User Access Permission">
         <Head title="Define User Access Permission" />
-        <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            <!-- Animated Bubbles Background -->
-            <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                <div class="bubble bubble-1"></div>
-                <div class="bubble bubble-2"></div>
-                <div class="bubble bubble-3"></div>
-                <div class="bubble bubble-4"></div>
-                <div class="bubble bubble-5"></div>
-                <div class="bubble bubble-6"></div>
-                <div class="bubble bubble-7"></div>
-                <div class="bubble bubble-8"></div>
-            </div>
-            <div class="max-w-6xl mx-auto relative z-10">
+        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden overflow-x-hidden">
+            <div class="max-w-6xl w-full mx-auto relative z-10">
                 <!-- Header Card -->
-                <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8" style="background: linear-gradient(90deg, #2563eb 0%, #4f46e5 50%, #9333ea 100%);">
+                <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
+                    <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 md:p-8">
                         <div class="flex items-center justify-center">
-                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-4 mr-4">
+                            <div class="bg-white/20 rounded-full p-4 mr-4">
                                 <ShieldCheckIcon class="h-8 w-8 text-white" />
                             </div>
                             <div class="text-center">
-                                <h1 class="text-3xl font-bold text-white mb-2">User Access Permission</h1>
+                                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">User Access Permission</h1>
                                 <p class="text-blue-100">Define and manage user permissions for system access</p>
                             </div>
                         </div>
@@ -30,18 +19,18 @@
                 </div>
 
                 <!-- Search User Section -->
-                <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden mb-8">
-                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-6">
+                <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden mb-8">
+                    <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
                         <h2 class="text-xl font-semibold text-white flex items-center">
-                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-2 mr-3">
+                            <div class="bg-white/20 rounded-full p-2 mr-3">
                                 <UserIcon class="h-6 w-6 text-white" />
                             </div>
                             Find User
                         </h2>
                         <p class="text-blue-100 text-sm mt-1">Search for user to define permissions</p>
                     </div>
-                    <div class="p-8">
-                        <form @submit.prevent="searchUser" class="flex flex-col lg:flex-row gap-6">
+                    <div class="p-4 md:p-8">
+                        <form @submit.prevent="searchUser" class="flex flex-col lg:flex-row gap-4 md:gap-6">
                             <div class="flex-1">
                                 <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
                                     <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full p-2 mr-3">
@@ -51,14 +40,14 @@
                                 </label>
                                 <input type="text" 
                                        v-model="searchForm.user_id" 
-                                       class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                       class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                        placeholder="Enter User ID (e.g., ADMIN001, USER001)..."
                                        required>
                             </div>
                             <div class="flex items-end">
                                 <button type="submit" 
                                         :disabled="isSearching"
-                                        class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-600 to-teal-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-cyan-700 hover:to-teal-700 focus:outline-none focus:ring-4 focus:ring-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300">
+                                        class="inline-flex items-center px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
                                     <SearchIcon class="h-6 w-6 mr-3" />
                                     {{ isSearching ? 'Searching...' : 'Search User' }}
                                 </button>
@@ -105,16 +94,16 @@
                 </div>
 
                 <!-- User Permission Form -->
-                <div v-if="foundUser" class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden">
+                <div v-if="foundUser" class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden">
                     <!-- User Info Header -->
-                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-8">
+                    <div class="bg-purple-500 md:bg-gradient-to-r md:from-purple-500 md:to-pink-500 p-4 md:p-8">
                         <div class="flex flex-col lg:flex-row items-center justify-between">
                             <div class="flex items-center mb-4 lg:mb-0">
-                                <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white font-bold text-2xl mr-6">
+                                <div class="w-16 h-16 md:w-20 md:h-20 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-2xl mr-4 md:mr-6">
                                     {{ foundUser.official_name.charAt(0).toUpperCase() }}
                                 </div>
                                 <div class="text-center lg:text-left">
-                                    <h3 class="text-2xl font-bold text-white mb-1">{{ foundUser.official_name }}</h3>
+                                    <h3 class="text-xl md:text-2xl font-bold text-white mb-1">{{ foundUser.official_name }}</h3>
                                     <p class="text-purple-100">{{ foundUser.user_id }} • {{ foundUser.official_title || 'No Title' }}</p>
                                     <p class="text-sm text-purple-200 mt-2">
                                         Status: 
@@ -125,7 +114,7 @@
                                 </div>
                             </div>
                             <div class="text-center lg:text-right">
-                                <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+                                <div class="bg-white/20 rounded-xl p-4">
                                     <p class="text-sm text-purple-200 mb-1">Total Permissions</p>
                                     <p class="text-4xl font-bold text-white">{{ selectedPermissionsCount }}</p>
                                     <p class="text-xs text-purple-300">of {{ totalPermissionsCount }}</p>
@@ -133,7 +122,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-8">
+                    <div class="p-4 md:p-8">
 
                     <form @submit.prevent="savePermissions" class="space-y-8">
                         <!-- Select All Toggle -->
@@ -161,14 +150,14 @@
                         <div class="space-y-6">
                             <!-- Dashboard -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                                <div class="dashboard-header bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 border-b border-blue-800">
+                                <div class="dashboard-header bg-gradient-to-r from-blue-600 to-blue-700 px-4 md:px-6 py-4 border-b border-blue-800">
                                     <h4 class="font-semibold text-white flex items-center">
                                         <i class="fas fa-tachometer-alt w-5 h-5 mr-3 text-blue-200"></i>
                                         Dashboard
                                         <span class="ml-auto text-sm text-blue-200">({{ getSelectedCountForCategory('dashboard') }}/{{ getCategoryPermissions('dashboard').length }})</span>
                                     </h4>
                                 </div>
-                                <div class="p-6">
+                                <div class="p-4 md:p-6">
                                     <label class="flex items-center">
                                         <input type="checkbox" v-model="form.permissions.dashboard" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
                                         <span class="ml-3 text-sm text-gray-700">Dashboard Access</span>
@@ -179,7 +168,7 @@
                             <!-- System Manager -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                                 <button @click="toggleCategory('system_manager')" 
-                                        class="system-manager-header w-full bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 border-b border-indigo-800 text-left hover:from-indigo-700 hover:to-indigo-800 transition-all">
+                                        class="system-manager-header w-full bg-gradient-to-r from-indigo-600 to-indigo-700 px-4 md:px-6 py-4 border-b border-indigo-800 text-left hover:from-indigo-700 hover:to-indigo-800 transition-colors">
                                     <h4 class="font-semibold text-white flex items-center">
                                         <i class="fas fa-cogs w-5 h-5 mr-3 text-indigo-200"></i>
                                         System Manager
@@ -187,7 +176,7 @@
                                         <span class="ml-auto text-sm text-indigo-200">({{ getSelectedCountForCategory('system_manager') }}/{{ getCategoryPermissions('system_manager').length }})</span>
                                     </h4>
                                 </button>
-                                <div v-show="openCategories.system_manager" class="p-6 space-y-4">
+                                <div v-show="openCategories.system_manager" class="p-4 md:p-6 space-y-4">
                                     <!-- Main Permission -->
                                     <label class="flex items-center p-3 bg-gray-50 rounded-lg">
                                         <input type="checkbox" v-model="form.permissions.system_manager" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
@@ -195,10 +184,10 @@
                                     </label>
                                     
                                     <!-- Sub Permissions -->
-                                    <div class="ml-6 space-y-3">
+                                    <div class="md:ml-6 ml-3 space-y-3">
                                         <h5 class="text-sm font-medium text-gray-700 mb-3">System Security</h5>
                                         <div class="grid grid-cols-1 gap-2">
-                                            <label class="flex items-center">
+                                            <label class="flex items-center break-words">
                                                 <input type="checkbox" v-model="form.permissions.define_user" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-sm text-gray-700">Define User</span>
                                             </label>
@@ -226,7 +215,7 @@
                             <!-- Sales Management -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                                 <button @click="toggleCategory('sales_management')" 
-                                        class="sales-management-header w-full bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 border-b border-green-800 text-left hover:from-green-700 hover:to-green-800 transition-all">
+                                        class="sales-management-header w-full bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 border-b border-green-800 text-left hover:from-green-700 hover:to-green-800 transition-colors">
                                     <h4 class="font-semibold text-white flex items-center">
                                         <i class="fas fa-chart-line w-5 h-5 mr-3 text-green-200"></i>
                                         Sales Management
@@ -234,7 +223,7 @@
                                         <span class="ml-auto text-sm text-green-200">({{ getSelectedCountForCategory('sales_management') }}/{{ getCategoryPermissions('sales_management').length }})</span>
                                     </h4>
                                 </button>
-                                <div v-show="openCategories.sales_management" class="p-6 space-y-6 max-h-96 overflow-y-auto">
+                                <div v-show="openCategories.sales_management" class="p-4 md:p-6 space-y-6 md:max-h-96 md:overflow-y-auto">
                                     <!-- Main Permission -->
                                     <label class="flex items-center p-3 bg-gray-50 rounded-lg">
                                         <input type="checkbox" v-model="form.permissions.sales_management" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
@@ -242,7 +231,7 @@
                                     </label>
                                     
                                     <!-- Sales Configuration -->
-                                    <div class="border-l-4 border-green-200 pl-4">
+                                    <div class="border-l-0 md:border-l-4 border-green-200 pl-3 md:pl-4">
                                         <h5 class="text-sm font-medium text-gray-700 mb-3">Sales Configuration</h5>
                                         <label class="flex items-center">
                                             <input type="checkbox" v-model="form.permissions.define_sales_configuration" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
@@ -251,9 +240,9 @@
                                     </div>
 
                                     <!-- Standard Requirement -->
-                                    <div class="border-l-4 border-green-200 pl-4">
+                                    <div class="border-l-0 md:border-l-4 border-green-200 pl-3 md:pl-4">
                                         <h5 class="text-sm font-medium text-gray-700 mb-3">Standard Requirement</h5>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:max-h-64 md:overflow-y-auto">
                                             <!-- Basic Define Permissions -->
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_sales_team" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
@@ -462,7 +451,7 @@
                             <!-- Warehouse Management -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                                 <button @click="toggleCategory('warehouse_management')" 
-                                        class="warehouse-management-header w-full bg-gradient-to-r from-yellow-600 to-yellow-700 px-6 py-4 border-b border-yellow-800 text-left hover:from-yellow-700 hover:to-yellow-800 transition-all">
+                                        class="warehouse-management-header w-full bg-gradient-to-r from-yellow-600 to-yellow-700 px-4 md:px-6 py-4 border-b border-yellow-800 text-left hover:from-yellow-700 hover:to-yellow-800 transition-colors">
                                     <h4 class="font-semibold text-white flex items-center">
                                         <i class="fas fa-warehouse w-5 h-5 mr-3 text-yellow-200"></i>
                                         Warehouse Management
@@ -470,7 +459,7 @@
                                         <span class="ml-auto text-sm text-yellow-200">({{ getSelectedCountForCategory('warehouse_management') }}/{{ getCategoryPermissions('warehouse_management').length }})</span>
                                     </h4>
                                 </button>
-                                <div v-show="openCategories.warehouse_management" class="p-6 space-y-4 max-h-96 overflow-y-auto">
+                                <div v-show="openCategories.warehouse_management" class="p-4 md:p-6 space-y-4 md:max-h-96 md:overflow-y-auto">
                                     <!-- Main Permission -->
                                     <label class="flex items-center p-3 bg-gray-50 rounded-lg">
                                         <input type="checkbox" v-model="form.permissions.warehouse_management" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
@@ -480,7 +469,7 @@
                                     <!-- Warehouse Sub Permissions -->
                                     <div class="space-y-4">
                                         <!-- Delivery Order Processing -->
-                                        <div class="border-l-4 border-yellow-200 pl-4">
+                                        <div class="border-l-0 md:border-l-4 border-yellow-200 pl-3 md:pl-4">
                                             <h5 class="text-sm font-medium text-gray-700 mb-3">Delivery Order Processing</h5>
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                 <label class="flex items-center">
@@ -511,7 +500,7 @@
                                         </div>
 
                                         <!-- DORN Processing -->
-                                        <div class="border-l-4 border-yellow-200 pl-4">
+                                        <div class="border-l-0 md:border-l-4 border-yellow-200 pl-3 md:pl-4">
                                             <h5 class="text-sm font-medium text-gray-700 mb-3">DORN Processing</h5>
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                 <label class="flex items-center">
@@ -534,7 +523,7 @@
                                         </div>
 
                                         <!-- Invoice Processing -->
-                                        <div class="border-l-4 border-yellow-200 pl-4">
+                                        <div class="border-l-0 md:border-l-4 border-yellow-200 pl-3 md:pl-4">
                                             <h5 class="text-sm font-medium text-gray-700 mb-3">Invoice Processing</h5>
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                 <label class="flex items-center">
@@ -577,15 +566,15 @@
                         </div>
 
                         <!-- Submit Button -->
-                        <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 justify-end">
                             <Link href="/user" 
-                                class="inline-flex justify-center items-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                                class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                                 <XIcon class="h-5 w-5 mr-2" />
                                 Kembali
                             </Link>
                             <button type="submit" 
                                     :disabled="isSaving"
-                                    class="inline-flex justify-center items-center px-6 py-3 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                                    class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                                 <SaveIcon class="h-5 w-5 mr-2" />
                                 {{ isSaving ? 'Menyimpan...' : 'Simpan Permissions' }}
                             </button>
@@ -1154,11 +1143,11 @@ export default {
     box-shadow: 0 0 0 4px rgba(var(--ring-color), 0.3);
 }
 
-/* Smooth transitions */
-* {
-    transition-property: all;
+/* Scoped smooth transitions for interactive elements only */
+button, a, input, select, textarea, .transition, .transition-all {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 300ms;
+    transition-duration: 200ms;
 }
 
 /* Mobile responsiveness */
@@ -1180,6 +1169,17 @@ export default {
     .text-3xl {
         font-size: 1.875rem;
     }
+    /* Reduce left indent and inner scroll on mobile */
+    .border-l-4 { border-left-width: 0 !important; }
+    .pl-4 { padding-left: 0.75rem !important; }
+    .max-h-96 { max-height: none !important; }
+    .overflow-y-auto { overflow-y: visible !important; }
+}
+
+/* Ensure long permission labels wrap cleanly */
+label.flex.items-center span {
+    overflow-wrap: anywhere;
+    white-space: normal;
 }
 
 /* Explicit gradient definitions for category headers */
