@@ -1,13 +1,15 @@
 <template>
     <!-- Error Modal for MC Model validation -->
-    <div v-if="showErrorModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-96 mx-auto">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-red-600 text-white rounded-t-lg">
-                <h3 class="text-lg font-semibold flex items-center">
+    <div v-if="showErrorModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-2 sm:p-4 md:p-6">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50" @click="$emit('closeErrorModal')"></div>
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm mx-auto relative z-60 max-h-[95vh] flex flex-col">
+            <div class="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-red-600 text-white rounded-t-lg">
+                <h3 class="text-base sm:text-lg font-semibold flex items-center">
                     <i class="fas fa-exclamation-triangle mr-2"></i>Error
                 </h3>
             </div>
-            <div class="p-6">
+            <div class="p-4 sm:p-5">
                 <div class="flex items-center mb-4">
                     <div class="flex-shrink-0 w-10 h-10 mx-auto bg-red-100 rounded-full flex items-center justify-center">
                         <i class="fas fa-times text-red-600 text-xl"></i>
@@ -20,7 +22,7 @@
                     </div>
                 </div>
             </div>
-            <div class="flex justify-end p-4 border-t border-gray-200">
+            <div class="flex justify-end p-3 sm:p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
                 <button
                     @click="$emit('closeErrorModal')"
                     class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
@@ -31,18 +33,21 @@
     </div>
 
     <!-- Setup MC Component Modal -->
-    <div v-if="showSetupMcModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-4/5 lg:w-3/4 max-w-6xl mx-auto flex flex-col max-h-[90vh]">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
-                <h3 class="text-xl font-semibold flex items-center">
-                    <i class="fas fa-cogs mr-3"></i>Setup MC, Component
+    <div v-if="showSetupMcModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-2 sm:p-4 md:p-6">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50" @click="$emit('closeSetupMcModal')"></div>
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-sm sm:max-w-3xl md:max-w-5xl lg:max-w-6xl mx-auto flex flex-col max-h-[95vh] relative z-60">
+            <div class="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                <h3 class="text-base sm:text-xl font-semibold flex items-center">
+                    <i class="fas fa-cogs mr-2 sm:mr-3"></i>
+                    <span class="truncate">Setup MC, Component</span>
                 </h3>
-                <button type="button" @click="$emit('closeSetupMcModal')" class="text-white hover:text-gray-200 focus:outline-none">
-                    <i class="fas fa-times text-xl"></i>
+                <button type="button" @click="$emit('closeSetupMcModal')" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                    <i class="fas fa-times text-lg sm:text-xl"></i>
                 </button>
             </div>
 
-            <div class="p-6 overflow-y-auto flex-grow">
+            <div class="p-4 sm:p-6 overflow-y-auto flex-grow bg-gray-50">
                 <!-- Info Section Above Table -->
                 <div class="mb-6 bg-gray-50 p-4 rounded-lg border">
                     <div class="grid grid-cols-2 gap-4 mb-4">
@@ -65,44 +70,56 @@
                     </div>
                 </div>
                 <!-- Component Table -->
-                <div class="mb-6">
-                    <table class="min-w-full text-sm border border-gray-300">
-                        <thead class="bg-gray-200 text-gray-800">
+                <div class="mb-6 overflow-auto rounded-lg border border-gray-200">
+                    <table class="min-w-full text-sm divide-y divide-gray-200">
+                        <thead class="bg-gray-50 text-gray-600">
                             <tr>
-                                <th class="px-3 py-2 border border-gray-300 text-left">NO</th>
-                                <th class="px-3 py-2 border border-gray-300 text-left">C#</th>
-                                <th class="px-3 py-2 border border-gray-300 text-left">PD</th>
-                                <th class="px-3 py-2 border border-gray-300 text-left">PCS/SET</th>
-                                <th class="px-3 py-2 border border-gray-300 text-left">PART#</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">NO</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">C#</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">PD</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">PCS/SET</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">PART#</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white">
-                            <tr v-for="(component, index) in localComponents" :key="index"
-                                class="hover:bg-gray-100 cursor-pointer"
-                                :class="{ 'bg-yellow-200': selectedComponentIndex === index }"
-                                @click="onSelectComponent(component, index)">
-                                <td class="px-3 py-2 border border-gray-300">{{ String(index + 1).padStart(2, '0') }}</td>
-                                <td class="px-3 py-2 border border-gray-300">{{ component.c_num }}</td>
-                                <td class="px-3 py-2 border border-gray-300">{{ component.pd }}</td>
-                                <td class="px-3 py-2 border border-gray-300">{{ component.pcs_set }}</td>
-                                <td class="px-3 py-2 border border-gray-300">{{ component.part_num }}</td>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr
+                                v-for="(component, index) in localComponents"
+                                :key="index"
+                                class="hover:bg-blue-50 cursor-pointer transition-colors"
+                                :class="selectedComponentIndex === index ? 'bg-blue-100 border-l-4 border-blue-500' : ''"
+                                @click="onSelectComponent(component, index)"
+                            >
+                                <td class="px-3 py-2 text-xs font-medium text-gray-900">{{ String(index + 1).padStart(2, '0') }}</td>
+                                <td class="px-3 py-2 text-xs text-gray-700">{{ component.c_num }}</td>
+                                <td class="px-3 py-2 text-xs text-gray-700">{{ component.pd }}</td>
+                                <td class="px-3 py-2 text-xs text-gray-700">{{ component.pcs_set }}</td>
+                                <td class="px-3 py-2 text-xs text-gray-700">{{ component.part_num }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex justify-between">
+                <div class="flex justify-between items-center mt-2">
                     <div class="space-x-2">
-                        <button type="button" @click="openSetupPd()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                        <button
+                            type="button"
+                            @click="openSetupPd()"
+                            class="py-1.5 sm:py-2 px-3 sm:px-4 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all"
+                        >
                             Setup PD
                         </button>
-                        <button type="button" @click="$emit('setupOthers')" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors">
+                        <button
+                            type="button"
+                            @click="$emit('setupOthers')"
+                            class="py-1.5 sm:py-2 px-3 sm:px-4 bg-purple-500 hover:bg-purple-600 text-white text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all"
+                        >
                             Setup Others
                         </button>
                     </div>
                     <div class="text-xs text-gray-600 self-center" v-if="selectedComponentIndex !== null">
-                        Editing component: <span class="font-semibold">{{ localComponents[selectedComponentIndex]?.c_num }}</span>
+                        Editing component:
+                        <span class="font-semibold">{{ localComponents[selectedComponentIndex]?.c_num }}</span>
                     </div>
                 </div>
             </div>
@@ -113,18 +130,52 @@
     </div>
 
     <!-- MCS Table Modal -->
-    <div v-if="showMcsTableModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+    <div v-if="showMcsTableModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-2 sm:p-4 md:p-6">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50" @click="$emit('closeMcsTableModal')"></div>
         <!-- Modal content -->
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-3/4 max-w-4xl mx-auto flex flex-col max-h-[90vh]">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-sm sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto flex flex-col max-h-[95vh] relative z-60">
             <!-- Modal header -->
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-                <h3 class="text-xl font-semibold flex items-center">
-                    <i class="fas fa-id-card mr-3"></i>Master Card Table
-                </h3>
-                <div class="flex space-x-3 items-center">
-                    <div class="text-white text-sm mr-2">
-                        <span class="mr-2">Sort:</span>
-                        <select :value="mcsSortOption" @change="handleSortOptionChange" class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs">
+            <div class="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                <div class="flex items-center">
+                    <div class="p-1.5 sm:p-2 bg-white bg-opacity-30 rounded-lg mr-2 sm:mr-3">
+                        <i class="fas fa-id-card text-sm sm:text-base"></i>
+                    </div>
+                    <h3 class="text-base sm:text-xl font-semibold truncate">Master Card Table</h3>
+                </div>
+                <button type="button" @click="$emit('closeMcsTableModal')" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                    <i class="fas fa-times text-lg sm:text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-3 sm:p-4 md:p-5 overflow-y-auto flex-grow">
+                <!-- Search Bar -->
+                <div class="mb-3 sm:mb-4">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                            <i class="fas fa-search text-sm"></i>
+                        </span>
+                        <input
+                            type="text"
+                            :value="mcsSearchTerm"
+                            placeholder="Search..."
+                            @input="$emit('updateSearchTerm', $event.target.value)"
+                            @keyup.enter="$emit('fetchMcsData')"
+                            class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-xs sm:text-sm shadow-sm"
+                        />
+                    </div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="mb-3 sm:mb-4 flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-600 mb-1">Sort By:</label>
+                        <select
+                            :value="mcsSortOption"
+                            @change="handleSortOptionChange"
+                            class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs sm:text-sm focus:ring-blue-500 focus:border-blue-500"
+                        >
                             <option value="mc_seq">MC Seq#</option>
                             <option value="mc_model">MC Model</option>
                             <option value="part_no">MC PD Part#</option>
@@ -132,48 +183,28 @@
                             <option value="int_dim_1">MC PD ID</option>
                         </select>
                     </div>
-                    <div class="text-white text-sm">
-                        <span class="mr-2">Order:</span>
+                    <div class="w-full sm:w-32 md:w-40">
+                        <label class="block text-xs text-gray-600 mb-1">Order:</label>
                         <select
                             :value="mcsSortOrder"
                             @input="$emit('update:mcsSortOrder', $event.target.value); $emit('fetchMcsData')"
-                            class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs"
+                            class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs sm:text-sm focus:ring-blue-500 focus:border-blue-500"
                         >
                             <option value="asc">Asc</option>
                             <option value="desc">Desc</option>
                         </select>
                     </div>
-                    <div class="text-white text-sm">
-                        <span class="mr-2">Status:</span>
+                    <div class="w-full sm:w-40">
+                        <label class="block text-xs text-gray-600 mb-1">Status:</label>
                         <select
                             :value="mcsStatusFilter"
                             @input="$emit('update:mcsStatusFilter', $event.target.value); $emit('fetchMcsData')"
-                            class="bg-blue-700 text-white border border-blue-500 rounded px-1 py-0.5 text-xs"
+                            class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs sm:text-sm focus:ring-blue-500 focus:border-blue-500"
                         >
                             <option value="Act">Active</option>
                             <option value="Obsolete">Obsolete</option>
                             <option value="all">All</option>
                         </select>
-                    </div>
-                    <button type="button" @click="$emit('closeMcsTableModal')" class="text-white hover:text-gray-200 focus:outline-none">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Modal Body -->
-            <div class="p-2 overflow-y-auto flex-grow" style="max-height: 60vh;">
-                <div class="mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div class="relative w-full md:w-64">
-                        <input
-                            type="text"
-                            :value="mcsSearchTerm"
-                            placeholder="Search..."
-                            @input="$emit('updateSearchTerm', $event.target.value)"
-                            @keyup.enter="$emit('fetchMcsData')"
-                            class="border border-gray-300 rounded-md py-1 px-2 text-xs focus:ring-blue-500 focus:border-blue-500 w-full shadow-sm"
-                        />
-                        <i class="fas fa-search absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     </div>
                 </div>
 
@@ -194,54 +225,55 @@
                     No master card records found. Please adjust your filter criteria.
                 </div>
 
-                <table v-else class="min-w-full text-xs border border-gray-300">
-                    <thead class="bg-gray-200 sticky top-0">
+                <div v-else class="overflow-auto rounded-lg border border-gray-200 flex-1 min-h-0">
+                    <table class="w-full divide-y divide-gray-200 text-xs" id="masterCardDataTable" style="min-width: 650px;">
+                        <thead class="bg-gray-50 sticky top-0">
                         <tr v-if="mcsSortOption === 'mc_model'">
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">M/Card Seq#</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Model</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">M/Card Seq#</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Status</th>
                         </tr>
                         <tr v-else-if="mcsSortOption === 'part_no'">
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part No</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comp#</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Part No</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">MC Seq#</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Comp#</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">P/Design</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Status</th>
                         </tr>
                         <tr v-else-if="mcsSortOption === 'ext_dim_1'">
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ext. Dimension</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comp#</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Ext. Dimension</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">MC Seq#</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Comp#</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">P/Design</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Model</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Status</th>
                         </tr>
                         <tr v-else-if="mcsSortOption === 'int_dim_1'">
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Int. Dimension</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Seq#</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comp#</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P/Design</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Int. Dimension</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">MC Seq#</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Comp#</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">P/Design</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Model</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Status</th>
                         </tr>
                         <tr v-else>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">M/Card Seq#</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comp#</th>
-                            <th class="px-2 py-1 border border-gray-300 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">M/Card Seq#</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Model</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Part</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Comp#</th>
+                            <th class="px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white divide-y divide-gray-200 text-xs">
                         <tr v-for="mcs in mcsMasterCards" :key="mcs.seq"
-                            class="hover:bg-blue-100 cursor-pointer"
-                            :class="{ 'bg-blue-200': selectedMcs?.seq === mcs.seq }"
+                            class="hover:bg-blue-50 cursor-pointer transition-colors"
+                            :class="selectedMcs?.seq === mcs.seq ? 'bg-blue-100 border-l-4 border-blue-500' : ''"
                             @click="$emit('selectMcsItem', mcs)"
                             @dblclick="$emit('selectMcs', mcs)">
                             <template v-if="mcsSortOption === 'mc_model'">
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
-                                <td class="px-2 py-1 border border-gray-300">
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.model }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.seq }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">
                                     <span
                                         :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                                         class="px-2 py-0.5 rounded-full text-xs">
@@ -250,11 +282,11 @@
                                 </td>
                             </template>
                             <template v-else-if="mcsSortOption === 'part_no'">
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.part }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.p_design }}</td>
-                                <td class="px-2 py-1 border border-gray-300">
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.part }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.seq }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.comp }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.p_design }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">
                                     <span
                                         :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                                         class="px-2 py-0.5 rounded-full text-xs">
@@ -263,12 +295,12 @@
                                 </td>
                             </template>
                             <template v-else-if="mcsSortOption === 'ext_dim_1'">
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.ext_dim_1 }}x{{ mcs.ext_dim_2 }}x{{ mcs.ext_dim_3 }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.p_design }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
-                                <td class="px-2 py-1 border border-gray-300">
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.ext_dim_1 }}x{{ mcs.ext_dim_2 }}x{{ mcs.ext_dim_3 }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.seq }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.comp }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.p_design }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.model }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">
                                     <span
                                         :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                                         class="px-2 py-0.5 rounded-full text-xs">
@@ -277,12 +309,12 @@
                                 </td>
                             </template>
                             <template v-else-if="mcsSortOption === 'int_dim_1'">
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.int_dim_1 }}x{{ mcs.int_dim_2 }}x{{ mcs.int_dim_3 }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.p_design }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
-                                <td class="px-2 py-1 border border-gray-300">
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.int_dim_1 }}x{{ mcs.int_dim_2 }}x{{ mcs.int_dim_3 }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.seq }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.comp }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.p_design }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.model }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">
                                     <span
                                         :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                                         class="px-2 py-0.5 rounded-full text-xs">
@@ -291,11 +323,11 @@
                                 </td>
                             </template>
                             <template v-else>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.seq }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.model }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.part }}</td>
-                                <td class="px-2 py-1 border border-gray-300">{{ mcs.comp }}</td>
-                                <td class="px-2 py-1 border border-gray-300">
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.seq }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.model }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.part }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">{{ mcs.comp }}</td>
+                                <td class="px-2 sm:px-4 md:px-6 py-2 sm:py-3">
                                     <span
                                         :class="(mcs.status === 'Act' || mcs.status === 'Active') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                                         class="px-2 py-0.5 rounded-full text-xs">
@@ -305,7 +337,8 @@
                             </template>
                         </tr>
                     </tbody>
-                </table>
+                    </table>
+                </div>
 
                 <!-- Detail Fields for MC PD Part# Sort Option -->
                 <div v-if="mcsSortOption === 'part_no'" class="mt-4 border border-gray-400 rounded bg-white">
@@ -415,33 +448,66 @@
             </div>
 
             <!-- Modal Footer -->
-            <div class="flex items-center justify-end gap-2 p-2 border-t border-gray-200 bg-gray-100 rounded-b-lg flex-shrink-0">
-                <div class="text-xs text-gray-500 mr-auto" v-if="mcsMasterCards.length > 0">
-                    {{ mcsMasterCards.length }} records found
+            <div class="border-t border-gray-200 bg-gray-100 rounded-b-lg flex-shrink-0 p-3">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                    <div class="text-xs text-gray-500" v-if="mcsMasterCards.length > 0">
+                        {{ mcsMasterCards.length }} records found · Page {{ mcsCurrentPage }} of {{ mcsLastPage }}
+                    </div>
+                    <div class="text-xs text-gray-500 italic hidden md:block">
+                        Click row to select, double-click to select and close.
+                    </div>
                 </div>
-                <!-- Pagination -->
-                <button @click="$emit('goToMcsPage', mcsCurrentPage - 1)" :disabled="mcsCurrentPage === 1" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed"><i class="fas fa-chevron-left"></i> Previous</button>
-                <span class="text-gray-600 text-xs">Page {{ mcsCurrentPage }} of {{ mcsLastPage }}</span>
-                <button @click="$emit('goToMcsPage', mcsCurrentPage + 1)" :disabled="mcsCurrentPage === mcsLastPage" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed">Next <i class="fas fa-chevron-right"></i></button>
-
-                <button
-                    @click="$emit('selectMcs', selectedMcs)"
-                    :disabled="!selectedMcs"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed">
-                    Select
-                </button>
-                <button type="button" @click="$emit('closeMcsTableModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-3 rounded text-xs">Exit</button>
+                <div class="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
+                    <button
+                        type="button"
+                        @click="$emit('goToMcsPage', mcsCurrentPage - 1)"
+                        :disabled="mcsCurrentPage === 1"
+                        class="py-1.5 sm:py-2 px-2 sm:px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all disabled:opacity-50 disabled:cursor-not-allowed text-gray-800"
+                    >
+                        <i class="fas fa-chevron-left mr-1"></i>
+                        Previous
+                    </button>
+                    <button
+                        type="button"
+                        @click="$emit('goToMcsPage', mcsCurrentPage + 1)"
+                        :disabled="mcsCurrentPage === mcsLastPage"
+                        class="py-1.5 sm:py-2 px-2 sm:px-3 bg-gray-100 border border-gray-400 hover:bg-gray-200 text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all disabled:opacity-50 disabled:cursor-not-allowed text-gray-800"
+                    >
+                        Next
+                        <i class="fas fa-chevron-right ml-1"></i>
+                    </button>
+                    <button
+                        type="button"
+                        @click="$emit('selectMcs', selectedMcs)"
+                        :disabled="!selectedMcs"
+                        class="py-1.5 sm:py-2 px-2 sm:px-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed text-white text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all"
+                    >
+                        <i class="fas fa-check mr-1"></i>
+                        Select
+                    </button>
+                    <button
+                        type="button"
+                        @click="$emit('closeMcsTableModal')"
+                        class="py-1.5 sm:py-2 px-2 sm:px-3 bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs rounded-md sm:rounded-lg transform active:translate-y-px transition-all"
+                    >
+                        <i class="fas fa-times mr-1"></i>
+                        Exit
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Setup PD Modal -->
-    <div v-if="showSetupPdModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-5/6 lg:w-11/12 max-w-7xl mx-auto flex flex-col max-h-[95vh]">
+    <div v-if="showSetupPdModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-2 sm:p-4 md:p-6">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50" @click="$emit('closeSetupPdModal')"></div>
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-sm sm:max-w-4xl md:max-w-6xl mx-auto flex flex-col max-h-[95vh] relative z-60">
             <!-- Modal Header -->
-            <div class="flex items-center justify-between p-3 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-                <h3 class="text-lg font-semibold flex items-center">
-                    <i class="fas fa-cogs mr-2"></i>Setup MC, PD
+            <div class="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                <h3 class="text-base sm:text-lg font-semibold flex items-center">
+                    <i class="fas fa-cogs mr-2 sm:mr-3"></i>
+                    <span class="truncate">Setup MC, PD</span>
                 </h3>
                 <div class="flex space-x-2">
                     <button type="button" class="text-white hover:text-red-300 focus:outline-none">
@@ -450,8 +516,8 @@
                     <button type="button" class="text-white hover:text-green-300 focus:outline-none">
                         <i class="fas fa-file text-lg"></i>
                     </button>
-                    <button type="button" @click="$emit('closeSetupPdModal')" class="text-white hover:text-gray-200 focus:outline-none">
-                        <i class="fas fa-times text-lg"></i>
+                    <button type="button" @click="$emit('closeSetupPdModal')" class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px">
+                        <i class="fas fa-times text-lg sm:text-xl"></i>
                     </button>
                 </div>
             </div>
