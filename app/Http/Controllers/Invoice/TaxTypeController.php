@@ -28,8 +28,11 @@ class TaxTypeController extends Controller
     public function getTaxTypes()
     {
         try {
-            $taxTypes = TaxType::orderBy('code')->get();
-            
+            // Only return active tax types by default
+            $taxTypes = TaxType::where('status', 'A')
+                ->orderBy('code')
+                ->get();
+
             return response()->json([
                 'success' => true,
                 'data' => $taxTypes
@@ -52,7 +55,7 @@ class TaxTypeController extends Controller
     {
         try {
             $taxType = TaxType::where('code', $code)->first();
-            
+
             if (!$taxType) {
                 return response()->json([
                     'success' => false,
@@ -87,6 +90,7 @@ class TaxTypeController extends Controller
                 'apply' => 'required|in:Y,N',
                 'rate' => 'required|numeric|min:0|max:100',
                 'custom_type' => 'required|string|max:50',
+                'status' => 'sometimes|in:A,O',
             ]);
 
             if ($validator->fails()) {
@@ -103,6 +107,7 @@ class TaxTypeController extends Controller
                 'apply' => $request->apply,
                 'rate' => $request->rate,
                 'custom_type' => $request->custom_type,
+                'status' => $request->input('status', 'A'),
             ]);
 
             return response()->json([
@@ -143,6 +148,7 @@ class TaxTypeController extends Controller
                 'apply' => 'required|in:Y,N',
                 'rate' => 'required|numeric|min:0|max:100',
                 'custom_type' => 'required|string|max:50',
+                'status' => 'sometimes|in:A,O',
             ]);
 
             if ($validator->fails()) {
@@ -158,6 +164,7 @@ class TaxTypeController extends Controller
                 'apply' => $request->apply,
                 'rate' => $request->rate,
                 'custom_type' => $request->custom_type,
+                'status' => $request->input('status', $taxType->status ?? 'A'),
             ]);
 
             return response()->json([
@@ -192,7 +199,8 @@ class TaxTypeController extends Controller
                 ], 404);
             }
 
-            $taxType->delete();
+            // Soft delete: mark as obsolete instead of physically deleting
+            $taxType->update(['status' => 'O']);
 
             return response()->json([
                 'success' => true,

@@ -49,6 +49,7 @@ class TaxType extends Model
         'rate',
         'custom_type',
         'tax_group_code',
+        'status',
     ];
 
     /**

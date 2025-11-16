@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('rate', 8, 2)->default(0.00);
             $table->string('custom_type', 50)->default('N-NIL');
             $table->string('tax_group_code', 20)->nullable(); // Relation to tax_groups
+            $table->char('status', 1)->default('A');
             $table->timestamps();
         });
     }

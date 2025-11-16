@@ -37,10 +37,12 @@
                     <thead class="bg-gray-100 border-b-2 border-gray-300">
                         <tr>
                             <th class="px-3 py-2 text-left font-semibold border-r w-16">No</th>
+                            <th class="px-3 py-2 text-left font-semibold border-r w-16">Seq</th>
                             <th class="px-3 py-2 text-left font-semibold border-r w-32">Tax Code</th>
                             <th class="px-3 py-2 text-left font-semibold border-r">Tax Name</th>
-                            <th class="px-3 py-2 text-left font-semibold border-r w-24">Tax Apply</th>
-                            <th class="px-3 py-2 text-left font-semibold border-r w-24">Tax %</th>
+                            <th class="px-3 py-2 text-center font-semibold border-r w-20">Apply</th>
+                            <th class="px-3 py-2 text-center font-semibold border-r w-24">Include</th>
+                            <th class="px-3 py-2 text-right font-semibold border-r w-24">Tax %</th>
                             <th class="px-3 py-2 text-left font-semibold w-32">Compute Item</th>
                         </tr>
                     </thead>
@@ -53,15 +55,41 @@
                             class="cursor-pointer border-b"
                         >
                             <td class="px-3 py-2 border-r">{{ String(index + 1).padStart(2, '0') }}</td>
+                            <td class="px-3 py-2 border-r text-center">
+                                <input
+                                    type="number"
+                                    v-model.number="item.sequence"
+                                    min="1"
+                                    class="w-14 px-1 py-0.5 text-xs border rounded text-center bg-white"
+                                    @click.stop
+                                />
+                            </td>
                             <td class="px-3 py-2 border-r font-mono">{{ item.code }}</td>
                             <td class="px-3 py-2 border-r">{{ item.name }}</td>
-                            <td class="px-3 py-2 border-r text-center">{{ item.apply }}</td>
+                            <td class="px-3 py-2 border-r text-center">
+                                <input
+                                    type="checkbox"
+                                    v-model="item.apply"
+                                    class="h-4 w-4"
+                                    @click.stop
+                                />
+                            </td>
+                            <td class="px-3 py-2 border-r text-center">
+                                <input
+                                    type="checkbox"
+                                    v-model="item.include"
+                                    class="h-4 w-4"
+                                    @click.stop
+                                />
+                            </td>
                             <td class="px-3 py-2 border-r text-right">{{ Number(item.rate).toFixed(2) }}</td>
                             <td class="px-3 py-2">{{ item.custom_type || 'Nil' }}</td>
                         </tr>
                         <!-- Empty rows for visual (up to 10) -->
                         <tr v-for="n in Math.max(0, 10 - taxTypes.length)" :key="'empty-' + n" class="border-b">
                             <td class="px-3 py-2 border-r text-center text-gray-400">{{ String(taxTypes.length + n).padStart(2, '0') }}</td>
+                            <td class="px-3 py-2 border-r"></td>
+                            <td class="px-3 py-2 border-r"></td>
                             <td class="px-3 py-2 border-r"></td>
                             <td class="px-3 py-2 border-r"></td>
                             <td class="px-3 py-2 border-r"></td>
@@ -185,20 +213,23 @@ const loadTaxTypes = async () => {
         originalTaxTypes.value = [];
         return;
     }
-    
+
     try {
         const res = await axios.get(`/api/invoices/tax-groups/${props.taxGroupCode}/tax-types`);
         console.log('Tax Item Screen - API Response:', res.data);
-        
+
         if (res.data && res.data.success) {
             const data = res.data.data || [];
-            // Map data to match expected format
-            taxTypes.value = data.map(item => ({
+            // Map data to match expected format (including sequence/apply/include)
+            taxTypes.value = data.map((item, index) => ({
                 code: item.code || item.tax_code,
                 name: item.name || item.tax_name,
-                apply: item.apply || item.tax_apply || 'Y',
+                // store as boolean for easier binding
+                apply: item.apply === true || item.apply === 'Y',
+                include: item.include === true || item.include === 'Y',
                 rate: item.rate || item.tax_rate || 0,
-                custom_type: item.custom_type || 'Nil'
+                custom_type: item.custom_type || 'Nil',
+                sequence: item.sequence ?? (index + 1),
             }));
             // Store original for comparison
             originalTaxTypes.value = JSON.parse(JSON.stringify(taxTypes.value));
@@ -218,9 +249,17 @@ const loadAvailableTaxTypes = async () => {
     try {
         const res = await axios.get('/api/invoices/tax-types');
         console.log('Available Tax Types - API Response:', res.data);
-        
+
         if (res.data && res.data.success) {
-            availableTaxTypes.value = res.data.data || [];
+            const data = res.data.data || [];
+            // Normalize available tax types
+            availableTaxTypes.value = data.map(item => ({
+                code: item.code,
+                name: item.name,
+                apply: item.apply === 'Y' || item.apply === true,
+                rate: item.rate || 0,
+                custom_type: item.custom_type || 'Nil',
+            }));
             console.log('✅ Loaded available tax types:', availableTaxTypes.value.length);
         } else {
             availableTaxTypes.value = [];
@@ -245,16 +284,24 @@ const selectTaxTypeFromTable = (taxType) => {
     if (!taxType) {
         return;
     }
-    
+
     // Check if already exists
     const exists = taxTypes.value.some(t => t.code === taxType.code);
     if (exists) {
         alert(`Tax type "${taxType.code}" is already added to this group.`);
         return;
     }
-    
-    // Add to list
-    taxTypes.value.push(taxType);
+
+    // Add to list with default CPS-style attributes
+    taxTypes.value.push({
+        code: taxType.code,
+        name: taxType.name,
+        apply: taxType.apply === true || taxType.apply === 'Y',
+        include: false,
+        rate: taxType.rate || 0,
+        custom_type: taxType.custom_type || 'Nil',
+        sequence: taxTypes.value.length + 1,
+    });
     showTaxTypeTableModal.value = false;
     console.log('✅ Added tax type:', taxType.code);
 };
@@ -264,11 +311,11 @@ const deleteSelectedTaxType = () => {
         alert('Please select a tax type to delete.');
         return;
     }
-    
+
     if (!confirm(`Remove tax type "${selectedRow.value}" from this group?`)) {
         return;
     }
-    
+
     taxTypes.value = taxTypes.value.filter(t => t.code !== selectedRow.value);
     selectedRow.value = null;
     console.log('✅ Deleted tax type');
@@ -279,17 +326,24 @@ const saveTaxItems = async () => {
         alert('No tax group selected.');
         return;
     }
-    
+
     if (!confirm('Confirm Saving / Updating ?')) {
         return;
     }
-    
+
     try {
-        const taxTypeCodes = taxTypes.value.map(t => t.code);
+        // Build detailed tax_items payload for CPS-style configuration
+        const taxItemsPayload = taxTypes.value.map((t, index) => ({
+            tax_type_code: t.code,
+            sequence: t.sequence ?? (index + 1),
+            apply: !!t.apply,
+            include: !!t.include,
+        }));
+
         const response = await axios.post(`/api/invoices/tax-groups/${props.taxGroupCode}/tax-types`, {
-            tax_type_codes: taxTypeCodes
+            tax_items: taxItemsPayload,
         });
-        
+
         if (response.data && response.data.success) {
             alert('Tax items saved successfully!');
             originalTaxTypes.value = JSON.parse(JSON.stringify(taxTypes.value));

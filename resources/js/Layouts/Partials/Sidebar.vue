@@ -209,12 +209,12 @@ const isActive = (route) => {
 // Check if user has permission for a specific menu
 const hasPermission = (menuKey) => {
   if (!user.value) return false;
-  
+
   // Temporary: Allow define_machine and obsolete_unobsolete_paper_quality for testing
   if (menuKey === 'define_machine' || menuKey === 'view_print_machine' || menuKey === 'obsolete_unobsolete_paper_quality') {
     return true;
   }
-  
+
   return userPermissions.value.includes(menuKey);
 };
 
@@ -700,7 +700,7 @@ const warehouseManagementItems = [
         icon: 'fas fa-tasks',
         children: [
           { title: 'Prepare Invoice by D/Order (Current Period)', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice/iv-processing/prepare-by-do-current-period' },
-          { title: 'Prepare Invoice by D/Order (Open Period)', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice/iv-processing/prepare-do-open' },
+          { title: 'Prepare Invoice by D/Order (Open Period)', icon: 'fas fa-file-invoice', route: '/warehouse-management/invoice/iv-processing/prepare-by-do-open-period' },
           { title: 'Print Invoice', icon: 'fas fa-print', route: '/warehouse-management/invoice/iv-processing/print-invoice' },
           { title: 'Amend Invoice', icon: 'fas fa-edit', route: '/warehouse-management/invoice/iv-processing/amend-invoice' },
           { title: 'Cancel Active Invoice', icon: 'fas fa-times-circle', route: '/warehouse-management/invoice/iv-processing/cancel-active-invoice' },

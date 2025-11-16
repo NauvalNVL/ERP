@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('product_group_code', 20);
             $table->boolean('tie_up_enabled')->default(false);
             $table->timestamps();
-            
+
             // Composite unique key
             $table->unique(['customer_code', 'index_number', 'product_group_code'], 'cust_idx_pg_unique');
-            
+
             // Indexes
             $table->index(['customer_code', 'index_number']);
             $table->index('product_group_code');

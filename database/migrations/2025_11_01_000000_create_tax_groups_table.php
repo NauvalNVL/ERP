@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('code', 20)->primary();
             $table->string('name', 100);
             $table->char('sales_tax_applied', 1)->default('Y'); // Y or N
+            $table->char('status', 1)->default('A');
             $table->timestamps();
         });
     }

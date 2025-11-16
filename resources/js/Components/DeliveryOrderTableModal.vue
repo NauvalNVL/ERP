@@ -66,8 +66,8 @@
                           @click="toggleSelection(order)"
                           :class="[
                             'cursor-pointer transition-all duration-150',
-                            isSelected(order.do_number) 
-                              ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md transform scale-[1.01]' 
+                            isSelected(order.do_number)
+                              ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md transform scale-[1.01]'
                               : 'hover:bg-blue-50 hover:shadow-sm'
                           ]"
                         >
@@ -97,10 +97,10 @@
                               <!-- DO Status Badge -->
                               <span :class="[
                                 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                                isSelected(order.do_number) 
-                                  ? 'bg-white bg-opacity-20 text-white' 
-                                  : order.status === 'Draft' 
-                                    ? 'bg-yellow-100 text-yellow-800' 
+                                isSelected(order.do_number)
+                                  ? 'bg-white bg-opacity-20 text-white'
+                                  : order.status === 'Draft'
+                                    ? 'bg-yellow-100 text-yellow-800'
                                     : 'bg-green-100 text-green-800'
                               ]">
                                 {{ order.status || 'Draft' }}
@@ -147,9 +147,9 @@
                   <div class="mb-3">
                     <div class="flex items-center gap-2">
                       <label class="text-xs font-semibold text-gray-700 w-32">D/Order#:</label>
-                      <input 
-                        v-model="filters.doNumber" 
-                        type="text" 
+                      <input
+                        v-model="filters.doNumber"
+                        type="text"
                         @keyup.enter="applyFilters"
                         placeholder="Type D/O number and press Enter"
                         class="flex-1 max-w-xs px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"
@@ -189,9 +189,9 @@
                   <div class="mb-3">
                     <div class="flex items-center gap-2">
                       <label class="text-xs font-semibold text-gray-700 w-32">Order Mode:</label>
-                      <input 
-                        v-model="filters.orderModeText" 
-                        type="text" 
+                      <input
+                        v-model="filters.orderModeText"
+                        type="text"
                         readonly
                         class="flex-1 px-2 py-1 bg-gray-50 border border-gray-300 rounded text-sm"
                         placeholder="D-Order by Customer + Deliver & Invoice to Customer"
@@ -254,13 +254,13 @@
 
                 <!-- Action Buttons in Content -->
                 <div class="mt-6 flex justify-center gap-3">
-                  <button 
-                    @click="handleClose" 
+                  <button
+                    @click="handleClose"
                     class="px-6 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all font-medium shadow-sm"
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     @click="handleSelect"
                     :disabled="selectedCount === 0"
                     class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 flex items-center gap-2"
@@ -289,7 +289,8 @@ const props = defineProps({
   customerCode: { type: String, default: '' },
   customerName: { type: String, default: '' },
   periodMonth: { type: String, default: '' },
-  periodYear: { type: String, default: '' }
+  periodYear: { type: String, default: '' },
+  openPeriod: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['close', 'select'])
@@ -354,16 +355,19 @@ const fetchDeliveryOrders = async () => {
     // Optional customer filter
     if (props.customerCode) params.append('customer_code', props.customerCode)
 
-    // Build from/to date (YYYY-MM-DD) for the given month/year
-    const month = String(props.periodMonth || filters.value.currentPeriodMonth).padStart(2, '0')
-    const year = String(props.periodYear || filters.value.currentPeriodYear)
-    if (month && year) {
-      const fromDate = `${year}-${month}-01`
-      // Compute last day of month
-      const lastDay = new Date(Number(year), Number(month), 0).getDate()
-      const toDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`
-      params.append('from_date', fromDate)
-      params.append('to_date', toDate)
+    // In openPeriod mode, do NOT restrict by month/year (no from_date/to_date)
+    if (!props.openPeriod) {
+      // Build from/to date (YYYY-MM-DD) for the given month/year
+      const month = String(props.periodMonth || filters.value.currentPeriodMonth).padStart(2, '0')
+      const year = String(props.periodYear || filters.value.currentPeriodYear)
+      if (month && year) {
+        const fromDate = `${year}-${month}-01`
+        // Compute last day of month
+        const lastDay = new Date(Number(year), Number(month), 0).getDate()
+        const toDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`
+        params.append('from_date', fromDate)
+        params.append('to_date', toDate)
+      }
     }
 
     const url = `/api/delivery-orders?${params.toString()}`
@@ -436,7 +440,7 @@ const isSelected = (doNumber) => {
 
 const toggleSelection = (item) => {
   const index = selectedDOs.value.findIndex(d => d.do_number === item.do_number)
-  
+
   if (index > -1) {
     // Clicking same row - deselect
     selectedDOs.value = []
@@ -455,20 +459,20 @@ const toggleSelection = (item) => {
  */
 const searchByDoNumber = async () => {
   const doNum = filters.value.doNumber?.trim()
-  
+
   if (!doNum) {
     console.warn('⚠️ No D/Order# provided for search')
     return
   }
-  
+
   console.log('🔍 Searching for D/Order#:', doNum)
-  
+
   try {
     // Search in existing loaded orders first
-    const existingOrder = deliveryOrders.value.find(o => 
+    const existingOrder = deliveryOrders.value.find(o =>
       o.do_number === doNum || o.do_number.includes(doNum)
     )
-    
+
     if (existingOrder) {
       console.log('✅ Found in loaded orders:', existingOrder.do_number)
       // Select and populate
@@ -476,35 +480,35 @@ const searchByDoNumber = async () => {
       populateFormFields(existingOrder)
       return
     }
-    
+
     // If not found, fetch from API
     console.log('🌐 Fetching from API...')
     const params = new URLSearchParams()
     params.append('do_number', doNum)
-    
+
     // Add period if available
     if (props.periodMonth && props.periodYear) {
       params.append('period_month', props.periodMonth)
       params.append('period_year', props.periodYear)
     }
-    
+
     const url = `/api/invoices/delivery-orders?${params.toString()}`
     const res = await fetch(url, {
       headers: { 'Accept': 'application/json' }
     })
-    
+
     if (res.ok) {
       const data = await res.json()
-      
+
       if (data && data.length > 0) {
         const foundOrder = data[0]
         console.log('✅ Found via API:', foundOrder.do_number)
-        
+
         // Add to loaded orders if not already there
         if (!deliveryOrders.value.some(o => o.do_number === foundOrder.do_number)) {
           deliveryOrders.value.unshift(foundOrder)
         }
-        
+
         // Select and populate
         selectedDOs.value = [foundOrder]
         populateFormFields(foundOrder)
@@ -540,10 +544,10 @@ const handleSelect = () => {
     const selectedDO = selectedDOs.value[0]
     console.log('📤 Emitting selected DO:', selectedDO.do_number)
     console.log('📋 Table modal will close, Screen modal stays open')
-    
+
     // Emit selection to parent - parent will handle closing this modal
     emit('select', selectedDO)  // Emit single object, not array
-    
+
     // Note: We DO NOT call handleClose() here
     // Parent component (PrepareInvoicebyDOCurrentPeriod) will close this modal
     // via onDOsSelectedFromTable() function while keeping Screen modal open
@@ -572,22 +576,22 @@ const formatDate = (dateString) => {
 const populateFormFields = (order) => {
   console.log('🔄 Auto-populating fields with DO:', order.do_number)
   console.log('📦 Full order data:', order)
-  
+
   // D/Order# - primary identifier
   filters.value.doNumber = order.do_number || ''
-  
+
   // Salesperson - from DO or Customer table (already includes code + name from API)
   filters.value.salesperson = order.salesperson || order.salesperson_code || ''
-  
+
   // CR/Ticket# - from PO number or SO number
   filters.value.crTicket = order.po_number || order.so_number || ''
-  
+
   // On Hold - based on status
   filters.value.onHold = (order.status === 'Hold' || order.status === 'OnHold') ? 'Yes' : 'No'
-  
+
   // Order Mode - Build textbox content based on SO_Type
   let orderModeText = 'D-Order by Customer'
-  
+
   if (order.order_mode === 'invoice' || order.so_type === 'invoice') {
     orderModeText = 'D-Order by Customer + Deliver & Invoice to Customer'
     filters.value.orderMode = 'invoice'
@@ -599,19 +603,19 @@ const populateFormFields = (order) => {
     orderModeText = 'D-Order by Customer'
     filters.value.orderMode = 'customer'
   }
-  
+
   filters.value.orderModeText = orderModeText
-  
+
   // Agent Cust - can be populated if available
   filters.value.agentCust = order.agent_customer || ''
-  
+
   // Sales Type - default to 'Sales'
   filters.value.salesType = order.sales_type || 'Sales'
-  
+
   // D/O Inst1 & Inst2 - from remarks
   filters.value.doInst1 = order.remark1 || ''
   filters.value.doInst2 = order.remark2 || ''
-  
+
   // Audit trail fields - populate if available from backend
   filters.value.preparedBy = order.prepared_by || ''
   filters.value.preparedDate = order.prepared_date || ''
@@ -621,7 +625,7 @@ const populateFormFields = (order) => {
   filters.value.cancelledDate = order.cancelled_date || ''
   filters.value.printedBy = order.printed_by || ''
   filters.value.printedDate = order.printed_date || ''
-  
+
   console.log('✅ Form fields auto-populated (CPS-style):', {
     doNumber: filters.value.doNumber,
     salesperson: filters.value.salesperson,
@@ -633,7 +637,7 @@ const populateFormFields = (order) => {
     doInst1: filters.value.doInst1,
     doInst2: filters.value.doInst2
   })
-  
+
   // Warning if important fields are empty
   if (!filters.value.salesperson) {
     console.warn('⚠️ Salesperson is empty for customer:', order.customer_code)
@@ -666,7 +670,7 @@ const clearFormFields = () => {
   filters.value.cancelledDate = ''
   filters.value.printedBy = ''
   filters.value.printedDate = ''
-  
+
   console.log('✅ All fields cleared')
 }
 </script>

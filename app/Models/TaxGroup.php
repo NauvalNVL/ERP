@@ -46,6 +46,7 @@ class TaxGroup extends Model
         'code',
         'name',
         'sales_tax_applied',
+        'status',
     ];
 
     /**
@@ -63,6 +64,13 @@ class TaxGroup extends Model
      */
     public function taxTypes()
     {
-        return $this->hasMany(TaxType::class, 'tax_group_code', 'code');
+        return $this->belongsToMany(TaxType::class, 'tax_group_items', 'tax_group_code', 'tax_type_code')
+            ->withPivot(['sequence', 'apply', 'include', 'status'])
+            ->withTimestamps();
+    }
+
+    public function items()
+    {
+        return $this->hasMany(TaxGroupItem::class, 'tax_group_code', 'code');
     }
 }

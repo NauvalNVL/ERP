@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Invoice;
 
 use App\Http\Controllers\Controller;
 use App\Models\TaxGroup;
+use App\Models\TaxGroupItem;
 use App\Models\TaxType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TaxGroupController extends Controller
 {
@@ -17,8 +19,11 @@ class TaxGroupController extends Controller
     public function index()
     {
         try {
-            $taxGroups = TaxGroup::orderBy('code')->get();
-            
+            // Only return active tax groups by default
+            $taxGroups = TaxGroup::where('status', 'A')
+                ->orderBy('code')
+                ->get();
+
             return response()->json([
                 'success' => true,
                 'data' => $taxGroups
@@ -37,8 +42,12 @@ class TaxGroupController extends Controller
     public function getTaxGroupsWithTypes()
     {
         try {
-            $taxGroups = TaxGroup::with('taxTypes')->orderBy('code')->get();
-            
+            // Only return active tax groups with their tax types
+            $taxGroups = TaxGroup::with('taxTypes')
+                ->where('status', 'A')
+                ->orderBy('code')
+                ->get();
+
             return response()->json([
                 'success' => true,
                 'data' => $taxGroups
@@ -60,6 +69,7 @@ class TaxGroupController extends Controller
             'code' => 'required|string|max:20|unique:tax_groups,code',
             'name' => 'required|string|max:100',
             'sales_tax_applied' => 'required|in:Y,N',
+            'status' => 'sometimes|in:A,O',
         ]);
 
         if ($validator->fails()) {
@@ -75,6 +85,7 @@ class TaxGroupController extends Controller
                 'code' => strtoupper($request->code),
                 'name' => $request->name,
                 'sales_tax_applied' => $request->sales_tax_applied,
+                'status' => $request->input('status', 'A'),
             ]);
 
             return response()->json([
@@ -97,7 +108,7 @@ class TaxGroupController extends Controller
     {
         try {
             $taxGroup = TaxGroup::with('taxTypes')->findOrFail($code);
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $taxGroup
@@ -117,36 +128,44 @@ class TaxGroupController extends Controller
     public function getTaxItems($code)
     {
         try {
-            $taxGroup = TaxGroup::where('code', $code)->with('taxTypes')->first();
-            
+            $taxGroup = TaxGroup::where('code', $code)->first();
+
             if (!$taxGroup) {
-                \Log::error("Tax Group not found: {$code}");
+                Log::error("Tax Group not found: {$code}");
                 return response()->json([
                     'success' => false,
                     'message' => "Tax group '{$code}' not found"
                 ], 404);
             }
-            
-            // Get tax types associated with this tax group
-            $taxItems = $taxGroup->taxTypes->map(function($taxType) {
+
+            // Read detailed items from tax_group_items + join tax_types for rate/name
+            $items = TaxGroupItem::with('taxType')
+                ->where('tax_group_code', $code)
+                ->orderBy('sequence')
+                ->get();
+
+            $taxItems = $items->map(function (TaxGroupItem $item) {
+                $taxType = $item->taxType;
+
                 return [
-                    'tax_code' => $taxType->code,
-                    'tax_name' => $taxType->name ?? '',
-                    'rate' => floatval($taxType->rate ?? 0),
-                    'include' => isset($taxType->include) ? ($taxType->include === 'Y' || $taxType->include === true) : false,
-                    'status' => 'A', // Default to Active
-                    'apply' => isset($taxType->apply) ? ($taxType->apply === 'Y' || $taxType->apply === true) : true,
+                    'tax_group_code' => $item->tax_group_code,
+                    'tax_code'       => $item->tax_type_code,
+                    'tax_name'       => $taxType->name ?? '',
+                    'rate'           => floatval($taxType->rate ?? 0),
+                    'include'        => $item->include === 'Y',
+                    'status'         => $item->status ?? 'A',
+                    'apply'          => $item->apply === 'Y',
+                    'sequence'       => $item->sequence,
                 ];
             });
-            
-            // Log if no tax items found
+
             if ($taxItems->isEmpty()) {
-                \Log::warning("Tax Group '{$code}' has no tax types assigned. Please assign tax types in Define Tax Group menu.");
+                Log::warning("Tax Group '{$code}' has no tax_group_items. Please assign tax types in Define Tax Group menu.");
             }
-            
+
             return response()->json($taxItems);
         } catch (\Exception $e) {
-            \Log::error("Error fetching tax items for group {$code}: " . $e->getMessage());
+            Log::error("Error fetching tax items for group {$code}: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch tax items: ' . $e->getMessage()
@@ -162,6 +181,7 @@ class TaxGroupController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:100',
             'sales_tax_applied' => 'required|in:Y,N',
+            'status' => 'sometimes|in:A,O',
         ]);
 
         if ($validator->fails()) {
@@ -174,10 +194,11 @@ class TaxGroupController extends Controller
 
         try {
             $taxGroup = TaxGroup::findOrFail($code);
-            
+
             $taxGroup->update([
                 'name' => $request->name,
                 'sales_tax_applied' => $request->sales_tax_applied,
+                'status' => $request->input('status', $taxGroup->status ?? 'A'),
             ]);
 
             return response()->json([
@@ -200,17 +221,9 @@ class TaxGroupController extends Controller
     {
         try {
             $taxGroup = TaxGroup::findOrFail($code);
-            
-            // Check if tax group has associated tax types
-            $taxTypesCount = $taxGroup->taxTypes()->count();
-            if ($taxTypesCount > 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Cannot delete tax group. It has {$taxTypesCount} associated tax type(s)."
-                ], 400);
-            }
-            
-            $taxGroup->delete();
+
+            // Soft delete: mark as obsolete instead of physically deleting
+            $taxGroup->update(['status' => 'O']);
 
             return response()->json([
                 'success' => true,
@@ -290,8 +303,28 @@ class TaxGroupController extends Controller
     {
         try {
             $taxGroup = TaxGroup::findOrFail($code);
-            $taxTypes = $taxGroup->taxTypes()->orderBy('code')->get();
-            
+
+            // Load items with their tax type for this group
+            $items = TaxGroupItem::with('taxType')
+                ->where('tax_group_code', $code)
+                ->orderBy('sequence')
+                ->get();
+
+            $taxTypes = $items->map(function (TaxGroupItem $item) {
+                $taxType = $item->taxType;
+
+                return [
+                    'code'        => $item->tax_type_code,
+                    'name'        => $taxType->name ?? '',
+                    'apply'       => $item->apply ?? 'Y',
+                    'rate'        => floatval($taxType->rate ?? 0),
+                    'custom_type' => $taxType->custom_type ?? 'Nil',
+                    'include'     => $item->include ?? 'N',
+                    'sequence'    => $item->sequence,
+                    'status'      => $item->status ?? 'A',
+                ];
+            });
+
             return response()->json([
                 'success' => true,
                 'data' => $taxTypes
@@ -310,9 +343,15 @@ class TaxGroupController extends Controller
      */
     public function saveTaxTypes(Request $request, $code)
     {
+        // Support both legacy payload (tax_type_codes) and new detailed payload (tax_items)
         $validator = Validator::make($request->all(), [
-            'tax_type_codes' => 'required|array',
-            'tax_type_codes.*' => 'required|string|exists:tax_types,code',
+            'tax_type_codes' => 'sometimes|array',
+            'tax_type_codes.*' => 'required_with:tax_type_codes|string|exists:tax_types,code',
+            'tax_items' => 'sometimes|array',
+            'tax_items.*.tax_type_code' => 'required_with:tax_items|string|exists:tax_types,code',
+            'tax_items.*.sequence' => 'sometimes|integer|min:1',
+            'tax_items.*.apply' => 'sometimes|boolean',
+            'tax_items.*.include' => 'sometimes|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -325,25 +364,60 @@ class TaxGroupController extends Controller
 
         try {
             $taxGroup = TaxGroup::findOrFail($code);
-            
-            // Get the tax type codes from request
-            $taxTypeCodes = $request->tax_type_codes;
-            
-            // Update all tax types: set tax_group_code to this group for selected ones
-            // First, clear existing associations
-            TaxType::where('tax_group_code', $code)->update(['tax_group_code' => null]);
-            
-            // Then, set new associations
-            if (!empty($taxTypeCodes)) {
-                TaxType::whereIn('code', $taxTypeCodes)->update(['tax_group_code' => $code]);
+
+            // Build normalized tax_items array
+            $taxItemsInput = $request->input('tax_items');
+
+            if (is_array($taxItemsInput) && count($taxItemsInput) > 0) {
+                $taxItems = collect($taxItemsInput)->values()->map(function ($item, $index) use ($code) {
+                    return [
+                        'tax_group_code' => $code,
+                        'tax_type_code'  => $item['tax_type_code'],
+                        'sequence'       => isset($item['sequence']) ? (int) $item['sequence'] : $index + 1,
+                        'apply'          => array_key_exists('apply', $item) ? ($item['apply'] ? 'Y' : 'N') : 'Y',
+                        'include'        => array_key_exists('include', $item) ? ($item['include'] ? 'Y' : 'N') : 'N',
+                        'status'         => 'A',
+                    ];
+                });
+            } else {
+                // Legacy payload: tax_type_codes => default attributes
+                $taxTypeCodes = $request->input('tax_type_codes', []);
+                $taxItems = collect($taxTypeCodes)->values()->map(function ($codeItem, $index) use ($code) {
+                    return [
+                        'tax_group_code' => $code,
+                        'tax_type_code'  => $codeItem,
+                        'sequence'       => $index + 1,
+                        'apply'          => 'Y',
+                        'include'        => 'N',
+                        'status'         => 'A',
+                    ];
+                });
             }
-            
+
+            DB::transaction(function () use ($code, $taxItems) {
+                // Remove existing items for this group
+                TaxGroupItem::where('tax_group_code', $code)->delete();
+
+                if ($taxItems->count() > 0) {
+                    // Insert new items
+                    TaxGroupItem::insert($taxItems->toArray());
+
+                    // Keep legacy tax_types.tax_group_code roughly in sync (best-effort)
+                    $codes = $taxItems->pluck('tax_type_code')->unique()->values();
+                    TaxType::where('tax_group_code', $code)->update(['tax_group_code' => null]);
+                    TaxType::whereIn('code', $codes)->update(['tax_group_code' => $code]);
+                } else {
+                    // If no items, clear legacy associations
+                    TaxType::where('tax_group_code', $code)->update(['tax_group_code' => null]);
+                }
+            });
+
             return response()->json([
                 'success' => true,
                 'message' => 'Tax types updated successfully for group: ' . $code,
                 'data' => [
                     'tax_group_code' => $code,
-                    'tax_type_count' => count($taxTypeCodes)
+                    'tax_type_count' => $taxItems->count(),
                 ]
             ]);
         } catch (\Exception $e) {

@@ -135,12 +135,9 @@
                 </div>
             </div>
 
-            <div class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-lg flex justify-between items-center">
-                <div class="flex gap-2">
-                    <button @click="handleZoom" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded shadow">Zoom</button>
-                    <button @click="handleSelect" :disabled="!selectedRow" class="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded shadow">Select</button>
-                </div>
+            <div class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-lg flex justify-end items-center gap-2">
                 <button @click="closeModal" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded">Exit</button>
+                <button @click="handleSelect" :disabled="!selectedRow" class="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded shadow">Select</button>
             </div>
         </div>
     </div>
@@ -162,7 +159,7 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['close', 'select', 'zoom']);
+const emit = defineEmits(['close', 'select']);
 
 // Local state
 const invoices = ref([]);
@@ -244,10 +241,6 @@ const handleSelect = () => {
         return;
     }
     emit('select', selectedRow.value);
-};
-
-const handleZoom = () => {
-    emit('zoom');
 };
 
 const closeModal = () => {

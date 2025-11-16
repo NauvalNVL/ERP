@@ -397,6 +397,7 @@ const form = ref({
     apply: 'Y',
     rate: 0.00,
     custom_type: 'N-NIL',
+    status: 'A',
 });
 
 const customTypeOptions = [
@@ -440,6 +441,7 @@ const resetForm = () => {
         apply: 'Y',
         rate: 0.00,
         custom_type: 'N-NIL',
+        status: 'A',
     };
     showForm.value = false;
     recordMode.value = 'select';
@@ -462,6 +464,7 @@ const selectFromTable = (tx) => {
     form.value.apply = tx.apply;
     form.value.rate = Number(tx.rate);
     form.value.custom_type = tx.custom_type;
+    form.value.status = tx.status || 'A';
     originalData.value = { ...tx };
     recordMode.value = 'review';
     showForm.value = true;
@@ -481,6 +484,7 @@ const handleCodeInput = async () => {
             form.value.apply = data.apply;
             form.value.rate = Number(data.rate);
             form.value.custom_type = data.custom_type;
+            form.value.status = data.status || 'A';
             originalData.value = { ...data };
             recordMode.value = 'review';
             showForm.value = true;
@@ -511,6 +515,7 @@ const handleNew = () => {
         apply: 'Y',
         rate: 0.00,
         custom_type: 'N-NIL',
+        status: 'A',
     };
     recordMode.value = 'select';
     originalData.value = null;
@@ -568,6 +573,7 @@ const saveTaxType = async () => {
             apply: form.value.apply,
             rate: Number(form.value.rate),
             custom_type: form.value.custom_type,
+            status: form.value.status,
         };
 
         let res;

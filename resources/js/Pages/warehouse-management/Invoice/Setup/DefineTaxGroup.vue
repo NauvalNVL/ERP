@@ -95,20 +95,20 @@
                                     </label>
                                     <div class="flex gap-8">
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input 
-                                                type="radio" 
-                                                v-model="form.sales_tax_applied" 
-                                                value="Y" 
-                                                class="w-4 h-4 text-blue-600" 
+                                            <input
+                                                type="radio"
+                                                v-model="form.sales_tax_applied"
+                                                value="Y"
+                                                class="w-4 h-4 text-blue-600"
                                             />
                                             <span class="text-sm font-medium">Y-Yes</span>
                                         </label>
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input 
-                                                type="radio" 
-                                                v-model="form.sales_tax_applied" 
-                                                value="N" 
-                                                class="w-4 h-4 text-blue-600" 
+                                            <input
+                                                type="radio"
+                                                v-model="form.sales_tax_applied"
+                                                value="N"
+                                                class="w-4 h-4 text-blue-600"
                                             />
                                             <span class="text-sm font-medium">N-No</span>
                                         </label>
@@ -139,7 +139,7 @@
                                         Delete
                                     </button>
                                     <div v-else></div>
-                                    
+
                                     <div class="flex gap-3">
                                         <button
                                             type="button"
@@ -292,7 +292,8 @@ const taxGroups = ref([]);
 const form = ref({
     code: '',
     name: '',
-    sales_tax_applied: 'Y'
+    sales_tax_applied: 'Y',
+    status: 'A'
 });
 const originalCode = ref(''); // Track original code for updates
 
@@ -340,12 +341,13 @@ const handleNew = () => {
     form.value = {
         code: '',
         name: '',
-        sales_tax_applied: 'Y'
+        sales_tax_applied: 'Y',
+        status: 'A'
     };
     originalCode.value = '';
     recordMode.value = 'add';
     showNotification('Create new tax group - Enter code and details', 'success');
-    
+
     // Focus on code input
     setTimeout(() => {
         const codeInput = document.getElementById('taxGroupCode');
@@ -368,7 +370,7 @@ const handleCodeInput = () => {
 const handleEnterKey = async () => {
     const code = form.value.code?.trim().toUpperCase();
     if (!code) return;
-    
+
     // Try to find existing tax group
     try {
         const response = await axios.get(`/api/invoices/tax-groups/${code}`);
@@ -382,6 +384,7 @@ const handleEnterKey = async () => {
             form.value.code = code;
             form.value.name = '';
             form.value.sales_tax_applied = 'Y';
+            form.value.status = 'A';
             originalCode.value = '';
             recordMode.value = 'add';
             showNotification('Creating new tax group: ' + code, 'success');
@@ -394,16 +397,17 @@ const handleEnterKey = async () => {
 
 const onTaxGroupSelected = (group) => {
     showTableModal.value = false;
-    
+
     // Load the selected tax group into form
     form.value = {
         code: group.code,
         name: group.name || '',
-        sales_tax_applied: group.sales_tax_applied || 'Y'
+        sales_tax_applied: group.sales_tax_applied || 'Y',
+        status: group.status || 'A'
     };
     originalCode.value = group.code;
     recordMode.value = 'review';
-    
+
     showNotification('Tax group loaded: ' + group.code, 'success');
 };
 
@@ -411,7 +415,8 @@ const handleCancel = () => {
     form.value = {
         code: '',
         name: '',
-        sales_tax_applied: 'Y'
+        sales_tax_applied: 'Y',
+        status: 'A'
     };
     originalCode.value = '';
     recordMode.value = 'select';
@@ -422,12 +427,12 @@ const handleSave = async () => {
         showNotification('Tax Group Code and Name are required.', 'error');
         return;
     }
-    
+
     // Show confirmation dialog
     if (!confirm('Confirm Saving / Updating ?')) {
         return;
     }
-    
+
     saving.value = true;
     try {
         let response;
@@ -436,7 +441,7 @@ const handleSave = async () => {
             name: form.value.name,
             sales_tax_applied: form.value.sales_tax_applied || 'Y'
         };
-        
+
         if (recordMode.value === 'add' || !originalCode.value) {
             // Create new tax group
             response = await axios.post('/api/invoices/tax-groups', payload);
@@ -444,7 +449,7 @@ const handleSave = async () => {
             // Update existing tax group
             response = await axios.put(`/api/invoices/tax-groups/${originalCode.value}`, payload);
         }
-        
+
         const result = response.data;
         if (result.success) {
             showNotification(
@@ -452,7 +457,7 @@ const handleSave = async () => {
                 'success'
             );
             await fetchTaxGroups();
-            
+
             // Keep in review mode after save
             originalCode.value = form.value.code.toUpperCase();
             recordMode.value = 'review';
@@ -472,11 +477,11 @@ const handleDelete = async () => {
     if (!form.value.code) {
         return;
     }
-    
+
     if (!confirm(`Are you sure you want to delete tax group "${form.value.code}"? This action cannot be undone.`)) {
         return;
     }
-    
+
     saving.value = true;
     try {
         const response = await axios.delete(`/api/invoices/tax-groups/${form.value.code}`);

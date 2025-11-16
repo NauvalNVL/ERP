@@ -1,14 +1,35 @@
 <template>
-  <AppLayout header="Prepare Invoice by D/Order (Current Period)">
+  <AppLayout :header="openPeriod ? 'Prepare Invoice by D/Order (Open Period)' : 'Prepare Invoice by D/Order (Current Period)'">
     <div class="space-y-6" v-page-transition>
-      <!-- Simple heading -->
+      <!-- Hero header -->
       <div class="px-2 sm:px-0">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-base sm:text-lg font-semibold text-gray-800">Prepare Invoice by D/Order</h2>
-            <p class="text-xs text-gray-500">Current period processing and customer-scoped filtering</p>
+        <div class="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-500 rounded-2xl shadow-lg overflow-hidden relative px-6 py-5 sm:px-8 sm:py-6">
+          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-lg"></div>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 relative z-10">
+            <div class="flex items-start gap-3">
+              <div class="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/15 shadow-inner">
+                <i class="fa fa-file-invoice-dollar text-white text-xl"></i>
+              </div>
+              <div>
+                <h2 class="text-lg sm:text-xl font-bold text-white">{{ openPeriod ? 'Prepare Invoice by D/Order (Open Period)' : 'Prepare Invoice by D/Order (Current Period)' }}</h2>
+                <p class="text-xs sm:text-sm text-cyan-100">
+                  Follow CPS flow: select customer &amp; tax index, choose delivery orders, review items, then confirm invoice.
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-col items-end gap-2 text-right">
+              <div class="hidden sm:flex items-center gap-2 text-xs text-cyan-50">
+                <i class="fa fa-calendar-day"></i>
+                <span>Today {{ new Date().toLocaleDateString('en-GB') }}</span>
+              </div>
+              <div class="flex flex-wrap gap-2 text-[11px] sm:text-xs justify-end">
+                <span class="px-2 py-1 rounded-full bg-white/10 text-cyan-50 border border-white/20">Step 1: Customer &amp; Tax</span>
+                <span class="px-2 py-1 rounded-full bg-white/10 text-cyan-50 border border-white/20">Step 2: Delivery Orders</span>
+                <span class="px-2 py-1 rounded-full bg-white/10 text-cyan-50 border border-white/20">Step 3: Items &amp; Tax</span>
+                <span class="px-2 py-1 rounded-full bg-white/10 text-cyan-50 border border-white/20">Step 4: Invoice</span>
+              </div>
+            </div>
           </div>
-          <div class="hidden sm:block text-xs text-gray-400">Today {{ new Date().toLocaleDateString('en-GB') }}</div>
         </div>
       </div>
 
@@ -97,8 +118,11 @@
                       <input
                         v-model="updateMonth"
                         type="text"
-                        readonly
-                        class="w-12 h-12 text-center text-lg font-bold bg-gray-100 border-2 border-gray-300 text-gray-700 rounded-lg cursor-not-allowed"
+                        :readonly="!openPeriod"
+                        :class="[
+                          'w-12 h-12 text-center text-lg font-bold border-2 border-gray-300 text-gray-700 rounded-lg',
+                          openPeriod ? 'bg-white cursor-text' : 'bg-gray-100 cursor-not-allowed'
+                        ]"
                         placeholder="MM"
                       />
                       <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 font-medium">Month</div>
@@ -116,8 +140,11 @@
                       <input
                         v-model="updateYear"
                         type="text"
-                        readonly
-                        class="w-16 h-12 text-center text-lg font-bold bg-gray-100 border-2 border-gray-300 text-gray-700 rounded-lg cursor-not-allowed"
+                        :readonly="!openPeriod"
+                        :class="[
+                          'w-16 h-12 text-center text-lg font-bold border-2 border-gray-300 text-gray-700 rounded-lg',
+                          openPeriod ? 'bg-white cursor-text' : 'bg-gray-100 cursor-not-allowed'
+                        ]"
                         placeholder="YYYY"
                       />
                       <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 font-medium">Year</div>
@@ -217,10 +244,10 @@
                 Tax Index No. <span class="text-red-600">*</span>
               </label>
               <div class="flex rounded-md shadow-sm ring-1 ring-inset overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200" :class="taxIndexNo ? 'ring-gray-300' : 'ring-red-300 bg-red-50'">
-                <input 
-                  v-model="taxIndexNo" 
-                  type="text" 
-                  class="flex-1 px-3 py-2 text-sm outline-none border-0 bg-transparent" 
+                <input
+                  v-model="taxIndexNo"
+                  type="text"
+                  class="flex-1 px-3 py-2 text-sm outline-none border-0 bg-transparent"
                   placeholder="Type index (01, 02) or browse..."
                   maxlength="2"
                   @input="handleTaxIndexInput"
@@ -309,7 +336,7 @@
       <CheckSalesTaxModal
         :open="checkTaxModalOpen"
         :customerCode="customerCode"
-        :preselectedTaxCode="taxIndexNo"
+        :preselectedTaxCode="selectedTaxCode || ''"
         :selectedIndexData="selectedIndexData"
         @close="checkTaxModalOpen = false"
         @confirm="onTaxConfirmed"
@@ -338,6 +365,7 @@
         :customerName="customerName"
         :periodMonth="currentMonth"
         :periodYear="currentYear"
+        :openPeriod="openPeriod"
         @close="handleDetailedDOClose"
         @select="onDOsSelectedFromTable"
       />
@@ -346,7 +374,7 @@
       <FinalScreenModal
         :open="finalTaxModalOpen"
         :totalAmount="totalAmount"
-        :taxCode="taxIndexNo"
+        :taxCode="selectedTaxCode || taxIndexNo"
         :taxOptions="taxOptions"
         :customerCode="selectedDeliveryOrder?.customer_code || ''"
         :customerName="selectedDeliveryOrder?.customer_name || ''"
@@ -389,6 +417,10 @@ import DeliveryOrderSelectionModal from '@/Components/DeliveryOrderTableModal.vu
 import FinalScreenModal from '@/Components/FinalScreen.vue'
 import SalesOrderItemsModal from '@/Components/SalesOrderItemsModal.vue'
 import InvoiceNumberOptionModal from '@/Components/InvoiceNumberOptionModal.vue'
+
+const { openPeriod } = defineProps({
+  openPeriod: { type: Boolean, default: false }
+})
 
 // Period defaults
 const now = new Date()
@@ -471,6 +503,7 @@ async function selectCustomer(customer){
 const customerName = ref('')
 const currency = ref('')
 const taxIndexNo = ref('')
+const selectedTaxCode = ref('')
 const selectedIndexData = ref(null) // Store full tax index data: { index_number, tax_group_code, tax_group_name, status }
 const taxModalOpen = ref(false)
 const invoiceDate = ref(new Date().toISOString().slice(0,10))
@@ -525,6 +558,7 @@ watch(() => invoiceDate.value, (val) => {
 watch(() => customerCode.value, (newVal, oldVal) => {
   if (newVal !== oldVal && oldVal !== '') {
     taxIndexNo.value = ''
+    selectedTaxCode.value = ''
     selectedIndexData.value = null
     console.log('🔄 Customer changed, tax index reset')
   }
@@ -559,12 +593,12 @@ async function fetchTaxIndexByNumber() {
     alert('Please select a customer first before entering tax index number.')
     return
   }
-  
+
   if (!taxIndexNo.value || taxIndexNo.value.trim() === '') {
     selectedIndexData.value = null
     return
   }
-  
+
   try {
     // Pad with leading zero if needed (e.g., "1" -> "01")
     const indexNumber = parseInt(taxIndexNo.value)
@@ -572,7 +606,7 @@ async function fetchTaxIndexByNumber() {
       console.warn('⚠️ Invalid tax index number:', taxIndexNo.value)
       return
     }
-    
+
     console.log('═══════════════════════════════════════════════════════════')
     console.log('📋 FETCHING TAX INDEX FROM DEFINE CUSTOMER SALES TAX INDEX')
     console.log('═══════════════════════════════════════════════════════════')
@@ -580,22 +614,22 @@ async function fetchTaxIndexByNumber() {
     console.log(`   Index Number: ${indexNumber}`)
     console.log(`   API Endpoint: /api/invoices/customer-tax-indices/${customerCode.value}`)
     console.log(`   Data Source: customer_sales_tax_indices table (Define Customer Sales Tax Index menu)`)
-    
+
     // Call API to get customer tax indices from Define Customer Sales Tax Index
     const response = await fetch(`/api/invoices/customer-tax-indices/${customerCode.value}`)
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`)
     }
-    
+
     const result = await response.json()
     console.log('📦 API Response from customer_sales_tax_indices table:', result)
-    
+
     if (result.success && result.data && Array.isArray(result.data)) {
       // Find the tax index with matching index_number
-      const matchedIndex = result.data.find(item => 
+      const matchedIndex = result.data.find(item =>
         parseInt(item.index_number) === indexNumber
       )
-      
+
       if (matchedIndex) {
         // Auto-populate selectedIndexData
         selectedIndexData.value = {
@@ -604,10 +638,10 @@ async function fetchTaxIndexByNumber() {
           tax_group_name: matchedIndex.tax_group?.name || matchedIndex.tax_group_name || '',
           status: matchedIndex.status
         }
-        
+
         // Format tax index with leading zero
         taxIndexNo.value = String(indexNumber).padStart(2, '0')
-        
+
         console.log('✅ SUCCESS! Tax Index Found in Define Customer Sales Tax Index')
         console.log('═══════════════════════════════════════════════════════════')
         console.log('📊 Retrieved Data from customer_sales_tax_indices table:')
@@ -623,7 +657,7 @@ async function fetchTaxIndexByNumber() {
         console.warn(`⚠️ Tax index ${indexNumber} NOT FOUND in customer_sales_tax_indices table`)
         console.warn(`   Customer: ${customerCode.value}`)
         console.warn(`   Searched Index: ${indexNumber}`)
-        
+
         if (result.data.length > 0) {
           console.warn(`   Available indices for this customer:`)
           result.data.forEach(idx => {
@@ -634,13 +668,13 @@ async function fetchTaxIndexByNumber() {
           console.warn(`   Please add indices in Define Customer Sales Tax Index menu`)
         }
         console.warn('═══════════════════════════════════════════════════════════')
-        
+
         selectedIndexData.value = null
-        
-        const availableMsg = result.data.length > 0 
+
+        const availableMsg = result.data.length > 0
           ? `\n\nAvailable indices for this customer:\n${result.data.map(i => `  ${String(i.index_number).padStart(2, '0')} - ${i.tax_group_code}`).join('\n')}`
           : '\n\nNo tax indices found for this customer.\nPlease add indices in Define Customer Sales Tax Index menu.'
-        
+
         alert(`Tax Index ${String(indexNumber).padStart(2, '0')} not found in Define Customer Sales Tax Index.${availableMsg}`)
       }
     } else {
@@ -680,11 +714,9 @@ function openFlow(){
     return
   }
 
-  // Fetch tax options first
-  fetchTaxOptions().then(() => {
-    // Show Check Sales Tax Screen (CPS workflow)
-    checkTaxModalOpen.value = true
-  })
+  // Show Check Sales Tax Screen (CPS workflow)
+  // Tax options are loaded inside CheckSalesTaxModal based on selected tax group
+  checkTaxModalOpen.value = true
 }
 
 /**
@@ -714,9 +746,9 @@ function onTaxConfirmed(data){
   const selectedTax = data.selectedTax || data
   const allTaxOptions = data.allTaxOptions || []
 
-  // Update tax information from confirmed selection
-  taxIndexNo.value = selectedTax.code
-  console.log('💼 Tax Index No set to:', taxIndexNo.value)
+  // Update tax code information from confirmed selection (keep taxIndexNo as customer tax index)
+  selectedTaxCode.value = selectedTax?.code || ''
+  console.log('💼 Selected Tax Code set to:', selectedTaxCode.value)
 
   // Store all tax options for later use
   if (allTaxOptions.length > 0) {
@@ -923,11 +955,9 @@ async function proceedToFinalScreen(){
 
   // Check if taxOptions is loaded
   if (!taxOptions.value || taxOptions.value.length === 0) {
-    console.warn('⚠️ Tax Options not loaded! Fetching now...')
-    await fetchTaxOptions()
-    console.log('✅ Tax Options fetched:', taxOptions.value.length)
+    console.warn('⚠️ Tax Options not loaded! Expected to be filled from CheckSalesTaxModal.')
   } else {
-    console.log('✅ Tax Options already loaded:', taxOptions.value.length, 'options')
+    console.log('✅ Tax Options already loaded (from CheckSalesTaxModal):', taxOptions.value.length, 'options')
   }
 
   // Log data being passed to Final Screen
@@ -994,8 +1024,8 @@ async function prepareInvoices(){
       body: JSON.stringify({
         do_numbers: doNumbers,
         customer_code: customerCode.value,
-        tax_index_no: finalTaxData.value?.taxCode || taxIndexNo.value,
-        tax_code: finalTaxData.value?.taxCode || taxIndexNo.value, // ✅ ADDED: Pass tax code explicitly
+        tax_index_no: taxIndexNo.value,
+        tax_code: finalTaxData.value?.taxCode || selectedTaxCode.value || null, // ✅ Pass tax code explicitly (from Final Screen or Check Sales Tax)
         tax_percent: finalTaxData.value?.taxPercent || null, // ✅ ADDED: Pass tax percent from Final Screen
         invoice_date: invoiceDate.value,
         second_ref: secondRef.value,
@@ -1033,6 +1063,7 @@ function resetForm(){
   customerName.value = ''
   currency.value = ''
   taxIndexNo.value = ''
+  selectedTaxCode.value = ''
   secondRef.value = ''
   remark.value = ''
   selectedDOs.value = []

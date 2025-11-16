@@ -1006,15 +1006,49 @@ class InvoiceController extends Controller
                     }
                 }
 
-                // Calculate TOTAL_IV_NET_KG (KG calculation)
-                $totalNetKg = $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Net_KG'));
-                if (!$totalNetKg || $totalNetKg == 0) {
-                    // Try to calculate from MC_Net_Kg_Per_Pcs × DO_Qty
-                    $kgPerPcs = $this->toDecimalOrNull($this->getProperty($do, 'MC_Net_Kg_Per_Pcs'));
-                    $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
-                    if ($kgPerPcs && $doQty > 0) {
-                        $totalNetKg = round($kgPerPcs * $doQty, 4);
-                    }
+                // =====================================================================
+                // M2 & KG measurements (per PCS and totals) - CPS-compatible logic
+                // =====================================================================
+                // Base quantity (DO_Qty already used above for remainingQty)
+                $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
+
+                // Raw values from DO table
+                $grossM2PerPcs = $this->toDecimalOrNull($this->getProperty($do, 'MC_Gross_M2_Per_Pcs'));
+                $netM2PerPcs   = $this->toDecimalOrNull($this->getProperty($do, 'MC_Net_M2_Per_Pcs'));
+                $totalGrossM2  = $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Gross_M2'));
+                $totalNetM2    = $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Net_M2'));
+
+                $grossKgPerPcs = $this->toDecimalOrNull($this->getProperty($do, 'MC_Gross_Kg_Per_Pcs'));
+                $netKgPerPcs   = $this->toDecimalOrNull($this->getProperty($do, 'MC_Net_Kg_Per_Pcs'));
+                $totalGrossKg  = $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Gross_KG'));
+                $totalNetKg    = $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Net_KG'));
+
+                // --- Derive per-PCS values from totals when missing ---
+                if ((!$grossM2PerPcs || $grossM2PerPcs == 0) && $totalGrossM2 && $doQty > 0) {
+                    $grossM2PerPcs = round($totalGrossM2 / $doQty, 4);
+                }
+                if ((!$netM2PerPcs || $netM2PerPcs == 0) && $totalNetM2 && $doQty > 0) {
+                    $netM2PerPcs = round($totalNetM2 / $doQty, 4);
+                }
+                if ((!$grossKgPerPcs || $grossKgPerPcs == 0) && $totalGrossKg && $doQty > 0) {
+                    $grossKgPerPcs = round($totalGrossKg / $doQty, 4);
+                }
+                if ((!$netKgPerPcs || $netKgPerPcs == 0) && $totalNetKg && $doQty > 0) {
+                    $netKgPerPcs = round($totalNetKg / $doQty, 4);
+                }
+
+                // --- Derive totals from per-PCS values when missing ---
+                if ((!$totalGrossM2 || $totalGrossM2 == 0) && $grossM2PerPcs && $doQty > 0) {
+                    $totalGrossM2 = round($grossM2PerPcs * $doQty, 4);
+                }
+                if ((!$totalNetM2 || $totalNetM2 == 0) && $netM2PerPcs && $doQty > 0) {
+                    $totalNetM2 = round($netM2PerPcs * $doQty, 4);
+                }
+                if ((!$totalGrossKg || $totalGrossKg == 0) && $grossKgPerPcs && $doQty > 0) {
+                    $totalGrossKg = round($grossKgPerPcs * $doQty, 4);
+                }
+                if ((!$totalNetKg || $totalNetKg == 0) && $netKgPerPcs && $doQty > 0) {
+                    $totalNetKg = round($netKgPerPcs * $doQty, 4);
                 }
 
                 // Insert invoice record into INV table
@@ -1083,15 +1117,15 @@ class InvoiceController extends Controller
                     'IV_TRAN_AMT' => $tranAmount, // ✅ FIXED: Calculated above
                     'IV_BASE_AMT' => $baseAmount, // ✅ FIXED: Calculated above
 
-                    // Measurements (M2 and KG) - all decimal fields (FIXED: TOTAL_IV_NET_KG)
-                    'MC_GROSS_M2_PER__PCS' => $this->toDecimalOrNull($this->getProperty($do, 'MC_Gross_M2_Per_Pcs')),
-                    'MC_NET_M2_PER_PCS' => $this->toDecimalOrNull($this->getProperty($do, 'MC_Net_M2_Per_Pcs')),
-                    'TOTAL_IV_GROSS_M2' => $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Gross_M2')),
-                    'TOTAL_IV_NET_M2' => $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Net_M2')),
-                    'MC_GROSS_KG_PER_PCS' => $this->toDecimalOrNull($this->getProperty($do, 'MC_Gross_Kg_Per_Pcs')),
-                    'MC_NET_KG_PER_PCS' => $this->toDecimalOrNull($this->getProperty($do, 'MC_Net_Kg_Per_Pcs')),
-                    'TOTAL_IV_GROSS_KG' => $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Gross_KG')),
-                    'TOTAL_IV_NET_KG' => $totalNetKg, // ✅ FIXED: Calculated above
+                    // Measurements (M2 and KG) - all decimal fields (CPS logic for per-PCS and totals)
+                    'MC_GROSS_M2_PER__PCS' => $grossM2PerPcs,
+                    'MC_NET_M2_PER_PCS' => $netM2PerPcs,
+                    'TOTAL_IV_GROSS_M2' => $totalGrossM2,
+                    'TOTAL_IV_NET_M2' => $totalNetM2,
+                    'MC_GROSS_KG_PER_PCS' => $grossKgPerPcs,
+                    'MC_NET_KG_PER_PCS' => $netKgPerPcs,
+                    'TOTAL_IV_GROSS_KG' => $totalGrossKg,
+                    'TOTAL_IV_NET_KG' => $totalNetKg,
 
                     // Tax information (FIXED: IV_TAX_CODE, IV_TAX_PERCENT)
                     'IV_TAX_CODE' => $taxCode, // ✅ FIXED: From tax lookup

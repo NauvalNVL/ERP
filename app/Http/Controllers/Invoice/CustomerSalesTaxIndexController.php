@@ -32,7 +32,7 @@ class CustomerSalesTaxIndexController extends Controller
             \Log::info('   Customer Code: ' . $customerCode);
             \Log::info('   Data Source: customer_sales_tax_indices table');
             \Log::info('   Source Menu: Define Customer Sales Tax Index');
-            
+
             // Query customer_sales_tax_indices table
             $indices = CustomerSalesTaxIndex::where('customer_code', $customerCode)
                 ->with('taxGroup')
@@ -61,7 +61,7 @@ class CustomerSalesTaxIndexController extends Controller
             \Log::error('   Customer Code: ' . $customerCode);
             \Log::error('   Error: ' . $e->getMessage());
             \Log::error('═══════════════════════════════════════════════════════════');
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to load customer tax indices: ' . $e->getMessage()
@@ -147,12 +147,8 @@ class CustomerSalesTaxIndexController extends Controller
                 ->where('index_number', $indexNumber)
                 ->firstOrFail();
 
-            // Also delete associated product tieups
-            CustomerTaxProductTieup::where('customer_code', $customerCode)
-                ->where('index_number', $indexNumber)
-                ->delete();
-
-            $index->delete();
+            // Soft delete: mark index as obsolete instead of physically deleting
+            $index->update(['status' => 'O']);
 
             return response()->json([
                 'success' => true,
