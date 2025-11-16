@@ -24,10 +24,10 @@
             leave-from="opacity-100 scale-100"
             leave-to="opacity-0 scale-95"
           >
-            <DialogPanel class="w-full max-w-6xl transform overflow-hidden rounded-2xl bg-gray-100 p-6 text-left align-middle shadow-xl transition-all">
+            <DialogPanel class="w-full max-w-6xl transform overflow-hidden rounded-2xl bg-gray-100 p-6 text-left align-middle shadow-xl transition-all flex flex-col max-h-[calc(100vh-4rem)]">
               <!-- Header -->
-              <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 rounded-t-xl -mx-6 -mt-6 mb-4">
-                <DialogTitle as="h3" class="text-lg font-semibold text-gray-900">
+              <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-xl -mx-6 -mt-6 mb-4">
+                <DialogTitle as="h3" class="text-lg font-semibold text-white">
                   {{ props.customerData?.code === 'ALL' ? 'Outstanding Sales Orders [Sorted by S/Order#]' : 'Sales Order Table [Sorted by S/Order#]' }}
                 </DialogTitle>
                 <div class="flex items-center space-x-2">
@@ -37,180 +37,179 @@
                 </div>
               </div>
 
-              <!-- Main Sales Order Table -->
-              <div class="mb-4 border border-gray-200 rounded-lg overflow-hidden">
-                <div class="bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-200">
-                  Sales Orders
-                  <span v-if="isLoading" class="ml-2 text-blue-600">
-                    <i class="fas fa-spinner fa-spin"></i> Loading...
-                  </span>
-                  <span v-else-if="salesOrders.length > 0" class="ml-2 text-green-600">
-                    ({{ salesOrders.length }} order(s) found)
-                  </span>
-                </div>
-                <div class="overflow-x-auto max-h-80 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                  <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50 sticky top-0 z-10">
-                      <tr>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SO#</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CUSTOMER PO#</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AC#</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MCS#</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS D/LOCATION</th>
-                      </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                      <template v-if="isLoading">
+              <div class="flex-1 overflow-y-auto space-y-4">
+                <!-- Main Sales Order Table -->
+                <div class="mb-4 border border-gray-200 rounded-lg overflow-hidden">
+                  <div class="bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-200">
+                    Sales Orders
+                    <span v-if="isLoading" class="ml-2 text-blue-600">
+                      <i class="fas fa-spinner fa-spin"></i> Loading...
+                    </span>
+                    <span v-else-if="salesOrders.length > 0" class="ml-2 text-green-600">
+                      ({{ salesOrders.length }} order(s) found)
+                    </span>
+                  </div>
+                  <div class="overflow-x-auto max-h-80 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    <table class="min-w-full divide-y divide-gray-200">
+                      <thead class="bg-gray-50 sticky top-0 z-10">
                         <tr>
-                          <td colspan="5" class="px-4 py-8 text-center text-blue-500">
-                            <i class="fas fa-spinner fa-spin mr-2"></i> Loading sales orders...
-                          </td>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SO#</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CUSTOMER PO#</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AC#</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MCS#</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS D/LOCATION</th>
                         </tr>
-                      </template>
-                      <template v-else-if="salesOrders.length === 0">
-                        <tr>
-                          <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                            No sales orders found for this customer
-                          </td>
-                        </tr>
-                      </template>
-                      <template v-else>
-                        <tr v-for="(order, index) in salesOrders" :key="index" 
-                            :class="{'bg-blue-100': selectedOrderIndex === index, 'hover:bg-gray-50': selectedOrderIndex !== index}"
-                            @click="selectOrder(index)">
-                          <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ order.soNumber || '-' }}</td>
-                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.customerPo || '-' }}</td>
-                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.acNumber || '-' }}</td>
-                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.mcsNumber || '-' }}</td>
-                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.statusLocation || '-' }}</td>
-                        </tr>
-                      </template>
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody class="bg-white divide-y divide-gray-200">
+                        <template v-if="isLoading">
+                          <tr>
+                            <td colspan="5" class="px-4 py-8 text-center text-blue-500">
+                              <i class="fas fa-spinner fa-spin mr-2"></i> Loading sales orders...
+                            </td>
+                          </tr>
+                        </template>
+                        <template v-else-if="salesOrders.length === 0">
+                          <tr>
+                            <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                              No sales orders found for this customer
+                            </td>
+                          </tr>
+                        </template>
+                        <template v-else>
+                          <tr v-for="(order, index) in salesOrders" :key="index" 
+                              :class="{'bg-blue-100': selectedOrderIndex === index, 'hover:bg-gray-50': selectedOrderIndex !== index}"
+                              @click="selectOrder(index)">
+                            <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ order.soNumber || '-' }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.customerPo || '-' }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.acNumber || '-' }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.mcsNumber || '-' }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ order.statusLocation || '-' }}</td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Search Section -->
-              <div class="mb-4 flex items-center space-x-4">
-                <label class="text-sm font-medium text-gray-700">Search:</label>
-                <input type="text" v-model="searchTerm1" class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0" />
-                <input type="text" v-model="searchTerm2" class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0" />
-                <input type="text" v-model="searchTerm3" class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0" />
-                <button @click="searchOrders" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
-                  Search
-                </button>
-                <div class="flex items-center space-x-2 ml-4">
-                  <label class="text-sm font-medium text-gray-700">S/Order#:</label>
-                  <input type="text" v-model="soNumberFilter" class="w-32 px-2 py-1 border border-gray-300 rounded text-sm" placeholder="Enter SO#" />
+                <!-- Search Section -->
+                <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:space-x-4">
+                  <label class="text-sm font-medium text-gray-700">Search:</label>
+                  <input type="text" v-model="searchTerm1" class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0" />
+                  <input type="text" v-model="searchTerm2" class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0" />
+                  <input type="text" v-model="searchTerm3" class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" placeholder="0" />
+                  <button @click="searchOrders" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
+                    Search
+                  </button>
+                  <div class="flex items-center space-x-2 ml-4">
+                    <label class="text-sm font-medium text-gray-700">S/Order#:</label>
+                    <input type="text" v-model="soNumberFilter" class="w-32 px-2 py-1 border border-gray-300 rounded text-sm" placeholder="Enter SO#" />
+                  </div>
                 </div>
-              </div>
 
-              <!-- Order Information Section -->
-              <div class="mb-4 bg-white border border-gray-200 rounded-lg p-4">
-                <h4 class="text-sm font-medium text-gray-700 mb-3">Order Information</h4>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Customer Name:</label>
-                    <input type="text" v-model="orderInfo.customerName" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" readonly />
-                  </div>
-                  <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Model:</label>
-                    <input type="text" v-model="orderInfo.model" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" readonly />
-                  </div>
-                  <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Order Mode:</label>
-                    <input type="text" v-model="orderInfo.orderMode" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" readonly />
-                  </div>
-                  <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Salesperson:</label>
-                    <div class="flex space-x-2">
-                      <input type="text" v-model="orderInfo.salespersonCode" class="w-24 px-2 py-1 border border-gray-300 rounded text-sm" readonly placeholder="Code" />
-                      <input type="text" v-model="orderInfo.salespersonName" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm" readonly placeholder="Name" />
+                <!-- Order Information Section -->
+                <div class="mb-4 bg-white border border-gray-200 rounded-lg p-4">
+                  <h4 class="text-sm font-medium text-gray-700 mb-3">Order Information</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Customer Name:</label>
+                      <input type="text" v-model="orderInfo.customerName" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" readonly />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Model:</label>
+                      <input type="text" v-model="orderInfo.model" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" readonly />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Order Mode:</label>
+                      <input type="text" v-model="orderInfo.orderMode" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" readonly />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Salesperson:</label>
+                      <div class="flex space-x-2">
+                        <input type="text" v-model="orderInfo.salespersonCode" class="w-24 px-2 py-1 border border-gray-300 rounded text-sm" readonly placeholder="Code" />
+                        <input type="text" v-model="orderInfo.salespersonName" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm" readonly placeholder="Name" />
+                      </div>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Order Group:</label>
+                      <input type="text" v-model="orderInfo.orderGroup" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" readonly />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Order Type:</label>
+                      <input type="text" v-model="orderInfo.orderType" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" readonly />
                     </div>
                   </div>
-                  <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Order Group:</label>
-                    <input type="text" v-model="orderInfo.orderGroup" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" readonly />
+                </div>
+
+                <!-- Item Details Table -->
+                <div class="mb-4 border border-gray-200 rounded-lg overflow-hidden">
+                  <div class="bg-blue-50 px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-200">Item Details</div>
+                  <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                      <thead class="bg-blue-50">
+                        <tr>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ITEM</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MAIN</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F1</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F2</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F3</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F4</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F5</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F6</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F7</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F8</th>
+                          <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F9</th>
+                        </tr>
+                      </thead>
+                      <tbody class="bg-white divide-y divide-gray-200">
+                        <tr v-for="(item, index) in itemDetails" :key="index" 
+                            :class="{'bg-blue-100': selectedItemIndex === index, 'hover:bg-gray-50': selectedItemIndex !== index}"
+                            @click="selectItem(index)">
+                          <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.name }}</td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                            <input type="text" v-model="item.main" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
+                          </td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                            <input type="text" v-model="item.f1" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
+                          </td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                            <input type="text" v-model="item.f2" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
+                          </td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                            <input type="text" v-model="item.f3" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
+                          </td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                            <input type="text" v-model="item.f4" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
+                          </td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                            <input type="text" v-model="item.f5" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
+                          </td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                            <input type="text" v-model="item.f6" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
+                          </td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                            <input type="text" v-model="item.f7" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
+                          </td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                            <input type="text" v-model="item.f8" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
+                          </td>
+                          <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                            <input type="text" v-model="item.f9" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                  <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Order Type:</label>
-                    <input type="text" v-model="orderInfo.orderType" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" readonly />
-                  </div>
+                </div>
+
+                <!-- Sales Order Delivery Schedule Section -->
+                <div class="mb-4 flex items-center space-x-2">
+                  <i class="fas fa-play text-green-600"></i>
+                  <span class="text-sm font-medium text-gray-700">Sales Order Delivery Schedule</span>
                 </div>
               </div>
 
-              <!-- Item Details Table -->
-              <div class="mb-4 border border-gray-200 rounded-lg overflow-hidden">
-                <div class="bg-blue-50 px-4 py-2 text-sm font-medium text-gray-700 border-b border-gray-200">Item Details</div>
-                <div class="overflow-x-auto">
-                  <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-blue-50">
-                      <tr>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ITEM</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MAIN</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F1</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F2</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F3</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F4</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F5</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F6</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F7</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F8</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F9</th>
-                      </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                      <tr v-for="(item, index) in itemDetails" :key="index" 
-                          :class="{'bg-blue-100': selectedItemIndex === index, 'hover:bg-gray-50': selectedItemIndex !== index}"
-                          @click="selectItem(index)">
-                        <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.name }}</td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                          <input type="text" v-model="item.main" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                          <input type="text" v-model="item.f1" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                          <input type="text" v-model="item.f2" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                          <input type="text" v-model="item.f3" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                          <input type="text" v-model="item.f4" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                          <input type="text" v-model="item.f5" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                          <input type="text" v-model="item.f6" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                          <input type="text" v-model="item.f7" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                          <input type="text" v-model="item.f8" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                          <input type="text" v-model="item.f9" class="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <!-- Sales Order Delivery Schedule Section -->
-              <div class="mb-4 flex items-center space-x-2">
-                <i class="fas fa-play text-green-600"></i>
-                <span class="text-sm font-medium text-gray-700">Sales Order Delivery Schedule</span>
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="flex justify-center space-x-4">
-                <button @click="zoomOrder" class="px-6 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors">
-                  Zoom
-                </button>
+              <!-- Action Buttons (Footer) -->
+              <div class="flex justify-center space-x-4 mt-4 px-6 py-4 border-t border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-b-xl -mx-6 -mb-6">
                 <button @click="selectOrder" class="px-6 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
                   Select
                 </button>

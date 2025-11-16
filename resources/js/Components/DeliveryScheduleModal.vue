@@ -16,13 +16,6 @@
             </h3>
             <div class="flex items-center space-x-1 sm:space-x-2">
               <button 
-                @click="saveSchedule"
-                class="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors"
-                title="Save (Ctrl+S)"
-              >
-                <i class="fas fa-save"></i>
-              </button>
-              <button 
                 @click="deleteSelectedEntry"
                 class="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
                 title="Delete (Del)"

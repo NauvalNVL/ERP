@@ -7,29 +7,14 @@
           <div class="flex items-center space-x-4">
             <i class="fas fa-truck text-2xl text-blue-600"></i>
             <div>
-              <h1 class="text-xl font-semibold text-gray-800">Prepare Delivery Order (Multiple Item)</h1>
-              <p class="text-xs text-gray-500">F2: Customer • F3: Items • F4: Calendar • F8: Next • F5: Refresh</p>
+              <h1 class="text-xl font-semibold text-white">Prepare Delivery Order (Multiple Item)</h1>
             </div>
           </div>
           <div class="flex items-center space-x-2">
             <button 
-              @click="exitPage" 
-              class="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
-              title="Exit"
-            >
-              <i class="fas fa-power-off"></i>
-            </button>
-            <button 
-              @click="openSalesOrderScreenNext" 
-              class="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors"
-              title="Next"
-            >
-              <i class="fas fa-arrow-right"></i>
-            </button>
-            <button 
               @click="refreshPage" 
               class="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
-              title="Refresh (F5)"
+              title="Refresh"
             >
               <i class="fas fa-sync-alt"></i>
             </button>
@@ -250,14 +235,14 @@
           <div class="flex items-center space-x-4">
             <button 
               @click="refreshPage" 
-              class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center"
+              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
             >
               <i class="fas fa-sync-alt mr-2"></i>
               Refresh
             </button>
             <button 
               @click="openSalesOrderScreenNext" 
-              class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center"
+              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
             >
               <i class="fas fa-arrow-right mr-2"></i>
               Next
@@ -304,7 +289,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomerAccountModal from '@/Components/customer-account-modal.vue'
 import VehicleLookupModal from '@/Components/VehicleTableModal.vue'
@@ -700,30 +685,6 @@ const exitPage = () => {
     window.history.back()
   }
 }
-
-// Keyboard shortcuts
-const handleKeydown = (event) => {
-  if (event.key === 'F8') {
-    event.preventDefault()
-    openSalesOrderScreenNext()
-  } else if (event.key === 'F5') {
-    event.preventDefault()
-    refreshPage()
-  } else if (event.key === 'F2') {
-    event.preventDefault()
-    openCustomerLookup()
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-})
-
-// Cleanup
-import { onUnmounted } from 'vue'
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-})
 </script>
 
 <style scoped>
