@@ -10,8 +10,8 @@
           <TransitionChild as="template" enter="ease-out duration-200" enter-from="opacity-0 translate-y-3 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-150" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-3 sm:scale-95">
             <DialogPanel class="w-full max-w-sm transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5">
               <!-- Header -->
-              <div class="px-5 py-4 border-b bg-gradient-to-r from-blue-50 to-white">
-                <DialogTitle class="text-base font-semibold text-gray-800">Option</DialogTitle>
+              <div class="px-5 py-4 border-b bg-gradient-to-r from-blue-600 to-indigo-600">
+                <DialogTitle class="text-base font-semibold text-white">Option</DialogTitle>
               </div>
 
               <!-- Content -->

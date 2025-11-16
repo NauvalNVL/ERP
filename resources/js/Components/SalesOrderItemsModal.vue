@@ -24,7 +24,7 @@
             leave-from="opacity-100 translate-y-0 sm:scale-100" 
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <DialogPanel class="w-full max-w-6xl transform overflow-hidden bg-white shadow-2xl rounded-xl">
+            <DialogPanel class="w-full max-w-6xl max-h-[90vh] transform bg-white shadow-2xl rounded-xl flex flex-col overflow-hidden">
               <!-- Header -->
               <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3">
                 <div class="flex items-center justify-between">
@@ -41,86 +41,38 @@
                   </button>
                 </div>
               </div>
-
-              <!-- Toolbar - CPS ERP Style -->
-              <div class="px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-300 shadow-sm">
-                <div class="flex items-center gap-2">
-                  <!-- Exit/Close Button (Red) -->
-                  <button 
-                    @click="$emit('close')" 
-                    class="p-2 hover:bg-red-100 rounded-md bg-white border-2 border-red-400 transition-all shadow-md hover:shadow-lg" 
-                    title="Exit / Close"
-                  >
-                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                    </svg>
-                  </button>
-
-                  <!-- Delete Button (Red) -->
-                  <button 
-                    @click="handleDelete" 
-                    class="p-2 hover:bg-red-100 rounded-md bg-white border-2 border-red-400 transition-all shadow-md hover:shadow-lg" 
-                    title="Delete"
-                  >
-                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                  </button>
-
-                  <!-- Save/Update Button (Blue) -->
-                  <button 
-                    @click="handleSave" 
-                    class="p-2 hover:bg-blue-100 rounded-md bg-white border-2 border-blue-500 transition-all shadow-md hover:shadow-lg" 
-                    title="Save / Update"
-                  >
-                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"/>
-                    </svg>
-                  </button>
-
-                  <!-- Enter/Return Button (Blue) -->
-                  <button 
-                    @click="handleConfirm" 
-                    class="p-2 hover:bg-blue-100 rounded-md bg-white border-2 border-blue-500 transition-all shadow-md hover:shadow-lg" 
-                    title="Enter / Return"
-                  >
-                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Content -->
-              <div class="p-4">
-                <!-- Loading Indicator -->
-                <div v-if="loading" class="text-center py-8">
+              <!-- Main content (scrollable) -->
+              <div class="flex-1 overflow-y-auto">
+                <!-- Content -->
+                <div class="p-4">
+                  <!-- Loading Indicator -->
+                  <div v-if="loading" class="text-center py-8">
                   <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                   <p class="mt-2 text-sm text-gray-600">Loading DO items...</p>
-                </div>
-
-                <!-- Content (show when not loading) -->
-                <div v-else>
-                  <!-- Header Info Row -->
-                  <div class="grid grid-cols-6 gap-4 mb-4 text-xs">
-                    <div class="flex items-center gap-2">
-                      <label class="font-semibold text-gray-700">D/Order#:</label>
-                      <span class="font-medium text-blue-700">{{ doData?.do_number || doNumber }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <label class="font-semibold text-gray-700">D/O Date:</label>
-                      <span>{{ doData?.do_date || doDate }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <label class="font-semibold text-gray-700">Control Set Order:</label>
-                      <span>{{ controlSetOrder }}</span>
-                    </div>
                   </div>
 
-                  <!-- S/O List Table -->
-                  <div class="border border-gray-300 rounded-md overflow-hidden mb-4">
-                    <table class="min-w-full divide-y divide-gray-200">
-                      <thead class="bg-blue-600 text-white">
+                  <!-- Content (show when not loading) -->
+                  <div v-else>
+                    <!-- Header Info Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-xs">
+                      <div class="flex items-center gap-2">
+                        <label class="font-semibold text-gray-700">D/Order#:</label>
+                        <span class="font-medium text-blue-700">{{ doData?.do_number || doNumber }}</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <label class="font-semibold text-gray-700">D/O Date:</label>
+                        <span>{{ doData?.do_date || doDate }}</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <label class="font-semibold text-gray-700">Control Set Order:</label>
+                        <span>{{ controlSetOrder }}</span>
+                      </div>
+                    </div>
+
+                    <!-- S/O List Table -->
+                    <div class="border border-gray-300 rounded-md overflow-x-auto mb-4">
+                      <table class="min-w-full divide-y divide-gray-200">
+                      <thead class="bg-blue-50">
                         <tr>
                           <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wider">No</th>
                           <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wider">S/O Item#</th>
@@ -149,14 +101,14 @@
                   </div>
 
                   <!-- S/O Count and Totals -->
-                  <div class="grid grid-cols-4 gap-4 mb-4 text-xs">
+                  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 text-xs">
                     <div class="flex items-center gap-2">
                       <label class="font-semibold text-gray-700">S/O Count:</label>
                       <span class="font-medium">{{ soCount }}</span>
                     </div>
                     <div></div>
                     <div></div>
-                    <div class="flex items-center gap-2 justify-end">
+                    <div class="flex items-center gap-2 justify-between md:justify-end">
                       <label class="font-semibold text-gray-700">Total:</label>
                       <span class="font-bold text-blue-700">{{ formatCurrency(total || totalAmount) }}</span>
                     </div>
@@ -171,7 +123,7 @@
                   </div>
 
                   <!-- Item Details Table -->
-                  <div class="border border-gray-300 rounded-md overflow-hidden">
+                  <div class="border border-gray-300 rounded-md overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-xs">
                       <thead class="bg-gray-100">
                         <tr>
@@ -241,6 +193,7 @@
                   </div>
                 </div>
               </div>
+              </div>
 
               <!-- Footer -->
               <div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-blue-50 border-t-2 border-gray-300 flex justify-center gap-3 shadow-inner">
@@ -280,7 +233,7 @@ const props = defineProps({
   unitPrice: { type: Number, default: 14700000 },
 })
 
-const emit = defineEmits(['close', 'confirm', 'delete', 'save'])
+const emit = defineEmits(['close', 'confirm'])
 
 // State for fetched data
 const loading = ref(false)
@@ -495,20 +448,8 @@ const handleConfirm = () => {
     totalAmount: finalTotal,
     model: doData.value?.model || props.model,
     doData: updatedDoData,
-    itemDetails: itemDetails.value // Pass updated item details
+    itemDetails: itemDetails.value, // Pass updated item details
   })
-}
-
-const handleDelete = () => {
-  if (confirm('Delete this sales order item?')) {
-    console.log('🗑️ Deleting sales order item')
-    emit('delete')
-  }
-}
-
-const handleSave = () => {
-  console.log('💾 Saving sales order items')
-  emit('save')
 }
 </script>
 
@@ -516,6 +457,7 @@ const handleSave = () => {
 /* Custom table styling */
 table {
   font-size: 11px;
+  overflow-x: auto;
 }
 
 /* Highlighted row */

@@ -89,16 +89,16 @@
               <div class="px-5 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-center gap-3">
                 <button
                   class="px-10 py-2 text-sm font-semibold rounded border-2 border-gray-400 bg-white text-gray-700 hover:bg-gray-100 transition-colors"
+                  @click="$emit('close')"
+                >
+                  Cancel
+                </button>
+                <button
+                  class="px-10 py-2 text-sm font-semibold rounded border-2 border-gray-400 bg-white text-gray-700 hover:bg-gray-100 transition-colors"
                   @click="handleOK"
                   :disabled="!selectedTaxGroup"
                 >
                   OK
-                </button>
-                <button
-                  class="px-10 py-2 text-sm font-semibold rounded border-2 border-gray-400 bg-white text-gray-700 hover:bg-gray-100 transition-colors"
-                  @click="$emit('close')"
-                >
-                  Cancel
                 </button>
               </div>
             </DialogPanel>

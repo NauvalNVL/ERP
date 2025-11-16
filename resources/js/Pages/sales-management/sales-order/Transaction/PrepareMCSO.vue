@@ -497,14 +497,14 @@
           </div>
 
           <!-- Action Buttons -->
-          <div class="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+          <div class="mt-6 flex justify-end">
             <button
               @click="openProductDesignScreen"
-              class="w-full sm:w-auto px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed shadow-md"
+              class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed shadow-md"
               :disabled="!canProceed"
             >
               <i class="fas fa-cogs mr-2"></i>
-              <span>Continue to Product Design</span>
+              <span>Next</span>
             </button>
           </div>
 

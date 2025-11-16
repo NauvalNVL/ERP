@@ -329,7 +329,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import VehicleLookupModal from '@/Components/VehicleLookupModal.vue'
+import VehicleLookupModal from '@/Components/VehicleTableModal.vue'
 import DeliveryOrderLookupModal from '@/Components/DeliveryOrderLookupModal.vue'
 import DeliveryLocationModal from '@/Components/DeliveryLocationModal.vue'
 import { useToast } from '@/Composables/useToast'

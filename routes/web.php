@@ -759,12 +759,12 @@ return Inertia::render('warehouse-management/DebitCreditNote/index');
 
 // Warehouse Management - Invoice - IV Processing - Prepare by DO (Current Period)
 Route::get('/warehouse-management/invoice/iv-processing/prepare-by-do-current-period', function () {
-return Inertia::render('warehouse-management/Invoice/IVProcessing/PrepareInvoicebyDOCurrentPeriod');
+return Inertia::render('warehouse-management/Invoice/IVProcessing/PrepareInvoicebyDO');
 })->name('vue.warehouse-management.invoice.iv-processing.prepare-by-do-current-period');
 
 // Warehouse Management - Invoice - IV Processing - Prepare by DO (Open Period)
 Route::get('/warehouse-management/invoice/iv-processing/prepare-by-do-open-period', function () {
-return Inertia::render('warehouse-management/Invoice/IVProcessing/PrepareInvoicebyDOCurrentPeriod', [
+return Inertia::render('warehouse-management/Invoice/IVProcessing/PrepareInvoicebyDO', [
   'openPeriod' => true,
 ]);
 })->name('vue.warehouse-management.invoice.iv-processing.prepare-by-do-open-period');

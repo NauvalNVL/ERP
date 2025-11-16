@@ -7,15 +7,15 @@
     <div class="relative min-h-screen flex items-center justify-center p-4">
       <div class="relative bg-white rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] overflow-hidden">
         <!-- Header -->
-        <div class="px-8 py-5 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div class="px-8 py-5 border-b border-gray-200 bg-gradient-to-r from-green-600 to-emerald-600">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-              <i class="fas fa-cogs mr-2 text-green-600"></i>
+            <h3 class="text-lg font-semibold text-white flex items-center">
+              <i class="fas fa-cogs mr-2 text-white"></i>
               Product Design Screen
             </h3>
             <button 
               @click="$emit('close')"
-              class="text-gray-400 hover:text-gray-600 transition-colors"
+              class="text-white hover:text-gray-200 transition-colors"
             >
               <i class="fas fa-times text-xl"></i>
             </button>
@@ -152,13 +152,13 @@
         <div class="px-8 py-6 bg-gray-50 border-t border-gray-200 flex justify-end space-x-4">
           <button 
             @click="$emit('close')"
-            class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            class="px-4 py-2 text-sm font-medium text-blue-700 border border-blue-500 rounded-md bg-white hover:bg-blue-50 hover:border-blue-600 transition-colors"
           >
             Cancel
           </button>
           <button 
             @click="saveDesign"
-            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            class="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm"
           >
             Save Design
           </button>

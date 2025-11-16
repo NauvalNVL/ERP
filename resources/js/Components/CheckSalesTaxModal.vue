@@ -10,13 +10,13 @@
           <TransitionChild as="template" enter="ease-out duration-200" enter-from="opacity-0 translate-y-3 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-150" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-3 sm:scale-95">
             <DialogPanel class="w-full max-w-2xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5">
               <!-- Header -->
-              <div class="px-5 py-4 border-b bg-gradient-to-r from-blue-50 to-white">
+              <div class="px-5 py-4 border-b bg-gradient-to-r from-blue-600 to-indigo-600">
                 <div class="flex items-center justify-between">
                   <div>
-                    <DialogTitle class="text-base font-semibold text-gray-800">Check Sales Tax Screen</DialogTitle>
-                    <p class="text-xs text-gray-500 mt-0.5">Verify tax configuration before invoice preparation</p>
+                    <DialogTitle class="text-base font-semibold text-white">Check Sales Tax Screen</DialogTitle>
+                    <p class="text-xs text-white mt-0.5">Verify tax configuration before invoice preparation</p>
                   </div>
-                  <button class="text-gray-400 hover:text-gray-600 transition-colors" @click="handleClose">
+                  <button class="text-white hover:text-gray-200 transition-colors" @click="handleClose">
                     <XIcon class="w-5 h-5"/>
                   </button>
                 </div>
@@ -158,17 +158,7 @@
               </div>
 
               <!-- Footer Actions -->
-              <div class="px-5 py-4 border-t bg-gray-50 flex items-center justify-between">
-                <button 
-                  class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
-                  @click="handleZoom"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-                  </svg>
-                  Zoom
-                </button>
-                
+              <div class="px-5 py-4 border-t bg-gray-50 flex items-center justify-end">
                 <div class="flex items-center gap-2">
                   <button 
                     class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
@@ -335,11 +325,6 @@ const handleOk = () => {
 
 const handleClose = () => {
   emit('close')
-}
-
-const handleZoom = () => {
-  // Optional: Implement zoom/detail view
-  console.log('Zoom clicked for tax:', selectedTax.value)
 }
 </script>
 

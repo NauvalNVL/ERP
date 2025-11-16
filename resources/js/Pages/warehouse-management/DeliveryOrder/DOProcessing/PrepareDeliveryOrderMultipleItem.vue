@@ -307,7 +307,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import CustomerAccountModal from '@/Components/customer-account-modal.vue'
-import VehicleLookupModal from '@/Components/VehicleLookupModal.vue'
+import VehicleLookupModal from '@/Components/VehicleTableModal.vue'
 import SalesOrderScreenModal from '@/Components/SalesOrderScreenModal.vue'
 import { useToast } from '@/Composables/useToast'
 import axios from 'axios'

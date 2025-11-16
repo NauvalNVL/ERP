@@ -9,7 +9,7 @@
         <!-- Header -->
         <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 flex items-center">
+            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-white flex items-center">
               <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>
               <span class="hidden sm:inline">Delivery Schedule Screen</span>
               <span class="sm:hidden">Delivery Schedule</span>

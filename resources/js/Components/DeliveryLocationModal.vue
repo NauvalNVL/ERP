@@ -7,15 +7,15 @@
     <div class="relative min-h-screen flex items-center justify-center p-2 sm:p-4">
       <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
         <!-- Header -->
-        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600 flex-shrink-0">
           <div class="flex items-center justify-between">
-            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 flex items-center">
-              <i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>
+            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-white flex items-center">
+              <i class="fas fa-map-marker-alt mr-2 text-white"></i>
               <span class="line-clamp-2">Delivery Location: 0-Order by Customer + Deliver & Invoice to Customer</span>
             </h3>
             <button 
               @click="$emit('close')"
-              class="text-gray-400 hover:text-gray-600 transition-colors"
+              class="text-white hover:text-gray-200 transition-colors"
             >
               <i class="fas fa-times text-xl"></i>
             </button>
