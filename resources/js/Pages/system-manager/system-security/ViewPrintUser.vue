@@ -1,36 +1,25 @@
 <template>
     <AppLayout header="View & Print User">
         <Head title="View & Print User" />
-        <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            <!-- Animated Bubbles Background -->
-            <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                <div class="bubble bubble-1"></div>
-                <div class="bubble bubble-2"></div>
-                <div class="bubble bubble-3"></div>
-                <div class="bubble bubble-4"></div>
-                <div class="bubble bubble-5"></div>
-                <div class="bubble bubble-6"></div>
-                <div class="bubble bubble-7"></div>
-                <div class="bubble bubble-8"></div>
-            </div>
-            <div class="max-w-7xl mx-auto relative z-10">
+        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden overflow-x-hidden">
+            <div class="max-w-7xl w-full mx-auto relative z-10">
                 <!-- Header Card -->
-                <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8" style="background: linear-gradient(90deg, #2563eb 0%, #4f46e5 50%, #9333ea 100%);">
-                        <div class="flex items-center justify-between">
+                <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
+                    <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 md:p-8">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div class="flex items-center">
-                                <div class="bg-white/20 backdrop-blur-sm rounded-full p-4 mr-4">
+                                <div class="bg-white/20 rounded-full p-4 mr-4">
                                     <UsersIcon class="h-8 w-8 text-white" />
                                 </div>
                                 <div>
-                                    <h1 class="text-3xl font-bold text-white mb-2">View & Print Users</h1>
+                                    <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">View & Print Users</h1>
                                     <p class="text-blue-100">Comprehensive user information and printing</p>
                                 </div>
                             </div>
-                            <div class="flex items-center space-x-4">
+                            <div class="flex flex-wrap items-center gap-3 justify-start md:justify-end">
                                 <button 
                                     @click="refreshData"
-                                    class="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-xl shadow-lg hover:bg-white/30 focus:outline-none focus:ring-4 focus:ring-white/20 transform hover:scale-105 transition-all duration-300"
+                                    class="inline-flex items-center px-4 md:px-6 py-2.5 md:py-3 bg-white/10 text-white font-semibold rounded-xl shadow hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                     title="Refresh Data"
                                 >
                                     <ArrowPathIcon class="h-5 w-5 mr-2" />
@@ -38,7 +27,7 @@
                                 </button>
                                 <button 
                                     @click="printUsers"
-                                    class="inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold rounded-xl shadow-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transform hover:scale-105 transition-all duration-300"
+                                    class="inline-flex items-center px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-xl shadow hover:from-emerald-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                     title="Print Users"
                                 >
                                     <PrinterIcon class="h-5 w-5 mr-2" />
@@ -46,7 +35,7 @@
                                 </button>
                                 <button 
                                     @click="exportUsers"
-                                    class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transform hover:scale-105 transition-all duration-300"
+                                    class="inline-flex items-center px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-semibold rounded-xl shadow hover:from-indigo-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                     title="Export Users"
                                 >
                                     <DocumentArrowDownIcon class="h-5 w-5 mr-2" />
@@ -58,10 +47,10 @@
                 </div>
 
                 <!-- User Table -->
-                <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden mb-8">
-                    <div class="bg-gradient-to-r from-slate-600 to-gray-700 p-6">
+                <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden mb-8" style="content-visibility:auto; contain-intrinsic-size: 1px 520px; contain: content;">
+                    <div class="bg-slate-700 md:bg-gradient-to-r md:from-slate-600 md:to-gray-700 p-4 md:p-6">
                         <h2 class="text-xl font-semibold text-white flex items-center">
-                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-2 mr-3">
+                            <div class="bg-white/20 rounded-full p-2 mr-3">
                                 <TableCellsIcon class="h-6 w-6 text-white" />
                             </div>
                             User Directory
@@ -70,10 +59,11 @@
                     </div>
                     <div class="overflow-hidden">
                         <div class="overflow-x-auto" style="max-height: 500px; overflow-y: auto;">
-                            <table class="min-w-full">
+                            <!-- Desktop / tablet table -->
+                            <table class="hidden md:table min-w-full table-fixed">
                                 <thead class="bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 z-10">
                                     <tr>
-                                        <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center">
                                                 <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-1 mr-2">
                                                     <IdentificationIcon class="h-4 w-4 text-white" />
@@ -81,7 +71,7 @@
                                                 User ID
                                             </div>
                                         </th>
-                                        <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center">
                                                 <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full p-1 mr-2">
                                                     <UserIcon class="h-4 w-4 text-white" />
@@ -89,7 +79,7 @@
                                                 Username
                                             </div>
                                         </th>
-                                        <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center">
                                                 <div class="bg-gradient-to-r from-teal-500 to-green-500 rounded-full p-1 mr-2">
                                                     <CheckCircleIcon class="h-4 w-4 text-white" />
@@ -97,7 +87,7 @@
                                                 Official Name
                                             </div>
                                         </th>
-                                        <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center">
                                                 <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-1 mr-2">
                                                     <BriefcaseIcon class="h-4 w-4 text-white" />
@@ -105,7 +95,7 @@
                                                 Position
                                             </div>
                                         </th>
-                                        <th class="px-8 py-4 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                             <div class="flex items-center justify-end">
                                                 <div class="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full p-1 mr-2">
                                                     <DocumentTextIcon class="h-4 w-4 text-white" />
@@ -115,55 +105,55 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white/50 backdrop-blur-sm divide-y divide-gray-200">
+                                <tbody class="bg-white/50 divide-y divide-gray-200">
                                     <tr 
                                         v-for="(user, index) in users" 
                                         :key="user.userID"
                                         :class="[
-                                            'cursor-pointer transition-all duration-300 hover:bg-white/80 hover:shadow-md',
-                                            selectedUser && selectedUser.userID === user.userID ? 'bg-gradient-to-r from-indigo-100 to-purple-100 shadow-md border-l-4 border-indigo-500' : ''
+                                            'cursor-pointer transition-colors duration-150 hover:bg-white/80',
+                                            selectedUser && selectedUser.userID === user.userID ? 'bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500' : ''
                                         ]"
                                         @click="selectUser(user)"
                                     >
-                                        <td class="px-8 py-6 whitespace-nowrap">
+                                        <td class="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg px-3 py-2">
                                                     <span class="text-white font-mono font-semibold text-sm">{{ user.userID }}</span>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-8 py-6 whitespace-nowrap">
-                                            <div class="flex items-center">
+                                        <td class="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap">
+                                            <div class="flex items-center min-w-0">
                                                 <div class="bg-gray-100 rounded-full p-2 mr-3">
                                                     <UserIcon class="h-5 w-5 text-gray-600" />
                                                 </div>
-                                                <div>
-                                                    <div class="text-sm font-semibold text-gray-900">{{ user.userName }}</div>
-                                                    <div class="text-xs text-gray-500">{{ user.status === 'Active' ? 'Active User' : 'Inactive User' }}</div>
+                                                <div class="min-w-0">
+                                                    <div class="text-sm font-semibold text-gray-900 truncate">{{ user.userName }}</div>
+                                                    <div class="text-xs text-gray-500 truncate">{{ user.status === 'Active' ? 'Active User' : 'Inactive User' }}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-8 py-6 whitespace-nowrap">
-                                            <div class="flex items-center">
+                                        <td class="px-3 md:px-6 py-3 md:py-5 whitespace-normal">
+                                            <div class="flex items-center min-w-0">
                                                 <div class="bg-green-100 rounded-full p-2 mr-3">
                                                     <CheckCircleIcon class="h-5 w-5 text-green-600" />
                                                 </div>
-                                                <div>
-                                                    <div class="text-sm font-medium text-gray-900">{{ user.officialName || 'No Official Name' }}</div>
-                                                    <div class="text-xs text-gray-500">{{ user.mobileNumber || 'No mobile number' }}</div>
+                                                <div class="min-w-0">
+                                                    <div class="text-sm font-medium text-gray-900 break-words">{{ user.officialName || 'No Official Name' }}</div>
+                                                    <div class="text-xs text-gray-500 break-words">{{ user.mobileNumber || 'No mobile number' }}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-8 py-6 whitespace-nowrap">
-                                            <span class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 text-white border border-indigo-300 shadow-md">
+                                        <td class="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-3 md:px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 text-white border border-indigo-300 shadow-md">
                                                 <BriefcaseIcon class="h-4 w-4 mr-2" />
                                                 {{ user.officialTitle || 'No Position' }}
                                             </span>
                                         </td>
-                                        <td class="px-8 py-6 whitespace-nowrap text-right text-sm font-medium">
+                                        <td class="px-3 md:px-6 py-3 md:py-5 whitespace-nowrap text-right text-xs md:text-sm font-medium">
                                             <button 
                                                 @click.stop="selectUser(user)"
-                                                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+                                                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
                                             >
                                                 <DocumentTextIcon class="h-4 w-4 mr-2" />
                                                 View Details
@@ -172,29 +162,74 @@
                                     </tr>
                                 </tbody>
                             </table>
+
+                            <!-- Mobile card list -->
+                            <div class="md:hidden divide-y divide-gray-200 bg-slate-900">
+                                <div
+                                    v-for="(user, index) in users"
+                                    :key="user.userID"
+                                    :class="[
+                                        'px-4 py-3 flex flex-col gap-2 cursor-pointer',
+                                        selectedUser && selectedUser.userID === user.userID ? 'bg-slate-800 border-l-4 border-indigo-500' : ''
+                                    ]"
+                                    @click="selectUser(user)"
+                                >
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg px-3 py-2 mr-3">
+                                                <span class="text-white font-mono font-semibold text-sm">{{ user.userID }}</span>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-semibold text-white">{{ user.userName }}</div>
+                                                <div class="text-xs text-slate-200">{{ user.status === 'Active' ? 'Active User' : 'Inactive User' }}</div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            @click.stop="selectUser(user)"
+                                            class="ml-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[11px] font-medium rounded-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                                        >
+                                            <DocumentTextIcon class="h-4 w-4 mr-1" />
+                                            View
+                                        </button>
+                                    </div>
+                                    <div class="text-[11px] text-slate-200 mb-0.5">Official Name</div>
+                                    <div class="text-sm font-medium text-white break-words mb-1">{{ user.officialName || 'No Official Name' }}</div>
+                                    <div class="text-[11px] text-slate-200 mb-0.5">Mobile</div>
+                                    <div class="text-sm text-slate-100 break-words mb-1">{{ user.mobileNumber || 'No mobile number' }}</div>
+                                    <div class="flex items-center justify-between mt-1">
+                                        <div class="flex items-center">
+                                            <div class="text-[11px] text-slate-200 mr-2">Position</div>
+                                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-[11px] font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 text-white border border-indigo-300">
+                                                <BriefcaseIcon class="h-4 w-4 mr-1" />
+                                                {{ user.officialTitle || 'No Position' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- User Details Form -->
-                <div v-if="selectedUser" class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden mb-8">
-                    <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-6">
+                <div v-if="selectedUser" class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden mb-8" style="content-visibility:auto; contain-intrinsic-size: 1px 640px; contain: content;">
+                    <div class="bg-emerald-600 md:bg-gradient-to-r md:from-emerald-600 md:to-teal-600 p-4 md:p-6">
                         <div class="flex items-center">
-                            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
+                            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
                                 {{ selectedUser.officialName ? selectedUser.officialName.charAt(0).toUpperCase() : selectedUser.userID.charAt(0).toUpperCase() }}
                             </div>
                             <div>
-                                <h3 class="text-2xl font-bold text-white">{{ selectedUser.officialName || selectedUser.userName }}</h3>
+                                <h3 class="text-xl md:text-2xl font-bold text-white">{{ selectedUser.officialName || selectedUser.userName }}</h3>
                                 <p class="text-emerald-100">{{ selectedUser.userID }} • {{ selectedUser.officialTitle || 'No Title' }}</p>
                                 <p class="text-sm text-emerald-200 mt-1">✓ User selected for detailed view</p>
                             </div>
                         </div>
                     </div>
-                    <div class="p-8">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="p-4 md:p-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                             <!-- Left Column -->
                             <div class="space-y-6">
-                                <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                                <div class="bg-white/80 rounded-xl p-4 md:p-6 border border-white/20">
                                     <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                                         <UserIcon class="h-5 w-5 mr-2 text-emerald-600" />
                                         Personal Information
@@ -208,7 +243,7 @@
                                             <input 
                                                 v-model="selectedUser.officialName" 
                                                 type="text"
-                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200"
                                                 readonly
                                             >
                                         </div>
@@ -296,7 +331,7 @@
                                                 <input 
                                                     v-model="selectedUser.passwordExpiry" 
                                                     type="text"
-                                                    class="w-20 px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium text-center focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                    class="w-20 px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium text-center focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200"
                                                     readonly
                                                 >
                                                 <span class="text-sm text-gray-600">[Zero for None]</span>
@@ -308,7 +343,7 @@
                                                 <input 
                                                     v-model="selectedUser.passwordExpired" 
                                                     type="text"
-                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200"
                                                     readonly
                                                 >
                                             </div>
@@ -419,7 +454,7 @@
 
                 <!-- Back to User List -->
                 <div class="text-center">
-                    <Link href="/user" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-gray-700 hover:to-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-300 transform hover:scale-105 transition-all duration-300">
+                    <Link href="/user" class="inline-flex items-center px-6 py-3 md:px-8 md:py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
                         <ArrowLeftIcon class="h-6 w-6 mr-3" />
                         Back to User List
                     </Link>
@@ -490,8 +525,11 @@ export default {
                     userPrinter: user.userPrinter || '/VIEWER',
                     route: user.route || 'Function to User',
                     slm: user.slm || '',
-                    officialName: user.officialName,
-                    officialTitle: user.officialTitle,
+
+                    // align with Define User table fields
+                    officialName: user.official_name ?? user.officialName ?? '',
+                    officialTitle: user.official_title ?? user.officialTitle ?? '',
+
                     mobileNumber: user.mobileNumber,
                     officeTel: user.officeTel,
                     slmName: user.slmName || '',
@@ -702,11 +740,11 @@ tr.cursor-pointer:hover {
     box-shadow: 0 0 0 4px rgba(var(--ring-color), 0.3);
 }
 
-/* Smooth transitions */
-* {
-    transition-property: all;
+/* Smooth transitions (scoped to interactive elements) */
+button, a, input, select, textarea, .transition, .transition-all {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 300ms;
+    transition-duration: 200ms;
 }
 
 /* Mobile responsiveness */

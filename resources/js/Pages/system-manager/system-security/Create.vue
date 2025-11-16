@@ -1,17 +1,17 @@
 <template>
     <AppLayout header="Create User">
         <Head title="Create User" />
-        <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8" style="background: linear-gradient(135deg, #e0e7ff 0%, #ffffff 50%, #faf5ff 100%);">
-            <div class="max-w-6xl mx-auto">
+        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+            <div class="max-w-6xl w-full mx-auto">
                 <!-- Header Card -->
-                <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8" style="background: linear-gradient(90deg, #2563eb 0%, #4f46e5 50%, #9333ea 100%);">
+                <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
+                    <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 md:p-8">
                         <div class="flex items-center justify-center">
-                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-4 mr-4">
+                            <div class="bg-white/20 rounded-full p-4 mr-4">
                                 <UserAddIcon class="h-8 w-8 text-white" />
                             </div>
                             <div class="text-center">
-                                <h1 class="text-3xl font-bold text-white mb-2">Create New User</h1>
+                                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Create New User</h1>
                                 <p class="text-blue-100">Add new user to the ERP system with modern interface</p>
                             </div>
                         </div>
@@ -19,20 +19,20 @@
                 </div>
 
                 <!-- Main Form -->
-                <form @submit.prevent="submitForm" class="space-y-8">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <form @submit.prevent="submitForm" class="space-y-8 w-full">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 w-full">
                         <!-- User Information -->
-                        <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden">
-                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-6">
+                        <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 540px; contain: content;">
+                            <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
                                 <h3 class="text-xl font-semibold text-white flex items-center">
-                                    <div class="bg-white/20 backdrop-blur-sm rounded-full p-2 mr-3">
+                                    <div class="bg-white/20 rounded-full p-2 mr-3">
                                         <UserCircleIcon class="h-6 w-6 text-white" />
                                     </div>
                                     User Information
                                 </h3>
                                 <p class="text-blue-100 text-sm mt-1">Basic user details</p>
                             </div>
-                            <div class="p-8">
+                            <div class="p-4 md:p-8">
                                 <div class="space-y-6">
                                     <!-- User ID -->
                                     <div>
@@ -97,17 +97,17 @@
                         </div>
 
                         <!-- Contact Information -->
-                        <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden">
-                            <div class="bg-gradient-to-r from-emerald-500 to-teal-500 p-6">
+                        <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 540px;">
+                            <div class="bg-emerald-500 md:bg-gradient-to-r md:from-emerald-500 md:to-teal-500 p-4 md:p-6">
                                 <h3 class="text-xl font-semibold text-white flex items-center">
-                                    <div class="bg-white/20 backdrop-blur-sm rounded-full p-2 mr-3">
+                                    <div class="bg-white/20 rounded-full p-2 mr-3">
                                         <PhoneIcon class="h-6 w-6 text-white" />
                                     </div>
                                     Contact Information
                                 </h3>
                                 <p class="text-emerald-100 text-sm mt-1">Contact details and status</p>
                             </div>
-                            <div class="p-8">
+                            <div class="p-4 md:p-8">
                                 <div class="space-y-6">
                                     <!-- Mobile Number -->
                                     <div>
@@ -148,7 +148,7 @@
                                         <RadioGroup v-model="form.status">
                                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <RadioGroupOption v-for="option in statusOptions" :key="option.value" :value="option.value" v-slot="{ active, checked }">
-                                                    <div :class="[active ? 'ring-4 ring-blue-300' : '', checked ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600' : 'bg-white text-gray-900 border-gray-200 hover:bg-gray-50', 'relative flex cursor-pointer rounded-xl px-6 py-4 shadow-lg focus:outline-none border-2 transition-all duration-300 transform hover:scale-105']">
+                                                    <div :class="[active ? 'ring-2 ring-blue-300' : '', checked ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600' : 'bg-white text-gray-900 border-gray-200 hover:bg-gray-50', 'relative flex cursor-pointer rounded-xl px-6 py-4 shadow focus:outline-none border-2 transition-colors duration-200']">
                                                         <div class="flex w-full items-center justify-between">
                                                             <div class="flex items-center">
                                                                 <div class="text-lg">
@@ -172,18 +172,18 @@
                     </div>
 
                     <!-- Password Settings -->
-                    <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden">
-                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-6">
+                    <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 520px; contain: content;">
+                        <div class="bg-purple-500 md:bg-gradient-to-r md:from-purple-500 md:to-pink-500 p-4 md:p-6">
                             <h3 class="text-xl font-semibold text-white flex items-center">
-                                <div class="bg-white/20 backdrop-blur-sm rounded-full p-2 mr-3">
+                                <div class="bg-white/20 rounded-full p-2 mr-3">
                                     <KeyIcon class="h-6 w-6 text-white" />
                                 </div>
                                 Password Settings
                             </h3>
                             <p class="text-purple-100 text-sm mt-1">Configure password policies</p>
                         </div>
-                        <div class="p-8">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="p-4 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                                 <!-- Password Expiry -->
                                 <div>
                                     <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
@@ -210,8 +210,8 @@
                                     <SwitchGroup>
                                         <div class="flex items-center p-4 bg-gray-50 rounded-xl">
                                             <Switch v-model="amendPasswordEnabled"
-                                                :class="[amendPasswordEnabled ? 'bg-gradient-to-r from-pink-500 to-red-500' : 'bg-gray-300', 'relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-pink-300']">
-                                                <span aria-hidden="true" :class="[amendPasswordEnabled ? 'translate-x-7' : 'translate-x-1', 'inline-block h-6 w-6 rounded-full bg-white shadow-lg transform transition-transform duration-300 ease-in-out']" />
+                                                :class="[amendPasswordEnabled ? 'bg-gradient-to-r from-pink-500 to-red-500' : 'bg-gray-300', 'relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-300']">
+                                                <span aria-hidden="true" :class="[amendPasswordEnabled ? 'translate-x-7' : 'translate-x-1', 'inline-block h-6 w-6 rounded-full bg-white transform transition-transform duration-300 ease-in-out']" />
                                             </Switch>
                                             <SwitchLabel as="span" class="ml-4">
                                                 <span class="text-lg font-semibold" :class="amendPasswordEnabled ? 'text-pink-600' : 'text-gray-600'">{{ amendPasswordEnabled ? 'Enabled' : 'Disabled' }}</span>
@@ -223,71 +223,16 @@
                         </div>
                     </div>
 
-                    <!-- User Permissions Info -->
-                    <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden">
-                        <div class="bg-gradient-to-r from-indigo-500 to-purple-500 p-6">
-                            <div class="flex items-center">
-                                <div class="bg-white/20 backdrop-blur-sm rounded-full p-3 mr-4">
-                                    <ShieldCheckIcon class="h-8 w-8 text-white" />
-                                </div>
-                                <div>
-                                    <h3 class="text-xl font-semibold text-white">User Permissions</h3>
-                                    <p class="text-indigo-100">Permissions will be configured after user creation</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-8">
-                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
-                                <div class="flex items-start">
-                                    <div class="flex-shrink-0">
-                                        <div class="bg-blue-500 rounded-full p-2">
-                                            <ExclamationCircleIcon class="h-6 w-6 text-white" />
-                                        </div>
-                                    </div>
-                                    <div class="ml-4">
-                                        <h4 class="text-lg font-semibold text-gray-900 mb-3">How to Configure Permissions:</h4>
-                                        <ol class="text-gray-700 space-y-3">
-                                            <li class="flex items-center">
-                                                <span class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full text-sm flex items-center justify-center mr-3 font-semibold">1</span>
-                                                <span class="text-base">Create new user by filling this form</span>
-                                            </li>
-                                            <li class="flex items-center">
-                                                <span class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full text-sm flex items-center justify-center mr-3 font-semibold">2</span>
-                                                <span class="text-base">User will be created without any permissions</span>
-                                            </li>
-                                            <li class="flex items-center">
-                                                <span class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm flex items-center justify-center mr-3 font-semibold">3</span>
-                                                <span class="text-base">Use <strong>"Define User Access Permission"</strong> menu to configure permissions</span>
-                                            </li>
-                                        </ol>
-                                        
-                                        <div class="mt-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded-xl">
-                                            <div class="flex items-center">
-                                                <ExclamationCircleIcon class="h-6 w-6 text-yellow-600 mr-3" />
-                                                <div>
-                                                    <p class="font-semibold text-yellow-800 mb-1">Important Notice:</p>
-                                                    <p class="text-yellow-700">
-                                                        New users will not have access to any menu until permissions are configured through the "Define User Access Permission" menu.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Action Buttons -->
-                    <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 p-8">
+                    <div class="bg-white/80 shadow rounded-2xl border border-white/20 p-4 md:p-8" style="content-visibility:auto; contain-intrinsic-size: 1px 160px; contain: content;">
                         <div class="flex flex-col sm:flex-row gap-4 justify-end">
                             <Link href="/user" 
-                                class="flex-1 sm:flex-none inline-flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-300 transform hover:scale-105">
+                                class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
                                 <XIcon class="h-6 w-6 mr-3" />
                                 Cancel
                             </Link>
                             <button type="submit" 
-                                class="flex-1 inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transform hover:scale-105 transition-all duration-300">
+                                class="flex-1 inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-200">
                                 <SaveIcon class="h-6 w-6 mr-3" />
                                 Create User
                             </button>
@@ -315,7 +260,6 @@ import {
     UserCircleIcon,
     UserPlusIcon as UserAddIcon,
     AtSymbolIcon,
-    CheckBadgeIcon as BadgeCheckIcon,
     BriefcaseIcon,
     PhoneIcon,
     BuildingOfficeIcon as OfficeBuildingIcon,
@@ -326,7 +270,6 @@ import {
     XMarkIcon as XIcon,
     ArrowDownTrayIcon as SaveIcon,
     IdentificationIcon,
-    ExclamationCircleIcon,
     CheckIcon
 } from '@heroicons/vue/24/outline'
 
@@ -345,7 +288,6 @@ export default {
         UserCircleIcon,
         UserAddIcon,
         AtSymbolIcon,
-        BadgeCheckIcon,
         BriefcaseIcon,
         PhoneIcon,
         OfficeBuildingIcon,
@@ -356,7 +298,6 @@ export default {
         XIcon,
         SaveIcon,
         IdentificationIcon,
-        ExclamationCircleIcon,
         CheckIcon
     },
     data() {
@@ -471,10 +412,23 @@ export default {
 }
 
 /* Smooth transitions */
-* {
-    transition-property: all;
+button, a, input, select, textarea, .transition-all, .transition {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 300ms;
+    transition-duration: 200ms;
+}
+
+/* Promote transform animations to compositor for smoother hover effects */
+.transform {
+    will-change: transform;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    button, a, input, select, textarea, .transition-all, .transition, .animate-fadeIn, .animate-slideIn {
+        transition: none !important;
+        animation: none !important;
+    }
 }
 
 /* Custom scrollbar */
@@ -518,6 +472,15 @@ export default {
     
     .grid-cols-1.lg\:grid-cols-2 {
         grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    
+    .backdrop-blur-sm {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+    
+    .shadow-xl, .shadow-2xl, .shadow-lg {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
 }
 

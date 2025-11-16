@@ -3,7 +3,7 @@
         <Head title="Edit User" />
         <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
             <!-- Animated Bubbles Background -->
-            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute inset-0 overflow-hidden pointer-events-none hidden">
                 <div class="bubble bubble-1"></div>
                 <div class="bubble bubble-2"></div>
                 <div class="bubble bubble-3"></div>
@@ -15,22 +15,22 @@
             </div>
             <div class="max-w-5xl mx-auto relative z-10">
                 <!-- Header Card -->
-                <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8" style="background: linear-gradient(90deg, #2563eb 0%, #4f46e5 50%, #9333ea 100%);">
-                        <div class="flex items-center justify-between">
+                <div class="bg-white shadow-md rounded-2xl overflow-hidden border border-white/20 mb-8">
+                    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4 sm:p-6" style="background: linear-gradient(90deg, #2563eb 0%, #4f46e5 50%, #9333ea 100%);">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                             <div class="flex items-center">
-                                <div class="bg-white/20 backdrop-blur-sm rounded-full p-4 mr-4">
+                                <div class="bg-white/20 rounded-full p-2 sm:p-3 mr-3 sm:mr-4">
                                     <UserIcon class="h-8 w-8 text-white" />
                                 </div>
                                 <div>
-                                    <h1 class="text-3xl font-bold text-white mb-2">Edit User</h1>
-                                    <p class="text-blue-100">Update user information and settings</p>
+                                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-1">Edit User</h1>
+                                    <p class="text-blue-100 text-xs sm:text-sm">Update user information and settings</p>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+                            <div class="w-full sm:w-auto text-left sm:text-right mt-3 sm:mt-0">
+                                <div class="bg-white/20 rounded-xl p-3 sm:p-4">
                                     <p class="text-sm text-blue-200 mb-1">User ID</p>
-                                    <p class="text-2xl font-bold text-white">{{ user.user_id }}</p>
+                                    <p class="text-2xl font-bold text-white truncate">{{ user.user_id }}</p>
                                 </div>
                             </div>
                         </div>
@@ -39,7 +39,7 @@
 
                 <!-- Error Messages -->
                 <div v-if="Object.keys($page.props.errors).length > 0" class="mb-8">
-                    <div class="bg-gradient-to-r from-red-500 to-pink-500 border-l-4 border-red-600 p-6 rounded-xl shadow-lg animate-fadeIn">
+                    <div class="bg-gradient-to-r from-red-500 to-pink-500 border-l-4 border-red-600 p-6 rounded-xl shadow">
                         <div class="flex items-center">
                             <div class="bg-red-500 rounded-full p-2 mr-4">
                                 <ExclamationCircleIcon class="h-6 w-6 text-white" />
@@ -58,21 +58,21 @@
                 </div>
 
                 <!-- Form Card -->
-                <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden">
-                    <div class="bg-gradient-to-r from-slate-600 to-gray-700 p-6">
+                <div class="bg-white shadow-md rounded-2xl border border-white/20 overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-600 to-gray-700 p-4 md:p-6">
                         <h2 class="text-xl font-semibold text-white flex items-center">
-                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-2 mr-3">
+                            <div class="bg-white/20 rounded-full p-2 mr-3">
                                 <IdentificationIcon class="h-6 w-6 text-white" />
                             </div>
                             User Information
                         </h2>
                         <p class="text-slate-200 text-sm mt-1">Update user details and account settings</p>
                     </div>
-                    <div class="p-8">
+                    <div class="p-4 md:p-8">
 
                         <form @submit.prevent="submitForm" class="space-y-8">
                             <!-- Basic Information Section -->
-                            <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                            <div class="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
                                     <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-2 mr-3">
                                         <UserIcon class="h-5 w-5 text-white" />
@@ -89,7 +89,7 @@
                                             User ID
                                         </label>
                                         <input type="text" v-model="form.user_id" id="user_id" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white"
+                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white"
                                             required>
                                     </div>
 
@@ -102,14 +102,14 @@
                                             Username
                                         </label>
                                         <input type="text" v-model="form.username" id="username" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white"
+                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white"
                                             required>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Personal Details Section -->
-                            <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                            <div class="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
                                     <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-2 mr-3">
                                         <UserCircleIcon class="h-5 w-5 text-white" />
@@ -126,7 +126,7 @@
                                             Official Name
                                         </label>
                                         <input type="text" v-model="form.official_name" id="official_name" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white"
+                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white"
                                             required>
                                     </div>
 
@@ -139,13 +139,13 @@
                                             Position
                                         </label>
                                         <input type="text" v-model="form.official_title" id="official_title" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
+                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Contact Information Section -->
-                            <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                            <div class="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
                                     <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full p-2 mr-3">
                                         <PhoneIcon class="h-5 w-5 text-white" />
@@ -162,7 +162,7 @@
                                             Mobile Number
                                         </label>
                                         <input type="text" v-model="form.mobile_number" id="mobile_number" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
+                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white">
                                     </div>
 
                                     <!-- Official Tel -->
@@ -174,13 +174,13 @@
                                             Office Phone
                                         </label>
                                         <input type="text" v-model="form.official_tel" id="official_tel" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
+                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Security Settings Section -->
-                            <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                            <div class="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
                                     <div class="bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full p-2 mr-3">
                                         <LockClosedIcon class="h-5 w-5 text-white" />
@@ -199,7 +199,7 @@
                                         <p class="text-xs text-gray-500 mb-2">Leave empty if you don't want to change the password</p>
                                         <div class="relative">
                                             <input :type="showPassword ? 'text' : 'password'" v-model="form.password" id="password" 
-                                                class="block w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
+                                                class="block w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white">
                                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                                 <button @click="showPassword = !showPassword" type="button" class="text-gray-400 hover:text-purple-500 transition-colors" :aria-label="showPassword ? 'Hide password' : 'Show password'">
                                                     <EyeIcon v-if="!showPassword" class="h-5 w-5" />
@@ -225,7 +225,7 @@
                                         </label>
                                         <div class="relative">
                                             <input :type="showConfirmPassword ? 'text' : 'password'" v-model="form.password_confirmation" id="password_confirmation" 
-                                                class="block w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
+                                                class="block w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white">
                                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                                 <button @click="showConfirmPassword = !showConfirmPassword" type="button" class="text-gray-400 hover:text-indigo-500 transition-colors" :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'">
                                                     <EyeIcon v-if="!showConfirmPassword" class="h-5 w-5" />
@@ -238,7 +238,7 @@
                             </div>
 
                             <!-- Account Settings Section -->
-                            <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                            <div class="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
                                     <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full p-2 mr-3">
                                         <ShieldCheckIcon class="h-5 w-5 text-white" />
@@ -258,7 +258,7 @@
                                             <RadioGroupLabel class="sr-only">Choose an account status</RadioGroupLabel>
                                             <div class="grid grid-cols-2 gap-3">
                                                 <RadioGroupOption as="template" v-for="option in statusOptions" :key="option.label" :value="option.value" v-slot="{ active, checked }">
-                                                    <div :class="[checked ? 'bg-gradient-to-r from-emerald-500 to-teal-500 border-transparent text-white shadow-lg transform scale-105' : 'bg-white border-2 border-gray-200 text-gray-900 hover:bg-gray-50 hover:border-emerald-300', 'border rounded-xl py-4 px-4 flex items-center justify-center text-sm font-semibold cursor-pointer focus:outline-none transition-all duration-300']">
+                                                    <div :class="[checked ? 'bg-gradient-to-r from-emerald-500 to-teal-500 border-transparent text-white shadow' : 'bg-white border-2 border-gray-200 text-gray-900 hover:bg-gray-50 hover:border-emerald-300', 'border rounded-xl py-3 px-3 md:py-4 md:px-4 flex items-center justify-center text-sm font-semibold cursor-pointer focus:outline-none transition-colors duration-200']">
                                                         <RadioGroupLabel as="span">{{ option.label }}</RadioGroupLabel>
                                                     </div>
                                                 </RadioGroupOption>
@@ -275,7 +275,7 @@
                                             Password Validity (days)
                                         </label>
                                         <input type="number" v-model="form.password_expiry_date" id="password_expiry_date" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white"
+                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white"
                                             min="0">
                                     </div>
                                 </div>
@@ -296,8 +296,8 @@
                                                 </SwitchLabel>
                                                 <p class="text-xs text-gray-500 mt-1">Enable users to update their own expired passwords</p>
                                             </div>
-                                            <Switch v-model="amendPasswordEnabled" :class="[amendPasswordEnabled ? 'bg-gradient-to-r from-cyan-500 to-blue-500' : 'bg-gray-300', 'relative inline-flex flex-shrink-0 h-7 w-12 border-2 border-transparent rounded-full cursor-pointer transition-all ease-in-out duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transform hover:scale-105']">
-                                                <span aria-hidden="true" :class="[amendPasswordEnabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-6 w-6 rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-300']" />
+                                            <Switch v-model="amendPasswordEnabled" :class="[amendPasswordEnabled ? 'bg-gradient-to-r from-cyan-500 to-blue-500' : 'bg-gray-300', 'relative inline-flex flex-shrink-0 h-7 w-12 border-2 border-transparent rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500']">
+                                                <span aria-hidden="true" :class="[amendPasswordEnabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-6 w-6 rounded-full bg-white shadow ring-0 transition-transform']" />
                                             </Switch>
                                         </SwitchGroup>
                                     </div>
@@ -307,12 +307,12 @@
                             <!-- Action Buttons -->
                             <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-8 border-t border-gray-200">
                                 <Link href="/user" 
-                                    class="inline-flex justify-center items-center px-8 py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-gray-600 hover:to-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-300 transform hover:scale-105 transition-all duration-300">
+                                    class="inline-flex justify-center items-center px-5 py-3 sm:px-8 sm:py-4 bg-gray-500 text-white text-lg font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-300 hover:bg-gray-600">
                                     <XIcon class="h-6 w-6 mr-3" />
                                     Cancel
                                 </Link>
                                 <button type="submit" 
-                                    class="inline-flex justify-center items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transform hover:scale-105 transition-all duration-300">
+                                    class="inline-flex justify-center items-center px-5 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-semibold rounded-xl shadow hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-colors duration-200">
                                     <SaveIcon class="h-6 w-6 mr-3" />
                                     Update User
                                 </button>

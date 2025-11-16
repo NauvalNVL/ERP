@@ -1,28 +1,17 @@
 <template>
     <AppLayout header="Amend User Password">
         <Head title="Amend User Password" />
-        <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            <!-- Animated Bubbles Background -->
-            <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                <div class="bubble bubble-1"></div>
-                <div class="bubble bubble-2"></div>
-                <div class="bubble bubble-3"></div>
-                <div class="bubble bubble-4"></div>
-                <div class="bubble bubble-5"></div>
-                <div class="bubble bubble-6"></div>
-                <div class="bubble bubble-7"></div>
-                <div class="bubble bubble-8"></div>
-            </div>
+        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-x-hidden no-overscroll gutter-stable">
             <div class="max-w-4xl mx-auto relative z-10">
                 <!-- Header Card -->
-                <div class="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8" style="background: linear-gradient(90deg, #2563eb 0%, #4f46e5 50%, #9333ea 100%);">
+                <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
+                    <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 md:p-6">
                         <div class="flex items-center justify-center">
-                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-4 mr-4">
+                            <div class="bg-white/20 rounded-full p-3 md:p-4 mr-3 md:mr-4">
                                 <KeyIcon class="h-8 w-8 text-white" />
                             </div>
                             <div class="text-center">
-                                <h1 class="text-3xl font-bold text-white mb-2">Password Management</h1>
+                                <h1 class="text-2xl md:text-3xl font-bold text-white mb-1">Password Management</h1>
                                 <p class="text-blue-100">Update user password securely</p>
                             </div>
                         </div>
@@ -30,29 +19,29 @@
                 </div>
 
                 <!-- Main Content -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
                     <!-- Search Section -->
                     <div class="lg:col-span-1">
-                        <div class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden">
-                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-6">
+                        <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 280px; contain: content;">
+                            <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
                                 <h3 class="text-xl font-semibold text-white flex items-center">
                                     <SearchIcon class="h-6 w-6 mr-3" />
                                     Find User
                                 </h3>
                                 <p class="text-blue-100 text-sm mt-1">Search by User ID</p>
                             </div>
-                            <div class="p-6">
+                            <div class="p-4 md:p-6">
                                 <form @submit.prevent="searchUser" class="space-y-4">
                                     <div class="relative">
                                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                             <SearchIcon class="h-5 w-5 text-gray-400" />
                                         </div>
                                         <input type="text" v-model="search_user_id" id="search_user_id" 
-                                            class="block w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                                            class="block w-full pl-12 pr-4 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-gray-50 hover:bg-white"
                                             placeholder="Enter User ID..." required>
                                     </div>
                                     <button type="submit" 
-                                        class="w-full flex items-center justify-center px-6 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl shadow-lg hover:from-blue-700 hover:to-cyan-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transform hover:scale-105 transition-all duration-300">
+                                        class="w-full flex items-center justify-center px-5 py-3 md:px-6 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-200">
                                         <SearchIcon class="h-5 w-5 mr-2" />
                                         Search User
                                     </button>
@@ -64,7 +53,7 @@
                     <!-- Password Update Section -->
                     <div class="lg:col-span-2">
                         <!-- Feedback Messages -->
-                        <div class="space-y-4 mb-6">
+                        <div class="space-y-4 mb-6 no-anchor">
                             <div v-if="message" class="transform transition-all duration-500 animate-slideIn" :class="messageClass">
                                 <div class="flex items-center p-4 rounded-xl shadow-lg">
                                     <div class="flex-shrink-0">
@@ -90,14 +79,14 @@
                         </div>
 
                         <!-- Update Password Form -->
-                        <div v-if="foundUser" class="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-white/20 overflow-hidden">
-                            <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-6">
+                        <div v-if="foundUser" class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 360px; contain: content;">
+                            <div class="bg-purple-500 md:bg-gradient-to-r md:from-purple-500 md:to-pink-500 p-4 md:p-6">
                                 <div class="flex items-center">
-                                    <div class="bg-white/20 backdrop-blur-sm rounded-full p-3 mr-4">
+                                    <div class="bg-white/20 rounded-full p-2 md:p-3 mr-3 md:mr-4">
                                         <UserCircleIcon class="h-8 w-8 text-white" />
                                     </div>
                                     <div>
-                                        <h3 class="text-xl font-semibold text-white">
+                                        <h3 class="text-lg md:text-xl font-semibold text-white">
                                             {{ foundUser.official_name }}
                                         </h3>
                                         <p class="text-purple-100">User ID: {{ foundUser.user_id }}</p>
@@ -105,14 +94,14 @@
                                 </div>
                             </div>
                             
-                            <form @submit.prevent="updatePassword" class="p-8 space-y-6">
+                            <form @submit.prevent="updatePassword" class="p-4 md:p-8 space-y-6">
 
                                 <input type="hidden" v-model="form.user_id">
                                 
                                 <!-- New Password -->
                                 <div class="space-y-4">
                                     <div>
-                                        <label for="new_password" class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label for="new_password" class="flex items-center text-base md:text-lg font-semibold text-gray-800 mb-3">
                                             <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-2 mr-3">
                                                 <LockClosedIcon class="h-5 w-5 text-white" />
                                             </div>
@@ -120,7 +109,7 @@
                                         </label>
                                         <div class="relative">
                                             <input :type="showPassword ? 'text' : 'password'" v-model="form.new_password" id="new_password"
-                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-gray-900 pr-12 bg-gray-50 hover:bg-white text-lg"
+                                                class="block w-full px-4 py-3 md:px-6 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200 text-gray-900 pr-12 bg-gray-50 hover:bg-white text-base md:text-lg"
                                                 placeholder="Enter at least 8 characters"
                                                 required
                                                 minlength="8">
@@ -141,7 +130,7 @@
 
                                     <!-- Confirm New Password -->
                                     <div>
-                                        <label for="new_password_confirmation" class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label for="new_password_confirmation" class="flex items-center text-base md:text-lg font-semibold text-gray-800 mb-3">
                                             <div class="bg-gradient-to-r from-pink-500 to-red-500 rounded-full p-2 mr-3">
                                                 <LockClosedIcon class="h-5 w-5 text-white" />
                                             </div>
@@ -149,7 +138,7 @@
                                         </label>
                                         <div class="relative">
                                             <input :type="showConfirmPassword ? 'text' : 'password'" v-model="form.new_password_confirmation" id="new_password_confirmation"
-                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-300 text-gray-900 pr-12 bg-gray-50 hover:bg-white text-lg"
+                                                class="block w-full px-4 py-3 md:px-6 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors duration-200 text-gray-900 pr-12 bg-gray-50 hover:bg-white text-base md:text-lg"
                                                 placeholder="Re-type the password"
                                                 required
                                                 minlength="8">
@@ -176,13 +165,13 @@
 
                                 <!-- Action Buttons -->
                                 <div class="flex flex-col sm:flex-row gap-4 pt-8 border-t border-gray-200">
-                                    <Link href="/user" class="flex-1 sm:flex-none inline-flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-300 transform hover:scale-105">
+                                    <Link href="/user" class="flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-3 sm:px-8 sm:py-4 border-2 border-gray-300 text-base sm:text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
                                         <ArrowLeftIcon class="h-6 w-6 mr-3" />
                                         Back to Users
                                     </Link>
                                     <button type="submit" 
                                         :disabled="!form.new_password || !form.new_password_confirmation || form.new_password !== form.new_password_confirmation"
-                                        class="flex-1 inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300">
+                                        class="flex-1 inline-flex items-center justify-center px-5 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-base sm:text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
                                         <RefreshIcon class="h-6 w-6 mr-3" />
                                         Update Password
                                     </button>
@@ -426,12 +415,8 @@ export default {
     background: linear-gradient(135deg, var(--tw-gradient-stops));
 }
 
-/* Smooth transitions */
-* {
-    transition-property: all;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 300ms;
-}
+/* Remove global transitions to avoid layout jank */
+/* Intentionally left empty */
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
@@ -618,4 +603,18 @@ export default {
         border-color: #374151;
     }
 }
-</style> 
+
+/* Prevent scroll jumping utilities */
+.no-overscroll {
+    overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
+}
+
+.no-anchor {
+    overflow-anchor: none;
+}
+
+.gutter-stable {
+    scrollbar-gutter: stable both-edges;
+}
+</style>
