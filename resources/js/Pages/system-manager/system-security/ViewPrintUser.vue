@@ -2,7 +2,7 @@
     <AppLayout header="View & Print User">
         <Head title="View & Print User" />
         <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden overflow-x-hidden">
-            <div class="max-w-7xl w-full mx-auto relative z-10">
+            <div class="max-w-7xl mx-auto w-full relative z-10">
                 <!-- Header Card -->
                 <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
                     <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 md:p-8">
@@ -48,19 +48,19 @@
 
                 <!-- User Table -->
                 <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden mb-8" style="content-visibility:auto; contain-intrinsic-size: 1px 520px; contain: content;">
-                    <div class="bg-slate-700 md:bg-gradient-to-r md:from-slate-600 md:to-gray-700 p-4 md:p-6">
-                        <h2 class="text-xl font-semibold text-white flex items-center">
+                    <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
+                        <h2 class="text-lg md:text-xl font-semibold text-white flex items-center">
                             <div class="bg-white/20 rounded-full p-2 mr-3">
                                 <TableCellsIcon class="h-6 w-6 text-white" />
                             </div>
                             User Directory
                         </h2>
-                        <p class="text-slate-200 text-sm mt-1">Click on any user to view detailed information</p>
+                        <p class="text-blue-100 text-xs md:text-sm mt-1">Click on any user to view detailed information</p>
                     </div>
                     <div class="overflow-hidden">
                         <div class="overflow-x-auto" style="max-height: 500px; overflow-y: auto;">
                             <!-- Desktop / tablet table -->
-                            <table class="hidden md:table min-w-full table-fixed">
+                            <table class="hidden md:table min-w-full table-fixed divide-y divide-gray-200">
                                 <thead class="bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 z-10">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
@@ -105,7 +105,7 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white/50 divide-y divide-gray-200">
+                                <tbody class="bg-white/50 md:divide-y divide-transparent md:divide-gray-200">
                                     <tr 
                                         v-for="(user, index) in users" 
                                         :key="user.userID"
@@ -164,13 +164,13 @@
                             </table>
 
                             <!-- Mobile card list -->
-                            <div class="md:hidden divide-y divide-gray-200 bg-slate-900">
+                            <div class="md:hidden divide-y divide-gray-200 bg-white">
                                 <div
                                     v-for="(user, index) in users"
                                     :key="user.userID"
                                     :class="[
-                                        'px-4 py-3 flex flex-col gap-2 cursor-pointer',
-                                        selectedUser && selectedUser.userID === user.userID ? 'bg-slate-800 border-l-4 border-indigo-500' : ''
+                                        'px-4 py-3 flex flex-col gap-2 cursor-pointer bg-white rounded-xl shadow-sm mb-3 border border-gray-100',
+                                        selectedUser && selectedUser.userID === user.userID ? 'ring-2 ring-indigo-400 border-indigo-400' : ''
                                     ]"
                                     @click="selectUser(user)"
                                 >
@@ -180,25 +180,25 @@
                                                 <span class="text-white font-mono font-semibold text-sm">{{ user.userID }}</span>
                                             </div>
                                             <div>
-                                                <div class="text-sm font-semibold text-white">{{ user.userName }}</div>
-                                                <div class="text-xs text-slate-200">{{ user.status === 'Active' ? 'Active User' : 'Inactive User' }}</div>
+                                                <div class="text-sm font-semibold text-gray-900">{{ user.userName }}</div>
+                                                <div class="text-xs text-gray-500">{{ user.status === 'Active' ? 'Active User' : 'Inactive User' }}</div>
                                             </div>
                                         </div>
                                         <button
                                             @click.stop="selectUser(user)"
-                                            class="ml-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[11px] font-medium rounded-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                                            class="ml-2 inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[11px] font-medium rounded-lg shadow hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
                                         >
                                             <DocumentTextIcon class="h-4 w-4 mr-1" />
                                             View
                                         </button>
                                     </div>
-                                    <div class="text-[11px] text-slate-200 mb-0.5">Official Name</div>
-                                    <div class="text-sm font-medium text-white break-words mb-1">{{ user.officialName || 'No Official Name' }}</div>
-                                    <div class="text-[11px] text-slate-200 mb-0.5">Mobile</div>
-                                    <div class="text-sm text-slate-100 break-words mb-1">{{ user.mobileNumber || 'No mobile number' }}</div>
+                                    <div class="text-[11px] text-gray-500 mb-0.5">Official Name</div>
+                                    <div class="text-sm font-medium text-gray-900 break-words mb-1">{{ user.officialName || 'No Official Name' }}</div>
+                                    <div class="text-[11px] text-gray-500 mb-0.5">Mobile</div>
+                                    <div class="text-sm text-gray-700 break-words mb-1">{{ user.mobileNumber || 'No mobile number' }}</div>
                                     <div class="flex items-center justify-between mt-1">
                                         <div class="flex items-center">
-                                            <div class="text-[11px] text-slate-200 mr-2">Position</div>
+                                            <div class="text-[11px] text-gray-500 mr-2">Position</div>
                                             <span class="inline-flex items-center px-3 py-1 rounded-xl text-[11px] font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 text-white border border-indigo-300">
                                                 <BriefcaseIcon class="h-4 w-4 mr-1" />
                                                 {{ user.officialTitle || 'No Position' }}

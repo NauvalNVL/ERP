@@ -1,37 +1,18 @@
 <template>
     <AppLayout header="Edit User">
         <Head title="Edit User" />
-        <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            <!-- Animated Bubbles Background -->
-            <div class="absolute inset-0 overflow-hidden pointer-events-none hidden">
-                <div class="bubble bubble-1"></div>
-                <div class="bubble bubble-2"></div>
-                <div class="bubble bubble-3"></div>
-                <div class="bubble bubble-4"></div>
-                <div class="bubble bubble-5"></div>
-                <div class="bubble bubble-6"></div>
-                <div class="bubble bubble-7"></div>
-                <div class="bubble bubble-8"></div>
-            </div>
-            <div class="max-w-5xl mx-auto relative z-10">
+        <div class="min-h-screen bg-white md:bg-gradient-to-br md:from-indigo-50 md:via-white md:to-purple-50 py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+            <div class="max-w-6xl w-full mx-auto">
                 <!-- Header Card -->
-                <div class="bg-white shadow-md rounded-2xl overflow-hidden border border-white/20 mb-8">
-                    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4 sm:p-6" style="background: linear-gradient(90deg, #2563eb 0%, #4f46e5 50%, #9333ea 100%);">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-                            <div class="flex items-center">
-                                <div class="bg-white/20 rounded-full p-2 sm:p-3 mr-3 sm:mr-4">
-                                    <UserIcon class="h-8 w-8 text-white" />
-                                </div>
-                                <div>
-                                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-1">Edit User</h1>
-                                    <p class="text-blue-100 text-xs sm:text-sm">Update user information and settings</p>
-                                </div>
+                <div class="bg-white/80 shadow rounded-2xl overflow-hidden border border-white/20 mb-8">
+                    <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:via-indigo-600 md:to-purple-600 p-4 md:p-8">
+                        <div class="flex items-center justify-center">
+                            <div class="bg-white/20 rounded-full p-4 mr-4">
+                                <UserIcon class="h-8 w-8 text-white" />
                             </div>
-                            <div class="w-full sm:w-auto text-left sm:text-right mt-3 sm:mt-0">
-                                <div class="bg-white/20 rounded-xl p-3 sm:p-4">
-                                    <p class="text-sm text-blue-200 mb-1">User ID</p>
-                                    <p class="text-2xl font-bold text-white truncate">{{ user.user_id }}</p>
-                                </div>
+                            <div class="text-center">
+                                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Edit User</h1>
+                                <p class="text-blue-100">Update existing user information with modern interface</p>
                             </div>
                         </div>
                     </div>
@@ -57,269 +38,278 @@
                     </div>
                 </div>
 
-                <!-- Form Card -->
-                <div class="bg-white shadow-md rounded-2xl border border-white/20 overflow-hidden">
-                    <div class="bg-gradient-to-r from-slate-600 to-gray-700 p-4 md:p-6">
-                        <h2 class="text-xl font-semibold text-white flex items-center">
-                            <div class="bg-white/20 rounded-full p-2 mr-3">
-                                <IdentificationIcon class="h-6 w-6 text-white" />
-                            </div>
-                            User Information
-                        </h2>
-                        <p class="text-slate-200 text-sm mt-1">Update user details and account settings</p>
-                    </div>
-                    <div class="p-4 md:p-8">
-
-                        <form @submit.prevent="submitForm" class="space-y-8">
-                            <!-- Basic Information Section -->
-                            <div class="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
-                                <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
-                                    <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-2 mr-3">
-                                        <UserIcon class="h-5 w-5 text-white" />
+                <!-- Main Form -->
+                <form @submit.prevent="submitForm" class="space-y-8 w-full">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 w-full">
+                        <!-- Basic & Personal Information -->
+                        <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 540px; contain: content;">
+                            <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
+                                <h3 class="text-xl font-semibold text-white flex items-center">
+                                    <div class="bg-white/20 rounded-full p-2 mr-3">
+                                        <IdentificationIcon class="h-6 w-6 text-white" />
                                     </div>
-                                    Basic Information
+                                    User Information
                                 </h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <p class="text-blue-100 text-sm mt-1">Basic user details</p>
+                            </div>
+                            <div class="p-4 md:p-8">
+                                <div class="space-y-6">
                                     <!-- User ID -->
                                     <div>
-                                        <label for="user_id" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full p-1 mr-2">
-                                                <IdentificationIcon class="h-4 w-4 text-white" />
+                                        <label for="user_id" class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-2 mr-3">
+                                                <IdentificationIcon class="h-5 w-5 text-white" />
                                             </div>
-                                            User ID
+                                            User ID <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" v-model="form.user_id" id="user_id" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white"
+                                        <input type="text" v-model="form.user_id" id="user_id"
+                                            class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                             required>
                                     </div>
 
                                     <!-- Username -->
                                     <div>
-                                        <label for="username" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                            <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full p-1 mr-2">
-                                                <AtSymbolIcon class="h-4 w-4 text-white" />
+                                        <label for="username" class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                            <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full p-2 mr-3">
+                                                <AtSymbolIcon class="h-5 w-5 text-white" />
                                             </div>
-                                            Username
+                                            Username <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" v-model="form.username" id="username" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white"
+                                        <input type="text" v-model="form.username" id="username"
+                                            class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                             required>
                                     </div>
-                                </div>
-                            </div>
 
-                            <!-- Personal Details Section -->
-                            <div class="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
-                                <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
-                                    <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-2 mr-3">
-                                        <UserCircleIcon class="h-5 w-5 text-white" />
-                                    </div>
-                                    Personal Details
-                                </h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <!-- Official Name -->
                                     <div>
-                                        <label for="official_name" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                            <div class="bg-gradient-to-r from-teal-500 to-green-500 rounded-full p-1 mr-2">
-                                                <UserCircleIcon class="h-4 w-4 text-white" />
+                                        <label for="official_name" class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                            <div class="bg-gradient-to-r from-teal-500 to-green-500 rounded-full p-2 mr-3">
+                                                <UserCircleIcon class="h-5 w-5 text-white" />
                                             </div>
-                                            Official Name
+                                            Official Name <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" v-model="form.official_name" id="official_name" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white"
+                                        <input type="text" v-model="form.official_name" id="official_name"
+                                            class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                             required>
                                     </div>
 
                                     <!-- Official Title -->
                                     <div>
-                                        <label for="official_title" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                            <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-1 mr-2">
-                                                <BriefcaseIcon class="h-4 w-4 text-white" />
+                                        <label for="official_title" class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                            <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-2 mr-3">
+                                                <BriefcaseIcon class="h-5 w-5 text-white" />
                                             </div>
                                             Position
                                         </label>
-                                        <input type="text" v-model="form.official_title" id="official_title" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white">
+                                        <input type="text" v-model="form.official_title" id="official_title"
+                                            class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg">
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
+                        <!-- Contact & Account Information -->
+                        <div class="space-y-4 md:space-y-8">
                             <!-- Contact Information Section -->
-                            <div class="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
-                                <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
-                                    <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full p-2 mr-3">
-                                        <PhoneIcon class="h-5 w-5 text-white" />
-                                    </div>
-                                    Contact Information
-                                </h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <!-- Mobile Number -->
-                                    <div>
-                                        <label for="mobile_number" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                            <div class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full p-1 mr-2">
-                                                <PhoneIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            Mobile Number
-                                        </label>
-                                        <input type="text" v-model="form.mobile_number" id="mobile_number" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white">
-                                    </div>
-
-                                    <!-- Official Tel -->
-                                    <div>
-                                        <label for="official_tel" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                            <div class="bg-gradient-to-r from-red-500 to-pink-500 rounded-full p-1 mr-2">
-                                                <OfficeBuildingIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            Office Phone
-                                        </label>
-                                        <input type="text" v-model="form.official_tel" id="official_tel" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white">
-                                    </div>
+                            <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 260px;">
+                                <div class="bg-emerald-500 md:bg-gradient-to-r md:from-emerald-500 md:to-teal-500 p-4 md:p-6">
+                                    <h3 class="text-xl font-semibold text-white flex items-center">
+                                        <div class="bg-white/20 rounded-full p-2 mr-3">
+                                            <PhoneIcon class="h-6 w-6 text-white" />
+                                        </div>
+                                        Contact Information
+                                    </h3>
+                                    <p class="text-emerald-100 text-sm mt-1">Contact details</p>
                                 </div>
-                            </div>
-
-                            <!-- Security Settings Section -->
-                            <div class="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
-                                <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
-                                    <div class="bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full p-2 mr-3">
-                                        <LockClosedIcon class="h-5 w-5 text-white" />
-                                    </div>
-                                    Security Settings
-                                </h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <!-- Password -->
-                                    <div>
-                                        <label for="password" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                            <div class="bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full p-1 mr-2">
-                                                <LockClosedIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            New Password
-                                        </label>
-                                        <p class="text-xs text-gray-500 mb-2">Leave empty if you don't want to change the password</p>
-                                        <div class="relative">
-                                            <input :type="showPassword ? 'text' : 'password'" v-model="form.password" id="password" 
-                                                class="block w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white">
-                                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                                <button @click="showPassword = !showPassword" type="button" class="text-gray-400 hover:text-purple-500 transition-colors" :aria-label="showPassword ? 'Hide password' : 'Show password'">
-                                                    <EyeIcon v-if="!showPassword" class="h-5 w-5" />
-                                                    <EyeOffIcon v-else class="h-5 w-5" />
-                                                </button>
-                                            </div>
+                                <div class="p-4 md:p-8">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <!-- Mobile Number -->
+                                        <div>
+                                            <label for="mobile_number" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
+                                                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full p-2 mr-3">
+                                                    <PhoneIcon class="h-5 w-5 text-white" />
+                                                </div>
+                                                Mobile Number
+                                            </label>
+                                            <input type="text" v-model="form.mobile_number" id="mobile_number"
+                                                class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
                                         </div>
-                                        <div v-if="form.password" class="mt-3">
-                                            <div class="h-3 rounded-full bg-gray-200 overflow-hidden">
-                                                <div class="h-3 rounded-full transition-all duration-500" :class="passwordStrength.color" :style="{ width: passwordStrength.width }"></div>
-                                            </div>
-                                            <p class="text-sm mt-2 font-medium" :class="passwordStrength.textColor">{{ passwordStrength.label }}</p>
-                                        </div>
-                                    </div>
 
-                                    <!-- Confirm Password -->
-                                    <div>
-                                        <label for="password_confirmation" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                            <div class="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full p-1 mr-2">
-                                                <LockClosedIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            Confirm Password
-                                        </label>
-                                        <div class="relative">
-                                            <input :type="showConfirmPassword ? 'text' : 'password'" v-model="form.password_confirmation" id="password_confirmation" 
-                                                class="block w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white">
-                                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                                <button @click="showConfirmPassword = !showConfirmPassword" type="button" class="text-gray-400 hover:text-indigo-500 transition-colors" :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'">
-                                                    <EyeIcon v-if="!showConfirmPassword" class="h-5 w-5" />
-                                                    <EyeOffIcon v-else class="h-5 w-5" />
-                                                </button>
-                                            </div>
+                                        <!-- Official Tel -->
+                                        <div>
+                                            <label for="official_tel" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
+                                                <div class="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full p-2 mr-3">
+                                                    <OfficeBuildingIcon class="h-5 w-5 text-white" />
+                                                </div>
+                                                Office Phone
+                                            </label>
+                                            <input type="text" v-model="form.official_tel" id="official_tel"
+                                                class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Account Settings Section -->
-                            <div class="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
-                                <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
-                                    <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full p-2 mr-3">
-                                        <ShieldCheckIcon class="h-5 w-5 text-white" />
-                                    </div>
-                                    Account Settings
-                                </h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <!-- Status -->
-                                    <div>
-                                        <label for="status" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                            <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full p-1 mr-2">
-                                                <ShieldCheckIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            Account Status
-                                        </label>
-                                        <RadioGroup v-model="form.status" class="mt-2">
-                                            <RadioGroupLabel class="sr-only">Choose an account status</RadioGroupLabel>
-                                            <div class="grid grid-cols-2 gap-3">
-                                                <RadioGroupOption as="template" v-for="option in statusOptions" :key="option.label" :value="option.value" v-slot="{ active, checked }">
-                                                    <div :class="[checked ? 'bg-gradient-to-r from-emerald-500 to-teal-500 border-transparent text-white shadow' : 'bg-white border-2 border-gray-200 text-gray-900 hover:bg-gray-50 hover:border-emerald-300', 'border rounded-xl py-3 px-3 md:py-4 md:px-4 flex items-center justify-center text-sm font-semibold cursor-pointer focus:outline-none transition-colors duration-200']">
-                                                        <RadioGroupLabel as="span">{{ option.label }}</RadioGroupLabel>
-                                                    </div>
-                                                </RadioGroupOption>
-                                            </div>
-                                        </RadioGroup>
+                            <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 260px;">
+                                <div class="bg-cyan-500 md:bg-gradient-to-r md:from-cyan-500 md:to-blue-500 p-4 md:p-6">
+                                    <h3 class="text-xl font-semibold text-white flex items-center">
+                                        <div class="bg-white/20 rounded-full p-2 mr-3">
+                                            <ShieldCheckIcon class="h-6 w-6 text-white" />
+                                        </div>
+                                        Account Settings
+                                    </h3>
+                                    <p class="text-cyan-100 text-sm mt-1">Status & password rules</p>
+                                </div>
+                                <div class="p-4 md:p-8">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <!-- Status -->
+                                        <div>
+                                            <label for="status" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-4">
+                                                <div class="bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full p-2 mr-3">
+                                                    <ShieldCheckIcon class="h-5 w-5 text-white" />
+                                                </div>
+                                                Account Status
+                                            </label>
+                                            <RadioGroup v-model="form.status">
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    <RadioGroupOption v-for="option in statusOptions" :key="option.value" :value="option.value" v-slot="{ active, checked }">
+                                                        <div :class="[active ? 'ring-2 ring-blue-300' : '', checked ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600' : 'bg-white text-gray-900 border-gray-200 hover:bg-gray-50', 'relative flex cursor-pointer rounded-xl px-4 md:px-6 py-3 md:py-4 shadow focus:outline-none border-2 transition-colors duration-200']">
+                                                            <div class="flex w-full items-center justify-between">
+                                                                <div class="flex items-center">
+                                                                    <div class="text-sm md:text-base">
+                                                                        <RadioGroupLabel as="p" :class="checked ? 'text-white' : 'text-gray-900'" class="font-semibold">
+                                                                            {{ option.label }}
+                                                                        </RadioGroupLabel>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </RadioGroupOption>
+                                                </div>
+                                            </RadioGroup>
+                                        </div>
+
+                                        <!-- Password Expiry Date -->
+                                        <div>
+                                            <label for="password_expiry_date" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
+                                                <div class="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full p-2 mr-3">
+                                                    <CalendarIcon class="h-5 w-5 text-white" />
+                                                </div>
+                                                Password Validity (days)
+                                            </label>
+                                            <input type="number" v-model="form.password_expiry_date" id="password_expiry_date"
+                                                class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white"
+                                                min="0">
+                                        </div>
                                     </div>
 
-                                    <!-- Password Expiry Date -->
-                                    <div>
-                                        <label for="password_expiry_date" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                            <div class="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full p-1 mr-2">
-                                                <CalendarIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            Password Validity (days)
-                                        </label>
-                                        <input type="number" v-model="form.password_expiry_date" id="password_expiry_date" 
-                                            class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors duration-200 text-gray-900 bg-gray-50 hover:bg-white"
-                                            min="0">
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-6">
-                                    <!-- Amend Expired Password -->
-                                    <div>
-                                        <label for="amend_expired_password" class="flex items-center text-sm font-semibold text-gray-700 mb-3">
-                                            <div class="bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full p-1 mr-2">
-                                                <KeyIcon class="h-4 w-4 text-white" />
-                                            </div>
-                                            Update Expired Password
-                                        </label>
-                                        <SwitchGroup as="div" class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
-                                            <div>
-                                                <SwitchLabel as="span" class="text-sm font-medium text-gray-900">
-                                                    Allow password updates when expired
-                                                </SwitchLabel>
-                                                <p class="text-xs text-gray-500 mt-1">Enable users to update their own expired passwords</p>
-                                            </div>
-                                            <Switch v-model="amendPasswordEnabled" :class="[amendPasswordEnabled ? 'bg-gradient-to-r from-cyan-500 to-blue-500' : 'bg-gray-300', 'relative inline-flex flex-shrink-0 h-7 w-12 border-2 border-transparent rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500']">
-                                                <span aria-hidden="true" :class="[amendPasswordEnabled ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-6 w-6 rounded-full bg-white shadow ring-0 transition-transform']" />
-                                            </Switch>
-                                        </SwitchGroup>
+                                    <div class="mt-6">
+                                        <!-- Amend Expired Password -->
+                                        <div>
+                                            <label for="amend_expired_password" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
+                                                <div class="bg-gradient-to-r from-pink-500 to-red-500 rounded-full p-2 mr-3">
+                                                    <KeyIcon class="h-5 w-5 text-white" />
+                                                </div>
+                                                Allow Amend Expired Password
+                                            </label>
+                                            <SwitchGroup>
+                                                <div class="flex items-center p-4 bg-gray-50 rounded-xl">
+                                                    <Switch v-model="amendPasswordEnabled"
+                                                        :class="[amendPasswordEnabled ? 'bg-gradient-to-r from-pink-500 to-red-500' : 'bg-gray-300', 'relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-300']">
+                                                        <span aria-hidden="true" :class="[amendPasswordEnabled ? 'translate-x-7' : 'translate-x-1', 'inline-block h-6 w-6 rounded-full bg-white transform transition-transform duration-300 ease-in-out']" />
+                                                    </Switch>
+                                                    <SwitchLabel as="span" class="ml-4">
+                                                        <span class="text-sm md:text-lg font-semibold" :class="amendPasswordEnabled ? 'text-pink-600' : 'text-gray-600'">{{ amendPasswordEnabled ? 'Enabled' : 'Disabled' }}</span>
+                                                    </SwitchLabel>
+                                                </div>
+                                            </SwitchGroup>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-8 border-t border-gray-200">
-                                <Link href="/user" 
-                                    class="inline-flex justify-center items-center px-5 py-3 sm:px-8 sm:py-4 bg-gray-500 text-white text-lg font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-300 hover:bg-gray-600">
-                                    <XIcon class="h-6 w-6 mr-3" />
-                                    Cancel
-                                </Link>
-                                <button type="submit" 
-                                    class="inline-flex justify-center items-center px-5 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-semibold rounded-xl shadow hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-colors duration-200">
-                                    <SaveIcon class="h-6 w-6 mr-3" />
-                                    Update User
-                                </button>
+                            <!-- Security Settings Section -->
+                            <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 260px;">
+                                <div class="bg-purple-500 md:bg-gradient-to-r md:from-purple-500 md:to-pink-500 p-4 md:p-6">
+                                    <h3 class="text-xl font-semibold text-white flex items-center">
+                                        <div class="bg-white/20 rounded-full p-2 mr-3">
+                                            <LockClosedIcon class="h-6 w-6 text-white" />
+                                        </div>
+                                        Security Settings
+                                    </h3>
+                                    <p class="text-purple-100 text-sm mt-1">Update user password securely</p>
+                                </div>
+                                <div class="p-4 md:p-8">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <!-- Password -->
+                                        <div>
+                                            <label for="password" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
+                                                <div class="bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full p-2 mr-3">
+                                                    <LockClosedIcon class="h-5 w-5 text-white" />
+                                                </div>
+                                                New Password
+                                            </label>
+                                            <p class="text-xs text-gray-500 mb-2">Leave empty if you don't want to change the password</p>
+                                            <div class="relative">
+                                                <input :type="showPassword ? 'text' : 'password'" v-model="form.password" id="password"
+                                                    class="block w-full px-4 md:px-6 py-3 md:py-4 pr-12 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
+                                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                                    <button @click="showPassword = !showPassword" type="button" class="text-gray-400 hover:text-purple-500 transition-colors" :aria-label="showPassword ? 'Hide password' : 'Show password'">
+                                                        <EyeIcon v-if="!showPassword" class="h-5 w-5" />
+                                                        <EyeOffIcon v-else class="h-5 w-5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div v-if="form.password" class="mt-3">
+                                                <div class="h-3 rounded-full bg-gray-200 overflow-hidden">
+                                                    <div class="h-3 rounded-full transition-all duration-500" :class="passwordStrength.color" :style="{ width: passwordStrength.width }"></div>
+                                                </div>
+                                                <p class="text-sm mt-2 font-medium" :class="passwordStrength.textColor">{{ passwordStrength.label }}</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Confirm Password -->
+                                        <div>
+                                            <label for="password_confirmation" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
+                                                <div class="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full p-2 mr-3">
+                                                    <LockClosedIcon class="h-5 w-5 text-white" />
+                                                </div>
+                                                Confirm Password
+                                            </label>
+                                            <div class="relative">
+                                                <input :type="showConfirmPassword ? 'text' : 'password'" v-model="form.password_confirmation" id="password_confirmation"
+                                                    class="block w-full px-4 md:px-6 py-3 md:py-4 pr-12 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
+                                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                                    <button @click="showConfirmPassword = !showConfirmPassword" type="button" class="text-gray-400 hover:text-indigo-500 transition-colors" :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'">
+                                                        <EyeIcon v-if="!showConfirmPassword" class="h-5 w-5" />
+                                                        <EyeOffIcon v-else class="h-5 w-5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
+
+                    <!-- Action Buttons -->
+                    <div class="bg-white/80 shadow rounded-2xl border border-white/20 p-4 md:p-8" style="content-visibility:auto; contain-intrinsic-size: 1px 160px; contain: content;">
+                        <div class="flex flex-col sm:flex-row gap-4 justify-end">
+                            <Link href="/user"
+                                class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
+                                <XIcon class="h-6 w-6 mr-3" />
+                                Cancel
+                            </Link>
+                            <button type="submit"
+                                class="flex-1 inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-200">
+                                <SaveIcon class="h-6 w-6 mr-3" />
+                                Update User
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </AppLayout>
