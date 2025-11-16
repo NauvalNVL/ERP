@@ -5,47 +5,16 @@
     
     <!-- Modal Container -->
     <div class="flex min-h-full items-center justify-center p-4">
-      <div class="relative w-full max-w-6xl bg-white rounded-lg shadow-xl">
+      <div class="relative w-full max-w-6xl bg-white rounded-lg shadow-xl flex flex-col max-h-[calc(100vh-4rem)] overflow-hidden">
         <!-- Header -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-          <h3 class="text-lg font-semibold text-gray-900">Sales Order Screen</h3>
-          <div class="flex items-center space-x-2">
-            <!-- Control Buttons -->
-            <button 
-              @click="handlePowerOff"
-              class="p-2 text-red-600 hover:bg-red-100 rounded transition-colors"
-              title="Power Off"
-            >
-              <i class="fas fa-power-off"></i>
-            </button>
-            <button 
-              @click="closeModal"
-              class="p-2 text-red-600 hover:bg-red-100 rounded transition-colors"
-              title="Close"
-            >
-              <i class="fas fa-times"></i>
-            </button>
-            <button 
-              @click="handleSave"
-              class="p-2 text-blue-600 hover:bg-blue-100 rounded transition-colors"
-              title="Save"
-            >
-              <i class="fas fa-save"></i>
-            </button>
-            <button 
-              @click="handleRefresh"
-              class="p-2 text-green-600 hover:bg-green-100 rounded transition-colors"
-              title="Refresh"
-            >
-              <i class="fas fa-arrow-left"></i>
-            </button>
-          </div>
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
+          <h3 class="text-lg font-semibold text-white">Sales Order Screen</h3>
         </div>
 
         <!-- Modal Content -->
-        <div class="p-6 space-y-6">
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
           <!-- Order Information Section -->
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Order Group:</label>
               <input 
@@ -71,8 +40,8 @@
             <h4 class="text-md font-semibold text-gray-800">Sales Order Entry</h4>
             
             <!-- Sales Order Table -->
-            <div class="border border-gray-200 rounded-lg overflow-hidden">
-              <table class="min-w-full divide-y divide-gray-200">
+            <div class="border border-gray-200 rounded-lg overflow-hidden overflow-x-auto">
+              <table class="min-w-[720px] divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">No.</th>
@@ -157,8 +126,8 @@
           <div class="space-y-4">
             <h4 class="text-md font-semibold text-gray-800">Item Details</h4>
             
-            <div class="border border-gray-200 rounded-lg overflow-hidden">
-              <table class="min-w-full divide-y divide-gray-200">
+            <div class="border border-gray-200 rounded-lg overflow-hidden overflow-x-auto">
+              <table class="min-w-[720px] divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
@@ -235,7 +204,7 @@
               </div>
               <h4 class="ml-3 text-md font-semibold text-gray-800">Additional Information</h4>
             </div>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Model:</label>
                 <input 
@@ -269,7 +238,7 @@
 
         <!-- Footer -->
         <div class="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
-          <div class="text-sm text-gray-600">
+          <div class="text-sm text-white">
             <i class="fas fa-info-circle text-blue-500 mr-2"></i>
             Select sales order and configure items for delivery
           </div>

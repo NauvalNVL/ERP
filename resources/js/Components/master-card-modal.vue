@@ -1,23 +1,25 @@
 <template>
-  <div v-if="show" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 max-w-lg mx-auto">
+  <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-2 sm:p-4 md:p-6">
+    <!-- Background overlay -->
+    <div class="fixed inset-0 bg-black bg-opacity-50" @click="$emit('close')"></div>
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-sm sm:max-w-xl md:max-w-3xl lg:w-3/4 xl:w-2/3 z-60 relative max-h-[95vh] flex flex-col mx-auto">
       <!-- Modal Header -->
-      <div class="flex items-center justify-between p-4 border-b border-gray-200" 
-           :class="[
-             mode === 'add' ? 'bg-gradient-to-r from-green-600 to-green-700' : 'bg-gradient-to-r from-blue-600 to-blue-700',
-             'text-white rounded-t-lg'
-           ]">
-        <h3 class="text-xl font-semibold flex items-center text-white">
-          <i :class="[mode === 'add' ? 'fas fa-plus-circle' : 'fas fa-edit', 'mr-3']"></i>
-          {{ mode === 'add' ? 'Add New Master Card' : 'Edit Master Card' }}
+      <div class="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+        <h3 class="text-base sm:text-xl font-semibold flex items-center text-white">
+          <i :class="[mode === 'add' ? 'fas fa-plus-circle' : 'fas fa-edit', 'mr-2 sm:mr-3']"></i>
+          <span class="truncate">{{ mode === 'add' ? 'Add New Master Card' : 'Edit Master Card' }}</span>
         </h3>
-        <button type="button" @click="$emit('close')" class="text-white hover:text-gray-200 focus:outline-none">
-          <i class="fas fa-times text-xl"></i>
+        <button
+          type="button"
+          @click="$emit('close')"
+          class="text-white hover:text-gray-200 focus:outline-none transform active:translate-y-px ml-2"
+        >
+          <i class="fas fa-times text-lg sm:text-xl"></i>
         </button>
       </div>
 
       <!-- Modal Body -->
-      <div class="p-6">
+      <div class="p-3 sm:p-4 md:p-5 flex-1 overflow-y-auto">
         <div v-if="loading" class="flex justify-center items-center p-4">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         </div>

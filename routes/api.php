@@ -45,6 +45,63 @@ use App\Http\Controllers\WarehouseManagement\Invoice\InvoiceController;
 |
 */
 
+// Menu search routes for AppLayout header search
+// This endpoint is used by the Vue AppLayout to provide a searchable menu.
+// It scans all registered routes, filters for GET web routes whose names
+// start with 'vue.', and returns a simplified list of { title, uri, name }.
+Route::get('/menu-routes', function (Request $request) {
+    $routes = collect(Route::getRoutes())
+        ->filter(function ($route) {
+            // Only GET routes
+            if (!in_array('GET', $route->methods(), true)) {
+                return false;
+            }
+
+            $uri = $route->uri();
+
+            // Skip API routes themselves to avoid noise
+            if (strpos($uri, 'api/') === 0) {
+                return false;
+            }
+
+            $name = $route->getName();
+
+            // Only include routes that are used for Vue pages / menus
+            if ($name && strpos($name, 'vue.') === 0) {
+                return true;
+            }
+
+            return false;
+        })
+        ->map(function ($route) {
+            $uri = '/' . ltrim($route->uri(), '/');
+            $name = $route->getName();
+
+            // Humanize title from last URI segment (e.g. 'prepare-mc-so' -> 'Prepare Mc So')
+            $segment = collect(explode('/', trim($uri, '/')))->last();
+            $segment = $segment ?: $uri;
+            $title = ucwords(str_replace(['-', '_'], ' ', $segment));
+
+            // Custom labels for specific invoice DO routes so they appear nicely in menu search
+            if ($name === 'vue.warehouse-management.invoice.iv-processing.prepare-by-do-current-period') {
+                $title = 'Prepare Invoice by D/Order (Current Period)';
+            } elseif ($name === 'vue.warehouse-management.invoice.iv-processing.prepare-by-do-open-period') {
+                $title = 'Prepare Invoice by D/Order (Open Period)';
+            }
+
+            return [
+                'title' => $title,
+                'uri'   => $uri,
+                'name'  => $name,
+            ];
+        })
+        // Ensure each URI appears only once
+        ->unique('uri')
+        ->values();
+
+    return response()->json($routes);
+});
+
 // NOTE: Material Management SKU routes are now defined in the material-management prefix group below (around line 1104)
 // to avoid duplication and ensure proper route ordering
 

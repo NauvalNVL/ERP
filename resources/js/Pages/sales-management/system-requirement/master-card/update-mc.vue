@@ -1426,7 +1426,7 @@ const selectCustomer = async (customer) => {
     });
 
     // Close the modal
-    showCustomerAccountModal.value = false;
+    showCustomerAccountTable.value = false;
 
     // Reset Master Card data when customer changes
     isProgrammaticUpdate.value = true; // Prevent input handlers from clearing data
@@ -1512,15 +1512,15 @@ const openCustomerAccountModal = () => {
         // Use .then instead of await to better handle errors
         loadCustomerAccounts()
             .then(() => {
-                showCustomerAccountModal.value = true;
+                showCustomerAccountTable.value = true;
             })
             .catch((error) => {
                 console.error("Failed to load customer accounts:", error);
                 // Still show the modal, just with empty data
-                showCustomerAccountModal.value = true;
+                showCustomerAccountTable.value = true;
             });
     } else {
-        showCustomerAccountModal.value = true;
+        showCustomerAccountTable.value = true;
     }
 };
 

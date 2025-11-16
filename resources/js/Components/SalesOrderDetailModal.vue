@@ -5,47 +5,16 @@
     
     <!-- Modal Container -->
     <div class="flex min-h-full items-center justify-center p-4">
-      <div class="relative w-full max-w-7xl bg-white rounded-lg shadow-xl">
+      <div class="relative w-full max-w-7xl bg-white rounded-lg shadow-xl flex flex-col max-h-[calc(100vh-4rem)] overflow-hidden">
         <!-- Header -->
-        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-100">
-          <h3 class="text-lg font-semibold text-gray-900">Sales Order Detail Screen</h3>
-          <div class="flex items-center space-x-2">
-            <!-- Control Buttons -->
-            <button 
-              @click="handlePowerOff"
-              class="p-2 text-red-600 hover:bg-red-100 rounded transition-colors"
-              title="Power Off"
-            >
-              <i class="fas fa-power-off"></i>
-            </button>
-            <button 
-              @click="handleUndo"
-              class="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors"
-              title="Undo"
-            >
-              <i class="fas fa-undo"></i>
-            </button>
-            <button 
-              @click="handlePrint"
-              class="p-2 text-blue-600 hover:bg-blue-100 rounded transition-colors"
-              title="Print"
-            >
-              <i class="fas fa-print"></i>
-            </button>
-            <button 
-              @click="handleSave"
-              class="p-2 text-green-600 hover:bg-green-100 rounded transition-colors"
-              title="Save"
-            >
-              <i class="fas fa-save"></i>
-            </button>
-          </div>
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
+          <h3 class="text-lg font-semibold text-white">Sales Order Detail Screen</h3>
         </div>
 
         <!-- Modal Content -->
-        <div class="p-6 space-y-6">
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
           <!-- Top Information Section -->
-          <div class="grid grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Left Column -->
             <div class="space-y-3">
               <div class="flex items-center space-x-2">
@@ -156,7 +125,7 @@
             </div>
 
             <!-- Right Column - Product Description -->
-            <div class="col-span-2">
+            <div class="md:col-span-2 lg:col-span-2">
               <div class="flex items-center space-x-2 mb-3">
                 <input 
                   v-model="orderDetail.productDescription"
@@ -170,7 +139,7 @@
           </div>
 
           <!-- Delivery Settings -->
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div class="flex items-center space-x-4">
               <div class="flex items-center space-x-2">
                 <label class="text-sm font-medium text-gray-700">
@@ -209,8 +178,8 @@
           </div>
 
           <!-- Main Data Table -->
-          <div class="border border-gray-300 rounded-lg overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200">
+          <div class="border border-gray-300 rounded-lg overflow-hidden overflow-x-auto">
+            <table class="min-w-[960px] divide-y divide-gray-200">
               <thead class="bg-gray-100">
                 <tr>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-300">Item</th>
@@ -374,7 +343,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="flex items-center justify-end space-x-4 p-4 border-t border-gray-200 bg-gray-50">
+        <div class="flex items-center justify-end space-x-4 p-4 border-t border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
           <button 
             @click="closeModal"
             class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
