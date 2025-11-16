@@ -12,6 +12,7 @@
 
             <div class="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-white to-gray-50">
                 <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
@@ -56,6 +57,7 @@
                             </tr>
                         </tbody>
                     </table>
+                    </div>
                 </div>
 
                 <!-- Detail Panel - CPS Style -->
@@ -167,19 +169,19 @@ const loading = ref(false);
 const selectedRow = ref(null);
 const reason = ref('');
 const localQuery = ref({
-    part1: props.initialQuery.part1 || '',
-    part2: props.initialQuery.part2 || '',
-    part3: props.initialQuery.part3 || ''
+    part1: '',
+    part2: '',
+    part3: ''
 });
 
 // Watch for modal open
 watch(() => props.open, (newVal) => {
     if (newVal) {
-        // Update local query from props when modal opens
+        // Reset local query when modal opens so Invoice# fields start empty
         localQuery.value = {
-            part1: props.initialQuery.part1 || '',
-            part2: props.initialQuery.part2 || '',
-            part3: props.initialQuery.part3 || ''
+            part1: '',
+            part2: '',
+            part3: ''
         };
         // Fetch invoices when modal opens
         fetchInvoices();

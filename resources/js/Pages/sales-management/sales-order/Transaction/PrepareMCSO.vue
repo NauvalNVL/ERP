@@ -1,16 +1,16 @@
 <template>
   <AppLayout header="Prepare MC SO">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="bg-white shadow-xl rounded-xl border border-gray-200 overflow-hidden max-w-6xl mx-auto px-4 py-6">
       <!-- Header with controls -->
-      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-          <div class="flex items-center justify-between">
+      <div class="bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-100 px-6 py-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <i class="fas fa-clipboard-list text-2xl text-blue-600"></i>
             <div>
-            <h1 class="text-xl font-semibold text-gray-800">Prepare MC SO</h1>
-              <p class="text-xs text-gray-500">F2: Customer • F3: Master Card • F4: Calendar • F6: SO Table • Ctrl+S: Save • F5: Refresh</p>
+              <h1 class="text-xl font-semibold text-white">Prepare MC SO</h1>
+              <p class="text-xs text-white">Form for preparing Master Card based Sales Order</p>
             </div>
-            </div>
+          </div>
           <div class="flex items-center space-x-2">
             <button
               @click="refreshPage"
@@ -19,35 +19,19 @@
             >
               <i class="fas fa-sync-alt"></i>
             </button>
-              <button
-              @click="printLog"
-              class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
-              title="Print SO Log (Ctrl+P)"
-              >
-              <i class="fas fa-print mr-1"></i>
-              Print SO Log
-              </button>
-              <button
-              @click="printJitTracking"
-              class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
-              title="Print JIT Tracking"
-              >
-              <i class="fas fa-print mr-1"></i>
-              Print SO JIT Tracking
-              </button>
-            </div>
           </div>
         </div>
+      </div>
 
       <!-- Main Form Content -->
       <div class="p-6">
         <!-- Period and Customer Information -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <!-- Period Information -->
-              <div class="space-y-4">
-            <div class="bg-gray-50 rounded-lg p-4">
-              <h3 class="text-sm font-medium text-gray-700 mb-3">Period Information</h3>
-              <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-4">
+            <div class="bg-gradient-to-b from-gray-50 to-white rounded-lg p-4 border border-gray-200 shadow-sm">
+              <h3 class="text-sm font-semibold text-gray-800 mb-4 border-b border-dashed border-gray-200 pb-2">Period Information</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Current Period:</label>
                   <div class="flex items-center space-x-2">
@@ -89,31 +73,31 @@
                 </div>
               </div>
               <div class="grid grid-cols-2 gap-4 mt-3">
-                  <div>
+                <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Forward Period:</label>
-                    <div class="flex items-center space-x-2">
-                      <input
+                  <div class="flex items-center space-x-2">
+                    <input
                       v-model="forwardPeriod"
-                        type="number"
+                      type="number"
                       min="1"
                       class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
-                      >
+                    >
                     <span class="text-xs text-gray-500">Months</span>
-                    </div>
                   </div>
-                  <div>
+                </div>
+                <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Backward Period:</label>
-                    <div class="flex items-center space-x-2">
-                      <input
+                  <div class="flex items-center space-x-2">
+                    <input
                       v-model="backwardPeriod"
-                        type="number"
+                      type="number"
                       min="1"
                       class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
-                      >
+                    >
                     <span class="text-xs text-gray-500">Months</span>
                   </div>
                 </div>
@@ -121,8 +105,8 @@
             </div>
 
             <!-- Last SO Order ID -->
-            <div class="bg-gray-50 rounded-lg p-4">
-              <h3 class="text-sm font-medium text-gray-700 mb-3">Order Information</h3>
+            <div class="bg-gradient-to-b from-gray-50 to-white rounded-lg p-4 border border-gray-200 shadow-sm">
+              <h3 class="text-sm font-semibold text-gray-800 mb-4 border-b border-dashed border-gray-200 pb-2">Order Information</h3>
               <div class="flex items-center space-x-2">
                 <label class="text-xs font-medium text-gray-600">Last S/Order#:</label>
                 <input
@@ -140,14 +124,14 @@
                   type="number"
                   class="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                </div>
               </div>
             </div>
+          </div>
 
-            <!-- Customer Information -->
-              <div class="space-y-4">
-            <div class="bg-gray-50 rounded-lg p-4">
-              <h3 class="text-sm font-medium text-gray-700 mb-3">Customer Information</h3>
+          <!-- Customer Information -->
+          <div class="space-y-4">
+            <div class="bg-gradient-to-b from-gray-50 to-white rounded-lg p-4 border border-gray-200 shadow-sm">
+              <h3 class="text-sm font-semibold text-gray-800 mb-4 border-b border-dashed border-gray-200 pb-2">Customer Information</h3>
               <div class="space-y-3">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Customer Code:</label>
@@ -228,62 +212,61 @@
         </div>
 
         <!-- Sales Order Details -->
-        <div class="bg-gray-50 rounded-lg p-4 mb-6" v-if="selectedCustomer.code && selectedMasterCard.seq">
-          <h3 class="text-sm font-medium text-gray-700 mb-4">Sales Order Details</h3>
+        <div class="bg-gradient-to-b from-gray-50 to-white rounded-lg p-5 mb-6 border border-gray-200 shadow-sm" v-if="selectedCustomer.code && selectedMasterCard.seq">
+          <h3 class="text-sm font-semibold text-gray-800 mb-4 border-b border-dashed border-gray-200 pb-2">Sales Order Details</h3>
 
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-x-10">
             <!-- Order Information -->
-              <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-4 lg:pr-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Order Mode:</label>
                   <select
                     v-model="orderDetails.orderMode"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
-                    disabled
-                  >
+                    disabled>
                     <option value="0">0-Order by Customer + Deliver & Invoice to Customer</option>
                     <option value="1">1-Order by Customer + Deliver to Customer + Invoice to Different Address</option>
                     <option value="2">2-Order by Customer + Deliver to Different Address + Invoice to Customer</option>
                     <option value="3">3-Order by Customer + Deliver to Different Address + Invoice to Different Address</option>
                   </select>
                 </div>
-                  <div>
+                <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Product:</label>
                   <div class="flex items-center space-x-2">
                     <input
                       v-model="orderDetails.product.code"
                       type="text"
-                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                      class="w-16 px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
                     >
                     <input
                       v-model="orderDetails.product.name"
                       type="text"
-                      class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
                     >
                   </div>
-                  </div>
                 </div>
+              </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
+              <div class="grid grid-cols-1 gap-4">
+                <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Salesperson:</label>
                   <div class="flex items-center space-x-2">
                     <input
                       v-model="orderDetails.salesperson.code"
                       type="text"
-                      class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                      class="w-16 px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
                     >
                     <input
                       v-model="orderDetails.salesperson.name"
                       type="text"
-                      class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600"
                       readonly
                       disabled
                     >
@@ -299,9 +282,9 @@
                     disabled
                   >
                 </div>
-                </div>
+              </div>
 
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">Exchange Rate:</label>
                   <input
@@ -339,35 +322,36 @@
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">P/Order Date:</label>
                 <div class="flex items-center space-x-2">
-                    <input
+                  <input
                     ref="pOrderDateInput"
                     v-model="orderDetails.pOrderDate"
-                      type="date"
+                    type="date"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     @change="updateDayOfWeek"
-                    >
+                  >
                   <span class="text-xs text-gray-500 min-w-[35px]">{{ dayOfWeek }}</span>
                 </div>
-                  </div>
-                </div>
+              </div>
+            </div>
 
             <!-- Order Configuration -->
-            <div class="space-y-4">
-                <div>
+            <div class="space-y-4 lg:pl-4">
+              <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Set Quantity:</label>
                 <div class="flex items-center space-x-2">
                   <input
                     v-model="orderDetails.setQuantity"
                     type="text"
                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Leave blank for loose item order">
-                  </div>
+                    placeholder="Leave blank for loose item order"
+                  >
                 </div>
+              </div>
 
-                <div>
+              <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Order Group:</label>
                 <div class="flex items-center space-x-4">
-                    <label class="flex items-center">
+                  <label class="flex items-center">
                     <input
                       v-model="orderDetails.orderGroup"
                       type="radio"
@@ -376,8 +360,8 @@
                       @change="handleOrderGroupChange"
                     >
                     <span class="text-sm text-gray-700">Sales</span>
-                    </label>
-                    <label class="flex items-center">
+                  </label>
+                  <label class="flex items-center">
                     <input
                       v-model="orderDetails.orderGroup"
                       type="radio"
@@ -386,13 +370,13 @@
                       @change="handleOrderGroupChange"
                     >
                     <span class="text-sm text-gray-700">Non-Sales</span>
-                    </label>
-                  </div>
+                  </label>
                 </div>
+              </div>
 
-                <div>
+              <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Order Type:</label>
-                  <select
+                <select
                   v-model="orderDetails.orderType"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   @change="handleOrderTypeChange"
@@ -404,55 +388,55 @@
                   >
                     {{ orderType.label }}
                   </option>
-                  </select>
-                  <div v-if="selectedOrderTypeDescription" class="mt-1 text-xs text-gray-500 italic">
-                    {{ selectedOrderTypeDescription }}
+                </select>
+                <div v-if="selectedOrderTypeDescription" class="mt-1 text-xs text-gray-500 italic">
+                  {{ selectedOrderTypeDescription }}
+                </div>
+
+                <!-- Workflow Steps Display -->
+                <div v-if="currentOrderTypeConfig && currentOrderTypeConfig.workflow" class="mt-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 shadow-sm">
+                  <div class="text-xs font-semibold text-blue-900 mb-2 flex items-center">
+                    <i class="fas fa-route mr-1"></i>
+                    Workflow Process:
+                  </div>
+                  <div class="flex items-center space-x-2 text-xs flex-wrap gap-y-1">
+                    <template v-for="(step, index) in getWorkflowSteps()" :key="step.code">
+                      <div class="flex items-center px-2 py-1 bg-white rounded-md border border-blue-300 text-blue-800 font-medium shadow-sm">
+                        <i :class="step.icon + ' mr-1 text-blue-600'"></i>
+                        {{ step.name }}
+                      </div>
+                      <i v-if="index < getWorkflowSteps().length - 1" class="fas fa-chevron-right text-blue-500"></i>
+                    </template>
                   </div>
 
-                  <!-- Workflow Steps Display -->
-                  <div v-if="currentOrderTypeConfig && currentOrderTypeConfig.workflow" class="mt-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 shadow-sm">
-                    <div class="text-xs font-semibold text-blue-900 mb-2 flex items-center">
-                      <i class="fas fa-route mr-1"></i>
-                      Workflow Process:
+                  <!-- Special Indicators -->
+                  <div class="mt-2 flex items-center space-x-3 text-xs">
+                    <div v-if="currentOrderTypeConfig.isKanban" class="flex items-center text-orange-600">
+                      <i class="fas fa-clock mr-1"></i>
+                      <span class="font-medium">JIT/Kanban Mode</span>
                     </div>
-                    <div class="flex items-center space-x-2 text-xs flex-wrap gap-y-1">
-                      <template v-for="(step, index) in getWorkflowSteps()" :key="step.code">
-                        <div class="flex items-center px-2 py-1 bg-white rounded-md border border-blue-300 text-blue-800 font-medium shadow-sm">
-                          <i :class="step.icon + ' mr-1 text-blue-600'"></i>
-                          {{ step.name }}
-                        </div>
-                        <i v-if="index < getWorkflowSteps().length - 1" class="fas fa-chevron-right text-blue-500"></i>
-                      </template>
+                    <div v-if="currentOrderTypeConfig.skipCorrugator" class="flex items-center text-purple-600">
+                      <i class="fas fa-forward mr-1"></i>
+                      <span class="font-medium">Skip Corrugator</span>
                     </div>
-
-                    <!-- Special Indicators -->
-                    <div class="mt-2 flex items-center space-x-3 text-xs">
-                      <div v-if="currentOrderTypeConfig.isKanban" class="flex items-center text-orange-600">
-                        <i class="fas fa-clock mr-1"></i>
-                        <span class="font-medium">JIT/Kanban Mode</span>
-                      </div>
-                      <div v-if="currentOrderTypeConfig.skipCorrugator" class="flex items-center text-purple-600">
-                        <i class="fas fa-forward mr-1"></i>
-                        <span class="font-medium">Skip Corrugator</span>
-                      </div>
-                      <div v-if="currentOrderTypeConfig.corrugatorOnly" class="flex items-center text-green-600">
-                        <i class="fas fa-cog mr-1"></i>
-                        <span class="font-medium">Corrugator Only</span>
-                      </div>
-                      <div v-if="currentOrderTypeConfig.requiresInvoice" class="flex items-center text-blue-600">
-                        <i class="fas fa-file-invoice-dollar mr-1"></i>
-                        <span class="font-medium">With Invoice</span>
-                      </div>
-                      <div v-else class="flex items-center text-gray-600">
-                        <i class="fas fa-ban mr-1"></i>
-                        <span class="font-medium">No Invoice</span>
-                      </div>
+                    <div v-if="currentOrderTypeConfig.corrugatorOnly" class="flex items-center text-green-600">
+                      <i class="fas fa-cog mr-1"></i>
+                      <span class="font-medium">Corrugator Only</span>
+                    </div>
+                    <div v-if="currentOrderTypeConfig.requiresInvoice" class="flex items-center text-blue-600">
+                      <i class="fas fa-file-invoice-dollar mr-1"></i>
+                      <span class="font-medium">With Invoice</span>
+                    </div>
+                    <div v-else class="flex items-center text-gray-600">
+                      <i class="fas fa-ban mr-1"></i>
+                      <span class="font-medium">No Invoice</span>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div>
                   <label class="block text-xs font-medium text-gray-600 mb-1">
                     Sales Tax:
                     <span class="text-xs text-gray-400 font-normal">Tick for Y-Yes</span>
@@ -482,84 +466,84 @@
 
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Remark:</label>
-                  <textarea
+                <textarea
                   v-model="orderDetails.remark"
-                    rows="2"
+                  rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder=""
-                  ></textarea>
-                </div>
+                ></textarea>
+              </div>
 
-                <div>
+              <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Instruction1:</label>
-                  <textarea
+                <textarea
                   v-model="orderDetails.instruction1"
-                    rows="2"
+                  rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder=""
-                  ></textarea>
-                </div>
+                ></textarea>
+              </div>
 
-                <div>
+              <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Instruction2:</label>
-                  <textarea
+                <textarea
                   v-model="orderDetails.instruction2"
-                    rows="2"
+                  rows="2"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder=""
-                  ></textarea>
+                ></textarea>
               </div>
             </div>
           </div>
 
           <!-- Action Buttons -->
-          <div class="flex justify-center space-x-4 mt-6">
-                <button
-                  @click="openProductDesignScreen"
-              class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center disabled:bg-gray-400 disabled:cursor-not-allowed"
+          <div class="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+            <button
+              @click="openProductDesignScreen"
+              class="w-full sm:w-auto px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed shadow-md"
               :disabled="!canProceed"
-                >
+            >
               <i class="fas fa-cogs mr-2"></i>
-              Continue to Product Design
-                </button>
-              </div>
+              <span>Continue to Product Design</span>
+            </button>
+          </div>
 
-              <!-- Form validation summary -->
-              <div v-if="!canProceed" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <div class="flex items-center">
-                  <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
-                  <span class="text-sm text-yellow-800">
-                    Please complete the required fields to proceed:
-                  </span>
-                </div>
-                <ul class="text-xs text-yellow-700 mt-2 ml-6 list-disc">
-                  <li v-if="!selectedCustomer.code">Select a customer account</li>
-                  <li v-if="!selectedMasterCard.seq">Select a master card sequence</li>
-                </ul>
-              </div>
-
-              <!-- Master Card Approval Warning -->
-              <div v-if="canProceed && !isMasterCardApproved" class="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                <div class="flex items-center">
-                  <i class="fas fa-exclamation-triangle text-orange-600 mr-2"></i>
-                  <span class="text-sm text-orange-800 font-medium">
-                    Master Card Approval Notice
-                  </span>
-                </div>
-                <p class="text-xs text-orange-700 mt-1">
-                  The selected master card is not yet approved. You can proceed with creating the sales order,
-                  but the master card may need to be approved before production can begin.
-                </p>
-              </div>
-                </div>
-              </div>
+          <!-- Form validation summary -->
+          <div v-if="!canProceed" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div class="flex items-center">
+              <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+              <span class="text-sm text-yellow-800">
+                Please complete the required fields to proceed:
+              </span>
             </div>
+            <ul class="text-xs text-yellow-700 mt-2 ml-6 list-disc">
+              <li v-if="!selectedCustomer.code">Select a customer account</li>
+              <li v-if="!selectedMasterCard.seq">Select a master card sequence</li>
+            </ul>
+          </div>
+
+          <!-- Master Card Approval Warning -->
+          <div v-if="canProceed && !isMasterCardApproved" class="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+            <div class="flex items-center">
+              <i class="fas fa-exclamation-triangle text-orange-600 mr-2"></i>
+              <span class="text-sm text-orange-800 font-medium">
+                Master Card Approval Notice
+              </span>
+            </div>
+            <p class="text-xs text-orange-700 mt-1">
+              The selected master card is not yet approved. You can proceed with creating the sales order,
+              but the master card may need to be approved before production can begin.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Customer Lookup Modal -->
     <CustomerAccountModal
       :show="showCustomerModal"
       @close="showCustomerModal = false"
-          @select="selectCustomer"
+      @select="selectCustomer"
       :initial-sort-by="'customer_code'"
       :initial-status-filter="['Active']"
     />
@@ -1060,7 +1044,7 @@ const refreshPage = () => {
     exchangeMethod: 'N/A',
     customerPOrder: '',
     pOrderDate: new Date().toISOString().split('T')[0],
-    setQuantity: false,
+    setQuantity: '',
     orderGroup: 'Sales',
     orderType: 'S1-Sales',
     salesTax: false,
@@ -1077,24 +1061,6 @@ const refreshPage = () => {
   success('Form reset successfully')
 }
 
-const printLog = async () => {
-  // Open Sales Order Table Modal to view existing sales orders
-  openSalesOrderTable()
-}
-
-const printJitTracking = async () => {
-  try {
-    const response = await fetch('/api/sales-order/print-jit-tracking')
-    const data = await response.json()
-    success('JIT Tracking report generated successfully')
-    // You can implement actual PDF download or print functionality here
-    console.log('JIT Tracking data:', data)
-  } catch (err) {
-    error('Error generating JIT Tracking report')
-  }
-}
-
-// Open Sales Order Table Modal
 const openSalesOrderTable = () => {
   if (!selectedCustomer.code) {
     error('Please select a customer first to view sales orders')
@@ -2102,11 +2068,6 @@ const handleKeyDown = (event) => {
     openSalesOrderTable()
   }
 
-  // Ctrl/Cmd + P to print log
-  if ((event.ctrlKey || event.metaKey) && event.key === 'p') {
-    event.preventDefault()
-    printLog()
-  }
 }
 
 

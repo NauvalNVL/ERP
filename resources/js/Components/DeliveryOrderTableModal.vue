@@ -24,7 +24,7 @@
             leave-from="opacity-100 translate-y-0 sm:scale-100"
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <DialogPanel class="relative transform overflow-hidden rounded-xl bg-white shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-6xl">
+            <DialogPanel class="relative transform overflow-hidden rounded-xl bg-white shadow-2xl transition-all w-full max-w-6xl max-h-[85vh] flex flex-col sm:my-8">
               <!-- Header with Gradient -->
               <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 px-6 py-4">
                 <div class="flex items-center justify-between">
@@ -43,7 +43,7 @@
               </div>
 
               <!-- Content -->
-              <div class="p-6 bg-gray-50">
+              <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
                 <!-- Table Container with Modern Shadow -->
                 <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
                   <!-- Table -->
@@ -51,14 +51,14 @@
                     <table class="min-w-full divide-y divide-gray-200">
                       <thead class="bg-gradient-to-r from-gray-100 to-gray-50">
                         <tr>
-                          <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">D/ORDER#</th>
-                          <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">D/O DATE</th>
-                          <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">CUSTOMER</th>
-                          <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">VEHICLE#</th>
-                          <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">ITEM#</th>
-                          <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">P/C</th>
-                          <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">MODE</th>
-                          <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">STATUS</th>
+                          <th class="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">D/ORDER#</th>
+                          <th class="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">D/O DATE</th>
+                          <th class="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">CUSTOMER</th>
+                          <th class="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">VEHICLE#</th>
+                          <th class="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">ITEM#</th>
+                          <th class="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">P/C</th>
+                          <th class="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">MODE</th>
+                          <th class="px-2 py-2 sm:px-4 sm:py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">STATUS</th>
                         </tr>
                       </thead>
                       <tbody class="bg-white divide-y divide-gray-100">
@@ -71,28 +71,28 @@
                               : 'hover:bg-blue-50 hover:shadow-sm'
                           ]"
                         >
-                          <td :class="['px-4 py-3 text-sm font-semibold border-r', isSelected(order.do_number) ? 'border-blue-500 text-white' : 'border-gray-200 text-gray-900']">
+                          <td :class="['px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm font-semibold border-r', isSelected(order.do_number) ? 'border-blue-500 text-white' : 'border-gray-200 text-gray-900']">
                             {{ order.do_number }}
                           </td>
-                          <td :class="['px-4 py-3 text-sm border-r', isSelected(order.do_number) ? 'border-blue-500 text-blue-50' : 'border-gray-200 text-gray-600']">
+                          <td :class="['px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm border-r', isSelected(order.do_number) ? 'border-blue-500 text-blue-50' : 'border-gray-200 text-gray-600']">
                             {{ formatDate(order.do_date) }}
                           </td>
-                          <td :class="['px-4 py-3 text-sm border-r', isSelected(order.do_number) ? 'border-blue-500 text-white' : 'border-gray-200 text-gray-900']">
+                          <td :class="['px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm border-r', isSelected(order.do_number) ? 'border-blue-500 text-white' : 'border-gray-200 text-gray-900']">
                             {{ order.customer_code || '-' }}
                           </td>
-                          <td :class="['px-4 py-3 text-sm border-r', isSelected(order.do_number) ? 'border-blue-500 text-blue-100' : 'border-gray-200 text-gray-600']">
+                          <td :class="['px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm border-r', isSelected(order.do_number) ? 'border-blue-500 text-blue-100' : 'border-gray-200 text-gray-600']">
                             {{ order.vehicle_no || '-' }}
                           </td>
-                          <td :class="['px-4 py-3 text-sm border-r text-center', isSelected(order.do_number) ? 'border-blue-500 text-white' : 'border-gray-200 text-gray-900']">
+                          <td :class="['px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm border-r text-center', isSelected(order.do_number) ? 'border-blue-500 text-white' : 'border-gray-200 text-gray-900']">
                             {{ order.item_count || 1 }}
                           </td>
-                          <td :class="['px-4 py-3 text-sm border-r text-center', isSelected(order.do_number) ? 'border-blue-500 text-white' : 'border-gray-200 text-gray-900']">
+                          <td :class="['px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm border-r text-center', isSelected(order.do_number) ? 'border-blue-500 text-white' : 'border-gray-200 text-gray-900']">
                             {{ order.pc || 1 }}
                           </td>
-                          <td :class="['px-4 py-3 text-sm border-r', isSelected(order.do_number) ? 'border-blue-500 text-blue-50' : 'border-gray-200 text-gray-600']">
+                          <td :class="['px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm border-r', isSelected(order.do_number) ? 'border-blue-500 text-blue-50' : 'border-gray-200 text-gray-600']">
                             {{ order.mode || 'Multiple' }}
                           </td>
-                          <td :class="['px-4 py-3 text-sm', isSelected(order.do_number) ? 'text-white' : '']">
+                          <td :class="['px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm', isSelected(order.do_number) ? 'text-white' : '']">
                             <div class="flex flex-col gap-1">
                               <!-- DO Status Badge -->
                               <span :class="[
@@ -170,9 +170,9 @@
                   </div>
 
                   <!-- Row 5: Salesperson, CR/Ticket#, On Hold -->
-                  <div class="grid grid-cols-3 gap-3 mb-3">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                     <div class="flex items-center gap-2">
-                      <label class="text-xs font-semibold text-gray-700 w-24">Salesperson:</label>
+                      <label class="text-xs font-semibold text-gray-700 w-32">Salesperson:</label>
                       <input v-model="filters.salesperson" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"/>
                     </div>
                     <div class="flex items-center gap-2">
@@ -200,7 +200,7 @@
                   </div>
 
                   <!-- Row 7: Agent Cust & Sales Type -->
-                  <div class="grid grid-cols-2 gap-x-4 mb-3">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 mb-3">
                     <div class="flex items-center gap-2">
                       <label class="text-xs font-semibold text-gray-700 w-32">Agent Cust.:</label>
                       <input v-model="filters.agentCust" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"/>
@@ -212,7 +212,7 @@
                   </div>
 
                   <!-- Row 8: D/O Inst1 & Inst2 -->
-                  <div class="grid grid-cols-2 gap-x-4 mb-3">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 mb-3">
                     <div class="flex items-center gap-2">
                       <label class="text-xs font-semibold text-gray-700 w-32">D/O Inst1:</label>
                       <input v-model="filters.doInst1" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"/>
@@ -224,7 +224,7 @@
                   </div>
 
                   <!-- Row 9-10: Prepared/Cancelled & Amended/Printed (2x2 Grid) -->
-                  <div class="grid grid-cols-2 gap-x-4 gap-y-2">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
                     <div class="flex items-center gap-2">
                       <label class="text-xs font-semibold text-gray-700 w-32">Prepared by:</label>
                       <input v-model="filters.preparedBy" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"/>
@@ -253,17 +253,17 @@
                 </div>
 
                 <!-- Action Buttons in Content -->
-                <div class="mt-6 flex justify-center gap-3">
+                <div class="mt-6 flex flex-col sm:flex-row justify-center gap-3">
                   <button
                     @click="handleClose"
-                    class="px-6 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all font-medium shadow-sm"
+                    class="w-full sm:w-auto px-6 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all font-medium shadow-sm"
                   >
                     Cancel
                   </button>
                   <button
                     @click="handleSelect"
                     :disabled="selectedCount === 0"
-                    class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 flex items-center gap-2"
+                    class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 flex items-center justify-center gap-2"
                   >
                     <span>Select</span>
                     <span v-if="selectedCount > 0" class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold bg-white bg-opacity-30 rounded-full">

@@ -52,13 +52,6 @@ use App\Http\Controllers\WarehouseManagement\Invoice\InvoiceController;
 Route::get('/users/search/{userId}', [UserController::class, 'searchUser']);
 Route::post('/users/{userId}/permissions', [UserController::class, 'updateUserPermissions']);
 
-// Foreign Currency API routes
-Route::get('/foreign-currencies', [App\Http\Controllers\ForeignCurrencyController::class, 'apiIndex']);
-Route::post('/foreign-currencies', [App\Http\Controllers\ForeignCurrencyController::class, 'apiStore']);
-Route::get('/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyController::class, 'apiShow']);
-Route::put('/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyController::class, 'apiUpdate']);
-Route::delete('/foreign-currencies/{id}', [App\Http\Controllers\ForeignCurrencyController::class, 'apiDestroy']);
-
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
 
 // Product API routes

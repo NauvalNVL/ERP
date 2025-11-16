@@ -43,54 +43,6 @@
 
               <!-- Toolbar - CPS ERP Style -->
               <div class="px-3 py-2 bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-300 shadow-sm">
-                <div class="flex items-center gap-2 mb-2">
-                  <!-- Exit/Close Button (Red) -->
-                  <button 
-                    @click="handleClose" 
-                    class="p-2 hover:bg-red-100 rounded-md bg-white border-2 border-red-400 transition-all shadow-md hover:shadow-lg" 
-                    title="Exit / Close"
-                  >
-                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                    </svg>
-                  </button>
-
-                  <!-- Delete Button (Red) -->
-                  <button 
-                    @click="handleDelete" 
-                    :disabled="selectedCount === 0"
-                    class="p-2 hover:bg-red-100 rounded-md bg-white border-2 border-red-400 transition-all shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed" 
-                    title="Delete"
-                  >
-                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                  </button>
-
-                  <!-- Save/Update Button (Blue) -->
-                  <button 
-                    @click="handleSave" 
-                    :disabled="selectedCount === 0"
-                    class="p-2 hover:bg-blue-100 rounded-md bg-white border-2 border-blue-500 transition-all shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed" 
-                    title="Save / Update"
-                  >
-                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"/>
-                    </svg>
-                  </button>
-
-                  <!-- Enter/Return Button (Blue) -->
-                  <button 
-                    @click="handleReturn" 
-                    :disabled="selectedCount === 0"
-                    class="p-2 hover:bg-blue-100 rounded-md bg-white border-2 border-blue-500 transition-all shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed" 
-                    title="Enter / Return"
-                  >
-                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/>
-                    </svg>
-                  </button>
-                </div>
                 <!-- Search Bar -->
                 <div class="flex items-center gap-2 bg-white rounded border border-gray-300 px-2 py-1 shadow-sm">
                   <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
