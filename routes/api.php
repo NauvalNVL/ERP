@@ -19,16 +19,13 @@ use App\Http\Controllers\BundlingStringController;
 use App\Http\Controllers\WrappingMaterialController;
 use App\Http\Controllers\GlueingMaterialController;
 use App\Http\Controllers\MachineController;
-use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController;
 use App\Http\Controllers\SalesManagement\CustomerService\CustomerServiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaperFluteController;
 use App\Http\Controllers\WarehouseLocationController;
 use App\Http\Controllers\CustomerSalesTypeController;
-use App\Http\Controllers\FgDoConfigController;
 use App\Http\Controllers\DeliveryOrderFormatController;
-use App\Http\Controllers\CustomerWarehouseRequirementController;
 use App\Http\Controllers\UpdateMcController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\DeliveryOrderController;
@@ -381,8 +378,8 @@ Route::delete('/machines/{id}', [MachineController::class, 'destroy']);
 Route::post('/machines/seed', [MachineController::class, 'seed']);
 
 // Approve MC API routes
-Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);
-Route::get('/mc-auto-wo-not-releasing', [ApproveMcController::class, 'apiIndexMcAutoWoNotReleasing']);
+Route::get('/approve-mc/by-customer/{customerId}', [UpdateMcController::class, 'apiIndex']);
+Route::get('/mc-auto-wo-not-releasing', [UpdateMcController::class, 'apiIndex']);
 
 // Add API route for Update MC Master Cards
 Route::get('/update-mc/master-cards', [App\Http\Controllers\UpdateMcController::class, 'apiIndex']);
@@ -559,15 +556,6 @@ return response()->json([
 });
 
 
-// Warehouse Location API routes
-Route::prefix('warehouse-locations')->group(function () {
-Route::get('/', [WarehouseLocationController::class, 'index']);
-Route::get('/json', [WarehouseLocationController::class, 'getWarehouseLocationsJson'])->name('warehouse-locations.json'); // For search/listing in modal - MUST BE BEFORE /{code}
-Route::post('/', [WarehouseLocationController::class, 'store']);
-Route::get('/{code}', [WarehouseLocationController::class, 'show']);
-Route::put('/{code}', [WarehouseLocationController::class, 'update']);
-Route::delete('/{code}', [WarehouseLocationController::class, 'destroy']);
-});
 
 Route::get('/customer-sales-types', [CustomerSalesTypeController::class, 'index']);
 Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'store']);
@@ -598,17 +586,6 @@ Route::post('/customer-groups/seed', [App\Http\Controllers\CustomerGroupControll
 Route::post('/update-customer-account', [App\Http\Controllers\UpdateCustomerAccountController::class, 'apiStore']);
 Route::put('/update-customer-account/{id}', [App\Http\Controllers\UpdateCustomerAccountController::class, 'apiUpdate']);
 
-
-
-// Customer Warehouse Requirement API routes
-Route::get('/customer-warehouse-requirements', [CustomerWarehouseRequirementController::class, 'getAllRequirements']);
-Route::get('/customer-warehouse-requirements/{customerCode}', [CustomerWarehouseRequirementController::class, 'getByCustomerCode']);
-Route::post('/customer-warehouse-requirements', [CustomerWarehouseRequirementController::class, 'store']);
-Route::put('/customer-warehouse-requirements/{customerCode}', [CustomerWarehouseRequirementController::class, 'update']);
-Route::delete('/customer-warehouse-requirements/{customerCode}', [CustomerWarehouseRequirementController::class, 'destroy']);
-Route::get('/warehouse-requirements/customers', [CustomerWarehouseRequirementController::class, 'getCustomers']);
-Route::get('/warehouse-requirements/warehouse-locations', [CustomerWarehouseRequirementController::class, 'getWarehouseLocations']);
-Route::get('/warehouse-requirements/delivery-order-formats', [CustomerWarehouseRequirementController::class, 'getDeliveryOrderFormats']);
 
 // Update MC API Routes
 Route::prefix('update-mc')->group(function () {

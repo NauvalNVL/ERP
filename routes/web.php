@@ -9,7 +9,6 @@ use Inertia\Inertia;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\SalesConfigurationController;
 use App\Http\Controllers\SalesTeamController;
 use App\Http\Controllers\SalespersonController;
 use App\Http\Controllers\SalespersonTeamController;
@@ -38,7 +37,6 @@ use App\Http\Controllers\SalesManagement\SystemRequirement\SystemRequirementCont
 use App\Http\Controllers\UpdateCustomerAccountController;
 use App\Http\Controllers\CustomerAlternateAddressController;
 use App\Http\Controllers\UpdateMcController;
-use App\Http\Controllers\ApproveMcController;
 use App\Http\Controllers\RealeseApproveMcController;
 // use App\Http\Controllers\SOConfigController; // TODO: Controller tidak ditemukan
 use App\Http\Controllers\ScoringFormulaController;
@@ -159,8 +157,6 @@ Route::get('/system-security/copy-paste-access', [UserController::class, 'vueCop
 Route::get('/system-security/view-print-user', [UserController::class, 'vueViewPrintUser'])->name('vue.system-security.view-print-user');
 
 // Sales Management Routes
-// Sales Configuration
-Route::get('/sales-configuration', [SalesConfigurationController::class, 'vueIndex'])->name('vue.sales-configuration.index');
 
         // Sales Order Setup - Define SO Config
          // TODO: SOConfigController tidak ditemukan, perlu dibuat
@@ -323,9 +319,6 @@ return Inertia::render('warehouse-management/DeliveryOrder/DOProcessing/PrepareD
          Route::get('/sales-order/report/print-so-report', function () {
              return Inertia::render('sales-management/sales-order/report/print-so-report');
          })->name('vue.sales-order.report.print-so-report');
-
-Route::get('/scoring-formula', [ScoringFormulaController::class, 'index'])->name('vue.scoring-formula.index');
-Route::get('/scoring-formula/view-print', [ScoringFormulaController::class, 'viewAndPrint'])->name('vue.scoring-formula.view-print');
 
 // Customer Service Routes
 Route::get('/customer-service/dashboard', function () {
@@ -985,12 +978,12 @@ Route::delete('/finishings/{code}', [FinishingController::class, 'destroy']);
 Route::post('/finishings/seed', [FinishingController::class, 'seed']);
 
 // ApproveMC API routes
-Route::get('/approve-mc', [ApproveMcController::class, 'apiIndex']);
-Route::post('/approve-mc', [ApproveMcController::class, 'store']);
-Route::put('/approve-mc/{id}', [ApproveMcController::class, 'update']);
-Route::post('/approve-mc/approve/{id}', [ApproveMcController::class, 'approve']);
-Route::post('/approve-mc/reject/{id}', [ApproveMcController::class, 'reject']);
-Route::get('/approve-mc/by-customer/{customerId}', [ApproveMcController::class, 'getByCustomer']);
+Route::get('/approve-mc', [UpdateMcController::class, 'apiIndex']);
+Route::post('/approve-mc', [UpdateMcController::class, 'store']);
+Route::put('/approve-mc/{id}', [UpdateMcController::class, 'store']);
+Route::post('/approve-mc/approve/{id}', [UpdateMcController::class, 'store']);
+Route::post('/approve-mc/reject/{id}', [UpdateMcController::class, 'store']);
+Route::get('/approve-mc/by-customer/{customerId}', [UpdateMcController::class, 'apiIndex']);
 
 // Update MC API routes
 Route::get('/update-mc/master-cards', [UpdateMcController::class, 'apiIndex']);
