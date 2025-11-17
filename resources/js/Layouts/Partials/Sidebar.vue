@@ -210,8 +210,13 @@ const isActive = (route) => {
 const hasPermission = (menuKey) => {
   if (!user.value) return false;
 
-  // Temporary: Allow define_machine and obsolete_unobsolete_paper_quality for testing
-  if (menuKey === 'define_machine' || menuKey === 'view_print_machine' || menuKey === 'obsolete_unobsolete_paper_quality') {
+  // Temporary: Allow some menus without checking backend permissions (for development/testing)
+  if (
+    menuKey === 'define_machine' ||
+    menuKey === 'view_print_machine' ||
+    menuKey === 'obsolete_unobsolete_paper_quality' ||
+    menuKey === 'reactive_unobsolete_user'
+  ) {
     return true;
   }
 
@@ -264,6 +269,7 @@ const getPermissionKeyFromTitle = (title) => {
     'Amend User Password': 'amend_user_password',
     'Define User Access Permission': 'define_user_access_permission',
     'Copy & Paste User Access Permission': 'copy_paste_user_access_permission',
+    'Reactive/Unobsolete User': 'reactive_unobsolete_user',
     'View & Print User': 'view_print_user',
 
     // Sales Management - Sales Configuration
@@ -506,6 +512,7 @@ const systemManagerItems = [
       { title: 'Amend User Password', icon: 'fas fa-key', route: '/system-security/amend-password' },
       { title: 'Define User Access Permission', icon: 'fas fa-user-lock', route: '/system-security/define-access' },
       { title: 'Copy & Paste User Access Permission', icon: 'fas fa-copy', route: '/system-security/copy-paste-access' },
+      { title: 'Reactive/Unobsolete User', icon: 'fas fa-user-clock', route: '/system-security/reactive-unobsolete-user' },
       { title: 'View & Print User', icon: 'fas fa-users', route: '/system-security/view-print-user' }
     ]
   }

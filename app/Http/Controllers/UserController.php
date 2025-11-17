@@ -243,6 +243,37 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * API: Get list of users for Vue pages (View & Print User, Reactive/Unobsolete User, etc.)
+     */
+    public function apiIndex(Request $request)
+    {
+        try {
+            $query = UserCps::query();
+
+            $search = $request->query('search');
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('userID', 'like', '%' . $search . '%')
+                        ->orWhere('userName', 'like', '%' . $search . '%')
+                        ->orWhere('OFFICIAL_NAME', 'like', '%' . $search . '%');
+                });
+            }
+
+            $users = $query->orderBy('userID')->get();
+
+            // Rely on model accessors & hidden attributes to shape JSON
+            return response()->json($users);
+        } catch (\Exception $e) {
+            Log::error('Error fetching users for API: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching users: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function searchUsers(Request $request)
     {
         $search = $request->query('search');
@@ -399,6 +430,52 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal memperbarui permissions: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Toggle user status Active / Obsolete for Reactive/Unobsolete User page
+     */
+    public function apiToggleStatus(Request $request, $userId)
+    {
+        try {
+            $user = UserCps::where('userID', $userId)->firstOrFail();
+
+            $request->validate([
+                'status' => 'nullable|in:A,O,Active,Inactive',
+            ]);
+
+            // Determine target status: use provided status if any, otherwise toggle
+            if ($request->filled('status')) {
+                $statusInput = $request->input('status');
+                $shouldBeActive = in_array($statusInput, ['A', 'Active'], true);
+            } else {
+                $currentSts = $user->STS ?? 'Inactive';
+                $shouldBeActive = $currentSts !== 'Active';
+            }
+
+            $user->STS = $shouldBeActive ? 'Active' : 'Inactive';
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User status updated successfully',
+                'user' => $user,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found',
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Error toggling user status: ' . $e->getMessage(), [
+                'userID' => $userId,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating user status: ' . $e->getMessage(),
             ], 500);
         }
     }

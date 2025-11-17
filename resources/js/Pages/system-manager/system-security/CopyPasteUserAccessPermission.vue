@@ -65,10 +65,10 @@
                         <div v-if="copyFromUser" class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:to-indigo-600 p-4 md:p-6 rounded-xl shadow animate-fadeIn">
                             <div class="flex items-center">
                                 <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
-                                    {{ copyFromUser.official_name.charAt(0).toUpperCase() }}
+                                    {{ ((copyFromUser.official_name || copyFromUser.user_id || '').charAt(0) || '').toUpperCase() }}
                                 </div>
                                 <div class="text-white">
-                                    <h4 class="text-lg font-semibold">{{ copyFromUser.official_name }}</h4>
+                                    <h4 class="text-lg font-semibold">{{ copyFromUser.official_name || copyFromUser.user_id }}</h4>
                                     <p class="text-blue-100">{{ copyFromUser.user_id }} • {{ copyFromUser.official_title || 'No Title' }}</p>
                                     <p class="text-xs text-blue-200 mt-1">✓ Source user selected</p>
                                 </div>
@@ -119,10 +119,10 @@
                         <div v-if="pasteToUser" class="bg-indigo-600 md:bg-gradient-to-r md:from-indigo-600 md:to-purple-600 p-4 md:p-6 rounded-xl shadow animate-fadeIn">
                             <div class="flex items-center">
                                 <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
-                                    {{ pasteToUser.official_name.charAt(0).toUpperCase() }}
+                                    {{ ((pasteToUser.official_name || pasteToUser.user_id || '').charAt(0) || '').toUpperCase() }}
                                 </div>
                                 <div class="text-white">
-                                    <h4 class="text-lg font-semibold">{{ pasteToUser.official_name }}</h4>
+                                    <h4 class="text-lg font-semibold">{{ pasteToUser.official_name || pasteToUser.user_id }}</h4>
                                     <p class="text-indigo-100">{{ pasteToUser.user_id }} • {{ pasteToUser.official_title || 'No Title' }}</p>
                                     <p class="text-xs text-indigo-200 mt-1">✓ Target user selected</p>
                                 </div>
@@ -271,8 +271,8 @@ export default {
                         this.copyFromUser = {
                             id: user.id,
                             user_id: user.userID,
-                            official_name: user.officialName,
-                            official_title: user.officialTitle
+                            official_name: user.officialName || user.userID || '',
+                            official_title: user.officialTitle || ''
                         };
                         this.showMessage('User found successfully', 'success');
                     } else {
@@ -305,8 +305,8 @@ export default {
                         this.pasteToUser = {
                             id: user.id,
                             user_id: user.userID,
-                            official_name: user.officialName,
-                            official_title: user.officialTitle
+                            official_name: user.officialName || user.userID || '',
+                            official_title: user.officialTitle || ''
                         };
                         this.showMessage('User found successfully', 'success');
                     } else {

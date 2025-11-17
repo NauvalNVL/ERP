@@ -10,14 +10,14 @@
         <p class="text-emerald-100">Preview and print salesperson data</p>
     </div>
 
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+    <div class="bg-gradient-to-br from-slate-50 via-white to-emerald-50 rounded-b-lg shadow-lg p-6 mb-6">
         <!-- Actions Bar -->
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
                 <button @click="exportPDF" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
-                <Link href="/sales-person" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                <Link href="/sales-person" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Salespersons
                 </Link>
             </div>
@@ -28,7 +28,7 @@
                 <input
                     type="text"
                     v-model="searchQuery"
-                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Search salespersons..."
                 >
             </div>
@@ -84,7 +84,7 @@
                         <tr v-if="loading" class="hover:bg-gray-50">
                             <td colspan="8" class="px-6 py-4 text-center text-gray-500">
                                 <div class="flex justify-center">
-                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                 </div>
                                 <p class="mt-2">Loading salesperson data...</p>
                             </td>
@@ -94,13 +94,13 @@
                                 No salespersons found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
-                                    <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
+                                    <button @click="searchQuery = ''" class="mt-2 text-emerald-600 hover:text-emerald-700 hover:underline">Clear search</button>
                                 </template>
                             </td>
                         </tr>
                         <tr v-for="(person, index) in filteredSalespersons" :key="person.code"
-                            :class="{'bg-blue-50': index % 2 === 0}"
-                            class="hover:bg-blue-100">
+                            :class="{'bg-emerald-50': index % 2 === 0}"
+                            class="hover:bg-emerald-100">
                             <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">{{ person.code || 'N/A' }}</td>
                             <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.name || 'N/A' }}</td>
                             <td class="px-4 py-4 whitespace-nowrap text-sm">{{ person.grup || '-' }}</td>
@@ -127,11 +127,11 @@
         </div>
 
         <!-- Print Instructions -->
-        <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+        <div class="mt-6 bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+            <h3 class="font-semibold text-emerald-800 mb-2 flex items-center">
                 <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
-            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+            <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
                 <li>Click the "Print PDF" button above to generate and download PDF</li>
                 <li>PDF will be automatically saved in landscape orientation</li>
                 <li>You can search or sort data before exporting</li>
@@ -235,8 +235,8 @@ const getSortIcon = (column) => {
     }
 
     return sortDirection.value === 'asc'
-        ? 'fas fa-sort-up text-blue-500'
-        : 'fas fa-sort-down text-blue-500';
+        ? 'fas fa-sort-up text-emerald-600'
+        : 'fas fa-sort-down text-emerald-600';
 };
 
 // Filtered and sorted salespersons
@@ -296,7 +296,7 @@ const exportPDF = () => {
 
         // Add title
         doc.setFontSize(16);
-        doc.setTextColor(37, 99, 235); // Blue color
+        doc.setTextColor(5, 150, 105); // Emerald color
         doc.text('SALESPERSON LIST', 10, 15);
 
         // Add subtitle
@@ -324,7 +324,7 @@ const exportPDF = () => {
             theme: 'grid',
             tableWidth: 'auto',
             headStyles: {
-                fillColor: [37, 99, 235], // Blue background
+                fillColor: [5, 150, 105], // Emerald background
                 textColor: [255, 255, 255], // White text
                 fontStyle: 'bold',
                 halign: 'left',
@@ -336,7 +336,7 @@ const exportPDF = () => {
                 fontSize: 7
             },
             alternateRowStyles: {
-                fillColor: [219, 234, 254] // Light blue for alternate rows
+                fillColor: [209, 250, 229] // Light emerald for alternate rows
             },
             columnStyles: {
                 0: { cellWidth: 25 },

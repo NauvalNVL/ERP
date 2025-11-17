@@ -103,8 +103,14 @@ Route::get('/menu-routes', function (Request $request) {
 // to avoid duplication and ensure proper route ordering
 
 // User API routes
+Route::get('/users', [UserController::class, 'apiIndex']);
 Route::get('/users/search/{userId}', [UserController::class, 'searchUser']);
 Route::post('/users/{userId}/permissions', [UserController::class, 'updateUserPermissions']);
+
+// Protected user status toggle (use web + auth to leverage session authentication)
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::put('/users/{userId}/status', [UserController::class, 'apiToggleStatus']);
+});
 
 Route::get('/paper-flutes', [PaperFluteController::class, 'apiIndex']);
 

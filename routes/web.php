@@ -154,6 +154,9 @@ Route::post('/system-security/update-password', [UserController::class, 'updateP
 Route::get('/system-security/define-access', [UserController::class, 'vueDefineAccess'])->name('vue.system-security.define-access');
 Route::post('/user-permissions/{userId}', [UserController::class, 'updateUserPermissions'])->name('user-permissions.update');
 Route::get('/system-security/copy-paste-access', [UserController::class, 'vueCopyPasteAccess'])->name('vue.system-security.copy-paste-access');
+Route::get('/system-security/reactive-unobsolete-user', function () {
+    return Inertia::render('system-manager/ReactiveUnobsoleteUser');
+})->name('vue.system-security.reactive-unobsolete-user');
 Route::get('/system-security/view-print-user', [UserController::class, 'vueViewPrintUser'])->name('vue.system-security.view-print-user');
 
 // Sales Management Routes
