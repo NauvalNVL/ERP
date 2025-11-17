@@ -371,17 +371,8 @@ class SalesOrderController extends Controller
             $customerData = DB::table('CUSTOMER')->where('CODE', $validated['customer_code'])->first();
 
             if ($customerData) {
-                $updateCustomerAccount = DB::table('update_customer_accounts')
-                    ->where('customer_code', $validated['customer_code'])
-                    ->first();
-
-                // D_LOC_Num should be geographical code from customer
-                $dLocNum = '';
-                if ($updateCustomerAccount && !empty($updateCustomerAccount->geographical)) {
-                    $dLocNum = $updateCustomerAccount->geographical;
-                } elseif (!empty($customerData->AREA)) {
-                    $dLocNum = $customerData->AREA;
-                }
+                // D_LOC_Num uses geographical code from CUSTOMER.AREA
+                $dLocNum = !empty($customerData->AREA) ? $customerData->AREA : '';
 
                 $deliveryTo = $customerData->NAME ?? '';
                 $deliveryAdd1 = $customerData->ADDRESS1 ?? '';
@@ -394,7 +385,7 @@ class SalesOrderController extends Controller
                     'address_1' => $deliveryAdd1,
                     'address_2' => $deliveryAdd2,
                     'address_3' => $deliveryAdd3,
-                    'geographical_source' => $updateCustomerAccount ? 'update_customer_accounts.geographical' : 'CUSTOMER.AREA',
+                    'geographical_source' => 'CUSTOMER.AREA',
                     'source' => 'CUSTOMER table'
                 ]);
             } else {

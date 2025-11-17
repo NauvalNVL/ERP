@@ -474,40 +474,10 @@ const getPermissionKeyFromTitle = (title) => {
 };
 
 const logout = () => {
-  // Use Inertia router for logout with fresh CSRF token
-  router.post('/logout', {
-    _token: page.props.csrf
-  }, {
+  // Simple Inertia logout; backend redirects to /login
+  router.post('/logout', {}, {
     preserveScroll: false,
     preserveState: false,
-    onStart: () => {
-      console.log('Logout started');
-    },
-    onSuccess: () => {
-      console.log('Logout successful');
-      // Force redirect to login page
-      window.location.replace('/login');
-    },
-    onError: (errors) => {
-      console.error('Logout failed:', errors);
-      // Try to get fresh CSRF and retry once
-      if (!logout.retried) {
-        logout.retried = true;
-        setTimeout(() => {
-          router.reload({
-            onSuccess: () => {
-              logout();
-            }
-          });
-        }, 100);
-      } else {
-        // Force redirect even if logout fails after retry
-        window.location.replace('/login');
-      }
-    },
-    onFinish: () => {
-      console.log('Logout finished');
-    }
   });
 };
 

@@ -2,19 +2,19 @@
   <AppLayout header="Prepare Delivery Order (Multiple Item)">
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
       <!-- Header with controls -->
-      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+      <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 px-6 py-4 border-b border-blue-700">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
-            <i class="fas fa-truck text-2xl text-blue-600"></i>
+            <i class="fas fa-truck text-2xl text-white opacity-90"></i>
             <div>
               <h1 class="text-xl font-semibold text-white">Prepare Delivery Order (Multiple Item)</h1>
             </div>
           </div>
           <div class="flex items-center space-x-2">
-            <button 
-              @click="refreshPage" 
-              class="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
-              title="Refresh"
+            <button
+              @click="refreshPage"
+              class="p-2 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full transition-colors border border-white border-opacity-20"
+              title="Refresh (F5)"
             >
               <i class="fas fa-sync-alt"></i>
             </button>
@@ -30,17 +30,17 @@
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">Current Period:</label>
             <div class="flex items-center space-x-2">
-              <input 
-                v-model="currentPeriod.month" 
-                type="number" 
-                min="1" 
+              <input
+                v-model="currentPeriod.month"
+                type="number"
+                min="1"
                 max="12"
                 class="w-16 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                 readonly
                 disabled
               >
-              <input 
-                v-model="currentPeriod.year" 
+              <input
+                v-model="currentPeriod.year"
                 type="number"
                 class="w-20 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-600"
                 readonly
@@ -54,8 +54,8 @@
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">Customer Code:</label>
             <div class="flex items-center space-x-2">
-              <input 
-                v-model="selectedCustomer.code" 
+              <input
+                v-model="selectedCustomer.code"
                 type="text"
                 class="w-32 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter customer code"
@@ -64,7 +64,7 @@
               <div v-if="selectedCustomer.name" class="px-3 py-2 bg-gray-100 border border-gray-300 rounded text-sm text-gray-700 min-w-0 flex-1">
                 {{ selectedCustomer.name }}
               </div>
-              <button 
+              <button
                 @click="openCustomerLookup"
                 class="p-2 text-blue-600 hover:bg-blue-100 rounded transition-colors"
                 title="Customer Lookup"
@@ -79,7 +79,7 @@
             <!-- Cust. Remark -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Cust. Remark:</label>
-              <input 
+              <input
                 v-model="deliveryOrder.custRemark"
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -91,14 +91,14 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Vehicle#:</label>
               <div class="flex items-center space-x-2">
-                <input 
+                <input
                   v-model="deliveryOrder.vehicleNumber"
                   type="text"
                   class="w-32 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter vehicle number"
                   readonly
                 >
-                <button 
+                <button
                   @click="openVehicleLookup"
                   class="p-2 text-blue-600 hover:bg-blue-100 rounded transition-colors"
                   title="Vehicle Lookup"
@@ -133,12 +133,12 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">D/Order Date:</label>
               <div class="flex items-center space-x-2">
-                <input 
+                <input
                   v-model="deliveryOrder.orderDate"
                   type="date"
                   class="w-40 px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                <button 
+                <button
                   @click="openDatePicker"
                   class="p-2 text-blue-600 hover:bg-blue-100 rounded transition-colors"
                   title="Date Picker"
@@ -151,7 +151,7 @@
 
             <!-- Unapply F/G -->
             <div class="flex items-center space-x-2">
-              <input 
+              <input
                 v-model="deliveryOrder.unapplyFG"
                 type="checkbox"
                 class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
@@ -162,7 +162,7 @@
             <!-- Remark1 -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Remark1:</label>
-              <input 
+              <input
                 v-model="deliveryOrder.remark1"
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -173,7 +173,7 @@
             <!-- Remark2 -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Remark2:</label>
-              <input 
+              <input
                 v-model="deliveryOrder.remark2"
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -233,15 +233,15 @@
         <div v-if="selectedCustomer.code" class="mt-6 flex items-center justify-end">
           <!-- Right side buttons -->
           <div class="flex items-center space-x-4">
-            <button 
-              @click="refreshPage" 
+            <button
+              @click="refreshPage"
               class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
             >
               <i class="fas fa-sync-alt mr-2"></i>
               Refresh
             </button>
-            <button 
-              @click="openSalesOrderScreenNext" 
+            <button
+              @click="openSalesOrderScreenNext"
               class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
             >
               <i class="fas fa-arrow-right mr-2"></i>
@@ -263,25 +263,25 @@
     </div>
 
     <!-- Customer Lookup Modal -->
-    <CustomerAccountModal 
-      :show="showCustomerModal" 
-      @close="showCustomerModal = false" 
+    <CustomerAccountModal
+      :show="showCustomerModal"
+      @close="showCustomerModal = false"
       @select="selectCustomer"
       :initial-sort-by="'customer_code'"
     />
 
     <!-- Vehicle Lookup Modal -->
-    <VehicleLookupModal 
-      :is-open="showVehicleModal" 
-      @close="showVehicleModal = false" 
+    <VehicleLookupModal
+      :is-open="showVehicleModal"
+      @close="showVehicleModal = false"
       @select="selectVehicle"
     />
 
     <!-- Sales Order Screen Modal -->
-    <SalesOrderScreenModal 
-      :is-open="showSalesOrderModal" 
+    <SalesOrderScreenModal
+      :is-open="showSalesOrderModal"
       :customer-data="selectedCustomer"
-      @close="showSalesOrderModal = false" 
+      @close="showSalesOrderModal = false"
       @save="handleSalesOrderSave"
       @save-delivery-order="handleSalesOrderDeliveryOrderSave"
     />
@@ -381,25 +381,25 @@ const selectCustomer = async (customer) => {
   selectedCustomer.address = customer.address || ''
   selectedCustomer.salesperson = customer.salesperson_code || ''
   selectedCustomer.currency = customer.currency_code || 'IDR'
-  
+
   showCustomerModal.value = false
   success('Customer selected successfully')
 }
 
 const validateCustomer = async () => {
   if (!selectedCustomer.code.trim()) return
-  
+
   try {
     const response = await fetch(`/api/sales-order/customer/${selectedCustomer.code}`)
     const data = await response.json()
-    
+
     if (data.success) {
       const customer = data.data
       selectedCustomer.name = customer.customer_name
       selectedCustomer.address = customer.address || ''
       selectedCustomer.salesperson = customer.salesperson_code || ''
       selectedCustomer.currency = customer.currency_code || 'IDR'
-      
+
       success('Customer validated successfully')
     } else {
       error('Customer not found')
@@ -426,10 +426,10 @@ const selectVehicle = (vehicle) => {
   selectedVehicle.driverPhone = vehicle.DRIVER_PHONE
   selectedVehicle.vehicleClass = vehicle.VEHICLE_CLASS
   selectedVehicle.vehicleCompany = vehicle.VEHICLE_COMPANY
-  
+
   // Update the delivery order vehicle number
   deliveryOrder.vehicleNumber = vehicle.VEHICLE_NO
-  
+
   success(`Vehicle ${vehicle.VEHICLE_NO} selected successfully`)
 }
 
@@ -443,29 +443,29 @@ const openSalesOrderScreenNext = () => {
     error('Please select a customer first')
     return
   }
-  
+
   if (!deliveryOrder.orderDate) {
     error('Please select delivery order date')
     return
   }
-  
+
   showSalesOrderModal.value = true
 }
 
 const handleSalesOrderSave = (salesOrderData) => {
   console.log('Complete Sales Order Data:', salesOrderData)
-  
+
   // Process the complete data from Sales Order Detail + Packing Details
   if (salesOrderData.salesOrderDetail) {
     const detailData = salesOrderData.salesOrderDetail
     console.log('Order Detail:', detailData.orderDetail)
     console.log('Item Rows:', detailData.itemRows)
-    
+
     // Update delivery order with SO details
     if (detailData.orderDetail.sOrderMonth && detailData.orderDetail.sOrderYear && detailData.orderDetail.sOrderSeq) {
       const soNumber = `${detailData.orderDetail.sOrderMonth}-${detailData.orderDetail.sOrderYear}-${detailData.orderDetail.sOrderSeq}`
       console.log('Processing SO Number:', soNumber)
-      
+
       // Store the SO data for further processing
       deliveryOrder.soNumber = soNumber
       deliveryOrder.mcardSeq = detailData.orderDetail.mcardSeq
@@ -482,49 +482,49 @@ const handleSalesOrderSave = (salesOrderData) => {
       deliveryOrder.mainUnit = mainRow.unit || ''
     }
   }
-  
+
   // Process packing details if available
   if (salesOrderData.packingDetails) {
     const packingData = salesOrderData.packingDetails
     console.log('Packing Items:', packingData.packingItems)
-    
+
     // Store packing data
     deliveryOrder.packingItems = packingData.packingItems
     const mainPack = packingData.packingItems.find(i => i.name === 'Main') || {}
     deliveryOrder.mainToDel = mainPack.toDel || ''
   }
-  
+
   // Process finished goods offsets if available
   if (salesOrderData.finishedGoodsOffsets) {
     const offsetsData = salesOrderData.finishedGoodsOffsets
     console.log('Offset Details:', offsetsData.offsetDetails)
     console.log('Offset Items:', offsetsData.offsetItems)
     console.log('Sales Order Data:', offsetsData.salesOrderData)
-    
+
     // Store offsets data
     deliveryOrder.offsetDetails = offsetsData.offsetDetails
     deliveryOrder.offsetItems = offsetsData.offsetItems
     deliveryOrder.salesOrderData = offsetsData.salesOrderData
   }
-  
+
   success('Sales order and packing details saved successfully')
   showSalesOrderModal.value = false
 }
 
 const handleSalesOrderDeliveryOrderSave = async (salesOrderData) => {
   console.log('Complete Sales Order Data for Delivery Order:', salesOrderData)
-  
+
   // Process the complete data from Sales Order Detail + Packing Details + Finished Goods Offsets
   if (salesOrderData.salesOrderDetail) {
     const detailData = salesOrderData.salesOrderDetail
     console.log('Order Detail:', detailData.orderDetail)
     console.log('Item Rows:', detailData.itemRows)
-    
+
     // Update delivery order with SO details
     if (detailData.orderDetail.sOrderMonth && detailData.orderDetail.sOrderYear && detailData.orderDetail.sOrderSeq) {
       const soNumber = `${detailData.orderDetail.sOrderMonth}-${detailData.orderDetail.sOrderYear}-${detailData.orderDetail.sOrderSeq}`
       console.log('Processing SO Number:', soNumber)
-      
+
       // Store the SO data for further processing
       deliveryOrder.soNumber = soNumber
       deliveryOrder.mcardSeq = detailData.orderDetail.mcardSeq
@@ -535,13 +535,13 @@ const handleSalesOrderDeliveryOrderSave = async (salesOrderData) => {
       deliveryOrder.toDeliverySet = od.toDeliverySet || ''
     }
   }
-  
+
   // Process packing details if available
   if (salesOrderData.packingDetails) {
     const packingData = salesOrderData.packingDetails
     const items = Array.isArray(packingData.packingItems) ? packingData.packingItems : []
     console.log('Packing Items:', items)
-    
+
     // Store packing data
     deliveryOrder.packingItems = items
     // Capture Main row To Delivery for DO_Qty
@@ -556,20 +556,20 @@ const handleSalesOrderDeliveryOrderSave = async (salesOrderData) => {
   if (!deliveryOrder.mainToDel && deliveryOrder.toDeliverySet) {
     deliveryOrder.mainToDel = deliveryOrder.toDeliverySet
   }
-  
+
   // Process finished goods offsets if available
   if (salesOrderData.finishedGoodsOffsets) {
     const offsetsData = salesOrderData.finishedGoodsOffsets
     console.log('Offset Details:', offsetsData.offsetDetails)
     console.log('Offset Items:', offsetsData.offsetItems)
     console.log('Sales Order Data:', offsetsData.salesOrderData)
-    
+
     // Store offsets data
     deliveryOrder.offsetDetails = offsetsData.offsetDetails
     deliveryOrder.offsetItems = offsetsData.offsetItems
     deliveryOrder.salesOrderData = offsetsData.salesOrderData
   }
-  
+
   // Now save the delivery order
   await saveDeliveryOrder()
   showSalesOrderModal.value = false
@@ -580,12 +580,12 @@ const saveDeliveryOrder = async () => {
     error('Please select a customer first')
     return
   }
-  
+
   if (!selectedVehicle.vehicleNo) {
     error('Please select a vehicle first')
     return
   }
-  
+
   try {
     const deliveryOrderData = {
       customer_code: selectedCustomer.code,
@@ -610,15 +610,15 @@ const saveDeliveryOrder = async () => {
       do_qty: Number((deliveryOrder.mainToDel || '0').toString().replace(/,/g, '')) || 0,
       pcs_per_bdl: deliveryOrder.pcsPerBdl || ''
     }
-    
+
     console.log('Saving delivery order:', deliveryOrderData)
-    
+
     const response = await axios.post('/api/delivery-orders', deliveryOrderData)
-    
+
     if (response.data.success) {
       success(`Delivery order ${response.data.data.do_number} saved successfully`)
       deliveryOrderStatus.value = 'Saved'
-      
+
       // Reset form after successful save
       refreshPage()
     } else {
@@ -641,9 +641,9 @@ const refreshPage = () => {
   selectedCustomer.address = ''
   selectedCustomer.salesperson = ''
   selectedCustomer.currency = 'IDR'
-  
+
   deliveryOrderStatus.value = 'Draft'
-  
+
   // Reset delivery order details
   Object.assign(deliveryOrder, {
     custRemark: '',
@@ -661,7 +661,7 @@ const refreshPage = () => {
     offsetItems: [],
     salesOrderData: []
   })
-  
+
   // Reset selected vehicle
   Object.assign(selectedVehicle, {
     id: null,
@@ -671,7 +671,7 @@ const refreshPage = () => {
     vehicleClass: '',
     vehicleCompany: ''
   })
-  
+
   success('Form reset successfully')
 }
 

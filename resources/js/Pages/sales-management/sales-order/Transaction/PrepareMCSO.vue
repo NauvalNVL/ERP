@@ -1471,33 +1471,14 @@ const saveProductDesign = async (designData) => {
       ...designData
     }
 
-    // Debug CSRF token
-    const csrfToken = (window.getCsrfToken && window.getCsrfToken()) || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-    console.log('CSRF Token:', csrfToken ? 'Found' : 'Missing')
-    console.log('CSRF Token Value:', csrfToken.substring(0, 20) + '...')
-    console.log('Request URL:', '/api/sales-order/product-design')
-    console.log('Request Method:', 'POST')
-
-    const response = await fetch('/api/sales-order/product-design', {
-      method: 'POST',
+    // Use globally configured axios instance (with CSRF + cookies)
+    const response = await window.axios.post('/api/sales-order/product-design', requestData, {
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': csrfToken
-      },
-      credentials: 'same-origin',
-      body: JSON.stringify(requestData)
+        'Accept': 'application/json'
+      }
     })
 
-    console.log('Response status:', response.status)
-    console.log('Response headers:', Object.fromEntries(response.headers.entries()))
-
-    if (!response.ok) {
-      const text = await response.text()
-      throw new Error(`Request failed (${response.status}). ${text?.slice(0, 120)}`)
-    }
-    const data = await response.json()
+    const data = response.data
 
     if (data.success) {
   console.log('Product design saved:', designData)
