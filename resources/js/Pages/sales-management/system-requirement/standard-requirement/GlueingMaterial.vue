@@ -8,11 +8,11 @@
     </form>
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
             <i class="fas fa-vial mr-3"></i> Define Glueing Material
         </h2>
-        <p class="text-cyan-100">Manage Glueing Material definitions for production</p>
+        <p class="text-emerald-100">Manage Glueing Material definitions for production</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
@@ -172,7 +172,7 @@
     <!-- Edit Modal -->
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                         <i class="fas fa-vial"></i>

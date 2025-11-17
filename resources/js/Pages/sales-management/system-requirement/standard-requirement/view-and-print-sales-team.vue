@@ -3,14 +3,14 @@
     <Head title="View & Print Sales Teams" />
 
         <!-- Header Section -->
-    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-2xl shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
             <i class="fas fa-print mr-3"></i> View & Print Sales Teams
         </h2>
         <p class="text-cyan-100">Preview and print sales team data</p>
     </div>
 
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+    <div class="bg-gradient-to-br from-slate-50 via-white to-emerald-50 rounded-b-2xl shadow-lg p-6 mb-6">
         <!-- Actions Bar -->
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
@@ -38,7 +38,7 @@
         <div class="overflow-x-auto">
             <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <!-- Table Header -->
-                <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 flex items-center">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 flex items-center">
                     <div class="flex items-center">
                         <div class="mr-4">
                             <i class="fas fa-users-cog text-3xl"></i>

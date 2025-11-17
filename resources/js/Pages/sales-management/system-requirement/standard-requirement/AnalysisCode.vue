@@ -8,14 +8,17 @@
     </form>
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
-            <i class="fas fa-code-branch mr-3"></i> Define Analysis Code
+    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 sm:p-7 md:p-8 rounded-t-2xl shadow-lg">
+        <h2 class="text-2xl md:text-3xl font-bold text-white mb-2 flex items-center">
+            <span class="inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl bg-white/15 mr-3">
+                <i class="fas fa-code-branch text-lg md:text-xl"></i>
+            </span>
+            Define Analysis Code
         </h2>
-        <p class="text-cyan-100">Define analysis codes for transaction categorization and reporting</p>
+        <p class="text-emerald-100 text-sm md:text-base">Define analysis codes for transaction categorization and reporting</p>
     </div>
 
-    <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
+    <div class="bg-gradient-to-br from-slate-50 via-white to-emerald-50 rounded-b-2xl shadow-lg p-6 mb-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-2">
