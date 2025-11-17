@@ -713,19 +713,32 @@ const warehouseManagementItems = [
 </script>
 
 <style scoped>
-/* Custom scrollbar for webkit browsers */
+/* Modern custom scrollbar - cross browser */
+.sidebar-content {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #2563eb transparent; /* blue-600 */
+}
+
+/* WebKit (Chrome, Edge, Safari) */
 .sidebar-content::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
+
 .sidebar-content::-webkit-scrollbar-track {
-  background: #2d3748; /* bg-gray-800 */
+  background: linear-gradient(to bottom, #1f2937, #111827); /* gray-800 -> gray-900 */
+  border-radius: 9999px;
 }
+
 .sidebar-content::-webkit-scrollbar-thumb {
-  background: #4a5568; /* bg-gray-600 */
-  border-radius: 4px;
+  background: linear-gradient(to bottom, #3b82f6, #2563eb); /* blue-500 -> blue-600 */
+  border-radius: 9999px;
+  border: 2px solid #1f2937; /* subtle inset ring */
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.6);
 }
+
 .sidebar-content::-webkit-scrollbar-thumb:hover {
-  background: #718096; /* bg-gray-500 */
+  background: linear-gradient(to bottom, #60a5fa, #3b82f6); /* blue-400 -> blue-500 */
 }
 
 /* Animations */
