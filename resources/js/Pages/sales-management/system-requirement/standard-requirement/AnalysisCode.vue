@@ -22,9 +22,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
                     <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-edit text-white"></i>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Define Analysis Code</h3>
@@ -38,15 +38,15 @@
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-code-branch"></i>
                                 </span>
-                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
+                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
-                            <button type="button" @click="createNewCode" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                            <button type="button" @click="createNewCode" class="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded transition-colors transform active:translate-y-px">
                                 <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
@@ -75,17 +75,17 @@
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
                 <!-- Analysis Code Info Card -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500 mb-6">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-info-circle text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Analysis Code Information</h3>
                     </div>
 
                     <div class="space-y-4">
-                        <div class="p-4 bg-teal-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
+                        <div class="p-4 bg-emerald-50 rounded-lg">
+                            <h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider mb-2">Instructions</h4>
                             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
                                 <li>Analysis code must be unique and cannot be changed</li>
                                 <li>Use the <span class="font-medium">search</span> button to select a code</li>
@@ -94,11 +94,11 @@
                             </ul>
                         </div>
 
-                        <div class="p-4 bg-blue-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Analysis Groups</h4>
+                        <div class="p-4 bg-emerald-50 rounded-lg">
+                            <h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider mb-2">Analysis Groups</h4>
                             <div class="space-y-2 text-sm">
                                 <div class="flex items-center">
-                                    <span class="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">MC</span>
+                                    <span class="w-8 h-8 flex items-center justify-center bg-emerald-500 text-white rounded-full font-bold mr-2">MC</span>
                                     <span>Master Card</span>
                                 </div>
                                 <div class="flex items-center">
@@ -119,42 +119,42 @@
                 </div>
 
                 <!-- Quick Links -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-link text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Related Reports</h3>
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <Link href="/analysis-code/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                            <div class="p-2 bg-green-500 rounded-full mr-3">
+                        <Link href="/analysis-code/view-print" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
                                 <i class="fas fa-print text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-green-900">View & Print</p>
-                                <p class="text-xs text-green-700">Print analysis code list</p>
+                                <p class="font-medium text-emerald-900">View & Print</p>
+                                <p class="text-xs text-emerald-700">Print analysis code list</p>
                             </div>
                         </Link>
 
-                        <div class="flex items-center p-3 bg-purple-50 rounded-lg">
-                            <div class="p-2 bg-purple-500 rounded-full mr-3">
+                        <div class="flex items-center p-3 bg-emerald-50 rounded-lg">
+                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
                                 <i class="fas fa-chart-bar text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-purple-900">SO Analysis</p>
-                                <p class="text-xs text-purple-700">By Analysis Code</p>
+                                <p class="font-medium text-emerald-900">SO Analysis</p>
+                                <p class="text-xs text-emerald-700">By Analysis Code</p>
                             </div>
                         </div>
 
-                        <div class="flex items-center p-3 bg-blue-50 rounded-lg">
-                            <div class="p-2 bg-blue-500 rounded-full mr-3">
+                        <div class="flex items-center p-3 bg-emerald-50 rounded-lg">
+                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
                                 <i class="fas fa-list text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">MC Reports</p>
-                                <p class="text-xs text-blue-700">Run Size Analysis</p>
+                                <p class="font-medium text-emerald-900">MC Reports</p>
+                                <p class="text-xs text-emerald-700">Run Size Analysis</p>
                             </div>
                         </div>
                     </div>
@@ -176,7 +176,7 @@
     <!-- Edit Modal -->
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                         <i class="fas fa-code-branch"></i>
@@ -205,7 +205,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-font"></i>
                                 </span>
-                                <input v-model="editForm.analysis_name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                                <input v-model="editForm.analysis_name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
                             </div>
                         </div>
                         <div>
@@ -214,7 +214,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-layer-group"></i>
                                 </span>
-                                <select v-model="editForm.analysis_group" @change="onAnalysisGroupChange" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                                <select v-model="editForm.analysis_group" @change="onAnalysisGroupChange" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
                                     <option value="">Select Analysis Group</option>
                                     <option value="MC">MC-Master Card</option>
                                     <option value="SD">SD-Sales Order</option>
@@ -227,7 +227,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-tag"></i>
                                 </span>
-                                <select v-model="editForm.analysis_group2" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required :disabled="!editForm.analysis_group">
+                                <select v-model="editForm.analysis_group2" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" required :disabled="!editForm.analysis_group">
                                     <option value="">Select Analysis Group2</option>
                                     <optgroup label="Master Card Options" v-if="editForm.analysis_group === 'MC'">
                                         <option value="CS">CS-Corrugator Run Size</option>
@@ -255,7 +255,7 @@
                             <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
                                 <i class="fas fa-times mr-2"></i>Cancel
                             </button>
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
+                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-colors text-sm transform active:translate-y-px">
                                 <i class="fas fa-save mr-2"></i>Save
                             </button>
                         </div>
@@ -267,7 +267,7 @@
 
     <!-- Loading Overlay -->
     <div v-if="saving" class="fixed inset-0 z-[80] bg-black bg-opacity-50 flex justify-center items-center">
-        <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
 
     <!-- Notification Toast -->

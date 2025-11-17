@@ -183,7 +183,7 @@
     <!-- Edit Modal -->
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                         <i class="fas fa-palette"></i>
@@ -212,7 +212,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-font"></i>
                                 </span>
-                                <input v-model="editForm.color_name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                                <input v-model="editForm.color_name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
                             </div>
                         </div>
                         <div>
@@ -221,7 +221,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </span>
-                                <input v-model="editForm.origin" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                                <input v-model="editForm.origin" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
                             </div>
                         </div>
                         <div>
@@ -230,8 +230,8 @@
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-layer-group"></i>
                                 </span>
-                                <input v-model="editForm.color_group_id" type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-sm" required>
-                                <button type="button" @click="openColorGroupSelector" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                <input v-model="editForm.color_group_id" type="text" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
+                                <button type="button" @click="openColorGroupSelector" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
@@ -242,7 +242,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-tag"></i>
                                 </span>
-                                <input v-model="editForm.cg_type" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:ring-blue-500 focus:border-blue-500 text-sm" readonly>
+                                <input v-model="editForm.cg_type" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:ring-emerald-500 focus:border-emerald-500 text-sm" readonly>
                             </div>
                         </div>
                     </div>
@@ -255,7 +255,7 @@
                             <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
                                 <i class="fas fa-times mr-2"></i>Cancel
                             </button>
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
+                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-colors text-sm transform active:translate-y-px">
                                 <i class="fas fa-save mr-2"></i>Save
                             </button>
                         </div>
@@ -268,7 +268,7 @@
     <!-- Color Group Selector Modal -->
     <div v-if="showColorGroupModal" class="fixed inset-0 z-[70] bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto transform transition-transform duration-300">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                         <i class="fas fa-layer-group"></i>
@@ -286,7 +286,7 @@
                             <i class="fas fa-search"></i>
                         </span>
                         <input type="text" v-model="cgSearchQuery" placeholder="Search color groups..."
-                            class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                            class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
                     </div>
                 </div>
 
@@ -301,7 +301,7 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-xs">
                             <tr v-for="group in filteredColorGroups" :key="group.cg"
-                                :class="['hover:bg-blue-50 cursor-pointer', selectedColorGroup && selectedColorGroup.cg === group.cg ? 'bg-blue-100' : '']"
+                                :class="['hover:bg-emerald-50 cursor-pointer', selectedColorGroup && selectedColorGroup.cg === group.cg ? 'bg-emerald-100' : '']"
                                 @click="selectColorGroupRow(group)"
                                 @dblclick="selectColorGroup(group)">
                                 <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ group.cg }}</td>
@@ -329,7 +329,7 @@
 
     <!-- Loading Overlay -->
     <div v-if="saving" class="fixed inset-0 z-[80] bg-black bg-opacity-50 flex justify-center items-center">
-        <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
 
     <!-- Notification Toast -->

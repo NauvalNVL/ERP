@@ -22,9 +22,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
                     <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-edit text-white"></i>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Salesperson Management</h3>
@@ -39,15 +39,15 @@
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-user-tie"></i>
                                 </span>
-                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
+                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-emerald-500 hover:bg-emerald-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
-                            <button type="button" @click="createNewSalesperson" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                            <button type="button" @click="createNewSalesperson" class="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded transition-colors transform active:translate-y-px">
                                 <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
@@ -187,38 +187,38 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Code:</label>
-                            <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required :disabled="!isCreating">
+                            <input v-model="editForm.code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500" required :disabled="!isCreating">
                             <span class="text-xs text-gray-500">Code must be unique</span>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Salesperson Name:</label>
-                            <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                            <input v-model="editForm.name" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Group:</label>
-                            <select v-model="editForm.grup" @change="onSalesTeamChange" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <select v-model="editForm.grup" @change="onSalesTeamChange" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
                                 <option v-for="team in salesTeams" :key="team.code" :value="team.name">{{ team.name }}</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Code Group:</label>
-                            <input v-model="editForm.code_grup" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" readonly>
+                            <input v-model="editForm.code_grup" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500" readonly>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Target Sales:</label>
-                            <input v-model="editForm.target_sales" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input v-model="editForm.target_sales" type="number" step="0.01" min="0" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Internal:</label>
-                            <input v-model="editForm.internal" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input v-model="editForm.internal" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
-                            <input v-model="editForm.email" type="email" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input v-model="editForm.email" type="email" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
-                            <select v-model="editForm.status" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <select v-model="editForm.status" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
                             </select>
@@ -231,7 +231,7 @@
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
                             <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
+                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700">Save</button>
                         </div>
                     </div>
                 </form>
@@ -241,7 +241,7 @@
 
     <!-- Loading Overlay -->
     <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
-        <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
 
     <!-- Notification Toast -->

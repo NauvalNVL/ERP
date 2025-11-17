@@ -178,7 +178,7 @@
     <!-- Edit Modal -->
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl mx-auto my-8 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                         <i class="fas fa-box"></i>
@@ -192,8 +192,8 @@
             <div class="flex-1 overflow-y-auto p-6">
                 <form @submit.prevent="saveProductChanges" class="space-y-4">
                     <!-- UOM Reference Table -->
-                    <div class="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-sm">
-                        <h4 class="text-sm font-semibold text-blue-800 mb-3 flex items-center">
+                    <div class="mb-6 bg-emerald-50 p-4 rounded-lg border border-emerald-200 shadow-sm">
+                        <h4 class="text-sm font-semibold text-emerald-800 mb-3 flex items-center">
                             <i class="fas fa-table mr-2"></i>
                             Product Category and UOM allowable:
                         </h4>
@@ -283,26 +283,26 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-barcode text-blue-500 mr-1"></i>
+                                <i class="fas fa-barcode text-emerald-500 mr-1"></i>
                                 Product Code:
                             </label>
-                            <input v-model="editForm.product_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
+                            <input v-model="editForm.product_code" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" :class="{ 'bg-gray-100': !isCreating }" :readonly="!isCreating" required>
                             <span class="text-xs text-gray-500 mt-1 block">Product code must be unique</span>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-align-left text-blue-500 mr-1"></i>
+                                <i class="fas fa-align-left text-emerald-500 mr-1"></i>
                                 Description:
                             </label>
-                            <input v-model="editForm.description" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <input v-model="editForm.description" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-tags text-blue-500 mr-1"></i>
+                                <i class="fas fa-tags text-emerald-500 mr-1"></i>
                                 Category:
                             </label>
                             <template v-if="isCreating">
-                                <select v-model="editForm.category" @change="updateUnitBasedOnCategory" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                                <select v-model="editForm.category" @change="updateUnitBasedOnCategory" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
                                     <option value="">Select a category</option>
                                     <option value="1-Corrugated Carton Box">1-Corrugated Carton Box</option>
                                     <option value="2-Single Facer Roll">2-Single Facer Roll</option>
@@ -321,18 +321,18 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-ruler text-blue-500 mr-1"></i>
+                                <i class="fas fa-ruler text-emerald-500 mr-1"></i>
                                 Unit (UOM):
                             </label>
-                            <input v-model="editForm.unit" type="text" class="block w-full rounded-md border-gray-300 shadow-sm bg-blue-50 font-medium text-blue-700" readonly>
+                            <input v-model="editForm.unit" type="text" class="block w-full rounded-md border-gray-300 shadow-sm bg-emerald-50 font-medium text-emerald-700" readonly>
                             <span class="text-xs text-gray-500 mt-1 block">Unit is automatically set based on category selection</span>
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-layer-group text-blue-500 mr-1"></i>
+                                <i class="fas fa-layer-group text-emerald-500 mr-1"></i>
                                 Product Group ID:
                             </label>
-                            <select v-model="editForm.product_group_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <select v-model="editForm.product_group_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" required>
                                 <option value="">Select a product group</option>
                                 <option v-for="group in productGroups" :key="group.id || group.product_group_id" :value="group.product_group_id">
                                     {{ group.product_group_id }} - {{ group.product_group_name }}
@@ -342,7 +342,7 @@
                         </div>
                         <div class="md:col-span-2">
                             <label class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer">
-                                <input type="checkbox" v-model="editForm.is_active" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 w-4 h-4">
+                                <input type="checkbox" v-model="editForm.is_active" class="rounded border-gray-300 text-emerald-600 shadow-sm focus:border-emerald-300 focus:ring focus:ring-emerald-200 focus:ring-opacity-50 w-4 h-4">
                                 <span class="ml-3 text-sm font-medium text-gray-700">
                                     <i class="fas fa-check-circle text-green-500 mr-1"></i>
                                     Active Status
@@ -364,7 +364,7 @@
                         <button type="button" @click="closeEditModal" class="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow-sm flex items-center">
                             <i class="fas fa-times mr-2"></i>Cancel
                         </button>
-                        <button type="submit" @click="saveProductChanges" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-sm flex items-center">
+                        <button type="submit" @click="saveProductChanges" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-colors shadow-sm flex items-center">
                             <i class="fas fa-save mr-2"></i>Save Changes
                         </button>
                     </div>
@@ -375,7 +375,7 @@
 
     <!-- Loading Overlay -->
     <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
-        <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
     
     <!-- Notification Toast -->

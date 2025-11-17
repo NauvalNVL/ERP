@@ -7,17 +7,17 @@
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
             <i class="fas fa-print mr-3"></i> View & Print Sales Teams
         </h2>
-        <p class="text-cyan-100">Preview and print sales team data</p>
+        <p class="text-emerald-100">Preview and print sales team data</p>
     </div>
 
     <div class="bg-gradient-to-br from-slate-50 via-white to-emerald-50 rounded-b-2xl shadow-lg p-6 mb-6">
         <!-- Actions Bar -->
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
-                <button @click="exportPDF" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                <button @click="exportPDF" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
-                <Link href="/sales-team" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                <Link href="/sales-team" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Sales Teams
                 </Link>
             </div>
@@ -28,7 +28,7 @@
                 <input
                     type="text"
                     v-model="searchQuery"
-                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Search sales teams..."
                 >
             </div>
@@ -90,8 +90,8 @@
                         </td>
                     </tr>
                         <tr v-for="(team, index) in filteredSalesTeams" :key="team.id"
-                            :class="{'bg-blue-50': index % 2 === 0}"
-                            class="hover:bg-blue-100">
+                            :class="{'bg-emerald-50': index % 2 === 0}"
+                            class="hover:bg-emerald-100">
                             <td class="px-3 py-4 whitespace-nowrap text-sm">{{ team.id || 'N/A' }}</td>
                             <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">{{ team.code || 'N/A' }}</td>
                             <td class="px-3 py-4 whitespace-nowrap text-sm">{{ team.name || 'N/A' }}</td>
@@ -113,11 +113,11 @@
         </div>
 
         <!-- Print Instructions -->
-        <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+        <div class="mt-6 bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+            <h3 class="font-semibold text-emerald-800 mb-2 flex items-center">
                 <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
-            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+            <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
                 <li>Click the "Print PDF" button above to generate and download PDF</li>
                 <li>PDF will be automatically saved in landscape orientation</li>
                 <li>You can search or sort data before exporting</li>

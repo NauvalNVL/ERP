@@ -3,20 +3,20 @@
     <Head title="Industry Management" />
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
             <i class="fas fa-industry mr-3"></i> Define Industry
         </h2>
-        <p class="text-cyan-100">Define industries for customer and product categorization</p>
+        <p class="text-emerald-100">Define industries for customer and product categorization</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
                     <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-cogs text-white"></i>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Industry Management</h3>
@@ -30,15 +30,15 @@
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-industry"></i>
                                 </span>
-                                <input type="text" v-model="industryCode" @input="searchIndustryCode" @keyup.enter="handleSearchAndCreate" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Enter industry code">
-                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md">
+                                <input type="text" v-model="industryCode" @input="searchIndustryCode" @keyup.enter="handleSearchAndCreate" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="Enter industry code">
+                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-r-md">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Record:</label>
-                            <button type="button" @click="createNewIndustry" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
+                            <button type="button" @click="createNewIndustry" class="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded">
                                 <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
@@ -68,17 +68,17 @@
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
                 <!-- Industry Info Card -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500 mb-6">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-info-circle text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Industry Information</h3>
                     </div>
 
                     <div class="space-y-4">
-                        <div class="p-4 bg-teal-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
+                        <div class="p-4 bg-emerald-50 rounded-lg">
+                            <h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider mb-2">Instructions</h4>
                             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
                                 <li>Industry code must be unique and maximum 4 characters</li>
                                 <li>Use the <span class="font-medium">Add New</span> button to add a new industry</li>
@@ -87,11 +87,11 @@
                             </ul>
                         </div>
 
-                        <div class="p-4 bg-blue-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common Industries</h4>
+                        <div class="p-4 bg-emerald-50 rounded-lg">
+                            <h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider mb-2">Common Industries</h4>
                             <div class="grid grid-cols-2 gap-2 text-sm">
                                 <div class="flex items-center">
-                                    <span class="w-6 h-6 flex items-center justify-center bg-blue-600 text-white rounded-full font-bold mr-2">F</span>
+                                    <span class="w-6 h-6 flex items-center justify-center bg-emerald-600 text-white rounded-full font-bold mr-2">F</span>
                                     <span>Food</span>
                                 </div>
                                 <div class="flex items-center">
@@ -116,37 +116,37 @@
                 </div>
 
                 <!-- Quick Links -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-link text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <Link href="/color" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                            <div class="p-2 bg-purple-500 rounded-full mr-3">
+                        <Link href="/color" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
                                 <i class="fas fa-palette text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-purple-900">Colors</p>
-                                <p class="text-xs text-purple-700">Manage colors</p>
+                                <p class="font-medium text-emerald-900">Colors</p>
+                                <p class="text-xs text-emerald-700">Manage colors</p>
                             </div>
                         </Link>
 
-                        <Link href="/geo" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                            <div class="p-2 bg-blue-500 rounded-full mr-3">
+                        <Link href="/geo" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
                                 <i class="fas fa-globe-americas text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">Geo</p>
-                                <p class="text-xs text-blue-700">Manage geographical data</p>
+                                <p class="font-medium text-emerald-900">Geo</p>
+                                <p class="text-xs text-emerald-700">Manage geographical data</p>
                             </div>
                         </Link>
 
                         <Link href="/industry/view-print" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                            <div class="p-2 bg-green-500 rounded-full mr-3">
+                            <div class="p-2 bg-green-600 rounded-full mr-3">
                                 <i class="fas fa-print text-white text-sm"></i>
                             </div>
                             <div>
@@ -172,7 +172,7 @@
     <!-- Edit/Create Modal -->
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                         <i class="fas fa-industry"></i>
@@ -184,7 +184,7 @@
                 </button>
             </div>
             <div class="p-6">
-                <div v-if="!isCreating" class="mb-4 text-sm text-blue-700 bg-blue-50 p-3 rounded-lg">
+                <div v-if="!isCreating" class="mb-4 text-sm text-emerald-700 bg-emerald-50 p-3 rounded-lg">
                     <p><i class="fas fa-info-circle mr-2"></i> You are editing industry <span class="font-bold">{{ editForm.code }}</span></p>
                 </div>
                 <form @submit.prevent="saveIndustryChanges" class="space-y-4">
@@ -221,7 +221,7 @@
                         <div v-else class="w-24"></div>
                         <div class="flex space-x-3">
                             <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
+                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg">Save</button>
                         </div>
                     </div>
                 </form>
@@ -231,7 +231,7 @@
 
     <!-- Loading Overlay -->
     <div v-if="saving" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
-        <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
     
     <!-- Notification Toast -->

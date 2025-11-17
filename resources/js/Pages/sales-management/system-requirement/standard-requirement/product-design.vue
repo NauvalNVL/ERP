@@ -3,20 +3,20 @@
     <Head title="Product Design Management" />
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
             <i class="fas fa-drafting-compass mr-3"></i> Define Product Design
         </h2>
-        <p class="text-cyan-100">Define product designs for specific product categories</p>
+        <p class="text-emerald-100">Define product designs for specific product categories</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
                     <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-edit text-white"></i>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Product Design Management</h3>
@@ -30,15 +30,15 @@
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-drafting-compass"></i>
                                 </span>
-                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md">
+                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
+                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-r-md">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
-                            <button type="button" @click="openModalForCreate" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded">
+                            <button type="button" @click="openModalForCreate" class="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded">
                                 <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
@@ -70,17 +70,17 @@
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
                 <!-- Product Design Info Card -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500 mb-6">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-info-circle text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Product Design Info</h3>
                     </div>
 
                     <div class="space-y-4">
-                        <div class="p-4 bg-teal-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
+                        <div class="p-4 bg-emerald-50 rounded-lg">
+                            <h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider mb-2">Instructions</h4>
                             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
                                 <li>Product design code must be unique</li>
                                 <li>Use the <span class="font-medium">search</span> button to select a design</li>
@@ -89,10 +89,10 @@
                             </ul>
                         </div>
 
-                        <div class="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors" :class="{'cursor-pointer': selectedRow}" @click="selectedRow ? showModal = true : null">
+                        <div class="p-4 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors" :class="{'cursor-pointer': selectedRow}" @click="selectedRow ? showModal = true : null">
                             <div class="flex justify-between items-center mb-2">
-                                <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider">Design Information</h4>
-                                <button v-if="selectedRow" @click.stop="showModal = true" class="text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-200">
+                                <h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider">Design Information</h4>
+                                <button v-if="selectedRow" @click.stop="showModal = true" class="text-emerald-600 hover:text-emerald-800 p-1 rounded-full hover:bg-emerald-200">
                                     <i class="fas fa-edit"></i>
                                 </button>
                             </div>
@@ -111,7 +111,7 @@
                                     Select a design to view details
                                 </div>
                             </div>
-                            <div v-if="selectedRow" class="mt-3 text-xs text-blue-600 flex items-center">
+                            <div v-if="selectedRow" class="mt-3 text-xs text-emerald-600 flex items-center">
                                 <i class="fas fa-info-circle mr-1"></i>
                                 Click the browse button to edit this design
                             </div>
@@ -120,32 +120,32 @@
                 </div>
 
                 <!-- Quick Links -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-link text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <Link href="/product" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                            <div class="p-2 bg-purple-500 rounded-full mr-3">
+                        <Link href="/product" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
                                 <i class="fas fa-box text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-purple-900">Products</p>
-                                <p class="text-xs text-purple-700">Manage product categories</p>
+                                <p class="font-medium text-emerald-900">Products</p>
+                                <p class="text-xs text-emerald-700">Manage product categories</p>
                             </div>
                         </Link>
 
-                        <a href="/product-group" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                            <div class="p-2 bg-blue-500 rounded-full mr-3">
+                        <a href="/product-group" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
                                 <i class="fas fa-drafting-compass text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">Product Groups</p>
-                                <p class="text-xs text-blue-700">Manage product groups</p>
+                                <p class="font-medium text-emerald-900">Product Groups</p>
+                                <p class="text-xs text-emerald-700">Manage product groups</p>
                             </div>
                         </a>
 
@@ -321,7 +321,7 @@ const closeModal = () => {
 
 /* Form heading styles */
 .font-medium.text-gray-700.mb-4.pb-2.border-b {
-  color: #2563eb;
+  color: #059669; /* emerald-600 */
   font-weight: 600;
 }
 
@@ -330,14 +330,15 @@ const closeModal = () => {
   cursor: pointer;
 }
 
+
 .inline-flex.items-center input[type="radio"]:checked {
-  background-color: #2563eb;
-  border-color: #2563eb;
+  background-color: #059669; /* emerald-600 */
+  border-color: #059669;
 }
 
 /* Input focus effects */
 input:focus, select:focus {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25); /* emerald-500 */
   transition: all 0.2s;
 }
 

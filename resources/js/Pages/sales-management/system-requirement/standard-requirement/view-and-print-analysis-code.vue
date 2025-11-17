@@ -3,21 +3,21 @@
     <Head title="View & Print Analysis Codes" />
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
             <i class="fas fa-print mr-3"></i> View & Print Analysis Codes
         </h2>
-        <p class="text-cyan-100">Preview and print analysis code data</p>
+        <p class="text-emerald-100">Preview and print analysis code data</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
         <!-- Actions Bar -->
         <div class="flex flex-wrap items-center justify-between mb-6">
             <div class="flex items-center space-x-2 mb-3 sm:mb-0">
-                <button @click="printTable" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                <button @click="printTable" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-file-pdf mr-2"></i> Print PDF
                 </button>
-                <Link href="/analysis-code" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2">
+                <Link href="/analysis-code" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-4 py-2 rounded flex items-center space-x-2">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Analysis Code
                 </Link>
             </div>
@@ -28,7 +28,7 @@
                 <input
                     type="text"
                     v-model="searchQuery"
-                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="Search analysis codes..."
                 >
             </div>
@@ -38,7 +38,7 @@
         <div class="overflow-x-auto">
             <div id="printableTable" class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <!-- Table Header -->
-                <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 flex items-center">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 px-6 flex items-center">
                     <div class="flex items-center">
                         <div class="mr-4">
                             <i class="fas fa-code-branch text-3xl"></i>
@@ -52,7 +52,7 @@
 
                 <!-- Table Content -->
                 <table class="min-w-full border-collapse">
-                    <thead class="bg-blue-600" style="background-color: #2563eb;">
+                    <thead class="bg-green-700" style="background-color: #047857;">
                         <tr>
                             <th @click="sortTable('analysis_code')" class="px-4 py-2 text-left font-semibold border border-gray-300 cursor-pointer" style="color: black;">
                                 Analysis Code <i :class="getSortIcon('analysis_code')" class="text-xs"></i>
@@ -72,7 +72,7 @@
                         <tr v-if="loading">
                             <td colspan="4" class="px-4 py-3 text-center text-gray-500 border border-gray-300">
                                 <div class="flex justify-center">
-                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-500"></div>
                                 </div>
                                 <p class="mt-2">Loading analysis code data...</p>
                             </td>
@@ -82,13 +82,13 @@
                                 No analysis codes found.
                                 <template v-if="searchQuery">
                                     <p class="mt-2">No results match your search query: "{{ searchQuery }}"</p>
-                                    <button @click="searchQuery = ''" class="mt-2 text-blue-500 hover:underline">Clear search</button>
+                                    <button @click="searchQuery = ''" class="mt-2 text-emerald-600 hover:underline">Clear search</button>
                                 </template>
                             </td>
                         </tr>
                         <tr v-for="(code, index) in filteredCodes" :key="code.analysis_code"
-                            :class="index % 2 === 0 ? 'bg-blue-100' : 'bg-white'"
-                            class="hover:bg-blue-200">
+                            :class="index % 2 === 0 ? 'bg-emerald-50' : 'bg-white'"
+                            class="hover:bg-emerald-100">
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm font-medium text-gray-900">{{ code.analysis_code || 'N/A' }}</div>
                             </td>
@@ -97,7 +97,7 @@
                             </td>
                             <td class="px-4 py-2 border border-gray-300">
                                 <div class="text-sm text-gray-900">
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">
                                         {{ code.analysis_group || 'N/A' }}
                                     </span>
                                 </div>
@@ -121,8 +121,8 @@
         </div>
 
         <!-- Print Instructions -->
-        <div class="mt-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h3 class="font-semibold text-blue-800 mb-2 flex items-center">
+        <div class="mt-6 bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+            <h3 class="font-semibold text-emerald-800 mb-2 flex items-center">
                 <i class="fas fa-info-circle mr-2"></i> PDF Export Instructions
             </h3>
             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
@@ -263,7 +263,7 @@ const printTable = () => {
 
         // Add title
         doc.setFontSize(16);
-        doc.setTextColor(37, 99, 235); // Blue color
+        doc.setTextColor(5, 150, 105); // Emerald color
         doc.text('ANALYSIS CODE LIST', 10, 15);
 
         // Add subtitle
@@ -287,7 +287,7 @@ const printTable = () => {
             theme: 'grid',
             tableWidth: 'auto',
             headStyles: {
-                fillColor: [37, 99, 235], // Blue background
+                fillColor: [5, 150, 105], // Emerald background
                 textColor: [255, 255, 255], // White text
                 fontStyle: 'bold',
                 halign: 'left',
@@ -299,7 +299,7 @@ const printTable = () => {
                 fontSize: 9
             },
             alternateRowStyles: {
-                fillColor: [219, 234, 254] // Light blue for alternate rows
+                fillColor: [209, 250, 229] // Light emerald for alternate rows
             },
             columnStyles: {
                 0: { cellWidth: 40 },  // Analysis Code

@@ -8,20 +8,20 @@
     </form>
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-cyan-700 to-blue-600 p-6 rounded-t-lg shadow-lg">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
             <i class="fas fa-vial mr-3"></i> Define Chemical Coat
         </h2>
-        <p class="text-cyan-100">Manage chemical coating definitions for production</p>
+        <p class="text-emerald-100">Manage chemical coating definitions for production</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6 mb-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column -->
             <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
                     <div class="flex items-center mb-6 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-blue-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-edit text-white"></i>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-800">Define Chemical Coat</h3>
@@ -35,15 +35,15 @@
                                 <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
                                     <i class="fas fa-vial"></i>
                                 </span>
-                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-blue-500 hover:bg-blue-600 text-white rounded-r-md transition-colors transform active:translate-y-px">
+                                <input type="text" v-model="searchQuery" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
+                                <button type="button" @click="showModal = true" class="inline-flex items-center px-3 py-2 border border-l-0 border-emerald-500 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-r-md transition-colors transform active:translate-y-px">
                                     <i class="fas fa-table"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Action:</label>
-                            <button type="button" @click="createNewChemicalCoat" class="w-full flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded transition-colors transform active:translate-y-px">
+                            <button type="button" @click="createNewChemicalCoat" class="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded transition-colors transform active:translate-y-px">
                                 <i class="fas fa-plus-circle mr-2"></i> Add New
                             </button>
                         </div>
@@ -72,17 +72,17 @@
             <!-- Right Column - Quick Info -->
             <div class="lg:col-span-1">
                 <!-- Chemical Coat Info Card -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-teal-500 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500 mb-6">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-teal-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-info-circle text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Chemical Coat Info</h3>
                     </div>
 
                     <div class="space-y-4">
-                        <div class="p-4 bg-teal-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-teal-800 uppercase tracking-wider mb-2">Instructions</h4>
+                        <div class="p-4 bg-emerald-50 rounded-lg">
+                            <h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider mb-2">Instructions</h4>
                             <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
                                 <li>Chemical coat code must be unique</li>
                                 <li>Use the search button to select a coat</li>
@@ -91,15 +91,15 @@
                             </ul>
                         </div>
 
-                        <div class="p-4 bg-blue-50 rounded-lg">
-                            <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">Common Coatings</h4>
+                        <div class="p-4 bg-emerald-50 rounded-lg">
+                            <h4 class="text-sm font-semibold text-emerald-800 uppercase tracking-wider mb-2">Common Coatings</h4>
                             <div class="space-y-2 text-sm">
                                 <div class="flex items-center">
                                     <span class="w-8 h-8 flex items-center justify-center bg-purple-500 text-white rounded-full font-bold mr-2">V</span>
                                     <span>Vernish</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded-full font-bold mr-2">W</span>
+                                    <span class="w-8 h-8 flex items-center justify-center bg-emerald-500 text-white rounded-full font-bold mr-2">W</span>
                                     <span>Water Base</span>
                                 </div>
                                 <div class="flex items-center">
@@ -111,7 +111,7 @@
                                     <span>Matte Coat</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-8 h-8 flex items-center justify-center bg-indigo-500 text-white rounded-full font-bold mr-2">U</span>
+                                    <span class="w-8 h-8 flex items-center justify-center bg-emerald-700 text-white rounded-full font-bold mr-2">U</span>
                                     <span>UV Coating</span>
                                 </div>
                             </div>
@@ -120,27 +120,27 @@
                 </div>
 
                 <!-- Quick Links -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-500">
+                <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-emerald-500">
                     <div class="flex items-center mb-4 pb-2 border-b border-gray-200">
-                        <div class="p-2 bg-purple-500 rounded-lg mr-3">
+                        <div class="p-2 bg-emerald-500 rounded-lg mr-3">
                             <i class="fas fa-link text-white"></i>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800">Quick Links</h3>
                     </div>
 
                     <div class="grid grid-cols-1 gap-3">
-                        <Link href="/stitch-wire" class="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                            <div class="p-2 bg-blue-500 rounded-full mr-3">
+                        <Link href="/stitch-wire" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
                                 <i class="fas fa-paperclip text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-blue-900">Stitch Wire</p>
-                                <p class="text-xs text-blue-700">Manage stitch wire</p>
+                                <p class="font-medium text-emerald-900">Stitch Wire</p>
+                                <p class="text-xs text-emerald-700">Manage stitch wire</p>
                             </div>
                         </Link>
 
                         <Link href="/finishing" class="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                            <div class="p-2 bg-green-500 rounded-full mr-3">
+                            <div class="p-2 bg-green-600 rounded-full mr-3">
                                 <i class="fas fa-th-list text-white text-sm"></i>
                             </div>
                             <div>
@@ -149,13 +149,13 @@
                             </div>
                         </Link>
 
-                        <Link href="/chemical-coat/view-print" class="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                            <div class="p-2 bg-purple-500 rounded-full mr-3">
+                        <Link href="/chemical-coat/view-print" class="flex items-center p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                            <div class="p-2 bg-emerald-500 rounded-full mr-3">
                                 <i class="fas fa-print text-white text-sm"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-purple-900">Print List</p>
-                                <p class="text-xs text-purple-700">Print chemical coat list</p>
+                                <p class="font-medium text-emerald-900">Print List</p>
+                                <p class="text-xs text-emerald-700">Print chemical coat list</p>
                             </div>
                         </Link>
                     </div>
@@ -176,7 +176,7 @@
     <!-- Edit Modal -->
     <div v-if="showEditModal" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-2/5 max-w-md mx-auto transform transition-transform duration-300">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
                 <div class="flex items-center">
                     <div class="p-2 bg-white bg-opacity-30 rounded-lg mr-3">
                         <i class="fas fa-vial"></i>
@@ -205,14 +205,14 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                                     <i class="fas fa-font"></i>
                                 </span>
-                                <input v-model="editForm.name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                                <input v-model="editForm.name" type="text" class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Process Code:</label>
                             <div class="flex items-center space-x-2">
                                 <div class="relative flex-shrink-0" style="width: 50px;">
-                                    <input v-model="editForm.dry_end_code" type="text" maxlength="1" class="block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm text-center font-bold" placeholder="">
+                                    <input v-model="editForm.dry_end_code" type="text" maxlength="1" class="block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm text-center font-bold" placeholder="">
                                 </div>
                                 <span class="text-sm text-gray-700">For Corrugator Dry-End</span>
                             </div>
@@ -227,7 +227,7 @@
                             <button type="button" @click="closeEditModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm transform active:translate-y-px">
                                 <i class="fas fa-times mr-2"></i>Cancel
                             </button>
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm transform active:translate-y-px">
+                            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg transition-colors text-sm transform active:translate-y-px">
                                 <i class="fas fa-save mr-2"></i>Save
                             </button>
                         </div>
@@ -239,7 +239,7 @@
 
     <!-- Loading Overlay -->
     <div v-if="saving" class="fixed inset-0 z-[80] bg-black bg-opacity-50 flex justify-center items-center">
-        <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
 
     <!-- Notification Toast -->

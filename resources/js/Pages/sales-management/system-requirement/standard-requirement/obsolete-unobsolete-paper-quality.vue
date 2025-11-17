@@ -3,11 +3,11 @@
     <Head title="Manage Paper Quality Status" />
 
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-blue-700 to-indigo-600 p-6 rounded-t-lg shadow-lg mb-6">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-t-lg shadow-lg mb-6">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center">
             <i class="fas fa-sync-alt mr-3"></i> Manage Paper Quality Status (Obsolete/Unobsolete)
         </h2>
-        <p class="text-indigo-100">Toggle the active status of paper qualities.</p>
+        <p class="text-emerald-100">Toggle the active status of paper qualities.</p>
     </div>
 
     <div class="bg-white rounded-b-lg shadow-lg p-6">
@@ -29,11 +29,11 @@
                         <i class="fas fa-search"></i>
                     </span>
                     <input type="text" v-model="searchQuery" placeholder="Search paper qualities..."
-                        class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
+                        class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50">
                 </div>
             </div>
             <div>
-                <select v-model="statusFilter" class="py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                <select v-model="statusFilter" class="py-2 px-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
                     <option value="all">All Statuses</option>
                     <option value="active">Active Only</option>
                     <option value="obsolete">Obsolete Only</option>
@@ -43,7 +43,7 @@
 
         <!-- Loading Indicator -->
         <div v-if="loading" class="my-8 flex justify-center">
-            <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
 
         <!-- Paper Qualities Table -->
@@ -101,8 +101,8 @@
                     @click="changePage(pagination.currentPage - 1)" 
                     :disabled="pagination.currentPage === 1"
                     :class="[
-                        pagination.currentPage === 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700',
-                        'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                        pagination.currentPage === 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700',
+                        'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500'
                     ]">
                     Previous
                 </button>
@@ -115,8 +115,8 @@
                     @click="changePage(pagination.currentPage + 1)" 
                     :disabled="pagination.currentPage >= Math.ceil(pagination.total / pagination.perPage)"
                     :class="[
-                        pagination.currentPage >= Math.ceil(pagination.total / pagination.perPage) ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700',
-                        'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                        pagination.currentPage >= Math.ceil(pagination.total / pagination.perPage) ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700',
+                        'py-2 px-4 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500'
                     ]">
                     Next
                 </button>
@@ -127,7 +127,7 @@
     <!-- Loading Overlay -->
     <div v-if="isToggling" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
         <div class="bg-white p-4 rounded-lg shadow-lg text-center">
-            <div class="w-12 h-12 border-4 border-solid border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <div class="w-12 h-12 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
             <p>Updating status...</p>
         </div>
     </div>
