@@ -558,11 +558,6 @@ return response()->json([
 ]);
 });
 
-// FgDoConfig API routes
-Route::prefix('fg-do-config')->group(function () {
-Route::get('/', [FgDoConfigController::class, 'getConfig']);
-Route::post('/', [FgDoConfigController::class, 'updateConfig']);
-});
 
 // Warehouse Location API routes
 Route::prefix('warehouse-locations')->group(function () {
@@ -577,13 +572,6 @@ Route::delete('/{code}', [WarehouseLocationController::class, 'destroy']);
 Route::get('/customer-sales-types', [CustomerSalesTypeController::class, 'index']);
 Route::post('/customer-sales-types', [CustomerSalesTypeController::class, 'store']);
 
-// Diecut Computation Formula API routes
-Route::get('/diecut-computation-formulas', [App\Http\Controllers\ComputationFormulaController::class, 'apiIndex']);
-Route::get('/diecut-computation-formulas/{id}', [App\Http\Controllers\ComputationFormulaController::class, 'apiShow']);
-Route::post('/diecut-computation-formulas', [App\Http\Controllers\ComputationFormulaController::class, 'apiStore']);
-Route::put('/diecut-computation-formulas/{id}', [App\Http\Controllers\ComputationFormulaController::class, 'apiUpdate']);
-Route::delete('/diecut-computation-formulas/{id}', [App\Http\Controllers\ComputationFormulaController::class, 'apiDestroy']);
-Route::post('/diecut-computation-formulas/seed', [App\Http\Controllers\ComputationFormulaController::class, 'apiSeed']);
 
 // Industry, Geo, and Salesperson API routes
 Route::get('/industry', [App\Http\Controllers\IndustryController::class, 'apiIndex']);
@@ -610,29 +598,7 @@ Route::post('/customer-groups/seed', [App\Http\Controllers\CustomerGroupControll
 Route::post('/update-customer-account', [App\Http\Controllers\UpdateCustomerAccountController::class, 'apiStore']);
 Route::put('/update-customer-account/{id}', [App\Http\Controllers\UpdateCustomerAccountController::class, 'apiUpdate']);
 
-// DR/CR Note API routes
-Route::prefix('dr-cr-notes')->group(function () {
-Route::get('/', [App\Http\Controllers\DrCrNoteController::class, 'index']);
-Route::post('/', [App\Http\Controllers\DrCrNoteController::class, 'store']);
-Route::get('/customer-suggestions', [App\Http\Controllers\DrCrNoteController::class, 'getCustomerSuggestions']);
-Route::get('/summary', [App\Http\Controllers\DrCrNoteController::class, 'getSummary']);
-Route::get('/{id}', [App\Http\Controllers\DrCrNoteController::class, 'show']);
-Route::put('/{id}', [App\Http\Controllers\DrCrNoteController::class, 'update']);
-Route::delete('/{id}', [App\Http\Controllers\DrCrNoteController::class, 'destroy']);
-Route::post('/{id}/approve', [App\Http\Controllers\DrCrNoteController::class, 'approve']);
-Route::post('/{id}/reject', [App\Http\Controllers\DrCrNoteController::class, 'reject']);
-Route::post('/{id}/post', [App\Http\Controllers\DrCrNoteController::class, 'post']);
-});
 
-// Customer Warehouse Location API routes
-Route::prefix('customer-warehouse-locations')->group(function () {
-Route::get('/', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'index'])->name('customer-warehouse-locations.index');
-Route::post('/', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'store'])->name('customer-warehouse-locations.store');
-Route::get('/check/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'check'])->name('customer-warehouse-locations.check');
-Route::get('/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'show'])->name('customer-warehouse-locations.show');
-Route::put('/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'update'])->name('customer-warehouse-locations.update');
-Route::delete('/{customer_code}', [App\Http\Controllers\CustomerWarehouseLocationController::class, 'destroy'])->name('customer-warehouse-locations.destroy');
-});
 
 // Customer Warehouse Requirement API routes
 Route::get('/customer-warehouse-requirements', [CustomerWarehouseRequirementController::class, 'getAllRequirements']);
@@ -671,27 +637,6 @@ Route::post('/', [App\Http\Controllers\Api\FgStockInByWoController::class, 'stor
 Route::get('/', [App\Http\Controllers\Api\FgStockInByWoController::class, 'index']);
 });
 
-// Work Orders API routes
-Route::get('/work-orders', [App\Http\Controllers\Api\FgStockInByWoController::class, 'getWorkOrders']);
-
-// Purchase Requisition API Routes
-Route::prefix('purchase-requisitions')->group(function () {
-Route::get('/', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'apiIndex']);
-Route::post('/', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'store']);
-Route::get('/{id}', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'show']);
-Route::put('/{id}', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'update']);
-Route::delete('/{id}', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'destroy']);
-
-// PR Actions
-Route::post('/{id}/submit', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'submit']);
-Route::post('/{id}/approve', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'approve']);
-Route::post('/{id}/reject', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'reject']);
-Route::post('/{id}/cancel', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'cancel']);
-
-// Utility endpoints
-Route::get('/statistics/dashboard', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'getStatistics']);
-Route::get('/approvals/my-pending', [App\Http\Controllers\MaterialManagement\PurchaseOrder\PurchaseRequisitionController::class, 'myPendingApprovals']);
-});
 
 // Vendor API Routes
 Route::prefix('vendors')->group(function () {
@@ -1080,11 +1025,3 @@ Route::post('/{id}/amend-rejected', function ($id) {
 return response()->json(['message' => 'Amendment notes recorded successfully']);
 });
 });
-
-// FG Stock In API Routes
-Route::prefix('fg-stock-in')->group(function () {
-Route::post('/', [App\Http\Controllers\FGStockInController::class, 'store']);
-});
-
-// Test FG Stock In Route
-Route::get('/test-fg-stock-in', [App\Http\Controllers\TestFGStockInController::class, 'test']);

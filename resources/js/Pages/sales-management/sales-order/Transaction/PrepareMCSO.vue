@@ -2,10 +2,10 @@
   <AppLayout header="Prepare MC SO">
     <div class="bg-white shadow-xl rounded-xl border border-gray-200 overflow-hidden max-w-6xl mx-auto px-4 py-6">
       <!-- Header with controls -->
-      <div class="bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-100 px-6 py-4 border-b border-gray-200">
+      <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 px-6 py-4 border-b border-blue-700">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
-            <i class="fas fa-clipboard-list text-2xl text-blue-600"></i>
+            <i class="fas fa-clipboard-list text-2xl text-white opacity-90"></i>
             <div>
               <h1 class="text-xl font-semibold text-white">Prepare MC SO</h1>
               <p class="text-xs text-white">Form for preparing Master Card based Sales Order</p>
@@ -14,7 +14,7 @@
           <div class="flex items-center space-x-2">
             <button
               @click="refreshPage"
-              class="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
+              class="p-2 text-white bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full transition-colors border border-white border-opacity-20"
               title="Refresh (F5)"
             >
               <i class="fas fa-sync-alt"></i>
