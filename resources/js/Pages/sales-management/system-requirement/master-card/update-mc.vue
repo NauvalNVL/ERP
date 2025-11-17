@@ -1154,30 +1154,38 @@ const clearSoWo = () => {
 };
 const saveMasterCardFromModal = async (pdSetup = null) => {
     try {
-    const pdRoot = pdSetup ? { ...pdSetup } : {};
-    // Ensure SO/WO arrays are always present at root for backend mapping
-    pdRoot.soValues = Array.isArray(soValues.value) ? [...soValues.value] : [];
-    pdRoot.woValues = Array.isArray(woValues.value) ? [...woValues.value] : [];
+        const pdRoot = pdSetup ? { ...pdSetup } : {};
+        // Ensure SO/WO arrays are always present at root for backend mapping
+        pdRoot.soValues = Array.isArray(soValues.value) ? [...soValues.value] : [];
+        pdRoot.woValues = Array.isArray(woValues.value) ? [...woValues.value] : [];
 
-    // Get selected component name (Main, Fit1, Fit2, etc.)
-    const selectedComponent = mcComponents.value.find(c => c.selected);
-    const componentName = selectedComponent ? selectedComponent.c_num : 'Main';
+        // Get selected component name (Main, Fit1, Fit2, etc.)
+        // Use form.comp_no directly as it's already updated by selectComponent
+        const componentName = form.value.comp_no || 'Main';
+        const selectedComponent = mcComponents.value.find(c => c.c_num === componentName);
+        
+        console.log('🔍 Save Master Card - Component Info:', {
+            selectedComponent: selectedComponent,
+            componentName: componentName,
+            form_comp_no: form.value.comp_no,
+            all_components: mcComponents.value.map(c => ({ name: c.c_num, selected: c.selected }))
+        });
 
-    // Ensure status is valid (Active or Obsolete)
-    let validStatus = 'Active';
-    if (form.value.mc_status === 'Active' || form.value.mc_status === 'Obsolete') {
-        validStatus = form.value.mc_status;
-    } else if (form.value.mc_status === 'Act') {
-        validStatus = 'Active';
-    }
-    
-    // Ensure mc_approval is valid (Yes or No)
-    let validApproval = 'No';
-    if (form.value.mc_approval === 'Yes' || form.value.mc_approval === 'No') {
-        validApproval = form.value.mc_approval;
-    }
+        // Ensure status is valid (Active or Obsolete)
+        let validStatus = 'Active';
+        if (form.value.mc_status === 'Active' || form.value.mc_status === 'Obsolete') {
+            validStatus = form.value.mc_status;
+        } else if (form.value.mc_status === 'Act') {
+            validStatus = 'Active';
+        }
+        
+        // Ensure mc_approval is valid (Yes or No)
+        let validApproval = 'No';
+        if (form.value.mc_approval === 'Yes' || form.value.mc_approval === 'No') {
+            validApproval = form.value.mc_approval;
+        }
 
-    const payload = {
+        const payload = {
             mc_seq: form.value.mcs,
             customer_code: form.value.ac,
             customer_name: form.value.customer_name || '', // Pass customer name to backend
@@ -1197,22 +1205,36 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
             detailed_master_card: {
                 mc_details: mcDetails.value,
             },
-        // Ensure backend receives normalized root keys
-        pd_setup: pdRoot,
-        // Include PD setup data directly in payload for better mapping
-        ...pdRoot,
+            // Ensure backend receives normalized root keys
+            pd_setup: pdRoot,
+            // Include PD setup data directly in payload for better mapping
+            ...pdRoot,
         };
 
+        console.log('📤 Payload being sent:', {
+            mc_seq: payload.mc_seq,
+            customer_code: payload.customer_code,
+            comp_no: payload.comp_no,
+            comp_no_type: typeof payload.comp_no,
+            comp_no_empty: !payload.comp_no
+        });
+
+        // Get CSRF token from meta tag or cookie
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
         const res = await axios.post('/api/update-mc/master-cards', payload, {
             headers: { 
                 'Content-Type': 'application/json', 
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
             }
         });
 
         if (res.data) {
-        toast.success('Master Card saved');
+            toast.success(`Master Card saved successfully for component: ${componentName}`);
         }
+        
         // Refresh full MC so subsequent openings have the latest pd_setup
         try {
             if (form.value.mcs && form.value.ac) {
@@ -1233,6 +1255,12 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         console.error('=== SAVE MASTERCARD ERROR ===');
         console.error('Full Error:', e);
         console.error('Error Response:', e.response?.data);
+        
+        // Handle CSRF token mismatch specifically
+        if (e.response?.status === 419) {
+            toast.error('Session expired. Please refresh the page and try again.');
+            return;
+        }
         
         // Display detailed error information
         if (e.response?.data?.errors) {
@@ -2280,8 +2308,8 @@ const saveRecord = async () => {
         const loadingToast = toast.loading("Saving master card...");
         
         // Get selected component name (Main, Fit1, Fit2, etc.)
-        const selectedComponent = mcComponents.value.find(c => c.selected);
-        const componentName = selectedComponent ? selectedComponent.c_num : 'Main';
+        // Use form.comp_no directly as it's already updated by selectComponent
+        const componentName = form.value.comp_no || 'Main';
         
         const payload = {
             mc_seq: form.value.mcs,
@@ -2306,23 +2334,30 @@ const saveRecord = async () => {
             pd_setup: {},
         };
 
+        // Get CSRF token from meta tag or cookie
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
         const response = await axios.post('/api/update-mc/master-cards', payload, {
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
             }
         });
 
+        toast.dismiss(loadingToast);
+        
         if (response.data) {
-            toast.success('Master Card saved successfully');
+            toast.success(`Master Card saved successfully for component: ${componentName}`);
             console.log('Master Card saved:', response.data);
         }
     } catch (error) {
         console.error('Error saving master card:', error);
-        if (error.response?.data?.message) {
+        if (error.response?.status === 419) {
+            toast.error('Session expired. Please refresh the page and try again.');
+        } else if (error.response?.data?.message) {
             toast.error(error.response.data.message);
-        } else if (error.response?.status === 419) {
-            toast.error('CSRF token mismatch. Please refresh the page and try again.');
         } else {
             toast.error('Failed to save master card. Please try again.');
         }
@@ -2439,6 +2474,16 @@ const selectMcs = async (mcs) => {
             const full = await res.json();
             // Keep a local copy to pass into child modals
             selectedMcsFull.value = full;
+            
+            console.log('✅ Loaded full MC data:', {
+                mcs: mcsSeq,
+                has_pd_setup: !!full.pd_setup,
+                has_components: !!full.components,
+                components_in_pd_setup: full.pd_setup?.components?.length || 0,
+                components_at_root: full.components?.length || 0,
+                component_list: full.components?.map(c => ({ c_num: c.c_num, pd: c.pd, pcs_set: c.pcs_set })) || []
+            });
+            
             // Hydrate SO/WO for currently selected component and prefill PD code
             try {
                 hydrateSoWoFromFull(selectedMcsFull.value);
@@ -2456,9 +2501,13 @@ const selectMcs = async (mcs) => {
                     const target = mcComponents.value.find(c => c.c_num === compName);
                     if (target) target.pd = compEntry.pd;
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error('Error hydrating component data:', e);
+            }
         }
-    } catch (e) {}
+    } catch (e) {
+        console.error('Error fetching full MC data:', e);
+    }
 
     // Show confirmation toast
     toast.success(`Selected Master Card: ${mcModel}`);
@@ -2787,7 +2836,7 @@ const handleMcsProceed = async () => {
     }
 };
 
-const handleNextSetup = () => {
+const handleNextSetup = async () => {
     // Validate MC Model is filled for new records
     if (recordMode.value === "new" && !form.value.mc_model.trim()) {
         showErrorModal.value = true;
@@ -2799,6 +2848,29 @@ const handleNextSetup = () => {
         soValues.value = ["", "", "", "", ""];
         woValues.value = ["", "", "", "", ""];
         selectedMcsFull.value = null;
+    } else if (recordMode.value === "existing") {
+        // Load full MC data with all components for existing MC
+        try {
+            if (form.value.mcs && form.value.ac) {
+                const mcsSeqEnc = encodeURIComponent(form.value.mcs);
+                const custEnc = encodeURIComponent(form.value.ac);
+                const res = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}?customer_code=${custEnc}`, {
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                if (res.ok) {
+                    const full = await res.json();
+                    selectedMcsFull.value = full;
+                    console.log('✅ Loaded full MC data with components:', {
+                        mcs: form.value.mcs,
+                        components_count: full.components?.length || 0,
+                        components: full.components?.map(c => c.c_num) || []
+                    });
+                }
+            }
+        } catch (e) {
+            console.error('Failed to load full MC data:', e);
+        }
     }
 
     // Show Setup MC Component modal
@@ -2806,6 +2878,12 @@ const handleNextSetup = () => {
 };
 
 const selectComponent = (component, index) => {
+    console.log('🔧 selectComponent called:', {
+        component: component,
+        index: index,
+        component_c_num: component?.c_num
+    });
+    
     // Reset all selections
     mcComponents.value.forEach((comp) => (comp.selected = false));
     // Select the clicked component
@@ -2814,6 +2892,11 @@ const selectComponent = (component, index) => {
     // Update form comp_no with selected component name
     if (form.value) {
         form.value.comp_no = component.c_num; // Main, Fit1, Fit2, etc.
+        console.log('✅ Component selected:', {
+            component_name: component.c_num,
+            form_comp_no: form.value.comp_no,
+            mcComponents_state: mcComponents.value.map(c => ({ name: c.c_num, selected: c.selected }))
+        });
     }
 };
 

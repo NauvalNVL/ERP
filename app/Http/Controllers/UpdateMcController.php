@@ -74,7 +74,9 @@ class UpdateMcController extends Controller
             ]);
         }
 
-        $mcQuery = DB::table('MC')->where('AC_NUM', $customerCode);
+        $mcQuery = DB::table('MC')
+            ->where('AC_NUM', $customerCode)
+            ->where('COMP', 'Main'); // Only show Main component in master card table
 
         if ($query) {
             $mcQuery->where(function ($q) use ($query) {
@@ -152,19 +154,65 @@ class UpdateMcController extends Controller
 
     /**
      * Show a single Master Card (by mc_seq) with details/PD setup.
+     * Returns Main component data with all Fit components in 'components' array.
      */
     public function apiShow($mcSeq, Request $request)
     {
         $customerCode = $request->input('customer_code');
-        $q = DB::table('MC')->where('MCS_Num', $mcSeq);
+        
+        // Get Main component
+        $q = DB::table('MC')
+            ->where('MCS_Num', $mcSeq)
+            ->where('COMP', 'Main');
         if ($customerCode) {
             $q->where('AC_NUM', $customerCode);
         }
-        $mc = $q->first();
-        if (!$mc) {
+        $main = $q->first();
+        
+        if (!$main) {
             return response()->json(['message' => 'Not found'], 404);
         }
-        return response()->json($mc);
+        
+        // Get all Fit components for this MC
+        $fitsQuery = DB::table('MC')
+            ->where('MCS_Num', $mcSeq)
+            ->where('COMP', '!=', 'Main')
+            ->orderBy('COMP');
+        if ($customerCode) {
+            $fitsQuery->where('AC_NUM', $customerCode);
+        }
+        $fits = $fitsQuery->get();
+        
+        // Convert Main to array
+        $result = (array) $main;
+        
+        // Add components array with all Fit data
+        $components = [];
+        foreach ($fits as $fit) {
+            $components[] = [
+                'c_num' => $fit->COMP,
+                'pd' => $fit->P_DESIGN ?? '',
+                'pcs_set' => $fit->PCS_SET ?? '',
+                'part_num' => $fit->PART_NO ?? '',
+                'model' => $fit->MODEL ?? '',
+                'status' => $fit->STS ?? '',
+            ];
+        }
+        
+        // Add to both root level and pd_setup for compatibility
+        $result['components'] = $components;
+        $result['pd_setup'] = [
+            'components' => $components
+        ];
+        
+        Log::info('apiShow result', [
+            'mcs_num' => $mcSeq,
+            'main_comp' => $main->COMP,
+            'fits_count' => count($components),
+            'fits' => array_map(fn($c) => $c['c_num'], $components)
+        ]);
+        
+        return response()->json($result);
     }
 
     /**
@@ -478,12 +526,19 @@ class UpdateMcController extends Controller
                 'p_design' => $pDesignCode
             ]);
 
+            // Log component info for debugging
+            Log::info('Component Info', [
+                'comp_no_from_request' => $validated['comp_no'] ?? 'NULL',
+                'comp_no_type' => gettype($validated['comp_no'] ?? null),
+                'comp_no_empty' => empty($validated['comp_no']),
+            ]);
+
             $legacy = [
                 'AC_NUM' => $validated['customer_code'],
                 // Store customer NAME, not code
                 'AC_NAME' => $customer ? $customer->NAME : $validated['customer_code'],
                 'STS' => $validated['status'],
-                'COMP' => $validated['comp_no'] ?? null,
+                'COMP' => $validated['comp_no'] ?? 'Main', // Default to 'Main' if not specified
                 'P_DESIGN' => $pDesignCode,
                 'MCS_Num' => $validated['mc_seq'],
                 'MODEL' => $validated['mc_model'] ?? null,
@@ -493,6 +548,10 @@ class UpdateMcController extends Controller
                 // Get UNIT from product_designs -> products table
                 'UNIT' => $unit,
             ];
+            
+            Log::info('Legacy COMP value set to', [
+                'COMP' => $legacy['COMP']
+            ]);
 
             // Try to enrich with dimensions from detailed_master_card if present
             $details = Arr::get($validated, 'detailed_master_card.mc_details', []);
@@ -1040,10 +1099,12 @@ class UpdateMcController extends Controller
             ]);
 
             // Upsert via query builder due to lack of primary key
+            // Include COMP in the unique key to support multiple components per MC
             DB::table('MC')->updateOrInsert(
                 [
                     'MCS_Num' => $normalized['MCS_Num'],
                     'AC_NUM' => $normalized['AC_NUM'],
+                    'COMP' => $normalized['COMP'] ?? 'Main', // Default to 'Main' if not specified
                 ],
                 $normalized
             );
@@ -1295,6 +1356,91 @@ class UpdateMcController extends Controller
         } catch (\Exception $e) {
             Log::error('Update MC Status Error', ['error' => $e->getMessage()]);
             return response()->json(['success' => false, 'message' => 'Error occurred.'], 500);
+        }
+    }
+
+    /**
+     * Get all components (Main, Fit1-9) for a specific Master Card
+     * Used by Setup MC Component modal to display component data from database
+     */
+    public function apiShowComponents($mcSeq, Request $request)
+    {
+        try {
+            $customerCode = $request->input('customer_code');
+            
+            Log::info('apiShowComponents called', [
+                'mcs_num' => $mcSeq,
+                'customer_code' => $customerCode
+            ]);
+            
+            // Query all components for this MC (Main + all Fit components)
+            $query = DB::table('MC')
+                ->where('MCS_Num', $mcSeq);
+            
+            if ($customerCode) {
+                $query->where('AC_NUM', $customerCode);
+            }
+            
+            // Order by component number: Main first, then Fit1-9
+            // SQL Server requires 3 arguments for SUBSTRING: SUBSTRING(string, start, length)
+            $components = $query->orderByRaw("CASE WHEN COMP = 'Main' THEN 0 ELSE CAST(SUBSTRING(COMP, 4, 10) AS INT) + 1 END")
+                ->get();
+            
+            Log::info('Components query result', [
+                'mcs_num' => $mcSeq,
+                'total_found' => $components->count(),
+                'components' => $components->map(fn($c) => [
+                    'COMP' => $c->COMP,
+                    'P_DESIGN' => $c->P_DESIGN,
+                    'PCS_SET' => $c->PCS_SET,
+                    'PART_NO' => $c->PART_NO
+                ])->toArray()
+            ]);
+            
+            if ($components->isEmpty()) {
+                Log::warning('No components found for MC', [
+                    'mcs_num' => $mcSeq,
+                    'customer_code' => $customerCode
+                ]);
+                return response()->json([], 200); // Return empty array if no components found
+            }
+            
+            // Transform components data
+            $result = $components->map(function ($comp) {
+                return [
+                    'c_num' => $comp->COMP ?? 'Main',
+                    'comp_no' => $comp->COMP ?? 'Main',
+                    'pd' => $comp->P_DESIGN ?? '',
+                    'p_design' => $comp->P_DESIGN ?? '',
+                    'pcs_set' => $comp->PCS_SET ?? '',
+                    'pcs' => $comp->PCS_SET ?? '',
+                    'part_num' => $comp->PART_NO ?? '',
+                    'part_no' => $comp->PART_NO ?? '',
+                    'model' => $comp->MODEL ?? '',
+                    'status' => $comp->STS ?? 'Active',
+                ];
+            })->toArray();
+            
+            Log::info('Components fetched successfully', [
+                'mcs_num' => $mcSeq,
+                'customer_code' => $customerCode,
+                'component_count' => count($result),
+                'components' => array_map(fn($c) => $c['c_num'], $result)
+            ]);
+            
+            return response()->json($result);
+            
+        } catch (\Exception $e) {
+            Log::error('Error fetching MC components', [
+                'mcs_num' => $mcSeq,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'message' => 'Error fetching components',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }
