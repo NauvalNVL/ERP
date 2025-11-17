@@ -2122,6 +2122,7 @@ watch(() => props.showSetupPdModal, (newVal) => {
 // Local editable 10-row components list and selection state
 const selectedComponentIndex = ref(0);
 const localComponents = ref([]);
+const componentsLoadedFromDb = ref(false); // Flag to track if components loaded from DB
 
 // Per-component PD state (now includes per-component SO/WO and Print Colors)
 const makeEmptyPdState = () => ({
@@ -2151,6 +2152,8 @@ const mcComponentsToRender = computed(() => {
     // Source components: loaded first, otherwise props.mcComponents
     let source = [];
     const fromLoaded = props.mcLoaded?.pd_setup?.components;
+    
+    // Try to load from pd_setup.components first
     if (Array.isArray(fromLoaded) && fromLoaded.length > 0) {
         source = fromLoaded.map((c) => ({
             c_num: c.c_num || c.comp || '',
@@ -2158,7 +2161,22 @@ const mcComponentsToRender = computed(() => {
             pcs_set: c.pcs_set || c.pcs || '',
             part_num: c.part_num || c.part || '',
         }));
-    } else if (Array.isArray(props.mcComponents)) {
+    } 
+    // If no components in pd_setup, try to fetch from database using mc_seq
+    else if (props.mcLoaded?.mc_seq || props.mcLoaded?.mcs) {
+        // This will be handled by a separate fetch function
+        // For now, fallback to props.mcComponents
+        if (Array.isArray(props.mcComponents)) {
+            source = props.mcComponents.map((c) => ({
+                c_num: c.c_num || '',
+                pd: c.pd || '',
+                pcs_set: c.pcs_set || '',
+                part_num: c.part_num || '',
+            }));
+        }
+    }
+    // Fallback to props.mcComponents
+    else if (Array.isArray(props.mcComponents)) {
         source = props.mcComponents.map((c) => ({
             c_num: c.c_num || '',
             pd: c.pd || '',
@@ -2197,7 +2215,22 @@ const mcComponentsToRender = computed(() => {
 });
 
 // Initialize and keep localComponents in sync with computed default rows
+// BUT: Don't overwrite if components were loaded from database
 watch(mcComponentsToRender, (rows) => {
+    // Skip if components already loaded from database
+    if (componentsLoadedFromDb.value) {
+        console.log('⏭️ Skipping mcComponentsToRender update - components already loaded from DB', {
+            flag: componentsLoadedFromDb.value,
+            currentLocalComponents: localComponents.value.map(c => ({ c_num: c.c_num, pd: c.pd }))
+        });
+        return;
+    }
+    
+    console.log('📝 Updating localComponents from mcComponentsToRender:', {
+        rowsCount: rows.length,
+        rows: rows.map(r => ({ c_num: r.c_num, pd: r.pd }))
+    });
+    
     // Preserve existing edits by merging on index
     const next = rows.map((row, idx) => ({
         ...(localComponents.value[idx] || {}),
@@ -2206,6 +2239,23 @@ watch(mcComponentsToRender, (rows) => {
     }));
     localComponents.value = next;
 }, { immediate: true });
+
+// Watch for when Setup MC modal opens and mcLoaded exists - fetch components from DB
+watch(() => props.showSetupMcModal, async (newVal) => {
+    if (newVal && props.mcLoaded) {
+        console.log('🔍 Setup MC Modal opened with existing MC, fetching components from database');
+        componentsLoadedFromDb.value = false; // Reset flag before fetching
+        await fetchMcComponentsFromDb();
+    } else if (!newVal) {
+        // Reset flag when modal closes
+        componentsLoadedFromDb.value = false;
+    }
+});
+
+// Reset flag when mcLoaded changes
+watch(() => props.mcLoaded, () => {
+    componentsLoadedFromDb.value = false;
+});
 
 // Sync incoming SO/WO props into current component form so textboxes reflect selections
 watch(() => props.soValues, (vals) => {
@@ -2332,8 +2382,125 @@ watch(() => props.mcLoaded, (loaded) => {
     } catch (e) {}
 }, { immediate: true });
 
+// Fetch component data from database for existing MC
+const fetchMcComponentsFromDb = async () => {
+    try {
+        // Try multiple field names for MC sequence number
+        const mcSeq = props.mcLoaded?.mc_seq || props.mcLoaded?.mcs || props.mcLoaded?.MCS_Num || props.formData?.mcs;
+        const customerCode = props.formData?.ac || props.mcLoaded?.AC_NUM;
+        
+        console.log('🔍 fetchMcComponentsFromDb - Data check:', {
+            mcLoaded: props.mcLoaded,
+            formData: props.formData,
+            mcSeq: mcSeq,
+            customerCode: customerCode,
+            mcLoaded_keys: props.mcLoaded ? Object.keys(props.mcLoaded) : []
+        });
+        
+        if (!mcSeq || !customerCode) {
+            console.warn('Cannot fetch components: missing mc_seq or customer_code', {
+                mcSeq: mcSeq,
+                customerCode: customerCode,
+                mcLoaded: props.mcLoaded,
+                formData: props.formData
+            });
+            return;
+        }
+        
+        const mcsSeqEnc = encodeURIComponent(mcSeq);
+        const custEnc = encodeURIComponent(customerCode);
+        
+        console.log('🔄 Fetching MC components from database:', { mcSeq, customerCode });
+        
+        const response = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}/components?customer_code=${custEnc}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        if (!response.ok) {
+            console.warn('Failed to fetch components:', response.statusText);
+            return;
+        }
+        
+        const data = await response.json();
+        console.log('✅ MC components fetched from database:', data);
+        
+        // Update localComponents with fetched data
+        if (Array.isArray(data) && data.length > 0) {
+            const desiredLabels = ['Main', 'Fit1', 'Fit2', 'Fit3', 'Fit4', 'Fit5', 'Fit6', 'Fit7', 'Fit8', 'Fit9'];
+            const updated = [];
+            
+            console.log('📊 Processing fetched components:', {
+                totalFetched: data.length,
+                fetchedComponents: data.map(c => ({
+                    c_num: c.c_num || c.comp_no,
+                    pd: c.pd || c.p_design,
+                    pcs_set: c.pcs_set || c.pcs,
+                    part_num: c.part_num || c.part_no
+                }))
+            });
+            
+            for (let i = 0; i < 10; i++) {
+                const fetchedComp = data.find(c => {
+                    const cNum = c.c_num || c.comp_no || '';
+                    const match = cNum === desiredLabels[i];
+                    if (match) {
+                        console.log(`✓ Found ${desiredLabels[i]} at index ${i}:`, cNum);
+                    }
+                    return match;
+                });
+                
+                const componentData = {
+                    c_num: desiredLabels[i],
+                    pd: fetchedComp?.pd || fetchedComp?.p_design || '',
+                    pcs_set: fetchedComp?.pcs_set || fetchedComp?.pcs || '',
+                    part_num: fetchedComp?.part_num || fetchedComp?.part_no || '',
+                    selected: i === 0,
+                    index: i,
+                };
+                
+                if (fetchedComp) {
+                    console.log(`📍 Row ${i} (${desiredLabels[i]}):`, componentData);
+                }
+                
+                updated.push(componentData);
+            }
+            
+            console.log('📊 Before update - localComponents:', localComponents.value.map(c => ({ c_num: c.c_num, pd: c.pd, pcs_set: c.pcs_set })));
+            
+            localComponents.value = updated;
+            componentsLoadedFromDb.value = true; // Set flag to prevent watcher from overwriting
+            
+            console.log('✅ After update - localComponents:', localComponents.value.map(c => ({ c_num: c.c_num, pd: c.pd, pcs_set: c.pcs_set })));
+            console.log('✅ localComponents updated with fetched data:', {
+                totalRows: updated.length,
+                rowsWithData: updated.filter(r => r.pd || r.pcs_set || r.part_num).length,
+                flagSet: true,
+                data: updated.map(r => ({ c_num: r.c_num, pd: r.pd, pcs_set: r.pcs_set, part_num: r.part_num }))
+            });
+        } else {
+            console.warn('No components fetched from database or empty response');
+        }
+    } catch (error) {
+        console.error('Error fetching MC components:', error);
+    }
+};
+
 const onSelectComponent = (component, index) => {
+    console.log('📡 UpdateMcModal - onSelectComponent called:', {
+        component: component,
+        index: index,
+        component_c_num: component?.c_num
+    });
+    
     selectedComponentIndex.value = index;
+    
+    // Emit to parent to update mcComponents selection state
+    console.log('📡 UpdateMcModal - Emitting selectComponent to parent');
+    emit('selectComponent', component, index);
+    
     // When selecting a component, reflect its SO/WO into parent UI state
     try {
         const idx = selectedComponentIndex.value;
@@ -2357,6 +2524,14 @@ const openSetupPd = () => {
         const idx = selectedComponentIndex.value;
         const row = Array.isArray(localComponents.value) ? localComponents.value[idx] : null;
         const isRowEmpty = row && !row.pd && !row.pcs_set && !row.part_num;
+        
+        console.log('🔍 openSetupPd - Component row data:', {
+            index: idx,
+            row: row,
+            isRowEmpty: isRowEmpty,
+            componentForm: componentForms.value[idx]
+        });
+        
         if (isRowEmpty) {
             clearPdFields();
             // Also request parent to clear SO/WO paper quality values
@@ -2368,9 +2543,17 @@ const openSetupPd = () => {
             partNo.value = cf.partNo || row.part_num || partNo.value || '';
             selectedProductDesign.value = cf.selectedProductDesign || row.pd || selectedProductDesign.value || '';
             pcsPerSet.value = cf.pcsPerSet || row.pcs_set || pcsPerSet.value || '';
+            
+            console.log('✅ openSetupPd - PD fields hydrated:', {
+                partNo: partNo.value,
+                selectedProductDesign: selectedProductDesign.value,
+                pcsPerSet: pcsPerSet.value
+            });
             // Option B: no per-component SO/WO hydration/emits
         }
-    } catch (e) {}
+    } catch (e) {
+        console.error('Error in openSetupPd:', e);
+    }
     emit('setupPD');
 };
 

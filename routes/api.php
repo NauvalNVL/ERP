@@ -384,6 +384,7 @@ Route::get('/mc-auto-wo-not-releasing', [UpdateMcController::class, 'apiIndex'])
 // Add API route for Update MC Master Cards
 Route::get('/update-mc/master-cards', [App\Http\Controllers\UpdateMcController::class, 'apiIndex']);
 Route::get('/update-mc/master-cards/{mcSeq}', [App\Http\Controllers\UpdateMcController::class, 'apiShow']);
+Route::get('/update-mc/master-cards/{mcSeq}/components', [App\Http\Controllers\UpdateMcController::class, 'apiShowComponents']);
 Route::post('/update-mc/master-cards', [App\Http\Controllers\UpdateMcController::class, 'store']);
 
 // Obsolete & Reactive MC API routes
