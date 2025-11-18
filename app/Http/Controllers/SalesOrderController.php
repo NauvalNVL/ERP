@@ -428,6 +428,7 @@ class SalesOrderController extends Controller
             'PO_DATE' => (string) ($validated['po_date'] ?? $nowDate),
             'LOT_Num' => (string) ($validated['lot_number'] ?? ''),
             'MCS_Num' => (string) $validated['master_card_seq'],
+            // MODEL / PRODUCT / COMPONENT and MC-related fields will be customized per component row below
             'MODEL' => $mcModel,
             'PRODUCT' => (string) ($validated['details'][0]['item_code'] ?? ''),
             'COMP_Num' => $masterCardData ? (string) ($masterCardData->COMP ?? '') : '',
@@ -435,14 +436,14 @@ class SalesOrderController extends Controller
             'PER_SET' => 1,
             'UNIT' => (string) ($validated['details'][0]['uom'] ?? ''),
             'PART_NUMBER' => $partNumber,
-            // Populate dimensions from MC table
+            // Populate dimensions from MC table (will be overridden per component if multiple exist)
             'INT_L' => $intL,
             'INT_W' => $intW,
             'INT_H' => $intH,
             'EXT_L' => $extL,
             'EXT_W' => $extW,
             'EXT_H' => $extH,
-            // Populate flute and paper quality from MC table
+            // Populate flute and paper quality from MC table (will be overridden per component if needed)
             'FLUTE' => $flute,
             'PQ1' => $pq1,
             'PQ2' => $pq2,
@@ -535,14 +536,106 @@ class SalesOrderController extends Controller
             'updated_at' => now(),
         ];
 
-        // Always INSERT new record, NEVER update existing
+        // Build SO rows for Main + Fit components for this master card
+        $rowsToInsert = [];
+
+        // Always include the base row (typically Main component)
+        $rowsToInsert[] = $base;
+
+        // Fetch all MC components (Main + Fit1-9) for this MC & customer
+        $mcComponents = DB::table('MC')
+            ->where('MCS_Num', $validated['master_card_seq'])
+            ->where('AC_NUM', $validated['customer_code'])
+            ->orderBy('COMP')
+            ->get();
+
+        foreach ($mcComponents as $componentRow) {
+            // Skip if this is the same component as used for the base row to avoid duplicate Main
+            if ($masterCardData && $componentRow->COMP === ($masterCardData->COMP ?? null)) {
+                continue;
+            }
+
+            // Extract per-component PD and dimension data
+            $compModel = $componentRow->MODEL ?? $mcModel;
+            $compPDesign = $componentRow->P_DESIGN ?? $mcPDesign;
+            $compPartNumber = $componentRow->PART_NO ?? $mcPartNumber;
+
+            $compIntL = (float)($componentRow->INT_LENGTH ?? 0);
+            $compIntW = (float)($componentRow->INT_WIDTH ?? 0);
+            $compIntH = (float)($componentRow->INT_HEIGHT ?? 0);
+            $compExtL = (float)($componentRow->EXT_LENGTH ?? 0);
+            $compExtW = (float)($componentRow->EXT_WIDTH ?? 0);
+            $compExtH = (float)($componentRow->EXT_HEIGHT ?? 0);
+
+            $compFlute = $componentRow->FLUTE ?? $flute;
+            $compPq1 = $componentRow->SO_PQ1 ?? $pq1;
+            $compPq2 = $componentRow->SO_PQ2 ?? $pq2;
+            $compPq3 = $componentRow->SO_PQ3 ?? $pq3;
+            $compPq4 = $componentRow->SO_PQ4 ?? $pq4;
+            $compPq5 = $componentRow->SO_PQ5 ?? $pq5;
+
+            $compMcGrossM2 = (float)($componentRow->MC_GROSS_M2_PER_PCS ?? 0);
+            $compMcNetM2 = (float)($componentRow->MC_NET_M2_PER_PCS ?? 0);
+            $compMcGrossKg = (float)($componentRow->MC_GROSS_KG_PER_SET ?? 0);
+            $compMcNetKg = (float)($componentRow->MC_NET_KG_PER_PCS ?? 0);
+
+            $compTotalGrossM2 = $compMcGrossM2 * $qty;
+            $compTotalNetM2 = $compMcNetM2 * $qty;
+            $compTotalGrossKg = $compMcGrossKg * $qty;
+            $compTotalNetKg = $compMcNetKg * $qty;
+
+            // Calculate component-level TOTAL_M3 using same logic as base row
+            $compTotalM3 = 0;
+            if ($compExtL > 0 && $compExtW > 0 && $compExtH > 0 && $qty > 0) {
+                $compTotalM3 = ($compExtL * $compExtW * $compExtH * $qty) / 1000000000;
+            } elseif ($compIntL > 0 && $compIntW > 0 && $compIntH > 0 && $qty > 0) {
+                $compTotalM3 = ($compIntL * $compIntW * $compIntH * $qty) / 1000000000;
+            }
+
+            // Clone base row and override MC-related fields for this component
+            $row = $base;
+            $row['MODEL'] = $compModel;
+            $row['PRODUCT'] = (string) ($validated['details'][0]['item_code'] ?? '');
+            $row['COMP_Num'] = (string) ($componentRow->COMP ?? '');
+            $row['P_DESIGN'] = $compPDesign;
+            $row['PART_NUMBER'] = $compPartNumber;
+
+            $row['INT_L'] = $compIntL;
+            $row['INT_W'] = $compIntW;
+            $row['INT_H'] = $compIntH;
+            $row['EXT_L'] = $compExtL;
+            $row['EXT_W'] = $compExtW;
+            $row['EXT_H'] = $compExtH;
+
+            $row['FLUTE'] = $compFlute;
+            $row['PQ1'] = $compPq1;
+            $row['PQ2'] = $compPq2;
+            $row['PQ3'] = $compPq3;
+            $row['PQ4'] = $compPq4;
+            $row['PQ5'] = $compPq5;
+
+            $row['MC_GROSS_M2_PER_PCS'] = $compMcGrossM2;
+            $row['MC_NET_M2_PER_PCS'] = $compMcNetM2;
+            $row['TOTAL_SO_GROSS_M2'] = $compTotalGrossM2;
+            $row['TOTAL_SO_NET_M2'] = $compTotalNetM2;
+            $row['TOTAL_M3'] = (int) round($compTotalM3);
+            $row['MC_GROSS_KG_PER_PCS'] = $compMcGrossKg;
+            $row['MC_NET_KG_PER_PCS'] = $compMcNetKg;
+            $row['TOTAL_SO_GROSS_KG'] = $compTotalGrossKg;
+            $row['TOTAL_SO_NET_KG'] = $compTotalNetKg;
+
+            $rowsToInsert[] = $row;
+        }
+
+        // Always INSERT new records, NEVER update existing
         // This ensures each sales order is unique even for same customer and master card
-        DB::table('so')->insert($base);
+        DB::table('so')->insert($rowsToInsert);
 
         Log::info('New sales order created', [
             'so_number' => $soNumber,
             'customer_code' => $validated['customer_code'],
-            'master_card_seq' => $validated['master_card_seq']
+            'master_card_seq' => $validated['master_card_seq'],
+            'component_row_count' => count($rowsToInsert),
         ]);
 
         return response()->json([

@@ -594,6 +594,7 @@
           :master-card="selectedMasterCard"
           :customer="selectedCustomer"
           :initial-quantity="normalizedSetQuantity"
+          :mc-components="mcComponentsForDesign"
           ref="productDesignModalRef"
     />
 
@@ -612,6 +613,7 @@
       @close="showDeliveryScheduleModal = false"
       @save="saveDeliverySchedule"
       :order-details="orderDetails"
+      :mc-components="mcComponentsForDesign"
     />
 
     <!-- Sales Order Table Modal -->
@@ -742,6 +744,9 @@ const mcsMasterCards = ref([])
 const selectedMcs = ref(null)
 const mcsCurrentPage = ref(1)
 const mcsLastPage = ref(1)
+
+// MC components for Product Design Screen (Main, Fit1-9)
+const mcComponentsForDesign = ref([])
 
 
 // Computed properties
@@ -1446,11 +1451,57 @@ const validateDate = (dateString) => {
   return { valid: true, message: 'Valid date' }
 }
 
-const openProductDesignScreen = () => {
+const fetchMcComponentsForDesign = async () => {
+  try {
+    const mcSeq = selectedMasterCard.seq
+    const customerCode = selectedCustomer.code
+
+    if (!mcSeq || !customerCode) {
+      console.warn('Cannot fetch MC components for design: missing mcSeq or customerCode', {
+        mcSeq,
+        customerCode
+      })
+      mcComponentsForDesign.value = []
+      return
+    }
+
+    const mcsSeqEnc = encodeURIComponent(mcSeq)
+    const custEnc = encodeURIComponent(customerCode)
+
+    console.log('🔍 Fetching MC components for Product Design Screen:', { mcSeq, customerCode })
+
+    const response = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}/components?customer_code=${custEnc}`, {
+      headers: {
+        Accept: 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+
+    if (!response.ok) {
+      console.warn('Failed to fetch MC components for design:', response.statusText)
+      mcComponentsForDesign.value = []
+      return
+    }
+
+    const data = await response.json()
+    console.log('✅ MC components for design fetched:', data)
+
+    mcComponentsForDesign.value = Array.isArray(data) ? data : []
+  } catch (e) {
+    console.error('Error fetching MC components for design:', e)
+    mcComponentsForDesign.value = []
+  }
+}
+
+const openProductDesignScreen = async () => {
   if (!canProceed.value) {
     error('Please select customer and master card first')
     return
   }
+
+  // Load MC components (Main, Fit1-9) so Product Design modal can show per-component items
+  await fetchMcComponentsForDesign()
+
   showProductDesignModal.value = true
 }
 

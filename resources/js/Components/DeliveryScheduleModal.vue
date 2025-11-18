@@ -379,6 +379,10 @@ const props = defineProps({
   orderDetails: {
     type: Object,
     default: () => ({})
+  },
+  mcComponents: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -483,6 +487,17 @@ const orderTotal = computed(() => {
       return isNaN(num) ? 0 : num
     })()
   }
+})
+
+const activeComponentLabels = computed(() => {
+  const comps = Array.isArray(props.mcComponents) ? props.mcComponents : []
+  const labels = new Set()
+  comps.forEach((comp) => {
+    const raw = (comp.c_num || comp.comp_no || comp.COMP || '').toString()
+    if (!raw) return
+    labels.add(raw)
+  })
+  return labels
 })
 
 // Computed properties for totals
@@ -628,6 +643,19 @@ const calculateTotals = () => {
 // Keep Main in sync with Set input
 watch(() => scheduleEntry.set, (val) => {
   scheduleEntry.main = val
+
+  const labels = activeComponentLabels.value
+  if (!labels || labels.size === 0) {
+    return
+  }
+
+  for (let i = 1; i <= 9; i++) {
+    const label = `Fit${i}`
+    const key = `fit${i}`
+    if (labels.has(label)) {
+      scheduleEntry[key] = val
+    }
+  }
 })
 
 // Watch timeHours and timeMinutes changes

@@ -182,6 +182,10 @@ const props = defineProps({
   initialQuantity: {
     type: Number,
     default: 0
+  },
+  mcComponents: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -379,6 +383,76 @@ const dimensionItems = reactive([
   }
 ])
 
+// Helper: hydrate items and dimensions from MC components (Main, Fit1-9)
+const hydrateFromMcComponents = () => {
+  try {
+    const comps = Array.isArray(props.mcComponents) ? props.mcComponents : []
+    if (!comps.length) {
+      console.log('No mcComponents provided to ProductDesignScreenModal, skipping hydrate')
+      return
+    }
+
+    const desiredLabels = ['Main', 'Fit1', 'Fit2', 'Fit3', 'Fit4', 'Fit5', 'Fit6', 'Fit7', 'Fit8', 'Fit9']
+
+    comps.forEach((comp) => {
+      const rawLabel = (comp.c_num || comp.comp_no || comp.COMP || '').toString()
+      if (!rawLabel) return
+
+      const idx = desiredLabels.indexOf(rawLabel)
+      if (idx === -1) return
+
+      const itemRow = items[idx]
+      const dimRow = dimensionItems[idx]
+      if (!itemRow || !dimRow) return
+
+      const nameLabel = idx === 0 ? 'Main' : `Fit ${idx}`
+      itemRow.name = nameLabel
+      dimRow.name = nameLabel
+
+      // P/Design
+      itemRow.design = comp.pd || comp.p_design || itemRow.design
+
+      // PCS/SET
+      const pcsRaw = comp.pcs_set ?? comp.pcsPerSet ?? comp.pcs
+      if (pcsRaw !== undefined && pcsRaw !== null && pcsRaw !== '') {
+        const pcsNum = parseFloat(pcsRaw)
+        itemRow.pcs = isNaN(pcsNum) ? pcsRaw : pcsNum
+      }
+
+      // Part#
+      dimRow.partNumber = comp.part_no || comp.part_num || dimRow.partNumber
+
+      // Dimensions from id/ed structure or fallback ext_dim/int_dim style fields
+      const id = comp.id || {}
+      const ed = comp.ed || {}
+
+      const extL = ed.L ?? comp.ext_dim_1
+      const extW = ed.W ?? comp.ext_dim_2
+      const extH = ed.H ?? comp.ext_dim_3
+      const intL = id.L ?? comp.int_dim_1
+      const intW = id.W ?? comp.int_dim_2
+      const intH = id.H ?? comp.int_dim_3
+
+      const extParts = [extL, extW, extH].filter(v => v !== undefined && v !== null && v !== '')
+      const intParts = [intL, intW, intH].filter(v => v !== undefined && v !== null && v !== '')
+
+      if (extParts.length) {
+        dimRow.extDimension = extParts.join(' x ')
+      }
+      if (intParts.length) {
+        dimRow.intDimension = intParts.join(' x ')
+      }
+    })
+
+    console.log('✅ ProductDesignScreenModal hydrated from mcComponents:', {
+      items: items.map(i => ({ name: i.name, design: i.design, pcs: i.pcs })),
+      dimensionItems: dimensionItems.map(d => ({ name: d.name, ext: d.extDimension, int: d.intDimension, part: d.partNumber }))
+    })
+  } catch (e) {
+    console.error('Error hydrating ProductDesignScreenModal from mcComponents:', e)
+  }
+}
+
 // Computed
 const totalAmount = computed(() => {
   return items.reduce((sum, item) => sum + (item.amount || 0), 0)
@@ -420,13 +494,26 @@ const formatCurrency = (amount) => {
 
 const setQuantity = () => {
   console.log('setQuantity called with totalQuantity:', totalQuantity.value)
-  // Apply quantity to all items that have a unit price
+  // Apply quantity to Main and only Fit rows that have actual component data
   items.forEach((item, index) => {
-    if (item.unitPrice && item.unitPrice > 0) {
+    // Always apply to Main (index 0)
+    if (index === 0) {
       item.quantity = totalQuantity.value
       calculateAmount(item)
       console.log(`Item ${index} (${item.name}): quantity=${item.quantity}, unitPrice=${item.unitPrice}, amount=${item.amount}`)
+      return
     }
+
+    // For Fit rows, only apply if there is MC data (design/pcs/partNumber filled)
+    const dimRow = dimensionItems[index]
+    const hasComponentData = !!item.design || !!item.pcs || !!(dimRow && dimRow.partNumber)
+    if (!hasComponentData) {
+      return
+    }
+
+    item.quantity = totalQuantity.value
+    calculateAmount(item)
+    console.log(`Item ${index} (${item.name}): quantity=${item.quantity}, unitPrice=${item.unitPrice}, amount=${item.amount}`)
   })
 }
 
@@ -489,11 +576,18 @@ const saveDesign = () => {
 onMounted(() => {
   console.log('ProductDesignScreenModal mounted with initialQuantity:', props.initialQuantity)
   
-  // Load master card data if available
+  // Hydrate rows from MC components (Main, Fit1-9) when available
+  hydrateFromMcComponents()
+
+  // Load master card data if available (fallback / default for Main)
   if (props.masterCard) {
-    // Populate design data from master card
-    items[0].design = props.masterCard.model || 'B1'
-    items[0].unitPrice = props.masterCard.unit_price || 3036.3600
+    // Populate design data from master card if Main row design is still empty
+    if (!items[0].design) {
+      items[0].design = props.masterCard.model || 'B1'
+    }
+    if (!items[0].unitPrice) {
+      items[0].unitPrice = props.masterCard.unit_price || 3036.3600
+    }
     console.log('Master card data loaded:', { design: items[0].design, unitPrice: items[0].unitPrice })
   }
   
@@ -512,6 +606,12 @@ onMounted(() => {
     totalQuantity.value = null
   }
 })
+
+// Re-hydrate when MC components change (e.g. after async fetch in parent)
+watch(() => props.mcComponents, (newVal) => {
+  console.log('mcComponents changed in ProductDesignScreenModal:', newVal)
+  hydrateFromMcComponents()
+}, { deep: true })
 
 // Keep quantity in sync with parent changes
 watch(() => props.initialQuantity, (newVal) => {
