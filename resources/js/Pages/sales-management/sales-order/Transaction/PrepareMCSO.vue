@@ -752,17 +752,22 @@ const canProceed = computed(() => {
 })
 
 // Computed property to check if master card is approved
+// Treat MC with status 'Active' as approved even if mc_approval flag is missing
 const isMasterCardApproved = computed(() => {
-  return selectedMasterCard.approval === 'Yes'
+  const approvalFlag = (selectedMasterCard.approval || '').toString().toLowerCase()
+  const statusFlag = (selectedMasterCard.status || '').toString().toLowerCase()
+  return approvalFlag === 'yes' || statusFlag === 'active'
 })
 
 // Computed property to get approval status message
 const approvalStatusMessage = computed(() => {
   if (!selectedMasterCard.seq) return ''
 
+  if (isMasterCardApproved.value) {
+    return ''
+  }
+
   switch (selectedMasterCard.approval) {
-    case 'Yes':
-      return { type: 'success', message: 'Master Card is approved and ready for use' }
     case 'No':
       return { type: 'warning', message: 'Master Card is not approved yet. You can proceed but approval may be required later.' }
     default:
@@ -1225,7 +1230,7 @@ const selectMcs = (mc) => {
   showMcsTableModal.value = false
 
   // Show appropriate message based on approval status
-  if (selectedMasterCard.approval === 'Yes') {
+  if (isMasterCardApproved.value) {
     success('Master card selected successfully - Approved and ready for use')
   } else {
     success('Master card selected successfully - Not yet approved')
@@ -1249,7 +1254,7 @@ const validateMasterCard = async () => {
       selectedMasterCard.pDesign = masterCard.p_design || ''
 
       // Show appropriate message based on approval status
-      if (selectedMasterCard.approval === 'Yes') {
+      if (isMasterCardApproved.value) {
         success('Master card validated successfully - Approved and ready for use')
       } else {
         success('Master card validated successfully - Not yet approved')
@@ -1782,11 +1787,6 @@ const createSalesOrder = async () => {
     if (!selectedMasterCard.seq) {
       error('Master card is required')
       return
-    }
-    // Note: We allow proceeding even if master card is not approved
-    // The approval status is shown as a warning to the user
-    if (selectedMasterCard.approval !== 'Yes') {
-      info('Warning: Selected Master Card is not approved yet. Proceeding with sales order creation.')
     }
 
     if (!orderDetails.pOrderDate) {

@@ -12,6 +12,7 @@ class ProductDesign extends Model
     protected $fillable = [
         'pd_code',
         'pd_name',
+        'pd_alt_name',
         'pd_design_type',
         'idc',
         'product',
@@ -23,7 +24,6 @@ class ProductDesign extends Model
         'flute_style',
         'print_flute',
         'input_weight',
-        'compute'
     ];
 
     /**

@@ -30,7 +30,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'N/A',
                 'print_flute' => 'No',
                 'input_weight' => 'Yes',
-                'compute' => 'No',
+    
             ],
             [
                 'pd_code' => 'BO',
@@ -46,7 +46,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BO DJ',
@@ -62,7 +62,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BO/B1',
@@ -78,7 +78,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BO/B1 4J',
@@ -94,7 +94,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'No',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BO/B1 DJ',
@@ -110,7 +110,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1',
@@ -126,7 +126,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1 4J',
@@ -142,7 +142,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1 4J 2C',
@@ -158,7 +158,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1 DJ',
@@ -174,7 +174,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1 DJ FR',
@@ -190,7 +190,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Reverse',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1 DJ+',
@@ -206,7 +206,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1+1CR',
@@ -222,7 +222,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1+1CRDJ',
@@ -238,7 +238,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1+1CR-H',
@@ -254,7 +254,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1-DC',
@@ -270,7 +270,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'No',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1-DC DJ',
@@ -286,7 +286,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'No',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B1-H',
@@ -302,7 +302,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B2',
@@ -318,7 +318,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B2 DJ',
@@ -334,7 +334,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B3',
@@ -350,7 +350,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B3 DJ',
@@ -366,7 +366,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B4',
@@ -382,7 +382,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B5',
@@ -398,7 +398,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B6',
@@ -414,7 +414,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B7',
@@ -430,7 +430,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B8',
@@ -446,7 +446,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'B9',
@@ -462,7 +462,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BALI',
@@ -478,7 +478,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BB',
@@ -494,7 +494,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BF',
@@ -510,7 +510,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BK',
@@ -526,7 +526,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BL',
@@ -542,7 +542,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BM',
@@ -558,7 +558,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BMA',
@@ -574,7 +574,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BN',
@@ -590,7 +590,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BS',
@@ -606,7 +606,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'BSA',
@@ -622,7 +622,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'C1',
@@ -638,7 +638,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'C2',
@@ -654,7 +654,7 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
             [
                 'pd_code' => 'CF',
@@ -670,12 +670,16 @@ class ProductDesignSeeder extends Seeder
                 'flute_style' => 'Normal',
                 'print_flute' => 'Yes',
                 'input_weight' => 'No',
-                'compute' => 'No',
+                
             ],
         ];
 
         // Using updateOrInsert to avoid duplicate entries based on 'pd_code'
         foreach ($productDesigns as $design) {
+            // Ensure alt name is populated; default to main name if not explicitly set
+            if (!isset($design['pd_alt_name'])) {
+                $design['pd_alt_name'] = $design['pd_name'] ?? null;
+            }
             ProductDesign::updateOrInsert(['pd_code' => $design['pd_code']], $design);
         }
     }

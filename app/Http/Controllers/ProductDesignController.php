@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Border;
 use Database\Seeders\ProductDesignSeeder;
 
 class ProductDesignController extends Controller
@@ -72,6 +67,7 @@ class ProductDesignController extends Controller
         $validator = Validator::make($request->all(), [
             'pd_code' => 'required|string|max:10|unique:product_designs,pd_code',
             'pd_name' => 'required|string|max:255',
+            'pd_alt_name' => 'nullable|string|max:255',
             'pd_design_type' => 'required|string|max:255',
             'product' => 'required|string|max:255',
             'idc' => 'nullable|string|max:100',
@@ -83,7 +79,6 @@ class ProductDesignController extends Controller
             'flute_style' => 'nullable|string|max:100',
             'print_flute' => 'nullable|string|max:100',
             'input_weight' => 'nullable|string|max:100',
-            'compute' => 'nullable|string|max:10',
         ]);
 
         if ($validator->fails()) {
@@ -97,6 +92,7 @@ class ProductDesignController extends Controller
             ProductDesign::create([
                 'pd_code' => strtoupper($request->pd_code),
                 'pd_name' => $request->pd_name,
+                'pd_alt_name' => $request->pd_alt_name,
                 'pd_design_type' => $request->pd_design_type,
                 'idc' => $request->idc,
                 'product' => $request->product,
@@ -108,7 +104,6 @@ class ProductDesignController extends Controller
                 'flute_style' => $request->flute_style,
                 'print_flute' => $request->print_flute,
                 'input_weight' => $request->input_weight,
-                'compute' => $request->compute ?? 'No',
             ]);
 
             return redirect()
@@ -172,7 +167,6 @@ class ProductDesignController extends Controller
             'flute_style' => 'nullable|string|max:100',
             'print_flute' => 'nullable|string|max:100',
             'input_weight' => 'nullable|string|max:100',
-            'compute' => 'nullable|string|max:10',
         ]);
 
         if ($validator->fails()) {
@@ -187,6 +181,7 @@ class ProductDesignController extends Controller
             
             $productDesign->update([
                 'pd_name' => $request->pd_name,
+                'pd_alt_name' => $request->pd_alt_name,
                 'pd_design_type' => $request->pd_design_type,
                 'idc' => $request->idc,
                 'product' => $request->product,
@@ -198,7 +193,6 @@ class ProductDesignController extends Controller
                 'flute_style' => $request->flute_style,
                 'print_flute' => $request->print_flute,
                 'input_weight' => $request->input_weight,
-                'compute' => $request->compute ?? 'No',
             ]);
 
             return redirect()
@@ -290,6 +284,7 @@ class ProductDesignController extends Controller
                 'id',
                 'pd_code',
                 'pd_name',
+                'pd_alt_name',
                 'pd_design_type',
                 'idc',
                 'product',
@@ -301,11 +296,7 @@ class ProductDesignController extends Controller
                 'flute_style',
                 'print_flute',
                 'input_weight',
-                'compute'
-            )->get()->map(function ($design) {
-                $design->compute = (strtolower($design->compute) === 'yes');
-                return $design;
-            });
+            )->get();
             
             return response()->json($designs);
         } catch (\Exception $e) {
@@ -326,6 +317,7 @@ class ProductDesignController extends Controller
             $validator = Validator::make($request->all(), [
                 'pd_code' => 'required|string|max:10|unique:product_designs,pd_code',
                 'pd_name' => 'required|string|max:255',
+                'pd_alt_name' => 'nullable|string|max:255',
                 'pd_design_type' => 'required|string|max:255',
                 'product' => 'required|string|max:255',
                 'idc' => 'nullable|string|max:100',
@@ -337,7 +329,6 @@ class ProductDesignController extends Controller
                 'flute_style' => 'nullable|string|max:100',
                 'print_flute' => 'nullable|string|max:100',
                 'input_weight' => 'nullable|string|max:100',
-                'compute' => 'nullable|string|max:10',
             ]);
 
             if ($validator->fails()) {
@@ -350,6 +341,7 @@ class ProductDesignController extends Controller
             $productDesign = ProductDesign::create([
                 'pd_code' => strtoupper($request->pd_code),
                 'pd_name' => $request->pd_name,
+                'pd_alt_name' => $request->pd_alt_name,
                 'pd_design_type' => $request->pd_design_type,
                 'idc' => $request->idc,
                 'product' => $request->product,
@@ -361,7 +353,6 @@ class ProductDesignController extends Controller
                 'flute_style' => $request->flute_style,
                 'print_flute' => $request->print_flute,
                 'input_weight' => $request->input_weight,
-                'compute' => $request->compute ?? 'No',
             ]);
 
             return response()->json([
@@ -390,6 +381,7 @@ class ProductDesignController extends Controller
         $validator = Validator::make($request->all(), [
             'pd_code' => 'sometimes|string|max:10',
             'pd_name' => 'sometimes|string|max:255',
+            'pd_alt_name' => 'nullable|string|max:255',
             'pd_design_type' => 'sometimes|string|max:255',
             'product' => 'sometimes|string|max:255',
             'idc' => 'nullable|string|max:100',
@@ -401,7 +393,6 @@ class ProductDesignController extends Controller
             'flute_style' => 'nullable|string|max:100',
             'print_flute' => 'nullable|string|max:100',
             'input_weight' => 'nullable|string|max:100',
-            'compute' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -410,18 +401,6 @@ class ProductDesignController extends Controller
 
         try {
             $productDesign = ProductDesign::where('pd_code', $id)->firstOrFail();
-            
-            $computeValue = $request->compute;
-            // Handle boolean and string 'true'/'false' from JS
-            if (is_bool($computeValue)) {
-                $computeString = $computeValue ? 'Yes' : 'No';
-            } elseif (in_array(strtolower($computeValue), ['true', 'yes', '1'])) {
-                $computeString = 'Yes';
-            } elseif (in_array(strtolower($computeValue), ['false', 'no', '0'])) {
-                $computeString = 'No';
-            } else {
-                $computeString = 'No'; // Default value
-            }
 
             $productDesign->update([
                 'pd_name' => $request->pd_name,
@@ -436,14 +415,10 @@ class ProductDesignController extends Controller
                 'flute_style' => $request->flute_style,
                 'print_flute' => $request->print_flute,
                 'input_weight' => $request->input_weight,
-                'compute' => $computeString,
             ]);
             
             // Refresh the model from the database to get the latest state
             $productDesign->refresh();
-            
-            // Apply the same transformation as getDesignsJson
-            $productDesign->compute = (strtolower($productDesign->compute) === 'yes');
 
             return response()->json(['success' => true, 'data' => $productDesign]);
         } catch (\Exception $e) {
@@ -485,99 +460,6 @@ class ProductDesignController extends Controller
         }
     }
 
-    /**
-     * Export product designs to CSV
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function apiExport()
-    {
-        try {
-            $productDesigns = ProductDesign::with('productDetail')->get();
-
-            $data = $productDesigns->map(function ($design) {
-                return [
-                    'pd_code' => $design->pd_code,
-                    'pd_name' => $design->pd_name,
-                    'pd_design_type' => $design->pd_design_type,
-                    'product' => optional($design->productDetail)->description,
-                    'joint' => $design->joint ? 'Yes' : 'No',
-                    'joint_to_print' => $design->joint_to_print ? 'Yes' : 'No',
-                    'pcs_to_joint' => $design->pcs_to_joint,
-                    'score' => $design->score ? 'Yes' : 'No',
-                    'slot' => $design->slot ? 'Yes' : 'No',
-                    'flute_style' => $design->flute_style,
-                    'print_flute' => $design->print_flute ? 'Yes' : 'No',
-                    'input_weight' => $design->input_weight ? 'Yes' : 'No',
-                    'compute' => $design->compute ? 'Yes' : 'No',
-                ];
-            });
-
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-
-            // Set Title
-            $sheet->mergeCells('A1:M1');
-            $sheet->setCellValue('A1', 'Product Design List');
-            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
-            $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
-            // Set Date
-            $sheet->mergeCells('A2:M2');
-            $sheet->setCellValue('A2', 'Date: ' . now()->format('Y-m-d'));
-            $sheet->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
-
-            // Set Headers
-            $headers = [
-                'Product Design Code', 'Product Design Name', 'Design Type', 'Product',
-                'Joint', 'Joint to Print', 'Pcs to Joint', 'Score', 'Slot',
-                'Flute Style', 'Print Flute', 'Input Weight', 'To Compute'
-            ];
-            $sheet->fromArray($headers, NULL, 'A4');
-            $headerStyle = $sheet->getStyle('A4:M4');
-            $headerStyle->getFont()->setBold(true);
-            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFE0E0E0');
-
-            // Populate Data
-            $sheet->fromArray($data->toArray(), NULL, 'A5');
-
-            // Apply borders to the entire table
-            $highestRow = $sheet->getHighestRow();
-            $styleArray = [
-                'borders' => [
-                    'allBorders' => [
-                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                        'color' => ['argb' => 'FF000000'],
-                    ],
-                ],
-            ];
-            $sheet->getStyle('A4:M' . $highestRow)->applyFromArray($styleArray);
-
-            // Auto-size columns
-            foreach (range('A', 'M') as $columnID) {
-                $sheet->getColumnDimension($columnID)->setAutoSize(true);
-            }
-            
-            $writer = new Xlsx($spreadsheet);
-            $fileName = 'product_designs_' . now()->format('Ymd') . '.xlsx';
-
-            return response()->stream(function () use ($writer) {
-                $writer->save('php://output');
-            }, 200, [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
-                'Cache-Control' => 'max-age=0',
-            ]);
-
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Export Product Designs Failed: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Server error while exporting product designs: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
 
     /**
      * Get a product design by its code

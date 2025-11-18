@@ -12,7 +12,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            ChartOfAccountSeeder::class,
             CustomerSalesTypeSeeder::class,
             CustomerSeeder::class,
             CustomerAlternateAddressSeeder::class,
@@ -32,6 +31,7 @@ class DatabaseSeeder extends Seeder
             IndustrySeeder::class,
             GeoSeeder::class,
             ProductGroupSeeder::class,
+            ProductDesignSeeder::class,
             VehicleClassSeeder::class,
             VehicleSeeder::class,
             McTableSeeder::class,

@@ -17,9 +17,6 @@ class Machine extends Model
         'process',
         'sub_process',
         'resource_type',
-        'track_capacity',
-        'track_option_yz',
-        'track_option_bypass',
         'finisher_type'
     ];
 
