@@ -173,7 +173,7 @@ class UpdateMcController extends Controller
             return response()->json(['message' => 'Not found'], 404);
         }
         
-        // Get all Fit components for this MC
+        // Get all Fit components for this MC (all PD fields per component)
         $fitsQuery = DB::table('MC')
             ->where('MCS_Num', $mcSeq)
             ->where('COMP', '!=', 'Main')
@@ -186,16 +186,238 @@ class UpdateMcController extends Controller
         // Convert Main to array
         $result = (array) $main;
         
-        // Add components array with all Fit data
+        // Add components array with all Fit data (full PD fields per component)
         $components = [];
+
+        // First, push Main component with full PD mapping
+        $components[] = [
+            'c_num' => $main->COMP ?? 'Main',
+            'comp_no' => $main->COMP ?? 'Main',
+            'pd' => $main->P_DESIGN ?? '',
+            'p_design' => $main->P_DESIGN ?? '',
+            'pcs_set' => $main->PCS_SET ?? '',
+            'pcs' => $main->PCS_SET ?? '',
+            'part_num' => $main->PART_NO ?? '',
+            'part_no' => $main->PART_NO ?? '',
+            'model' => $main->MODEL ?? '',
+            'status' => $main->STS ?? 'Active',
+            // SO / WO paper qualities
+            'soValues' => [
+                $main->SO_PQ1 ?? '',
+                $main->SO_PQ2 ?? '',
+                $main->SO_PQ3 ?? '',
+                $main->SO_PQ4 ?? '',
+                $main->SO_PQ5 ?? '',
+            ],
+            'woValues' => [
+                $main->WO_PQ1 ?? '',
+                $main->WO_PQ2 ?? '',
+                $main->WO_PQ3 ?? '',
+                $main->WO_PQ4 ?? '',
+                $main->WO_PQ5 ?? '',
+            ],
+            // Internal / External dimensions
+            'id' => [
+                'L' => $main->INT_LENGTH ?? null,
+                'W' => $main->INT_WIDTH ?? null,
+                'H' => $main->INT_HEIGHT ?? null,
+            ],
+            'ed' => [
+                'L' => $main->EXT_LENGTH ?? null,
+                'W' => $main->EXT_WIDTH ?? null,
+                'H' => $main->EXT_HEIGHT ?? null,
+            ],
+            'pcsPerSet' => $main->PCS_SET ?? null,
+            'nestSlot' => $main->NEST_SLOT ?? null,
+            'creaseValue' => $main->CREASE ?? null,
+            'selectedReinforcementTape' => $main->TAPE ?? null,
+            'selectedChemicalCoat' => $main->COAT ?? null,
+            // Scores
+            'scoreL' => [
+                $main->SL1 ?? null,
+                $main->SL2 ?? null,
+                $main->SL3 ?? null,
+                $main->SL4 ?? null,
+                $main->SL5 ?? null,
+                $main->SL6 ?? null,
+                $main->SL7 ?? null,
+                $main->SL8 ?? null,
+            ],
+            'scoreW' => [
+                $main->SW1 ?? null,
+                $main->SW2 ?? null,
+                $main->SW3 ?? null,
+                $main->SW4 ?? null,
+                $main->SW5 ?? null,
+                $main->SW6 ?? null,
+                $main->SW7 ?? null,
+                $main->SW8 ?? null,
+            ],
+            'sheetLength' => $main->SHEET_LENGTH ?? null,
+            'sheetWidth' => $main->SHEET_WIDTH ?? null,
+            'selectedPaperSize' => $main->PAPER_SIZE ?? null,
+            // Colors and area percents
+            'printColorCodes' => [
+                $main->COLOR1 ?? '',
+                $main->COLOR2 ?? '',
+                $main->COLOR3 ?? '',
+                $main->COLOR4 ?? '',
+                $main->COLOR5 ?? '',
+                $main->COLOR6 ?? '',
+                $main->COLOR7 ?? '',
+            ],
+            'colorAreaPercents' => [
+                $main->COLOR1_AREA_PERCENT ?? null,
+                $main->COLOR2_AREA_PERCENT ?? null,
+                $main->COLOR3_AREA_PERCENT ?? null,
+                $main->COLOR4_AREA_PERCENT ?? null,
+                $main->COLOR5_AREA_PERCENT ?? null,
+                $main->COLOR6_AREA_PERCENT ?? null,
+                $main->COLOR7_AREA_PERCENT ?? null,
+            ],
+            // Die cut & blocks
+            'dcutSheet' => [
+                'L' => $main->DC_SHT_L ?? null,
+                'W' => $main->DC_SHT_W ?? null,
+            ],
+            'dcutMould' => [
+                'L' => $main->DC_MOULD_L ?? null,
+                'W' => $main->DC_MOULD_W ?? null,
+            ],
+            'dcutBlockNo' => $main->DIECUT_MOULD_NO ?? null,
+            'pitBlockNo' => $main->PRINTING_BLOCK_NO ?? null,
+            // Stitch wire & bundling
+            'stitchWirePieces' => $main->SWIRE_PCS ?? null,
+            'selectedStitchWireCode' => $main->SWIRE ?? null,
+            'bundlingStringQty' => $main->PCS_PER_BLD ?? null,
+            'selectedBundlingStringCode' => $main->STRING_TYPE ?? null,
+            // Glueing / wrapping / finishing
+            'selectedGlueingCode' => $main->GLUEING ?? null,
+            'selectedWrappingCode' => $main->WRAPPING ?? null,
+            'bdlPerPallet' => $main->BLD_PER_PLD ?? null,
+            'selectedFinishingCode' => $main->FSH ?? null,
+            // Other PD flags and remarks
+            'itemRemark' => $main->ITEM_REMARK ?? null,
+            'peelOffPercent' => $main->PEEL_OFF_PERCENT ?? null,
+            'handHole' => $main->HAND_HOLE ?? null,
+            'rotaryDCut' => $main->ROTARY_DC ?? null,
+            'fullBlockPrint' => $main->FB_PRINTING ?? null,
+        ];
+
+        // Then, push all Fit components
         foreach ($fits as $fit) {
             $components[] = [
-                'c_num' => $fit->COMP,
+                'c_num' => $fit->COMP ?? 'Main',
+                'comp_no' => $fit->COMP ?? 'Main',
                 'pd' => $fit->P_DESIGN ?? '',
+                'p_design' => $fit->P_DESIGN ?? '',
                 'pcs_set' => $fit->PCS_SET ?? '',
+                'pcs' => $fit->PCS_SET ?? '',
                 'part_num' => $fit->PART_NO ?? '',
+                'part_no' => $fit->PART_NO ?? '',
                 'model' => $fit->MODEL ?? '',
-                'status' => $fit->STS ?? '',
+                'status' => $fit->STS ?? 'Active',
+                // SO / WO paper qualities
+                'soValues' => [
+                    $fit->SO_PQ1 ?? '',
+                    $fit->SO_PQ2 ?? '',
+                    $fit->SO_PQ3 ?? '',
+                    $fit->SO_PQ4 ?? '',
+                    $fit->SO_PQ5 ?? '',
+                ],
+                'woValues' => [
+                    $fit->WO_PQ1 ?? '',
+                    $fit->WO_PQ2 ?? '',
+                    $fit->WO_PQ3 ?? '',
+                    $fit->WO_PQ4 ?? '',
+                    $fit->WO_PQ5 ?? '',
+                ],
+                // Internal / External dimensions
+                'id' => [
+                    'L' => $fit->INT_LENGTH ?? null,
+                    'W' => $fit->INT_WIDTH ?? null,
+                    'H' => $fit->INT_HEIGHT ?? null,
+                ],
+                'ed' => [
+                    'L' => $fit->EXT_LENGTH ?? null,
+                    'W' => $fit->EXT_WIDTH ?? null,
+                    'H' => $fit->EXT_HEIGHT ?? null,
+                ],
+                'pcsPerSet' => $fit->PCS_SET ?? null,
+                'nestSlot' => $fit->NEST_SLOT ?? null,
+                'creaseValue' => $fit->CREASE ?? null,
+                'selectedReinforcementTape' => $fit->TAPE ?? null,
+                'selectedChemicalCoat' => $fit->COAT ?? null,
+                // Scores
+                'scoreL' => [
+                    $fit->SL1 ?? null,
+                    $fit->SL2 ?? null,
+                    $fit->SL3 ?? null,
+                    $fit->SL4 ?? null,
+                    $fit->SL5 ?? null,
+                    $fit->SL6 ?? null,
+                    $fit->SL7 ?? null,
+                    $fit->SL8 ?? null,
+                ],
+                'scoreW' => [
+                    $fit->SW1 ?? null,
+                    $fit->SW2 ?? null,
+                    $fit->SW3 ?? null,
+                    $fit->SW4 ?? null,
+                    $fit->SW5 ?? null,
+                    $fit->SW6 ?? null,
+                    $fit->SW7 ?? null,
+                    $fit->SW8 ?? null,
+                ],
+                'sheetLength' => $fit->SHEET_LENGTH ?? null,
+                'sheetWidth' => $fit->SHEET_WIDTH ?? null,
+                'selectedPaperSize' => $fit->PAPER_SIZE ?? null,
+                // Colors and area percents
+                'printColorCodes' => [
+                    $fit->COLOR1 ?? '',
+                    $fit->COLOR2 ?? '',
+                    $fit->COLOR3 ?? '',
+                    $fit->COLOR4 ?? '',
+                    $fit->COLOR5 ?? '',
+                    $fit->COLOR6 ?? '',
+                    $fit->COLOR7 ?? '',
+                ],
+                'colorAreaPercents' => [
+                    $fit->COLOR1_AREA_PERCENT ?? null,
+                    $fit->COLOR2_AREA_PERCENT ?? null,
+                    $fit->COLOR3_AREA_PERCENT ?? null,
+                    $fit->COLOR4_AREA_PERCENT ?? null,
+                    $fit->COLOR5_AREA_PERCENT ?? null,
+                    $fit->COLOR6_AREA_PERCENT ?? null,
+                    $fit->COLOR7_AREA_PERCENT ?? null,
+                ],
+                // Die cut & blocks
+                'dcutSheet' => [
+                    'L' => $fit->DC_SHT_L ?? null,
+                    'W' => $fit->DC_SHT_W ?? null,
+                ],
+                'dcutMould' => [
+                    'L' => $fit->DC_MOULD_L ?? null,
+                    'W' => $fit->DC_MOULD_W ?? null,
+                ],
+                'dcutBlockNo' => $fit->DIECUT_MOULD_NO ?? null,
+                'pitBlockNo' => $fit->PRINTING_BLOCK_NO ?? null,
+                // Stitch wire & bundling
+                'stitchWirePieces' => $fit->SWIRE_PCS ?? null,
+                'selectedStitchWireCode' => $fit->SWIRE ?? null,
+                'bundlingStringQty' => $fit->PCS_PER_BLD ?? null,
+                'selectedBundlingStringCode' => $fit->STRING_TYPE ?? null,
+                // Glueing / wrapping / finishing
+                'selectedGlueingCode' => $fit->GLUEING ?? null,
+                'selectedWrappingCode' => $fit->WRAPPING ?? null,
+                'bdlPerPallet' => $fit->BLD_PER_PLD ?? null,
+                'selectedFinishingCode' => $fit->FSH ?? null,
+                // Other PD flags and remarks
+                'itemRemark' => $fit->ITEM_REMARK ?? null,
+                'peelOffPercent' => $fit->PEEL_OFF_PERCENT ?? null,
+                'handHole' => $fit->HAND_HOLE ?? null,
+                'rotaryDCut' => $fit->ROTARY_DC ?? null,
+                'fullBlockPrint' => $fit->FB_PRINTING ?? null,
             ];
         }
         
@@ -1405,7 +1627,7 @@ class UpdateMcController extends Controller
                 return response()->json([], 200); // Return empty array if no components found
             }
             
-            // Transform components data
+            // Transform components data (full PD fields per component)
             $result = $components->map(function ($comp) {
                 return [
                     'c_num' => $comp->COMP ?? 'Main',
@@ -1418,6 +1640,107 @@ class UpdateMcController extends Controller
                     'part_no' => $comp->PART_NO ?? '',
                     'model' => $comp->MODEL ?? '',
                     'status' => $comp->STS ?? 'Active',
+                    // SO / WO paper qualities
+                    'soValues' => [
+                        $comp->SO_PQ1 ?? '',
+                        $comp->SO_PQ2 ?? '',
+                        $comp->SO_PQ3 ?? '',
+                        $comp->SO_PQ4 ?? '',
+                        $comp->SO_PQ5 ?? '',
+                    ],
+                    'woValues' => [
+                        $comp->WO_PQ1 ?? '',
+                        $comp->WO_PQ2 ?? '',
+                        $comp->WO_PQ3 ?? '',
+                        $comp->WO_PQ4 ?? '',
+                        $comp->WO_PQ5 ?? '',
+                    ],
+                    // Internal / External dimensions
+                    'id' => [
+                        'L' => $comp->INT_LENGTH ?? null,
+                        'W' => $comp->INT_WIDTH ?? null,
+                        'H' => $comp->INT_HEIGHT ?? null,
+                    ],
+                    'ed' => [
+                        'L' => $comp->EXT_LENGTH ?? null,
+                        'W' => $comp->EXT_WIDTH ?? null,
+                        'H' => $comp->EXT_HEIGHT ?? null,
+                    ],
+                    'pcsPerSet' => $comp->PCS_SET ?? null,
+                    'nestSlot' => $comp->NEST_SLOT ?? null,
+                    'creaseValue' => $comp->CREASE ?? null,
+                    'selectedReinforcementTape' => $comp->TAPE ?? null,
+                    'selectedChemicalCoat' => $comp->COAT ?? null,
+                    // Scores
+                    'scoreL' => [
+                        $comp->SL1 ?? null,
+                        $comp->SL2 ?? null,
+                        $comp->SL3 ?? null,
+                        $comp->SL4 ?? null,
+                        $comp->SL5 ?? null,
+                        $comp->SL6 ?? null,
+                        $comp->SL7 ?? null,
+                        $comp->SL8 ?? null,
+                    ],
+                    'scoreW' => [
+                        $comp->SW1 ?? null,
+                        $comp->SW2 ?? null,
+                        $comp->SW3 ?? null,
+                        $comp->SW4 ?? null,
+                        $comp->SW5 ?? null,
+                        $comp->SW6 ?? null,
+                        $comp->SW7 ?? null,
+                        $comp->SW8 ?? null,
+                    ],
+                    'sheetLength' => $comp->SHEET_LENGTH ?? null,
+                    'sheetWidth' => $comp->SHEET_WIDTH ?? null,
+                    'selectedPaperSize' => $comp->PAPER_SIZE ?? null,
+                    // Colors and area percents
+                    'printColorCodes' => [
+                        $comp->COLOR1 ?? '',
+                        $comp->COLOR2 ?? '',
+                        $comp->COLOR3 ?? '',
+                        $comp->COLOR4 ?? '',
+                        $comp->COLOR5 ?? '',
+                        $comp->COLOR6 ?? '',
+                        $comp->COLOR7 ?? '',
+                    ],
+                    'colorAreaPercents' => [
+                        $comp->COLOR1_AREA_PERCENT ?? null,
+                        $comp->COLOR2_AREA_PERCENT ?? null,
+                        $comp->COLOR3_AREA_PERCENT ?? null,
+                        $comp->COLOR4_AREA_PERCENT ?? null,
+                        $comp->COLOR5_AREA_PERCENT ?? null,
+                        $comp->COLOR6_AREA_PERCENT ?? null,
+                        $comp->COLOR7_AREA_PERCENT ?? null,
+                    ],
+                    // Die cut & blocks
+                    'dcutSheet' => [
+                        'L' => $comp->DC_SHT_L ?? null,
+                        'W' => $comp->DC_SHT_W ?? null,
+                    ],
+                    'dcutMould' => [
+                        'L' => $comp->DC_MOULD_L ?? null,
+                        'W' => $comp->DC_MOULD_W ?? null,
+                    ],
+                    'dcutBlockNo' => $comp->DIECUT_MOULD_NO ?? null,
+                    'pitBlockNo' => $comp->PRINTING_BLOCK_NO ?? null,
+                    // Stitch wire & bundling
+                    'stitchWirePieces' => $comp->SWIRE_PCS ?? null,
+                    'selectedStitchWireCode' => $comp->SWIRE ?? null,
+                    'bundlingStringQty' => $comp->PCS_PER_BLD ?? null,
+                    'selectedBundlingStringCode' => $comp->STRING_TYPE ?? null,
+                    // Glueing / wrapping / finishing
+                    'selectedGlueingCode' => $comp->GLUEING ?? null,
+                    'selectedWrappingCode' => $comp->WRAPPING ?? null,
+                    'bdlPerPallet' => $comp->BLD_PER_PLD ?? null,
+                    'selectedFinishingCode' => $comp->FSH ?? null,
+                    // Other PD flags and remarks
+                    'itemRemark' => $comp->ITEM_REMARK ?? null,
+                    'peelOffPercent' => $comp->PEEL_OFF_PERCENT ?? null,
+                    'handHole' => $comp->HAND_HOLE ?? null,
+                    'rotaryDCut' => $comp->ROTARY_DC ?? null,
+                    'fullBlockPrint' => $comp->FB_PRINTING ?? null,
                 ];
             })->toArray();
             
