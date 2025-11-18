@@ -2111,10 +2111,14 @@ const hydratePdFromObject = (pd, loaded) => {
 
 // (moved below after refs are declared to avoid early access issues)
 
-// Clear PD fields when Setup PD modal is opened for new MC
-watch(() => props.showSetupPdModal, (newVal) => {
+// Clear PD fields when Setup PD modal is opened for new MC, and reset on close
+watch(() => props.showSetupPdModal, (newVal, oldVal) => {
     if (newVal && !props.mcLoaded) {
         // If opening Setup PD modal and no MC is loaded (new MC), clear all fields
+        clearPdFields();
+    }
+    if (!newVal && oldVal) {
+        // When closing Setup PD modal, always reset PD fields to avoid cross-component collisions
         clearPdFields();
     }
     // Option B: SO/WO are global at root pd_setup; do not change parent's SO/WO on modal open
@@ -2124,7 +2128,7 @@ const selectedComponentIndex = ref(0);
 const localComponents = ref([]);
 const componentsLoadedFromDb = ref(false); // Flag to track if components loaded from DB
 
-// Per-component PD state (now includes per-component SO/WO and Print Colors)
+// Per-component PD state (per C#)
 const makeEmptyPdState = () => ({
     partNo: '',
     selectedProductDesign: '',
@@ -2132,6 +2136,43 @@ const makeEmptyPdState = () => ({
     soValues: ['', '', '', '', ''],
     woValues: ['', '', '', '', ''],
     printColorCodes: ['', '', '', '', '', '', ''],
+    colorAreaPercents: ['', '', '', '', '', '', ''],
+    // Dimensions
+    id: { L: '', W: '', H: '' },
+    ed: { L: '', W: '', H: '' },
+    // Scores
+    scoreL: ['', '', '', '', '', '', '', '', '', ''],
+    scoreW: ['', '', '', '', '', '', '', '', '', ''],
+    // Sheet & paper size
+    sheetLength: '',
+    sheetWidth: '',
+    selectedPaperSize: '',
+    // Misc PD fields
+    nestSlot: '',
+    creaseValue: '',
+    selectedReinforcementTape: '',
+    selectedChemicalCoat: '',
+    // Diecut
+    dcutSheet: { L: '', W: '' },
+    dcutMould: { L: '', W: '' },
+    dcutBlockNo: '',
+    pitBlockNo: '',
+    // Stitch / bundling
+    stitchWirePieces: '',
+    selectedStitchWireCode: '',
+    bundlingStringQty: '',
+    selectedBundlingStringCode: '',
+    // Glueing / wrapping / finishing
+    selectedGlueingCode: '',
+    selectedWrappingCode: '',
+    bdlPerPallet: '',
+    selectedFinishingCode: '',
+    // Other flags / remarks
+    itemRemark: '',
+    peelOffPercent: '',
+    handHole: false,
+    rotaryDCut: false,
+    fullBlockPrint: false,
 });
 const componentForms = ref(Array.from({ length: 10 }, () => makeEmptyPdState()));
 // Now safe to hydrate PD from loaded MC/PD data
@@ -2152,45 +2193,54 @@ const mcComponentsToRender = computed(() => {
     // Source components: loaded first, otherwise props.mcComponents
     let source = [];
     const fromLoaded = props.mcLoaded?.pd_setup?.components;
-    
-    // Try to load from pd_setup.components first
-    if (Array.isArray(fromLoaded) && fromLoaded.length > 0) {
-        source = fromLoaded.map((c) => ({
-            c_num: c.c_num || c.comp || '',
-            pd: c.pd || c.p_design || '',
-            pcs_set: c.pcs_set || c.pcs || '',
-            part_num: c.part_num || c.part || '',
-        }));
-    } 
+
     // If no components in pd_setup, try to fetch from database using mc_seq
-    else if (props.mcLoaded?.mc_seq || props.mcLoaded?.mcs) {
-        // This will be handled by a separate fetch function
-        // For now, fallback to props.mcComponents
-        if (Array.isArray(props.mcComponents)) {
-            source = props.mcComponents.map((c) => ({
-                c_num: c.c_num || '',
-                pd: c.pd || '',
-                pcs_set: c.pcs_set || '',
-                part_num: c.part_num || '',
-            }));
+    // For now, fallback to props.mcComponents as before
+    if ((!Array.isArray(fromLoaded) || fromLoaded.length === 0)) {
+        if (props.mcLoaded?.mc_seq || props.mcLoaded?.mcs || Array.isArray(props.mcComponents)) {
+            if (Array.isArray(props.mcComponents)) {
+                source = props.mcComponents.map((c) => ({
+                    c_num: c.c_num || '',
+                    pd: c.pd || '',
+                    pcs_set: c.pcs_set || '',
+                    part_num: c.part_num || '',
+                }));
+            }
         }
-    }
-    // Fallback to props.mcComponents
-    else if (Array.isArray(props.mcComponents)) {
-        source = props.mcComponents.map((c) => ({
-            c_num: c.c_num || '',
-            pd: c.pd || '',
-            pcs_set: c.pcs_set || '',
-            part_num: c.part_num || '',
-        }));
     }
 
     // Build exactly 10 rows, normalizing labels and padding missing entries
     const rows = [];
     for (let i = 0; i < 10; i++) {
-        const base = source[i] || {};
+        const label = desiredLabels[i];
+        let base = {};
+
+        if (Array.isArray(fromLoaded) && fromLoaded.length > 0) {
+            // When components are stored in pd_setup as an array, map them by C# label (Main, Fit1, ...)
+            const match = fromLoaded.find((c) => {
+                const cNum = (c.c_num || c.comp || '').toString().toLowerCase();
+                return cNum === label.toLowerCase();
+            }) || null;
+
+            if (match) {
+                base = {
+                    pd: match.pd || match.p_design || '',
+                    pcs_set: match.pcs_set || match.pcs || '',
+                    part_num: match.part_num || match.part || '',
+                };
+            }
+        } else {
+            // Fallback to props.mcComponents ordered list
+            const src = source[i] || {};
+            base = {
+                pd: src.pd || '',
+                pcs_set: src.pcs_set || '',
+                part_num: src.part_num || '',
+            };
+        }
+
         rows.push({
-            c_num: desiredLabels[i],
+            c_num: label,
             pd: base.pd || '',
             pcs_set: base.pcs_set || '',
             part_num: base.part_num || '',
@@ -2342,22 +2392,109 @@ watch(() => props.mcLoaded, (loaded) => {
         const pd = loaded.pd_setup;
         for (let idx = 0; idx < componentForms.value.length; idx++) {
             const cf = componentForms.value[idx] || makeEmptyPdState();
-            // Basic fields from components when available
-            const compSrc = Array.isArray(pd.components)
-                ? (pd.components[idx] || null)
-                : (pd.components && typeof pd.components === 'object' ? pd.components[desiredLabels[idx]] : null);
-            if (compSrc) {
-                cf.selectedProductDesign = compSrc.pd || compSrc.p_design || cf.selectedProductDesign;
-                cf.pcsPerSet = compSrc.pcs_set || compSrc.pcs || cf.pcsPerSet;
-                cf.partNo = compSrc.part_num || compSrc.part || cf.partNo;
+            // Basic fields from components when available (match by C# label, not raw index)
+            let compSrc = null;
+            if (Array.isArray(pd.components)) {
+                const label = desiredLabels[idx];
+                compSrc = pd.components.find((c) => {
+                    const cNum = (c.c_num || c.comp || '').toString().toLowerCase();
+                    return cNum === label.toLowerCase();
+                }) || null;
+            } else if (pd.components && typeof pd.components === 'object') {
+                compSrc = pd.components[desiredLabels[idx]] || null;
             }
-            // Hydrate per-component SO/WO and print colors when present
-            const soArr = compSrc ? (Array.isArray(compSrc.soValues) ? compSrc.soValues : (Array.isArray(compSrc.so) ? compSrc.so : fromNumberedKeys(compSrc, 'so'))) : [];
-            const woArr = compSrc ? (Array.isArray(compSrc.woValues) ? compSrc.woValues : (Array.isArray(compSrc.wo) ? compSrc.wo : fromNumberedKeys(compSrc, 'wo'))) : [];
-            const pcArr = compSrc ? (Array.isArray(compSrc.printColorCodes) ? compSrc.printColorCodes : []) : [];
-            cf.soValues = Array.isArray(cf.soValues) && cf.soValues.some(v => v) ? cf.soValues : normalize5(soArr);
-            cf.woValues = Array.isArray(cf.woValues) && cf.woValues.some(v => v) ? cf.woValues : normalize5(woArr);
-            cf.printColorCodes = Array.isArray(cf.printColorCodes) && cf.printColorCodes.some(v => v) ? cf.printColorCodes : (Array.isArray(pcArr) ? pcArr.slice(0,7).concat(['','','','','','']).slice(0,7) : ['', '', '', '', '', '', '']);
+            if (compSrc) {
+                // Core identifiers
+                cf.selectedProductDesign = compSrc.selectedProductDesign || compSrc.pd || compSrc.p_design || cf.selectedProductDesign;
+                cf.pcsPerSet = compSrc.pcsPerSet || compSrc.pcs_set || compSrc.pcs || cf.pcsPerSet;
+                cf.partNo = compSrc.partNo || compSrc.part_num || compSrc.part || cf.partNo;
+
+                // SO / WO paper qualities
+                const soArr = Array.isArray(compSrc.soValues)
+                    ? compSrc.soValues
+                    : (Array.isArray(compSrc.so) ? compSrc.so : fromNumberedKeys(compSrc, 'so'));
+                const woArr = Array.isArray(compSrc.woValues)
+                    ? compSrc.woValues
+                    : (Array.isArray(compSrc.wo) ? compSrc.wo : fromNumberedKeys(compSrc, 'wo'));
+                cf.soValues = Array.isArray(cf.soValues) && cf.soValues.some(v => v) ? cf.soValues : normalize5(soArr);
+                cf.woValues = Array.isArray(cf.woValues) && cf.woValues.some(v => v) ? cf.woValues : normalize5(woArr);
+
+                // Dimensions
+                const idSrc = compSrc.id || {};
+                const edSrc = compSrc.ed || {};
+                cf.id = {
+                    L: idSrc.L ?? cf.id.L ?? '',
+                    W: idSrc.W ?? cf.id.W ?? '',
+                    H: idSrc.H ?? cf.id.H ?? '',
+                };
+                cf.ed = {
+                    L: edSrc.L ?? cf.ed.L ?? '',
+                    W: edSrc.W ?? cf.ed.W ?? '',
+                    H: edSrc.H ?? cf.ed.H ?? '',
+                };
+
+                // Scores
+                cf.scoreL = Array.isArray(compSrc.scoreL)
+                    ? compSrc.scoreL.slice(0, 10).concat(['','','','','','','','','']).slice(0, 10)
+                    : cf.scoreL;
+                cf.scoreW = Array.isArray(compSrc.scoreW)
+                    ? compSrc.scoreW.slice(0, 10).concat(['','','','','','','','','']).slice(0, 10)
+                    : cf.scoreW;
+
+                // Sheet & paper size
+                cf.sheetLength = compSrc.sheetLength ?? cf.sheetLength;
+                cf.sheetWidth = compSrc.sheetWidth ?? cf.sheetWidth;
+                cf.selectedPaperSize = compSrc.selectedPaperSize ?? cf.selectedPaperSize;
+
+                // Colors
+                const pcArr = Array.isArray(compSrc.printColorCodes) ? compSrc.printColorCodes : [];
+                cf.printColorCodes = Array.isArray(cf.printColorCodes) && cf.printColorCodes.some(v => v)
+                    ? cf.printColorCodes
+                    : pcArr.slice(0,7).concat(['','','','','','']).slice(0,7);
+                const caArr = Array.isArray(compSrc.colorAreaPercents) ? compSrc.colorAreaPercents : [];
+                cf.colorAreaPercents = Array.isArray(cf.colorAreaPercents) && cf.colorAreaPercents.some(v => v)
+                    ? cf.colorAreaPercents
+                    : caArr.slice(0,7).concat(['','','','','','']).slice(0,7);
+
+                // Misc PD fields
+                cf.nestSlot = compSrc.nestSlot ?? cf.nestSlot;
+                cf.creaseValue = compSrc.creaseValue ?? cf.creaseValue;
+                cf.selectedReinforcementTape = compSrc.selectedReinforcementTape ?? cf.selectedReinforcementTape;
+                cf.selectedChemicalCoat = compSrc.selectedChemicalCoat ?? cf.selectedChemicalCoat;
+
+                // Diecut
+                const dcutSheetSrc = compSrc.dcutSheet || {};
+                const dcutMouldSrc = compSrc.dcutMould || {};
+                cf.dcutSheet = {
+                    L: dcutSheetSrc.L ?? cf.dcutSheet.L ?? '',
+                    W: dcutSheetSrc.W ?? cf.dcutSheet.W ?? '',
+                };
+                cf.dcutMould = {
+                    L: dcutMouldSrc.L ?? cf.dcutMould.L ?? '',
+                    W: dcutMouldSrc.W ?? cf.dcutMould.W ?? '',
+                };
+                cf.dcutBlockNo = compSrc.dcutBlockNo ?? cf.dcutBlockNo;
+                cf.pitBlockNo = compSrc.pitBlockNo ?? cf.pitBlockNo;
+
+                // Stitch / bundling
+                cf.stitchWirePieces = compSrc.stitchWirePieces ?? cf.stitchWirePieces;
+                cf.selectedStitchWireCode = compSrc.selectedStitchWireCode ?? cf.selectedStitchWireCode;
+                cf.bundlingStringQty = compSrc.bundlingStringQty ?? cf.bundlingStringQty;
+                cf.selectedBundlingStringCode = compSrc.selectedBundlingStringCode ?? cf.selectedBundlingStringCode;
+
+                // Glueing / wrapping / finishing
+                cf.selectedGlueingCode = compSrc.selectedGlueingCode ?? cf.selectedGlueingCode;
+                cf.selectedWrappingCode = compSrc.selectedWrappingCode ?? cf.selectedWrappingCode;
+                cf.bdlPerPallet = compSrc.bdlPerPallet ?? cf.bdlPerPallet;
+                cf.selectedFinishingCode = compSrc.selectedFinishingCode ?? cf.selectedFinishingCode;
+
+                // Other flags / remarks
+                cf.itemRemark = compSrc.itemRemark ?? cf.itemRemark;
+                cf.peelOffPercent = compSrc.peelOffPercent ?? cf.peelOffPercent;
+                cf.handHole = (compSrc.handHole !== undefined ? !!compSrc.handHole : cf.handHole);
+                cf.rotaryDCut = (compSrc.rotaryDCut !== undefined ? !!compSrc.rotaryDCut : cf.rotaryDCut);
+                cf.fullBlockPrint = (compSrc.fullBlockPrint !== undefined ? !!compSrc.fullBlockPrint : cf.fullBlockPrint);
+            }
             componentForms.value[idx] = { ...makeEmptyPdState(), ...cf };
         }
     }
@@ -2426,12 +2563,40 @@ const fetchMcComponentsFromDb = async () => {
         
         const data = await response.json();
         console.log('✅ MC components fetched from database:', data);
-        
+
+        // Local helpers for SO/WO extraction in this scope
+        const fromNumberedKeysLocal = (obj, baseKey) => {
+            if (!obj || typeof obj !== 'object') return [];
+            const entries = [];
+            for (let i = 1; i <= 5; i++) {
+                const variants = [
+                    `${baseKey}${i}`,
+                    `${baseKey}_${i}`,
+                    `${baseKey}${i}`.toUpperCase(),
+                    `${baseKey}_${i}`.toUpperCase(),
+                ];
+                let found = '';
+                for (const k of Object.keys(obj)) {
+                    if (variants.includes(k)) {
+                        found = obj[k] ?? '';
+                        break;
+                    }
+                }
+                entries.push(found);
+            }
+            return entries;
+        };
+        const normalize5Local = (arr) => {
+            const base = Array.isArray(arr) ? arr.slice(0, 5) : [];
+            return base.concat(['', '', '', '', '']).slice(0, 5);
+        };
+
         // Update localComponents with fetched data
         if (Array.isArray(data) && data.length > 0) {
             const desiredLabels = ['Main', 'Fit1', 'Fit2', 'Fit3', 'Fit4', 'Fit5', 'Fit6', 'Fit7', 'Fit8', 'Fit9'];
             const updated = [];
-            
+            const nextComponentForms = [...componentForms.value];
+
             console.log('📊 Processing fetched components:', {
                 totalFetched: data.length,
                 fetchedComponents: data.map(c => ({
@@ -2441,7 +2606,7 @@ const fetchMcComponentsFromDb = async () => {
                     part_num: c.part_num || c.part_no
                 }))
             });
-            
+
             for (let i = 0; i < 10; i++) {
                 const fetchedComp = data.find(c => {
                     const cNum = c.c_num || c.comp_no || '';
@@ -2451,7 +2616,7 @@ const fetchMcComponentsFromDb = async () => {
                     }
                     return match;
                 });
-                
+
                 const componentData = {
                     c_num: desiredLabels[i],
                     pd: fetchedComp?.pd || fetchedComp?.p_design || '',
@@ -2460,19 +2625,116 @@ const fetchMcComponentsFromDb = async () => {
                     selected: i === 0,
                     index: i,
                 };
-                
+
                 if (fetchedComp) {
                     console.log(`📍 Row ${i} (${desiredLabels[i]}):`, componentData);
+
+                    // Hydrate full PD state for this component from fetchedComp
+                    const cf = nextComponentForms[i] || makeEmptyPdState();
+
+                    // Core identifiers
+                    cf.selectedProductDesign = fetchedComp.selectedProductDesign || fetchedComp.pd || fetchedComp.p_design || cf.selectedProductDesign;
+                    cf.pcsPerSet = fetchedComp.pcsPerSet || fetchedComp.pcs_set || fetchedComp.pcs || cf.pcsPerSet;
+                    cf.partNo = fetchedComp.partNo || fetchedComp.part_num || fetchedComp.part_no || cf.partNo;
+
+                    // SO / WO paper qualities
+                    const soArr = Array.isArray(fetchedComp.soValues)
+                        ? fetchedComp.soValues
+                        : (Array.isArray(fetchedComp.so) ? fetchedComp.so : fromNumberedKeysLocal(fetchedComp, 'so'));
+                    const woArr = Array.isArray(fetchedComp.woValues)
+                        ? fetchedComp.woValues
+                        : (Array.isArray(fetchedComp.wo) ? fetchedComp.wo : fromNumberedKeysLocal(fetchedComp, 'wo'));
+                    cf.soValues = Array.isArray(cf.soValues) && cf.soValues.some(v => v) ? cf.soValues : normalize5Local(soArr);
+                    cf.woValues = Array.isArray(cf.woValues) && cf.woValues.some(v => v) ? cf.woValues : normalize5Local(woArr);
+
+                    // Dimensions
+                    const idSrc = fetchedComp.id || {};
+                    const edSrc = fetchedComp.ed || {};
+                    cf.id = {
+                        L: idSrc.L ?? cf.id.L ?? '',
+                        W: idSrc.W ?? cf.id.W ?? '',
+                        H: idSrc.H ?? cf.id.H ?? '',
+                    };
+                    cf.ed = {
+                        L: edSrc.L ?? cf.ed.L ?? '',
+                        W: edSrc.W ?? cf.ed.W ?? '',
+                        H: edSrc.H ?? cf.ed.H ?? '',
+                    };
+
+                    // Scores
+                    cf.scoreL = Array.isArray(fetchedComp.scoreL)
+                        ? fetchedComp.scoreL.slice(0, 10).concat(['','','','','','','','','']).slice(0, 10)
+                        : cf.scoreL;
+                    cf.scoreW = Array.isArray(fetchedComp.scoreW)
+                        ? fetchedComp.scoreW.slice(0, 10).concat(['','','','','','','','','']).slice(0, 10)
+                        : cf.scoreW;
+
+                    // Sheet & paper size
+                    cf.sheetLength = fetchedComp.sheetLength ?? cf.sheetLength;
+                    cf.sheetWidth = fetchedComp.sheetWidth ?? cf.sheetWidth;
+                    cf.selectedPaperSize = fetchedComp.selectedPaperSize ?? cf.selectedPaperSize;
+
+                    // Colors
+                    const pcArr = Array.isArray(fetchedComp.printColorCodes) ? fetchedComp.printColorCodes : [];
+                    cf.printColorCodes = Array.isArray(cf.printColorCodes) && cf.printColorCodes.some(v => v)
+                        ? cf.printColorCodes
+                        : pcArr.slice(0,7).concat(['','','','','','']).slice(0,7);
+                    const caArr = Array.isArray(fetchedComp.colorAreaPercents) ? fetchedComp.colorAreaPercents : [];
+                    cf.colorAreaPercents = Array.isArray(cf.colorAreaPercents) && cf.colorAreaPercents.some(v => v)
+                        ? cf.colorAreaPercents
+                        : caArr.slice(0,7).concat(['','','','','','']).slice(0,7);
+
+                    // Misc PD fields
+                    cf.nestSlot = fetchedComp.nestSlot ?? cf.nestSlot;
+                    cf.creaseValue = fetchedComp.creaseValue ?? cf.creaseValue;
+                    cf.selectedReinforcementTape = fetchedComp.selectedReinforcementTape ?? cf.selectedReinforcementTape;
+                    cf.selectedChemicalCoat = fetchedComp.selectedChemicalCoat ?? cf.selectedChemicalCoat;
+
+                    // Diecut
+                    const dcutSheetSrc = fetchedComp.dcutSheet || {};
+                    const dcutMouldSrc = fetchedComp.dcutMould || {};
+                    cf.dcutSheet = {
+                        L: dcutSheetSrc.L ?? cf.dcutSheet.L ?? '',
+                        W: dcutSheetSrc.W ?? cf.dcutSheet.W ?? '',
+                    };
+                    cf.dcutMould = {
+                        L: dcutMouldSrc.L ?? cf.dcutMould.L ?? '',
+                        W: dcutMouldSrc.W ?? cf.dcutMould.W ?? '',
+                    };
+                    cf.dcutBlockNo = fetchedComp.dcutBlockNo ?? cf.dcutBlockNo;
+                    cf.pitBlockNo = fetchedComp.pitBlockNo ?? cf.pitBlockNo;
+
+                    // Stitch / bundling
+                    cf.stitchWirePieces = fetchedComp.stitchWirePieces ?? cf.stitchWirePieces;
+                    cf.selectedStitchWireCode = fetchedComp.selectedStitchWireCode ?? cf.selectedStitchWireCode;
+                    cf.bundlingStringQty = fetchedComp.bundlingStringQty ?? cf.bundlingStringQty;
+                    cf.selectedBundlingStringCode = fetchedComp.selectedBundlingStringCode ?? cf.selectedBundlingStringCode;
+
+                    // Glueing / wrapping / finishing
+                    cf.selectedGlueingCode = fetchedComp.selectedGlueingCode ?? cf.selectedGlueingCode;
+                    cf.selectedWrappingCode = fetchedComp.selectedWrappingCode ?? cf.selectedWrappingCode;
+                    cf.bdlPerPallet = fetchedComp.bdlPerPallet ?? cf.bdlPerPallet;
+                    cf.selectedFinishingCode = fetchedComp.selectedFinishingCode ?? cf.selectedFinishingCode;
+
+                    // Other flags / remarks
+                    cf.itemRemark = fetchedComp.itemRemark ?? cf.itemRemark;
+                    cf.peelOffPercent = fetchedComp.peelOffPercent ?? cf.peelOffPercent;
+                    cf.handHole = (fetchedComp.handHole !== undefined ? !!fetchedComp.handHole : cf.handHole);
+                    cf.rotaryDCut = (fetchedComp.rotaryDCut !== undefined ? !!fetchedComp.rotaryDCut : cf.rotaryDCut);
+                    cf.fullBlockPrint = (fetchedComp.fullBlockPrint !== undefined ? !!fetchedComp.fullBlockPrint : cf.fullBlockPrint);
+
+                    nextComponentForms[i] = { ...makeEmptyPdState(), ...cf };
                 }
-                
+
                 updated.push(componentData);
             }
-            
+
             console.log('📊 Before update - localComponents:', localComponents.value.map(c => ({ c_num: c.c_num, pd: c.pd, pcs_set: c.pcs_set })));
-            
+
             localComponents.value = updated;
+            componentForms.value = nextComponentForms;
             componentsLoadedFromDb.value = true; // Set flag to prevent watcher from overwriting
-            
+
             console.log('✅ After update - localComponents:', localComponents.value.map(c => ({ c_num: c.c_num, pd: c.pd, pcs_set: c.pcs_set })));
             console.log('✅ localComponents updated with fetched data:', {
                 totalRows: updated.length,
@@ -2480,6 +2742,12 @@ const fetchMcComponentsFromDb = async () => {
                 flagSet: true,
                 data: updated.map(r => ({ c_num: r.c_num, pd: r.pd, pcs_set: r.pcs_set, part_num: r.part_num }))
             });
+            console.log('✅ componentForms hydrated from MC components:', nextComponentForms.map((cf, idx) => ({
+                idx,
+                partNo: cf?.partNo,
+                pd: cf?.selectedProductDesign,
+                pcsPerSet: cf?.pcsPerSet
+            })));
         } else {
             console.warn('No components fetched from database or empty response');
         }
@@ -2520,44 +2788,104 @@ const openSetupPd = () => {
     // Ensure a component is selected; default to index 0 (Main)
     if (selectedComponentIndex.value === null) selectedComponentIndex.value = 0;
     // If the selected component row is empty (no PD, PCS/SET, PART#), clear the PD form
-    try {
-        const idx = selectedComponentIndex.value;
-        const row = Array.isArray(localComponents.value) ? localComponents.value[idx] : null;
-        const isRowEmpty = row && !row.pd && !row.pcs_set && !row.part_num;
-        
-        console.log('🔍 openSetupPd - Component row data:', {
-            index: idx,
-            row: row,
-            isRowEmpty: isRowEmpty,
-            componentForm: componentForms.value[idx]
-        });
-        
-        if (isRowEmpty) {
-            clearPdFields();
-            // Also request parent to clear SO/WO paper quality values
-            emit('requestClearSoWo');
-        } else if (row) {
-            // If row has saved values, hydrate PD key fields from the selected component
-            // Preserve already-loaded global PD (from mcLoaded), but override component-specific fields
-            const cf = componentForms.value[selectedComponentIndex.value] || makeEmptyPdState();
-            partNo.value = cf.partNo || row.part_num || partNo.value || '';
-            selectedProductDesign.value = cf.selectedProductDesign || row.pd || selectedProductDesign.value || '';
-            pcsPerSet.value = cf.pcsPerSet || row.pcs_set || pcsPerSet.value || '';
-            
-            console.log('✅ openSetupPd - PD fields hydrated:', {
-                partNo: partNo.value,
-                selectedProductDesign: selectedProductDesign.value,
-                pcsPerSet: pcsPerSet.value
-            });
-            // Option B: no per-component SO/WO hydration/emits
+    const idx = selectedComponentIndex.value;
+    const row = Array.isArray(localComponents.value) ? localComponents.value[idx] : null;
+    const isRowEmpty = row && !row.pd && !row.pcs_set && !row.part_num;
+
+    console.log('🔍 openSetupPd - Component row data:', {
+        index: idx,
+        row: row,
+        isRowEmpty: isRowEmpty,
+        componentForm: componentForms.value[idx]
+    });
+
+    if (isRowEmpty) {
+        clearPdFields();
+        // Also request parent to clear SO/WO paper quality values
+        emit('requestClearSoWo');
+    } else if (row) {
+        // If row has saved values, hydrate ALL PD fields from the selected component
+        // Preserve already-loaded global PD (from mcLoaded), but override component-specific fields
+        const cf = componentForms.value[idx] || makeEmptyPdState();
+
+        // Core identifiers
+        partNo.value = cf.partNo || row.part_num || partNo.value || '';
+        selectedProductDesign.value = cf.selectedProductDesign || row.pd || selectedProductDesign.value || '';
+        pcsPerSet.value = cf.pcsPerSet || row.pcs_set || pcsPerSet.value || '';
+
+        // Dimensions
+        idL.value = (cf.id?.L ?? idL.value ?? '').toString();
+        idW.value = (cf.id?.W ?? idW.value ?? '').toString();
+        idH.value = (cf.id?.H ?? idH.value ?? '').toString();
+        edL.value = (cf.ed?.L ?? edL.value ?? '').toString();
+        edW.value = (cf.ed?.W ?? edW.value ?? '').toString();
+        edH.value = (cf.ed?.H ?? edH.value ?? '').toString();
+
+        // Sheet & paper size
+        sheetLength.value = (cf.sheetLength ?? sheetLength.value ?? '').toString();
+        sheetWidth.value = (cf.sheetWidth ?? sheetWidth.value ?? '').toString();
+        selectedPaperSize.value = (cf.selectedPaperSize ?? selectedPaperSize.value ?? '').toString();
+
+        // Scores
+        if (Array.isArray(cf.scoreL)) {
+            scoreL.value = cf.scoreL.map(v => (v ?? '').toString()).slice(0, 10).concat(['','','','','','','','','']).slice(0, 10);
         }
-    } catch (e) {
-        console.error('Error in openSetupPd:', e);
+        if (Array.isArray(cf.scoreW)) {
+            scoreW.value = cf.scoreW.map(v => (v ?? '').toString()).slice(0, 10).concat(['','','','','','','','','']).slice(0, 10);
+        }
+
+        // Colors & area percents
+        if (Array.isArray(cf.printColorCodes)) {
+            printColorCodes.value = cf.printColorCodes.map(v => (v ?? '').toString()).slice(0, 7).concat(['','','','','','']).slice(0, 7);
+        }
+        if (Array.isArray(cf.colorAreaPercents)) {
+            colorAreaPercents.value = cf.colorAreaPercents.map(v => (v ?? '').toString()).slice(0, 7).concat(['','','','','','']).slice(0, 7);
+        }
+
+        // Misc PD fields
+        nestSlot.value = (cf.nestSlot ?? nestSlot.value ?? '').toString();
+        creaseValue.value = (cf.creaseValue ?? creaseValue.value ?? '').toString();
+        selectedReinforcementTape.value = (cf.selectedReinforcementTape ?? selectedReinforcementTape.value ?? '').toString();
+        selectedChemicalCoat.value = (cf.selectedChemicalCoat ?? selectedChemicalCoat.value ?? '').toString();
+
+        // Diecut
+        dcutSheetL.value = (cf.dcutSheet?.L ?? dcutSheetL.value ?? '').toString();
+        dcutSheetW.value = (cf.dcutSheet?.W ?? dcutSheetW.value ?? '').toString();
+        dcutMouldL.value = (cf.dcutMould?.L ?? dcutMouldL.value ?? '').toString();
+        dcutMouldW.value = (cf.dcutMould?.W ?? dcutMouldW.value ?? '').toString();
+        dcutBlockNo.value = (cf.dcutBlockNo ?? dcutBlockNo.value ?? '').toString();
+        pitBlockNo.value = (cf.pitBlockNo ?? pitBlockNo.value ?? '').toString();
+
+        // Stitch / bundling
+        stitchWirePieces.value = (cf.stitchWirePieces ?? stitchWirePieces.value ?? '').toString();
+        selectedStitchWireCode.value = (cf.selectedStitchWireCode ?? selectedStitchWireCode.value ?? '').toString();
+        bundlingStringQty.value = (cf.bundlingStringQty ?? bundlingStringQty.value ?? '').toString();
+        selectedBundlingStringCode.value = (cf.selectedBundlingStringCode ?? selectedBundlingStringCode.value ?? '').toString();
+
+        // Glueing / wrapping / finishing
+        selectedGlueingCode.value = (cf.selectedGlueingCode ?? selectedGlueingCode.value ?? '').toString();
+        selectedWrappingCode.value = (cf.selectedWrappingCode ?? selectedWrappingCode.value ?? '').toString();
+        bdlPerPallet.value = (cf.bdlPerPallet ?? bdlPerPallet.value ?? '').toString();
+        selectedFinishingCode.value = (cf.selectedFinishingCode ?? selectedFinishingCode.value ?? '').toString();
+
+        // Other flags / remarks
+        itemRemark.value = (cf.itemRemark ?? itemRemark.value ?? '').toString();
+        peelOffPercent.value = (cf.peelOffPercent ?? peelOffPercent.value ?? '').toString();
+        handHole.value = !!(cf.handHole ?? handHole.value);
+        rotaryDCut.value = !!(cf.rotaryDCut ?? rotaryDCut.value);
+        fullBlockPrint.value = !!(cf.fullBlockPrint ?? fullBlockPrint.value);
     }
+
+    console.log('✅ openSetupPd - PD fields hydrated:', {
+        partNo: partNo.value,
+        selectedProductDesign: selectedProductDesign.value,
+        pcsPerSet: pcsPerSet.value
+    });
+
     emit('setupPD');
 };
 
-// Persist PD fields into the current component form so they don't affect others
+// Persist key PD fields into the current component form so they don't affect others
 watch([partNo, selectedProductDesign, pcsPerSet], () => {
     if (selectedComponentIndex.value === null) return;
     const idx = selectedComponentIndex.value;
