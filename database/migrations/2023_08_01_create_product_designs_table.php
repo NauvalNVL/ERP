@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('pd_code')->unique();
             $table->string('pd_name');
+            $table->string('pd_alt_name')->nullable();
             $table->string('pd_design_type');
             $table->string('idc');
             $table->string('product');

@@ -113,7 +113,8 @@ class UpdateMcController extends Controller
         $paginated = $mcQuery->paginate($perPage);
 
         $transformed = collect($paginated->items())->map(function ($item) {
-            $isApproved = false; // MC table does not store approval; default false
+            // Treat MC with STS = 'Active' as approved for SO preparation
+            $isApproved = strtoupper((string) $item->STS) === 'ACTIVE';
             return [
                 'seq' => $item->MCS_Num,
                 'model' => $item->MODEL,
@@ -456,6 +457,7 @@ class UpdateMcController extends Controller
             $row = $q->first();
 
             if ($row) {
+                $isApproved = strtoupper((string) $row->STS) === 'ACTIVE';
                 return response()->json([
                     'exists' => true,
                     'data' => [
@@ -464,7 +466,7 @@ class UpdateMcController extends Controller
                         'mc_model' => $row->MODEL,
                         'mc_short_model' => '',
                         'status' => $row->STS,
-                        'mc_approval' => 'No',
+                        'mc_approval' => $isApproved ? 'Yes' : 'No',
                         'part_no' => $row->PART_NO,
                         'comp_no' => $row->COMP,
                         'p_design' => $row->P_DESIGN,
