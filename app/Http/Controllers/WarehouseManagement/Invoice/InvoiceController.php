@@ -795,8 +795,14 @@ class InvoiceController extends Controller
             DB::beginTransaction();
 
             foreach ($payload['do_numbers'] as $doNumber) {
+                // Fetch all DO lines for this DO number (Main + Fit components)
+                $doRecords = DB::table('DO')
+                    ->where('DO_Num', $doNumber)
+                    ->orderBy('No')
+                    ->get();
+
                 /** @var \stdClass|null $do */
-                $do = DB::table('DO')->where('DO_Num', $doNumber)->first();
+                $do = $doRecords->first();
 
                 if (!$do) {
                     throw new \RuntimeException("Delivery Order not found: {$doNumber}");
@@ -899,9 +905,9 @@ class InvoiceController extends Controller
                     Log::info('Generated auto invoice number', ['number' => $ivNum]);
                 }
 
-                // Calculate amounts (with proper decimal handling)
-                $tranAmount = $this->toDecimalOrNull($this->getProperty($do, 'DO_Tran_Amt'), 0);
-                $baseAmount = $this->toDecimalOrNull($this->getProperty($do, 'DO_Base_Amt'), 0);
+                // Calculate amounts for the whole DO (sum of all component lines)
+                $tranAmount = $this->toDecimalOrNull($doRecords->sum('DO_Tran_Amt'), 0);
+                $baseAmount = $this->toDecimalOrNull($doRecords->sum('DO_Base_Amt'), 0);
                 $exRate = $this->toDecimalOrNull($this->getProperty($do, 'Ex_Rate'), 1);
 
                 // If DO_Tran_Amt is 0, calculate from DO_Qty * SO_Unit_Price
@@ -1007,143 +1013,171 @@ class InvoiceController extends Controller
                 }
 
                 // =====================================================================
-                // M2 & KG measurements (per PCS and totals) - CPS-compatible logic
+                // Insert invoice rows: one INV line per DO component (Main + Fit)
                 // =====================================================================
-                // Base quantity (DO_Qty already used above for remainingQty)
-                $doQty = $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty'), 0);
+                $itemNo = 1;
 
-                // Raw values from DO table
-                $grossM2PerPcs = $this->toDecimalOrNull($this->getProperty($do, 'MC_Gross_M2_Per_Pcs'));
-                $netM2PerPcs   = $this->toDecimalOrNull($this->getProperty($do, 'MC_Net_M2_Per_Pcs'));
-                $totalGrossM2  = $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Gross_M2'));
-                $totalNetM2    = $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Net_M2'));
+                foreach ($doRecords as $line) {
+                    // Base quantity per line
+                    $lineQty = $this->toDecimalOrNull($this->getProperty($line, 'DO_Qty'), 0);
 
-                $grossKgPerPcs = $this->toDecimalOrNull($this->getProperty($do, 'MC_Gross_Kg_Per_Pcs'));
-                $netKgPerPcs   = $this->toDecimalOrNull($this->getProperty($do, 'MC_Net_Kg_Per_Pcs'));
-                $totalGrossKg  = $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Gross_KG'));
-                $totalNetKg    = $this->toDecimalOrNull($this->getProperty($do, 'Total_DO_Net_KG'));
+                    // Raw values from DO line for M2 & KG
+                    $grossM2PerPcs = $this->toDecimalOrNull($this->getProperty($line, 'MC_Gross_M2_Per_Pcs'));
+                    $netM2PerPcs   = $this->toDecimalOrNull($this->getProperty($line, 'MC_Net_M2_Per_Pcs'));
+                    $totalGrossM2  = $this->toDecimalOrNull($this->getProperty($line, 'Total_DO_Gross_M2'));
+                    $totalNetM2    = $this->toDecimalOrNull($this->getProperty($line, 'Total_DO_Net_M2'));
 
-                // --- Derive per-PCS values from totals when missing ---
-                if ((!$grossM2PerPcs || $grossM2PerPcs == 0) && $totalGrossM2 && $doQty > 0) {
-                    $grossM2PerPcs = round($totalGrossM2 / $doQty, 4);
+                    $grossKgPerPcs = $this->toDecimalOrNull($this->getProperty($line, 'MC_Gross_Kg_Per_Pcs'));
+                    $netKgPerPcs   = $this->toDecimalOrNull($this->getProperty($line, 'MC_Net_Kg_Per_Pcs'));
+                    $totalGrossKg  = $this->toDecimalOrNull($this->getProperty($line, 'Total_DO_Gross_KG'));
+                    $totalNetKg    = $this->toDecimalOrNull($this->getProperty($line, 'Total_DO_Net_KG'));
+
+                    // --- Derive per-PCS values from totals when missing ---
+                    if ((!$grossM2PerPcs || $grossM2PerPcs == 0) && $totalGrossM2 && $lineQty > 0) {
+                        $grossM2PerPcs = round($totalGrossM2 / $lineQty, 4);
+                    }
+                    if ((!$netM2PerPcs || $netM2PerPcs == 0) && $totalNetM2 && $lineQty > 0) {
+                        $netM2PerPcs = round($totalNetM2 / $lineQty, 4);
+                    }
+                    if ((!$grossKgPerPcs || $grossKgPerPcs == 0) && $totalGrossKg && $lineQty > 0) {
+                        $grossKgPerPcs = round($totalGrossKg / $lineQty, 4);
+                    }
+                    if ((!$netKgPerPcs || $netKgPerPcs == 0) && $totalNetKg && $lineQty > 0) {
+                        $netKgPerPcs = round($totalNetKg / $lineQty, 4);
+                    }
+
+                    // --- Derive totals from per-PCS values when missing ---
+                    if ((!$totalGrossM2 || $totalGrossM2 == 0) && $grossM2PerPcs && $lineQty > 0) {
+                        $totalGrossM2 = round($grossM2PerPcs * $lineQty, 4);
+                    }
+                    if ((!$totalNetM2 || $totalNetM2 == 0) && $netM2PerPcs && $lineQty > 0) {
+                        $totalNetM2 = round($netM2PerPcs * $lineQty, 4);
+                    }
+                    if ((!$totalGrossKg || $totalGrossKg == 0) && $grossKgPerPcs && $lineQty > 0) {
+                        $totalGrossKg = round($grossKgPerPcs * $lineQty, 4);
+                    }
+                    if ((!$totalNetKg || $totalNetKg == 0) && $netKgPerPcs && $lineQty > 0) {
+                        $totalNetKg = round($netKgPerPcs * $lineQty, 4);
+                    }
+
+                    // Determine Main vs Fit component
+                    $comp = trim((string) ($line->COMP ?? ''));
+                    $isMain = ($itemNo === 1) || strcasecmp($comp, 'Main') === 0;
+
+                    // Only Main carries invoice quantity; Fit lines are informational (qty 0)
+                    $ivQty = $isMain ? $lineQty : 0;
+
+                    // Line-level amounts from DO line
+                    $lineTranAmt = $this->toDecimalOrNull($this->getProperty($line, 'DO_Tran_Amt'), 0);
+                    $lineBaseAmt = $this->toDecimalOrNull($this->getProperty($line, 'DO_Base_Amt'), 0);
+
+                    if ($lineTranAmt == 0 && $lineQty > 0) {
+                        $unitPrice = $this->toDecimalOrNull($this->getProperty($line, 'SO_Unit_Price'), 0);
+                        if ($unitPrice > 0) {
+                            $lineTranAmt = round($lineQty * $unitPrice, 2);
+                            $lineBaseAmt = round($lineTranAmt * $exRate, 2);
+                        }
+                    }
+                    if ($lineBaseAmt == 0 && $lineTranAmt > 0) {
+                        $lineBaseAmt = round($lineTranAmt * $exRate, 2);
+                    }
+
+                    // Insert invoice record for this DO component line
+                    DB::table('INV')->insert([
+                        // Period and identification
+                        'YYYY' => $yyyy,
+                        'MM' => $mm,
+                        'IV_NUM' => $ivNum,
+                        'IV_STS' => 'Prepared',
+                        'IV_DMY' => $invoiceDate,
+
+                        // Payment terms and references
+                        'AR_TERM' => $paymentTerm,
+                        'IV_SECOND_REF' => $secondRef ?? $this->getProperty($line, 'DO_Num'),
+
+                        // Customer information
+                        'AC_NUM' => $this->getProperty($line, 'AC_Num'),
+                        'AC_NAME' => $this->getProperty($line, 'AC_Name'),
+
+                        // Item details
+                        'ITEM' => $itemNo,
+                        'MCS_NUM' => $this->getProperty($line, 'MCS_Num'),
+                        'MODEL' => $this->getProperty($line, 'Model'),
+                        'PRODUCT' => $this->getProperty($line, 'Product'),
+                        'COMP' => $this->getProperty($line, 'COMP'),
+                        'P_DESIGN' => $this->getProperty($line, 'PD'),
+                        'PCS_PER_SET' => $this->toDecimalOrNull($this->getProperty($line, 'PCS_PER_SET')),
+                        'UNIT' => $this->getProperty($line, 'Unit'),
+                        'PART' => $this->getProperty($line, 'Part_Number'),
+
+                        // Dimensions
+                        'INT_L' => $this->toDecimalOrNull($this->getProperty($line, 'INT_L')),
+                        'INT_W' => $this->toDecimalOrNull($this->getProperty($line, 'INT_W')),
+                        'INT_H' => $this->toDecimalOrNull($this->getProperty($line, 'INT_H')),
+                        'EXT_L' => $this->toDecimalOrNull($this->getProperty($line, 'EXT_L')),
+                        'EXT_W' => $this->toDecimalOrNull($this->getProperty($line, 'EXT_W')),
+                        'EXT_H' => $this->toDecimalOrNull($this->getProperty($line, 'EXT_H')),
+                        'FLUTE' => $this->getProperty($line, 'Flute'),
+
+                        // Sales and organizational info
+                        'SLM' => $this->getProperty($line, 'SLM'),
+                        'IND' => $this->getProperty($line, 'IND'),
+                        'AREA' => $this->getProperty($line, 'Area1'),
+                        'GROUP_' => $this->getProperty($line, 'Group_'),
+
+                        // Order references
+                        'SO_NUM' => $this->getProperty($line, 'SO_Num'),
+                        'SO_TYPE' => $this->getProperty($line, 'SO_Type'),
+                        'SO_DMY' => $soDmy,
+                        'PO_NUM' => $this->getProperty($line, 'PO_Num'),
+                        'PO_DMY' => $this->getProperty($line, 'PO_Date'),
+                        'LOT_NUM' => $this->getProperty($line, 'LOT_Num'),
+
+                        // Quantities
+                        'SO_PQ1' => $this->getProperty($line, 'PQ1'),
+                        'SO_PQ2' => $this->getProperty($line, 'PQ2'),
+                        'SO_PQ3' => $this->getProperty($line, 'PQ3'),
+                        'SO_PQ4' => $this->getProperty($line, 'PQ4'),
+                        'SO_PQ5' => $this->getProperty($line, 'PQ5'),
+                        'IV_QTY' => $ivQty,
+                        'IV_UNIT_PRICE' => $this->toDecimalOrNull($this->getProperty($line, 'SO_Unit_Price')),
+
+                        // Currency and amounts
+                        'CURR' => $this->getProperty($line, 'Curr', 'IDR'),
+                        'EX_RATE' => $this->toDecimalOrNull($this->getProperty($line, 'Ex_Rate'), 1.0),
+                        'IV_TRAN_AMT' => $lineTranAmt,
+                        'IV_BASE_AMT' => $lineBaseAmt,
+
+                        // Measurements
+                        'MC_GROSS_M2_PER__PCS' => $grossM2PerPcs,
+                        'MC_NET_M2_PER_PCS' => $netM2PerPcs,
+                        'TOTAL_IV_GROSS_M2' => $totalGrossM2,
+                        'TOTAL_IV_NET_M2' => $totalNetM2,
+                        'MC_GROSS_KG_PER_PCS' => $grossKgPerPcs,
+                        'MC_NET_KG_PER_PCS' => $netKgPerPcs,
+                        'TOTAL_IV_GROSS_KG' => $totalGrossKg,
+                        'TOTAL_IV_NET_KG' => $totalNetKg,
+
+                        // Tax information
+                        'IV_TAX_CODE' => $taxCode,
+                        'IV_TAX_PERCENT' => $this->toDecimalOrNull($taxPercent),
+
+                        // Remarks
+                        'IV_REMARK' => $remark,
+
+                        // Audit trail
+                        'NW_UID' => $currentUserId,
+                        'NW_DATE' => $this->getNowWib()->format('d/m/Y'),
+                        'NW_TIME' => $this->getNowWib()->format('H:i'),
+
+                        // Date surrogate keys
+                        'IVDateSK' => $this->toIntegerOrNull($this->getProperty($line, 'DODateSK'), 0),
+                        'SODateSK' => $this->toIntegerOrNull($this->getProperty($line, 'SODateSK'), 0),
+                        'PODateSK' => $this->toIntegerOrNull($this->getProperty($line, 'PODateSK'), 0),
+                    ]);
+
+                    $itemNo++;
                 }
-                if ((!$netM2PerPcs || $netM2PerPcs == 0) && $totalNetM2 && $doQty > 0) {
-                    $netM2PerPcs = round($totalNetM2 / $doQty, 4);
-                }
-                if ((!$grossKgPerPcs || $grossKgPerPcs == 0) && $totalGrossKg && $doQty > 0) {
-                    $grossKgPerPcs = round($totalGrossKg / $doQty, 4);
-                }
-                if ((!$netKgPerPcs || $netKgPerPcs == 0) && $totalNetKg && $doQty > 0) {
-                    $netKgPerPcs = round($totalNetKg / $doQty, 4);
-                }
-
-                // --- Derive totals from per-PCS values when missing ---
-                if ((!$totalGrossM2 || $totalGrossM2 == 0) && $grossM2PerPcs && $doQty > 0) {
-                    $totalGrossM2 = round($grossM2PerPcs * $doQty, 4);
-                }
-                if ((!$totalNetM2 || $totalNetM2 == 0) && $netM2PerPcs && $doQty > 0) {
-                    $totalNetM2 = round($netM2PerPcs * $doQty, 4);
-                }
-                if ((!$totalGrossKg || $totalGrossKg == 0) && $grossKgPerPcs && $doQty > 0) {
-                    $totalGrossKg = round($grossKgPerPcs * $doQty, 4);
-                }
-                if ((!$totalNetKg || $totalNetKg == 0) && $netKgPerPcs && $doQty > 0) {
-                    $totalNetKg = round($netKgPerPcs * $doQty, 4);
-                }
-
-                // Insert invoice record into INV table
-                DB::table('INV')->insert([
-                    // Period and identification
-                    'YYYY' => $yyyy,
-                    'MM' => $mm,
-                    'IV_NUM' => $ivNum,
-                    'IV_STS' => 'Prepared',
-                    'IV_DMY' => $invoiceDate,
-
-                    // Payment terms and references
-                    'AR_TERM' => $paymentTerm, // From customer account table (COD, 30D, 60D, etc.)
-                    'IV_SECOND_REF' => $secondRef ?? $this->getProperty($do, 'DO_Num'),
-
-                    // Customer information
-                    'AC_NUM' => $this->getProperty($do, 'AC_Num'),
-                    'AC_NAME' => $this->getProperty($do, 'AC_Name'),
-
-                    // Item details
-                    'ITEM' => $this->getProperty($do, 'No'),
-                    'MCS_NUM' => $this->getProperty($do, 'MCS_Num'),
-                    'MODEL' => $this->getProperty($do, 'Model'),
-                    'PRODUCT' => $this->getProperty($do, 'Product'),
-                    'COMP' => $this->getProperty($do, 'COMP'),
-                    'P_DESIGN' => $this->getProperty($do, 'PD'),
-                    'PCS_PER_SET' => $this->toDecimalOrNull($this->getProperty($do, 'PCS_PER_SET')),
-                    'UNIT' => $this->getProperty($do, 'Unit'),
-                    'PART' => $this->getProperty($do, 'Part_Number'),
-
-                    // Dimensions (all decimal fields)
-                    'INT_L' => $this->toDecimalOrNull($this->getProperty($do, 'INT_L')),
-                    'INT_W' => $this->toDecimalOrNull($this->getProperty($do, 'INT_W')),
-                    'INT_H' => $this->toDecimalOrNull($this->getProperty($do, 'INT_H')),
-                    'EXT_L' => $this->toDecimalOrNull($this->getProperty($do, 'EXT_L')),
-                    'EXT_W' => $this->toDecimalOrNull($this->getProperty($do, 'EXT_W')),
-                    'EXT_H' => $this->toDecimalOrNull($this->getProperty($do, 'EXT_H')),
-                    'FLUTE' => $this->getProperty($do, 'Flute'),
-
-                    // Sales and organizational info
-                    'SLM' => $this->getProperty($do, 'SLM'),
-                    'IND' => $this->getProperty($do, 'IND'),
-                    'AREA' => $this->getProperty($do, 'Area1'),
-                    'GROUP_' => $this->getProperty($do, 'Group_'),
-
-                    // Order references (FIXED: SO_DMY and LOT_NUM)
-                    'SO_NUM' => $this->getProperty($do, 'SO_Num'),
-                    'SO_TYPE' => $this->getProperty($do, 'SO_Type'),
-                    'SO_DMY' => $soDmy, // ✅ FIXED: Now properly populated
-                    'PO_NUM' => $this->getProperty($do, 'PO_Num'),
-                    'PO_DMY' => $this->getProperty($do, 'PO_Date'),
-                    'LOT_NUM' => $this->getProperty($do, 'LOT_Num'), // ✅ FIXED: Now properly populated
-
-                    // Quantities (string fields, not numeric)
-                    'SO_PQ1' => $this->getProperty($do, 'PQ1'),
-                    'SO_PQ2' => $this->getProperty($do, 'PQ2'),
-                    'SO_PQ3' => $this->getProperty($do, 'PQ3'),
-                    'SO_PQ4' => $this->getProperty($do, 'PQ4'),
-                    'SO_PQ5' => $this->getProperty($do, 'PQ5'),
-                    'IV_QTY' => $this->toDecimalOrNull($this->getProperty($do, 'DO_Qty')),
-                    'IV_UNIT_PRICE' => $this->toDecimalOrNull($this->getProperty($do, 'SO_Unit_Price')),
-
-                    // Currency and amounts (FIXED: IV_TRAN_AMT, IV_BASE_AMT)
-                    'CURR' => $this->getProperty($do, 'Curr', 'IDR'),
-                    'EX_RATE' => $this->toDecimalOrNull($this->getProperty($do, 'Ex_Rate'), 1.0),
-                    'IV_TRAN_AMT' => $tranAmount, // ✅ FIXED: Calculated above
-                    'IV_BASE_AMT' => $baseAmount, // ✅ FIXED: Calculated above
-
-                    // Measurements (M2 and KG) - all decimal fields (CPS logic for per-PCS and totals)
-                    'MC_GROSS_M2_PER__PCS' => $grossM2PerPcs,
-                    'MC_NET_M2_PER_PCS' => $netM2PerPcs,
-                    'TOTAL_IV_GROSS_M2' => $totalGrossM2,
-                    'TOTAL_IV_NET_M2' => $totalNetM2,
-                    'MC_GROSS_KG_PER_PCS' => $grossKgPerPcs,
-                    'MC_NET_KG_PER_PCS' => $netKgPerPcs,
-                    'TOTAL_IV_GROSS_KG' => $totalGrossKg,
-                    'TOTAL_IV_NET_KG' => $totalNetKg,
-
-                    // Tax information (FIXED: IV_TAX_CODE, IV_TAX_PERCENT)
-                    'IV_TAX_CODE' => $taxCode, // ✅ FIXED: From tax lookup
-                    'IV_TAX_PERCENT' => $this->toDecimalOrNull($taxPercent), // ✅ FIXED: From tax lookup
-
-                    // Remarks
-                    'IV_REMARK' => $remark,
-
-                    // Audit trail - New/Created by User ID (WIB timezone)
-                    'NW_UID' => $currentUserId, // Use pre-captured value with logging
-                    'NW_DATE' => $this->getNowWib()->format('d/m/Y'),
-                    'NW_TIME' => $this->getNowWib()->format('H:i'),
-
-                    // Date surrogate keys (integers)
-                    'IVDateSK' => $this->toIntegerOrNull($this->getProperty($do, 'DODateSK'), 0),
-                    'SODateSK' => $this->toIntegerOrNull($this->getProperty($do, 'SODateSK'), 0),
-                    'PODateSK' => $this->toIntegerOrNull($this->getProperty($do, 'PODateSK'), 0),
-                ]);
 
                 // CPS-Compatible: Update DO status based on remaining quantity
                 try {
@@ -1494,15 +1528,12 @@ class InvoiceController extends Controller
                 ];
             })->values();
 
-            // Build item details (Main + Finishing items)
+            // Build item details from actual DO component lines (Main + Fit)
             $itemDetails = [];
-
-            // Main item
-            $mainItem = $doRecords->first();
 
             // Calculate total Net KG from all DO records (sum if multiple lines)
             $totalNetKg = floatval($doRecords->sum('Total_DO_Net_KG'));
-            $doQty = floatval($mainItem->DO_Qty ?: 0);
+            $doQty = floatval($doRecords->first()->DO_Qty ?: 0);
             $kgPerUnit = 0;
 
             Log::info("=== KG Calculation Start ===", [
@@ -1521,8 +1552,8 @@ class InvoiceController extends Controller
                 ]);
             }
             // Priority 2: Try MC_Net_Kg_Per_Pcs if available
-            else if ($mainItem->MC_Net_Kg_Per_Pcs && floatval($mainItem->MC_Net_Kg_Per_Pcs) > 0) {
-                $kgPerUnit = floatval($mainItem->MC_Net_Kg_Per_Pcs);
+            elseif ($doRecords->first()->MC_Net_Kg_Per_Pcs && floatval($doRecords->first()->MC_Net_Kg_Per_Pcs) > 0) {
+                $kgPerUnit = floatval($doRecords->first()->MC_Net_Kg_Per_Pcs);
                 $totalNetKg = $kgPerUnit * $doQty;
                 Log::info("✅ Method 2: Using MC_Net_Kg_Per_Pcs", [
                     'MC_Net_Kg_Per_Pcs' => $kgPerUnit,
@@ -1544,40 +1575,37 @@ class InvoiceController extends Controller
                 ]);
             }
 
-            $itemDetails[] = [
-                'item' => 'Main',
-                'p_design' => $mainItem->PD ?: 'B1',
-                'pcs' => $mainItem->PCS_PER_SET ?: 1,
-                'unit' => $mainItem->Unit ?: 'Pcs',
-                'u_price' => floatval($mainItem->SO_Unit_Price ?: 0),
-                'deliver' => $doQty,
-                'reject' => 0,
-                'unbill' => $doQty,
-                'to_bill' => 0, // Default 0 - User must input manually (CPS-compatible)
-                'to_bill_kg' => 0, // Will calculate when user inputs to_bill
-                'kg_per_unit' => $kgPerUnit,
-            ];
-
             Log::info("=== Final KG Data ===", [
                 'kg_per_unit' => $kgPerUnit,
                 'total_kg_available' => $totalNetKg,
                 'ready_for_calculation' => $kgPerUnit > 0
             ]);
 
-            // Finishing items F#1 - F#9 (placeholders for now)
-            for ($i = 1; $i <= 9; $i++) {
-                $itemDetails[] = [
-                    'item' => "F# {$i}",
-                    'p_design' => '-',
-                    'pcs' => null,
-                    'unit' => null,
-                    'u_price' => null,
-                    'deliver' => null,
-                    'reject' => null,
-                    'unbill' => null,
-                    'to_bill' => null,
-                    'to_bill_kg' => null,
+            foreach ($doRecords as $index => $record) {
+                $comp = trim((string) ($record->COMP ?? ''));
+                $isMain = ($index === 0) || strcasecmp($comp, 'Main') === 0;
+
+                $label = $comp !== ''
+                    ? $comp
+                    : ($isMain ? 'Main' : ('Comp ' . ($record->No ?? ($index + 1))));
+
+                $qty = floatval($record->DO_Qty ?: 0);
+
+                $detail = [
+                    'item' => $label,
+                    'p_design' => $record->PD ?: ($isMain ? 'B1' : '-'),
+                    'pcs' => $record->PCS_PER_SET ?: null,
+                    'unit' => $record->Unit ?: null,
+                    'u_price' => floatval($record->SO_Unit_Price ?: 0),
+                    'deliver' => $qty,
+                    'reject' => 0,
+                    'unbill' => $qty,
+                    'to_bill' => 0,      // User will input for Main row only in UI
+                    'to_bill_kg' => 0,   // Calculated client-side for Main row
+                    'kg_per_unit' => $isMain ? $kgPerUnit : null,
                 ];
+
+                $itemDetails[] = $detail;
             }
 
             $response = [
@@ -1659,6 +1687,7 @@ class InvoiceController extends Controller
             }
 
             // Get delivery orders with aggregated item count and additional fields
+            // IMPORTANT: Group by DO header only (one row per DO_Num), not per component line
             $deliveryOrders = $query
                 ->select([
                     'DO_Num',
@@ -1666,7 +1695,6 @@ class InvoiceController extends Controller
                     'AC_Num',
                     'AC_Name',
                     'DO_VHC_Num',
-                    'COMP',
                     'Status',
                     'SO_Num',
                     'SO_Type',
@@ -1679,7 +1707,8 @@ class InvoiceController extends Controller
                     'Group_', // Group
                     DB::raw('COUNT(*) as item_count'),
                     DB::raw('MAX(DOYYYY) as year'),
-                    DB::raw('MAX(DOMM) as month')
+                    DB::raw('MAX(DOMM) as month'),
+                    DB::raw('MAX(PCS_PER_SET) as pcs_per_set')
                 ])
                 ->groupBy([
                     'DO_Num',
@@ -1687,7 +1716,6 @@ class InvoiceController extends Controller
                     'AC_Num',
                     'AC_Name',
                     'DO_VHC_Num',
-                    'COMP',
                     'Status',
                     'SO_Num',
                     'SO_Type',
@@ -1794,7 +1822,7 @@ class InvoiceController extends Controller
                     'customer_name' => $order->AC_Name,
                     'vehicle_no' => $order->DO_VHC_Num,
                     'item_count' => intval($order->item_count),
-                    'pc' => $order->COMP ?? 1,
+                    'pc' => $order->pcs_per_set ?? 1,
                     'mode' => 'Multiple',
                     'status' => $order->Status ?? 'Draft',
                     'so_number' => $order->SO_Num,

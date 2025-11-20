@@ -355,22 +355,17 @@ const fetchDeliveryOrders = async () => {
     // Optional customer filter
     if (props.customerCode) params.append('customer_code', props.customerCode)
 
-    // In openPeriod mode, do NOT restrict by month/year (no from_date/to_date)
+    // For invoice module, filter by period using month/year (CPS-style)
     if (!props.openPeriod) {
-      // Build from/to date (YYYY-MM-DD) for the given month/year
       const month = String(props.periodMonth || filters.value.currentPeriodMonth).padStart(2, '0')
       const year = String(props.periodYear || filters.value.currentPeriodYear)
       if (month && year) {
-        const fromDate = `${year}-${month}-01`
-        // Compute last day of month
-        const lastDay = new Date(Number(year), Number(month), 0).getDate()
-        const toDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`
-        params.append('from_date', fromDate)
-        params.append('to_date', toDate)
+        params.append('period_month', month)
+        params.append('period_year', year)
       }
     }
 
-    const url = `/api/delivery-orders?${params.toString()}`
+    const url = `/api/invoices/delivery-orders?${params.toString()}`
     console.log('Fetching delivery orders from:', url)
 
     const res = await fetch(url, { headers: { Accept: 'application/json' } })
@@ -394,11 +389,11 @@ const fetchDeliveryOrders = async () => {
       rows = []
     }
 
-    // Map DB fields to UI fields
+    // Map DB fields to UI fields (supports both raw DO rows and invoice endpoint format)
     deliveryOrders.value = rows.map(r => {
-      const doNum = r.DO_Num || r.do_num || r.doNumber || ''
+      const doNum = r.do_number || r.DO_Num || r.do_num || r.doNumber || ''
       const doDateSk = r.DODateSK || r.dodatesk
-      const doDmy = r.DO_DMY || r.do_dmy || ''
+      const doDmy = r.DO_DMY || r.do_dmy || r.do_date || ''
       // Prefer DODateSK (YYYYMMDD) to build a proper ISO date string
       let doDate = ''
       if (doDateSk) {
@@ -407,19 +402,28 @@ const fetchDeliveryOrders = async () => {
       } else {
         doDate = doDmy // may be d/m/Y; formatDate() will fallback to raw if invalid
       }
+
       return {
         do_number: doNum,
         do_date: doDate,
-        customer_code: r.AC_Num || r.ac_num || r.customer_code || '',
-        vehicle_no: r.DO_VHC_Num || r.vehicle_number || r.vehicle_no || '',
-        item_count: 1,
-        pc: r.PCS_PER_SET || r.pcs_per_set || 1,
-        mode: 'Multiple',
-        status: r.Status || r.status || 'Draft',
-        remark1: r.DO_Remark1 || r.do_remark1 || '',
-        remark2: r.DO_Remark2 || r.do_remark2 || '',
-        salesperson: r.SLM || r.slm || '',
-        // CPS-compatible invoice tracking (from backend calculation)
+        customer_code: r.customer_code || r.AC_Num || r.ac_num || '',
+        vehicle_no: r.vehicle_no || r.DO_VHC_Num || r.vehicle_number || '',
+        item_count: r.item_count != null ? Number(r.item_count) : 1,
+        pc: r.pc || r.PCS_PER_SET || r.pcs_per_set || 1,
+        mode: r.mode || 'Multiple',
+        status: r.status || r.Status || 'Draft',
+        so_number: r.so_number || r.SO_Num || r.so_num || '',
+        so_type: r.so_type || r.SO_Type || '',
+        po_number: r.po_number || r.PO_Num || r.po_num || '',
+        remark1: r.remark1 || r.DO_Remark1 || r.do_remark1 || '',
+        remark2: r.remark2 || r.DO_Remark2 || r.do_remark2 || '',
+        salesperson: r.salesperson || r.SLM || r.slm || r.salesperson_code || '',
+        salesperson_code: r.salesperson_code || r.SLM || r.slm || '',
+        area: r.area || r.Area1 || '',
+        industry: r.industry || r.IND || '',
+        group: r.group || r.Group_ || '',
+        order_mode: r.order_mode || r.so_type || 'customer',
+        // CPS-compatible invoice tracking (from backend calculation, if available)
         do_qty: r.do_qty || r.DO_Qty || 0,
         invoiced_qty: r.invoiced_qty || 0,
         remaining_qty: r.remaining_qty || r.do_qty || 0,
