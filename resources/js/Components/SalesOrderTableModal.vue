@@ -76,7 +76,7 @@
                           </tr>
                         </template>
                         <template v-else>
-                          <tr v-for="(order, index) in salesOrders" :key="index" 
+                          <tr v-for="(order, index) in salesOrders" :key="index"
                               :class="{'bg-blue-100': selectedOrderIndex === index, 'hover:bg-gray-50': selectedOrderIndex !== index}"
                               @click="selectOrder(index)">
                             <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ order.soNumber || '-' }}</td>
@@ -161,7 +161,7 @@
                         </tr>
                       </thead>
                       <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="(item, index) in itemDetails" :key="index" 
+                        <tr v-for="(item, index) in itemDetails" :key="index"
                             :class="{'bg-blue-100': selectedItemIndex === index, 'hover:bg-gray-50': selectedItemIndex !== index}"
                             @click="selectItem(index)">
                           <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.name }}</td>
@@ -241,6 +241,10 @@ const props = defineProps({
   customerData: {
     type: Object,
     default: () => ({})
+  },
+  deduplicateBySo: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -336,7 +340,7 @@ const selectOrder = (index) => {
         mcardSeq: selectedOrder.value.mcardSeq || selectedOrder.value.mcsNumber || '',
         pOrderRef: selectedOrder.value.pOrderRef || selectedOrder.value.customerPo || ''
       }
-      
+
       emit('select', completeOrderData)
       closeModal()
     }
@@ -352,16 +356,16 @@ const updateOrderInfo = async () => {
     try {
       // Fetch detailed sales order data from new endpoint
       const response = await axios.get(`/api/sales-order/${selectedOrder.value.soNumber}/detail`)
-      
+
       console.log('API Response:', response.data)
-      
+
       if (response.data.success) {
         const data = response.data.data
-        
+
         console.log('Order Info from API:', data.order_info)
         console.log('Salesperson Code:', data.order_info.salesperson_code)
         console.log('Salesperson Name:', data.order_info.salesperson_name)
-        
+
         // Update order information
         orderInfo.customerName = data.order_info.customer_name || ''
         orderInfo.model = data.order_info.model || ''
@@ -370,9 +374,9 @@ const updateOrderInfo = async () => {
         orderInfo.salespersonName = data.order_info.salesperson_name || ''
         orderInfo.orderGroup = data.order_info.order_group || 'Sales'
         orderInfo.orderType = data.order_info.order_type || 'S1'
-        
+
         console.log('Updated orderInfo:', orderInfo)
-        
+
         // Update item details - Main item (PD row)
         if (data.item_details) {
           // PD (Product Design)
@@ -388,7 +392,7 @@ const updateOrderInfo = async () => {
           // BALANCE = ORDER - NET DELIVERY (from API if provided, otherwise default later by watcher)
           itemDetails.value[5].main = (data.item_details.balance ?? '')
         }
-        
+
         // Update fittings (F1-F9) if available
         if (data.fittings && data.fittings.length > 0) {
           data.fittings.forEach((fitting, index) => {
@@ -403,7 +407,7 @@ const updateOrderInfo = async () => {
             }
           })
         }
-        
+
         success('Sales order details loaded successfully')
       } else {
         error(response.data.message || 'Failed to load sales order details')
@@ -421,10 +425,10 @@ const searchOrders = async () => {
   try {
     console.log('searchOrders called')
     console.log('Customer data:', props.customerData)
-    
+
     // Fetch sales orders from API based on customer code
     const params = {}
-    
+
     // If customer code is 'ALL', fetch all outstanding sales orders
     // Otherwise, filter by specific customer
     if (props.customerData?.code && props.customerData.code !== 'ALL') {
@@ -434,9 +438,9 @@ const searchOrders = async () => {
       params.status = 'Outstanding'
       params.all_customers = true
     }
-    
+
     console.log('API params:', params)
-    
+
     // Add search parameters if provided
     if (searchTerm1.value && searchTerm1.value !== '0') {
       params.month = searchTerm1.value
@@ -450,20 +454,20 @@ const searchOrders = async () => {
     if (soNumberFilter.value) {
       params.so_number = soNumberFilter.value
     }
-    
+
     console.log('Calling API /api/sales-orders with params:', params)
-    
+
     // Use different endpoint for all outstanding orders
     const endpoint = params.all_customers ? '/api/sales-orders/outstanding' : '/api/sales-orders'
     const response = await axios.get(endpoint, { params })
     console.log('API response:', response.data)
     console.log('API response.data.data:', response.data.data)
     console.log('First order raw:', response.data.data[0])
-    
+
     if (response.data.success) {
       console.log('Raw response.data.data:', response.data.data)
       console.log('Number of orders:', response.data.data.length)
-      
+
       // Log debug information if available
       if (response.data.debug) {
         console.log('=== DEBUG INFO ===')
@@ -473,7 +477,7 @@ const searchOrders = async () => {
         console.log('Query result count:', response.data.debug.query_result_count)
         console.log('==================')
       }
-      
+
       // Map API data to component format and sort by SO number
       salesOrders.value = response.data.data
         .map((order, idx) => {
@@ -500,16 +504,26 @@ const searchOrders = async () => {
           // Sort by SO number in descending order (newest first)
           return b.soNumber.localeCompare(a.soNumber)
         })
-      
+
+      if (props.deduplicateBySo && Array.isArray(salesOrders.value)) {
+        const seen = new Set()
+        salesOrders.value = salesOrders.value.filter(order => {
+          if (!order || !order.soNumber) return false
+          if (seen.has(order.soNumber)) return false
+          seen.add(order.soNumber)
+          return true
+        })
+      }
+
       console.log('Mapped sales orders:', salesOrders.value)
       console.log('Total orders loaded:', salesOrders.value.length)
       console.log('Sample order object keys:', salesOrders.value[0] ? Object.keys(salesOrders.value[0]) : 'none')
       console.log('Sample order values:', salesOrders.value[0])
-      
+
       // Do NOT select first order by default - keep containers empty
       selectedOrderIndex.value = -1
       clearOrderInfo()
-      
+
       if (salesOrders.value.length === 0) {
         if (params.all_customers) {
           info('No outstanding sales orders found')
@@ -561,7 +575,7 @@ const clearOrderInfo = () => {
   orderInfo.salespersonName = ''
   orderInfo.orderGroup = ''
   orderInfo.orderType = ''
-  
+
   // Clear item details
   itemDetails.value.forEach(item => {
     item.main = ''
@@ -582,7 +596,7 @@ const loadSalesOrders = async () => {
     // Load sales orders for the customer or all outstanding orders
     if (props.customerData && props.customerData.code) {
       console.log('Loading sales orders for customer:', props.customerData.code)
-      
+
       // If customer code is 'ALL', load all outstanding sales orders
       if (props.customerData.code === 'ALL') {
         console.log('Loading all outstanding sales orders for AmendSO')
@@ -598,7 +612,7 @@ const loadSalesOrders = async () => {
         } catch (debugErr) {
           console.error('Debug route error:', debugErr)
         }
-        
+
         // Then call the actual search for specific customer
         await searchOrders()
       }

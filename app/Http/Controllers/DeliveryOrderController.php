@@ -36,7 +36,14 @@ class DeliveryOrderController extends Controller
             'per_set' => 'nullable|string|max:50',
             'unit' => 'nullable|string|max:50',
             'do_qty' => 'nullable|numeric',
-            'pcs_per_bdl' => 'nullable|string|max:50'
+            'pcs_per_bdl' => 'nullable|string|max:50',
+            // Optional multi-line DO items (Main + Fit1-9)
+            'items' => 'sometimes|array',
+            'items.*.name' => 'nullable|string|max:50',
+            'items.*.p_design' => 'nullable|string|max:50',
+            'items.*.pcs' => 'nullable|string|max:50',
+            'items.*.unit' => 'nullable|string|max:50',
+            'items.*.to_deliver' => 'nullable|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -118,7 +125,7 @@ class DeliveryOrderController extends Controller
                 }
             }
 
-            // Normalize DO quantity (To Delivery) from request
+            // Normalize DO quantity (To Delivery) from request (Main row)
             $rawQty = $request->do_qty
                 ?? $request->input('to_delivery')
                 ?? $request->input('to_deliver')
@@ -134,27 +141,9 @@ class DeliveryOrderController extends Controller
             $so = $salesOrder; // alias
             $mc = $masterCard; // alias
 
-            // Calculate DO_Tran_Amt and DO_Base_Amt
-            $unitPrice = (float) ($so ? ($so->UNIT_PRICE ?? 0) : 0);
-            $exRate = (float) ($so ? ($so->EX_RATE ?? 1) : 1);
-            $doTranAmt = $doQty > 0 && $unitPrice > 0 ? round($doQty * $unitPrice, 2) : 0.0;
-            $doBaseAmt = round($doTranAmt * $exRate, 2);
-
-            // Calculate M2 (Square Meter) - MC table uses MC_GROSS_M2_PER_PCS and MC_NET_M2_PER_PCS
-            $grossM2PerPcs = (float) ($mc ? ($mc->MC_GROSS_M2_PER_PCS ?? 0) : 0);
-            $netM2PerPcs = (float) ($mc ? ($mc->MC_NET_M2_PER_PCS ?? 0) : 0);
-            $totalGrossM2 = $doQty > 0 && $grossM2PerPcs > 0 ? round($doQty * $grossM2PerPcs, 4) : 0.0;
-            $totalNetM2 = $doQty > 0 && $netM2PerPcs > 0 ? round($doQty * $netM2PerPcs, 4) : 0.0;
-
-            // Calculate KG (Kilogram) - MC table uses MC_GROSS_KG_PER_SET and MC_NET_KG_PER_PCS
-            $grossKgPerPcs = (float) ($mc ? ($mc->MC_GROSS_KG_PER_SET ?? 0) : 0);
-            $netKgPerPcs = (float) ($mc ? ($mc->MC_NET_KG_PER_PCS ?? 0) : 0);
-            $totalGrossKg = $doQty > 0 && $grossKgPerPcs > 0 ? round($doQty * $grossKgPerPcs, 4) : 0.0;
-            $totalNetKg = $doQty > 0 && $netKgPerPcs > 0 ? round($doQty * $netKgPerPcs, 4) : 0.0;
-
             // Get LOT_Num from SO table
             $lotNum = $so ? ($so->LOT_Num ?? '') : '';
-            
+
             // ===================================================================
             // Del_Code (Delivery Code / Kode Geo) Logic
             // ===================================================================
@@ -162,47 +151,22 @@ class DeliveryOrderController extends Controller
             // SO.D_LOC_Num already stores geographical delivery code (same logic as Del_Code)
             // No need to re-query customer_alternate_addresses or update_customer_accounts
             // ===================================================================
-            
+
             $delCode = $so ? ($so->D_LOC_Num ?? '') : '';
-            
+
             Log::info('DO Del_Code - From SO.D_LOC_Num', [
                 'del_code' => $delCode,
                 'so_number' => $soNumber ?? 'N/A',
                 'source' => 'SO.D_LOC_Num (geographical code)'
             ]);
-            
+
             $customerGroup = $customer->GROUP_ ?? ($customer->Group_ ?? '');
 
             // NOTE: SO_Date, SODateSK, PODateSK are NOT in DO table schema
             // These fields will be retrieved from SO table when creating invoice
 
-            // Get EXT dimensions for DO_M3 calculation
-            $extL = (float) (($so->EXT_L ?? null) !== null ? $so->EXT_L : ($mc->EXT_LENGTH ?? 0));
-            $extW = (float) (($so->EXT_W ?? null) !== null ? $so->EXT_W : ($mc->EXT_WIDTH ?? 0));
-            $extH = (float) (($so->EXT_H ?? null) !== null ? $so->EXT_H : ($mc->EXT_HEIGHT ?? 0));
-            
-            // Calculate DO_M3 (volume) = (L × W × H × Quantity) / 1,000,000,000 (convert mm³ to m³)
-            // Use EXT dimensions for outer carton volume
-            $doM3 = 0.0;
-            if ($extL > 0 && $extW > 0 && $extH > 0 && $doQty > 0) {
-                $doM3 = ($extL * $extW * $extH * $doQty) / 1000000000;
-                Log::info('DO_M3 calculated from EXT dimensions', [
-                    'do_number' => $doNumber,
-                    'ext_l' => $extL,
-                    'ext_w' => $extW,
-                    'ext_h' => $extH,
-                    'do_qty' => $doQty,
-                    'do_m3' => $doM3
-                ]);
-            } else {
-                Log::warning('DO_M3 calculation failed - no valid dimensions', [
-                    'do_number' => $doNumber,
-                    'ext_dimensions' => [$extL, $extW, $extH],
-                    'do_qty' => $doQty
-                ]);
-            }
-            
-            $doData = [
+            // Base fields shared by all DO lines for this DO number
+            $baseDo = [
                 'DOYYYY' => $doYear,
                 'DOMM' => $doMonth,
                 'DO_Num' => $doNumber,
@@ -212,23 +176,9 @@ class DeliveryOrderController extends Controller
                 'VHC_Class' => $vehicle->VEHICLE_CLASS ?? '',
                 'AC_Num' => $request->customer_code,
                 'AC_Name' => $customer->NAME ?? ($customer->AC_Name ?? ''),
-                'No' => '1', // Line number
                 'MCS_Num' => $request->mcard_seq ?? '',
                 'Model' => $request->model ?? ($so ? ($so->MODEL ?? '') : ''),
                 'Product' => ($so ? ($so->PRODUCT ?? $so->Product ?? '') : '') ?: ($mc->PRODUCT ?? ''),
-                'COMP' => $customer->CODE ?? ($customer->AC_Num ?? ''),
-                'PD' => $request->pd ?? ($so ? ($so->P_DESIGN ?? '') : ''),
-                'PCS_PER_SET' => is_numeric($request->per_set) ? (float)$request->per_set : (float)($so ? ($so->PER_SET ?? 1) : 1),
-                'Unit' => $request->unit ?? ($so ? ($so->UNIT ?? 'PCS') : 'PCS'),
-                // Pull from SO first (as created with MC data), fallback to MC raw columns
-                'Part_Number' => (string) (($so->PART_NUMBER ?? '') ?: ($mc->PART_NO ?? '')),
-                'INT_L' => (float) (($so->INT_L ?? null) !== null ? $so->INT_L : ($mc->INT_LENGTH ?? 0)),
-                'INT_W' => (float) (($so->INT_W ?? null) !== null ? $so->INT_W : ($mc->INT_WIDTH ?? 0)),
-                'INT_H' => (float) (($so->INT_H ?? null) !== null ? $so->INT_H : ($mc->INT_HEIGHT ?? 0)),
-                'EXT_L' => $extL,
-                'EXT_W' => $extW,
-                'EXT_H' => $extH,
-                'Flute' => (string) (($so->FLUTE ?? '') ?: ($mc->FLUTE ?? '')),
                 'SLM' => $customer->SLM ?? ($so ? ($so->SLM ?? '') : ''),
                 'IND' => $customer->IND ?? ($customer->INDUSTRY ?? ''),
                 'Area1' => $customer->AREA ?? ($customer->AREA1 ?? ''),
@@ -238,36 +188,218 @@ class DeliveryOrderController extends Controller
                 'SO_Type' => $so ? ($so->TYPE ?? '') : '',
                 'PO_Num' => $request->po_number ?? ($so ? ($so->PO_Num ?? '') : ''),
                 'PO_Date' => $request->po_date ?? ($so ? ($so->PO_DATE ?? '') : ''),
-                'LOT_Num' => $lotNum, // ✅ FIXED: LOT_Num from SO table
-                'PQ1' => (string) (($so->PQ1 ?? '') ?: ($mc->SO_PQ1 ?? '')),
-                'PQ2' => (string) (($so->PQ2 ?? '') ?: ($mc->SO_PQ2 ?? '')),
-                'PQ3' => (string) (($so->PQ3 ?? '') ?: ($mc->SO_PQ3 ?? '')),
-                'PQ4' => (string) (($so->PQ4 ?? '') ?: ($mc->SO_PQ4 ?? '')),
-                'PQ5' => (string) (($so->PQ5 ?? '') ?: ($mc->SO_PQ5 ?? '')),
-                'DO_Qty' => $doQty,
-                'UNAPPLIED_FG' => $request->unapply_fg ? 'Y' : 'N',
-                'DO_M3' => round($doM3, 2), // ✅ FIXED: Calculated from (EXT_L × EXT_W × EXT_H × DO_Qty) / 1,000,000,000
-                'SO_Unit_Price' => $unitPrice,
+                'LOT_Num' => $lotNum,
                 'Curr' => $so ? ($so->CURR ?? 'IDR') : 'IDR',
-                'Ex_Rate' => $exRate,
-                'DO_Tran_Amt' => $doTranAmt, // ✅ FIXED: Calculated from DO_Qty × Unit_Price
-                'DO_Base_Amt' => $doBaseAmt, // ✅ FIXED: Calculated from DO_Tran_Amt × Ex_Rate
-                'MC_Gross_M2_Per_Pcs' => $grossM2PerPcs, // ✅ FIXED: From MC
-                'MC_Net_M2_Per_Pcs' => $netM2PerPcs, // ✅ FIXED: From MC
-                'Total_DO_Gross_M2' => $totalGrossM2, // ✅ FIXED: Calculated from DO_Qty × Gross_M2_Per_Pcs
-                'Total_DO_Net_M2' => $totalNetM2, // ✅ FIXED: Calculated from DO_Qty × Net_M2_Per_Pcs
-                'MC_Gross_Kg_Per_Pcs' => $grossKgPerPcs, // ✅ FIXED: From MC
-                'MC_Net_Kg_Per_Pcs' => $netKgPerPcs, // ✅ FIXED: From MC
-                'Total_DO_Gross_KG' => $totalGrossKg, // ✅ FIXED: Calculated from DO_Qty × Gross_KG_Per_Pcs
-                'Total_DO_Net_KG' => $totalNetKg, // ✅ FIXED: Calculated from DO_Qty × Net_KG_Per_Pcs
                 'DODateSK' => $orderDate->format('Ymd'),
                 'DO_Remark1' => $request->remark1 ?? '',
                 'DO_Remark2' => $request->remark2 ?? '',
                 'Cancelled_Reason' => ''
             ];
 
+            $items = $request->input('items', []);
+            $rowsToInsert = [];
+
+            if (!is_array($items) || empty($items)) {
+                // Legacy single-line behavior (Main only)
+                $extL = (float) (($so->EXT_L ?? null) !== null ? $so->EXT_L : ($mc->EXT_LENGTH ?? 0));
+                $extW = (float) (($so->EXT_W ?? null) !== null ? $so->EXT_W : ($mc->EXT_WIDTH ?? 0));
+                $extH = (float) (($so->EXT_H ?? null) !== null ? $so->EXT_H : ($mc->EXT_HEIGHT ?? 0));
+
+                $doM3 = 0.0;
+                if ($extL > 0 && $extW > 0 && $extH > 0 && $doQty > 0) {
+                    $doM3 = ($extL * $extW * $extH * $doQty) / 1000000000;
+                }
+
+                $unitPrice = (float) ($so ? ($so->UNIT_PRICE ?? 0) : 0);
+                $exRate = (float) ($so ? ($so->EX_RATE ?? 1) : 1);
+                $doTranAmt = $doQty > 0 && $unitPrice > 0 ? round($doQty * $unitPrice, 2) : 0.0;
+                $doBaseAmt = round($doTranAmt * $exRate, 2);
+
+                $grossM2PerPcs = (float) ($mc ? ($mc->MC_GROSS_M2_PER_PCS ?? 0) : 0);
+                $netM2PerPcs = (float) ($mc ? ($mc->MC_NET_M2_PER_PCS ?? 0) : 0);
+                $totalGrossM2 = $doQty > 0 && $grossM2PerPcs > 0 ? round($doQty * $grossM2PerPcs, 4) : 0.0;
+                $totalNetM2 = $doQty > 0 && $netM2PerPcs > 0 ? round($doQty * $netM2PerPcs, 4) : 0.0;
+
+                $grossKgPerPcs = (float) ($mc ? ($mc->MC_GROSS_KG_PER_SET ?? 0) : 0);
+                $netKgPerPcs = (float) ($mc ? ($mc->MC_NET_KG_PER_PCS ?? 0) : 0);
+                $totalGrossKg = $doQty > 0 && $grossKgPerPcs > 0 ? round($doQty * $grossKgPerPcs, 4) : 0.0;
+                $totalNetKg = $doQty > 0 && $netKgPerPcs > 0 ? round($doQty * $netKgPerPcs, 4) : 0.0;
+
+                $rowsToInsert[] = array_merge($baseDo, [
+                    'No' => '1',
+                    'COMP' => $customer->CODE ?? ($customer->AC_Num ?? ''),
+                    'PD' => $request->pd ?? ($so ? ($so->P_DESIGN ?? '') : ''),
+                    'PCS_PER_SET' => is_numeric($request->per_set) ? (float)$request->per_set : (float)($so ? ($so->PER_SET ?? 1) : 1),
+                    'Unit' => $request->unit ?? ($so ? ($so->UNIT ?? 'PCS') : 'PCS'),
+                    'Part_Number' => (string) (($so->PART_NUMBER ?? '') ?: ($mc->PART_NO ?? '')),
+                    'INT_L' => (float) (($so->INT_L ?? null) !== null ? $so->INT_L : ($mc->INT_LENGTH ?? 0)),
+                    'INT_W' => (float) (($so->INT_W ?? null) !== null ? $so->INT_W : ($mc->INT_WIDTH ?? 0)),
+                    'INT_H' => (float) (($so->INT_H ?? null) !== null ? $so->INT_H : ($mc->INT_HEIGHT ?? 0)),
+                    'EXT_L' => $extL,
+                    'EXT_W' => $extW,
+                    'EXT_H' => $extH,
+                    'Flute' => (string) (($so->FLUTE ?? '') ?: ($mc->FLUTE ?? '')),
+                    'PQ1' => (string) (($so->PQ1 ?? '') ?: ($mc->SO_PQ1 ?? '')),
+                    'PQ2' => (string) (($so->PQ2 ?? '') ?: ($mc->SO_PQ2 ?? '')),
+                    'PQ3' => (string) (($so->PQ3 ?? '') ?: ($mc->SO_PQ3 ?? '')),
+                    'PQ4' => (string) (($so->PQ4 ?? '') ?: ($mc->SO_PQ4 ?? '')),
+                    'PQ5' => (string) (($so->PQ5 ?? '') ?: ($mc->SO_PQ5 ?? '')),
+                    'DO_Qty' => $doQty,
+                    'UNAPPLIED_FG' => $request->unapply_fg ? 'Y' : 'N',
+                    'DO_M3' => round($doM3, 2),
+                    'SO_Unit_Price' => $unitPrice,
+                    'Ex_Rate' => $exRate,
+                    'DO_Tran_Amt' => $doTranAmt,
+                    'DO_Base_Amt' => $doBaseAmt,
+                    'MC_Gross_M2_Per_Pcs' => $grossM2PerPcs,
+                    'MC_Net_M2_Per_Pcs' => $netM2PerPcs,
+                    'Total_DO_Gross_M2' => $totalGrossM2,
+                    'Total_DO_Net_M2' => $totalNetM2,
+                    'MC_Gross_Kg_Per_Pcs' => $grossKgPerPcs,
+                    'MC_Net_Kg_Per_Pcs' => $netKgPerPcs,
+                    'Total_DO_Gross_KG' => $totalGrossKg,
+                    'Total_DO_Net_KG' => $totalNetKg,
+                ]);
+            } else {
+                // Multi-line DO: build one row per MC component (Main + Fit components)
+                $mcComponents = [];
+                if ($request->mcard_seq && $request->customer_code) {
+                    $mcComponents = DB::table('MC')
+                        ->where('MCS_Num', $request->mcard_seq)
+                        ->where('AC_NUM', $request->customer_code)
+                        ->orderBy('COMP')
+                        ->get();
+                }
+
+                $lineNo = 1;
+                foreach ($items as $item) {
+                    $compName = isset($item['name']) ? (string) $item['name'] : '';
+                    $qty = isset($item['to_deliver']) && is_numeric($item['to_deliver'])
+                        ? (float) $item['to_deliver']
+                        : 0.0;
+
+                    if ($qty <= 0) {
+                        continue;
+                    }
+
+                    // Map UI name to MC.COMP value: Main, Fit1-9
+                    $targetComp = $compName === 'Main' ? 'Main' : $compName;
+                    $compRow = null;
+                    foreach ($mcComponents as $row) {
+                        if ((string) $row->COMP === (string) $targetComp) {
+                            $compRow = $row;
+                            break;
+                        }
+                    }
+
+                    // Jika komponen tidak ditemukan di MC, lewati.
+                    // Pengecualian: Main boleh fallback ke master card umum ($mc) jika tersedia.
+                    if (!$compRow) {
+                        if ($targetComp === 'Main' && $mc) {
+                            $compRow = $mc;
+                        } else {
+                            continue;
+                        }
+                    }
+
+                    $compModel = $compRow->MODEL ?? ($mc->MODEL ?? '');
+                    $compPDesign = $compRow->P_DESIGN ?? ($item['p_design'] ?? ($request->pd ?? ''));
+                    $compPartNumber = $compRow->PART_NO ?? ($mc->PART_NO ?? '');
+
+                    $compIntL = (float)($compRow->INT_LENGTH ?? $mc->INT_LENGTH ?? 0);
+                    $compIntW = (float)($compRow->INT_WIDTH ?? $mc->INT_WIDTH ?? 0);
+                    $compIntH = (float)($compRow->INT_HEIGHT ?? $mc->INT_HEIGHT ?? 0);
+                    $compExtL = (float)($compRow->EXT_LENGTH ?? $mc->EXT_LENGTH ?? 0);
+                    $compExtW = (float)($compRow->EXT_WIDTH ?? $mc->EXT_WIDTH ?? 0);
+                    $compExtH = (float)($compRow->EXT_HEIGHT ?? $mc->EXT_HEIGHT ?? 0);
+
+                    $compFlute = $compRow->FLUTE ?? $mc->FLUTE ?? '';
+                    $compPq1 = $compRow->SO_PQ1 ?? $mc->SO_PQ1 ?? '';
+                    $compPq2 = $compRow->SO_PQ2 ?? $mc->SO_PQ2 ?? '';
+                    $compPq3 = $compRow->SO_PQ3 ?? $mc->SO_PQ3 ?? '';
+                    $compPq4 = $compRow->SO_PQ4 ?? $mc->SO_PQ4 ?? '';
+                    $compPq5 = $compRow->SO_PQ5 ?? $mc->SO_PQ5 ?? '';
+
+                    $unitPrice = (float) ($so ? ($so->UNIT_PRICE ?? 0) : 0);
+                    $exRate = (float) ($so ? ($so->EX_RATE ?? 1) : 1);
+                    $doTranAmt = $qty > 0 && $unitPrice > 0 ? round($qty * $unitPrice, 2) : 0.0;
+                    $doBaseAmt = round($doTranAmt * $exRate, 2);
+
+                    $grossM2PerPcs = (float)($compRow->MC_GROSS_M2_PER_PCS ?? $mc->MC_GROSS_M2_PER_PCS ?? 0);
+                    $netM2PerPcs = (float)($compRow->MC_NET_M2_PER_PCS ?? $mc->MC_NET_M2_PER_PCS ?? 0);
+                    $totalGrossM2 = $qty > 0 && $grossM2PerPcs > 0 ? round($qty * $grossM2PerPcs, 4) : 0.0;
+                    $totalNetM2 = $qty > 0 && $netM2PerPcs > 0 ? round($qty * $netM2PerPcs, 4) : 0.0;
+
+                    $grossKgPerPcs = (float)($compRow->MC_GROSS_KG_PER_SET ?? $mc->MC_GROSS_KG_PER_SET ?? 0);
+                    $netKgPerPcs = (float)($compRow->MC_NET_KG_PER_PCS ?? $mc->MC_NET_KG_PER_PCS ?? 0);
+                    $totalGrossKg = $qty > 0 && $grossKgPerPcs > 0 ? round($qty * $grossKgPerPcs, 4) : 0.0;
+                    $totalNetKg = $qty > 0 && $netKgPerPcs > 0 ? round($qty * $netKgPerPcs, 4) : 0.0;
+
+                    $doM3 = 0.0;
+                    if ($compExtL > 0 && $compExtW > 0 && $compExtH > 0 && $qty > 0) {
+                        $doM3 = ($compExtL * $compExtW * $compExtH * $qty) / 1000000000;
+                    } elseif ($compIntL > 0 && $compIntW > 0 && $compIntH > 0 && $qty > 0) {
+                        $doM3 = ($compIntL * $compIntW * $compIntH * $qty) / 1000000000;
+                    }
+
+                    $rowsToInsert[] = array_merge($baseDo, [
+                        'No' => (string) $lineNo,
+                        'COMP' => $compRow->COMP ?? $targetComp,
+                        'Model' => $compModel,
+                        'PD' => $compPDesign,
+                        'PCS_PER_SET' => is_numeric($item['pcs'] ?? null)
+                            ? (float) $item['pcs']
+                            : (float)($compRow->PCS_SET ?? $mc->PCS_SET ?? 1),
+                        'Unit' => $item['unit'] ?? ($request->unit ?? ($so ? ($so->UNIT ?? 'PCS') : 'PCS')),
+                        'Part_Number' => (string) $compPartNumber,
+                        'INT_L' => $compIntL,
+                        'INT_W' => $compIntW,
+                        'INT_H' => $compIntH,
+                        'EXT_L' => $compExtL,
+                        'EXT_W' => $compExtW,
+                        'EXT_H' => $compExtH,
+                        'Flute' => $compFlute,
+                        'PQ1' => $compPq1,
+                        'PQ2' => $compPq2,
+                        'PQ3' => $compPq3,
+                        'PQ4' => $compPq4,
+                        'PQ5' => $compPq5,
+                        'DO_Qty' => $qty,
+                        'UNAPPLIED_FG' => $request->unapply_fg ? 'Y' : 'N',
+                        'DO_M3' => round($doM3, 2),
+                        'SO_Unit_Price' => $unitPrice,
+                        'Ex_Rate' => $exRate,
+                        'DO_Tran_Amt' => $doTranAmt,
+                        'DO_Base_Amt' => $doBaseAmt,
+                        'MC_Gross_M2_Per_Pcs' => $grossM2PerPcs,
+                        'MC_Net_M2_Per_Pcs' => $netM2PerPcs,
+                        'Total_DO_Gross_M2' => $totalGrossM2,
+                        'Total_DO_Net_M2' => $totalNetM2,
+                        'MC_Gross_Kg_Per_Pcs' => $grossKgPerPcs,
+                        'MC_Net_Kg_Per_Pcs' => $netKgPerPcs,
+                        'Total_DO_Gross_KG' => $totalGrossKg,
+                        'Total_DO_Net_KG' => $totalNetKg,
+                    ]);
+
+                    $lineNo++;
+                }
+
+                if (empty($rowsToInsert)) {
+                    // Fallback if no valid items: insert a single legacy row
+                    $rowsToInsert[] = array_merge($baseDo, [
+                        'No' => '1',
+                        'COMP' => $customer->CODE ?? ($customer->AC_Num ?? ''),
+                        'PD' => $request->pd ?? ($so ? ($so->P_DESIGN ?? '') : ''),
+                        'PCS_PER_SET' => is_numeric($request->per_set) ? (float)$request->per_set : 1,
+                        'Unit' => $request->unit ?? ($so ? ($so->UNIT ?? 'PCS') : 'PCS'),
+                        'DO_Qty' => $doQty,
+                        'UNAPPLIED_FG' => $request->unapply_fg ? 'Y' : 'N',
+                    ]);
+                }
+            }
+
             // Insert into DO table
-            DB::table('DO')->insert($doData);
+            DB::table('DO')->insert($rowsToInsert);
 
             // Update SO status based on remaining balance
             if (!empty($soNumber) && $so) {
@@ -604,10 +736,10 @@ class DeliveryOrderController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             $updated = 0;
             $errors = 0;
-            
+
             // Get all DO records with missing data
             $doRecords = DB::table('DO')
                 ->whereRaw('(Del_Code IS NULL OR Del_Code = "")')
@@ -619,11 +751,11 @@ class DeliveryOrderController extends Controller
                 ->orWhereRaw('(Total_DO_Gross_KG = 0 OR Total_DO_Gross_KG IS NULL)')
                 ->orWhereRaw('(Total_DO_Net_KG = 0 OR Total_DO_Net_KG IS NULL)')
                 ->get();
-            
+
             foreach ($doRecords as $do) {
                 try {
                     $updateData = [];
-                    
+
                     // Get Customer data for Del_Code and Group_
                     if (empty($do->Del_Code) || empty($do->Group_)) {
                         // Get Del_Code from SO.D_LOC_Num (which stores geographical code)
@@ -633,59 +765,59 @@ class DeliveryOrderController extends Controller
                                 $updateData['Del_Code'] = $so->D_LOC_Num;
                             }
                         }
-                        
+
                         // Get Group_ from customer
                         if (empty($do->Group_)) {
                             $customer = DB::table('CUSTOMER')
                                 ->where('CODE', $do->AC_Num)
                                 ->first();
-                            
+
                             if ($customer) {
                                 $updateData['Group_'] = $customer->GROUP_ ?? ($customer->Group_ ?? '');
                             }
                         }
                     }
-                    
+
                     // Get Master Card data for M2 and KG calculations
                     if (!empty($do->MCS_Num) && !empty($do->AC_Num)) {
                         $mc = DB::table('MC')
                             ->where('MCS_Num', $do->MCS_Num)
                             ->where('AC_NUM', $do->AC_Num)
                             ->first();
-                        
+
                         if ($mc) {
                             $doQty = (float) ($do->DO_Qty ?? 0);
-                            
+
                             // M2 calculations - MC table uses MC_GROSS_M2_PER_PCS and MC_NET_M2_PER_PCS
                             $grossM2PerPcs = (float) ($mc->MC_GROSS_M2_PER_PCS ?? 0);
                             $netM2PerPcs = (float) ($mc->MC_NET_M2_PER_PCS ?? 0);
-                            
+
                             if ($grossM2PerPcs > 0) {
                                 $updateData['MC_Gross_M2_Per_Pcs'] = $grossM2PerPcs;
                                 $updateData['Total_DO_Gross_M2'] = round($doQty * $grossM2PerPcs, 4);
                             }
-                            
+
                             if ($netM2PerPcs > 0) {
                                 $updateData['MC_Net_M2_Per_Pcs'] = $netM2PerPcs;
                                 $updateData['Total_DO_Net_M2'] = round($doQty * $netM2PerPcs, 4);
                             }
-                            
+
                             // KG calculations - MC table uses MC_GROSS_KG_PER_SET and MC_NET_KG_PER_PCS
                             $grossKgPerPcs = (float) ($mc->MC_GROSS_KG_PER_SET ?? 0);
                             $netKgPerPcs = (float) ($mc->MC_NET_KG_PER_PCS ?? 0);
-                            
+
                             if ($grossKgPerPcs > 0) {
                                 $updateData['MC_Gross_Kg_Per_Pcs'] = $grossKgPerPcs;
                                 $updateData['Total_DO_Gross_KG'] = round($doQty * $grossKgPerPcs, 4);
                             }
-                            
+
                             if ($netKgPerPcs > 0) {
                                 $updateData['MC_Net_Kg_Per_Pcs'] = $netKgPerPcs;
                                 $updateData['Total_DO_Net_KG'] = round($doQty * $netKgPerPcs, 4);
                             }
                         }
                     }
-                    
+
                     // Update record if there's data to update
                     if (!empty($updateData)) {
                         DB::table('DO')
@@ -693,7 +825,7 @@ class DeliveryOrderController extends Controller
                             ->update($updateData);
                         $updated++;
                     }
-                    
+
                 } catch (\Exception $e) {
                     Log::error('Error fixing DO record: ' . $do->DO_Num, [
                         'error' => $e->getMessage()
@@ -701,9 +833,9 @@ class DeliveryOrderController extends Controller
                     $errors++;
                 }
             }
-            
+
             DB::commit();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Data fixed successfully',
@@ -713,11 +845,11 @@ class DeliveryOrderController extends Controller
                     'errors' => $errors
                 ]
             ]);
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error fixing DO data: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error fixing DO data: ' . $e->getMessage()

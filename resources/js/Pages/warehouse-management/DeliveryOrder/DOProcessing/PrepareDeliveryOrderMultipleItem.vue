@@ -587,6 +587,66 @@ const saveDeliveryOrder = async () => {
   }
 
   try {
+    const normalizeNumber = (val) => {
+      if (val === null || val === undefined) return 0
+      const str = val.toString().replace(/,/g, '').trim()
+      const num = Number(str)
+      return Number.isFinite(num) ? num : 0
+    }
+
+    // Base quantity (in sets) used for DO header / Main component
+    const baseToDeliver = normalizeNumber(
+      deliveryOrder.mainToDel || deliveryOrder.toDeliverySet || '0'
+    )
+
+    // Build per-component items array (Main + Fit1-9) for multi-line DO
+    // Komponen yang dianggap "ada" adalah:
+    // - Main, selalu
+    // - Fit yang mempunyai pDesign (hasil mapping dari MC)
+    // Komponen lain (tanpa pDesign) akan dikirim dengan qty 0 sehingga tidak dibuat baris DO.
+    const items = Array.isArray(deliveryOrder.itemDetails)
+      ? deliveryOrder.itemDetails.map(row => {
+          const pack = Array.isArray(deliveryOrder.packingItems)
+            ? deliveryOrder.packingItems.find(p => p && p.name === row.name)
+            : null
+
+          const hasComponent =
+            row &&
+            row.name &&
+            (row.name === 'Main' || (row.pDesign && row.pDesign !== ''))
+
+          let rawToDeliver
+
+          if (!hasComponent) {
+            // Baris dummy (Fit2-Fit9 yang tidak ada di MC) -> selalu 0
+            rawToDeliver = '0'
+          } else if (row && row.toDeliver !== undefined && row.toDeliver !== null && row.toDeliver !== '') {
+            // Prioritas 1: nilai To Deliver per baris di detail SO
+            rawToDeliver = row.toDeliver
+          } else if (pack && pack.toDel !== undefined && pack.toDel !== null && pack.toDel !== '') {
+            // Prioritas 2: nilai To Del dari Packing per komponen
+            rawToDeliver = pack.toDel
+          } else {
+            // Fallback: gunakan qty utama (mainToDel / To Delivery Set)
+            // untuk semua komponen yang benar-benar ada di MC (Main + Fit)
+            rawToDeliver = baseToDeliver
+          }
+
+          return {
+            name: row.name || '',
+            p_design: row.pDesign || '',
+            pcs: row.pcs || '',
+            unit: row.unit || '',
+            to_deliver: normalizeNumber(rawToDeliver),
+            // Optional packing helpers (digunakan untuk laporan / pengembangan berikutnya)
+            pcs_per_bdl: pack && pack.pcsRolls ? normalizeNumber(pack.pcsRolls) : 0,
+            rolls: pack && pack.rolls ? normalizeNumber(pack.rolls) : 0,
+            qty: pack && pack.qty ? normalizeNumber(pack.qty) : 0,
+            loose_qty: pack && pack.looseQty ? normalizeNumber(pack.looseQty) : 0
+          }
+        })
+      : []
+
     const deliveryOrderData = {
       customer_code: selectedCustomer.code,
       vehicle_number: selectedVehicle.vehicleNo,
@@ -607,8 +667,10 @@ const saveDeliveryOrder = async () => {
       pd: deliveryOrder.mainPD,
       per_set: deliveryOrder.mainPCS,
       unit: deliveryOrder.mainUnit,
-      do_qty: Number((deliveryOrder.mainToDel || '0').toString().replace(/,/g, '')) || 0,
-      pcs_per_bdl: deliveryOrder.pcsPerBdl || ''
+      do_qty: normalizeNumber(deliveryOrder.mainToDel || '0'),
+      pcs_per_bdl: deliveryOrder.pcsPerBdl || '',
+      // New: per-component items (Main + Fit1-9) for multi-line DO insert
+      items
     }
 
     console.log('Saving delivery order:', deliveryOrderData)

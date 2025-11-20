@@ -1647,27 +1647,49 @@ class SalesOrderController extends Controller
                 $itemDetails['pcs_per_bdl'] = (float) $masterCard->PCS_PER_BLD;
             }
 
-            // Get fittings from master card if available
+            // Get fittings from master card components if available
             $fittings = [];
-            if ($masterCard) {
-                // Convert object to array for easier access
-                $mcArray = (array)$masterCard;
 
-                // Check for fitting data in MC table
-                for ($i = 1; $i <= 9; $i++) {
-                    $designField = "FIT{$i}_DESIGN";
-                    $pcsField = "FIT{$i}_PCS";
-                    $unitField = "FIT{$i}_UNIT";
+            try {
+                if (!empty($salesOrder->MCS_Num) && !empty($salesOrder->AC_Num)) {
+                    // Fetch all MC rows for this master card & customer
+                    $mcComponents = DB::table('MC')
+                        ->where('MCS_Num', $salesOrder->MCS_Num)
+                        ->where('AC_NUM', $salesOrder->AC_Num)
+                        ->orderBy('COMP')
+                        ->get();
 
-                    // Check if design field exists and has value
-                    if (isset($mcArray[$designField]) && !empty($mcArray[$designField])) {
+                    foreach ($mcComponents as $componentRow) {
+                        $compName = trim((string) ($componentRow->COMP ?? ''));
+
+                        // Skip Main row; only use Fit components as fittings
+                        if ($compName === '' || strcasecmp($compName, 'Main') === 0) {
+                            continue;
+                        }
+
                         $fittings[] = [
-                            'design' => $mcArray[$designField],
-                            'pcs' => $mcArray[$pcsField] ?? '',
-                            'unit' => $mcArray[$unitField] ?? '',
+                            // Optional name for debugging/other UIs; frontend consumers use index-based mapping
+                            'name' => $compName,
+                            // Use P_DESIGN, PCS_SET and UNIT from each MC component row
+                            'design' => $componentRow->P_DESIGN ?? '',
+                            'pcs' => $componentRow->PCS_SET ?? '',
+                            'unit' => $componentRow->UNIT ?? '',
                         ];
+
+                        // Limit to first 9 components (Fit1..Fit9)
+                        if (count($fittings) >= 9) {
+                            break;
+                        }
                     }
                 }
+            } catch (\Exception $e) {
+                Log::warning('Error fetching fittings from MC components; falling back to empty fittings array', [
+                    'so_number' => $soNumber,
+                    'mc_seq' => $salesOrder->MCS_Num ?? null,
+                    'customer_code' => $salesOrder->AC_Num ?? null,
+                    'error' => $e->getMessage(),
+                ]);
+                $fittings = [];
             }
 
             Log::info('Successfully prepared response', [

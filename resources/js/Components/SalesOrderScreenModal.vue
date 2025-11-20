@@ -2,7 +2,7 @@
   <div v-if="isOpen" class="fixed inset-0 z-50 overflow-y-auto">
     <!-- Backdrop -->
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" @click="closeModal"></div>
-    
+
     <!-- Modal Container -->
     <div class="flex min-h-full items-center justify-center p-4">
       <div class="relative w-full max-w-6xl bg-white rounded-lg shadow-xl flex flex-col max-h-[calc(100vh-4rem)] overflow-hidden">
@@ -17,7 +17,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Order Group:</label>
-              <input 
+              <input
                 v-model="orderInfo.orderGroup"
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -26,7 +26,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Order Mode:</label>
-              <input 
+              <input
                 v-model="orderInfo.orderMode"
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -38,7 +38,7 @@
           <!-- Sales Order Entry Section -->
           <div class="space-y-4">
             <h4 class="text-md font-semibold text-gray-800">Sales Order Entry</h4>
-            
+
             <!-- Sales Order Table -->
             <div class="border border-gray-200 rounded-lg overflow-hidden overflow-x-auto">
               <table class="min-w-[720px] divide-y divide-gray-200">
@@ -53,8 +53,8 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr 
-                    v-for="(entry, index) in salesOrderEntries" 
+                  <tr
+                    v-for="(entry, index) in salesOrderEntries"
                     :key="index"
                     @click="selectEntry(index)"
                     :class="[
@@ -65,25 +65,25 @@
                     <td class="px-3 py-2 text-sm text-gray-900">{{ String(index + 1).padStart(2, '0') }}</td>
                     <td class="px-3 py-2">
                       <div class="flex items-center space-x-1">
-                        <input 
+                        <input
                           v-model="entry.sOrder"
                           type="text"
                           class="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                           placeholder="S/Order"
                         >
-                        <input 
+                        <input
                           v-model="entry.sOrder2"
                           type="text"
                           class="w-12 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                           placeholder="0"
                         >
-                        <input 
+                        <input
                           v-model="entry.sOrder3"
                           type="text"
                           class="w-12 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                           placeholder="0"
                         >
-                        <button 
+                        <button
                           @click="openSalesOrderTable"
                           class="p-1 text-blue-600 hover:bg-blue-100 rounded"
                           title="Sales Order Table"
@@ -125,7 +125,7 @@
           <!-- Item Details Table -->
           <div class="space-y-4">
             <h4 class="text-md font-semibold text-gray-800">Item Details</h4>
-            
+
             <div class="border border-gray-200 rounded-lg overflow-hidden overflow-x-auto">
               <table class="min-w-[720px] divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -143,7 +143,7 @@
                   <tr v-for="(item, index) in itemDetails" :key="index">
                     <td class="px-3 py-2 text-sm text-gray-900">{{ item.name }}</td>
                     <td class="px-3 py-2">
-                      <input 
+                      <input
                         v-model="item.pDesign"
                         type="text"
                         class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
@@ -151,7 +151,7 @@
                       >
                     </td>
                     <td class="px-3 py-2">
-                      <input 
+                      <input
                         v-model="item.pcs"
                         type="text"
                         class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
@@ -159,7 +159,7 @@
                       >
                     </td>
                     <td class="px-3 py-2">
-                      <input 
+                      <input
                         v-model="item.unit"
                         type="text"
                         class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
@@ -167,7 +167,7 @@
                       >
                     </td>
                     <td class="px-3 py-2">
-                      <input 
+                      <input
                         v-model="item.partNumber"
                         type="text"
                         class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
@@ -175,7 +175,7 @@
                       >
                     </td>
                     <td class="px-3 py-2">
-                      <input 
+                      <input
                         v-model="item.doQty"
                         type="text"
                         class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
@@ -183,7 +183,7 @@
                       >
                     </td>
                     <td class="px-3 py-2">
-                      <input 
+                      <input
                         v-model="item.doKg"
                         type="text"
                         class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
@@ -207,7 +207,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Model:</label>
-                <input 
+                <input
                   v-model="bottomInfo.model"
                   type="text"
                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white shadow-sm"
@@ -216,7 +216,7 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">S/O Ins1:</label>
-                <input 
+                <input
                   v-model="bottomInfo.soIns1"
                   type="text"
                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white shadow-sm"
@@ -225,7 +225,7 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">S/O Ins2:</label>
-                <input 
+                <input
                   v-model="bottomInfo.soIns2"
                   type="text"
                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white shadow-sm"
@@ -243,14 +243,14 @@
             Select sales order and configure items for delivery
           </div>
           <div class="flex items-center space-x-3">
-            <button 
+            <button
               @click="closeModal"
               class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all shadow-sm"
             >
               <i class="fas fa-times mr-2"></i>
               Cancel
             </button>
-            <button 
+            <button
               @click="handleSave"
               class="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 border border-transparent rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-lg"
             >
@@ -263,15 +263,16 @@
     </div>
 
     <!-- Sales Order Table Modal -->
-    <SalesOrderTableModal 
+    <SalesOrderTableModal
       :is-open="showSalesOrderTableModal"
       :customer-data="customerData"
+      :deduplicate-by-so="true"
       @close="showSalesOrderTableModal = false"
       @select="handleSalesOrderSelect"
     />
 
     <!-- Sales Order Detail Modal -->
-    <SalesOrderDetailModal 
+    <SalesOrderDetailModal
       :is-open="showSalesOrderDetailModal"
       :sales-order-data="currentSalesOrderData"
       @close="showSalesOrderDetailModal = false"
@@ -284,6 +285,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useToast } from '@/Composables/useToast'
+import axios from 'axios'
 import SalesOrderTableModal from './SalesOrderTableModal.vue'
 import SalesOrderDetailModal from './SalesOrderDetailModal.vue'
 
@@ -354,20 +356,55 @@ const openSalesOrderTable = () => {
   showSalesOrderTableModal.value = true
 }
 
-const handleSalesOrderSelect = (selectedOrder) => {
+const loadItemDetailsFromSo = async (soNumber) => {
+  if (!soNumber) return
+  try {
+    const response = await axios.get(`/api/sales-order/${soNumber}/detail`)
+    if (response.data && response.data.success) {
+      const data = response.data.data || {}
+      const details = data.item_details || {}
+
+      const mainRow = itemDetails.value.find(row => row.name === 'Main')
+      if (mainRow) {
+        mainRow.pDesign = details.pd ?? ''
+        mainRow.pcs = details.pcs ?? ''
+        mainRow.unit = details.unit ?? ''
+      }
+
+      if (Array.isArray(data.fittings)) {
+        data.fittings.forEach((fitting, index) => {
+          if (index < 9) {
+            const row = itemDetails.value[index + 1]
+            if (row) {
+              row.pDesign = fitting.design || ''
+              row.pcs = fitting.pcs || ''
+              row.unit = fitting.unit || ''
+            }
+          }
+        })
+      }
+    } else if (response.data && response.data.message) {
+      error(response.data.message)
+    }
+  } catch (e) {
+    error('Error loading sales order details')
+  }
+}
+
+const handleSalesOrderSelect = async (selectedOrder) => {
   // Update the current sales order entry with selected order data
   if (selectedEntryIndex.value >= 0 && selectedEntryIndex.value < salesOrderEntries.value.length) {
     const entry = salesOrderEntries.value[selectedEntryIndex.value]
-    
+
     // Parse SO number format: MM-YYYY-SEQ (e.g., "09-2025-03777")
     const soParts = selectedOrder.soNumber.split('-')
-    
+
     if (soParts.length === 3) {
       // Split the SO number into parts
       const month = soParts[0]  // MM (e.g., "09")
       const year = soParts[1]   // YYYY (e.g., "2025")
       const sequence = soParts[2] // SEQ (e.g., "03777")
-      
+
       // Fill the three textboxes with parsed data
       entry.sOrder = month      // First textbox: Month (MM)
       entry.sOrder2 = year      // Second textbox: Year (YYYY)
@@ -379,11 +416,15 @@ const handleSalesOrderSelect = (selectedOrder) => {
       entry.sOrder2 = ''
       entry.sOrder3 = ''
     }
-    
+
     // Store the complete selected order data for use in Sales Order Detail
     entry.selectedOrderData = selectedOrder
     entry.mcardSeq = selectedOrder.mcardSeq || ''
     entry.pOrderRef = selectedOrder.pOrderRef || selectedOrder.customerPORef || ''
+
+    if (selectedOrder.soNumber) {
+      await loadItemDetailsFromSo(selectedOrder.soNumber)
+    }
   }
   showSalesOrderTableModal.value = false
   success('Sales order selected successfully')
@@ -394,15 +435,15 @@ const currentSalesOrderData = ref({})
 
 const handleSave = () => {
   // Check if any sales order entry is filled
-  const hasValidEntry = salesOrderEntries.value.some(entry => 
+  const hasValidEntry = salesOrderEntries.value.some(entry =>
     entry.sOrder && entry.sOrder2 && entry.sOrder3
   )
-  
+
   if (!hasValidEntry) {
     error('Please select a sales order entry first')
     return
   }
-  
+
   // Get the selected entry data
   const selectedEntry = salesOrderEntries.value[selectedEntryIndex.value]
   currentSalesOrderData.value = {
@@ -414,7 +455,7 @@ const handleSave = () => {
     bottomInfo,
     selectedOrderData: selectedEntry.selectedOrderData || null
   }
-  
+
   // Close current modal and open Sales Order Detail Modal
   showSalesOrderDetailModal.value = true
   success('Opening Sales Order Detail Screen')
