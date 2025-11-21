@@ -23,7 +23,7 @@
                         <div class="relative bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-100 p-8 rounded-2xl shadow-2xl border-t-4 border-cyan-500 overflow-hidden mb-8 animate-fade-in-up">
                             <div class="absolute -top-16 -right-16 w-40 h-40 bg-cyan-200 rounded-full opacity-30"></div>
                             <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-teal-200 rounded-full opacity-30"></div>
-                            
+
                             <div class="flex items-center mb-6 pb-3 border-b border-gray-200 relative z-10">
                                 <div class="p-2 bg-gradient-to-r from-cyan-500 to-teal-600 rounded-lg mr-4 shadow-md">
                                     <i class="fas fa-edit text-white"></i>
@@ -196,7 +196,7 @@
                                         Delete
                                     </button>
                                     <div v-else></div>
-                                    
+
                                     <div class="flex gap-3">
                                         <button
                                             type="button"
@@ -280,6 +280,30 @@
                                     <i class="fas fa-list mr-2"></i>
                                     View Tax Indices
                                 </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-md border-t-4 border-green-400 p-6">
+                            <div class="flex items-center mb-2">
+                                <div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-400 to-teal-400 rounded-lg mr-3">
+                                    <i class="fas fa-print text-white text-2xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800">Quick Links</h3>
+                            </div>
+                            <hr class="my-2 border-green-100">
+                            <div class="space-y-3">
+                                <a
+                                    href="/warehouse-management/invoice/setup/print-customer-sales-tax-index"
+                                    class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition"
+                                >
+                                    <span class="inline-flex items-center justify-center w-9 h-9 bg-green-400 rounded-lg mr-3">
+                                        <i class="fas fa-file-alt text-white text-xl"></i>
+                                    </span>
+                                    <div>
+                                        <div class="font-bold text-green-800">View & Print Tax Index</div>
+                                        <div class="text-xs text-green-700">Print customer's sales tax indices</div>
+                                    </div>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -377,7 +401,7 @@ const loadCustomerAccounts = async () => {
     try {
         const response = await axios.get('/api/customers-with-status');
         const data = response.data;
-        
+
         if (Array.isArray(data)) {
             customers.value = data;
         } else if (data.data && Array.isArray(data.data)) {
@@ -398,7 +422,7 @@ const selectCustomer = async (account) => {
         name: account.customer_name
     };
     showCustomerModal.value = false;
-    
+
     // Check if customer has existing indices
     await checkCustomerIndices();
 };
@@ -406,7 +430,7 @@ const selectCustomer = async (account) => {
 // Check if customer has existing tax indices
 const checkCustomerIndices = async () => {
     if (!form.value.customer_code) return;
-    
+
     try {
         const response = await axios.get(`/api/invoices/customer-tax-indices/${form.value.customer_code}`);
         if (response.data.success && response.data.data.length > 0) {
@@ -474,24 +498,24 @@ const handleSave = async () => {
         alert('Please select a customer.');
         return;
     }
-    
+
     if (!form.value.index_number || form.value.index_number < 1) {
         alert('Please enter a valid index number.');
         return;
     }
-    
+
     if (!form.value.tax_group_code) {
         alert('Please select a tax group.');
         return;
     }
-    
+
     if (!confirm('Confirm Saving / Updating ?')) {
         return;
     }
-    
+
     try {
         const response = await axios.post('/api/invoices/customer-tax-indices', form.value);
-        
+
         if (response.data.success) {
             alert('Customer sales tax index saved successfully!');
             recordMode.value = 'review';
@@ -507,12 +531,12 @@ const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this tax index?')) {
         return;
     }
-    
+
     try {
         const response = await axios.delete(
             `/api/invoices/customer-tax-indices/${form.value.customer_code}/${form.value.index_number}`
         );
-        
+
         if (response.data.success) {
             alert('Tax index deleted successfully!');
             handleCancel();

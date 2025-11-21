@@ -745,6 +745,19 @@ return Inertia::render('warehouse-management/Invoice/Setup/DefineTaxType');
 
 Route::get('/warehouse-management/invoice/setup/define-customer-sales-tax-index', [App\Http\Controllers\Invoice\CustomerSalesTaxIndexController::class, 'index'])->name('vue.warehouse-management.invoice.setup.define-customer-sales-tax-index');
 
+// Invoice → Setup → View & Print (Tax masters)
+Route::get('/warehouse-management/invoice/setup/print-tax-type', function () {
+return Inertia::render('warehouse-management/Invoice/Setup/PrintTaxType');
+})->name('vue.warehouse-management.invoice.setup.print-tax-type');
+
+Route::get('/warehouse-management/invoice/setup/print-tax-group', function () {
+return Inertia::render('warehouse-management/Invoice/Setup/PrintTaxGroup');
+})->name('vue.warehouse-management.invoice.setup.print-tax-group');
+
+Route::get('/warehouse-management/invoice/setup/print-customer-sales-tax-index', function () {
+return Inertia::render('warehouse-management/Invoice/Setup/PrintCustomerSalesTaxIndex');
+})->name('vue.warehouse-management.invoice.setup.print-customer-sales-tax-index');
+
 Route::get('/warehouse-management/invoice/setup/invoice-configuration', function () {
 return Inertia::render('warehouse-management/Invoice/Setup/SetupInvoiceConfiguration');
 })->name('vue.warehouse-management.invoice.setup.invoice-configuration');

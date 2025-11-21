@@ -200,7 +200,7 @@
                             </div>
                             <hr class="my-2 border-cyan-100">
                             <div class="space-y-3 mt-4">
-                                <a href="#" class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition">
+                                <a href="/warehouse-management/invoice/setup/print-tax-group" class="flex items-center p-3 rounded-lg bg-green-50 hover:bg-green-100 transition">
                                     <span class="inline-flex items-center justify-center w-9 h-9 bg-green-400 rounded-lg mr-3">
                                         <i class="fas fa-print text-white text-xl"></i>
                                     </span>
