@@ -47,6 +47,7 @@ use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\VehicleClassController;
 use App\Http\Controllers\DeliveryOrderController;
+use App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController;
 
 // Test Routes
 Route::get('/test-vue', function () {
@@ -208,15 +209,15 @@ Route::get('/system-security/view-print-user', [UserController::class, 'vueViewP
         })->name('vue.sales-order.setup.print-mc-auto-wo');
 
 // Sales Order Transaction - Prepare MC SO
-Route::get('/sales-order/transaction/prepare-mc-so', function () {
-return Inertia::render('sales-management/sales-order/Transaction/PrepareMCSO');
-})->name('vue.sales-order.transaction.prepare-mc-so');
+        Route::get('/sales-order/transaction/prepare-mc-so', function () {
+        return Inertia::render('sales-management/sales-order/Transaction/PrepareMCSO');
+        })->name('vue.sales-order.transaction.prepare-mc-so');
 
         // Sales Order Product Design API (with CSRF protection)
-        Route::post('/api/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign']);
+        Route::post('/api/sales-order/product-design', [App\Http\Controllers\SalesOrderController::class, 'saveProductDesign'])->middleware('auth');
 
         // Sales Order Delivery Schedule API (with CSRF protection)
-        Route::post('/api/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule']);
+        Route::post('/api/sales-order/delivery-schedule', [App\Http\Controllers\SalesOrderController::class, 'saveDeliverySchedule'])->middleware('auth');
 
         // Sales Order Transaction - Prepare SB SO
         Route::get('/sales-order/transaction/prepare-sb-so', function () {
@@ -278,7 +279,7 @@ return Inertia::render('sales-management/sales-order/Transaction/PrintSO');
         });
 
         // Print SO API routes
-        Route::post('/api/so-report', [App\Http\Controllers\SalesManagement\SalesOrder\Report\SalesOrderReportController::class, 'apiGenerateSoReport']);
+        Route::post('/api/so-report', [SalesOrderReportController::class, 'apiGenerateSoReport']);
         Route::get('/api/sales-order/{soNumber}/delivery-schedules', [SalesOrderController::class, 'getDeliverySchedules']);
 
         // Sales Order API routes

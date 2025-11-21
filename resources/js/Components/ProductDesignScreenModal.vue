@@ -563,7 +563,8 @@ const saveDesign = () => {
   }
 
   const designData = {
-    items: items.filter(item => item.quantity && item.unitPrice),
+    // Include all items that have a quantity so Delivery Schedule can see Main + Fit quantities
+    items: items.filter(item => item.quantity),
     dimensions: dimensionItems.filter(item => item.totalGrossKg),
     totalAmount: totalAmount.value,
     totalGrossKg: totalGrossKg.value
