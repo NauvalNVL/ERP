@@ -1530,43 +1530,65 @@ const saveProductDesign = async (designData) => {
     // Use globally configured axios instance (with CSRF + cookies)
     const response = await window.axios.post('/api/sales-order/product-design', requestData, {
       headers: {
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
       }
     })
 
     const data = response.data
 
     if (data.success) {
-  console.log('Product design saved:', designData)
+      console.log('Product design saved:', designData)
 
-  // Persist key values from design to order details for SO creation
-  try {
-    const mainItem = Array.isArray(designData.items) ? designData.items[0] : null
-    if (mainItem) {
-      if (mainItem.unitPrice != null) {
-        orderDetails.unitPrice = Number(mainItem.unitPrice) || 0
+      // Persist key values from design to order details for SO creation
+      try {
+        const hadInitialSetQty = Number(orderDetails.setQuantity) > 0
+        const mainItem = Array.isArray(designData.items) ? designData.items[0] : null
+        if (mainItem) {
+          if (mainItem.unitPrice != null) {
+            orderDetails.unitPrice = Number(mainItem.unitPrice) || 0
+          }
+          if (mainItem.quantity != null) {
+            orderDetails.setQuantity = Number(mainItem.quantity) || 0
+          }
+          if (mainItem.unit) {
+            orderDetails.uom = mainItem.unit
+          }
+        }
+
+        // Map quantity per component (Main, Fit1-9) from Product Design
+        const componentQtyMap = {}
+        if (Array.isArray(designData.items)) {
+          designData.items.forEach((item) => {
+            const qty = Number(item.quantity) || 0
+            const name = (item.name || '').toString()
+            if (!name || qty <= 0) return
+            componentQtyMap[name] = qty
+          })
+        }
+        orderDetails.productDesignQuantities = componentQtyMap
+
+        const totalDesignQty = Array.isArray(designData.items)
+          ? designData.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+          : 0
+        if (!hadInitialSetQty && totalDesignQty > 0) {
+          orderDetails.mainQuantity = totalDesignQty
+          orderDetails.isProductDesignQuantity = true
+        }
+      } catch (e) {
+        console.warn('Failed to map product design values to order details:', e)
       }
-      if (mainItem.quantity != null) {
-        orderDetails.setQuantity = Number(mainItem.quantity) || 0
-      }
-      if (mainItem.unit) {
-        orderDetails.uom = mainItem.unit
-      }
-    }
-  } catch (e) {
-    console.warn('Failed to map product design values to order details:', e)
-  }
 
-  showProductDesignModal.value = false
-  success('Product design saved successfully')
+      showProductDesignModal.value = false
+      success('Product design saved successfully')
 
-  // Fetch customer alternate delivery location data and populate orderDetails
-  await fetchCustomerAlternateDeliveryData()
+      // Fetch customer alternate delivery location data and populate orderDetails
+      await fetchCustomerAlternateDeliveryData()
 
-  // After saving product design, open Delivery Location modal
-  setTimeout(() => {
-    showDeliveryLocationModal.value = true
-  }, 400)
+      // After saving product design, open Delivery Location modal
+      setTimeout(() => {
+        showDeliveryLocationModal.value = true
+      }, 400)
     } else {
       throw new Error(data.message || 'Failed to save product design')
     }

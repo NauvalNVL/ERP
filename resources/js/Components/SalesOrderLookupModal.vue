@@ -98,7 +98,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                   <tr 
-                    v-for="(order, index) in salesOrders" 
+                    v-for="order in salesOrders" 
                     :key="order.so_number"
                     @click="selectOrder(order)"
                     :class="[

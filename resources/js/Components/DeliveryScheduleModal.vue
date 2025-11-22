@@ -174,7 +174,9 @@
                       v-model="scheduleEntry.set"
                       type="number"
                       min="0"
-                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      :class="['w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500', isProductDesignQuantity ? 'bg-gray-100 text-gray-600' : '']"
+                      :readonly="isProductDesignQuantity"
+                      :disabled="isProductDesignQuantity"
                       @input="calculateTotals"
                     >
                   </div>
@@ -184,9 +186,9 @@
                       v-model="scheduleEntry.main"
                       type="number"
                       min="0"
-                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-100 text-gray-600"
-                      readonly
-                      disabled
+                      :class="['w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500', !isMainEditable ? 'bg-gray-100 text-gray-600' : '']"
+                      :readonly="!isMainEditable"
+                      :disabled="!isMainEditable"
                     >
                   </div>
                 </div>
@@ -199,9 +201,9 @@
                       v-model="scheduleEntry[`fit${i}`]"
                       type="number"
                       min="0"
-                      class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-100 text-gray-600"
-                      readonly
-                      disabled
+                      :class="['w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500', !isFitEditable(i) ? 'bg-gray-100 text-gray-600' : '']"
+                      :readonly="!isFitEditable(i)"
+                      :disabled="!isFitEditable(i)"
                       @input="calculateTotals"
                     >
                   </div>
@@ -281,32 +283,49 @@
           <!-- Summary Section -->
           <div class="bg-gray-50 rounded-lg p-4 mb-6">
             <h4 class="text-sm font-medium text-gray-700 mb-3">Order Summary</h4>
+
+            <!-- Per-component quantities (Main + Fit1-9) -->
+            <div class="mb-4">
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                <div>
+                  <div class="text-xs text-gray-600 mb-1">Main</div>
+                  <div class="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
+                    {{ orderComponentQuantities.Main || 0 }}
+                  </div>
+                </div>
+                <div v-for="i in 9" :key="`summary-fit-${i}`">
+                  <div class="text-xs text-gray-600 mb-1">Fit {{ i }}</div>
+                  <div class="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
+                    {{ orderComponentQuantities[`Fit${i}`] || 0 }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order total from all components -->
+            <div class="mb-4">
+              <div class="text-xs text-gray-600 mb-1">Order Total</div>
+              <div class="border border-gray-300 rounded px-2 py-1 text-sm font-medium bg-white">
+                {{ orderComponentsTotal || 0 }}
+              </div>
+            </div>
+
+            <!-- Existing summary info (adapted) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-3">
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-600">Entry Total:</span>
-                  <div class="flex space-x-4">
-                    <span class="font-medium">{{ entryTotal.set || 0 }}</span>
-                    <span class="font-medium">{{ entryTotal.main || 0 }}</span>
-                  </div>
+                  <span class="text-gray-600">Entry Total (Main):</span>
+                  <span class="font-medium">{{ entryTotal.main || 0 }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-600">Order Total:</span>
-                  <div class="flex space-x-4">
-                    <span class="font-medium">{{ orderTotal.set || 0 }}</span>
-                    <span class="font-medium">{{ orderTotal.main || 0 }}</span>
-                  </div>
+                  <span class="text-gray-600">Order Total (Main):</span>
+                  <span class="font-medium">{{ orderTotal.main || 0 }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-600">Remaining:</span>
-                  <div class="flex space-x-4">
-                    <span class="font-medium" :class="remaining.set < 0 ? 'text-red-600' : 'text-green-600'">
-                      {{ remaining.set }}
-                    </span>
-                    <span class="font-medium" :class="remaining.main < 0 ? 'text-red-600' : 'text-green-600'">
-                      {{ remaining.main }}
-                    </span>
-                  </div>
+                  <span class="text-gray-600">Remaining (Main):</span>
+                  <span class="font-medium" :class="remaining.main < 0 ? 'text-red-600' : 'text-green-600'">
+                    {{ remaining.main }}
+                  </span>
                 </div>
               </div>
               <div class="space-y-2">
@@ -500,11 +519,148 @@ const activeComponentLabels = computed(() => {
   return labels
 })
 
+const isProductDesignQuantity = computed(() => {
+  return !!(props.orderDetails && props.orderDetails.isProductDesignQuantity)
+})
+
+// Components that have quantity set in Product Design (and exist in MC components)
+const editableComponentLabels = computed(() => {
+  const result = new Set()
+  const pdQty = (props.orderDetails && props.orderDetails.productDesignQuantities) || {}
+  const active = activeComponentLabels.value
+
+  if (!active || active.size === 0) {
+    return result
+  }
+
+  Object.keys(pdQty || {}).forEach((key) => {
+    const qty = Number(pdQty[key]) || 0
+    if (qty <= 0) return
+
+    const normalized = key.toString().replace(/\s+/g, '') // Handle "Fit 1" vs "Fit1"
+    if (normalized === 'Main' && active.has('Main')) {
+      result.add('Main')
+    }
+
+    const fitMatch = normalized.match(/^Fit(\d)$/i)
+    if (fitMatch) {
+      const label = `Fit${fitMatch[1]}`
+      if (active.has(label)) {
+        result.add(label)
+      }
+    }
+  })
+
+  return result
+})
+
+const isMainEditable = computed(() => {
+  if (!isProductDesignQuantity.value) return false
+  return editableComponentLabels.value.has('Main')
+})
+
+const isFitEditable = (index) => {
+  if (!isProductDesignQuantity.value) return false
+  const label = `Fit${index}`
+  return editableComponentLabels.value.has(label)
+}
+
+// Per-component order quantities for summary (Main + Fit1-9)
+const orderComponentQuantities = computed(() => {
+  const result = {
+    Main: 0,
+    Fit1: 0,
+    Fit2: 0,
+    Fit3: 0,
+    Fit4: 0,
+    Fit5: 0,
+    Fit6: 0,
+    Fit7: 0,
+    Fit8: 0,
+    Fit9: 0
+  }
+
+  const active = activeComponentLabels.value
+  const pdQty = (props.orderDetails && props.orderDetails.productDesignQuantities) || {}
+
+  const normalizeKey = (key) => key.toString().replace(/\s+/g, '')
+
+  const getPdQtyForLabel = (label) => {
+    // Try exact key first (e.g. 'Main', 'Fit1')
+    if (pdQty[label] != null) {
+      return Number(pdQty[label]) || 0
+    }
+
+    // Then try with space (e.g. 'Fit 1')
+    if (label.startsWith('Fit')) {
+      const idx = label.replace('Fit', '')
+      const spaced = `Fit ${idx}`
+      if (pdQty[spaced] != null) {
+        return Number(pdQty[spaced]) || 0
+      }
+    }
+
+    // Finally, try normalized match
+    const target = normalizeKey(label)
+    const entry = Object.entries(pdQty).find(([k]) => normalizeKey(k) === target)
+    if (entry) {
+      return Number(entry[1]) || 0
+    }
+
+    return 0
+  }
+
+  if (isProductDesignQuantity.value && active && active.size > 0) {
+    // Use per-component quantities from Product Design
+    if (active.has('Main')) {
+      result.Main = getPdQtyForLabel('Main')
+    }
+    for (let i = 1; i <= 9; i++) {
+      const label = `Fit${i}`
+      if (active.has(label)) {
+        result[label] = getPdQtyForLabel(label)
+      }
+    }
+  } else {
+    // Fallback: use initial set quantity for Main only
+    const val = props.orderDetails?.setQuantity
+    const setQty = typeof val === 'string' ? parseFloat(val) : Number(val)
+    if (!isNaN(setQty) && setQty > 0) {
+      result.Main = setQty
+    }
+  }
+
+  return result
+})
+
+const orderComponentsTotal = computed(() => {
+  const q = orderComponentQuantities.value
+  return (
+    (Number(q.Main) || 0) +
+    (Number(q.Fit1) || 0) +
+    (Number(q.Fit2) || 0) +
+    (Number(q.Fit3) || 0) +
+    (Number(q.Fit4) || 0) +
+    (Number(q.Fit5) || 0) +
+    (Number(q.Fit6) || 0) +
+    (Number(q.Fit7) || 0) +
+    (Number(q.Fit8) || 0) +
+    (Number(q.Fit9) || 0)
+  )
+})
+
 // Computed properties for totals
 const entryTotal = computed(() => {
   const totals = scheduleEntries.value.reduce((acc, entry) => {
     acc.set += parseInt(entry.set) || 0
-    acc.main += parseInt(entry.main) || 0
+
+    // Main total = Main + all Fit quantities (if any)
+    let mainAndFits = parseInt(entry.main) || 0
+    for (let i = 1; i <= 9; i++) {
+      mainAndFits += parseInt(entry[`fit${i}`]) || 0
+    }
+    acc.main += mainAndFits
+
     return acc
   }, { set: 0, main: 0 })
 
@@ -587,8 +743,8 @@ const addScheduleEntry = () => {
   const newEntry = {
     id: isEditing.value ? scheduleEntry.id : Date.now(),
     ...scheduleEntry,
-    // Ensure Main mirrors Set and numbering is automatic
-    main: scheduleEntry.set,
+    // Ensure Main mirrors Set when not using product-design-driven quantities
+    main: isProductDesignQuantity.value ? scheduleEntry.main : scheduleEntry.set,
     no: (isEditing.value ? scheduleEntry.no : (scheduleEntries.value.length + 1).toString())
   }
 
@@ -640,8 +796,12 @@ const calculateTotals = () => {
   // This method is called when quantities change
   // The computed properties will automatically update
 }
-// Keep Main in sync with Set input
+// Keep Main in sync with Set input (only when not using product-design-driven quantities)
 watch(() => scheduleEntry.set, (val) => {
+  if (isProductDesignQuantity.value) {
+    return
+  }
+
   scheduleEntry.main = val
 
   const labels = activeComponentLabels.value
@@ -695,9 +855,9 @@ const saveSchedule = async () => {
     return
   }
 
-  // Validate totals
-  const totalMain = Number(entryTotal.value.main)
-  const requiredMain = Number(orderTotal.value.main)
+  // Validate totals (use Main + all Fit quantities as scheduled qty)
+  const totalMain = Number(entryTotal.value.main) || 0
+  const requiredMain = Number(orderComponentsTotal.value || orderTotal.value.main || 0)
   if (totalMain !== requiredMain) {
     // Show popup with code 200105
     errorInfo.code = '200105'
@@ -710,7 +870,12 @@ const saveSchedule = async () => {
   let runningTotal = 0
   for (let i = 0; i < scheduleEntries.value.length; i++) {
     const e = scheduleEntries.value[i]
-    const qty = Number(e.main || e.set || 0)
+    // Per-entry scheduled qty = Main + all Fit quantities; fallback to Set if they are all zero
+    let qtyMainAndFits = Number(e.main) || 0
+    for (let j = 1; j <= 9; j++) {
+      qtyMainAndFits += Number(e[`fit${j}`]) || 0
+    }
+    const qty = qtyMainAndFits > 0 ? qtyMainAndFits : (Number(e.set) || 0)
     if (!qty || qty <= 0) {
       error(`Entry ${e.no || i + 1}: Delivery quantity must be greater than 0`)
       return
@@ -729,8 +894,14 @@ const saveSchedule = async () => {
   try {
     // Validate entries before sending
     const validatedEntries = scheduleEntries.value.map(entry => {
-      const deliveryQuantity = parseFloat(entry.main) || parseFloat(entry.set) || 0
-
+      let qtyMainAndFits = Number(entry.main) || 0
+      for (let j = 1; j <= 9; j++) {
+        qtyMainAndFits += Number(entry[`fit${j}`]) || 0
+      }
+      const deliveryQuantity = qtyMainAndFits > 0
+        ? qtyMainAndFits
+        : (parseFloat(entry.set) || 0)
+      
       // Validate required fields
       if (!entry.date) {
         throw new Error(`Entry ${entry.no}: Date is required`)
