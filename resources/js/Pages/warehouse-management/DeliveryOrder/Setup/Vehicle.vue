@@ -1,5 +1,7 @@
 <template>
-  <AppLayout>
+  <AppLayout :header="'Define Vehicle'">
+    <Head title="Define Vehicle" />
+
     <div class="p-6">
       <!-- Header -->
       <div class="mb-6">
@@ -13,89 +15,145 @@
                 <p class="text-white/80 text-sm">Manage vehicle information and driver details</p>
               </div>
             </div>
-            <div class="hidden sm:flex items-center gap-2">
-              <button
-                @click="openAddModal"
-                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm"
-              >
-                <i class="fas fa-plus"></i>
-                Add Vehicle
-              </button>
-              <button
-                @click="refreshData"
-                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm"
-              >
-                <i class="fas fa-sync-alt"></i>
-                Refresh
-              </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Panel: Define Vehicle + Info/Links -->
+      <div class="bg-gradient-to-br from-slate-50 via-white to-blue-50 rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <!-- Left Column - Define Vehicle Card -->
+          <div class="lg:col-span-2">
+            <div class="bg-white/90 backdrop-blur-sm p-5 sm:p-6 rounded-2xl shadow-md border border-blue-100">
+              <div class="flex items-center mb-5 sm:mb-6 pb-3 border-b border-gray-100">
+                <div class="p-2.5 bg-blue-500 rounded-xl mr-3 text-white">
+                  <i class="fas fa-edit"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg sm:text-xl font-semibold text-slate-800">Define Vehicle</h3>
+                  <p class="text-xs sm:text-sm text-slate-500">Search, create, and maintain your vehicles</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-semibold text-slate-700 mb-1">Vehicle #</label>
+                  <div class="relative flex">
+                    <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-200 bg-slate-50 text-slate-500">
+                      <i class="fas fa-truck"></i>
+                    </span>
+                    <input
+                      v-model="searchQuery"
+                      type="text"
+                      placeholder="Search or type vehicle number"
+                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-blue-500 focus:border-blue-500 text-slate-800 placeholder-slate-400 text-sm sm:text-base transition-colors"
+                      @input="debouncedSearch"
+                    />
+                    <button
+                      type="button"
+                      @click="showVehicleModal = true"
+                      class="inline-flex items-center px-3 py-2 border border-l-0 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white rounded-r-xl text-sm transition-colors transform active:translate-y-px"
+                    >
+                      <i class="fas fa-table"></i>
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-1">Action</label>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      @click="openAddModal"
+                      class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm"
+                    >
+                      <i class="fas fa-plus-circle"></i>
+                      Add New
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Filters removed to match Define Color UI (no status/company filters shown here) -->
+            </div>
+          </div>
+
+          <!-- Right Column - Info & Quick Links -->
+          <div class="space-y-6">
+            <div class="bg-blue-50/80 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-blue-100">
+              <div class="flex items-center mb-4 pb-2 border-b border-blue-100">
+                <div class="p-2.5 bg-blue-500 rounded-xl mr-3">
+                  <i class="fas fa-info-circle text-white"></i>
+                </div>
+                <h3 class="text-base sm:text-lg font-semibold text-blue-900">Vehicle Information</h3>
+              </div>
+              <div class="space-y-2 text-xs sm:text-sm text-slate-600">
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Vehicle number should be unique per vehicle</li>
+                  <li>Use the search table button to select existing vehicles</li>
+                  <li>Assign the correct vehicle class and company</li>
+                  <li>Driver phone should be reachable for tracking purpose</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="bg-white/90 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-violet-100">
+              <div class="flex items-center mb-4 pb-2 border-b border-violet-100">
+                <div class="p-2.5 bg-violet-500 rounded-xl mr-3">
+                  <i class="fas fa-link text-white"></i>
+                </div>
+                <h3 class="text-base sm:text-lg font-semibold text-slate-800">Quick Links</h3>
+              </div>
+
+              <div class="grid grid-cols-1 gap-3">
+                <Link
+                  href="/warehouse-management/delivery-order/setup/vehicle-class"
+                  class="flex items-center p-3 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors border border-purple-100"
+                >
+                  <div class="p-2.5 bg-purple-500 rounded-full mr-3">
+                    <i class="fas fa-layer-group text-white text-sm"></i>
+                  </div>
+                  <div>
+                    <p class="font-medium text-purple-900 text-sm">Vehicle Class</p>
+                    <p class="text-xs text-purple-700">Manage vehicle classes</p>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/warehouse-management/delivery-order/setup/vehicle/view-print"
+                  class="flex items-center p-3 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors border border-emerald-100"
+                >
+                  <div class="p-2.5 bg-emerald-500 rounded-full mr-3">
+                    <i class="fas fa-print text-white text-sm"></i>
+                  </div>
+                  <div>
+                    <p class="font-medium text-emerald-900 text-sm">View &amp; Print Vehicle</p>
+                    <p class="text-xs text-emerald-700">Print vehicle list</p>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/warehouse-management/delivery-order/setup/vehicle-class/view-print"
+                  class="flex items-center p-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors border border-sky-100"
+                >
+                  <div class="p-2.5 bg-sky-500 rounded-full mr-3">
+                    <i class="fas fa-print text-white text-sm"></i>
+                  </div>
+                  <div>
+                    <p class="font-medium text-sky-900 text-sm">View &amp; Print Vehicle Class</p>
+                    <p class="text-xs text-sky-700">Print vehicle class list</p>
+                  </div>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Action Bar -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <!-- Search and Filters -->
-          <div class="flex flex-wrap items-center gap-4">
-            <!-- Search -->
-            <div class="relative">
-              <input
-                v-model="searchQuery"
-                type="text"
-                placeholder="Search vehicles..."
-                class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64 shadow-sm"
-                @input="debouncedSearch"
-              />
-              <i class="fas fa-search w-5 h-5 text-gray-400 absolute inset-y-0 left-2 my-auto"></i>
-            </div>
-
-            <!-- Status Filter -->
-            <select
-              v-model="statusFilter"
-              @change="fetchVehicles"
-              class="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
-            >
-              <option value="">All Status</option>
-              <option value="A">Active</option>
-              <option value="O">Obsolete</option>
-            </select>
-
-            <!-- Company Filter -->
-            <select
-              v-model="companyFilter"
-              @change="fetchVehicles"
-              class="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
-            >
-              <option value="">All Companies</option>
-              <option value="KIM">KIM</option>
-              <option value="CUSTOMER">CUSTOMER</option>
-              <option value="MBI">MBI</option>
-            </select>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="flex items-center gap-2">
-            <button
-              @click="openAddModal"
-              class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
-            >
-              <i class="fas fa-plus"></i>
-              Add Vehicle
-            </button>
-            <button
-              @click="refreshData"
-              class="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
-            >
-              <i class="fas fa-sync-alt"></i>
-              Refresh
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Vehicle Table -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <!-- Vehicle Table (hidden in UI as requested) -->
+      <div
+        v-if="false"
+        class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+      >
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50 sticky top-0 z-10">
@@ -138,22 +196,14 @@
                   </div>
                 </td>
               </tr>
-              <tr v-else-if="vehicles.length === 0">
-                <td colspan="9" class="px-6 py-4 text-center text-gray-500">
-                  <div class="flex flex-col items-center py-4">
-                    <i class="fas fa-truck w-10 h-10 text-gray-300 text-2xl"></i>
-                    <div class="mt-2 text-sm">No vehicles found</div>
-                  </div>
-                </td>
-              </tr>
               <tr v-else v-for="vehicle in vehicles" :key="vehicle.id" class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {{ vehicle.VEHICLE_NO }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span
-                    :class="vehicle.VEHICLE_STATUS === 'A' 
-                      ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200' 
+                    :class="vehicle.VEHICLE_STATUS === 'A'
+                      ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200'
                       : 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-200'"
                     class="px-2.5 py-1 text-xs font-medium rounded-full inline-flex items-center gap-1"
                   >
@@ -259,27 +309,35 @@
       <!-- Add/Edit Modal -->
       <div
         v-if="showModal"
-        class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+        class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4 sm:px-6"
         @click="closeModal"
       >
         <div
-          class="relative top-20 mx-auto p-5 border w-11/12 max-w-2xl shadow-lg rounded-md bg-white"
+          class="relative w-full max-w-2xl md:max-w-3xl bg-white rounded-xl shadow-2xl transform transition-transform duration-200 max-h-[90vh]"
           @click.stop
         >
-          <div class="mt-3">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-medium text-gray-900">
-                {{ isEditing ? 'Edit Vehicle' : 'Add New Vehicle' }}
-              </h3>
+          <div class="flex flex-col max-h-[90vh]">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-t-xl">
+              <div class="flex items-center">
+                <div class="p-2 bg-white/20 rounded-lg mr-3">
+                  <i class="fas fa-truck"></i>
+                </div>
+                <h3 class="text-lg font-semibold">
+                  {{ isEditing ? 'Edit Vehicle' : 'Add New Vehicle' }}
+                </h3>
+              </div>
               <button
                 @click="closeModal"
-                class="text-gray-400 hover:text-gray-600"
+                class="text-white hover:text-gray-100 rounded-full p-1.5 hover:bg-white/10 transition-colors"
               >
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times text-lg"></i>
               </button>
             </div>
 
-            <form @submit.prevent="saveVehicle" class="space-y-4">
+            <!-- Modal Body -->
+            <div class="p-5 sm:p-6 overflow-y-auto flex-1">
+              <form @submit.prevent="saveVehicle" class="space-y-4">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Vehicle Number -->
                 <div>
@@ -315,16 +373,25 @@
                   <label class="block text-sm font-medium text-gray-700 mb-1">
                     Vehicle Class <span class="text-red-500">*</span>
                   </label>
-                  <select
-                    v-model="form.VEHICLE_CLASS"
-                    required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select Vehicle Class</option>
-                    <option v-for="vc in vehicleClasses" :key="vc.VEHICLE_CLASS_CODE" :value="vc.VEHICLE_CLASS_CODE">
-                      {{ vc.VEHICLE_CLASS_CODE }} - {{ vc.DESCRIPTION }}
-                    </option>
-                  </select>
+                  <div class="relative flex">
+                    <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-slate-50 text-slate-500">
+                      <i class="fas fa-layer-group"></i>
+                    </span>
+                    <input
+                      v-model="form.VEHICLE_CLASS"
+                      type="text"
+                      required
+                      class="flex-1 min-w-0 block w-full px-3 py-2 border border-gray-300 rounded-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      placeholder="Select or type vehicle class code"
+                    />
+                    <button
+                      type="button"
+                      @click="showVehicleClassModal = true"
+                      class="inline-flex items-center px-3 py-2 border border-l-0 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white rounded-r-lg text-sm transition-colors transform active:translate-y-px"
+                    >
+                      <i class="fas fa-table"></i>
+                    </button>
+                  </div>
                 </div>
 
                 <!-- Vehicle Company -->
@@ -335,9 +402,7 @@
                   <select
                     v-model="form.VEHICLE_COMPANY"
                     required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select Company</option>
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="KIM">KIM</option>
                     <option value="CUSTOMER">CUSTOMER</option>
                     <option value="MBI">MBI</option>
@@ -429,35 +494,52 @@
               </div>
 
               <!-- Form Actions -->
-              <div class="flex items-center justify-end gap-3 pt-4">
+              <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 mt-4">
                 <button
                   type="button"
                   @click="closeModal"
-                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform active:translate-y-px"
                 >
+                  <i class="fas fa-times mr-2"></i>
                   Cancel
                 </button>
                 <button
                   type="submit"
                   :disabled="saving"
-                  class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border border-transparent rounded-lg hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transform active:translate-y-px"
                 >
                   <i v-if="saving" class="fas fa-spinner fa-spin mr-2"></i>
                   {{ isEditing ? 'Update' : 'Save' }} Vehicle
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <VehicleTableModal
+      :is-open="showVehicleModal"
+      @close="showVehicleModal = false"
+      @select="onVehicleSelected"
+    />
+
+    <VehicleClassTableModal
+      :is-open="showVehicleClassModal"
+      @close="showVehicleClassModal = false"
+      @select="onVehicleClassSelected"
+    />
   </AppLayout>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed, watch } from 'vue'
+import { Head, Link } from '@inertiajs/vue3'
 import { useToast } from '@/Composables/useToast'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import VehicleTableModal from '@/Components/VehicleTableModal.vue'
+import VehicleClassTableModal from '@/Components/VehicleClassTableModal.vue'
 // Updated to Heroicons v2
 import { ArrowPathIcon as RefreshIcon } from '@heroicons/vue/24/outline'
 
@@ -478,6 +560,8 @@ const currentPage = ref(1)
 const showModal = ref(false)
 const isEditing = ref(false)
 const editingVehicle = ref(null)
+const showVehicleModal = ref(false)
+const showVehicleClassModal = ref(false)
 
 // Form data
 const form = reactive({
@@ -495,14 +579,14 @@ const form = reactive({
 // Computed properties
 const visiblePages = computed(() => {
   if (!pagination.value) return []
-  
+
   const current = pagination.value.current_page
   const last = pagination.value.last_page
   const delta = 2
-  
+
   let start = Math.max(1, current - delta)
   let end = Math.min(last, current + delta)
-  
+
   if (end - start < delta * 2) {
     if (start === 1) {
       end = Math.min(last, start + delta * 2)
@@ -510,7 +594,7 @@ const visiblePages = computed(() => {
       start = Math.max(1, end - delta * 2)
     }
   }
-  
+
   const pages = []
   for (let i = start; i <= end; i++) {
     pages.push(i)
@@ -618,6 +702,18 @@ const openAddModal = () => {
   showModal.value = true
 }
 
+const onVehicleSelected = (vehicle) => {
+  if (!vehicle) return
+  searchQuery.value = vehicle.VEHICLE_NO || ''
+  showVehicleModal.value = false
+  openEditModal(vehicle)
+}
+
+const onVehicleClassSelected = (cls) => {
+  if (!cls) return
+  form.VEHICLE_CLASS = cls.VEHICLE_CLASS_CODE || ''
+}
+
 const openEditModal = (vehicle) => {
   isEditing.value = true
   editingVehicle.value = vehicle
@@ -657,12 +753,12 @@ const resetForm = () => {
 const saveVehicle = async () => {
   saving.value = true
   try {
-    const url = isEditing.value 
+    const url = isEditing.value
       ? buildApiUrl(`/vehicles/${editingVehicle.value.id}`)
       : buildApiUrl('/vehicles')
-    
+
     const method = isEditing.value ? 'PUT' : 'POST'
-    
+
     const response = await fetch(url, {
       method,
       headers: {
@@ -677,9 +773,9 @@ const saveVehicle = async () => {
       const text = await response.text()
       throw new Error(text || `Request failed with status ${response.status}`)
     }
-    
+
     const data = await response.json()
-    
+
     if (data.success) {
       addToast(data.message, 'success')
       closeModal()
@@ -698,7 +794,7 @@ const deleteVehicle = async (vehicle) => {
   if (!confirm(`Are you sure you want to delete vehicle ${vehicle.VEHICLE_NO}?`)) {
     return
   }
-  
+
   try {
     const response = await fetch(buildApiUrl(`/vehicles/${vehicle.id}`), {
       method: 'DELETE',
@@ -712,9 +808,9 @@ const deleteVehicle = async (vehicle) => {
       const text = await response.text()
       throw new Error(text || `Request failed with status ${response.status}`)
     }
-    
+
     const data = await response.json()
-    
+
     if (data.success) {
       addToast(data.message, 'success')
       fetchVehicles()
@@ -741,7 +837,7 @@ function debounce(func, wait) {
 
 // Lifecycle
 onMounted(() => {
-  fetchVehicles()
+  // Do not auto-load vehicles; wait for user interaction (search/filter)
 })
 </script>
 

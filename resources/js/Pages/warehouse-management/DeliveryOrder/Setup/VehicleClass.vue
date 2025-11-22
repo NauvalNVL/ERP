@@ -1,256 +1,249 @@
 <template>
-  <AppLayout>
+  <AppLayout :header="'Define Vehicle Class'">
+    <Head title="Define Vehicle Class" />
+
     <div class="p-6">
       <!-- Header Section -->
-      <div class="mb-8">
-        <div class="relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600">
+      <div class="mb-6">
+        <div class="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
           <div class="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,white,transparent_50%)]"></div>
           <div class="flex items-center justify-between p-5">
             <div class="flex items-center gap-3 text-white">
-              <i class="fas fa-truck text-2xl"></i>
+              <i class="fas fa-layer-group text-2xl"></i>
               <div>
                 <h1 class="text-2xl font-semibold">Define Vehicle Class</h1>
                 <p class="text-white/80 text-sm">Manage vehicle class definitions and specifications</p>
               </div>
             </div>
-            <div class="hidden sm:flex items-center gap-2">
-              <button
-                @click="openModal('add')"
-                class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur-sm"
-              >
-                <i class="fas fa-plus"></i>
-                Add Vehicle Class
-              </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Panel: Define Vehicle Class + Info/Links -->
+      <div class="bg-gradient-to-br from-slate-50 via-white to-blue-50 rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <!-- Left Column - Define Vehicle Class Card -->
+          <div class="lg:col-span-2">
+            <div class="bg-white/90 backdrop-blur-sm p-5 sm:p-6 rounded-2xl shadow-md border border-blue-100">
+              <div class="flex items-center mb-5 sm:mb-6 pb-3 border-b border-gray-100">
+                <div class="p-2.5 bg-blue-500 rounded-xl mr-3 text-white">
+                  <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg sm:text-xl font-semibold text-slate-800">Define Vehicle Class</h3>
+                  <p class="text-xs sm:text-sm text-slate-500">Search, create, and maintain your vehicle classes</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-semibold text-slate-700 mb-1">Vehicle Class Code</label>
+                  <div class="relative flex">
+                    <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-200 bg-slate-50 text-slate-500">
+                      <i class="fas fa-layer-group"></i>
+                    </span>
+                    <input
+                      v-model="searchQuery"
+                      type="text"
+                      placeholder="Search by code or description..."
+                      class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-blue-500 focus:border-blue-500 text-slate-800 placeholder-slate-400 text-sm sm:text-base transition-colors"
+                      @input="searchVehicleClasses"
+                    />
+                    <button
+                      type="button"
+                      @click="showVehicleClassModal = true"
+                      class="inline-flex items-center px-3 py-2 border border-l-0 border-blue-500 bg-blue-500 hover:bg-blue-600 text-white rounded-r-xl text-sm transition-colors transform active:translate-y-px"
+                    >
+                      <i class="fas fa-table"></i>
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-1">Action</label>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      @click="openModal('add')"
+                      class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm"
+                    >
+                      <i class="fas fa-plus-circle"></i>
+                      Add New
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column - Info & Quick Links -->
+          <div class="space-y-6">
+            <div class="bg-blue-50/80 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-blue-100">
+              <div class="flex items-center mb-4 pb-2 border-b border-blue-100">
+                <div class="p-2.5 bg-blue-500 rounded-xl mr-3">
+                  <i class="fas fa-info-circle text-white"></i>
+                </div>
+                <h3 class="text-base sm:text-lg font-semibold text-blue-900">Vehicle Class Information</h3>
+              </div>
+              <div class="space-y-2 text-xs sm:text-sm text-slate-600">
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Vehicle class code should be unique and readable for users.</li>
+                  <li>Use clear descriptions to differentiate similar vehicle types.</li>
+                  <li>Vehicle class is referenced when defining individual vehicles.</li>
+                  <li>Review classes periodically to keep your master data consistent.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="bg-white/90 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-violet-100">
+              <div class="flex items-center mb-4 pb-2 border-b border-violet-100">
+                <div class="p-2.5 bg-violet-500 rounded-xl mr-3">
+                  <i class="fas fa-link text-white"></i>
+                </div>
+                <h3 class="text-base sm:text-lg font-semibold text-slate-800">Quick Links</h3>
+              </div>
+
+              <div class="grid grid-cols-1 gap-3">
+                <Link
+                  href="/warehouse-management/delivery-order/setup/vehicle"
+                  class="flex items-center p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors border border-blue-100"
+                >
+                  <div class="p-2.5 bg-blue-500 rounded-full mr-3">
+                    <i class="fas fa-truck text-white text-sm"></i>
+                  </div>
+                  <div>
+                    <p class="font-medium text-blue-900 text-sm">Define Vehicle</p>
+                    <p class="text-xs text-blue-700">Manage vehicles linked to these classes</p>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/warehouse-management/delivery-order/setup/vehicle-class/view-print"
+                  class="flex items-center p-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors border border-sky-100"
+                >
+                  <div class="p-2.5 bg-sky-500 rounded-full mr-3">
+                    <i class="fas fa-print text-white text-sm"></i>
+                  </div>
+                  <div>
+                    <p class="font-medium text-sky-900 text-sm">View &amp; Print Vehicle Class</p>
+                    <p class="text-xs text-sky-700">Print vehicle class list</p>
+                  </div>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Search and Filter Section -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <div class="flex flex-col sm:flex-row gap-4">
-          <div class="flex-1">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Search Vehicle Classes</label>
-            <div class="relative">
-              <input
-                v-model="searchQuery"
-                type="text"
-                placeholder="Search by code, description, or standard class..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
-                @input="searchVehicleClasses"
-              />
-              <i class="fas fa-search absolute left-3 top-3 w-5 h-5 text-gray-400"></i>
-            </div>
-          </div>
-          <div class="flex items-end">
-            <button
-              @click="clearSearch"
-              class="px-4 py-2 text-gray-700 hover:text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Vehicle Classes Table -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50 sticky top-0 z-10">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  No.
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vehicle Class Code
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Description
-                </th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-100">
-              <tr v-if="loading" class="animate-pulse">
-                <td colspan="4" class="px-6 py-4 text-center">
-                  <div class="flex items-center justify-center">
-                    <i class="fas fa-spinner fa-spin text-blue-600 mr-2"></i>
-                    Loading vehicle classes...
-                  </div>
-                </td>
-              </tr>
-              <tr v-else-if="filteredVehicleClasses.length === 0" class="text-center">
-                <td colspan="4" class="px-6 py-8 text-gray-500">
-                  <div class="flex flex-col items-center">
-                    <i class="fas fa-truck w-12 h-12 text-gray-300 mb-4 text-2xl"></i>
-                    <p class="text-lg font-medium">No vehicle classes found</p>
-                    <p class="text-sm">Get started by adding your first vehicle class.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr v-else v-for="(vehicleClass, index) in filteredVehicleClasses" :key="vehicleClass.id" class="hover:bg-gray-50 transition-colors">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ index + 1 }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">{{ vehicleClass.VEHICLE_CLASS_CODE }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ vehicleClass.DESCRIPTION }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div class="flex items-center justify-end space-x-2">
-                    <button
-                      @click="openModal('edit', vehicleClass)"
-                      class="text-blue-600 hover:text-blue-900 p-2 rounded hover:bg-blue-50 transition-colors"
-                      title="Edit"
-                    >
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      @click="deleteVehicleClass(vehicleClass)"
-                      class="text-red-600 hover:text-red-900 p-2 rounded hover:bg-red-50 transition-colors"
-                      title="Delete"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Pagination -->
-      <div v-if="totalPages > 1" class="mt-6 flex items-center justify-between">
-        <div class="text-sm text-gray-700">
-          Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }} results
-        </div>
-        <div class="flex space-x-2">
-          <button
-            @click="previousPage"
-            :disabled="currentPage === 1"
-            class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-          >
-            Previous
-          </button>
-          <button
-            v-for="page in visiblePages"
-            :key="page"
-            @click="goToPage(page)"
-            :class="[
-              'px-3 py-2 text-sm font-medium rounded-md shadow-sm',
-              page === currentPage
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-700 bg-white border border-gray-200 hover:bg-gray-50'
-            ]"
-          >
-            {{ page }}
-          </button>
-          <button
-            @click="nextPage"
-            :disabled="currentPage === totalPages"
-            class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-          >
-            Next
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- Modal for Add/Edit Vehicle Class -->
-    <div v-if="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
-        <div class="mt-3">
+    <div
+      v-if="showModal"
+      class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center px-4 sm:px-6"
+      @click="closeModal"
+    >
+      <div
+        class="relative w-full max-w-2xl md:max-w-xl bg-white rounded-xl shadow-2xl transform transition-transform duration-200 max-h-[90vh]"
+        @click.stop
+      >
+        <div class="flex flex-col max-h-[90vh]">
           <!-- Modal Header -->
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-medium text-gray-900">
-              {{ modalMode === 'add' ? 'Add New Vehicle Class' : 'Edit Vehicle Class' }}
-            </h3>
+          <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-t-xl">
+            <div class="flex items-center">
+              <div class="p-2 bg-white/20 rounded-lg mr-3">
+                <i class="fas fa-layer-group"></i>
+              </div>
+              <h3 class="text-lg font-semibold">
+                {{ modalMode === 'add' ? 'Add New Vehicle Class' : 'Edit Vehicle Class' }}
+              </h3>
+            </div>
             <button
               @click="closeModal"
-              class="text-gray-400 hover:text-gray-600 transition-colors"
+              class="text-white hover:text-gray-100 rounded-full p-1.5 hover:bg-white/10 transition-colors"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
+              <i class="fas fa-times text-lg"></i>
             </button>
           </div>
 
           <!-- Modal Body -->
-          <form @submit.prevent="saveVehicleClass" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Vehicle Class Code *
-                </label>
-                <input
-                  v-model="form.VEHICLE_CLASS_CODE"
-                  type="text"
-                  required
-                  :readonly="modalMode === 'edit'"
-                  :class="[
-                    'w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent',
-                    modalMode === 'edit' 
-                      ? 'bg-gray-100 text-gray-600 cursor-not-allowed border-gray-200' 
-                      : 'border-gray-300'
-                  ]"
-                  placeholder="e.g., BE, DB, GM"
-                />
-                <div v-if="errors.VEHICLE_CLASS_CODE" class="mt-1 text-sm text-red-600">
-                  {{ errors.VEHICLE_CLASS_CODE[0] }}
+          <div class="p-5 sm:p-6 overflow-y-auto flex-1">
+            <form @submit.prevent="saveVehicleClass" class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Vehicle Class Code *
+                  </label>
+                  <input
+                    v-model="form.VEHICLE_CLASS_CODE"
+                    type="text"
+                    required
+                    :readonly="modalMode === 'edit'"
+                    :class="[
+                      'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm',
+                      modalMode === 'edit'
+                        ? 'bg-gray-100 text-gray-600 cursor-not-allowed border-gray-200'
+                        : 'border-gray-300'
+                    ]"
+                    placeholder="e.g., BE, DB, GM"
+                  />
+                  <div v-if="errors.VEHICLE_CLASS_CODE" class="mt-1 text-sm text-red-600">
+                    {{ errors.VEHICLE_CLASS_CODE[0] }}
+                  </div>
+                  <div v-if="modalMode === 'edit'" class="mt-1 text-xs text-gray-500">
+                    Vehicle class code cannot be changed
+                  </div>
                 </div>
-                <div v-if="modalMode === 'edit'" class="mt-1 text-xs text-gray-500">
-                  Vehicle class code cannot be changed
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Description *
+                  </label>
+                  <input
+                    v-model="form.DESCRIPTION"
+                    type="text"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    placeholder="e.g., T. Box Engkel"
+                  />
+                  <div v-if="errors.DESCRIPTION" class="mt-1 text-sm text-red-600">
+                    {{ errors.DESCRIPTION[0] }}
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Description *
-                </label>
-                <input
-                  v-model="form.DESCRIPTION"
-                  type="text"
-                  required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., T. Box Engkel"
-                />
-                <div v-if="errors.DESCRIPTION" class="mt-1 text-sm text-red-600">
-                  {{ errors.DESCRIPTION[0] }}
-                </div>
+              <!-- Modal Footer -->
+              <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 mt-4">
+                <button
+                  type="button"
+                  @click="closeModal"
+                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform active:translate-y-px"
+                >
+                  <i class="fas fa-times mr-2"></i>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  :disabled="saving"
+                  class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border border-transparent rounded-lg hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transform active:translate-y-px"
+                >
+                  <span v-if="saving" class="flex items-center">
+                    <i class="fas fa-spinner fa-spin -ml-1 mr-2"></i>
+                    Saving...
+                  </span>
+                  <span v-else>{{ modalMode === 'add' ? 'Add Vehicle Class' : 'Update Vehicle Class' }}</span>
+                </button>
               </div>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
-              <button
-                type="button"
-                @click="closeModal"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                :disabled="saving"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-              >
-                <span v-if="saving" class="flex items-center">
-                  <i class="fas fa-spinner fa-spin -ml-1 mr-2"></i>
-                  Saving...
-                </span>
-                <span v-else>{{ modalMode === 'add' ? 'Add Vehicle Class' : 'Update Vehicle Class' }}</span>
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     </div>
+
+    <VehicleClassTableModal
+      :is-open="showVehicleClassModal"
+      @close="showVehicleClassModal = false"
+      @select="onVehicleClassSelected"
+    />
 
     <!-- Toast Container -->
     <ToastContainer />
@@ -259,9 +252,11 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
+import { Head, Link } from '@inertiajs/vue3'
 import { useToast } from '@/Composables/useToast'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import ToastContainer from '@/Components/ToastContainer.vue'
+import VehicleClassTableModal from '@/Components/VehicleClassTableModal.vue'
 
 const { addToast } = useToast()
 
@@ -272,6 +267,7 @@ const saving = ref(false)
 const searchQuery = ref('')
 const showModal = ref(false)
 const modalMode = ref('add')
+const showVehicleClassModal = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const errors = ref({})
@@ -289,7 +285,7 @@ const filteredVehicleClasses = computed(() => {
 
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(vc => 
+    filtered = filtered.filter(vc =>
       vc.VEHICLE_CLASS_CODE.toLowerCase().includes(query) ||
       vc.DESCRIPTION.toLowerCase().includes(query)
     )
@@ -303,7 +299,7 @@ const filteredVehicleClasses = computed(() => {
 const totalItems = computed(() => {
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    return vehicleClasses.value.filter(vc => 
+    return vehicleClasses.value.filter(vc =>
       vc.VEHICLE_CLASS_CODE.toLowerCase().includes(query) ||
       vc.DESCRIPTION.toLowerCase().includes(query)
     ).length
@@ -317,7 +313,7 @@ const visiblePages = computed(() => {
   const pages = []
   const start = Math.max(1, currentPage.value - 2)
   const end = Math.min(totalPages.value, start + 4)
-  
+
   for (let i = start; i <= end; i++) {
     pages.push(i)
   }
@@ -330,7 +326,7 @@ const fetchVehicleClasses = async () => {
   try {
     const response = await fetch('/api/vehicle-classes')
     const data = await response.json()
-    
+
     if (data.success) {
       vehicleClasses.value = data.data
     } else {
@@ -345,6 +341,9 @@ const fetchVehicleClasses = async () => {
 
 const searchVehicleClasses = () => {
   currentPage.value = 1
+  if (!vehicleClasses.value.length) {
+    fetchVehicleClasses()
+  }
 }
 
 const clearSearch = () => {
@@ -352,11 +351,17 @@ const clearSearch = () => {
   currentPage.value = 1
 }
 
+const onVehicleClassSelected = (cls) => {
+  if (!cls) return
+  // Open edit modal with selected vehicle class, similar to onVehicleSelected in Vehicle.vue
+  openModal('edit', cls)
+}
+
 const openModal = (mode, vehicleClass = null) => {
   modalMode.value = mode
   showModal.value = true
   errors.value = {}
-  
+
   if (mode === 'edit' && vehicleClass) {
     form.value = {
       id: vehicleClass.id,
@@ -385,14 +390,14 @@ const closeModal = () => {
 const saveVehicleClass = async () => {
   saving.value = true
   errors.value = {}
-  
+
   try {
-    const url = modalMode.value === 'add' 
-      ? '/api/vehicle-classes' 
+    const url = modalMode.value === 'add'
+      ? '/api/vehicle-classes'
       : `/api/vehicle-classes/${form.value.id}`
-    
+
     const method = modalMode.value === 'add' ? 'POST' : 'PUT'
-    
+
     const response = await fetch(url, {
       method,
       headers: {
@@ -401,9 +406,9 @@ const saveVehicleClass = async () => {
       },
       body: JSON.stringify(form.value)
     })
-    
+
     const data = await response.json()
-    
+
     if (data.success) {
       addToast(data.message, 'success')
       closeModal()
@@ -425,7 +430,7 @@ const deleteVehicleClass = async (vehicleClass) => {
   if (!confirm(`Are you sure you want to delete vehicle class "${vehicleClass.VEHICLE_CLASS_CODE}"?`)) {
     return
   }
-  
+
   try {
     const response = await fetch(`/api/vehicle-classes/${vehicleClass.id}`, {
       method: 'DELETE',
@@ -433,9 +438,9 @@ const deleteVehicleClass = async (vehicleClass) => {
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
       }
     })
-    
+
     const data = await response.json()
-    
+
     if (data.success) {
       addToast(data.message, 'success')
       await fetchVehicleClasses()
@@ -470,7 +475,7 @@ const nextPage = () => {
 
 // Lifecycle
 onMounted(() => {
-  fetchVehicleClasses()
+  // Do not auto-load vehicle classes; data will be loaded after user actions (save/delete) if needed
 })
 
 // Watch for search changes

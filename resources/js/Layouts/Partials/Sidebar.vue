@@ -645,6 +645,16 @@ const warehouseManagementItems = [
     icon: 'fas fa-truck',
     children: [
       {
+        title: 'Setup',
+        icon: 'fas fa-cogs',
+        children: [
+          { title: 'Define Vehicle Class', icon: 'fas fa-layer-group', route: '/warehouse-management/delivery-order/setup/vehicle-class' },
+          { title: 'Define Vehicle', icon: 'fas fa-truck', route: '/warehouse-management/delivery-order/setup/vehicle' },
+          { title: 'View & Print Vehicle', icon: 'fas fa-print', route: '/warehouse-management/delivery-order/setup/vehicle/view-print' },
+          { title: 'View & Print Vehicle Class', icon: 'fas fa-print', route: '/warehouse-management/delivery-order/setup/vehicle-class/view-print' },
+        ]
+      },
+      {
         title: 'DO Processing',
         icon: 'fas fa-tasks',
         children: [

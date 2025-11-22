@@ -2,12 +2,12 @@
   <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
     <!-- Backdrop -->
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-    
+
     <!-- Modal -->
     <div class="relative min-h-screen flex items-center justify-center p-2 sm:p-4">
       <div class="relative bg-white rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] flex flex-col">
         <!-- Header -->
-        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 border-b border-blue-700 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 flex-shrink-0">
           <div class="flex items-center justify-between">
             <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-white flex items-center">
               <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>
@@ -15,7 +15,7 @@
               <span class="sm:hidden">Delivery Schedule</span>
             </h3>
             <div class="flex items-center space-x-1 sm:space-x-2">
-              <button 
+              <button
                 @click="deleteSelectedEntry"
                 class="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
                 title="Delete (Del)"
@@ -23,7 +23,7 @@
               >
                 <i class="fas fa-trash"></i>
               </button>
-              <button 
+              <button
                 @click="editSelectedEntry"
                 class="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
                 title="Edit (F2)"
@@ -31,21 +31,21 @@
               >
                 <i class="fas fa-edit"></i>
               </button>
-              <button 
+              <button
                 @click="addNewEntry"
                 class="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors"
                 title="Add New (F3)"
               >
                 <i class="fas fa-plus"></i>
               </button>
-              <button 
+              <button
                 @click="refreshScreen"
                 class="p-2 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
                 title="Refresh (F5)"
               >
                 <i class="fas fa-sync-alt"></i>
               </button>
-              <button 
+              <button
                 @click="$emit('close')"
                 class="text-gray-400 hover:text-gray-600 transition-colors"
                 title="Close (Esc)"
@@ -103,8 +103,8 @@
               </div>
 
               <!-- Schedule Entries -->
-              <div 
-                v-for="(entry, index) in scheduleEntries" 
+              <div
+                v-for="(entry, index) in scheduleEntries"
                 :key="entry.id ?? index"
                 @click="selectEntry(entry, index)"
                 :class="[
@@ -162,7 +162,7 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                   <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">No.</label>
-                    <div 
+                    <div
                       class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-700"
                     >
                       {{ scheduleEntry.no }}
@@ -170,8 +170,8 @@
                   </div>
                   <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Set</label>
-                    <input 
-                      v-model="scheduleEntry.set" 
+                    <input
+                      v-model="scheduleEntry.set"
                       type="number"
                       min="0"
                       class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -180,8 +180,8 @@
                   </div>
                   <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Main</label>
-                    <input 
-                      v-model="scheduleEntry.main" 
+                    <input
+                      v-model="scheduleEntry.main"
                       type="number"
                       min="0"
                       class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-100 text-gray-600"
@@ -195,8 +195,8 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mt-3">
                   <div v-for="i in 9" :key="i">
                     <label class="block text-xs font-medium text-gray-600 mb-1">Fit {{ i }}</label>
-                    <input 
-                      v-model="scheduleEntry[`fit${i}`]" 
+                    <input
+                      v-model="scheduleEntry[`fit${i}`]"
                       type="number"
                       min="0"
                       class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-100 text-gray-600"
@@ -217,8 +217,8 @@
                   <div class="grid grid-cols-2 gap-4">
                     <div>
                       <label class="block text-xs font-medium text-gray-600 mb-1">Date</label>
-                      <input 
-                        v-model="scheduleEntry.date" 
+                      <input
+                        v-model="scheduleEntry.date"
                         type="date"
                         class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
@@ -226,8 +226,8 @@
                     <div>
                       <label class="block text-xs font-medium text-gray-600 mb-1">Time (24-hour format)</label>
                       <div class="flex items-center space-x-2">
-                        <input 
-                          v-model="timeHours" 
+                        <input
+                          v-model="timeHours"
                           type="number"
                           min="0"
                           max="23"
@@ -237,8 +237,8 @@
                           @blur="padTimeInputs"
                         >
                         <span class="text-lg font-bold">:</span>
-                        <input 
-                          v-model="timeMinutes" 
+                        <input
+                          v-model="timeMinutes"
                           type="number"
                           min="0"
                           max="59"
@@ -254,8 +254,8 @@
 
                   <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Due</label>
-                    <select 
-                      v-model="scheduleEntry.due" 
+                    <select
+                      v-model="scheduleEntry.due"
                       class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="ETD">ETD - Expected Delivery Date</option>
@@ -266,8 +266,8 @@
 
                   <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Remarks</label>
-                    <textarea 
-                      v-model="scheduleEntry.remark" 
+                    <textarea
+                      v-model="scheduleEntry.remark"
                       rows="3"
                       class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter delivery remarks or special instructions..."
@@ -331,7 +331,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-gray-50 border-t border-gray-200 flex-shrink-0">
+        <div class="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-blue-50 border-t border-blue-200 flex-shrink-0">
           <div class="hidden lg:block text-xs text-gray-500 mb-4">
             <span class="font-medium">Keyboard Shortcuts:</span>
             <span class="ml-2">F2: Edit</span>
@@ -341,19 +341,19 @@
             <span class="ml-2">Esc: Close</span>
           </div>
           <div class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
-            <button 
+            <button
               @click="$emit('close')"
               class="w-full sm:w-auto px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors order-3 sm:order-1"
             >
               Cancel
             </button>
-            <button 
+            <button
               @click="addScheduleEntry"
               class="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors order-2 sm:order-2"
             >
               Add Entry
             </button>
-            <button 
+            <button
               @click="saveSchedule"
               class="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors order-1 sm:order-3"
             >
@@ -400,12 +400,12 @@ const updateTime = () => {
   let hours = parseInt(timeHours.value)
   if (isNaN(hours) || hours < 0) hours = 0
   if (hours > 23) hours = 23
-  
+
   // Validate minutes
   let minutes = parseInt(timeMinutes.value)
   if (isNaN(minutes) || minutes < 0) minutes = 0
   if (minutes > 59) minutes = 59
-  
+
   // Update scheduleEntry.time in HH:MM format
   const formattedHours = hours.toString().padStart(2, '0')
   const formattedMinutes = minutes.toString().padStart(2, '0')
@@ -418,7 +418,7 @@ const padTimeInputs = () => {
   if (isNaN(hours) || hours < 0) hours = 0
   if (hours > 23) hours = 23
   timeHours.value = hours.toString().padStart(2, '0')
-  
+
   let minutes = parseInt(timeMinutes.value)
   if (isNaN(minutes) || minutes < 0) minutes = 0
   if (minutes > 59) minutes = 59
@@ -507,7 +507,7 @@ const entryTotal = computed(() => {
     acc.main += parseInt(entry.main) || 0
     return acc
   }, { set: 0, main: 0 })
-  
+
   return totals
 })
 
@@ -550,7 +550,7 @@ const deleteSelectedEntry = () => {
     error('Please select an entry to delete')
     return
   }
-  
+
   const index = scheduleEntries.value.findIndex(entry => entry.id === selectedEntry.value.id)
   if (index > -1) {
     scheduleEntries.value.splice(index, 1)
@@ -560,7 +560,7 @@ const deleteSelectedEntry = () => {
     })
     success('Entry deleted successfully')
   }
-  
+
   resetForm()
   selectedEntry.value = null
 selectedIndex.value = -1
@@ -573,12 +573,12 @@ const addScheduleEntry = () => {
     error('Please enter at least Set or Main quantity')
     return
   }
-  
+
   if (!scheduleEntry.date) {
     error('Please select a schedule date')
     return
   }
-  
+
   if (!scheduleEntry.due) {
     error('Please select a due status')
     return
@@ -730,16 +730,16 @@ const saveSchedule = async () => {
     // Validate entries before sending
     const validatedEntries = scheduleEntries.value.map(entry => {
       const deliveryQuantity = parseFloat(entry.main) || parseFloat(entry.set) || 0
-      
+
       // Validate required fields
       if (!entry.date) {
         throw new Error(`Entry ${entry.no}: Date is required`)
       }
-      
+
       if (deliveryQuantity <= 0) {
         throw new Error(`Entry ${entry.no}: Delivery quantity must be greater than 0`)
       }
-      
+
       if (!entry.due || !['ETD', 'ETA', 'TBA'].includes(entry.due)) {
         throw new Error(`Entry ${entry.no}: Due status must be ETD, ETA, or TBA`)
       }
@@ -759,7 +759,7 @@ const saveSchedule = async () => {
     emit('save', { entries: validatedEntries })
   } catch (err) {
     console.error('Error saving delivery schedule:', err)
-    
+
     // Handle validation errors more specifically
     if (err.response && err.response.status === 422) {
       const validationErrors = err.response.data.errors
@@ -780,31 +780,31 @@ const saveSchedule = async () => {
 // Keyboard shortcuts
 const handleKeyDown = (event) => {
   if (!props.show) return
-  
+
   // Ctrl/Cmd + S to save
   if ((event.ctrlKey || event.metaKey) && event.key === 's') {
     event.preventDefault()
     saveSchedule()
   }
-  
+
   // F2 to edit
   if (event.key === 'F2') {
     event.preventDefault()
     editSelectedEntry()
   }
-  
+
   // F3 to add new
   if (event.key === 'F3') {
     event.preventDefault()
     addNewEntry()
   }
-  
+
   // Delete key to delete selected entry
   if (event.key === 'Delete' && selectedEntry.value) {
     event.preventDefault()
     deleteSelectedEntry()
   }
-  
+
   // Esc to close
   if (event.key === 'Escape') {
     event.preventDefault()
@@ -835,7 +835,7 @@ onUnmounted(() => {
 /* Grid layout for 16 columns with specific widths */
 .grid-cols-16 {
   display: grid;
-  grid-template-columns: 
+  grid-template-columns:
     minmax(50px, 60px)   /* No. */
     minmax(70px, 80px)   /* Set */
     minmax(70px, 80px)   /* Main */
@@ -884,11 +884,11 @@ input:focus, select:focus, textarea:focus {
   .fixed {
     position: static !important;
   }
-  
+
   .shadow-xl {
     box-shadow: none !important;
   }
-  
+
   button {
     display: none !important;
   }

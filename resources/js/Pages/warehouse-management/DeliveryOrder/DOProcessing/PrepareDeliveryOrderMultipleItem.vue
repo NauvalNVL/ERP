@@ -234,13 +234,6 @@
           <!-- Right side buttons -->
           <div class="flex items-center space-x-4">
             <button
-              @click="refreshPage"
-              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-            >
-              <i class="fas fa-sync-alt mr-2"></i>
-              Refresh
-            </button>
-            <button
               @click="openSalesOrderScreenNext"
               class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
             >

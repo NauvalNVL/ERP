@@ -1,19 +1,21 @@
 <template>
   <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-xl max-w-6xl w-full mx-4 max-h-[90vh] flex flex-col overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full mx-4 max-h-[90vh] flex flex-col overflow-hidden">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4">
+      <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-6 py-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <i class="fas fa-truck text-2xl"></i>
+            <div class="p-2 bg-white/20 rounded-lg">
+              <i class="fas fa-truck text-xl"></i>
+            </div>
             <div>
               <h2 class="text-xl font-semibold">Vehicle Table</h2>
               <p class="text-blue-100 text-sm">Browse and select a vehicle for delivery order</p>
             </div>
           </div>
-          <button 
+          <button
             @click="$emit('close')"
-            class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors"
+            class="text-white hover:text-gray-100 rounded-full p-2 hover:bg-white/10 transition-colors"
           >
             <i class="fas fa-times text-xl"></i>
           </button>
@@ -21,30 +23,30 @@
       </div>
 
       <!-- Search and Filter Section -->
-      <div class="p-6 border-b border-gray-200 bg-gray-50">
+      <div class="p-5 border-b border-gray-200 bg-slate-50">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- Search -->
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Search Vehicle</label>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Search Vehicle</label>
             <div class="relative">
-              <input 
+              <input
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search by vehicle number, driver name, or class..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm text-sm"
                 @input="searchVehicles"
               >
-              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+              <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
             </div>
           </div>
 
           <!-- Status Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-            <select 
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Status</label>
+            <select
               v-model="statusFilter"
               @change="searchVehicles"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm shadow-sm"
             >
               <option value="">All Status</option>
               <option value="A">Active</option>
@@ -54,11 +56,11 @@
 
           <!-- Company Filter -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Company</label>
-            <select 
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Company</label>
+            <select
               v-model="companyFilter"
               @change="searchVehicles"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm shadow-sm"
             >
               <option value="">All Companies</option>
               <option v-for="company in companies" :key="company" :value="company">
@@ -70,7 +72,7 @@
       </div>
 
       <!-- Main content (scrollable): loading / error / table + pagination -->
-      <div class="flex-1 overflow-y-auto">
+      <div class="flex-1 overflow-y-auto bg-white">
         <!-- Loading State -->
         <div v-if="loading" class="flex items-center justify-center py-12">
           <div class="text-center">
@@ -81,7 +83,7 @@
 
         <!-- Error State -->
         <div v-else-if="errorMessage" class="p-6">
-          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div class="bg-red-50 border border-red-200 rounded-xl p-4 shadow-sm">
             <div class="flex items-center">
               <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
               <span class="text-red-800">{{ errorMessage }}</span>
@@ -90,28 +92,30 @@
         </div>
 
         <!-- Vehicle Table -->
-        <div v-else class="p-6 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50 sticky top-0 z-20 shadow-sm sticky-header">
+        <div v-else class="p-5 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          <table class="min-w-full divide-y divide-gray-200 rounded-xl overflow-hidden">
+            <thead class="bg-slate-50 sticky top-0 z-20 shadow-sm sticky-header">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider table-cell">Vehicle No</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider table-cell">Class</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider table-cell">Description</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider table-cell">Company</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider table-cell">Driver</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider table-cell">Phone</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider table-cell">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-cell">Vehicle No</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-cell">Class</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-cell">Description</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-cell">Company</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-cell">Driver</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-cell">Phone</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider table-cell">Status</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-if="vehicles.length === 0">
-                <td colspan="7" class="px-4 py-8 text-center text-gray-500">
-                  <i class="fas fa-truck text-4xl mb-2 text-gray-300"></i>
-                  <p>No vehicles found</p>
+                <td colspan="7" class="px-4 py-10 text-center text-gray-500">
+                  <div class="flex flex-col items-center">
+                    <i class="fas fa-truck text-4xl mb-2 text-gray-300"></i>
+                    <p class="text-sm">No vehicles found</p>
+                  </div>
                 </td>
               </tr>
-              <tr 
-                v-for="vehicle in vehicles" 
+              <tr
+                v-for="vehicle in vehicles"
                 :key="vehicle.id"
                 class="hover:bg-gray-50 cursor-pointer"
                 :class="{ 'bg-blue-50': selectedVehicle?.id === vehicle.id }"
@@ -136,10 +140,11 @@
                   {{ vehicle.DRIVER_PHONE }}
                 </td>
                 <td class="px-4 py-4 whitespace-nowrap table-cell">
-                  <span 
-                    :class="vehicle.VEHICLE_STATUS === 'A' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
-                    class="px-2 py-1 rounded-full text-xs font-medium"
+                  <span
+                    :class="vehicle.VEHICLE_STATUS === 'A' ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200' : 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-200'"
+                    class="px-2.5 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1"
                   >
+                    <span class="inline-block w-1.5 h-1.5 rounded-full" :class="vehicle.VEHICLE_STATUS === 'A' ? 'bg-emerald-500' : 'bg-rose-500'" />
                     {{ vehicle.VEHICLE_STATUS === 'A' ? 'Active' : 'Obsolete' }}
                   </span>
                 </td>
@@ -149,13 +154,13 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="pagination && pagination.last_page > 1" class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div v-if="pagination && pagination.last_page > 1" class="px-6 py-4 border-t border-gray-200 bg-slate-50">
           <div class="flex items-center justify-between">
             <div class="text-sm text-gray-700">
               Showing {{ pagination.from }} to {{ pagination.to }} of {{ pagination.total }} results
             </div>
             <div class="flex space-x-2">
-              <button 
+              <button
                 @click="changePage(pagination.current_page - 1)"
                 :disabled="pagination.current_page <= 1"
                 class="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
@@ -165,7 +170,7 @@
               <span class="px-3 py-1 text-sm text-gray-700">
                 Page {{ pagination.current_page }} of {{ pagination.last_page }}
               </span>
-              <button 
+              <button
                 @click="changePage(pagination.current_page + 1)"
                 :disabled="pagination.current_page >= pagination.last_page"
                 class="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
@@ -178,17 +183,17 @@
       </div>
 
       <!-- Footer -->
-      <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3">
-        <button 
+      <div class="px-6 py-4 border-t border-gray-200 bg-slate-50 flex justify-end space-x-3">
+        <button
           @click="$emit('close')"
-          class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+          class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors text-sm font-medium"
         >
           Cancel
         </button>
-        <button 
+        <button
           @click="confirmSelection"
           :disabled="!selectedVehicle"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          class="px-4 py-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
         >
           Select Vehicle
         </button>
@@ -229,7 +234,7 @@ const pagination = ref(null)
 const searchVehicles = async () => {
   loading.value = true
   errorMessage.value = ''
-  
+
   try {
     const response = await axios.get('/api/vehicles', {
       params: {
@@ -239,7 +244,7 @@ const searchVehicles = async () => {
         plain: false
       }
     })
-    
+
     if (response.data.success) {
       vehicles.value = response.data.rows || []
       pagination.value = response.data.data?.pagination || null
@@ -273,7 +278,7 @@ const confirmSelection = () => {
 // Change page
 const changePage = async (page) => {
   if (page < 1 || (pagination.value && page > pagination.value.last_page)) return
-  
+
   loading.value = true
   try {
     const response = await axios.get('/api/vehicles', {
@@ -285,7 +290,7 @@ const changePage = async (page) => {
         plain: false
       }
     })
-    
+
     if (response.data.success) {
       vehicles.value = response.data.rows || []
       pagination.value = response.data.data?.pagination || null
