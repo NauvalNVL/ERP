@@ -85,9 +85,19 @@ const selectedSize = ref(null);
 const sortKey = ref('millimeter');
 const sortAsc = ref(true);
 
+const defaultPaperSizes = [
+  { id: 1, millimeter: '210.00', inches: '8.27', description: 'A4 Paper Size' },
+  { id: 2, millimeter: '297.00', inches: '11.69', description: 'A4 Paper Size' },
+  { id: 3, millimeter: '148.00', inches: '5.83', description: 'A5 Paper Size' },
+  { id: 4, millimeter: '105.00', inches: '4.13', description: 'A6 Paper Size' },
+  { id: 5, millimeter: '74.00', inches: '2.91', description: 'A7 Paper Size' }
+];
+
 // Compute filtered sizes based on search query
 const filteredSizes = computed(() => {
-  let sizes = props.paperSizes;
+  let sizes = (Array.isArray(props.paperSizes) && props.paperSizes.length > 0)
+    ? props.paperSizes
+    : defaultPaperSizes;
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
     sizes = sizes.filter(size =>
@@ -96,11 +106,11 @@ const filteredSizes = computed(() => {
       String(size.inches).toLowerCase().includes(q)
     );
   }
-  
+
   // Apply sorting
   return [...sizes].sort((a, b) => {
     let valA, valB;
-    
+
     if (sortKey.value === 'size_id') {
       valA = String(a.id).padStart(3, '0');
       valB = String(b.id).padStart(3, '0');
@@ -111,14 +121,14 @@ const filteredSizes = computed(() => {
       valA = parseFloat(a.inches || 0);
       valB = parseFloat(b.inches || 0);
     }
-    
+
     if (sortKey.value === 'millimeter' || sortKey.value === 'inches') {
       return sortAsc.value ? valA - valB : valB - valA;
     } else {
       if (typeof valA === 'string' && typeof valB === 'string') {
         return sortAsc.value ? valA.localeCompare(valB) : valB.localeCompare(valA);
       }
-      
+
       if (valA < valB) return sortAsc.value ? -1 : 1;
       if (valA > valB) return sortAsc.value ? 1 : -1;
       return 0;

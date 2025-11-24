@@ -560,7 +560,7 @@
                                 <div class="flex items-center justify-between">
                                     <label class="text-xs font-medium">System Gross Area:</label>
                                     <div class="flex items-center">
-                                        <input type="text" value="0.0000" class="w-16 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input type="text" value="0" class="w-16 px-2 py-1 border border-gray-400 text-xs text-right">
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
                                 </div>
@@ -600,7 +600,7 @@
                                 <div class="flex items-center justify-between">
                                     <label class="text-xs font-medium">System Gross Weight:</label>
                                     <div class="flex items-center">
-                                        <input type="text" value="0.0000" class="w-16 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input type="text" value="0" class="w-16 px-2 py-1 border border-gray-400 text-xs text-right">
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
                                 </div>
@@ -781,9 +781,9 @@
                         <div class="flex items-center mb-2">
                             <label class="text-xs font-medium w-16">Score L:</label>
                             <div class="flex items-center space-x-1">
-                                <template v-for="i in 10" :key="'scoreL'+i">
+                                <template v-for="i in 8" :key="'scoreL'+i">
                                     <input type="text" v-model.number="scoreL[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                    <span v-if="i < 10" class="text-xs text-gray-500 font-bold">+</span>
+                                    <span v-if="i < 8" class="text-xs text-gray-500 font-bold">+</span>
                                 </template>
                             </div>
                             <span class="mx-2 text-xs font-bold">=</span>
@@ -805,9 +805,9 @@
                         <div class="flex items-center mb-2">
                             <label class="text-xs font-medium w-16">Score W:</label>
                             <div class="flex items-center space-x-1">
-                                <template v-for="i in 10" :key="'scoreW'+i">
+                                <template v-for="i in 8" :key="'scoreW'+i">
                                     <input type="text" v-model.number="scoreW[i-1]" class="w-12 px-1 py-1 border border-gray-400 text-xs text-center">
-                                    <span v-if="i < 10" class="text-xs text-gray-500 font-bold">+</span>
+                                    <span v-if="i < 8" class="text-xs text-gray-500 font-bold">+</span>
                                 </template>
                             </div>
                             <span class="mx-2 text-xs font-bold">=</span>
@@ -830,13 +830,13 @@
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-12">P/Size:</label>
                                 <input type="text" :value="selectedPaperSize" readonly class="w-20 px-2 py-1 border border-gray-400 text-xs bg-gray-50">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="showPaperSizeModal = true" title="Select Paper Size">
+                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openPaperSizeModal" title="Select Paper Size">
                                     <i class="fas fa-search"></i>
                                 </button>
                                 <span class="text-xs ml-1">mm</span>
                             </div>
                             <div class="flex items-center">
-                                <label class="text-xs font-medium w-16">Con. Out:</label>
+                                <label class="text-xs font-medium w-16">Corr. Out:</label>
                                 <input type="text" v-model="conOut" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
                                     <i class="fas fa-search"></i>
@@ -1134,7 +1134,7 @@
         @update:value="(v) => { subMaterials = v }"
         @close="showSubMaterialModal = false"
     />
-    
+
     <!-- Machine Selecting Procedure Modal -->
     <MachineSelectingProcedureModal
         :show="showMspModal"
@@ -1335,13 +1335,35 @@ const openReinforcementTapeModal = async () => {
 // Paper Size Modal
 const showPaperSizeModal = ref(false);
 const selectedPaperSize = ref('');
-const paperSizeRows = ref([
-    { id: 1, millimeter: '210.00', inches: '8.27', description: 'A4 Paper Size' },
-    { id: 2, millimeter: '297.00', inches: '11.69', description: 'A4 Paper Size' },
-    { id: 3, millimeter: '148.00', inches: '5.83', description: 'A5 Paper Size' },
-    { id: 4, millimeter: '105.00', inches: '4.13', description: 'A6 Paper Size' },
-    { id: 5, millimeter: '74.00', inches: '2.91', description: 'A7 Paper Size' }
-]);
+const paperSizeRows = ref([]);
+const paperSizeLoading = ref(false);
+
+const fetchPaperSizes = async () => {
+    try {
+        paperSizeLoading.value = true;
+        const response = await fetch('/api/paper-sizes', {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            paperSizeRows.value = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+        } else {
+            paperSizeRows.value = [];
+        }
+    } catch (e) {
+        console.error('Error fetching paper sizes:', e);
+        paperSizeRows.value = [];
+    } finally {
+        paperSizeLoading.value = false;
+    }
+};
+
+const openPaperSizeModal = async () => {
+    if (paperSizeRows.value.length === 0) {
+        await fetchPaperSizes();
+    }
+    showPaperSizeModal.value = true;
+};
 
 // Scoring Tool Modal
 const showScoringToolModal = ref(false);
@@ -1413,9 +1435,9 @@ const onColorSelected = (color) => {
     showColorModal.value = false;
 };
 
-// Score L/W state and calculators
-const scoreL = ref(Array(10).fill(''));
-const scoreW = ref(Array(10).fill(''));
+// Score L/W state and calculators (8 columns only: SL1..SL8, SW1..SW8)
+const scoreL = ref(Array(8).fill(''));
+const scoreW = ref(Array(8).fill(''));
 const scoreLTotal = ref('');
 const scoreWTotal = ref('');
 
@@ -1428,11 +1450,25 @@ const calculateScore = (arr) => {
 };
 
 const calculateScoreL = () => {
-    scoreLTotal.value = calculateScore(scoreL.value);
+    const totalStr = calculateScore(scoreL.value);
+    scoreLTotal.value = totalStr;
+
+    const totalNum = parseFloat(totalStr);
+    if (!isNaN(totalNum)) {
+        // Sheet Length = (jumlah Score L) + 5 mm (trim trailing zeros)
+        sheetLength.value = formatTrimZeros((totalNum + 5).toFixed(2));
+    }
 };
 
 const calculateScoreW = () => {
-    scoreWTotal.value = calculateScore(scoreW.value);
+    const totalStr = calculateScore(scoreW.value);
+    scoreWTotal.value = totalStr;
+
+    const totalNum = parseFloat(totalStr);
+    if (!isNaN(totalNum)) {
+        // Sheet Width = jumlah Score W (mm), trim trailing zeros
+        sheetWidth.value = formatTrimZeros(totalNum.toFixed(2));
+    }
 };
 
 // Finishing Modal
@@ -1520,23 +1556,23 @@ const openMspModal = () => {
     // Load existing MSP data from mcLoaded if available
     const loaded = props.mcLoaded || {};
     const existingMspData = {};
-    
+
     // Load MSP1 to MSP12 fields from loaded MC data
     for (let i = 1; i <= 12; i++) {
         const mchKey = `MSP${i}_MCH`;
         const upKey = `MSP${i}_UP`;
         const instKey = `MSP${i}_SPECIAL_INST`;
-        
+
         if (loaded[mchKey]) {
             existingMspData[`msp${i}_mch`] = loaded[mchKey];
             existingMspData[`msp${i}_up`] = loaded[upKey] || '';
             existingMspData[`msp${i}_special_inst`] = loaded[instKey] || '';
         }
     }
-    
+
     // Pass existing data to modal
     mspData.value = existingMspData;
-    showMspModal.value = true; 
+    showMspModal.value = true;
 };
 const onMspSave = (data) => {
     mspData.value = data;
@@ -1659,14 +1695,14 @@ const mcGrossM2PerPcs = computed(() => {
     const conOutVal = parseFloat(conOut.value) || 1;
     const convOut1 = parseFloat(convDuctX2A.value) || 1;
     const convOut2 = parseFloat(convDuctX2B.value) || 1;
-    
+
     if (sheetLen === 0 || paperSize === 0) return 0;
-    
+
     const numerator = sheetLen * paperSize * joint;
     const denominator = conOutVal * convOut1 * convOut2;
-    
+
     if (denominator === 0) return 0;
-    
+
     return (numerator / denominator) / 1000000;
 });
 
@@ -1676,14 +1712,14 @@ const mcNetM2PerPcs = computed(() => {
     const sheetWid = parseFloat(sheetWidth.value) || 0;
     const convOut1 = parseFloat(convDuctX2A.value) || 1;
     const convOut2 = parseFloat(convDuctX2B.value) || 1;
-    
+
     if (sheetLen === 0 || sheetWid === 0) return 0;
-    
+
     const numerator = sheetLen * sheetWid;
     const denominator = convOut1 * convOut2;
-    
+
     if (denominator === 0) return 0;
-    
+
     return (numerator / 1000000) / denominator;
 });
 
@@ -1691,20 +1727,20 @@ const mcNetM2PerPcs = computed(() => {
 const mcGrossKgPerSet = computed(() => {
     // Get the selected flute data to retrieve ratio layers
     const selectedFlute = props.paperFlutes?.find(f => f.code === selectedPaperFlute.value || f.Flute === selectedPaperFlute.value);
-    
+
     if (!selectedFlute || mcGrossM2PerPcs.value === 0) return 0;
-    
+
     // Extract ratio layers from flute data
     const ratioDB = parseFloat(selectedFlute.DB) || 0;
     const ratioB = parseFloat(selectedFlute.B) || 0;
     const ratio1L = parseFloat(selectedFlute._1L) || 0;
     const ratioACE = parseFloat(selectedFlute.A_C_E) || 0;
     const ratio2L = parseFloat(selectedFlute._2L) || 0;
-    
+
     // Get SO values from component forms or props
     const idx = selectedComponentIndex.value ?? 0;
     const soArr = componentForms.value[idx]?.soValues ?? props.soValues ?? [];
-    
+
     // Helper function to extract GSM from paper quality string (e.g., "AGBS200" -> 200)
     const extractGSM = (paperQuality) => {
         if (!paperQuality) return 0;
@@ -1713,28 +1749,28 @@ const mcGrossKgPerSet = computed(() => {
         const match = str.match(/\d+/);
         return match ? parseFloat(match[0]) : 0;
     };
-    
+
     // Calculate each layer contribution
     // SO PQ1 * mc_gross_m2_per_pcs * ratio layer 1 (DB)
     const gsm1 = extractGSM(soArr[0]);
     const layer1 = (gsm1 / 1000) * mcGrossM2PerPcs.value * ratioDB;
-    
+
     // SO PQ2 / 1000 * mc_gross_m2_per_pcs * ratio layer 2 (B)
     const gsm2 = extractGSM(soArr[1]);
     const layer2 = (gsm2 / 1000) * mcGrossM2PerPcs.value * ratioB;
-    
+
     // SO PQ3 / 1000 * mc_gross_m2_per_pcs * ratio layer 3 (1L)
     const gsm3 = extractGSM(soArr[2]);
     const layer3 = (gsm3 / 1000) * mcGrossM2PerPcs.value * ratio1L;
-    
+
     // SO PQ4 / 1000 * mc_gross_m2_per_pcs * ratio layer 4 (A/C/E)
     const gsm4 = extractGSM(soArr[3]);
     const layer4 = (gsm4 / 1000) * mcGrossM2PerPcs.value * ratioACE;
-    
+
     // SO PQ5 / 1000 * mc_gross_m2_per_pcs * ratio layer 5 (2L)
     const gsm5 = extractGSM(soArr[4]);
     const layer5 = (gsm5 / 1000) * mcGrossM2PerPcs.value * ratio2L;
-    
+
     // Sum all layers
     return layer1 + layer2 + layer3 + layer4 + layer5;
 });
@@ -1743,20 +1779,20 @@ const mcGrossKgPerSet = computed(() => {
 const mcNetKgPerPcs = computed(() => {
     // Get the selected flute data to retrieve ratio layers
     const selectedFlute = props.paperFlutes?.find(f => f.code === selectedPaperFlute.value || f.Flute === selectedPaperFlute.value);
-    
+
     if (!selectedFlute || mcNetM2PerPcs.value === 0) return 0;
-    
+
     // Extract ratio layers from flute data
     const ratioDB = parseFloat(selectedFlute.DB) || 0;
     const ratioB = parseFloat(selectedFlute.B) || 0;
     const ratio1L = parseFloat(selectedFlute._1L) || 0;
     const ratioACE = parseFloat(selectedFlute.A_C_E) || 0;
     const ratio2L = parseFloat(selectedFlute._2L) || 0;
-    
+
     // Get SO values from component forms or props
     const idx = selectedComponentIndex.value ?? 0;
     const soArr = componentForms.value[idx]?.soValues ?? props.soValues ?? [];
-    
+
     // Helper function to extract GSM from paper quality string (e.g., "AGBS200" -> 200)
     const extractGSM = (paperQuality) => {
         if (!paperQuality) return 0;
@@ -1765,28 +1801,28 @@ const mcNetKgPerPcs = computed(() => {
         const match = str.match(/\d+/);
         return match ? parseFloat(match[0]) : 0;
     };
-    
+
     // Calculate each layer contribution using NET M2 instead of GROSS M2
     // SO PQ1 * mc_net_m2_per_pcs * ratio layer 1 (DB)
     const gsm1 = extractGSM(soArr[0]);
     const layer1 = (gsm1 / 1000) * mcNetM2PerPcs.value * ratioDB;
-    
+
     // SO PQ2 / 1000 * mc_net_m2_per_pcs * ratio layer 2 (B)
     const gsm2 = extractGSM(soArr[1]);
     const layer2 = (gsm2 / 1000) * mcNetM2PerPcs.value * ratioB;
-    
+
     // SO PQ3 / 1000 * mc_net_m2_per_pcs * ratio layer 3 (1L)
     const gsm3 = extractGSM(soArr[2]);
     const layer3 = (gsm3 / 1000) * mcNetM2PerPcs.value * ratio1L;
-    
+
     // SO PQ4 / 1000 * mc_net_m2_per_pcs * ratio layer 4 (A/C/E)
     const gsm4 = extractGSM(soArr[3]);
     const layer4 = (gsm4 / 1000) * mcNetM2PerPcs.value * ratioACE;
-    
+
     // SO PQ5 / 1000 * mc_net_m2_per_pcs * ratio layer 5 (2L)
     const gsm5 = extractGSM(soArr[4]);
     const layer5 = (gsm5 / 1000) * mcNetM2PerPcs.value * ratio2L;
-    
+
     // Sum all layers
     return layer1 + layer2 + layer3 + layer4 + layer5;
 });
@@ -1888,8 +1924,9 @@ const clearPdFields = () => {
     printColorCodes.value = ['', '', '', '', '', '', ''];
     // Color area percents (7 slots)
     colorAreaPercents.value = ['','', '', '', '', '', ''];
-    scoreL.value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    scoreW.value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    // Scores (8 slots for SL1..SL8, SW1..SW8)
+    scoreL.value = [0, 0, 0, 0, 0, 0, 0, 0];
+    scoreW.value = [0, 0, 0, 0, 0, 0, 0, 0];
     sheetLength.value = '';
     sheetWidth.value = '';
     conOut.value = '';
@@ -2016,7 +2053,7 @@ const hydratePdFromObject = (pd, loaded) => {
         selectedBundlingStringCode.value = (loaded.STRING_TYPE ?? '') + '';
         bundlingStringQty.value = formatTrimZeros(loaded.PCS_PER_BLD ?? '');
         // Packs and process flags
-        bdlPerPallet.value = (loaded.BLD_PER_PLD ?? '') + '';
+        bdlPerPallet.value = formatTrimZeros(loaded.BLD_PER_PLD ?? '');
         peelOffPercent.value = formatTrimZeros(loaded.PEEL_OFF_PERCENT ?? '');
         handHole.value = toBool(loaded.HAND_HOLE);
         rotaryDCut.value = toBool(loaded.ROTARY_DC);
@@ -2068,20 +2105,20 @@ const hydratePdFromObject = (pd, loaded) => {
     colorAreaPercents.value = Array.isArray(pd.colorAreaPercents) ? pd.colorAreaPercents : colorAreaPercents.value;
     scoreL.value = Array.isArray(pd.scoreL) ? pd.scoreL : scoreL.value;
     scoreW.value = Array.isArray(pd.scoreW) ? pd.scoreW : scoreW.value;
-    sheetLength.value = pd.sheetLength || (loaded.SHEET_LENGTH ?? '') + '';
-    sheetWidth.value = pd.sheetWidth || (loaded.SHEET_WIDTH ?? '') + '';
-    conOut.value = pd.conOut || (loaded.CORR_OUT ?? '') + '';
+    sheetLength.value = pd.sheetLength || formatTrimZeros(loaded.SHEET_LENGTH ?? '');
+    sheetWidth.value = pd.sheetWidth || formatTrimZeros(loaded.SHEET_WIDTH ?? '');
+    conOut.value = pd.conOut || formatTrimZeros(loaded.CORR_OUT ?? '');
     convDuctX2.value = pd.convDuctX2 || '';
     // If pd_setup provides explicit slit/die parts, prefer them
-    convDuctX2A.value = (pd.slitOut ?? convDuctX2A.value ?? '') + '';
-    convDuctX2B.value = (pd.dieOut ?? convDuctX2B.value ?? '') + '';
-    pcsToJoint.value = pd.pcsToJoint || (loaded.JOIN_ ?? '') + '';
-    idL.value = (pd.id?.L || (loaded.INT_LENGTH ?? '')) + '';
-    idW.value = (pd.id?.W || (loaded.INT_WIDTH ?? '')) + '';
-    idH.value = (pd.id?.H || (loaded.INT_HEIGHT ?? '')) + '';
-    edL.value = (pd.ed?.L || (loaded.EXT_LENGTH ?? '')) + '';
-    edW.value = (pd.ed?.W || (loaded.EXT_WIDTH ?? '')) + '';
-    edH.value = (pd.ed?.H || (loaded.EXT_HEIGHT ?? '')) + '';
+    convDuctX2A.value = formatTrimZeros(pd.slitOut ?? convDuctX2A.value ?? '');
+    convDuctX2B.value = formatTrimZeros(pd.dieOut ?? convDuctX2B.value ?? '');
+    pcsToJoint.value = pd.pcsToJoint || formatTrimZeros(loaded.JOIN_ ?? '');
+    idL.value = formatTrimZeros(pd.id?.L ?? loaded.INT_LENGTH ?? '');
+    idW.value = formatTrimZeros(pd.id?.W ?? loaded.INT_WIDTH ?? '');
+    idH.value = formatTrimZeros(pd.id?.H ?? loaded.INT_HEIGHT ?? '');
+    edL.value = formatTrimZeros(pd.ed?.L ?? loaded.EXT_LENGTH ?? '');
+    edW.value = formatTrimZeros(pd.ed?.W ?? loaded.EXT_WIDTH ?? '');
+    edH.value = formatTrimZeros(pd.ed?.H ?? loaded.EXT_HEIGHT ?? '');
     pcsPerSet.value = pd.pcsPerSet || '';
     creaseValue.value = pd.creaseValue || '';
     nestSlot.value = pd.nestSlot || '';
@@ -2100,7 +2137,8 @@ const hydratePdFromObject = (pd, loaded) => {
     fullBlockPrint.value = !!pd.fullBlockPrint;
     selectedFinishingCode.value = pd.selectedFinishingCode || '';
     selectedStitchWireCode.value = pd.selectedStitchWireCode || loaded.SWIRE || '';
-    stitchWirePieces.value = pd.stitchWirePieces || '';
+    // Re-apply formatting so pcs stay trimmed
+    stitchWirePieces.value = formatTrimZeros(pd.stitchWirePieces || stitchWirePieces.value || '');
     selectedBundlingStringCode.value = pd.selectedBundlingStringCode || loaded.STRING_TYPE || '';
     bundlingStringQty.value = formatTrimZeros(pd.bundlingStringQty || (loaded.PCS_PER_BLD ?? ''));
     selectedGlueingCode.value = pd.selectedGlueingCode || '';
@@ -2140,9 +2178,9 @@ const makeEmptyPdState = () => ({
     // Dimensions
     id: { L: '', W: '', H: '' },
     ed: { L: '', W: '', H: '' },
-    // Scores
-    scoreL: ['', '', '', '', '', '', '', '', '', ''],
-    scoreW: ['', '', '', '', '', '', '', '', '', ''],
+    // Scores (8 slots)
+    scoreL: ['', '', '', '', '', '', '', ''],
+    scoreW: ['', '', '', '', '', '', '', ''],
     // Sheet & paper size
     sheetLength: '',
     sheetWidth: '',
@@ -2275,12 +2313,12 @@ watch(mcComponentsToRender, (rows) => {
         });
         return;
     }
-    
+
     console.log('📝 Updating localComponents from mcComponentsToRender:', {
         rowsCount: rows.length,
         rows: rows.map(r => ({ c_num: r.c_num, pd: r.pd }))
     });
-    
+
     // Preserve existing edits by merging on index
     const next = rows.map((row, idx) => ({
         ...(localComponents.value[idx] || {}),
@@ -2433,12 +2471,12 @@ watch(() => props.mcLoaded, (loaded) => {
                     H: edSrc.H ?? cf.ed.H ?? '',
                 };
 
-                // Scores
+                // Scores (limit to 8 slots)
                 cf.scoreL = Array.isArray(compSrc.scoreL)
-                    ? compSrc.scoreL.slice(0, 10).concat(['','','','','','','','','']).slice(0, 10)
+                    ? compSrc.scoreL.slice(0, 8).concat(['','','','','','','','']).slice(0, 8)
                     : cf.scoreL;
                 cf.scoreW = Array.isArray(compSrc.scoreW)
-                    ? compSrc.scoreW.slice(0, 10).concat(['','','','','','','','','']).slice(0, 10)
+                    ? compSrc.scoreW.slice(0, 8).concat(['','','','','','','','']).slice(0, 8)
                     : cf.scoreW;
 
                 // Sheet & paper size
@@ -2525,7 +2563,7 @@ const fetchMcComponentsFromDb = async () => {
         // Try multiple field names for MC sequence number
         const mcSeq = props.mcLoaded?.mc_seq || props.mcLoaded?.mcs || props.mcLoaded?.MCS_Num || props.formData?.mcs;
         const customerCode = props.formData?.ac || props.mcLoaded?.AC_NUM;
-        
+
         console.log('🔍 fetchMcComponentsFromDb - Data check:', {
             mcLoaded: props.mcLoaded,
             formData: props.formData,
@@ -2533,7 +2571,7 @@ const fetchMcComponentsFromDb = async () => {
             customerCode: customerCode,
             mcLoaded_keys: props.mcLoaded ? Object.keys(props.mcLoaded) : []
         });
-        
+
         if (!mcSeq || !customerCode) {
             console.warn('Cannot fetch components: missing mc_seq or customer_code', {
                 mcSeq: mcSeq,
@@ -2543,24 +2581,24 @@ const fetchMcComponentsFromDb = async () => {
             });
             return;
         }
-        
+
         const mcsSeqEnc = encodeURIComponent(mcSeq);
         const custEnc = encodeURIComponent(customerCode);
-        
+
         console.log('🔄 Fetching MC components from database:', { mcSeq, customerCode });
-        
+
         const response = await fetch(`/api/update-mc/master-cards/${mcsSeqEnc}/components?customer_code=${custEnc}`, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
+
         if (!response.ok) {
             console.warn('Failed to fetch components:', response.statusText);
             return;
         }
-        
+
         const data = await response.json();
         console.log('✅ MC components fetched from database:', data);
 
@@ -2661,12 +2699,12 @@ const fetchMcComponentsFromDb = async () => {
                         H: edSrc.H ?? cf.ed.H ?? '',
                     };
 
-                    // Scores
+                    // Scores (limit to 8 slots)
                     cf.scoreL = Array.isArray(fetchedComp.scoreL)
-                        ? fetchedComp.scoreL.slice(0, 10).concat(['','','','','','','','','']).slice(0, 10)
+                        ? fetchedComp.scoreL.slice(0, 8).concat(['','','','','','','','']).slice(0, 8)
                         : cf.scoreL;
                     cf.scoreW = Array.isArray(fetchedComp.scoreW)
-                        ? fetchedComp.scoreW.slice(0, 10).concat(['','','','','','','','','']).slice(0, 10)
+                        ? fetchedComp.scoreW.slice(0, 8).concat(['','','','','','','','']).slice(0, 8)
                         : cf.scoreW;
 
                     // Sheet & paper size
@@ -2762,13 +2800,13 @@ const onSelectComponent = (component, index) => {
         index: index,
         component_c_num: component?.c_num
     });
-    
+
     selectedComponentIndex.value = index;
-    
+
     // Emit to parent to update mcComponents selection state
     console.log('📡 UpdateMcModal - Emitting selectComponent to parent');
     emit('selectComponent', component, index);
-    
+
     // When selecting a component, reflect its SO/WO into parent UI state
     try {
         const idx = selectedComponentIndex.value;
@@ -2811,66 +2849,65 @@ const openSetupPd = () => {
         // Core identifiers
         partNo.value = cf.partNo || row.part_num || partNo.value || '';
         selectedProductDesign.value = cf.selectedProductDesign || row.pd || selectedProductDesign.value || '';
-        pcsPerSet.value = cf.pcsPerSet || row.pcs_set || pcsPerSet.value || '';
+        pcsPerSet.value = formatTrimZeros(cf.pcsPerSet || row.pcs_set || pcsPerSet.value || '');
 
-        // Dimensions
-        idL.value = (cf.id?.L ?? idL.value ?? '').toString();
-        idW.value = (cf.id?.W ?? idW.value ?? '').toString();
-        idH.value = (cf.id?.H ?? idH.value ?? '').toString();
-        edL.value = (cf.ed?.L ?? edL.value ?? '').toString();
-        edW.value = (cf.ed?.W ?? edW.value ?? '').toString();
-        edH.value = (cf.ed?.H ?? edH.value ?? '').toString();
+        idL.value = formatTrimZeros(cf.id?.L ?? idL.value ?? '');
+        idW.value = formatTrimZeros(cf.id?.W ?? idW.value ?? '');
+        idH.value = formatTrimZeros(cf.id?.H ?? idH.value ?? '');
+        edL.value = formatTrimZeros(cf.ed?.L ?? edL.value ?? '');
+        edW.value = formatTrimZeros(cf.ed?.W ?? edW.value ?? '');
+        edH.value = formatTrimZeros(cf.ed?.H ?? edH.value ?? '');
 
         // Sheet & paper size
-        sheetLength.value = (cf.sheetLength ?? sheetLength.value ?? '').toString();
-        sheetWidth.value = (cf.sheetWidth ?? sheetWidth.value ?? '').toString();
+        sheetLength.value = formatTrimZeros(cf.sheetLength ?? sheetLength.value ?? '');
+        sheetWidth.value = formatTrimZeros(cf.sheetWidth ?? sheetWidth.value ?? '');
         selectedPaperSize.value = (cf.selectedPaperSize ?? selectedPaperSize.value ?? '').toString();
 
-        // Scores
+        // Scores (8 slots)
         if (Array.isArray(cf.scoreL)) {
-            scoreL.value = cf.scoreL.map(v => (v ?? '').toString()).slice(0, 10).concat(['','','','','','','','','']).slice(0, 10);
+            scoreL.value = cf.scoreL.map(v => formatTrimZeros(v ?? '')).slice(0, 8).concat(['','','','','','','','']).slice(0, 8);
         }
         if (Array.isArray(cf.scoreW)) {
-            scoreW.value = cf.scoreW.map(v => (v ?? '').toString()).slice(0, 10).concat(['','','','','','','','','']).slice(0, 10);
+            scoreW.value = cf.scoreW.map(v => formatTrimZeros(v ?? '')).slice(0, 8).concat(['','','','','','','','']).slice(0, 8);
         }
 
-        // Colors & area percents
+        // Colors & area percents (Print Area)
         if (Array.isArray(cf.printColorCodes)) {
             printColorCodes.value = cf.printColorCodes.map(v => (v ?? '').toString()).slice(0, 7).concat(['','','','','','']).slice(0, 7);
         }
         if (Array.isArray(cf.colorAreaPercents)) {
-            colorAreaPercents.value = cf.colorAreaPercents.map(v => (v ?? '').toString()).slice(0, 7).concat(['','','','','','']).slice(0, 7);
+            colorAreaPercents.value = cf.colorAreaPercents.map(v => formatTrimZeros(v ?? '')).slice(0, 7).concat(['','','','','','']).slice(0, 7);
         }
 
         // Misc PD fields
-        nestSlot.value = (cf.nestSlot ?? nestSlot.value ?? '').toString();
-        creaseValue.value = (cf.creaseValue ?? creaseValue.value ?? '').toString();
+        nestSlot.value = formatTrimZeros(cf.nestSlot ?? nestSlot.value ?? '');
+        creaseValue.value = formatTrimZeros(cf.creaseValue ?? creaseValue.value ?? '');
         selectedReinforcementTape.value = (cf.selectedReinforcementTape ?? selectedReinforcementTape.value ?? '').toString();
         selectedChemicalCoat.value = (cf.selectedChemicalCoat ?? selectedChemicalCoat.value ?? '').toString();
 
         // Diecut
-        dcutSheetL.value = (cf.dcutSheet?.L ?? dcutSheetL.value ?? '').toString();
-        dcutSheetW.value = (cf.dcutSheet?.W ?? dcutSheetW.value ?? '').toString();
-        dcutMouldL.value = (cf.dcutMould?.L ?? dcutMouldL.value ?? '').toString();
-        dcutMouldW.value = (cf.dcutMould?.W ?? dcutMouldW.value ?? '').toString();
+        dcutSheetL.value = formatTrimZeros(cf.dcutSheet?.L ?? dcutSheetL.value ?? '');
+        dcutSheetW.value = formatTrimZeros(cf.dcutSheet?.W ?? dcutSheetW.value ?? '');
+        dcutMouldL.value = formatTrimZeros(cf.dcutMould?.L ?? dcutMouldL.value ?? '');
+        dcutMouldW.value = formatTrimZeros(cf.dcutMould?.W ?? dcutMouldW.value ?? '');
         dcutBlockNo.value = (cf.dcutBlockNo ?? dcutBlockNo.value ?? '').toString();
         pitBlockNo.value = (cf.pitBlockNo ?? pitBlockNo.value ?? '').toString();
 
         // Stitch / bundling
-        stitchWirePieces.value = (cf.stitchWirePieces ?? stitchWirePieces.value ?? '').toString();
+        stitchWirePieces.value = formatTrimZeros(cf.stitchWirePieces ?? stitchWirePieces.value ?? '');
         selectedStitchWireCode.value = (cf.selectedStitchWireCode ?? selectedStitchWireCode.value ?? '').toString();
-        bundlingStringQty.value = (cf.bundlingStringQty ?? bundlingStringQty.value ?? '').toString();
+        bundlingStringQty.value = formatTrimZeros(cf.bundlingStringQty ?? bundlingStringQty.value ?? '');
         selectedBundlingStringCode.value = (cf.selectedBundlingStringCode ?? selectedBundlingStringCode.value ?? '').toString();
 
         // Glueing / wrapping / finishing
         selectedGlueingCode.value = (cf.selectedGlueingCode ?? selectedGlueingCode.value ?? '').toString();
         selectedWrappingCode.value = (cf.selectedWrappingCode ?? selectedWrappingCode.value ?? '').toString();
-        bdlPerPallet.value = (cf.bdlPerPallet ?? bdlPerPallet.value ?? '').toString();
+        bdlPerPallet.value = formatTrimZeros(cf.bdlPerPallet ?? bdlPerPallet.value ?? '');
         selectedFinishingCode.value = (cf.selectedFinishingCode ?? selectedFinishingCode.value ?? '').toString();
 
         // Other flags / remarks
         itemRemark.value = (cf.itemRemark ?? itemRemark.value ?? '').toString();
-        peelOffPercent.value = (cf.peelOffPercent ?? peelOffPercent.value ?? '').toString();
+        peelOffPercent.value = formatTrimZeros(cf.peelOffPercent ?? peelOffPercent.value ?? '');
         handHole.value = !!(cf.handHole ?? handHole.value);
         rotaryDCut.value = !!(cf.rotaryDCut ?? rotaryDCut.value);
         fullBlockPrint.value = !!(cf.fullBlockPrint ?? fullBlockPrint.value);
