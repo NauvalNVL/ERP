@@ -1152,9 +1152,88 @@ const clearSoWo = () => {
     soValues.value = ['', '', '', '', ''];
     woValues.value = ['', '', '', '', ''];
 };
+
+// Reset whole Update MC page to its initial state (similar to refreshing the page)
+const resetUpdateMcPage = () => {
+    // Close all related modals
+    showSetupPdModal.value = false;
+    showSetupMcModal.value = false;
+    showMcsTableModal.value = false;
+    showCustomerAccountTable.value = false;
+
+    // Reset main form
+    isProgrammaticUpdate.value = true;
+    form.value = {
+        ac: "",
+        mcs: "",
+        customer_name: "",
+        mc_model: "",
+        mc_short_model: "",
+        mc_status: "Active",
+        mc_approval: "No",
+        comp_no: "Main",
+    };
+    isProgrammaticUpdate.value = false;
+
+    // Reset selection and detailed info
+    selectedCustomer.value = null;
+    selectedMcs.value = null;
+    selectedMcsFull.value = null;
+    recordMode.value = "new";
+    recordSelected.value = false;
+    showDetailedMcInfo.value = false;
+    clearSoWo();
+
+    mcDetails.value = {
+        ac_name: "",
+        mc_model: "",
+        mc_short_model: "",
+        mc_status: "Active",
+        mc_approval: "No",
+        last_mcs: "",
+        last_updated_seq: "",
+        ext_dim_1: "",
+        ext_dim_2: "",
+        ext_dim_3: "",
+        int_dim_1: "",
+        int_dim_2: "",
+        int_dim_3: "",
+    };
+
+    // Reset MC components list
+    mcComponents.value = [
+        { c_num: "Main", pd: "", pcs_set: "", part_num: "", selected: true },
+        { c_num: "Fit1", pd: "", pcs_set: "", part_num: "", selected: false },
+        { c_num: "Fit2", pd: "", pcs_set: "", part_num: "", selected: false },
+        { c_num: "Fit3", pd: "", pcs_set: "", part_num: "", selected: false },
+        { c_num: "Fit4", pd: "", pcs_set: "", part_num: "", selected: false },
+        { c_num: "Fit5", pd: "", pcs_set: "", part_num: "", selected: false },
+        { c_num: "Fit6", pd: "", pcs_set: "", part_num: "", selected: false },
+        { c_num: "Fit7", pd: "", pcs_set: "", part_num: "", selected: false },
+        { c_num: "Fit8", pd: "", pcs_set: "", part_num: "", selected: false },
+        { c_num: "Fit9", pd: "", pcs_set: "", part_num: "", selected: false },
+    ];
+
+    // Reset MC list state
+    mcsMasterCards.value = [];
+    mcsCurrentPage.value = 1;
+    mcsLastPage.value = 1;
+    mcsSearchTerm.value = "";
+    mcsStatusFilter.value = "Act";
+};
 const saveMasterCardFromModal = async (pdSetup = null) => {
     try {
         const pdRoot = pdSetup ? { ...pdSetup } : {};
+
+        // Normalize moreDescriptions to a plain array for backend
+        let normalizedMoreDescriptions = [];
+        if (pdRoot.moreDescriptions && Array.isArray(pdRoot.moreDescriptions.value)) {
+            normalizedMoreDescriptions = [...pdRoot.moreDescriptions.value];
+        } else if (Array.isArray(pdRoot.moreDescriptions)) {
+            normalizedMoreDescriptions = [...pdRoot.moreDescriptions];
+        }
+        pdRoot.moreDescriptions = normalizedMoreDescriptions;
+
         // Ensure SO/WO arrays are always present at root for backend mapping
         pdRoot.soValues = Array.isArray(soValues.value) ? [...soValues.value] : [];
         pdRoot.woValues = Array.isArray(woValues.value) ? [...woValues.value] : [];
@@ -1209,6 +1288,8 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
             pd_setup: pdRoot,
             // Include PD setup data directly in payload for better mapping
             ...pdRoot,
+            // Explicit root-level moreDescriptions array
+            moreDescriptions: normalizedMoreDescriptions,
         };
 
         console.log('📤 Payload being sent:', {
@@ -1216,7 +1297,9 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
             customer_code: payload.customer_code,
             comp_no: payload.comp_no,
             comp_no_type: typeof payload.comp_no,
-            comp_no_empty: !payload.comp_no
+            comp_no_empty: !payload.comp_no,
+            pd_moreDescriptions: pdRoot.moreDescriptions,
+            payload_moreDescriptions: payload.moreDescriptions,
         });
 
         // Get CSRF token from meta tag or cookie
@@ -1250,7 +1333,8 @@ const saveMasterCardFromModal = async (pdSetup = null) => {
         } catch (e) {
             console.error('Failed to refresh full MC after save:', e);
         }
-        // Keep Setup PD modal open after save as requested
+        // After successful save, reset page to initial state (user must reselect AC and MCS)
+        resetUpdateMcPage();
     } catch (e) {
         console.error('=== SAVE MASTERCARD ERROR ===');
         console.error('Full Error:', e);

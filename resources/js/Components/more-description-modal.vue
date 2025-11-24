@@ -5,13 +5,6 @@
                 <h3 class="text-lg font-semibold">More Description</h3>
                 <button @click="$emit('close')" class="text-white hover:text-gray-200"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <div class="px-3 py-2 border-b border-gray-200 bg-gray-50 flex items-center space-x-2 text-gray-600">
-                <i class="fas fa-power-off"></i>
-                <i class="fas fa-times"></i>
-                <i class="fas fa-save"></i>
-                <i class="fas fa-print"></i>
-                <i class="fas fa-sync-alt"></i>
-            </div>
             <div class="p-4">
                 <div class="border rounded">
                     <table class="w-full text-xs">

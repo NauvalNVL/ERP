@@ -2192,8 +2192,8 @@ const hydratePdFromObject = (pd, loaded) => {
     conOut.value = pd.conOut || formatTrimZeros(loaded.CORR_OUT ?? '');
     convDuctX2.value = pd.convDuctX2 || '';
     // If pd_setup provides explicit slit/die parts, prefer them
-    convDuctX2A.value = formatTrimZeros(pd.slitOut ?? convDuctX2A.value ?? '');
-    convDuctX2B.value = formatTrimZeros(pd.dieOut ?? convDuctX2B.value ?? '');
+    convDuctX2A.value = formatTrimZeros(pd.slitOut ?? pd.SLIT_OUT ?? loaded.SLIT_OUT ?? '');
+    convDuctX2B.value = formatTrimZeros(pd.dieOut ?? pd.DIE_OUT ?? loaded.DIE_OUT ?? '');
     pcsToJoint.value = pd.pcsToJoint || formatTrimZeros(loaded.JOIN_ ?? '');
     idL.value = formatTrimZeros(pd.id?.L ?? loaded.INT_LENGTH ?? '');
     idW.value = formatTrimZeros(pd.id?.W ?? loaded.INT_WIDTH ?? '');
