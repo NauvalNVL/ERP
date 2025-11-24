@@ -820,7 +820,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   
   // Header
   doc.setFont('courier', 'bold')
-  doc.setFontSize(9)
+  doc.setFontSize(10)
   doc.text('PT. MULTIBOX INDAH', leftMargin, yPos)
   doc.text(`S/ORDER# : ${so.so_number || ''}`, rightMargin, yPos, { align: 'right' })
   yPos += 11
@@ -831,7 +831,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   
   // Credit control line
   doc.setFont('courier', 'normal')
-  doc.setFontSize(8)
+  doc.setFontSize(9)
   const creditControl = 'Credit Control: System Approved'
   const creditDate = new Date().toLocaleString('en-GB', { 
     day: '2-digit', 
@@ -855,50 +855,91 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   yPos += 10
   
   // Customer section (left side)
+  const customerStartY = yPos // Store the starting Y position for alignment
   doc.setFont('courier', 'bold')
-  doc.setFontSize(8)
+  doc.setFontSize(9)
   doc.text('CUSTOMER:', leftMargin, yPos)
   yPos += 10
   
   doc.setFont('courier', 'normal')
   doc.text(so.customer_name || '', leftMargin, yPos)
+  yPos += 10
   
-  // Deliver To section (right side)
+  // Address - Format to show longer lines with proper breaks
+  const address = so.customer_address || ''
+  if (address) {
+    // Split by comma and format with proper line breaks
+    const addressParts = address.split(',').map(s => s.trim()).filter(Boolean)
+    let currentLine = ''
+    const maxLineWidth = 50 // Reduced from 70 to create more frequent breaks
+    
+    addressParts.forEach((part, index) => {
+      if (currentLine === '') {
+        currentLine = part
+      } else if (currentLine.length + part.length + 2 <= maxLineWidth) {
+        currentLine += ', ' + part
+      } else {
+        // Current line is full, write it and start new line
+        doc.text(currentLine, leftMargin, yPos)
+        yPos += 9
+        currentLine = part
+      }
+      
+      // If this is the last part, write the remaining line
+      if (index === addressParts.length - 1 && currentLine) {
+        doc.text(currentLine, leftMargin, yPos)
+        yPos += 9
+      }
+    })
+  }
+  
+  // Deliver To section (right side) - Align with CUSTOMER line
   doc.setFont('courier', 'bold')
-  doc.text('DELIVER TO:', 300, yPos - 10)
+  doc.text('DELIVER TO:', 300, customerStartY)
   doc.setFont('courier', 'normal')
   
   const deliverTo = so.delivery_location || so.customer_name || ''
-  doc.text(deliverTo, 300, yPos)
-  yPos += 10
+  doc.text(deliverTo, 300, customerStartY + 10)
   
-  // Address
-  const addressLines = (so.customer_address || '').split(',').map(s => s.trim()).filter(Boolean)
-  addressLines.forEach((line, idx) => {
-    if (idx < 3) {
-      doc.text(line, leftMargin, yPos)
-      yPos += 9
-    }
-  })
-  
-  // Delivery address (right side)
-  const deliveryAddressLines = (so.delivery_address || so.customer_address || '').split(',').map(s => s.trim()).filter(Boolean)
-  let deliveryYPos = yPos - (addressLines.length * 9)
-  deliveryAddressLines.forEach((line, idx) => {
-    if (idx < 3) {
-      doc.text(line, 300, deliveryYPos)
-      deliveryYPos += 9
-    }
-  })
-  
-  yPos = Math.max(yPos, deliveryYPos) + 5
+  // Delivery address (right side) - Format properly
+  const deliveryAddress = so.delivery_address || ''
+  if (deliveryAddress) {
+    let deliveryYPos = customerStartY + 20
+    const deliveryParts = deliveryAddress.split(',').map(s => s.trim()).filter(Boolean)
+    let currentDeliveryLine = ''
+    const maxDeliveryLineWidth = 50 // Reduced from 70 to create more frequent breaks
+    
+    deliveryParts.forEach((part, index) => {
+      if (currentDeliveryLine === '') {
+        currentDeliveryLine = part
+      } else if (currentDeliveryLine.length + part.length + 2 <= maxDeliveryLineWidth) {
+        currentDeliveryLine += ', ' + part
+      } else {
+        // Current line is full, write it and start new line
+        doc.text(currentDeliveryLine, 300, deliveryYPos)
+        deliveryYPos += 9
+        currentDeliveryLine = part
+      }
+      
+      // If this is the last part, write the remaining line
+      if (index === deliveryParts.length - 1 && currentDeliveryLine) {
+        doc.text(currentDeliveryLine, 300, deliveryYPos)
+        deliveryYPos += 9
+      }
+    })
+    
+    // Update yPos to the maximum of customer or delivery address
+    yPos = Math.max(yPos, deliveryYPos) + 5
+  } else {
+    yPos += 5
+  }
   
   // Contact info
   doc.text(`TEL : ${so.customer_tel || ''}`, leftMargin, yPos)
-  doc.text(`TEL :`, 300, yPos)
+  doc.text(`TEL : ${so.customer_tel || ''}`, 300, yPos)
   yPos += 9
-  doc.text(`FAX :`, leftMargin, yPos)
-  doc.text(`FAX :`, 300, yPos)
+  doc.text(`FAX : ${so.customer_fax || ''}`, leftMargin, yPos)
+  doc.text(`FAX : ${so.customer_fax || ''}`, 300, yPos)
   yPos += 9
   doc.text(`EMAIL :`, leftMargin, yPos)
   doc.text(`EMAIL :`, 300, yPos)
@@ -930,7 +971,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   
   // Table header - Adjusted to match data positions exactly
   doc.setFont('courier', 'bold')
-  doc.setFontSize(7)
+  doc.setFontSize(8)
   doc.text('TYPE', leftMargin, yPos)
   doc.text('DESCRIPTION', leftMargin + 35, yPos)
   doc.text('QTY', leftMargin + 315, yPos)         // Align above QTY data
@@ -945,7 +986,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
 
   // Detail rows
   doc.setFont('courier', 'normal')
-  doc.setFontSize(7)
+  doc.setFontSize(8)
   details.forEach((detail, index) => {
     if (index > 0) yPos += 5 // Add spacing between components
 
@@ -960,9 +1001,10 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
     // Part number and design info - Moved closer to TYPE column
     const partNo = so.part_number || ''
     const pDesign = detail.item_code || ''
+    const perSet = detail.per_set || 1
     doc.text(`PART NO      : ${partNo}`, leftMargin + 35, yPos)
     yPos += 8
-    doc.text(`P/DESIGN     : ${pDesign} ( PCS/SET )`, leftMargin + 35, yPos)
+    doc.text(`P/DESIGN     : ${pDesign} ( ${perSet} PCS/SET )`, leftMargin + 35, yPos)
     yPos += 8
     
     // Flute and paper quality
@@ -1010,7 +1052,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   
   // Delivery schedule
   doc.setFont('courier', 'bold')
-  doc.setFontSize(7)
+  doc.setFontSize(8)
   doc.text('DELIVERY SCHEDULE :', leftMargin, yPos)
   yPos += 9
   
@@ -1029,7 +1071,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   yPos += 9
   
   doc.setFont('courier', 'normal')
-  doc.setFontSize(7)
+  doc.setFontSize(8)
   
   // Process schedules - keep each schedule separate (don't group by date)
   const scheduleList = []
@@ -1099,7 +1141,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   
   // SO Remark
   doc.setFont('courier', 'bold')
-  doc.setFontSize(7)
+  doc.setFontSize(8)
   doc.text('SO Remark :', leftMargin, yPos)
   doc.setFont('courier', 'normal')
   doc.text(so.remark || '', leftMargin + 65, yPos)
@@ -1107,6 +1149,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   
   // Order instructions
   doc.setFont('courier', 'bold')
+  doc.setFontSize(8)
   doc.text('ORDER INSTRUCTION :', leftMargin, yPos)
   yPos += 9
   doc.setFont('courier', 'normal')
@@ -1121,7 +1164,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   yPos += 12
   
   doc.setFont('courier', 'bold')
-  doc.setFontSize(7)
+  doc.setFontSize(8)
   doc.text('CHECKED BY : .', leftMargin, yPos)
   doc.text('APPROVED BY : .', 300, yPos)
   yPos += 25
@@ -1133,7 +1176,7 @@ function renderSalesOrderPdf(doc, so, details, schedules) {
   
   // Print info
   doc.setFont('courier', 'normal')
-  doc.setFontSize(7)
+  doc.setFontSize(8)
   const issuedBy = currentUser.value.official_name || 'Unknown User'
   const issuedDate = new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
   const printedBy = currentUser.value.user_id || 'guest'
@@ -1314,8 +1357,9 @@ function renderSoReport(so, details, schedules) {
     
     // Use COMP_Num for TYPE field
     const compType = detail.comp_num || 'Main'
+    const perSet = detail.per_set || 1
     lines.push(pad(compType, 15) + pad(`PART NO      : ${so.part_number || ''}`, 35) + padL(num(qty, 0), 12) + pad(detail.uom || 'PCS', 8) + padL(num(price, 4), 14) + padL(num(amount, 2), 15))
-    lines.push(pad('', 15) + `P/DESIGN     : ${detail.item_code || ''} ( PCS/SET )`)
+    lines.push(pad('', 15) + `P/DESIGN     : ${detail.item_code || ''} ( ${perSet} PCS/SET )`)
     
     const flute = detail.flute || ''
     const pq1 = detail.paper_quality_1 || ''

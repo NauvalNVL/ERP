@@ -75,7 +75,7 @@ class DeliveryOrderController extends Controller
                 $seq = isset($parts[2]) ? ((int) $parts[2]) + 1 : 1;
             }
 
-            $doNumber = $doYear . '-' . $doMonth . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
+            $doNumber = $doMonth . '-' . $doYear . '-' . str_pad($seq, 5, '0', STR_PAD_LEFT);
 
             // Get customer information
             $customer = DB::table('CUSTOMER')

@@ -814,9 +814,11 @@ class SalesOrderController extends Controller
             }
         }
 
-        // Get customer address
+        // Get customer address and contact info
         $customer = DB::table('CUSTOMER')->where('CODE', $mainSo->AC_Num)->first();
         $customerAddress = '';
+        $customerTel = '';
+        $customerFax = '';
         if ($customer) {
             $addressParts = array_filter([
                 $customer->ADDRESS1 ?? '',
@@ -824,6 +826,8 @@ class SalesOrderController extends Controller
                 $customer->ADDRESS3 ?? ''
             ]);
             $customerAddress = implode(', ', $addressParts);
+            $customerTel = $customer->TEL_NO ?? '';
+            $customerFax = $customer->FAX_NO ?? '';
         }
 
         // Get delivery address
@@ -863,6 +867,7 @@ class SalesOrderController extends Controller
             'price_per_m2' => (float) ($mainSo->MC_NET_M2_PER_PCS ?? 0),
             'comp_num' => $mainSo->COMP_Num,
             'p_design' => $mainSo->P_DESIGN,
+            'per_set' => (float) ($mainSo->PER_SET ?? 1),
             'roll_size' => ''
         ];
 
@@ -893,6 +898,7 @@ class SalesOrderController extends Controller
                     'price_per_m2' => (float) ($soRecord->MC_NET_M2_PER_PCS ?? 0),
                     'comp_num' => $soRecord->COMP_Num,
                     'p_design' => $soRecord->P_DESIGN,
+                    'per_set' => (float) ($soRecord->PER_SET ?? 1),
                     'roll_size' => ''
                 ];
             }
@@ -906,6 +912,8 @@ class SalesOrderController extends Controller
                     'customer_code' => $mainSo->AC_Num,
                     'customer_name' => $mainSo->AC_NAME,
                     'customer_address' => $customerAddress,
+                    'customer_tel' => $customerTel,
+                    'customer_fax' => $customerFax,
                     'customer_po_number' => $mainSo->PO_Num,
                     'po_date' => $mainSo->PO_DATE,
                     'master_card_seq' => $mainSo->MCS_Num,
