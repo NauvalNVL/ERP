@@ -80,11 +80,6 @@ class UserCps extends Authenticatable
      */
     protected $casts = [
         'EXPIRY_DATE' => 'datetime',
-        'EXPIRED' => 'boolean',
-        'U_PRICE' => 'decimal:2',
-        'MC_PRICE' => 'decimal:2',
-        'PRICE' => 'decimal:2',
-        'COST' => 'decimal:2',
         'PASS' => 'hashed',
     ];
 
@@ -193,19 +188,23 @@ class UserCps extends Authenticatable
             'MOBILE' => $data['mobile_number'] ?? '',
             'TEL_' => $data['official_tel'] ?? '',
             'STS' => $data['status'] === 'A' ? 'Active' : 'Inactive',
+            // Password expiry settings
             'EXPIRY_DATE' => now()->addDays($data['password_expiry_date'] ?? 90)->format('Y-m-d'),
-            'EXPIRED' => ($data['password_expiry_date'] ?? 90) <= 0 ? 'Yes' : 'No',
-            'PRINTER' => 'Default',
-            'ROUTE' => 'Web',
-            'TYPE' => 'Standard',
-            'U_PRICE' => '0.00',
-            'AC' => 'Default',
-            'MC' => 'Web',
-            'MC_PRICE' => '0.00',
-            'SM' => '0.00',
+            'EXPIRED' => $data['amend_expired_password'] ?? 'No',
+            // Printer & menu routing
+            'PRINTER' => $data['user_printer'] ?? '',
+            'ROUTE' => $data['print_route'] ?? '',
+            'TYPE' => $data['menu_type'] ?? '',
+            // Special access flags & salesperson lock
+            'U_PRICE' => $data['access_unit_price'] ?? 'N',
+            'AC' => $data['access_customer_acct'] ?? 'N',
+            'MC' => $data['amend_mc'] ?? 'N',
+            'MC_PRICE' => $data['amend_mc_price'] ?? 'N',
+            'SM' => $data['salesperson_code'] ?? '',
             'PASS' => bcrypt($data['password'] ?? 'temporary_password'),
-            'PRICE' => '0.00',
-            'COST' => '0.00'
+            // Price & cost visibility flags
+            'PRICE' => $data['rc_rt_price'] ?? 'N',
+            'COST' => $data['board_rc_cost'] ?? 'N'
         ]);
     }
 
@@ -307,7 +306,6 @@ class UserCps extends Authenticatable
 
     public function getAmendExpiredPasswordAttribute()
     {
-        $expired = $this->attributes['EXPIRED'] ?? null;
-        return $expired === 'No' ? 'Yes' : 'No';
+        return $this->attributes['EXPIRED'] ?? null;
     }
 }

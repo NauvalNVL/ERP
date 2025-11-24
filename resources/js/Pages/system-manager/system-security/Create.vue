@@ -22,21 +22,21 @@
                 <form @submit.prevent="submitForm" class="space-y-8 w-full">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 w-full">
                         <!-- User Information -->
-                        <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 540px; contain: content;">
-                            <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
+                        <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 540px; contain: content;">
+                            <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:to-cyan-600 p-4 md:p-6">
                                 <h3 class="text-xl font-semibold text-white flex items-center">
-                                    <div class="bg-white/20 rounded-full p-2 mr-3">
+                                    <div class="bg-white/30 rounded-full p-2 mr-3">
                                         <UserCircleIcon class="h-6 w-6 text-white" />
                                     </div>
                                     User Information
                                 </h3>
                                 <p class="text-blue-100 text-sm mt-1">Basic user details</p>
                             </div>
-                            <div class="p-4 md:p-8">
-                                <div class="space-y-6">
+                            <div class="p-4 md:p-8 bg-white">
+                                <div class="space-y-6 text-gray-900">
                                     <!-- User ID -->
                                     <div>
-                                        <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-2 mr-3">
                                                 <IdentificationIcon class="h-5 w-5 text-white" />
                                             </div>
@@ -44,14 +44,14 @@
                                         </label>
                                         <input type="text" 
                                                v-model="form.user_id" 
-                                               class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                               class="block w-full px-6 py-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white hover:bg-gray-50 text-lg"
                                                placeholder="Example: USER001"
                                                required>
                                     </div>
 
                                     <!-- Username -->
                                     <div>
-                                        <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full p-2 mr-3">
                                                 <AtSymbolIcon class="h-5 w-5 text-white" />
                                             </div>
@@ -66,7 +66,7 @@
 
                                     <!-- Official Name -->
                                     <div>
-                                        <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-teal-500 to-green-500 rounded-full p-2 mr-3">
                                                 <UserIcon class="h-5 w-5 text-white" />
                                             </div>
@@ -81,7 +81,7 @@
 
                                     <!-- Official Title -->
                                     <div>
-                                        <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-2 mr-3">
                                                 <BriefcaseIcon class="h-5 w-5 text-white" />
                                             </div>
@@ -92,26 +92,130 @@
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="Job position">
                                     </div>
+
+                                    <!-- User Status -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-full p-2 mr-3">
+                                                <StatusOnlineIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            User Status
+                                        </label>
+                                        <select v-model="form.user_status" class="block w-full px-6 py-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white hover:bg-gray-50 text-lg">
+                                            <option value="A">A-Active</option>
+                                            <option value="O">O-Obsolete</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Password Expiry Date -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-red-500 to-pink-500 rounded-full p-2 mr-3">
+                                                <ClockIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            Password Expiry Date
+                                        </label>
+                                        <input type="number" 
+                                               v-model="form.password_expiry_date" 
+                                               class="block w-full px-6 py-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white hover:bg-gray-50 text-lg"
+                                               placeholder="0 Days [Zero for None]"
+                                               value="0"
+                                               min="0">
+                                    </div>
+
+                                    <!-- Amend Expired Password -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-pink-500 to-rose-500 rounded-full p-2 mr-3">
+                                                <KeyIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            Amend Expired Password
+                                        </label>
+                                        <div class="flex space-x-6">
+                                            <label class="inline-flex items-center mr-6">
+                                                <input type="radio" v-model="form.amend_password" value="Y" class="form-radio h-5 w-5 text-blue-600">
+                                                <span class="ml-2 text-gray-900 font-medium">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.amend_password" value="N" class="form-radio h-5 w-5 text-blue-600">
+                                                <span class="ml-2 text-gray-900 font-medium">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- User Printer -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-rose-500 to-red-500 rounded-full p-2 mr-3">
+                                                <PrinterIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            User Printer
+                                        </label>
+                                        <input type="text" 
+                                               v-model="form.user_printer" 
+                                               class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                               placeholder="Default printer">
+                                    </div>
+
+                                    <!-- Print Route -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full p-2 mr-3">
+                                                <SwitchHorizontalIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            Print Route
+                                        </label>
+                                        <div class="flex space-x-6">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.print_route" value="UF" class="form-radio h-5 w-5 text-blue-600" checked>
+                                                <span class="ml-2 text-gray-700">UF-User to Function</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.print_route" value="FU" class="form-radio h-5 w-5 text-blue-600">
+                                                <span class="ml-2 text-gray-700">FU-Function to User</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Menu Type -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-2 mr-3">
+                                                <MenuAlt2Icon class="h-5 w-5 text-white" />
+                                            </div>
+                                            Menu Type
+                                        </label>
+                                        <div class="flex space-x-6">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.menu_type" value="W" class="form-radio h-5 w-5 text-blue-600">
+                                                <span class="ml-2 text-gray-700">W-Windows</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.menu_type" value="V" class="form-radio h-5 w-5 text-blue-600" checked>
+                                                <span class="ml-2 text-gray-700">V-View Tree</span>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Contact Information -->
-                        <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 540px;">
-                            <div class="bg-emerald-500 md:bg-gradient-to-r md:from-emerald-500 md:to-teal-500 p-4 md:p-6">
+                        <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 540px;">
+                            <div class="bg-emerald-600 md:bg-gradient-to-r md:from-emerald-600 md:to-teal-600 p-4 md:p-6">
                                 <h3 class="text-xl font-semibold text-white flex items-center">
-                                    <div class="bg-white/20 rounded-full p-2 mr-3">
+                                    <div class="bg-white/30 rounded-full p-2 mr-3">
                                         <PhoneIcon class="h-6 w-6 text-white" />
                                     </div>
                                     Contact Information
                                 </h3>
                                 <p class="text-emerald-100 text-sm mt-1">Contact details and status</p>
                             </div>
-                            <div class="p-4 md:p-8">
-                                <div class="space-y-6">
+                            <div class="p-4 md:p-8 bg-white">
+                                <div class="space-y-6 text-gray-900">
                                     <!-- Mobile Number -->
                                     <div>
-                                        <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full p-2 mr-3">
                                                 <PhoneIcon class="h-5 w-5 text-white" />
                                             </div>
@@ -125,46 +229,198 @@
 
                                     <!-- Official Tel -->
                                     <div>
-                                        <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full p-2 mr-3">
-                                                <OfficeBuildingIcon class="h-5 w-5 text-white" />
+                                                <PhoneIcon class="h-5 w-5 text-white" />
                                             </div>
-                                            Official Telephone
+                                            <span class="text-gray-900">Official Telephone</span>
                                         </label>
                                         <input type="tel" 
                                                v-model="form.official_tel" 
                                                class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
                                                placeholder="021xxxxxxx">
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                    <!-- Status -->
+                    <!-- User Special Access -->
+                    <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 520px; contain: content;">
+                        <div class="bg-purple-600 md:bg-gradient-to-r md:from-purple-700 md:to-indigo-700 p-4 md:p-6">
+                            <h3 class="text-xl font-semibold text-white flex items-center">
+                                <div class="bg-white/30 rounded-full p-2 mr-3">
+                                    <LockClosedIcon class="h-6 w-6 text-white" />
+                                </div>
+                                User Special Access
+                            </h3>
+                            <p class="text-purple-100 text-sm mt-1">Configure special access permissions</p>
+                        </div>
+                        <div class="p-4 md:p-8">
+                            <!-- Sales Management Section -->
+                            <div class="mb-8">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                    <ShoppingCartIcon class="h-5 w-5 text-purple-600 mr-2" />
+                                    Sales Management
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <!-- Access Unit Price -->
                                     <div>
-                                        <label class="flex items-center text-lg font-semibold text-gray-800 mb-4">
-                                            <div class="bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full p-2 mr-3">
-                                                <CogIcon class="h-5 w-5 text-white" />
-                                            </div>
-                                            Status <span class="text-red-500 ml-1">*</span>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Access Unit Price</label>
+                                        <div class="flex space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.access_unit_price" value="Y" class="form-radio h-4 w-4 text-blue-600">
+                                                <span class="ml-2 text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.access_unit_price" value="N" class="form-radio h-4 w-4 text-blue-600" checked>
+                                                <span class="ml-2 text-gray-700">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Access Customer A/C -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Access Customer A/C</label>
+                                        <div class="flex space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.access_customer_acct" value="Y" class="form-radio h-4 w-4 text-blue-600">
+                                                <span class="ml-2 text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.access_customer_acct" value="N" class="form-radio h-4 w-4 text-blue-600" checked>
+                                                <span class="ml-2 text-gray-700">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Amend MC -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Amend MC</label>
+                                        <div class="flex space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.amend_mc" value="Y" class="form-radio h-4 w-4 text-blue-600">
+                                                <span class="ml-2 text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.amend_mc" value="N" class="form-radio h-4 w-4 text-blue-600" checked>
+                                                <span class="ml-2 text-gray-700">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Amend MC Price -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Amend MC Price</label>
+                                        <div class="flex space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.amend_mc_price" value="Y" class="form-radio h-4 w-4 text-blue-600">
+                                                <span class="ml-2 text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.amend_mc_price" value="N" class="form-radio h-4 w-4 text-blue-600" checked>
+                                                <span class="ml-2 text-gray-700">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Approve Duplicate PO -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Approve Duplicate PO</label>
+                                        <div class="flex space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.approve_duplicate_po" value="Y" class="form-radio h-4 w-4 text-blue-600">
+                                                <span class="ml-2 text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.approve_duplicate_po" value="N" class="form-radio h-4 w-4 text-blue-600" checked>
+                                                <span class="ml-2 text-gray-700">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Lock to Salesperson -->
+                                    <div class="col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Lock to Salesperson
                                         </label>
-                                        <RadioGroup v-model="form.status">
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <RadioGroupOption v-for="option in statusOptions" :key="option.value" :value="option.value" v-slot="{ active, checked }">
-                                                    <div :class="[active ? 'ring-2 ring-blue-300' : '', checked ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600' : 'bg-white text-gray-900 border-gray-200 hover:bg-gray-50', 'relative flex cursor-pointer rounded-xl px-6 py-4 shadow focus:outline-none border-2 transition-colors duration-200']">
-                                                        <div class="flex w-full items-center justify-between">
-                                                            <div class="flex items-center">
-                                                                <div class="text-lg">
-                                                                    <RadioGroupLabel as="p" :class="checked ? 'text-white' : 'text-gray-900'" class="font-semibold">
-                                                                        {{ option.label }}
-                                                                    </RadioGroupLabel>
-                                                                </div>
-                                                            </div>
-                                                            <div v-show="checked" class="shrink-0">
-                                                                <CheckIcon class="h-6 w-6 text-white" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </RadioGroupOption>
+                                        <div class="flex">
+                                            <div class="relative flex-grow">
+                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <UserIcon class="h-5 w-5 text-gray-400" />
+                                                </div>
+                                                <input type="text" 
+                                                       v-model="form.salesperson_code" 
+                                                       class="block w-full pl-10 pr-3 py-2 border border-r-0 border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                                       placeholder="Salesperson Code">
                                             </div>
-                                        </RadioGroup>
+                                                                            <button type="button" 
+                                                    @click="openSalespersonModal"
+                                                    class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 text-sm font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                <MagnifyingGlassIcon class="h-4 w-4 mr-1 text-white" />
+                                                Search
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Warehouse Management Section -->
+                            <div class="mb-8">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                    <BuildingStorefrontIcon class="h-5 w-5 text-purple-600 mr-2" />
+                                    Warehouse Management
+                                </h4>
+                                <div class="flex items-center">
+                                    <input type="checkbox" v-model="form.wbms_restricted_pass" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                    <label class="ml-2 block text-sm text-gray-700">
+                                        WBMS Restricted Pass
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Material Management Section -->
+                            <div class="mb-8">
+                                <h4 class="text-lg font-semibold text-black mb-4 flex items-center">
+                                    <Cog6ToothIcon class="h-5 w-5 text-purple-600 mr-2" />
+                                    Material Management (Only for MM2)
+                                </h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">RC + RT Price</label>
+                                        <div class="space-y-2">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.rc_rt_price" value="Y" class="form-radio h-4 w-4 text-blue-600">
+                                                <span class="ml-2 text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.rc_rt_price" value="N" class="form-radio h-4 w-4 text-blue-600" checked>
+                                                <span class="ml-2 text-gray-700">N-No, Cannot See Price + Tax</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Board Purchase Section -->
+                            <div>
+                                <h4 class="text-lg font-semibold text-black mb-4 flex items-center">
+                                    <ScaleIcon class="h-5 w-5 text-purple-600 mr-2" />
+                                    Board Purchase
+                                </h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Board RC Cost</label>
+                                        <div class="space-y-2">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.board_rc_cost" value="Y" class="form-radio h-4 w-4 text-blue-600">
+                                                <span class="ml-2 text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.board_rc_cost" value="N" class="form-radio h-4 w-4 text-blue-600" checked>
+                                                <span class="ml-2 text-gray-700">N-No, Cannot See Price + Tax</span>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -172,15 +428,15 @@
                     </div>
 
                     <!-- Password Settings -->
-                    <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 520px; contain: content;">
-                        <div class="bg-purple-500 md:bg-gradient-to-r md:from-purple-500 md:to-pink-500 p-4 md:p-6">
+                    <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden mt-8">
+                        <div class="bg-indigo-600 md:bg-gradient-to-r md:from-indigo-600 md:to-purple-600 p-4 md:p-6">
                             <h3 class="text-xl font-semibold text-white flex items-center">
                                 <div class="bg-white/20 rounded-full p-2 mr-3">
                                     <KeyIcon class="h-6 w-6 text-white" />
                                 </div>
                                 Password Settings
                             </h3>
-                            <p class="text-purple-100 text-sm mt-1">Configure password policies</p>
+                            <p class="text-indigo-100 text-sm mt-1">Configure password policies</p>
                         </div>
                         <div class="p-4 md:p-8">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
@@ -190,7 +446,7 @@
                                         <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-2 mr-3">
                                             <CalendarIcon class="h-5 w-5 text-white" />
                                         </div>
-                                        Password Expiry (Days)
+                                        <span class="text-gray-900">Password Expiry (Days)</span>
                                     </label>
                                     <input type="number" 
                                            v-model="form.password_expiry_date" 
@@ -205,7 +461,7 @@
                                         <div class="bg-gradient-to-r from-pink-500 to-red-500 rounded-full p-2 mr-3">
                                             <ShieldCheckIcon class="h-5 w-5 text-white" />
                                         </div>
-                                        Allow Amend Expired Password
+                                        <span class="text-gray-900">Allow Amend Expired Password</span>
                                     </label>
                                     <SwitchGroup>
                                         <div class="flex items-center p-4 bg-gray-50 rounded-xl">
@@ -224,7 +480,7 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="bg-white/80 shadow rounded-2xl border border-white/20 p-4 md:p-8" style="content-visibility:auto; contain-intrinsic-size: 1px 160px; contain: content;">
+                    <div class="bg-white shadow-lg rounded-2xl border border-gray-200 p-4 md:p-8" style="content-visibility:auto; contain-intrinsic-size: 1px 160px; contain: content;">
                         <div class="flex flex-col sm:flex-row gap-4 justify-end">
                             <Link href="/user" 
                                 class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
@@ -239,14 +495,59 @@
                         </div>
                     </div>
                 </form>
+
+                <!-- Salesperson Selection Modal -->
+                <SalespersonModal 
+                    :show="showSalespersonModal"
+                    :salespersons="salespersons"
+                    @close="showSalespersonModal = false"
+                    @select="selectSalesperson"
+                />
             </div>
         </div>
     </AppLayout>
 </template>
 
 <script>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
+
+// Import icons from Heroicons v2
+import { 
+    UserPlusIcon as UserAddIcon,
+    UserCircleIcon, 
+    AtSymbolIcon, 
+    UserIcon, 
+    BriefcaseIcon, 
+    PhoneIcon, 
+    EnvelopeIcon as MailIcon,
+    LockClosedIcon, 
+    CheckCircleIcon,
+    XMarkIcon as XIcon,
+    SignalIcon as StatusOnlineIcon,
+    ClockIcon,
+    KeyIcon,
+    PrinterIcon,
+    ArrowsRightLeftIcon as SwitchHorizontalIcon,
+    Bars3BottomLeftIcon as MenuAlt2Icon,
+    ShoppingCartIcon,
+    BuildingStorefrontIcon,
+    Cog6ToothIcon,
+    ClipboardDocumentCheckIcon,
+    ClipboardDocumentListIcon,
+    ScaleIcon,
+    BuildingOfficeIcon,
+    ShieldCheckIcon,
+    CalendarIcon,
+    ArrowDownTrayIcon as SaveIcon,
+    IdentificationIcon,
+    CheckIcon,
+    MagnifyingGlassIcon
+} from '@heroicons/vue/24/outline';
+
+// Import Headless UI components
 import { 
     RadioGroup, 
     RadioGroupLabel, 
@@ -254,86 +555,144 @@ import {
     Switch, 
     SwitchGroup, 
     SwitchLabel 
-} from '@headlessui/vue'
-import { 
-    UserIcon, 
-    UserCircleIcon,
-    UserPlusIcon as UserAddIcon,
-    AtSymbolIcon,
-    BriefcaseIcon,
-    PhoneIcon,
-    BuildingOfficeIcon as OfficeBuildingIcon,
-    CogIcon,
-    ShieldCheckIcon,
-    CalendarIcon,
-    KeyIcon,
-    XMarkIcon as XIcon,
-    ArrowDownTrayIcon as SaveIcon,
-    IdentificationIcon,
-    CheckIcon
-} from '@heroicons/vue/24/outline'
+} from '@headlessui/vue';
+
+// Import the salesperson modal component
+import SalespersonModal from '@/Components/salesperson-modal.vue';
 
 export default {
     components: {
+        // Core components
         Head,
         Link,
         AppLayout,
+        SalespersonModal,
+        
+        // Headless UI components
         RadioGroup, 
         RadioGroupLabel, 
         RadioGroupOption,
         Switch,
         SwitchGroup,
         SwitchLabel,
+        
+        // Icons
+        UserAddIcon, 
+        UserCircleIcon, 
+        AtSymbolIcon, 
         UserIcon, 
-        UserCircleIcon,
-        UserAddIcon,
-        AtSymbolIcon,
-        BriefcaseIcon,
-        PhoneIcon,
-        OfficeBuildingIcon,
-        CogIcon,
+        BriefcaseIcon, 
+        PhoneIcon, 
+        MailIcon, 
+        LockClosedIcon, 
+        CheckCircleIcon,
+        XIcon,
+        StatusOnlineIcon,
+        ClockIcon,
+        KeyIcon,
+        PrinterIcon,
+        SwitchHorizontalIcon,
+        MenuAlt2Icon,
+        ShoppingCartIcon,
+        BuildingStorefrontIcon,
+        Cog6ToothIcon,
+        ClipboardDocumentCheckIcon,
+        ClipboardDocumentListIcon,
+        ScaleIcon,
+        BuildingOfficeIcon,
         ShieldCheckIcon,
         CalendarIcon,
-        KeyIcon,
-        XIcon,
         SaveIcon,
         IdentificationIcon,
-        CheckIcon
+        CheckIcon,
+        MagnifyingGlassIcon
     },
     data() {
         return {
-            statusOptions: [
-                { label: 'Active', value: 'A' },
-                { label: 'Obsolete', value: 'O' }
-            ],
-            form: {
+            showSalespersonModal: false,
+            salespersons: [],
+            form: this.$inertia.form({
                 user_id: '',
                 username: '',
                 official_name: '',
                 official_title: '',
                 mobile_number: '',
                 official_tel: '',
-                status: 'A',
+                email: '',
+                password: '',
+                password_confirmation: '',
                 password_expiry_date: 90,
-                amend_expired_password: 'Yes'
-            }
-        }
+                user_status: 'A',
+                amend_password: 'N',
+                user_printer: '',
+                print_route: 'UF',
+                menu_type: 'V',
+                // Special Access
+                access_unit_price: 'N',
+                access_customer_acct: 'N',
+                amend_mc: 'N',
+                amend_mc_price: 'N',
+                approve_duplicate_po: 'N',
+                lock_to_salesperson: false,
+                salesperson_code: '',
+                wbms_restricted_pass: false,
+                rc_rt_price: 'N',
+                board_rc_cost: 'N'
+            }),
+        };
     },
     computed: {
         amendPasswordEnabled: {
             get() {
-                return this.form.amend_expired_password === 'Yes';
+                return this.form.amend_password === 'Y';
             },
             set(value) {
-                this.form.amend_expired_password = value ? 'Yes' : 'No';
+                this.form.amend_password = value ? 'Y' : 'N';
             }
         }
     },
     methods: {
+        async openSalespersonModal() {
+            try {
+                // Fetch salespersons data from the server
+                const response = await axios.get('/api/salespersons');
+                this.salespersons = response.data;
+                this.showSalespersonModal = true;
+            } catch (error) {
+                console.error('Error fetching salespersons:', error);
+                alert('Failed to load salespersons. Please try again.');
+            }
+        },
+        selectSalesperson(salesperson) {
+            if (salesperson) {
+                this.form.salesperson_code = salesperson.code;
+                this.showSalespersonModal = false;
+            }
+        },
         submitForm() {
-            // Add CSRF token to form data
+            const passwordExpiry = Math.max(0, Number(this.form.password_expiry_date) || 0);
             const formData = {
-                ...this.form,
+                user_id: this.form.user_id,
+                username: this.form.username,
+                official_name: this.form.official_name,
+                official_title: this.form.official_title,
+                mobile_number: this.form.mobile_number,
+                official_tel: this.form.official_tel,
+                user_printer: this.form.user_printer,
+                print_route: this.form.print_route,
+                menu_type: this.form.menu_type,
+                access_unit_price: this.form.access_unit_price,
+                access_customer_acct: this.form.access_customer_acct,
+                amend_mc: this.form.amend_mc,
+                amend_mc_price: this.form.amend_mc_price,
+                salesperson_code: this.form.salesperson_code,
+                rc_rt_price: this.form.rc_rt_price,
+                board_rc_cost: this.form.board_rc_cost,
+                password_expiry_date: passwordExpiry,
+                status: this.form.user_status,
+                amend_expired_password: this.form.amend_password === 'Y' ? 'Yes' : 'No',
+                password: this.form.password,
+                password_confirmation: this.form.password_confirmation,
                 _token: this.$page.props.csrf
             };
             

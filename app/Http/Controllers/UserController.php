@@ -42,6 +42,16 @@ class UserController extends Controller
             'password_expiry_date' => 'required|integer|min:0',
             'status' => 'required|in:A,O',
             'amend_expired_password' => 'required|in:Yes,No',
+            'user_printer' => 'nullable|string|max:50',
+            'print_route' => 'required|string|in:UF,FU',
+            'menu_type' => 'required|string|in:W,V',
+            'access_unit_price' => 'required|string|in:Y,N',
+            'access_customer_acct' => 'required|string|in:Y,N',
+            'amend_mc' => 'required|string|in:Y,N',
+            'amend_mc_price' => 'required|string|in:Y,N',
+            'salesperson_code' => 'nullable|string|max:50',
+            'rc_rt_price' => 'required|string|in:Y,N',
+            'board_rc_cost' => 'required|string|in:Y,N',
             'permissions' => 'nullable|array'
         ]);
 
