@@ -560,7 +560,12 @@
                                 <div class="flex items-center justify-between">
                                     <label class="text-xs font-medium">System Gross Area:</label>
                                     <div class="flex items-center">
-                                        <input type="text" value="0" class="w-16 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))"
+                                            readonly
+                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
+                                        >
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
                                 </div>
@@ -600,7 +605,12 @@
                                 <div class="flex items-center justify-between">
                                     <label class="text-xs font-medium">System Gross Weight:</label>
                                     <div class="flex items-center">
-                                        <input type="text" value="0" class="w-16 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))"
+                                            readonly
+                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right bg-gray-50"
+                                        >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
                                 </div>
@@ -643,7 +653,12 @@
                                 <div class="flex items-center justify-between">
                                     <label class="text-xs font-medium">Input Gross Area:</label>
                                     <div class="flex items-center">
-                                        <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayGrossM2PerPcs || 0).toFixed(6))"
+                                            readonly
+                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                        >
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
                                 </div>
@@ -684,7 +699,12 @@
                                 <div class="flex items-center justify-between">
                                     <label class="text-xs font-medium">Input Gross Weight:</label>
                                     <div class="flex items-center">
-                                        <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayGrossKgPerSet || 0).toFixed(6))"
+                                            readonly
+                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                        >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
                                 </div>
@@ -725,7 +745,12 @@
                                 <div class="flex items-center justify-between">
                                     <label class="text-xs font-medium">Input Net Area:</label>
                                     <div class="flex items-center">
-                                        <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayNetM2PerPcs || 0).toFixed(6))"
+                                            readonly
+                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                        >
                                         <span class="text-xs ml-1">m2</span>
                                     </div>
                                 </div>
@@ -762,7 +787,12 @@
                                 <div class="flex items-center justify-between">
                                     <label class="text-xs font-medium">Input Net Weight:</label>
                                     <div class="flex items-center">
-                                        <input type="text" class="w-16 px-2 py-1 border border-gray-400 text-xs text-right">
+                                        <input
+                                            type="text"
+                                            :value="formatTrimZeros((displayNetKgPerPcs || 0).toFixed(6))"
+                                            readonly
+                                            class="w-16 px-2 py-1 border border-gray-400 text-xs text-right"
+                                        >
                                         <span class="text-xs ml-1">kg</span>
                                     </div>
                                 </div>
@@ -1825,6 +1855,59 @@ const mcNetKgPerPcs = computed(() => {
 
     // Sum all layers
     return layer1 + layer2 + layer3 + layer4 + layer5;
+});
+
+const resolveNumeric = (values) => {
+    for (const v of values) {
+        if (v === undefined || v === null || v === '') continue;
+        const n = parseFloat(v);
+        if (!isNaN(n)) return n;
+    }
+    return null;
+};
+
+const displayGrossM2PerPcs = computed(() => {
+    const loaded = props.mcLoaded || {};
+    const pd = loaded.pd_setup || {};
+    const fromPd = resolveNumeric([pd.mcGrossM2PerPcs, pd.mc_gross_m2_per_pcs]);
+    const fromLoaded = resolveNumeric([loaded.MC_GROSS_M2_PER_PCS, loaded.mc_gross_m2_per_pcs]);
+    if (fromPd !== null) return fromPd;
+    if (fromLoaded !== null) return fromLoaded;
+    const n = parseFloat(mcGrossM2PerPcs.value);
+    return isNaN(n) ? 0 : n;
+});
+
+const displayNetM2PerPcs = computed(() => {
+    const loaded = props.mcLoaded || {};
+    const pd = loaded.pd_setup || {};
+    const fromPd = resolveNumeric([pd.mcNetM2PerPcs, pd.mc_net_m2_per_pcs]);
+    const fromLoaded = resolveNumeric([loaded.MC_NET_M2_PER_PCS, loaded.mc_net_m2_per_pcs]);
+    if (fromPd !== null) return fromPd;
+    if (fromLoaded !== null) return fromLoaded;
+    const n = parseFloat(mcNetM2PerPcs.value);
+    return isNaN(n) ? 0 : n;
+});
+
+const displayGrossKgPerSet = computed(() => {
+    const loaded = props.mcLoaded || {};
+    const pd = loaded.pd_setup || {};
+    const fromPd = resolveNumeric([pd.mcGrossKgPerSet, pd.mc_gross_kg_per_set]);
+    const fromLoaded = resolveNumeric([loaded.MC_GROSS_KG_PER_SET, loaded.mc_gross_kg_per_set]);
+    if (fromPd !== null) return fromPd;
+    if (fromLoaded !== null) return fromLoaded;
+    const n = parseFloat(mcGrossKgPerSet.value);
+    return isNaN(n) ? 0 : n;
+});
+
+const displayNetKgPerPcs = computed(() => {
+    const loaded = props.mcLoaded || {};
+    const pd = loaded.pd_setup || {};
+    const fromPd = resolveNumeric([pd.mcNetKgPerPcs, pd.mc_net_kg_per_pcs]);
+    const fromLoaded = resolveNumeric([loaded.MC_NET_KG_PER_PCS, loaded.mc_net_kg_per_pcs]);
+    if (fromPd !== null) return fromPd;
+    if (fromLoaded !== null) return fromLoaded;
+    const n = parseFloat(mcNetKgPerPcs.value);
+    return isNaN(n) ? 0 : n;
 });
 
 const handleSortOptionChange = (event) => {
