@@ -1140,6 +1140,8 @@ class UpdateMcController extends Controller
                 // MC More Descriptions (1-5)
                 for ($i = 1; $i <= 5; $i++) {
                     $key = 'MC_MORE_DESCRIPTION_' . $i;
+
+                    // Prefer values from pd_setup aliases (including moreDescriptions array)
                     $incoming = $alias($pd, [
                         'mcMoreDescription' . $i,
                         'mc_more_description_' . $i,
@@ -1147,6 +1149,15 @@ class UpdateMcController extends Controller
                         'moreDescriptions.' . ($i - 1),
                         'more_descriptions.' . ($i - 1)
                     ]);
+
+                    // If still empty, fall back to root-level moreDescriptions array from validated payload
+                    if (($incoming === null || $incoming === '') && isset($validated['moreDescriptions']) && is_array($validated['moreDescriptions'])) {
+                        $rootVal = $validated['moreDescriptions'][$i - 1] ?? null;
+                        if ($rootVal !== null && $rootVal !== '') {
+                            $incoming = $rootVal;
+                        }
+                    }
+
                     $legacy[$key] = $keep($key, $incoming);
                 }
             }

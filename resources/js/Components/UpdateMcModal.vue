@@ -824,9 +824,6 @@
                             <div class="ml-auto flex items-center">
                                 <label class="text-xs font-medium w-20">Sheet Length:</label>
                                 <input type="text" v-model="sheetLength" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                    <i class="fas fa-search"></i>
-                                </button>
                                 <span class="text-xs ml-1">mm</span>
                             </div>
                         </div>
@@ -849,9 +846,6 @@
                                 <label class="text-xs font-medium w-20">Sheet Width:</label>
                                 <input type="text" v-model="sheetWidth" class="w-16 px-2 py-1 border border-gray-400 text-xs">
                                 <span class="text-xs ml-1">mm</span>
-                                <div class="ml-4 bg-gray-200 border border-gray-400 px-3 py-1 text-xs font-bold">
-                                    IDC/CAD
-                                </div>
                             </div>
                         </div>
 
@@ -868,9 +862,6 @@
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-16">Corr. Out:</label>
                                 <input type="text" v-model="conOut" class="w-16 px-2 py-1 border border-gray-400 text-xs">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                    <i class="fas fa-search"></i>
-                                </button>
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-24">Conv. Out 1 x 2:</label>
@@ -935,9 +926,6 @@
                                 <span class="text-xs ml-1">L</span>
                                 <input type="text" v-model="dcutSheetW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
                                 <span class="text-xs ml-1">W</span>
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                    <i class="fas fa-search"></i>
-                                </button>
                             </div>
                             <div class="flex items-center w-64">
                                 <label class="text-xs font-medium w-24">D/Cut Block#:</label>
@@ -966,9 +954,6 @@
                                 <span class="text-xs ml-1">L</span>
                                 <input type="text" v-model="dcutMouldW" class="w-16 px-2 py-1 border border-gray-400 text-xs ml-2">
                                 <span class="text-xs ml-1">W</span>
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                    <i class="fas fa-search"></i>
-                                </button>
                             </div>
                             <div class="flex items-center w-64">
                                 <label class="text-xs font-medium w-24">Stitch Wire Pcs:</label>
@@ -977,9 +962,6 @@
                                     <i class="fas fa-search"></i>
                                 </button>
                                 <input type="text" v-model="stitchWirePieces" class="ml-2 w-16 px-2 py-1 border border-gray-400 text-xs text-right" placeholder="pcs">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                    <i class="fas fa-calculator"></i>
-                                </button>
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-16">Wrapping:</label>
@@ -1012,9 +994,6 @@
                                     <i class="fas fa-search"></i>
                                 </button>
                                 <input type="text" v-model="bundlingStringQty" class="ml-2 w-16 px-2 py-1 border border-gray-400 text-xs text-right" placeholder="qty">
-                                <button class="ml-1 px-2 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300">
-                                    <i class="fas fa-calculator"></i>
-                                </button>
                             </div>
                             <div class="flex items-center">
                                 <label class="text-xs font-medium w-16">Bdl/Pallet:</label>
@@ -1041,7 +1020,6 @@
                             </div>
                             <div class="ml-auto flex items-center space-x-2">
                                 <button class="px-3 py-1 bg-blue-500 hover:bg-blue-600 border border-blue-600 text-xs font-bold text-white transition-colors" @click="openMspModal">MSP</button>
-                                <button class="px-3 py-1 bg-gray-200 border border-gray-400 text-xs hover:bg-gray-300" @click="openSubMaterialModal">Sub-Material</button>
                             </div>
                         </div>
                     </div>
@@ -1149,7 +1127,7 @@
     <MoreDescriptionModal
         :show="showMoreDescriptionModal"
         :value="moreDescriptions"
-        @update:value="(v) => { moreDescriptions = v }"
+        @update:value="(v) => { moreDescriptions.value = Array.isArray(v) ? v.slice(0, 5) : []; }"
         @close="showMoreDescriptionModal = false"
     />
     <WrappingMaterialModal
@@ -1157,12 +1135,6 @@
         :items="wrappingItems"
         @close="showWrappingModal = false"
         @select="onWrappingSelected"
-    />
-    <SubMaterialModal
-        :show="showSubMaterialModal"
-        :value="subMaterials"
-        @update:value="(v) => { subMaterials = v }"
-        @close="showSubMaterialModal = false"
     />
 
     <!-- Machine Selecting Procedure Modal -->
@@ -1245,7 +1217,6 @@ import FinishingModal from '@/Components/finishing-modal.vue';
 import StitchWireModal from '@/Components/stitch-wire-modal.vue';
 import BundlingStringModal from '@/Components/bundling-string-modal.vue';
 import GlueingMaterialModal from '@/Components/glueing-material-modal.vue';
-import SubMaterialModal from '@/Components/sub-material-modal.vue';
 import WrappingMaterialModal from '@/Components/wrapping-material-modal.vue';
 import MoreDescriptionModal from '@/Components/more-description-modal.vue';
 import ChemicalCoatModal from '@/Components/chemical-coat-modal.vue';
@@ -1479,6 +1450,28 @@ const calculateScore = (arr) => {
         .toFixed(2);
 };
 
+// Helper: recalculate totals from current score arrays, but keep empty when no numeric values
+const recalcScoreTotals = () => {
+    const hasNumeric = (arr) => {
+        return arr.some(v => {
+            const num = parseFloat(String(v).toString().replace(/,/g, '.'));
+            return !isNaN(num);
+        });
+    };
+
+    if (hasNumeric(scoreL.value)) {
+        scoreLTotal.value = calculateScore(scoreL.value);
+    } else {
+        scoreLTotal.value = '';
+    }
+
+    if (hasNumeric(scoreW.value)) {
+        scoreWTotal.value = calculateScore(scoreW.value);
+    } else {
+        scoreWTotal.value = '';
+    }
+};
+
 const calculateScoreL = () => {
     const totalStr = calculateScore(scoreL.value);
     scoreLTotal.value = totalStr;
@@ -1573,11 +1566,6 @@ const onBundlingStringSelected = (item) => {
     selectedBundlingStringCode.value = item?.code || '';
     showBundlingStringModal.value = false;
 };
-
-// Sub-Material Modal
-const showSubMaterialModal = ref(false);
-let subMaterials = ref([]);
-const openSubMaterialModal = () => { showSubMaterialModal.value = true; };
 
 // MSP (Machine Selecting Procedure) Modal
 const showMspModal = ref(false);
@@ -2047,7 +2035,6 @@ const clearPdFields = () => {
     selectedGlueingCode.value = '';
     selectedWrappingCode.value = '';
     moreDescriptions.value = [];
-    subMaterials.value = [];
 };
 
 // Display helper: trim trailing zeros in decimals; keep fraction if non-zero
@@ -2155,6 +2142,18 @@ const hydratePdFromObject = (pd, loaded) => {
             loaded.COLOR6_AREA_PERCENT,
             loaded.COLOR7_AREA_PERCENT,
         ].map(v => formatTrimZeros(v ?? ''));
+        // Recalculate score totals based on hydrated score arrays
+        recalcScoreTotals();
+
+        // More Descriptions (1-5) from MC table
+        moreDescriptions.value = [
+            (loaded.MC_MORE_DESCRIPTION_1 ?? '') + '',
+            (loaded.MC_MORE_DESCRIPTION_2 ?? '') + '',
+            (loaded.MC_MORE_DESCRIPTION_3 ?? '') + '',
+            (loaded.MC_MORE_DESCRIPTION_4 ?? '') + '',
+            (loaded.MC_MORE_DESCRIPTION_5 ?? '') + '',
+        ];
+
         // SO/WO root values from MC to selected component (Main)
         try {
             const cf0 = componentForms.value[0] || makeEmptyPdState();
@@ -2226,8 +2225,20 @@ const hydratePdFromObject = (pd, loaded) => {
     bundlingStringQty.value = formatTrimZeros(pd.bundlingStringQty || (loaded.PCS_PER_BLD ?? ''));
     selectedGlueingCode.value = pd.selectedGlueingCode || '';
     selectedWrappingCode.value = pd.selectedWrappingCode || '';
-    moreDescriptions.value = Array.isArray(pd.moreDescriptions) ? pd.moreDescriptions : [];
-    subMaterials.value = Array.isArray(pd.subMaterials) ? pd.subMaterials : [];
+
+    // Prefer pd_setup moreDescriptions if provided; otherwise fallback to MC columns
+    const loadedMoreDescriptions = [
+        (loaded.MC_MORE_DESCRIPTION_1 ?? '') + '',
+        (loaded.MC_MORE_DESCRIPTION_2 ?? '') + '',
+        (loaded.MC_MORE_DESCRIPTION_3 ?? '') + '',
+        (loaded.MC_MORE_DESCRIPTION_4 ?? '') + '',
+        (loaded.MC_MORE_DESCRIPTION_5 ?? '') + '',
+    ];
+    const pdMore = Array.isArray(pd.moreDescriptions) ? pd.moreDescriptions : null;
+    moreDescriptions.value = pdMore && pdMore.length ? pdMore : loadedMoreDescriptions;
+
+    // Ensure score totals reflect hydrated score arrays
+    recalcScoreTotals();
 };
 
 // (moved below after refs are declared to avoid early access issues)
@@ -2991,6 +3002,9 @@ const openSetupPd = () => {
         // Other flags / remarks
         itemRemark.value = (cf.itemRemark ?? itemRemark.value ?? '').toString();
         peelOffPercent.value = formatTrimZeros(cf.peelOffPercent ?? peelOffPercent.value ?? '');
+
+        // Ensure score totals reflect hydrated score arrays for selected component
+        recalcScoreTotals();
         handHole.value = !!(cf.handHole ?? handHole.value);
         rotaryDCut.value = !!(cf.rotaryDCut ?? rotaryDCut.value);
         fullBlockPrint.value = !!(cf.fullBlockPrint ?? fullBlockPrint.value);
@@ -3103,7 +3117,6 @@ const buildPdSetupPayload = () => {
         selectedGlueingCode: selectedGlueingCode.value,
         selectedWrappingCode: selectedWrappingCode.value,
         moreDescriptions: moreDescriptions.value,
-        subMaterials: subMaterials.value,
         // MSP (Machine Selecting Procedure) data
         mspData: mspData.value,
         // Calculated M2 and KG values

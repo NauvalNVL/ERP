@@ -53,12 +53,12 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'update:value']);
 
-const rows = ref(Array.from({ length: 10 }, (_, i) => ''));
+const rows = ref(Array.from({ length: 5 }, () => ''));
 
 watch(() => props.show, (val) => {
     if (val) {
         const incoming = Array.isArray(props.value) ? props.value : [];
-        rows.value = Array.from({ length: 10 }, (_, i) => incoming[i] || '');
+        rows.value = Array.from({ length: 5 }, (_, i) => incoming[i] || '');
     }
 });
 
