@@ -41,253 +41,223 @@
                 <!-- Main Form -->
                 <form @submit.prevent="submitForm" class="space-y-8 w-full">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 w-full">
-                        <!-- Basic & Personal Information -->
-                        <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 540px; contain: content;">
-                            <div class="bg-blue-500 md:bg-gradient-to-r md:from-blue-500 md:to-cyan-500 p-4 md:p-6">
+                        <!-- User Information -->
+                        <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 540px; contain: content;">
+                            <div class="bg-blue-600 md:bg-gradient-to-r md:from-blue-600 md:to-cyan-600 p-4 md:p-6">
                                 <h3 class="text-xl font-semibold text-white flex items-center">
-                                    <div class="bg-white/20 rounded-full p-2 mr-3">
-                                        <IdentificationIcon class="h-6 w-6 text-white" />
+                                    <div class="bg-white/30 rounded-full p-2 mr-3">
+                                        <UserCircleIcon class="h-6 w-6 text-white" />
                                     </div>
                                     User Information
                                 </h3>
                                 <p class="text-blue-100 text-sm mt-1">Basic user details</p>
                             </div>
-                            <div class="p-4 md:p-8">
-                                <div class="space-y-6">
+                            <div class="p-4 md:p-8 bg-white">
+                                <div class="space-y-6 text-gray-900">
                                     <!-- User ID -->
                                     <div>
-                                        <label for="user_id" class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-2 mr-3">
                                                 <IdentificationIcon class="h-5 w-5 text-white" />
                                             </div>
                                             User ID <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" v-model="form.user_id" id="user_id"
-                                            class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
-                                            required>
+                                        <input type="text" 
+                                               v-model="form.user_id" 
+                                               class="block w-full px-6 py-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white hover:bg-gray-50 text-lg"
+                                               placeholder="Example: USER001"
+                                               required>
                                     </div>
 
                                     <!-- Username -->
                                     <div>
-                                        <label for="username" class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-full p-2 mr-3">
                                                 <AtSymbolIcon class="h-5 w-5 text-white" />
                                             </div>
                                             Username <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" v-model="form.username" id="username"
-                                            class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
-                                            required>
+                                        <input type="text" 
+                                               v-model="form.username" 
+                                               class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                               placeholder="Login username"
+                                               required>
                                     </div>
 
                                     <!-- Official Name -->
                                     <div>
-                                        <label for="official_name" class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-teal-500 to-green-500 rounded-full p-2 mr-3">
-                                                <UserCircleIcon class="h-5 w-5 text-white" />
+                                                <UserIcon class="h-5 w-5 text-white" />
                                             </div>
                                             Official Name <span class="text-red-500 ml-1">*</span>
                                         </label>
-                                        <input type="text" v-model="form.official_name" id="official_name"
-                                            class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
-                                            required>
+                                        <input type="text" 
+                                               v-model="form.official_name" 
+                                               class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                               placeholder="Full name"
+                                               required>
                                     </div>
 
                                     <!-- Official Title -->
                                     <div>
-                                        <label for="official_title" class="flex items-center text-lg font-semibold text-gray-800 mb-3">
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
                                             <div class="bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-2 mr-3">
                                                 <BriefcaseIcon class="h-5 w-5 text-white" />
                                             </div>
-                                            Position
+                                            Official Title
                                         </label>
-                                        <input type="text" v-model="form.official_title" id="official_title"
-                                            class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg">
+                                        <input type="text" 
+                                               v-model="form.official_title" 
+                                               class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                               placeholder="Job position">
+                                    </div>
+
+                                    <!-- User Status -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-full p-2 mr-3">
+                                                <StatusOnlineIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            User Status
+                                        </label>
+                                        <select v-model="form.status" class="block w-full px-6 py-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white hover:bg-gray-50 text-lg">
+                                            <option value="A">A-Active</option>
+                                            <option value="O">O-Obsolete</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Password Expiry Date -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-red-500 to-pink-500 rounded-full p-2 mr-3">
+                                                <ClockIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            Password Expiry Date
+                                        </label>
+                                        <input type="number" 
+                                               v-model="form.password_expiry_date" 
+                                               class="block w-full px-6 py-4 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-white hover:bg-gray-50 text-lg"
+                                               placeholder="0 Days [Zero for None]"
+                                               min="0">
+                                    </div>
+
+                                    <!-- Amend Expired Password -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-pink-500 to-rose-500 rounded-full p-2 mr-3">
+                                                <KeyIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            Amend Expired Password
+                                        </label>
+                                        <div class="flex space-x-6">
+                                            <label class="inline-flex items-center mr-6">
+                                                <input type="radio" v-model="form.amend_expired_password" value="Yes" class="form-radio h-5 w-5 text-blue-600">
+                                                <span class="ml-2 text-gray-900 font-medium">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.amend_expired_password" value="No" class="form-radio h-5 w-5 text-blue-600">
+                                                <span class="ml-2 text-gray-900 font-medium">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- User Printer -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-rose-500 to-red-500 rounded-full p-2 mr-3">
+                                                <PrinterIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            User Printer
+                                        </label>
+                                        <input type="text" 
+                                               v-model="form.user_printer" 
+                                               class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                               placeholder="Default printer">
+                                    </div>
+
+                                    <!-- Print Route -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full p-2 mr-3">
+                                                <SwitchHorizontalIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            Print Route
+                                        </label>
+                                        <div class="flex space-x-6">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.print_route" value="UF" class="form-radio h-5 w-5 text-blue-600">
+                                                <span class="ml-2 text-gray-700">UF-User to Function</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.print_route" value="FU" class="form-radio h-5 w-5 text-blue-600">
+                                                <span class="ml-2 text-gray-700">FU-Function to User</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Menu Type -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-2 mr-3">
+                                                <MenuAlt2Icon class="h-5 w-5 text-white" />
+                                            </div>
+                                            Menu Type
+                                        </label>
+                                        <div class="flex space-x-6">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.menu_type" value="W" class="form-radio h-5 w-5 text-blue-600">
+                                                <span class="ml-2 text-gray-700">W-Windows</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.menu_type" value="V" class="form-radio h-5 w-5 text-blue-600">
+                                                <span class="ml-2 text-gray-700">V-View Tree</span>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Contact & Account Information -->
-                        <div class="space-y-4 md:space-y-8">
-                            <!-- Contact Information Section -->
-                            <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 260px;">
-                                <div class="bg-emerald-500 md:bg-gradient-to-r md:from-emerald-500 md:to-teal-500 p-4 md:p-6">
-                                    <h3 class="text-xl font-semibold text-white flex items-center">
-                                        <div class="bg-white/20 rounded-full p-2 mr-3">
-                                            <PhoneIcon class="h-6 w-6 text-white" />
-                                        </div>
-                                        Contact Information
-                                    </h3>
-                                    <p class="text-emerald-100 text-sm mt-1">Contact details</p>
-                                </div>
-                                <div class="p-4 md:p-8">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <!-- Mobile Number -->
-                                        <div>
-                                            <label for="mobile_number" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
-                                                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full p-2 mr-3">
-                                                    <PhoneIcon class="h-5 w-5 text-white" />
-                                                </div>
-                                                Mobile Number
-                                            </label>
-                                            <input type="text" v-model="form.mobile_number" id="mobile_number"
-                                                class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
-                                        </div>
-
-                                        <!-- Official Tel -->
-                                        <div>
-                                            <label for="official_tel" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
-                                                <div class="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full p-2 mr-3">
-                                                    <OfficeBuildingIcon class="h-5 w-5 text-white" />
-                                                </div>
-                                                Office Phone
-                                            </label>
-                                            <input type="text" v-model="form.official_tel" id="official_tel"
-                                                class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
-                                        </div>
+                        <!-- Contact Information -->
+                        <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 540px;">
+                            <div class="bg-emerald-600 md:bg-gradient-to-r md:from-emerald-600 md:to-teal-600 p-4 md:p-6">
+                                <h3 class="text-xl font-semibold text-white flex items-center">
+                                    <div class="bg-white/30 rounded-full p-2 mr-3">
+                                        <PhoneIcon class="h-6 w-6 text-white" />
                                     </div>
-                                </div>
+                                    Contact Information
+                                </h3>
+                                <p class="text-emerald-100 text-sm mt-1">Contact details and status</p>
                             </div>
-
-                            <!-- Account Settings Section -->
-                            <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 260px;">
-                                <div class="bg-cyan-500 md:bg-gradient-to-r md:from-cyan-500 md:to-blue-500 p-4 md:p-6">
-                                    <h3 class="text-xl font-semibold text-white flex items-center">
-                                        <div class="bg-white/20 rounded-full p-2 mr-3">
-                                            <ShieldCheckIcon class="h-6 w-6 text-white" />
-                                        </div>
-                                        Account Settings
-                                    </h3>
-                                    <p class="text-cyan-100 text-sm mt-1">Status & password rules</p>
-                                </div>
-                                <div class="p-4 md:p-8">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <!-- Status -->
-                                        <div>
-                                            <label for="status" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-4">
-                                                <div class="bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full p-2 mr-3">
-                                                    <ShieldCheckIcon class="h-5 w-5 text-white" />
-                                                </div>
-                                                Account Status
-                                            </label>
-                                            <RadioGroup v-model="form.status">
-                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    <RadioGroupOption v-for="option in statusOptions" :key="option.value" :value="option.value" v-slot="{ active, checked }">
-                                                        <div :class="[active ? 'ring-2 ring-blue-300' : '', checked ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600' : 'bg-white text-gray-900 border-gray-200 hover:bg-gray-50', 'relative flex cursor-pointer rounded-xl px-4 md:px-6 py-3 md:py-4 shadow focus:outline-none border-2 transition-colors duration-200']">
-                                                            <div class="flex w-full items-center justify-between">
-                                                                <div class="flex items-center">
-                                                                    <div class="text-sm md:text-base">
-                                                                        <RadioGroupLabel as="p" :class="checked ? 'text-white' : 'text-gray-900'" class="font-semibold">
-                                                                            {{ option.label }}
-                                                                        </RadioGroupLabel>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </RadioGroupOption>
-                                                </div>
-                                            </RadioGroup>
-                                        </div>
-
-                                        <!-- Password Expiry Date -->
-                                        <div>
-                                            <label for="password_expiry_date" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
-                                                <div class="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full p-2 mr-3">
-                                                    <CalendarIcon class="h-5 w-5 text-white" />
-                                                </div>
-                                                Password Validity (days)
-                                            </label>
-                                            <input type="number" v-model="form.password_expiry_date" id="password_expiry_date"
-                                                class="block w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white"
-                                                min="0">
-                                        </div>
+                            <div class="p-4 md:p-8 bg-white">
+                                <div class="space-y-6 text-gray-900">
+                                    <!-- Mobile Number -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full p-2 mr-3">
+                                                <PhoneIcon class="h-5 w-5 text-white" />
+                                            </div>
+                                            Mobile Number
+                                        </label>
+                                        <input type="tel" 
+                                               v-model="form.mobile_number" 
+                                               class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                               placeholder="08xxxxxxxxxx">
                                     </div>
 
-                                    <div class="mt-6">
-                                        <!-- Amend Expired Password -->
-                                        <div>
-                                            <label for="amend_expired_password" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
-                                                <div class="bg-gradient-to-r from-pink-500 to-red-500 rounded-full p-2 mr-3">
-                                                    <KeyIcon class="h-5 w-5 text-white" />
-                                                </div>
-                                                Allow Amend Expired Password
-                                            </label>
-                                            <SwitchGroup>
-                                                <div class="flex items-center p-4 bg-gray-50 rounded-xl">
-                                                    <Switch v-model="amendPasswordEnabled"
-                                                        :class="[amendPasswordEnabled ? 'bg-gradient-to-r from-pink-500 to-red-500' : 'bg-gray-300', 'relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-300']">
-                                                        <span aria-hidden="true" :class="[amendPasswordEnabled ? 'translate-x-7' : 'translate-x-1', 'inline-block h-6 w-6 rounded-full bg-white transform transition-transform duration-300 ease-in-out']" />
-                                                    </Switch>
-                                                    <SwitchLabel as="span" class="ml-4">
-                                                        <span class="text-sm md:text-lg font-semibold" :class="amendPasswordEnabled ? 'text-pink-600' : 'text-gray-600'">{{ amendPasswordEnabled ? 'Enabled' : 'Disabled' }}</span>
-                                                    </SwitchLabel>
-                                                </div>
-                                            </SwitchGroup>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Security Settings Section -->
-                            <div class="bg-white/80 shadow rounded-2xl border border-white/20 overflow-hidden" style="content-visibility:auto; contain-intrinsic-size: 1px 260px;">
-                                <div class="bg-purple-500 md:bg-gradient-to-r md:from-purple-500 md:to-pink-500 p-4 md:p-6">
-                                    <h3 class="text-xl font-semibold text-white flex items-center">
-                                        <div class="bg-white/20 rounded-full p-2 mr-3">
-                                            <LockClosedIcon class="h-6 w-6 text-white" />
-                                        </div>
-                                        Security Settings
-                                    </h3>
-                                    <p class="text-purple-100 text-sm mt-1">Update user password securely</p>
-                                </div>
-                                <div class="p-4 md:p-8">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <!-- Password -->
-                                        <div>
-                                            <label for="password" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
-                                                <div class="bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full p-2 mr-3">
-                                                    <LockClosedIcon class="h-5 w-5 text-white" />
-                                                </div>
-                                                New Password
-                                            </label>
-                                            <p class="text-xs text-gray-500 mb-2">Leave empty if you don't want to change the password</p>
-                                            <div class="relative">
-                                                <input :type="showPassword ? 'text' : 'password'" v-model="form.password" id="password"
-                                                    class="block w-full px-4 md:px-6 py-3 md:py-4 pr-12 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
-                                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                                    <button @click="showPassword = !showPassword" type="button" class="text-gray-400 hover:text-purple-500 transition-colors" :aria-label="showPassword ? 'Hide password' : 'Show password'">
-                                                        <EyeIcon v-if="!showPassword" class="h-5 w-5" />
-                                                        <EyeOffIcon v-else class="h-5 w-5" />
-                                                    </button>
-                                                </div>
+                                    <!-- Official Tel -->
+                                    <div>
+                                        <label class="flex items-center text-lg font-semibold text-gray-900 mb-3">
+                                            <div class="bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full p-2 mr-3">
+                                                <PhoneIcon class="h-5 w-5 text-white" />
                                             </div>
-                                            <div v-if="form.password" class="mt-3">
-                                                <div class="h-3 rounded-full bg-gray-200 overflow-hidden">
-                                                    <div class="h-3 rounded-full transition-all duration-500" :class="passwordStrength.color" :style="{ width: passwordStrength.width }"></div>
-                                                </div>
-                                                <p class="text-sm mt-2 font-medium" :class="passwordStrength.textColor">{{ passwordStrength.label }}</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Confirm Password -->
-                                        <div>
-                                            <label for="password_confirmation" class="flex items-center text-sm md:text-lg font-semibold text-gray-800 mb-3">
-                                                <div class="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full p-2 mr-3">
-                                                    <LockClosedIcon class="h-5 w-5 text-white" />
-                                                </div>
-                                                Confirm Password
-                                            </label>
-                                            <div class="relative">
-                                                <input :type="showConfirmPassword ? 'text' : 'password'" v-model="form.password_confirmation" id="password_confirmation"
-                                                    class="block w-full px-4 md:px-6 py-3 md:py-4 pr-12 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white">
-                                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                                    <button @click="showConfirmPassword = !showConfirmPassword" type="button" class="text-gray-400 hover:text-indigo-500 transition-colors" :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'">
-                                                        <EyeIcon v-if="!showConfirmPassword" class="h-5 w-5" />
-                                                        <EyeOffIcon v-else class="h-5 w-5" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                            <span class="text-gray-900">Official Telephone</span>
+                                        </label>
+                                        <input type="tel" 
+                                               v-model="form.official_tel" 
+                                               class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
+                                               placeholder="021xxxxxxx">
                                     </div>
                                 </div>
                             </div>
@@ -373,6 +343,21 @@
                                         </div>
                                     </div>
 
+                                    <!-- Approve Duplicate PO -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Approve Duplicate PO</label>
+                                        <div class="flex space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.approve_duplicate_po" value="Y" class="form-radio h-4 w-4 text-blue-600">
+                                                <span class="ml-2 text-gray-700">Y-Yes</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" v-model="form.approve_duplicate_po" value="N" class="form-radio h-4 w-4 text-blue-600">
+                                                <span class="ml-2 text-gray-700">N-No</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     <!-- Lock to Salesperson -->
                                     <div class="col-span-2">
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -388,8 +373,28 @@
                                                        class="block w-full pl-10 pr-3 py-2 border border-r-0 border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                                        placeholder="Salesperson Code">
                                             </div>
+                                            <button type="button" 
+                                                    @click="openSalespersonModal"
+                                                    class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 text-sm font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                <MagnifyingGlassIcon class="h-4 w-4 mr-1 text-white" />
+                                                Search
+                                            </button>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Warehouse Management Section -->
+                            <div class="mb-8">
+                                <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                    <BuildingStorefrontIcon class="h-5 w-5 text-purple-600 mr-2" />
+                                    Warehouse Management
+                                </h4>
+                                <div class="flex items-center">
+                                    <input type="checkbox" v-model="form.wbms_restricted_pass" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                    <label class="ml-2 block text-sm text-gray-700">
+                                        WBMS Restricted Pass
+                                    </label>
                                 </div>
                             </div>
 
@@ -441,85 +446,15 @@
                         </div>
                     </div>
 
-                    <!-- Printer & Menu Settings -->
-                    <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden mt-8">
-                        <div class="bg-indigo-600 md:bg-gradient-to-r md:from-indigo-600 md:to-purple-600 p-4 md:p-6">
-                            <h3 class="text-xl font-semibold text-white flex items-center">
-                                <div class="bg-white/20 rounded-full p-2 mr-3">
-                                    <PrinterIcon class="h-6 w-6 text-white" />
-                                </div>
-                                Printer & Menu Settings
-                            </h3>
-                            <p class="text-indigo-100 text-sm mt-1">Configure printer and menu preferences</p>
-                        </div>
-                        <div class="p-4 md:p-8">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- User Printer -->
-                                <div>
-                                    <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                                        <div class="bg-gradient-to-r from-rose-500 to-red-500 rounded-full p-2 mr-3">
-                                            <PrinterIcon class="h-5 w-5 text-white" />
-                                        </div>
-                                        User Printer
-                                    </label>
-                                    <input type="text" 
-                                           v-model="form.user_printer" 
-                                           class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
-                                           placeholder="Default printer">
-                                </div>
-
-                                <!-- Print Route -->
-                                <div>
-                                    <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                                        <div class="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full p-2 mr-3">
-                                            <SwitchHorizontalIcon class="h-5 w-5 text-white" />
-                                        </div>
-                                        Print Route
-                                    </label>
-                                    <div class="flex space-x-6">
-                                        <label class="inline-flex items-center">
-                                            <input type="radio" v-model="form.print_route" value="UF" class="form-radio h-5 w-5 text-blue-600">
-                                            <span class="ml-2 text-gray-700">UF-User to Function</span>
-                                        </label>
-                                        <label class="inline-flex items-center">
-                                            <input type="radio" v-model="form.print_route" value="FU" class="form-radio h-5 w-5 text-blue-600">
-                                            <span class="ml-2 text-gray-700">FU-Function to User</span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- Menu Type -->
-                                <div>
-                                    <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                                        <div class="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full p-2 mr-3">
-                                            <MenuAlt2Icon class="h-5 w-5 text-white" />
-                                        </div>
-                                        Menu Type
-                                    </label>
-                                    <div class="flex space-x-6">
-                                        <label class="inline-flex items-center">
-                                            <input type="radio" v-model="form.menu_type" value="W" class="form-radio h-5 w-5 text-blue-600">
-                                            <span class="ml-2 text-gray-700">W-Windows</span>
-                                        </label>
-                                        <label class="inline-flex items-center">
-                                            <input type="radio" v-model="form.menu_type" value="V" class="form-radio h-5 w-5 text-blue-600">
-                                            <span class="ml-2 text-gray-700">V-View Tree</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Action Buttons -->
-                    <div class="bg-white/80 shadow rounded-2xl border border-white/20 p-4 md:p-8" style="content-visibility:auto; contain-intrinsic-size: 1px 160px; contain: content;">
+                    <div class="bg-white shadow-lg rounded-2xl border border-gray-200 p-4 md:p-8" style="content-visibility:auto; contain-intrinsic-size: 1px 160px; contain: content;">
                         <div class="flex flex-col sm:flex-row gap-4 justify-end">
-                            <Link href="/user"
+                            <Link href="/user" 
                                 class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 border-2 border-gray-300 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors duration-200">
                                 <XIcon class="h-6 w-6 mr-3" />
                                 Cancel
                             </Link>
-                            <button type="submit"
+                            <button type="submit" 
                                 class="flex-1 inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-200">
                                 <SaveIcon class="h-6 w-6 mr-3" />
                                 Update User
@@ -527,6 +462,14 @@
                         </div>
                     </div>
                 </form>
+
+                <!-- Salesperson Selection Modal -->
+                <SalespersonModal 
+                    :show="showSalespersonModal"
+                    :salespersons="salespersons"
+                    @close="showSalespersonModal = false"
+                    @select="selectSalesperson"
+                />
             </div>
         </div>
     </AppLayout>
@@ -534,6 +477,7 @@
 
 <script>
 import { Head, Link } from '@inertiajs/vue3';
+import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { 
     RadioGroup, 
@@ -549,7 +493,6 @@ import {
     AtSymbolIcon,
     BriefcaseIcon,
     PhoneIcon,
-    BuildingOfficeIcon as OfficeBuildingIcon,
     ShieldCheckIcon,
     CalendarIcon,
     KeyIcon,
@@ -557,16 +500,20 @@ import {
     ArrowDownTrayIcon as SaveIcon,
     IdentificationIcon,
     ExclamationCircleIcon,
-    LockClosedIcon,
-    EyeIcon,
-    EyeSlashIcon as EyeOffIcon,
     PrinterIcon,
     ArrowsRightLeftIcon as SwitchHorizontalIcon,
     Bars3BottomLeftIcon as MenuAlt2Icon,
     ShoppingCartIcon,
     Cog6ToothIcon,
-    ScaleIcon
+    ScaleIcon,
+    SignalIcon as StatusOnlineIcon,
+    ClockIcon,
+    BuildingStorefrontIcon,
+    MagnifyingGlassIcon
 } from '@heroicons/vue/24/outline';
+
+// Import the salesperson modal component
+import SalespersonModal from '@/Components/salesperson-modal.vue';
 
 export default {
     components: {
@@ -584,7 +531,6 @@ export default {
         AtSymbolIcon,
         BriefcaseIcon,
         PhoneIcon,
-        OfficeBuildingIcon,
         ShieldCheckIcon,
         CalendarIcon,
         KeyIcon,
@@ -592,34 +538,25 @@ export default {
         SaveIcon,
         IdentificationIcon,
         ExclamationCircleIcon,
-        LockClosedIcon,
-        EyeIcon,
-        EyeOffIcon,
         PrinterIcon,
         SwitchHorizontalIcon,
         MenuAlt2Icon,
         ShoppingCartIcon,
         Cog6ToothIcon,
-        ScaleIcon
+        ScaleIcon,
+        StatusOnlineIcon,
+        ClockIcon,
+        BuildingStorefrontIcon,
+        MagnifyingGlassIcon,
+        SalespersonModal
     },
     props: {
         user: Object
     },
     data() {
         return {
-            statusOptions: [
-                { label: 'Active', value: 'A' },
-                { label: 'Obsolete', value: 'O' }
-            ],
-            showPassword: false,
-            showConfirmPassword: false,
-            passwordStrength: {
-                score: 0,
-                label: 'Weak',
-                color: 'bg-red-500',
-                textColor: 'text-red-700',
-                width: '0%'
-            },
+            showSalespersonModal: false,
+            salespersons: [],
             form: {
                 user_id: this.user.user_id,
                 username: this.user.username,
@@ -641,28 +578,33 @@ export default {
                 access_customer_acct: this.user.AC || 'N',
                 amend_mc: this.user.MC || 'N',
                 amend_mc_price: this.user.MC_PRICE || 'N',
+                approve_duplicate_po: this.user.APPROVE_DUP_PO || 'N',
                 salesperson_code: this.user.SM || '',
+                wbms_restricted_pass: this.user.WBMS_RESTRICTED || false,
                 rc_rt_price: this.user.PRICE || 'N',
                 board_rc_cost: this.user.COST || 'N'
             }
         }
     },
-    watch: {
-        'form.password'(newPassword) {
-            this.updatePasswordStrength(newPassword);
-        }
-    },
-    computed: {
-        amendPasswordEnabled: {
-            get() {
-                return this.form.amend_expired_password === 'Yes';
-            },
-            set(value) {
-                this.form.amend_expired_password = value ? 'Yes' : 'No';
-            }
-        }
-    },
+
     methods: {
+        async openSalespersonModal() {
+            try {
+                // Fetch salespersons data from the server
+                const response = await axios.get('/api/salespersons');
+                this.salespersons = response.data;
+                this.showSalespersonModal = true;
+            } catch (error) {
+                console.error('Error fetching salespersons:', error);
+                alert('Failed to load salespersons. Please try again.');
+            }
+        },
+        selectSalesperson(salesperson) {
+            if (salesperson) {
+                this.form.salesperson_code = salesperson.code;
+                this.showSalespersonModal = false;
+            }
+        },
         submitForm() {
             // Add CSRF token to form data
             const formData = {
@@ -687,51 +629,6 @@ export default {
                     console.error('Update user errors:', errors);
                 }
             });
-        },
-        updatePasswordStrength(password) {
-            let score = 0;
-            if (!password) {
-                this.passwordStrength = { score: 0, label: '', color: 'bg-gray-200', textColor: 'text-gray-500', width: '0%' };
-                return;
-            }
-
-            if (password.length >= 8) score++;
-            if (/[A-Z]/.test(password)) score++;
-            if (/[a-z]/.test(password)) score++;
-            if (/[0-9]/.test(password)) score++;
-            if (/[^A-Za-z0-9]/.test(password)) score++;
-
-            let label = '';
-            let color = '';
-            let textColor = '';
-            let width = (score / 5) * 100 + '%';
-
-            switch (score) {
-                case 0:
-                case 1:
-                case 2:
-                    label = 'Weak';
-                    color = 'bg-red-500';
-                    textColor = 'text-red-700';
-                    break;
-                case 3:
-                    label = 'Medium';
-                    color = 'bg-yellow-500';
-                    textColor = 'text-yellow-700';
-                    break;
-                case 4:
-                    label = 'Strong';
-                    color = 'bg-blue-500';
-                    textColor = 'text-blue-700';
-                    break;
-                case 5:
-                    label = 'Very Strong';
-                    color = 'bg-green-500';
-                    textColor = 'text-green-700';
-                    break;
-            }
-            
-            this.passwordStrength = { score, label, color, textColor, width };
         }
     }
 }
@@ -769,106 +666,6 @@ export default {
     }
 }
 
-/* Animated Bubbles */
-.bubble {
-    position: absolute;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    animation: float 15s infinite ease-in-out;
-    pointer-events: none;
-}
-
-.bubble-1 {
-    width: 80px;
-    height: 80px;
-    left: 10%;
-    top: 20%;
-    animation-delay: 0s;
-    animation-duration: 20s;
-}
-
-.bubble-2 {
-    width: 120px;
-    height: 120px;
-    right: 15%;
-    top: 10%;
-    animation-delay: 2s;
-    animation-duration: 25s;
-}
-
-.bubble-3 {
-    width: 60px;
-    height: 60px;
-    left: 20%;
-    bottom: 30%;
-    animation-delay: 4s;
-    animation-duration: 18s;
-}
-
-.bubble-4 {
-    width: 100px;
-    height: 100px;
-    right: 25%;
-    bottom: 20%;
-    animation-delay: 6s;
-    animation-duration: 22s;
-}
-
-.bubble-5 {
-    width: 40px;
-    height: 40px;
-    left: 50%;
-    top: 15%;
-    animation-delay: 8s;
-    animation-duration: 16s;
-}
-
-.bubble-6 {
-    width: 90px;
-    height: 90px;
-    left: 5%;
-    bottom: 10%;
-    animation-delay: 10s;
-    animation-duration: 24s;
-}
-
-.bubble-7 {
-    width: 70px;
-    height: 70px;
-    right: 5%;
-    top: 50%;
-    animation-delay: 12s;
-    animation-duration: 19s;
-}
-
-.bubble-8 {
-    width: 50px;
-    height: 50px;
-    left: 80%;
-    bottom: 40%;
-    animation-delay: 14s;
-    animation-duration: 21s;
-}
-
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0px) translateX(0px) rotate(0deg);
-        opacity: 0.3;
-    }
-    25% {
-        transform: translateY(-20px) translateX(10px) rotate(90deg);
-        opacity: 0.6;
-    }
-    50% {
-        transform: translateY(-40px) translateX(-10px) rotate(180deg);
-        opacity: 0.4;
-    }
-    75% {
-        transform: translateY(-20px) translateX(15px) rotate(270deg);
-        opacity: 0.7;
-    }
-}
-
 /* Glass morphism effect */
 .backdrop-blur-sm {
     backdrop-filter: blur(8px);
@@ -885,16 +682,53 @@ export default {
     box-shadow: 0 0 0 4px rgba(var(--ring-color), 0.3);
 }
 
+/* Custom gradient backgrounds */
+.bg-gradient-to-br {
+    background: linear-gradient(135deg, var(--tw-gradient-stops));
+}
+
 /* Smooth transitions */
-* {
-    transition-property: all;
+button, a, input, select, textarea, .transition-all, .transition {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 300ms;
+    transition-duration: 200ms;
+}
+
+/* Promote transform animations to compositor for smoother hover effects */
+.transform {
+    will-change: transform;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    button, a, input, select, textarea, .transition-all, .transition, .animate-fadeIn, .animate-slideIn {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
 }
 
 /* Mobile responsiveness */
 @media (max-width: 640px) {
-    .max-w-5xl {
+    .max-w-6xl {
         max-width: 100%;
         margin: 0;
         padding: 0 1rem;
@@ -912,31 +746,18 @@ export default {
         font-size: 1.875rem;
     }
     
-    .grid-cols-1.md\:grid-cols-2 {
+    .grid-cols-1.lg\:grid-cols-2 {
         grid-template-columns: repeat(1, minmax(0, 1fr));
     }
-}
-
-/* Enhanced form styling */
-input:focus, select:focus, textarea:focus {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Password strength indicator */
-.password-strength {
-    transition: all 0.5s ease;
-}
-
-/* Switch enhanced styling */
-.switch-enhanced {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Radio button enhanced styling */
-.radio-enhanced:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    
+    .backdrop-blur-sm {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+    
+    .shadow-xl, .shadow-2xl, .shadow-lg {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
 }
 
 /* Dark mode support */
@@ -952,5 +773,41 @@ input:focus, select:focus, textarea:focus {
     .border-gray-200 {
         border-color: #374151;
     }
+}
+
+/* Form validation styles */
+.form-input:invalid {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-input:valid {
+    border-color: #10b981;
+}
+
+/* Loading state */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 </style>

@@ -427,58 +427,6 @@
                         </div>
                     </div>
 
-                    <!-- Password Settings -->
-                    <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden mt-8">
-                        <div class="bg-indigo-600 md:bg-gradient-to-r md:from-indigo-600 md:to-purple-600 p-4 md:p-6">
-                            <h3 class="text-xl font-semibold text-white flex items-center">
-                                <div class="bg-white/20 rounded-full p-2 mr-3">
-                                    <KeyIcon class="h-6 w-6 text-white" />
-                                </div>
-                                Password Settings
-                            </h3>
-                            <p class="text-indigo-100 text-sm mt-1">Configure password policies</p>
-                        </div>
-                        <div class="p-4 md:p-8">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                                <!-- Password Expiry -->
-                                <div>
-                                    <label class="flex items-center text-lg font-semibold text-gray-800 mb-3">
-                                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-2 mr-3">
-                                            <CalendarIcon class="h-5 w-5 text-white" />
-                                        </div>
-                                        <span class="text-gray-900">Password Expiry (Days)</span>
-                                    </label>
-                                    <input type="number" 
-                                           v-model="form.password_expiry_date" 
-                                           class="block w-full px-6 py-4 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-gray-900 bg-gray-50 hover:bg-white text-lg"
-                                           placeholder="90"
-                                           min="0">
-                                </div>
-
-                                <!-- Amend Expired Password -->
-                                <div>
-                                    <label class="flex items-center text-lg font-semibold text-gray-800 mb-4">
-                                        <div class="bg-gradient-to-r from-pink-500 to-red-500 rounded-full p-2 mr-3">
-                                            <ShieldCheckIcon class="h-5 w-5 text-white" />
-                                        </div>
-                                        <span class="text-gray-900">Allow Amend Expired Password</span>
-                                    </label>
-                                    <SwitchGroup>
-                                        <div class="flex items-center p-4 bg-gray-50 rounded-xl">
-                                            <Switch v-model="amendPasswordEnabled"
-                                                :class="[amendPasswordEnabled ? 'bg-gradient-to-r from-pink-500 to-red-500' : 'bg-gray-300', 'relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-300']">
-                                                <span aria-hidden="true" :class="[amendPasswordEnabled ? 'translate-x-7' : 'translate-x-1', 'inline-block h-6 w-6 rounded-full bg-white transform transition-transform duration-300 ease-in-out']" />
-                                            </Switch>
-                                            <SwitchLabel as="span" class="ml-4">
-                                                <span class="text-lg font-semibold" :class="amendPasswordEnabled ? 'text-pink-600' : 'text-gray-600'">{{ amendPasswordEnabled ? 'Enabled' : 'Disabled' }}</span>
-                                            </SwitchLabel>
-                                        </div>
-                                    </SwitchGroup>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Action Buttons -->
                     <div class="bg-white shadow-lg rounded-2xl border border-gray-200 p-4 md:p-8" style="content-visibility:auto; contain-intrinsic-size: 1px 160px; contain: content;">
                         <div class="flex flex-col sm:flex-row gap-4 justify-end">

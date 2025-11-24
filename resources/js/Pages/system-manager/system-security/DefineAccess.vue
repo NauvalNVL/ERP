@@ -204,6 +204,10 @@
                                                 <span class="ml-3 text-sm text-gray-700">Copy & Paste User Access Permission</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.reactive_unobsolete_user" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-sm text-gray-700">Reactive/Unobsolete User</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.view_print_user" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-sm text-gray-700">View & Print User</span>
                                             </label>
@@ -230,17 +234,9 @@
                                         <span class="ml-3 text-sm font-medium text-gray-900">Sales Management (Main Access)</span>
                                     </label>
                                     
-                                    <!-- Sales Configuration -->
-                                    <div class="border-l-0 md:border-l-4 border-green-200 pl-3 md:pl-4">
-                                        <h5 class="text-sm font-medium text-gray-700 mb-3">Sales Configuration</h5>
-                                        <label class="flex items-center">
-                                            <input type="checkbox" v-model="form.permissions.define_sales_configuration" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
-                                            <span class="ml-3 text-sm text-gray-700">Define Sales Configuration</span>
-                                        </label>
-                                    </div>
-
+                                    
                                     <!-- Standard Requirement -->
-                                    <div class="border-l-0 md:border-l-4 border-green-200 pl-3 md:pl-4">
+                                    <div class="border-l-4 border-green-200 pl-4">
                                         <h5 class="text-sm font-medium text-gray-700 mb-3">Standard Requirement</h5>
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:max-h-64 md:overflow-y-auto">
                                             <!-- Basic Define Permissions -->
@@ -285,6 +281,10 @@
                                                 <span class="ml-3 text-xs text-gray-700">Define Paper Quality</span>
                                             </label>
                                             <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_unobsolete_paper_quality" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete/Unobsolete Paper Quality</span>
+                                            </label>
+                                            <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_paper_flute" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Paper Flute</span>
                                             </label>
@@ -303,6 +303,10 @@
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_finishing" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Finishing</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_analysis_code" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Analysis Code</span>
                                             </label>
                                             <label class="flex items-center">
                                                 <input type="checkbox" v-model="form.permissions.define_stitch_wire" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
@@ -328,6 +332,10 @@
                                                 <input type="checkbox" v-model="form.permissions.define_glueing_material" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                 <span class="ml-3 text-xs text-gray-700">Define Glueing Material</span>
                                             </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.define_machine" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Define Machine</span>
+                                            </label>
                                             
                                             <!-- View & Print Permissions -->
                                             <div class="col-span-full">
@@ -343,12 +351,60 @@
                                                             <span class="ml-3 text-xs text-gray-600">View & Print Salesperson</span>
                                                         </label>
                                                         <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_salesperson_team" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Salesperson Team</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_industry" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Industry</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_geo" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Geo</span>
+                                                        </label>
+                                                        <label class="flex items-center">
                                                             <input type="checkbox" v-model="form.permissions.view_print_product_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                             <span class="ml-3 text-xs text-gray-600">View & Print Product Group</span>
                                                         </label>
                                                         <label class="flex items-center">
                                                             <input type="checkbox" v-model="form.permissions.view_print_product" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                             <span class="ml-3 text-xs text-gray-600">View & Print Product</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_product_design" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Product Design</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_paper_quality" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Paper Quality</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_paper_flute" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Paper Flute</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_paper_size" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Paper Size</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_scoring_tool" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Scoring Tool</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_color_group" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Color Group</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_color" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Color</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_analysis_code" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Analysis Code</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_finishing" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Finishing</span>
                                                         </label>
                                                         <label class="flex items-center">
                                                             <input type="checkbox" v-model="form.permissions.view_print_stitch_wire" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
@@ -373,6 +429,10 @@
                                                         <label class="flex items-center">
                                                             <input type="checkbox" v-model="form.permissions.view_print_glueing_material" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
                                                             <span class="ml-3 text-xs text-gray-600">View & Print Glueing Material</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_machine" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-600">View & Print Machine</span>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -434,6 +494,57 @@
                                         </div>
                                     </div>
 
+                                    <!-- Master Card -->
+                                    <div class="border-l-0 md:border-l-4 border-green-200 pl-3 md:pl-4">
+                                        <h5 class="text-sm font-medium text-gray-700 mb-3">Master Card</h5>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.update_mc" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Update MC</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.obsolete_reactive_mc" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Obsolete & Reactive MC</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.view_print_mc" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">View & Print MC</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Sales Order -->
+                                    <div class="border-l-0 md:border-l-4 border-green-200 pl-3 md:pl-4">
+                                        <h5 class="text-sm font-medium text-gray-700 mb-3">Sales Order</h5>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.prepare_mc_so" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Prepare MC SO</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.print_so" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Print SO</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.cancel_so" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Cancel SO</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" v-model="form.permissions.amend_so" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                                <span class="ml-3 text-xs text-gray-700">Amend SO</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Customer Service -->
+                                    <div class="border-l-0 md:border-l-4 border-green-200 pl-3 md:pl-4">
+                                        <h5 class="text-sm font-medium text-gray-700 mb-3">Customer Service</h5>
+                                        <label class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                            <input type="checkbox" v-model="form.permissions.customer_service_dashboard" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50">
+                                            <span class="ml-3 text-sm font-medium text-gray-900">Customer Service Dashboard</span>
+                                        </label>
+                                    </div>
+
                                     <!-- Quick Actions for Sales -->
                                     <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
                                         <button @click="selectAllSalesPermissions" 
@@ -467,85 +578,126 @@
                                     </label>
                                     
                                     <!-- Warehouse Sub Permissions -->
-                                    <div class="space-y-4">
-                                        <!-- Delivery Order Processing -->
+                                    <div class="space-y-6">
+                                        <!-- Delivery Order Section -->
                                         <div class="border-l-0 md:border-l-4 border-yellow-200 pl-3 md:pl-4">
-                                            <h5 class="text-sm font-medium text-gray-700 mb-3">Delivery Order Processing</h5>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.prepare_delivery_order_single" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Prepare DO (Single)</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.prepare_delivery_order_multiple" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Prepare DO (Multiple)</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.print_delivery_order" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Print Delivery Order</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.amend_delivery_order" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Amend Delivery Order</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.cancel_delivery_order" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Cancel Delivery Order</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.print_do_proforma_invoice" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Print DO Proforma Invoice</span>
-                                                </label>
+                                            <h5 class="text-sm font-medium text-gray-700 mb-3">Delivery Order</h5>
+                                            
+                                            <div class="space-y-4">
+                                                <!-- DO Setup -->
+                                                <div class="pl-2">
+                                                    <h6 class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider">Setup</h6>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.define_vehicle_class" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Define Vehicle Class</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.define_vehicle" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Define Vehicle</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_vehicle" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">View & Print Vehicle</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_vehicle_class" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">View & Print Vehicle Class</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- DO Processing -->
+                                                <div class="pl-2 border-t border-gray-100 pt-2">
+                                                    <h6 class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider">DO Processing</h6>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.prepare_delivery_order_multiple" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Prepare DO (Multiple Item)</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.print_delivery_order" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Print Delivery Order</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.amend_delivery_order" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Amend Delivery Order</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.cancel_delivery_order" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Cancel Delivery Order</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <!-- DORN Processing -->
+                                        <!-- Invoice Section -->
                                         <div class="border-l-0 md:border-l-4 border-yellow-200 pl-3 md:pl-4">
-                                            <h5 class="text-sm font-medium text-gray-700 mb-3">DORN Processing</h5>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.issue_dorn" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Issue DORN</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.print_dorn" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Print DORN</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.amend_dorn" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Amend DORN</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.cancel_dorn" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Cancel DORN</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                            <h5 class="text-sm font-medium text-gray-700 mb-3">Invoice</h5>
+                                            
+                                            <div class="space-y-4">
+                                                <!-- Invoice Setup -->
+                                                <div class="pl-2">
+                                                    <h6 class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider">Setup</h6>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.define_tax_type" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Define Tax Type</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.define_tax_group" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Define Tax Group</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.define_customer_sales_tax_index" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Define Customer Sales Tax Index</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_tax_type" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">View & Print Tax Type</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_tax_group" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">View & Print Tax Group</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_customer_sales_tax_index" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">View & Print Customer Sales Tax Index</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
 
-                                        <!-- Invoice Processing -->
-                                        <div class="border-l-0 md:border-l-4 border-yellow-200 pl-3 md:pl-4">
-                                            <h5 class="text-sm font-medium text-gray-700 mb-3">Invoice Processing</h5>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.prepare_invoice_by_do_current_period" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Prepare Invoice (Current)</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.prepare_invoice_by_do_open_period" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Prepare Invoice (Open)</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.print_invoice" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Print Invoice</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.amend_invoice" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Amend Invoice</span>
-                                                </label>
-                                                <label class="flex items-center">
-                                                    <input type="checkbox" v-model="form.permissions.cancel_active_invoice" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
-                                                    <span class="ml-3 text-xs text-gray-700">Cancel Active Invoice</span>
-                                                </label>
+                                                <!-- IV Processing -->
+                                                <div class="pl-2 border-t border-gray-100 pt-2">
+                                                    <h6 class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider">IV Processing</h6>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.prepare_invoice_by_do_current_period" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Prepare Invoice by D/Order (Current Period)</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.prepare_invoice_by_do_open_period" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Prepare Invoice by D/Order (Open Period)</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.print_invoice" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Print Invoice</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.amend_invoice" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Amend Invoice</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.cancel_active_invoice" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">Cancel Active Invoice</span>
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" v-model="form.permissions.view_print_invoice_log" class="rounded border-gray-300 text-yellow-600 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:ring-opacity-50">
+                                                            <span class="ml-3 text-xs text-gray-700">View & Print Invoice Log</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -659,9 +811,9 @@ export default {
                     'amend_user_password': false,
                     'define_user_access_permission': false,
                     'copy_paste_user_access_permission': false,
+                    'reactive_unobsolete_user': false,
                     'view_print_user': false,
-                    'sales_management': false,
-                    'define_sales_configuration': false,
+                    // Standard Requirement
                     'define_sales_team': false,
                     'define_salesperson': false,
                     'define_salesperson_team': false,
@@ -672,17 +824,22 @@ export default {
                     'define_product_design': false,
                     'define_scoring_tool': false,
                     'define_paper_quality': false,
+                    'obsolete_unobsolete_paper_quality': false,
                     'define_paper_flute': false,
                     'define_paper_size': false,
                     'define_color_group': false,
                     'define_color': false,
                     'define_finishing': false,
+                    'define_analysis_code': false,
                     'define_stitch_wire': false,
                     'define_chemical_coat': false,
                     'define_reinforcement_tape': false,
                     'define_bundling_string': false,
                     'define_wrapping_material': false,
                     'define_glueing_material': false,
+                    'define_machine': false,
+                    
+                    // View & Print Standard Requirement
                     'view_print_sales_team': false,
                     'view_print_salesperson': false,
                     'view_print_salesperson_team': false,
@@ -697,6 +854,7 @@ export default {
                     'view_print_scoring_tool': false,
                     'view_print_color_group': false,
                     'view_print_color': false,
+                    'view_print_analysis_code': false,
                     'view_print_finishing': false,
                     'view_print_stitch_wire': false,
                     'view_print_chemical_coat': false,
@@ -775,22 +933,14 @@ export default {
                     'reconcile_do_unapplied_fg': false,
                     'view_print_do_log': false,
                     'view_print_do_unapplied_fg': false,
-                    'customer_so_delivery_obsolete': false,
-                    'sales_order_delivery_schedule': false,
-                    'issue_dorn': false,
-                    'print_dorn': false,
-                    'amend_dorn': false,
-                    'cancel_dorn': false,
-                    'view_print_dorn_log': false,
-                    'activate_manual_configuration': false,
-                    'register_manual_numbers': false,
-                    'view_print_registered_manual_numbers_log': false,
+                    // Invoice Setup
                     'define_tax_type': false,
                     'define_tax_group': false,
                     'define_customer_sales_tax_index': false,
                     'view_print_tax_type': false,
                     'view_print_tax_group': false,
                     'view_print_customer_sales_tax_index': false,
+                    // Invoice Processing
                     'prepare_invoice_by_do_current_period': false,
                     'prepare_invoice_by_do_open_period': false,
                     'print_invoice': false,
